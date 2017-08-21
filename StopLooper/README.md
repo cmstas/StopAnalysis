@@ -1,0 +1,26 @@
+# New Stop Baby Looper
+
+## Dependency
+* First do `make` in directory `StopAnalysis/StopBabyMaker/stop_variables/` the `StopCORE` needs it.
+* A link to the SNT `CORE` dir is required to be under the `StopAnalysis` folder.
+* The new looper framework might still depends on other `StopCORE` modules being compiled/compilable, 
+  please make sure that the `Makefile` in `StopBabyMaker/stop_variables/` and `StopCORE` has the correct dependencies.
+  
+## To Run
+All the following are based on the directory `StopAnalysis/StopLooper`
+### Simple start
+``` bash
+    . do.sh
+```
+### Signal/Control Region definition
+The signal and control region are defined in the file `StopSelections.cc`, making use of the `SR` class.
+
+### Control the plots for SR and CR
+The plots to be made for each SR and CR are defined in the function `StopLooper::fillHistosForSR()`. 
+Additional plots of interest can be added anywhere in the looper 
+
+
+## TODO
+* To fill TODO section with more TODOs
+* To finish the TODOs listed here as much as possible
+* Get rid of the `dummy.root` (find a way to prevent hists from being destroyed after file close)
