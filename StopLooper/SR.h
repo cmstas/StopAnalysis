@@ -16,7 +16,7 @@ class SR {
 
 public:
 
-  SR() : yield_(0) {}
+  SR() : yield_(0), kAllowDummyVars_(0) {}
   SR(std::string name) : yield_(0), srname_(name) {}
   SR(const SR& sr) = default;
 
@@ -24,7 +24,7 @@ public:
 
   void SetName(std::string sr_name);
   void SetVar(std::string var_name, float lower_bound, float upper_bound);
-  void CheckNumOfVarsMatch(bool val);
+  void SetAllowDummyVars(int val);
 
   std::string GetName() const;
   unsigned int GetYield() const;
@@ -46,17 +46,18 @@ private:
   std::string srname_;
   std::map<std::string,std::pair<float,float>> bins_;
   std::vector<std::string> defaultplots_;
-  bool kAllowDummyVars_;
+  int kAllowDummyVars_;
 
 };
 
+
+// Helper Class & Functions
 
 struct SRptrSet {
   std::vector<float> bins;
   std::vector<std::set<SR*>> sets;
 };
 
-// Helper Functions
 std::map<std::string,SRptrSet> generateSRptrSet(const std::vector<SR*>& SRptrVec);
 
 std::vector<SR*> findSatisfiedSRset(const std::map<std::string,float>& vars, const std::map<std::string,SRptrSet>& setsMap);
