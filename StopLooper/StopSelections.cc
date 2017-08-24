@@ -70,7 +70,7 @@ std::vector<SR> getStopControlRegionsDilepton() {
   crbase.SetVar("nbjet", 0, fInf);
   crbase.SetVar("dphijmet", 0, 3.14);
   crbase.SetVar("nlep", 2, 3);
-  crbase.SetAllowDummyVars(0);
+  crbase.SetAllowDummyVars(1);
 
   crbase.SetName("cr2l_test");   // test
   CRvec.emplace_back(crbase);
@@ -86,49 +86,58 @@ std::vector<SR> getStopControlRegionsDilepton() {
   SR cr;
 
   cr = crbase;
-  cr.SetName("cr2l_2to3j_tmod10_mlb175toInf_met250to450");
+  cr.SetName("cr2lB1");
+  cr.SetDetailName("2to3j_tmod10toInf_mlb175toInf_met250to450");
   cr.SetVar("njet", 2, 3);
   cr.SetVar("tmod", 10, -1);
   cr.SetVar("mlb", 175, -1);
   cr.SetVar("met", 250, 450);
   CRvec.emplace_back(cr);
 
-  cr.SetName("cr2l_2to3j_tmod10toInf_mlb175toInf_met450to600");
+  cr.SetName("cr2lB2");
+  cr.SetDetailName("2to3j_tmod10toInf_mlb175toInf_met450to600");
   cr.SetVar("met", 450, 600);
   CRvec.emplace_back(cr);
 
-  cr.SetName("cr2l_2to3j_tmod10toInf_mlb175toInf_met600toInf");
+  cr.SetName("cr2lB3");
+  cr.SetDetailName("2to3j_tmod10toInf_mlb175toInf_met600toInf");
   cr.SetVar("met", 600, -1);
   CRvec.emplace_back(cr);
 
 
-  cr.SetName("cr2l_4j_tmod10toInf_mlb175toInf_met250to450");
+  cr.SetName("cr2lH1");
+  cr.SetDetailName("geq4j_tmod10toInf_mlb175toInf_met250to450");
   cr.SetVar("njet", 4, -1);
   cr.SetVar("met", 250, 450);
   CRvec.emplace_back(cr);
 
-  cr.SetName("cr2l_4j_tmod10toInf_mlb175toInf_met450toInf");
+  cr.SetName("cr2lH2");
+  cr.SetDetailName("geq4j_tmod10toInf_mlb175toInf_met450toInf");
   cr.SetVar("met", 450, -1);
   CRvec.emplace_back(cr);
 
 
-  cr.SetName("cr2l_4j_tmod0to10_mlb0to175_met350to550");
+  cr.SetName("cr2lE1");
+  cr.SetDetailName("geq4j_tmod0to10_mlb0to175_met350to550");
   cr.SetVar("tmod", 0, 10);
   cr.SetVar("mlb", 0, 175);
   cr.SetVar("met", 350, 550);
   CRvec.emplace_back(cr);
 
-  cr.SetName("cr2l_4j_tmod0to10_mlb0to175_met550toInf");
+  cr.SetName("cr2lE2");
+  cr.SetDetailName("geq4j_tmod0to10_mlb0to175_met550toInf");
   cr.SetVar("met", 550, -1);
   CRvec.emplace_back(cr);
 
 
-  cr.SetName("cr2l_4j_tmod0to10_mlb175toInf_met250to450");
+  cr.SetName("cr2lF1");
+  cr.SetDetailName("geq4j_tmod0to10_mlb175toInf_met250to450");
   cr.SetVar("mlb", 175, -1);
   cr.SetVar("met", 250, 450);
   CRvec.emplace_back(cr);
 
-  cr.SetName("cr2l_4j_tmod0to10_mlb175toInf_met450toInf");
+  cr.SetName("cr2lF2");
+  cr.SetDetailName("geq4j_tmod0to10_mlb175toInf_met450toInf");
   cr.SetVar("met", 450, -1);
   CRvec.emplace_back(cr);
 
@@ -186,15 +195,18 @@ std::vector<SR> getStopControlRegionsEMu() {
   crbase.SetAllowDummyVars(1);
 
   SR cr = crbase;
-  cr.SetName("cremu_0b_met50toInf");
+  cr.SetName("cremu1");
+  cr.SetDetailName("geq0b_met50toInf");
   crbase.SetVar("nbjet", 0, fInf);
   CRvec.emplace_back(cr);
 
-  cr.SetName("cremu_1b_met50toInf");
+  cr.SetName("cremu2");
+  cr.SetDetailName("geq1b_met50toInf");
   crbase.SetVar("nbjet", 1, fInf);
   CRvec.emplace_back(cr);
 
-  cr.SetName("cremu_2b_met50toInf");
+  cr.SetName("cremu3");
+  cr.SetDetailName("geq2b_met50toInf");
   crbase.SetVar("nbjet", 2, fInf);
   CRvec.emplace_back(cr);
 

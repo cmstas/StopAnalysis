@@ -266,7 +266,7 @@ void StopLooper::looper(TChain* chain, string sample, string output_dir) {
       values_["dphijmet_rl"]= mindphi_met_j1_j2_rl();
       values_["tmod_rl"] = topnessMod_rl();
 
-      // fillHistosForCR2l();
+      fillHistosForCR2l();
 
       fillHistosForCRemu();
 
@@ -342,7 +342,7 @@ void StopLooper::fillHistosForCRemu(string suf) {
   values_["lep2eta"] = lep2_p4().eta();
 
   for (auto& cr : CRemuVec) {
-    if (cr.PassesSelection(values_)) {
+    if ( cr.PassesSelection(values_) ) {
 
       auto fillhists = [&] (string s) {
         plot1D("h_mt"+suf+s,       values_["mt"]      , evtweight_, cr.histMap, ";MT [GeV]"             , 12,  0, 600);
@@ -392,23 +392,23 @@ void StopLooper::fillHistosForCR2l(string suf) {
 
   for (auto& cr : CR2lVec) {
     if ( cr.PassesSelection(values_) ) {
-      // This plot function port from MT2 demonstrate the simpleness of adding extra plots anywhere in the code
-      // and this functionality is great for quick checks
       // if (cr.GetName() != "cr2l_test" && cr.GetName() != "cr2l_base")
       //   cout << __LINE__ << ": Passes Selections! " << suf << endl;
 
-      plot1D("h_MET"+suf, pfmet_rl(), evtweight_, cr.histMap, ";E_{T}^{miss} [GeV]", 150, 0, 1500);
+      // plot1D("h_finemet"+suf, pfmet_rl(), evtweight_, cr.histMap, ";E_{T}^{miss} [GeV]", 150, 0, 1500);
 
-      plot1D("h_met"+suf,      values_["met_rl"]   , evtweight_, cr.histMap, ";E_{T}^{miss} [GeV]"   , 24,  50, 650);
-      plot1D("h_mt"+suf,       values_["mt_rl"]    , evtweight_, cr.histMap, ";MT"                   , 12,  0, 600);
-      plot1D("h_mt2w"+suf,     values_["mt2w_rl"]  , evtweight_, cr.histMap, ";MT2W"                 , 18,  50, 500);
-      plot1D("h_tmod"+suf,     values_["tmod"]     , evtweight_, cr.histMap, ";t_{mod}"              , 20, -5, 15);
-      plot1D("h_njets"+suf,    values_["njets"]    , evtweight_, cr.histMap, ";njets"                , 12,  0, 12);
-      plot1D("h_nbjets"+suf,   values_["nbjets"]   , evtweight_, cr.histMap, ";nbjets"               , 6,   0, 6);
-      plot1D("h_mlepb"+suf,    values_["mlepb"]    , evtweight_, cr.histMap, ";M(l,b)"               , 24,  0, 600);
-      plot1D("h_dphijmet"+suf, values_["dphijmet"] , evtweight_, cr.histMap, ";#Delta #phi (j, met)" , 24,  0, 4);
+      plot1D("h_met"+suf,       values_["met_rl"]   , evtweight_, cr.histMap, ";E_{T}^{miss} [GeV]"   , 24,  50, 650);
+      plot1D("h_mt"+suf,        values_["mt_rl"]    , evtweight_, cr.histMap, ";MT"                   , 12,  0, 600);
+      plot1D("h_mt2w"+suf,      values_["mt2w_rl"]  , evtweight_, cr.histMap, ";MT2W"                 , 18,  50, 500);
+      plot1D("h_tmod"+suf,      values_["tmod"]     , evtweight_, cr.histMap, ";t_{mod}"              , 20, -5, 15);
+      plot1D("h_njets"+suf,     values_["njets"]    , evtweight_, cr.histMap, ";njets"                , 12,  0, 12);
+      plot1D("h_nbjets"+suf,    values_["nbjets"]   , evtweight_, cr.histMap, ";nbjets"               , 6,   0, 6);
+      plot1D("h_nleps"+suf,     values_["nlep"]     , evtweight_, cr.histMap, ";njets"                , 12,  0, 12);
+      plot1D("h_lep1pt"+suf,    values_["lep1pt"]   , evtweight_, cr.histMap, ";p_{T}(lep1) [GeV]"    , 20,  0, 200);
+      plot1D("h_lep1eta"+suf,   values_["lep1eta"]  , evtweight_, cr.histMap, ";#eta (lep1)"          , 20, -5, 5);
+      plot1D("h_mlepb"+suf,     values_["mlb"]      , evtweight_, cr.histMap, ";M(l,b)"               , 24,  0, 600);
+      plot1D("h_dphijmet"+suf,  values_["dphijmet"] , evtweight_, cr.histMap, ";#Delta #phi (j, met)" , 24,  0, 4);
 
-      plot1D("h_nleps"+suf,  values_["nlep"]   , evtweight_, cr.histMap, ";njets"                , 12,  0, 12);
       // plot1D("h_mlb"+suf,       Mlb_closestb() , evtweight_, cr.histMap, ";M(l,b)"               , 24,  0, 600);
 
 
