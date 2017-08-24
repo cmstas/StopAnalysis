@@ -326,12 +326,12 @@ void StopLooper::fillHistosForCRemu(string suf) {
   if ( !(lep1_pdgid() * lep2_pdgid() == -143) ) return;
 
   // Basic cuts that are not supposed to change frequently
-  if ( lep1_p4().pt() < 30 || fabs(lep1_p4().eta()) < 2.1 ||
+  if ( lep1_p4().pt() < 30 || fabs(lep1_p4().eta()) > 2.1 ||
        (abs(lep1_pdgid()) == 13 && !lep1_passTightID()) ||
        (abs(lep1_pdgid()) == 11 && !lep1_passMediumID()) ||
        lep1_MiniIso() > 0.1 ) return;
 
-  if ( lep2_p4().pt() < 15 || fabs(lep2_p4().eta()) < 2.1 ||
+  if ( lep2_p4().pt() < 15 || fabs(lep2_p4().eta()) > 2.1 ||
        (abs(lep2_pdgid()) == 13 && !lep2_passTightID()) ||
        (abs(lep2_pdgid()) == 11 && !lep2_passMediumID()) ||
        lep2_MiniIso() > 0.1 ) return;
