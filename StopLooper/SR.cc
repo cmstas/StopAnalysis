@@ -12,6 +12,10 @@ void SR::SetName(string sr_name) {
   srname_ = sr_name;
 }
 
+void SR::SetDetailName(string detail_name) {
+  detailname_ = detail_name;
+}
+
 void SR::SetVar(string var_name, float lower_bound, float upper_bound) {
   bins_[var_name] = pair<float,float>(lower_bound, upper_bound);
 }
@@ -22,6 +26,10 @@ void SR::SetAllowDummyVars(int val) {
 
 string SR::GetName() const {
   return srname_;
+}
+
+string SR::GetDetailName() const {
+  return detailname_;
 }
 
 unsigned int SR::GetYield() const {
