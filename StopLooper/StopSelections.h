@@ -9,5 +9,6 @@ std::vector<SR> getStopSignalRegions();
 std::vector<SR> getStopControlRegions();
 std::vector<SR> getStopControlRegionsDilepton();
 std::vector<SR> getStopControlRegionsNoBTags();
+std::vector<SR> getStopControlRegionsEMu();
 
 #endif // STOPNALREGIONSMT2HIGGS_H

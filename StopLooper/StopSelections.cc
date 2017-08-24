@@ -59,62 +59,31 @@ std::vector<SR> getStopSignalRegions() {
   return SRvec;
 }
 
-std::vector<SR> getStopControlRegionsNoBTags() {
-  SR base;
-
-  SR crbase;
-  crbase.SetVar("mt", 50, -1);
-  crbase.SetVar("met", 50, -1);
-  crbase.SetVar("mt2w", 100, -1);
-  crbase.SetVar("mlb", 0, -1);
-  crbase.SetVar("tmod", 0, 2);
-  crbase.SetVar("nlep", 1, 2);
-  crbase.SetVar("njet", 2, -1);
-  crbase.SetVar("nbjet", 0, -1);
-  crbase.SetVar("dphijmet", 0.8, 3.14);
-  crbase.SetVar("ntightb", 0, -1);
-  // crbase.CheckNumOfVarsMatch(true);
-
-  SR cr;
+std::vector<SR> getStopControlRegionsDilepton() {
   std::vector<SR> CRvec;
 
-  // CR 0b
-  crbase.SetName("cr0b");
-  crbase.SetVar("nbjet", 0, 1);
-
-  cr = crbase;
-  cr.SetName(crbase.GetName()+"_base");
-  CRvec.emplace_back(cr);
-
-  cr = crbase;
-  cr.SetName(crbase.GetName()+"_4jets_highmlb_lowdm");
-  CRvec.emplace_back(cr);
-
-  cr.SetName(crbase.GetName()+"_4jets_highmlb_meddm");
-  CRvec.emplace_back(cr);
-
-  cr.SetName(crbase.GetName()+"_4jets_highmlb_highdm");
-  crbase.SetVar("ntightb", 0, 1);
-  CRvec.emplace_back(cr);
-
-  return CRvec;
-}
-
-std::vector<SR> getStopControlRegionsDilepton() {
-  SR base;
-
   SR crbase;
-  crbase.SetVar("mt", 150, -1);
-  crbase.SetVar("mt2w", 100, -1);
+
+  crbase.SetVar("met", 0, -1);
+  crbase.SetVar("tmod", -fInf, fInf);
+  crbase.SetVar("njet", 2, fInf);
+  crbase.SetVar("nbjet", 0, fInf);
+  crbase.SetVar("dphijmet", 0, 3.14);
   crbase.SetVar("nlep", 2, 3);
-  crbase.SetVar("isdilep", 1, 2);
+  crbase.SetAllowDummyVars(0);
+
+  crbase.SetName("cr2l_test");   // test
+  CRvec.emplace_back(crbase);
+
+  crbase.SetName("cr2l_base");   // test
+  crbase.SetVar("mt", 100, -1);
+  crbase.SetVar("mt2w", 100, -1);
+  crbase.SetVar("nlep", 1, 3);
   crbase.SetVar("nbjet", 1, -1);
   crbase.SetVar("dphijmet", 0.8, 3.14);
-  crbase.SetVar("ntightb", 0, -1);
-  // crbase.CheckNumOfVarsMatch(true);
+  CRvec.emplace_back(crbase);
 
   SR cr;
-  std::vector<SR> CRvec;
 
   cr = crbase;
   cr.SetName("cr2l_2to3j_tmod10_mlb175toInf_met250to450");
@@ -163,6 +132,71 @@ std::vector<SR> getStopControlRegionsDilepton() {
   cr.SetVar("met", 450, -1);
   CRvec.emplace_back(cr);
 
+  return CRvec;
+}
+
+std::vector<SR> getStopControlRegionsNoBTags() {
+  SR base;
+
+  SR crbase;
+  crbase.SetVar("mt", 50, -1);
+  crbase.SetVar("met", 50, -1);
+  crbase.SetVar("mt2w", 100, -1);
+  crbase.SetVar("mlb", 0, -1);
+  crbase.SetVar("tmod", 0, 2);
+  crbase.SetVar("nlep", 1, 2);
+  crbase.SetVar("njet", 2, -1);
+  crbase.SetVar("nbjet", 0, -1);
+  crbase.SetVar("dphijmet", 0, 3.14);
+  // crbase.SetVar("ntightb", 0, -1);
+
+  SR cr;
+  std::vector<SR> CRvec;
+
+  // CR 0b
+  crbase.SetName("cr0b");
+  crbase.SetVar("nbjet", 0, 1);
+
+  cr = crbase;
+  cr.SetName(crbase.GetName()+"_base");
+  CRvec.emplace_back(cr);
+
+  cr = crbase;
+  cr.SetName(crbase.GetName()+"_4jets_highmlb_lowdm");
+  CRvec.emplace_back(cr);
+
+  cr.SetName(crbase.GetName()+"_4jets_highmlb_meddm");
+  CRvec.emplace_back(cr);
+
+  cr.SetName(crbase.GetName()+"_4jets_highmlb_highdm");
+  crbase.SetVar("ntightb", 0, 1);
+  CRvec.emplace_back(cr);
+
+  return CRvec;
+}
+
+std::vector<SR> getStopControlRegionsEMu() {
+  std::vector<SR> CRvec;
+
+  SR crbase;
+
+  crbase.SetName("cremu_base");
+  crbase.SetVar("met", 50, fInf);
+  crbase.SetVar("njet", 2, fInf);
+  crbase.SetAllowDummyVars(1);
+
+  SR cr = crbase;
+  cr.SetName("cremu_0b_met50toInf");
+  crbase.SetVar("nbjet", 0, fInf);
+  CRvec.emplace_back(cr);
+
+  cr.SetName("cremu_1b_met50toInf");
+  crbase.SetVar("nbjet", 1, fInf);
+  CRvec.emplace_back(cr);
+
+  cr.SetName("cremu_2b_met50toInf");
+  crbase.SetVar("nbjet", 2, fInf);
+  CRvec.emplace_back(cr);
 
   return CRvec;
 }

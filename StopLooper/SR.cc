@@ -16,7 +16,7 @@ void SR::SetVar(string var_name, float lower_bound, float upper_bound) {
   bins_[var_name] = pair<float,float>(lower_bound, upper_bound);
 }
 
-void SR::CheckNumOfVarsMatch(bool val) {
+void SR::SetAllowDummyVars(int val) {
   kAllowDummyVars_ = val;
 }
 
@@ -50,17 +50,26 @@ vector<string> SR::GetListOfVariables() const {
 
 bool SR::PassesSelection(map<string, float> values) {
   float ep = 0.000001;
-  if ((kAllowDummyVars_)? GetNumberOfVariables() < values.size() : GetNumberOfVariables() != values.size()) {
+  if ((kAllowDummyVars_ == 0 && GetNumberOfVariables() != values.size()) ||
+      (kAllowDummyVars_ == 1 && GetNumberOfVariables()  > values.size())) {
     cout << "Number of variables to cut on != number of variables in signal region. Passed " << values.size() << ", expected " << GetNumberOfVariables() << endl;
     throw invalid_argument(srname_ + ": Number of variables to cut on != number of variables in signal region");
   }
   for (auto it = bins_.begin(); it != bins_.end(); it++) {
-    if(values.find(it->first) != values.end()) { //check that we actually have bounds set for this variable
+    if (values.find(it->first) != values.end()) { //check that we actually have bounds set for this variable
       float value = values[it->first];
       float cut_lower = (it->second).first;
       float cut_upper = (it->second).second;
       if (value < cut_lower) return false;
       if (( abs(cut_upper + 1.0) > ep ) && (value >= cut_upper)) return false;
+      // if (value < cut_lower && it->first != "met") {
+      //   cout << __LINE__ <<": var " << it->first << ": value= " << value << ", cut_lower= " << cut_lower << ": cr: " << srname_ << endl;
+      //   return false;
+      // }
+      // if (( abs(cut_upper + 1.0) > ep ) && (value >= cut_upper)) {
+      //   cout << __LINE__ <<": var " << it->first << ": value= " << value << ", cut_upper= " << cut_upper << ": cr: " << srname_ << endl;
+      //   return false;
+      // }
     }
     else if (!kAllowDummyVars_) {
       throw invalid_argument("Cut variable " + it->first + " not found in values");

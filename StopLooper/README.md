@@ -2,7 +2,7 @@
 
 ## Dependency
 * First do `make` in directory `StopAnalysis/StopBabyMaker/stop_variables/` the `StopCORE` needs it.
-* A link to the SNT `CORE` dir is required to be under the `StopAnalysis` folder.
+* A link to the SNT `CORE` dir is required to be under the `StopAnalysis` folder, make sure that the CORE is compiled in the `cms4` branch.
 * The new looper framework might still depends on other `StopCORE` modules being compiled/compilable, 
   please make sure that the `Makefile` in `StopBabyMaker/stop_variables/` and `StopCORE` has the correct dependencies.
   
@@ -10,8 +10,9 @@
 All the following are based on the directory `StopAnalysis/StopLooper`
 ### Simple start
 ``` bash
-    . do.sh
+. do.sh
 ```
+
 ### Signal/Control Region definition
 The signal and control region are defined in the file `StopSelections.cc`, making use of the `SR` class.
 
