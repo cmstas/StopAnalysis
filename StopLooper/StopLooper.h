@@ -15,22 +15,31 @@ public:
 
   void looper(TChain* chain, std::string sample, std::string outputdir);
 
-  std::vector<SR*> FindSR(std::map<std::string,float>& values);
-  void fillHistosForSR(std::map<std::string,float>& values, std::string suffix = "");
-  void fillHistosForCR2l(std::map<std::string,float>& values, std::string suffix = "");
-  void fillHistosForCR0b(std::map<std::string,float>& values, std::string suffix = "");
+  void fillHistosForSR(std::string suffix = "");
+  void fillHistosForCR2l(std::string suffix = "");
+  void fillHistosForCR0b(std::string suffix = "");
+  void fillHistosForCRemu(std::string suffix = "");
 
-  void newFillHistosForCR(std::map<std::string,float>& values, std::string suffix = "");
+  // Under development
+  std::vector<SR*> FindSR(std::map<std::string,float>& values);
+  void newFillHistosForCR(std::string suffix = "");
 
 protected:
   std::vector<SR> SRVec;
   std::vector<SR> CR2lVec;
   std::vector<SR> CR0bVec;
+  std::vector<SR> CRemuVec;
+
+  // Under development
   std::map<std::string,SRptrSet> allSRptrSets;
 
 private:
+  // Global variable
   TFile* outfile_;
+
+  // Event specific variables
   float evtweight_;
+  std::map<std::string,float> values_;
 
 };
 
