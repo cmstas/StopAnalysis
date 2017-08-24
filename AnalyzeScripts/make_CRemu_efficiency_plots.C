@@ -14,7 +14,7 @@ void compare_CRemu_efficiency_plots() {
   auto ofile = new TFile("plots/HLT_MuE_data_compare.root", "RECREATE");
 
   vector<TString> Dirs = {"cremu_0b_met50toInf", "cremu_1b_met50toInf", "cremu_2b_met50toInf"};
-  vector<TString> Hists = {"h_lep1ptbins", "h_njets", "h_nbjets"};
+  vector<TString> Hists = {"h_lep1ptbins", "h_lep2ptbins", "h_njets", "h_nbjets"};
   TString hltsuf = "_passHLT";
 
   auto c1 = new TCanvas("c1", "c1", 600, 400);
