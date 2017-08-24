@@ -10,7 +10,8 @@ LOGDIR=logs
 mkdir -p ${OUTDIR}
 mkdir -p ${LOGDIR}
 
-declare -a Samples=(data_singlemu)
+# declare -a Samples=(data_singlemu)
+declare -a Samples=(data_singlemu data_singleel data_met data_jetht)
 
 for SAMPLE in ${Samples[@]}; do
     echo ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
@@ -28,7 +29,8 @@ OUTDIR=output/data2016
 mkdir -p ${OUTDIR}
 mkdir -p ${LOGDIR}
 
-declare -a Samples=(data_single_muon)
+# declare -a Samples=(data_single_muon)
+declare -a Samples=(data_single_muon data_single_electron data_met data_double_eg data_double_mu)
 
 for SAMPLE in ${Samples[@]}; do
     echo ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
