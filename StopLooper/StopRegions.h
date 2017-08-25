@@ -1,5 +1,5 @@
-#ifndef STOPNALREGIONSMT2HIGGS_H
-#define STOPNALREGIONSMT2HIGGS_H
+#ifndef STOPREGIONS_H
+#define STOPREGIONS_H
 
 #include <string>
 #include "TTree.h"
@@ -11,4 +11,4 @@ std::vector<SR> getStopControlRegionsDilepton();
 std::vector<SR> getStopControlRegionsNoBTags();
 std::vector<SR> getStopControlRegionsEMu();
 
-#endif // STOPNALREGIONSMT2HIGGS_H
+#endif // STOPREGIONS_H
