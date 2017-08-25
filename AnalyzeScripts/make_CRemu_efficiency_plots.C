@@ -7,13 +7,13 @@
 using namespace std;
 
 void compare_CRemu_efficiency_plots() {
-  
+
   auto ifile_new = new TFile("../StopLooper/output/temp/all_data_Run2017.root");
   auto ifile_old = new TFile("../StopLooper/output/data2016/all_data_Run2016.root");
 
   auto ofile = new TFile("plots/HLT_MuE_data_compare.root", "RECREATE");
 
-  vector<TString> Dirs = {"cremu_0b_met50toInf", "cremu_1b_met50toInf", "cremu_2b_met50toInf"};
+  vector<TString> Dirs = {"cremu1", "cremu2", "cremu3"};
   vector<TString> Hists = {"h_lep1ptbins", "h_lep2ptbins", "h_njets", "h_nbjets"};
   TString hltsuf = "_passHLT";
 
@@ -41,7 +41,7 @@ void compare_CRemu_efficiency_plots() {
   lumi.SetNDC();
   lumi.SetTextAlign(31);
   lumi.SetTextFont(42);
-  lumi.SetTextSize(0.052);    
+  lumi.SetTextSize(0.052);
 
   for (auto dirstr : Dirs) {
     for (auto hstr : Hists) {
@@ -50,7 +50,7 @@ void compare_CRemu_efficiency_plots() {
       if (!hden) { cout << "Can't find " << dirstr+"/"+hstr << endl; continue; }
       auto hnum = (TH1F*) ifile_new->Get(dirstr+"/"+hstr+hltsuf);
       if (!hnum) { cout << "Can't find " << dirstr+"/"+hstr+hltsuf << endl; continue; }
-      
+
       auto heff_new = (TH1F*) hnum->Clone(hstr+"_eff");
       heff_new->Divide(hnum, hden, 1, 1, "B");
 
@@ -99,7 +99,7 @@ void compare_CRemu_efficiency_plots() {
 }
 
 void make_CRemu_efficiency_plots(TString ifdir = "../StopLooper/output/temp/", TString ifname = "all_data_Run2017.root") {
-  
+
   compare_CRemu_efficiency_plots();
   return;
 
@@ -135,7 +135,7 @@ void make_CRemu_efficiency_plots(TString ifdir = "../StopLooper/output/temp/", T
   lumi.SetNDC();
   lumi.SetTextAlign(31);
   lumi.SetTextFont(42);
-  lumi.SetTextSize(0.052);    
+  lumi.SetTextSize(0.052);
 
   for (auto dirstr : Dirs) {
     for (auto hstr : Hists) {
@@ -143,7 +143,7 @@ void make_CRemu_efficiency_plots(TString ifdir = "../StopLooper/output/temp/", T
       if (!hden) { cout << "Can't find " << dirstr+"/"+hstr << endl; continue; }
       auto hnum = (TH1F*) ifile->Get(dirstr+"/"+hstr+hltsuf);
       if (!hnum) { cout << "Can't find " << dirstr+"/"+hstr+hltsuf << endl; continue; }
-      
+
       auto heff = (TH1F*) hnum->Clone(hstr+"_eff");
       heff->Divide(hnum, hden, 1, 1, "B");
 
