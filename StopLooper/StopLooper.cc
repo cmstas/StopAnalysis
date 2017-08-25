@@ -90,7 +90,7 @@ void StopLooper::SetSignalRegions() {
       cout << it-CR2lVec.begin() << "  "<< it->GetName() << endl;
   }
 
-  auto createRangesHists = [&] (auto& srvec) {
+  auto createRangesHists = [&] (vector<SR>& srvec) {
     for (auto& sr : srvec) {
       vector<string> vars = sr.GetListOfVariables();
       TDirectory * dir = (TDirectory*) outfile_->Get((sr.GetName() + "/ranges").c_str());
@@ -105,7 +105,6 @@ void StopLooper::SetSignalRegions() {
 
   // createRangesHists(SRVec);
   // createRangesHists(CR0bVec);
-
   createRangesHists(CR2lVec);
   createRangesHists(CRemuVec);
 
@@ -117,7 +116,7 @@ void StopLooper::GenerateAllSRptrSets() {
 
   vector<SR*> all_SRptrs;
   // all_SRptrs.reserve(SRVec.size() + CRVec.size());
-  for (auto& sr : SRVec) all_SRptrs.push_back(&sr);
+  for (auto& sr : SRVec)   all_SRptrs.push_back(&sr);
   for (auto& cr : CR2lVec) all_SRptrs.push_back(&cr);
   for (auto& cr : CR0bVec) all_SRptrs.push_back(&cr);
 
@@ -292,25 +291,22 @@ void StopLooper::looper(TChain* chain, string sample, string output_dir) {
 
   outfile_->cd();
 
-  for (auto& cr : CR2lVec) {
-    TDirectory * dir = (TDirectory*) outfile_->Get(cr.GetName().c_str());
-    if (dir == 0) dir = outfile_->mkdir(cr.GetName().c_str()); // shouldn't happen
-    dir->cd();
-    for (auto& h : cr.histMap) {
-      if (h.first.find("HI") != string::npos || h.first.find("LOW") != string::npos) continue;
-      h.second->Write();
+  auto writeHistsToFile = [&] (vector<SR>& srvec) {
+    for (auto& sr : srvec) {
+      TDirectory * dir = (TDirectory*) outfile_->Get(sr.GetName().c_str());
+      if (dir == 0) dir = outfile_->mkdir(sr.GetName().c_str()); // shouldn't happen
+      dir->cd();
+      for (auto& h : sr.histMap) {
+        if (h.first.find("HI") != string::npos || h.first.find("LOW") != string::npos) continue;
+        h.second->Write();
+      }
     }
-  }
+  };
 
-  for (auto& cr : CRemuVec) {
-    TDirectory * dir = (TDirectory*) outfile_->Get(cr.GetName().c_str());
-    if (dir == 0) dir = outfile_->mkdir(cr.GetName().c_str()); // shouldn't happen
-    dir->cd();
-    for (auto& h : cr.histMap) {
-      if (h.first.find("HI") != string::npos || h.first.find("LOW") != string::npos) continue;
-      h.second->Write();
-    }
-  }
+  writeHistsToFile(SRVec);
+  writeHistsToFile(CR0bVec);
+  writeHistsToFile(CR2lVec);
+  writeHistsToFile(CRemuVec);
 
   outfile_->Write();
   outfile_->Close();
@@ -411,13 +407,13 @@ void StopLooper::fillHistosForCR2l(string suf) {
       plot1D("h_mt"+suf,       values_["mt"]          , evtweight_, cr.histMap, ";MT"                   , 12,  0, 600);
       plot1D("h_rlmt"+suf,     values_["mt_rl"]       , evtweight_, cr.histMap, ";MT (rl)"              , 12,  0, 600);
       plot1D("h_mt2w"+suf,     values_["mt2w_rl"]     , evtweight_, cr.histMap, ";MT2W"                 , 18,  50, 500);
-      plot1D("h_tmod"+suf,     values_["tmod_rl"]     , evtweight_, cr.histMap, ";t_{mod}"              , 20, -5, 15);
+      plot1D("h_tmod"+suf,     values_["tmod_rl"]     , evtweight_, cr.histMap, ";modified topness"     , 20, -5, 15);
       plot1D("h_njets"+suf,    values_["njet"]        , evtweight_, cr.histMap, ";njets"                , 12,  0, 12);
       plot1D("h_nbjets"+suf,   values_["nbjet"]       , evtweight_, cr.histMap, ";nbjets"               , 6,   0, 6);
       plot1D("h_nleps"+suf,    values_["nlep"]        , evtweight_, cr.histMap, ";nleps"                ,  5,  0, 5);
       plot1D("h_lep1pt"+suf,   values_["lep1pt"]      , evtweight_, cr.histMap, ";p_{T}(lep1) [GeV]"    , 20,  0, 200);
       plot1D("h_lep1eta"+suf,  values_["lep1eta"]     , evtweight_, cr.histMap, ";#eta (lep1)"          , 20, -5, 5);
-      plot1D("h_mlepb"+suf,    values_["mlb"]         , evtweight_, cr.histMap, ";M(l,b)"               , 24,  0, 600);
+      plot1D("h_mlepb"+suf,    values_["mlb"]         , evtweight_, cr.histMap, ";M(l,b) [GeV]"         , 24,  0, 600);
       plot1D("h_dphijmet"+suf, values_["dphijmet_rl"] , evtweight_, cr.histMap, ";#Delta #phi (j, met)" , 24,  0, 4);
 
       const float met_bins[] = {0, 250, 350, 450, 550, 650, 800};
