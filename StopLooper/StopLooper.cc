@@ -369,27 +369,27 @@ void StopLooper::fillHistosForCRemu(string suf) {
     if ( cr.PassesSelection(values_) ) {
 
       auto fillhists = [&] (string s) {
-        plot1D("h_mt"+suf+s,       values_["mt"]      , evtweight_, cr.histMap, ";MT [GeV]"             , 12,  0, 600);
-        plot1D("h_mt2w"+suf+s,     values_["mt2w"]    , evtweight_, cr.histMap, ";MT2W [GeV]"           , 18,  50, 500);
-        plot1D("h_met"+suf+s,      values_["met"]     , evtweight_, cr.histMap, ";E_{T}^{miss} [GeV]"   , 24,  50, 650);
-        plot1D("h_metphi"+suf+s,   values_["metphi"]  , evtweight_, cr.histMap, ";E_{T}^{miss} [GeV]"   , 24,  50, 650);
-        plot1D("h_lep1pt"+suf+s,   values_["lep1pt"]  , evtweight_, cr.histMap, ";p_{T}(lep1) [GeV]"    , 20,  0, 200);
-        plot1D("h_lep2pt"+suf+s,   values_["lep2pt"]  , evtweight_, cr.histMap, ";p_{T}(lep2) [GeV]"    , 20,  0, 200);
-        plot1D("h_lep1eta"+suf+s,  values_["lep1eta"] , evtweight_, cr.histMap, ";#eta (lep1)"          , 20, -5, 5);
-        plot1D("h_lep2eta"+suf+s,  values_["lep2eta"] , evtweight_, cr.histMap, ";#eta (lep2)"          , 20, -5, 5);
-        plot1D("h_nleps"+suf+s,    values_["nlep"]    , evtweight_, cr.histMap, ";nleps"                ,  5,  0, 5);
-        plot1D("h_njets"+suf+s,    values_["njet"]    , evtweight_, cr.histMap, ";njets"                , 12,  0, 12);
-        plot1D("h_nbjets"+suf+s,   values_["nbjet"]   , evtweight_, cr.histMap, ";nbjets"               , 6,   0, 6);
-        plot1D("h_mlepb"+suf+s,    values_["mlb"]     , evtweight_, cr.histMap, ";M(l,b) [GeV]"         , 24,  0, 600);
-        plot1D("h_dphijmet"+suf+s, values_["dphijmet"], evtweight_, cr.histMap, ";#Delta #phi (j, met)" , 24,  0, 4);
+        plot1D("h_mt"+s,       values_["mt"]      , evtweight_, cr.histMap, ";MT [GeV]"             , 12,  0, 600);
+        plot1D("h_mt2w"+s,     values_["mt2w"]    , evtweight_, cr.histMap, ";MT2W [GeV]"           , 18,  50, 500);
+        plot1D("h_met"+s,      values_["met"]     , evtweight_, cr.histMap, ";E_{T}^{miss} [GeV]"   , 24,  50, 650);
+        plot1D("h_metphi"+s,   values_["metphi"]  , evtweight_, cr.histMap, ";E_{T}^{miss} [GeV]"   , 24,  50, 650);
+        plot1D("h_lep1pt"+s,   values_["lep1pt"]  , evtweight_, cr.histMap, ";p_{T}(lep1) [GeV]"    , 20,  0, 200);
+        plot1D("h_lep2pt"+s,   values_["lep2pt"]  , evtweight_, cr.histMap, ";p_{T}(lep2) [GeV]"    , 20,  0, 200);
+        plot1D("h_lep1eta"+s,  values_["lep1eta"] , evtweight_, cr.histMap, ";#eta (lep1)"          , 20, -5, 5);
+        plot1D("h_lep2eta"+s,  values_["lep2eta"] , evtweight_, cr.histMap, ";#eta (lep2)"          , 20, -5, 5);
+        plot1D("h_nleps"+s,    values_["nlep"]    , evtweight_, cr.histMap, ";nleps"                ,  5,  0, 5);
+        plot1D("h_njets"+s,    values_["njet"]    , evtweight_, cr.histMap, ";njets"                , 12,  0, 12);
+        plot1D("h_nbjets"+s,   values_["nbjet"]   , evtweight_, cr.histMap, ";nbjets"               , 6,   0, 6);
+        plot1D("h_mlepb"+s,    values_["mlb"]     , evtweight_, cr.histMap, ";M(l,b) [GeV]"         , 24,  0, 600);
+        plot1D("h_dphijmet"+s, values_["dphijmet"], evtweight_, cr.histMap, ";#Delta #phi (j, met)" , 24,  0, 4);
 
         const float leppt_bins[] = {0, 30, 40, 50, 75, 100, 125, 200};
-        plot1D("h_lep1ptbins"+suf+s, values_["lep1pt"], evtweight_, cr.histMap, ";p_{T}(lep1) [GeV]"  , 7, leppt_bins);
-        plot1D("h_lep2ptbins"+suf+s, values_["lep2pt"], evtweight_, cr.histMap, ";p_{T}(lep2) [GeV]"  , 7, leppt_bins);
+        plot1D("h_lep1ptbins"+s, values_["lep1pt"], evtweight_, cr.histMap, ";p_{T}(lep1) [GeV]"  , 7, leppt_bins);
+        plot1D("h_lep2ptbins"+s, values_["lep2pt"], evtweight_, cr.histMap, ";p_{T}(lep2) [GeV]"  , 7, leppt_bins);
       };
-      fillhists("");
+      fillhists(suf);
       if (HLT_MuE())
-        fillhists("_passHLT");
+        fillhists(suf+"_passHLT");
     }
   }
 }
@@ -401,25 +401,34 @@ void StopLooper::fillHistosForCR2l(string suf) {
 
       // plot1D("h_finemet"+suf, pfmet_rl(), evtweight_, cr.histMap, ";E_{T}^{miss} [GeV]", 150, 0, 1500);
 
-      plot1D("h_met"+suf,      values_["met"]         , evtweight_, cr.histMap, ";E_{T}^{miss} [GeV]"   , 24,  50, 650);
-      plot1D("h_metphi"+suf,   values_["metphi"]      , evtweight_, cr.histMap, ";#phi(E_{T}^{miss})"   , 40,  -4, 4);
-      plot1D("h_rlmet"+suf,    values_["met_rl"]      , evtweight_, cr.histMap, ";(E^{miss}+lep2)_{T} [GeV]" , 24,  50, 650);
-      plot1D("h_mt"+suf,       values_["mt"]          , evtweight_, cr.histMap, ";MT"                   , 12,  0, 600);
-      plot1D("h_rlmt"+suf,     values_["mt_rl"]       , evtweight_, cr.histMap, ";MT (rl)"              , 12,  0, 600);
-      plot1D("h_mt2w"+suf,     values_["mt2w_rl"]     , evtweight_, cr.histMap, ";MT2W"                 , 18,  50, 500);
-      plot1D("h_tmod"+suf,     values_["tmod_rl"]     , evtweight_, cr.histMap, ";modified topness"     , 20, -5, 15);
-      plot1D("h_njets"+suf,    values_["njet"]        , evtweight_, cr.histMap, ";njets"                , 12,  0, 12);
-      plot1D("h_nbjets"+suf,   values_["nbjet"]       , evtweight_, cr.histMap, ";nbjets"               , 6,   0, 6);
-      plot1D("h_nleps"+suf,    values_["nlep"]        , evtweight_, cr.histMap, ";nleps"                ,  5,  0, 5);
-      plot1D("h_lep1pt"+suf,   values_["lep1pt"]      , evtweight_, cr.histMap, ";p_{T}(lep1) [GeV]"    , 20,  0, 200);
-      plot1D("h_lep1eta"+suf,  values_["lep1eta"]     , evtweight_, cr.histMap, ";#eta (lep1)"          , 20, -5, 5);
-      plot1D("h_mlepb"+suf,    values_["mlb"]         , evtweight_, cr.histMap, ";M(l,b) [GeV]"         , 24,  0, 600);
-      plot1D("h_dphijmet"+suf, values_["dphijmet_rl"] , evtweight_, cr.histMap, ";#Delta #phi (j, met)" , 24,  0, 4);
+      auto fillhists = [&] (string s) {
+        plot1D("h_met"+suf,      values_["met"]         , evtweight_, cr.histMap, ";E_{T}^{miss} [GeV]"   , 24,  50, 650);
+        plot1D("h_metphi"+suf,   values_["metphi"]      , evtweight_, cr.histMap, ";#phi(E_{T}^{miss})"   , 40,  -4, 4);
+        plot1D("h_rlmet"+suf,    values_["met_rl"]      , evtweight_, cr.histMap, ";(E^{miss}+lep2)_{T} [GeV]" , 24,  50, 650);
+        plot1D("h_mt"+suf,       values_["mt"]          , evtweight_, cr.histMap, ";MT"                   , 12,  0, 600);
+        plot1D("h_rlmt"+suf,     values_["mt_rl"]       , evtweight_, cr.histMap, ";MT (rl)"              , 12,  0, 600);
+        plot1D("h_mt2w"+suf,     values_["mt2w_rl"]     , evtweight_, cr.histMap, ";MT2W"                 , 18,  50, 500);
+        plot1D("h_tmod"+suf,     values_["tmod_rl"]     , evtweight_, cr.histMap, ";modified topness"     , 20, -5, 15);
+        plot1D("h_njets"+suf,    values_["njet"]        , evtweight_, cr.histMap, ";njets"                , 12,  0, 12);
+        plot1D("h_nbjets"+suf,   values_["nbjet"]       , evtweight_, cr.histMap, ";nbjets"               , 6,   0, 6);
+        plot1D("h_nleps"+suf,    values_["nlep"]        , evtweight_, cr.histMap, ";nleps"                ,  5,  0, 5);
+        plot1D("h_lep1pt"+suf,   values_["lep1pt"]      , evtweight_, cr.histMap, ";p_{T}(lep1) [GeV]"    , 20,  0, 200);
+        plot1D("h_lep1eta"+suf,  values_["lep1eta"]     , evtweight_, cr.histMap, ";#eta (lep1)"          , 20, -5, 5);
+        plot1D("h_mlepb"+suf,    values_["mlb"]         , evtweight_, cr.histMap, ";M(l,b) [GeV]"         , 24,  0, 600);
+        plot1D("h_dphijmet"+suf, values_["dphijmet_rl"] , evtweight_, cr.histMap, ";#Delta #phi (j, met)" , 24,  0, 4);
 
-      const float met_bins[] = {0, 250, 350, 450, 550, 650, 800};
-      plot1D("h_metbins"+suf,   values_["met"]    , evtweight_, cr.histMap, ";E^{miss}_{T} [GeV]"        , 6, met_bins);
-      plot1D("h_rlmetbins"+suf, values_["met_rl"] , evtweight_, cr.histMap, ";(E^{miss}+lep2)_{T} [GeV]" , 6, met_bins);
-
+        const float met_bins[] = {0, 250, 350, 450, 550, 650, 800};
+        plot1D("h_metbins"+suf,   values_["met"]    , evtweight_, cr.histMap, ";E^{miss}_{T} [GeV]"        , 6, met_bins);
+        plot1D("h_rlmetbins"+suf, values_["met_rl"] , evtweight_, cr.histMap, ";(E^{miss}+lep2)_{T} [GeV]" , 6, met_bins);
+      };
+      fillhists(suf);
+      if ( abs(lep1_pdgid()*lep2_pdgid()) == 121 )
+        fillhists(suf+"_ee");
+      else if ( abs(lep1_pdgid()*lep2_pdgid()) == 143 )
+        fillhists(suf+"_emu");
+      else if ( abs(lep1_pdgid()*lep2_pdgid()) == 169 )
+        fillhists(suf+"_mumu");
+      
     }
   }
 }
