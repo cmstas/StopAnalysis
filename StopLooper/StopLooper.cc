@@ -31,7 +31,7 @@
 #include "../StopCORE/sysInfo.h"
 
 #include "SR.h"
-#include "StopSelections.h"
+#include "StopRegions.h"
 #include "StopLooper.h"
 #include "PlotUtilities.h"
 
@@ -79,6 +79,7 @@ const bool fasterRuntime = true;
 
 void StopLooper::SetSignalRegions() {
 
+  // SRVec = getStopSignalRegions();
   CR2lVec = getStopControlRegionsDilepton();
   CR0bVec = getStopControlRegionsNoBTags();
   CRemuVec = getStopControlRegionsEMu();
@@ -89,27 +90,24 @@ void StopLooper::SetSignalRegions() {
       cout << it-CR2lVec.begin() << "  "<< it->GetName() << endl;
   }
 
-  for (auto& cr : CR2lVec) {
-    vector<string> vars = cr.GetListOfVariables();
-    TDirectory * dir = (TDirectory*) outfile_->Get((cr.GetName() + "/ranges").c_str());
-    if (dir == 0) dir = outfile_->mkdir((cr.GetName() + "/ranges").c_str());
-    dir->cd("ranges");
-    for (auto& var : vars) {
-      plot1D("h_"+var+"_"+"LOW",  1, cr.GetLowerBound(var), cr.histMap, "", 1, 0, 2);
-      plot1D("h_"+var+"_"+"HI",   1, cr.GetUpperBound(var), cr.histMap, "", 1, 0, 2);
+  auto createRangesHists = [&] (auto& srvec) {
+    for (auto& sr : srvec) {
+      vector<string> vars = sr.GetListOfVariables();
+      TDirectory * dir = (TDirectory*) outfile_->Get((sr.GetName() + "/ranges").c_str());
+      if (dir == 0) dir = outfile_->mkdir((sr.GetName() + "/ranges").c_str());
+      dir->cd("ranges");
+      for (auto& var : vars) {
+        plot1D("h_"+var+"_"+"LOW",  1, sr.GetLowerBound(var), sr.histMap, "", 1, 0, 2);
+        plot1D("h_"+var+"_"+"HI",   1, sr.GetUpperBound(var), sr.histMap, "", 1, 0, 2);
+      }
     }
-  }
+  };
 
-  for (auto& cr : CRemuVec) {
-    vector<string> vars = cr.GetListOfVariables();
-    TDirectory * dir = (TDirectory*) outfile_->Get((cr.GetName() + "/ranges").c_str());
-    if (dir == 0) dir = outfile_->mkdir((cr.GetName() + "/ranges").c_str());
-    dir->cd("ranges");
-    for (auto& var : vars) {
-      plot1D("h_"+var+"_"+"LOW",  1, cr.GetLowerBound(var), cr.histMap, "", 1, 0, 2);
-      plot1D("h_"+var+"_"+"HI",   1, cr.GetUpperBound(var), cr.histMap, "", 1, 0, 2);
-    }
-  }
+  // createRangesHists(SRVec);
+  // createRangesHists(CR0bVec);
+
+  createRangesHists(CR2lVec);
+  createRangesHists(CRemuVec);
 
 }
 
@@ -147,12 +145,14 @@ void StopLooper::looper(TChain* chain, string sample, string output_dir) {
 
   // Combined 2016 and 2017 json,
   const char* json_file = "../StopCORE/inputs/json_files/Cert_271036-300575_13TeV_Combined1617_JSON_snt.txt";
+  const float kLumi = 32.26;
+
   if (applyjson) {
     cout << "Loading json file: " << json_file << endl;
     set_goodrun_file(json_file);
   }
 
-  // sampleInfo::sampleUtil sample( sampleInfo::ID::k_single_mu );
+  // sampleInfo::sampleUtil samp_info( sampleInfo::ID::k_single_mu );
   TFile dummy( (output_dir+"/dummy.root").c_str(), "RECREATE" );
   SetSignalRegions();
   GenerateAllSRptrSets();
@@ -194,7 +194,7 @@ void StopLooper::looper(TChain* chain, string sample, string output_dir) {
       }
 
       // Apply filters
-      // if (!filt_globalTightHalo2016()) continue; // problematic
+      // if (!filt_globalTightHalo2016()) continue; // problematic for 2017
       if ( !filt_globalsupertighthalo2016() ) continue;
       if ( !filt_hbhenoise() ) continue;
       if ( !filt_hbheisonoise() )   continue;
@@ -213,15 +213,23 @@ void StopLooper::looper(TChain* chain, string sample, string output_dir) {
 
       ++nPassedTotal;
 
-      evtweight_ = 1.0; // just here for demonstration purpose for now.
+      // Calculate event weight
+      float MCscale_HF = 1;
+      float MCscaling = weight_PU(); // just for now, will put in SFs later
+      if (sample.find("WJets") != string::npos)
+        evtweight_ = kLumi * scale1fb() * MCscaling * MCscale_HF;
+      else if (sample.find("data") != string::npos)
+        evtweight_ = 1;
+      else
+        evtweight_ = kLumi * scale1fb() * MCscaling;
 
       // Fill the variables
 
       values_["mt"] = mt_met_lep();
       values_["met"] = pfmet();
+      values_["metphi"] = pfmet_phi();
       values_["mt2w"] = MT2W();
-      // values_["mlb"] = Mlb_closestb(); // currently all -9999
-      values_["mlb"] = 200;          // for temporary check purpose
+      values_["mlb"] = Mlb_closestb();
       values_["tmod"] = topnessMod();
       values_["nlep"] = ngoodleps();
       values_["njet"] = ngoodjets();
@@ -258,19 +266,20 @@ void StopLooper::looper(TChain* chain, string sample, string output_dir) {
       // Filling histograms
       // fillHistosForSR();
 
-      if (ngoodleps() == 1 && nvetoleps() >= 2 && lep2_p4().Pt()>10)
+      fillHistosForCRemu();
+
+      if (ngoodleps() == 1 && nvetoleps() >= 2 && lep2_p4().Pt() > 10)
         values_["nlep"] = 2;
       values_["mt_rl"] = mt_met_lep_rl();
       values_["mt2w_rl"] = MT2W_rl();
       values_["met_rl"] = pfmet_rl();
       values_["dphijmet_rl"]= mindphi_met_j1_j2_rl();
       values_["tmod_rl"] = topnessMod_rl();
+      // values_["mlb_rl"] = Mlb_closestb();
 
       fillHistosForCR2l();
 
-      fillHistosForCRemu();
-
-      // if (event > 10) break;  // for debug purpose
+      // if (event > 10) break;  // for debugging purpose
     } // end of event loop
 
     delete tree;
@@ -320,6 +329,25 @@ void StopLooper::looper(TChain* chain, string sample, string output_dir) {
   return;
 }
 
+
+void StopLooper::fillHistosForSR(string suf) {
+
+  for (auto& sr : SRVec) {
+    if ( sr.PassesSelection(values_) ) {
+      // This plot function port from MT2 demonstrate the simpleness of adding extra plots anywhere in the code
+      // and this functionality is great for quick checks
+      plot1D("h_met"+suf, pfmet(), evtweight_, sr.histMap, ";E_{T}^{miss} [GeV]", 150, 0, 1500);
+      plot1D("h_njet"+suf, ngoodjets(), evtweight_, sr.histMap, ";n jets", 20, 0, 20);
+
+      // fillBasic1DHistos(sr.histMap);
+
+      // The following skim is under development, can be used to fill standard set of plots
+      // for (string v : {"njet", "nbjet", "mt2w"})
+      //   plot1d("h_"+v +suf, values_[v], evtweight_, sr.histMap);
+    }
+  }
+}
+
 void StopLooper::fillHistosForCRemu(string suf) {
 
   // Trigger requirements
@@ -348,11 +376,12 @@ void StopLooper::fillHistosForCRemu(string suf) {
         plot1D("h_mt"+suf+s,       values_["mt"]      , evtweight_, cr.histMap, ";MT [GeV]"             , 12,  0, 600);
         plot1D("h_mt2w"+suf+s,     values_["mt2w"]    , evtweight_, cr.histMap, ";MT2W [GeV]"           , 18,  50, 500);
         plot1D("h_met"+suf+s,      values_["met"]     , evtweight_, cr.histMap, ";E_{T}^{miss} [GeV]"   , 24,  50, 650);
+        plot1D("h_metphi"+suf+s,   values_["metphi"]  , evtweight_, cr.histMap, ";E_{T}^{miss} [GeV]"   , 24,  50, 650);
         plot1D("h_lep1pt"+suf+s,   values_["lep1pt"]  , evtweight_, cr.histMap, ";p_{T}(lep1) [GeV]"    , 20,  0, 200);
         plot1D("h_lep2pt"+suf+s,   values_["lep2pt"]  , evtweight_, cr.histMap, ";p_{T}(lep2) [GeV]"    , 20,  0, 200);
         plot1D("h_lep1eta"+suf+s,  values_["lep1eta"] , evtweight_, cr.histMap, ";#eta (lep1)"          , 20, -5, 5);
         plot1D("h_lep2eta"+suf+s,  values_["lep2eta"] , evtweight_, cr.histMap, ";#eta (lep2)"          , 20, -5, 5);
-        plot1D("h_nleps"+suf+s,    values_["nlep"]    , evtweight_, cr.histMap, ";njets"                , 12,  0, 12);
+        plot1D("h_nleps"+suf+s,    values_["nlep"]    , evtweight_, cr.histMap, ";nleps"                ,  5,  0, 5);
         plot1D("h_njets"+suf+s,    values_["njet"]    , evtweight_, cr.histMap, ";njets"                , 12,  0, 12);
         plot1D("h_nbjets"+suf+s,   values_["nbjet"]   , evtweight_, cr.histMap, ";nbjets"               , 6,   0, 6);
         plot1D("h_mlepb"+suf+s,    values_["mlb"]     , evtweight_, cr.histMap, ";M(l,b) [GeV]"         , 24,  0, 600);
@@ -369,54 +398,32 @@ void StopLooper::fillHistosForCRemu(string suf) {
   }
 }
 
-
-void StopLooper::fillHistosForSR(string suf) {
-
-  for (auto& sr : SRVec) {
-    if ( sr.PassesSelection(values_) ) {
-      // This plot function port from MT2 demonstrate the simpleness of adding extra plots anywhere in the code
-      // and this functionality is great for quick checks
-      plot1D("h_met"+suf, pfmet(), evtweight_, sr.histMap, ";E_{T}^{miss} [GeV]", 150, 0, 1500);
-      plot1D("h_njet"+suf, ngoodjets(), evtweight_, sr.histMap, ";n jets", 20, 0, 20);
-
-      // fillBasic1DHistos(sr.histMap);
-
-      // The following skim is under development, can be used to fill standard set of plots
-      // for (string v : {"njet", "nbjet", "mt2w"})
-      //   plot1d("h_"+v +suf, values_[v], evtweight_, sr.histMap);
-    }
-  }
-}
-
 void StopLooper::fillHistosForCR2l(string suf) {
 
   for (auto& cr : CR2lVec) {
     if ( cr.PassesSelection(values_) ) {
-      // if (cr.GetName() != "cr2l_test" && cr.GetName() != "cr2l_base")
-      //   cout << __LINE__ << ": Passes Selections! " << suf << endl;
 
       // plot1D("h_finemet"+suf, pfmet_rl(), evtweight_, cr.histMap, ";E_{T}^{miss} [GeV]", 150, 0, 1500);
 
-      plot1D("h_met"+suf,       values_["met_rl"]   , evtweight_, cr.histMap, ";E_{T}^{miss} [GeV]"   , 24,  50, 650);
-      plot1D("h_mt"+suf,        values_["mt_rl"]    , evtweight_, cr.histMap, ";MT"                   , 12,  0, 600);
-      plot1D("h_mt2w"+suf,      values_["mt2w_rl"]  , evtweight_, cr.histMap, ";MT2W"                 , 18,  50, 500);
-      plot1D("h_tmod"+suf,      values_["tmod"]     , evtweight_, cr.histMap, ";t_{mod}"              , 20, -5, 15);
-      plot1D("h_njets"+suf,     values_["njets"]    , evtweight_, cr.histMap, ";njets"                , 12,  0, 12);
-      plot1D("h_nbjets"+suf,    values_["nbjets"]   , evtweight_, cr.histMap, ";nbjets"               , 6,   0, 6);
-      plot1D("h_nleps"+suf,     values_["nlep"]     , evtweight_, cr.histMap, ";njets"                , 12,  0, 12);
-      plot1D("h_lep1pt"+suf,    values_["lep1pt"]   , evtweight_, cr.histMap, ";p_{T}(lep1) [GeV]"    , 20,  0, 200);
-      plot1D("h_lep1eta"+suf,   values_["lep1eta"]  , evtweight_, cr.histMap, ";#eta (lep1)"          , 20, -5, 5);
-      plot1D("h_mlepb"+suf,     values_["mlb"]      , evtweight_, cr.histMap, ";M(l,b)"               , 24,  0, 600);
-      plot1D("h_dphijmet"+suf,  values_["dphijmet"] , evtweight_, cr.histMap, ";#Delta #phi (j, met)" , 24,  0, 4);
+      plot1D("h_met"+suf,      values_["met"]         , evtweight_, cr.histMap, ";E_{T}^{miss} [GeV]"   , 24,  50, 650);
+      plot1D("h_metphi"+suf,   values_["metphi"]      , evtweight_, cr.histMap, ";#phi(E_{T}^{miss})"   , 40,  -4, 4);
+      plot1D("h_rlmet"+suf,    values_["met_rl"]      , evtweight_, cr.histMap, ";(E^{miss}+lep2)_{T} [GeV]" , 24,  50, 650);
+      plot1D("h_mt"+suf,       values_["mt"]          , evtweight_, cr.histMap, ";MT"                   , 12,  0, 600);
+      plot1D("h_rlmt"+suf,     values_["mt_rl"]       , evtweight_, cr.histMap, ";MT (rl)"              , 12,  0, 600);
+      plot1D("h_mt2w"+suf,     values_["mt2w_rl"]     , evtweight_, cr.histMap, ";MT2W"                 , 18,  50, 500);
+      plot1D("h_tmod"+suf,     values_["tmod_rl"]     , evtweight_, cr.histMap, ";t_{mod}"              , 20, -5, 15);
+      plot1D("h_njets"+suf,    values_["njet"]        , evtweight_, cr.histMap, ";njets"                , 12,  0, 12);
+      plot1D("h_nbjets"+suf,   values_["nbjet"]       , evtweight_, cr.histMap, ";nbjets"               , 6,   0, 6);
+      plot1D("h_nleps"+suf,    values_["nlep"]        , evtweight_, cr.histMap, ";nleps"                ,  5,  0, 5);
+      plot1D("h_lep1pt"+suf,   values_["lep1pt"]      , evtweight_, cr.histMap, ";p_{T}(lep1) [GeV]"    , 20,  0, 200);
+      plot1D("h_lep1eta"+suf,  values_["lep1eta"]     , evtweight_, cr.histMap, ";#eta (lep1)"          , 20, -5, 5);
+      plot1D("h_mlepb"+suf,    values_["mlb"]         , evtweight_, cr.histMap, ";M(l,b)"               , 24,  0, 600);
+      plot1D("h_dphijmet"+suf, values_["dphijmet_rl"] , evtweight_, cr.histMap, ";#Delta #phi (j, met)" , 24,  0, 4);
 
-      // plot1D("h_mlb"+suf,       Mlb_closestb() , evtweight_, cr.histMap, ";M(l,b)"               , 24,  0, 600);
+      const float met_bins[] = {0, 250, 350, 450, 550, 650, 800};
+      plot1D("h_metbins"+suf,   values_["met"]    , evtweight_, cr.histMap, ";E^{miss}_{T} [GeV]"        , 6, met_bins);
+      plot1D("h_rlmetbins"+suf, values_["met_rl"] , evtweight_, cr.histMap, ";(E^{miss}+lep2)_{T} [GeV]" , 6, met_bins);
 
-
-      // plot1D("h_wpt"+suf,          wpt_        , evtweight_, cr.histMap, ";p_{T}(W)"             , 13,  0, 650);
-
-      // The following skim is under development, can be used to fill standard set of plots
-      // for (string v : {"njet", "nbjet", "mt2w"})
-      //   plot1d("h_"+v +suf, values_[v], evtweigh  t_, cr.histMap);
     }
   }
 }
@@ -435,49 +442,3 @@ void StopLooper::fillHistosForCR0b(string suf) {
     }
   }
 }
-
-
-/*
-  void StopLooper::fillBasic1DHistos(map<string,TH1*>& h1d, string suf) {
-
-  plot1D("h_mt"+suf,           mt_         , evtweight_, h1d, ";MT"                   , 12,  0, 600);
-  plot1D("h_mt2w"+suf,         mt2w_       , evtweight_, h1d, ";MT2W"                 , 18,  50, 500);
-  plot1D("h_tmod"+suf,         tmod_       , evtweight_, h1d, ";t_{mod}"              , 20, -5, 15);
-  plot1D("h_chi2"+suf,         chi2_       , evtweight_, h1d, ";#chi^{2}"             , 20,  0, 20);
-  plot1D("h_mindphi"+suf,      mindphi_    , evtweight_, h1d, ";min(#Delta Phi)"      , 20,  0, 4);
-  plot1D("h_htratio"+suf,      htratio_    , evtweight_, h1d, ";HTratio"              , 20,  0, 1);
-  plot1D("h_drlepb"+suf,       drlepb_     , evtweight_, h1d, ";DR(l,b)"              , 20,  0, 5);
-  plot1D("h_leadbpt"+suf,      leadbpt_    , evtweight_, h1d, ";leadbpt"              , 18,  30, 390);
-  plot1D("h_met"+suf,          met_        , evtweight_, h1d, ";E_{T}^{miss}"         , 24,  50, 650);
-  plot1D("h_leppt"+suf,        leppt_      , evtweight_, h1d, ";p_{T} (lep)"          , 26,  30, 680);
-  plot1D("h_lepeta"+suf,       lepeta_     , evtweight_, h1d, ";#eta (lep)"           , 30, -3, 3);
-  plot1D("h_lepphi"+suf,       lepphi_     , evtweight_, h1d, ";#phi (lep)"           , 20, -1, 1);
-  plot1D("h_ht"+suf,           ht_         , evtweight_, h1d, ";HT"                   , 30,  0, 1500);
-  plot1D("h_njets"+suf,        njets_      , evtweight_, h1d, ";njets"                , 12,  0, 12);
-  plot1D("h_nbjets"+suf,       nbjets_     , evtweight_, h1d, ";nbjets"               , 6,   0, 6);
-  plot1D("h_mlepb"+suf,        mlepb_      , evtweight_, h1d, ";M(l,b)"               , 24,  0, 600);
-  plot1D("h_wpt"+suf,          wpt_        , evtweight_, h1d, ";p_{T}(W)"             , 13,  0, 650);
-
-  }
-
-  void StopLooper::fillMore1DHistos(map<string,TH1*>& h1d, string suf) {
-
-  plot1D("h_topness"+suf,                   0, evtweight_, h1d, ";Topness"              , 18,  50, 500);
-  plot1D("h_njets_pt200_nobtags"+suf,       0, evtweight_, h1d, ";njets"                , 5,   0, 5);
-  plot1D("h_leadisrjet_pt200_nobtags"+suf,  0, evtweight_, h1d, ";p_{T}"                , 24,  0, 600);
-  plot1D("h_genmlepb"+suf,                  0, evtweight_, h1d, ";gen M(l,b)"           , 24,  0, 600);
-  plot1D("h_m3b"+suf,                       0, evtweight_, h1d, ";M3b"                  , 10,  0, 1);
-  plot1D("h_ak4_nef"+suf,                   0, evtweight_, h1d, ";ak4_nef"              , 34,  30, 300);
-  plot1D("h_ak4_cef"+suf,                   0, evtweight_, h1d, ";ak4_cef"              , 22,  30, 200);
-  plot1D("h_ak4_eff"+suf,                   0, evtweight_, h1d, ";ak4_EF"               , 10,  0, 1.);
-  plot1D("h_mhtsig"+suf,                    0, evtweight_, h1d, ";MET/#sqrt{HT}"        , 20,  0, 40);
-
-  plot1D("h_jetpt"+suf,                     0, evtweight_, h1d, ";p_{T}(jet)"           , 32,  30, 480);
-  plot1D("h_dphilepjet"+suf,                0, evtweight_, h1d, ";#Delta #phi (l, jet)" , 20,  0, 4);
-  plot1D("h_leadjetpt"+suf,                 0, evtweight_, h1d, ";pt(leadjet)"          , 32,  30, 480);
-  plot1D("h_dphiwlep"+suf,                  0, evtweight_, h1d, ";DPhiWLep"             , 25,  0, 5);
-  plot1D("h_pzeta_trklep"+suf,              0, evtweight_, h1d, ";PZeta_TrkLep"         , 60, -600, 600);
-  plot1D("h_pzetavis_trklep"+suf,           0, evtweight_, h1d, ";PZetaVis_TrkLep"      , 12,  0, 600);
-
-  }
-*/
