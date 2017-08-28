@@ -1,5 +1,6 @@
 // C++
 #include <iostream>
+#include <fstream>
 #include <vector>
 #include <set>
 #include <cmath>
@@ -80,6 +81,7 @@ const bool fasterRuntime = true;
 void StopLooper::SetSignalRegions() {
 
   // SRVec = getStopSignalRegions();
+  // SRVec = getStopSignalRegionsTopological();
   CR2lVec = getStopControlRegionsDilepton();
   CR0bVec = getStopControlRegionsNoBTags();
   CRemuVec = getStopControlRegionsEMu();
@@ -103,7 +105,7 @@ void StopLooper::SetSignalRegions() {
     }
   };
 
-  // createRangesHists(SRVec);
+  createRangesHists(SRVec);
   // createRangesHists(CR0bVec);
   createRangesHists(CR2lVec);
   createRangesHists(CRemuVec);
@@ -137,14 +139,17 @@ void StopLooper::looper(TChain* chain, string sample, string output_dir) {
 
   outfile_ = new TFile(output_name.Data(), "RECREATE") ;
 
-  // // full 2016 dataset json, 36.26/fb:
+  // // full 2016 dataset json, 35.87/fb:
   // const char* json_file = "../StopCORE/inputs/json_files/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON_snt.txt";
-  // // 2017 dataset json
-  // const char* json_file = "../StopCORE/inputs/json_files/Cert_294927-300575_13TeV_PromptReco_Collisions17_JSON_snt.txt";
+  // // 2017 dataset json, 10.09/fb (10.07 until 300780)
+  // const char* json_file = "../StopCORE/inputs/json_files/Cert_294927-301141_13TeV_PromptReco_Collisions17_JSON_snt.txt";
 
   // Combined 2016 and 2017 json,
-  const char* json_file = "../StopCORE/inputs/json_files/Cert_271036-300575_13TeV_Combined1617_JSON_snt.txt";
-  const float kLumi = 32.26;
+  const char* json_file = "../StopCORE/inputs/json_files/Cert_271036-301141_13TeV_Combined1617_JSON_snt.txt";
+  const float kLumi = 35.87;
+
+  // Test the lumi is in the baby
+  set<pair<int,int>> lumi_ran;
 
   if (applyjson) {
     cout << "Loading json file: " << json_file << endl;
@@ -190,6 +195,7 @@ void StopLooper::looper(TChain* chain, string sample, string output_dir) {
         if ( applyjson && !goodrun(run(), ls()) ) continue;
 	duplicate_removal::DorkyEventIdentifier id(run(), evt(), ls());
 	if ( is_duplicate(id) ) continue;
+        lumi_ran.insert( make_pair(run(), ls()) );  // to test the lumi in baby
       }
 
       // Apply filters
@@ -287,7 +293,8 @@ void StopLooper::looper(TChain* chain, string sample, string output_dir) {
 
   cout << "[StopLooper::looper] processed  " << nEventsTotal << " events" << endl;
   if ( nEventsChain != nEventsTotal )
-    std::cout << "WARNING: number of events from files is not equal to total number of events" << std::endl;
+    cout << "WARNING: number of events from files is not equal to total number of events" << endl;
+  cout << "[StopLooper::looper] The min and max of the run ran were [" << lumi_ran.begin()->first << ", " << lumi_ran.rbegin()->first << "]" << endl;
 
   outfile_->cd();
 
@@ -303,7 +310,7 @@ void StopLooper::looper(TChain* chain, string sample, string output_dir) {
     }
   };
 
-  writeHistsToFile(SRVec);
+  // writeHistsToFile(SRVec);
   writeHistsToFile(CR0bVec);
   writeHistsToFile(CR2lVec);
   writeHistsToFile(CRemuVec);
@@ -312,6 +319,11 @@ void StopLooper::looper(TChain* chain, string sample, string output_dir) {
   outfile_->Close();
 
   bmark->Stop("benchmark");
+
+  ofstream ofile("logs/lumi_ran.txt");
+  for (auto ls : lumi_ran) {
+    ofile << ls.first << " " << ls.second << endl;
+  }
 
   cout << endl;
   cout << nEventsTotal << " Events Processed, where " << nDuplicates << " duplicates were skipped, and ";
