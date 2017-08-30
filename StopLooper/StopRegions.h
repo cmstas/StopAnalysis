@@ -6,10 +6,12 @@
 #include "SR.h"
 
 std::vector<SR> getStopSignalRegions();
-std::vector<SR> getStopSignalRegionsTopological();
 std::vector<SR> getStopControlRegions();
 std::vector<SR> getStopControlRegionsDilepton();
 std::vector<SR> getStopControlRegionsNoBTags();
 std::vector<SR> getStopControlRegionsEMu();
+
+std::vector<SR> getStopSignalRegionsTopological();
+std::vector<SR> getStopControlRegionsNoBTagsTopological();
 
 #endif // STOPREGIONS_H
