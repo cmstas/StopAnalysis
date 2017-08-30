@@ -482,10 +482,16 @@ void StopLooper::fillHistosForCR0b(string suf) {
         plot1D("h_metbins"+s,   values_["met"]    , evtweight_, cr.histMap, ";E^{miss}_{T} [GeV]"        , 6, met_bins);
       };
       fillhists(suf);
-      if ( abs(lep1_pdgid()) == 11 )
+      if ( abs(lep1_pdgid()) == 11 ) {
         fillhists(suf+"_e");
-      else if ( abs(lep1_pdgid()) == 13 )
+        if ( fabs(lep1_p4().eta()) < 1.1 )
+          fillhists(suf+"_barrele");
+        else
+          fillhists(suf+"_endcape");
+      }
+      else if ( abs(lep1_pdgid()) == 13 ) {
         fillhists(suf+"_mu");
+      }
     }
   }
 }
