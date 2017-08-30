@@ -2713,8 +2713,6 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
           new_pfmet_y += tau_p4s.at(0).py();
         }
       }
-      else
-        ;
       
       float new_pfmet_x_jup = new_pfmet_x + (StopEvt.pfmet_jup * std::cos(StopEvt.pfmet_phi_jup));
       float new_pfmet_y_jup = new_pfmet_y + (StopEvt.pfmet_jup * std::sin(StopEvt.pfmet_phi_jup));
@@ -2785,9 +2783,9 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
       //std::cout << "[babymaker::looper]: filling HLT vars" << std::endl;
       //////////////// 2017 triggers //////////////////////
       if(!isSignalFromFileName){
-	      StopEvt.HLT_SingleEl = passHLTTriggerPattern("HLT_Ele35_WPTight_Gsf_v");
-	      StopEvt.HLT_DiEl =   ( passHLTTriggerPattern("HLT_DoubleEle33_CaloIdL_MW_v") ||
-	                             passHLTTriggerPattern("HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL") );
+        StopEvt.HLT_SingleEl = passHLTTriggerPattern("HLT_Ele35_WPTight_Gsf_v");
+        StopEvt.HLT_DiEl =   ( passHLTTriggerPattern("HLT_DoubleEle33_CaloIdL_MW_v") ||
+                               passHLTTriggerPattern("HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL") );
         StopEvt.HLT_SingleMu = passHLTTriggerPattern("HLT_IsoMu27_v");
         StopEvt.HLT_DiMu =   ( passHLTTriggerPattern("HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8_v") ||
                                passHLTTriggerPattern("HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass8_v") );

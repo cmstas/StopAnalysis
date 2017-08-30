@@ -14,7 +14,7 @@ All the following are based on the directory `StopAnalysis/StopLooper`
 ```
 
 ### Signal/Control Region definition
-The signal and control region are defined in the file `StopSelections.cc`, making use of the `SR` class.
+The signal and control region are defined in the file `StopRegions.cc`, making use of the `SR` class.
 
 ### Control the plots for SR and CR
 The plots to be made for each SR and CR are defined in the function `StopLooper::fillHistosForSR()`. 
@@ -22,6 +22,7 @@ Additional plots of interest can be added anywhere in the looper
 
 
 ## TODO
-* To fill TODO section with more TODOs
+* To add TODO to the TODOs
 * To finish the TODOs listed here as much as possible
 * Get rid of the `dummy.root` (find a way to prevent hists from being destroyed after file close)
+* Add automation script to monitor the running looper proceed with further command when finishes
