@@ -10,14 +10,14 @@ LOGDIR=logs
 mkdir -p ${OUTDIR}
 mkdir -p ${LOGDIR}
 
+# declare -a Samples=(data_met)
 # declare -a Samples=(data_singlemu)
 declare -a Samples=(data_singlemu data_singleel data_met data_jetht)
 
 for SAMPLE in ${Samples[@]}; do
-    echo ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
+    echo ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} '>&' ${LOGDIR}/log_${SAMPLE}.txt
     # ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
-    eval "nohup ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
-
+    eval "nohup ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >&  ${LOGDIR}/log_${SAMPLE}.txt &"
     # echo nice -n 10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
     # eval "nohup nice -n 10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
 done
@@ -28,8 +28,9 @@ OUTDIR=output/data2016
 mkdir -p ${OUTDIR}
 mkdir -p ${LOGDIR}
 
+# declare -a Samples=(data_met)
 # declare -a Samples=(data_single_muon)
-declare -a Samples=(data_single_muon data_single_electron data_met data_double_eg data_double_mu)
+declare -a Samples=(data_single_muon data_single_electron data_met data_double_eg data_double_mu data_muon_eg)
 
 for SAMPLE in ${Samples[@]}; do
     echo ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
@@ -49,13 +50,13 @@ mkdir -p ${LOGDIR}
 # declare -a Samples=(ttbar)
 declare -a Samples=(DYJetsToLL TTGJets TTWJets TTZ W1Jets W2Jets W3Jets W4Jets W4Jets WJetsToLNu WW WZ ZZ tZq ttbar ttWJets ttZJets t_sch t_tW t_tbarW t_tch tbar_tch)
 
-for SAMPLE in ${Samples[@]}; do
-    echo ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
-    # ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
-    eval "nohup ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
-    # echo nice -n 10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
-    # eval "nohup nice -n 10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}_2016.txt &"
-done
+# for SAMPLE in ${Samples[@]}; do
+#     echo ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
+#     # ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
+#     eval "nohup ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
+#     # echo nice -n 10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
+#     # eval "nohup nice -n 10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}_2016.txt &"
+# done
 
 
 # 2016 Signal
