@@ -8,6 +8,14 @@
 
 using namespace std;
 
+// // Somehow causing segmentation fault <-- need to understand how
+// SR::~SR() {
+//   for (auto hmap : histMap) {
+//     delete hmap.second;
+//     hmap.second = nullptr;
+//   }
+// }
+
 void SR::SetName(string sr_name) {
   srname_ = sr_name;
 }
@@ -88,8 +96,8 @@ bool SR::PassesSelection(map<string, float> values) {
 }
 
 void SR::RemoveVar(string var_name) {
-  if(bins_.find(var_name) != bins_.end()) bins_.erase(var_name);
-  else throw invalid_argument("Variable not added. Cannot remove!");
+  if (bins_.find(var_name) != bins_.end()) bins_.erase(var_name);
+  else cerr << "WARNING: Variable " << var_name << " is not present in " << srname_ << ". Cannot remove!" << endl;
 }
 
 void SR::Clear() {
