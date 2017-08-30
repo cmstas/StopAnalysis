@@ -6,6 +6,7 @@
 #include "SR.h"
 
 std::vector<SR> getStopSignalRegions();
+std::vector<SR> getStopSignalRegionsTopological();
 std::vector<SR> getStopControlRegions();
 std::vector<SR> getStopControlRegionsDilepton();
 std::vector<SR> getStopControlRegionsNoBTags();
