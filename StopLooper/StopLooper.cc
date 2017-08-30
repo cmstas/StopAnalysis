@@ -43,7 +43,7 @@ using namespace selectionInfo;
 class SR;
 extern stop_1l_babyAnalyzer babyAnalyzer;
 
-const bool verbose = false;
+const bool verbose = true;
 // turn on to apply weights to central value
 const bool applyWeights = false;
 // turn on to apply btag sf to central value
@@ -81,15 +81,18 @@ const bool fasterRuntime = true;
 void StopLooper::SetSignalRegions() {
 
   // SRVec = getStopSignalRegions();
-  // SRVec = getStopSignalRegionsTopological();
+  // CR0bVec = getStopControlRegionsNoBTags();
   CR2lVec = getStopControlRegionsDilepton();
-  CR0bVec = getStopControlRegionsNoBTags();
   CRemuVec = getStopControlRegionsEMu();
 
+  SRVec = getStopSignalRegionsTopological();
+  CR0bVec = getStopControlRegionsNoBTagsTopological();
+
   if (verbose) {
-    cout << "CR2lVec.size = " << CR2lVec.size() << ", including the following:" << endl;
-    for (auto it = CR2lVec.begin(); it != CR2lVec.end(); ++it)
-      cout << it-CR2lVec.begin() << "  "<< it->GetName() << endl;
+    cout << "SRVec.size = " << SRVec.size() << ", including the following:" << endl;
+    for (auto it = SRVec.begin(); it != SRVec.end(); ++it) {
+      cout << it-SRVec.begin() << "  " << it->GetName() << ":  " << it->GetDetailName() << endl;
+    }
   }
 
   auto createRangesHists = [&] (vector<SR>& srvec) {
@@ -101,6 +104,9 @@ void StopLooper::SetSignalRegions() {
       for (auto& var : vars) {
         plot1D("h_"+var+"_"+"LOW",  1, sr.GetLowerBound(var), sr.histMap, "", 1, 0, 2);
         plot1D("h_"+var+"_"+"HI",   1, sr.GetUpperBound(var), sr.histMap, "", 1, 0, 2);
+      }
+      if (sr.GetNMETBins() > 0) {
+        plot1D("h_metbins", -1, 0, sr.histMap, ";E^{miss}_{T} [GeV]", sr.GetNMETBins(), sr.GetMETBinsPtr());
       }
     }
   };
@@ -159,7 +165,7 @@ void StopLooper::looper(TChain* chain, string sample, string output_dir) {
   // sampleInfo::sampleUtil samp_info( sampleInfo::ID::k_single_mu );
   TFile dummy( (output_dir+"/dummy.root").c_str(), "RECREATE" );
   SetSignalRegions();
-  GenerateAllSRptrSets();
+  // GenerateAllSRptrSets();
 
   int nDuplicates = 0;
   int nEvents = chain->GetEntries();
@@ -184,7 +190,6 @@ void StopLooper::looper(TChain* chain, string sample, string output_dir) {
     if (nEventsTotal >= nEventsChain) continue;
     unsigned int nEventsTree = tree->GetEntriesFast();
     for (unsigned int event = 0; event < nEventsTree; ++event) {
-
       // Read Tree
       if (nEventsTotal >= nEventsChain) continue;
       tree->LoadTree(event);
@@ -311,7 +316,7 @@ void StopLooper::looper(TChain* chain, string sample, string output_dir) {
     }
   };
 
-  // writeHistsToFile(SRVec);
+  writeHistsToFile(SRVec);
   writeHistsToFile(CR0bVec);
   writeHistsToFile(CR2lVec);
   writeHistsToFile(CRemuVec);
@@ -448,6 +453,12 @@ void StopLooper::fillHistosForCR2l(string suf) {
         const float met_bins[] = {0, 250, 350, 450, 550, 650, 800};
         plot1D("h_metbins"+s,   values_["met"]    , evtweight_, cr.histMap, ";E^{miss}_{T} [GeV]"        , 6, met_bins);
         plot1D("h_rlmetbins"+s, values_["met_rl"] , evtweight_, cr.histMap, ";(E^{miss}+lep2)_{T} [GeV]" , 6, met_bins);
+
+        // Luminosity test at Z peak
+        float mll = (lep1_p4()+lep2_p4()).M();
+        if (80 < mll && mll < 100)
+          plot1D("h_mll"+s, mll, evtweight_, cr.histMap, ";M(ll) [GeV]", 70, 60, 130 );
+
       };
       fillhists(suf);
       if ( abs(lep1_pdgid()*lep2_pdgid()) == 121 )

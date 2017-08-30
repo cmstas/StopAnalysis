@@ -8,14 +8,6 @@
 
 using namespace std;
 
-// // Somehow causing segmentation fault <-- need to understand how
-// SR::~SR() {
-//   for (auto hmap : histMap) {
-//     delete hmap.second;
-//     hmap.second = nullptr;
-//   }
-// }
-
 void SR::SetName(string sr_name) {
   srname_ = sr_name;
 }
@@ -26,6 +18,10 @@ void SR::SetDetailName(string detail_name) {
 
 void SR::SetVar(string var_name, float lower_bound, float upper_bound) {
   bins_[var_name] = pair<float,float>(lower_bound, upper_bound);
+}
+
+void SR::SetMETBins(std::vector<float> met_bins) {
+  metbins_ = met_bins;
 }
 
 void SR::SetAllowDummyVars(int val) {
@@ -62,6 +58,14 @@ vector<string> SR::GetListOfVariables() const {
     vars.push_back(it->first);
   }
   return vars;
+}
+
+float* SR::GetMETBinsPtr() {
+  return metbins_.data();
+}
+
+int SR::GetNMETBins() {
+  return metbins_.size() - 1;
 }
 
 bool SR::PassesSelection(map<string, float> values) {

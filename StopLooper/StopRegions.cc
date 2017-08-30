@@ -7,6 +7,7 @@ std::vector<SR> getStopSignalRegionsTopological() {
   SR base;
 
   SR srbase;
+  srbase.SetName("srbase");
   srbase.SetVar("mt", 150, fInf);
   srbase.SetVar("met", 250, fInf);
   srbase.SetVar("mt2w", 0, fInf);
@@ -31,67 +32,59 @@ std::vector<SR> getStopSignalRegionsTopological() {
   sr.SetVar("tmod", 10, fInf);
   sr.SetVar("mlb", 175, fInf);
   sr.SetVar("met", 250, fInf);
+  sr.SetMETBins({250, 350, 450, 600, 1500});
   SRvec.emplace_back(sr);
-  const float metbinsA[] = {250, 350, 450, 600, 1500};
-  plot1D("h_metbins", -1, 0, SRvec.back().histMap, ";E^{miss}_{T} [GeV]", 4, metbinsA);
 
   sr.SetName("srB");
   sr.SetDetailName("2to3j_tmod10toInf_mlb175toInf");
   sr.SetVar("njet", 2, 4);
   sr.SetVar("tmod", 10, fInf);
   sr.SetVar("mlb", 175, fInf);
+  sr.SetMETBins({250, 450, 600, 1500});
   SRvec.emplace_back(sr);
-  const float metbinsB[] = {250, 450, 600, 1500};
-  plot1D("h_metbins", -1, 0, SRvec.back().histMap, ";E^{miss}_{T} [GeV]", 3, metbinsB);
 
   sr.SetName("srC");
   sr.SetDetailName("geq4j_tmodlt0_mlb0to175");
   sr.SetVar("njet", 4, fInf);
   sr.SetVar("tmod", -fInf, 0);
   sr.SetVar("mlb", 0, 175);
+  sr.SetMETBins({250, 350, 450, 550, 650, 1500});
   SRvec.emplace_back(sr);
-  const float metbinsC[] = {250, 350, 450, 550, 650, 1500};
-  plot1D("h_metbins", -1, 0, SRvec.back().histMap, ";E^{miss}_{T} [GeV]", 5, metbinsC);
 
   sr.SetName("srD");
   sr.SetDetailName("geq4j_tmodlt0_mlb175toInf");
   sr.SetVar("tmod", -fInf, 0);
   sr.SetVar("mlb", 175, fInf);
+  sr.SetMETBins({250, 350, 450, 550, 1500});
   SRvec.emplace_back(sr);
-  const float metbinsD[] = {250, 350, 450, 550, 1500};
-  plot1D("h_metbins", -1, 0, SRvec.back().histMap, ";E^{miss}_{T} [GeV]", 4, metbinsD);
 
   sr.SetName("srE");
   sr.SetDetailName("geq4j_tmod0to10_mlb0to175");
   sr.SetVar("tmod", 0, 10);
   sr.SetVar("mlb", 0, 175);
+  sr.SetMETBins({250, 350, 450, 1500});
   SRvec.emplace_back(sr);
-  const float metbinsE[] = {250, 350, 450, 1500};
-  plot1D("h_metbins", -1, 0, SRvec.back().histMap, ";E^{miss}_{T} [GeV]", 3, metbinsE);
 
   sr.SetName("srF");
   sr.SetDetailName("geq4j_tmod0to10_mlb175toInf");
   sr.SetVar("tmod", 0, 10);
   sr.SetVar("mlb", 175, fInf);
+  sr.SetMETBins({250, 450, 1500});
   SRvec.emplace_back(sr);
-  const float metbinsF[] = {250, 450, 1500};
-  plot1D("h_metbins", -1, 0, SRvec.back().histMap, ";E^{miss}_{T} [GeV]", 2, metbinsF);
 
   sr.SetName("srG");
   sr.SetDetailName("geq4j_tmod0to10_mlb0to175");
   sr.SetVar("tmod", 0, 10);
   sr.SetVar("mlb", 0, 175);
+  sr.SetMETBins({250, 350, 450, 600, 1500});
   SRvec.emplace_back(sr);
-  const float metbinsG[] = {250, 350, 450, 600, 1500};
-  plot1D("h_metbins", -1, 0, SRvec.back().histMap, ";E^{miss}_{T} [GeV]", 4, metbinsG);
 
   sr.SetName("srH");
   sr.SetDetailName("geq4j_tmod10toInf_mlb175toInf");
   sr.SetVar("njet", 4, -1);
   sr.SetVar("met", 250, 450);
+  sr.SetMETBins({250, 450, 1500});
   SRvec.emplace_back(sr);
-  const float metbinsH[] = {250, 450, 1500};
-  plot1D("h_metbins", -1, 0, SRvec.back().histMap, ";E^{miss}_{T} [GeV]", 2, metbinsH);
 
   // Compressed regions
   sr.SetName("srI");
@@ -103,12 +96,40 @@ std::vector<SR> getStopSignalRegionsTopological() {
   sr.SetVar("met", 250, 350);
   sr.SetVar("dphilmet", 0, 2);
   sr.SetVar("dphijmet", 0.5, 3.1416);
+  sr.SetMETBins({250, 350, 450, 550, 1500});
   SRvec.emplace_back(sr);
-  const float metbinsI[] = {250, 350, 450, 550, 1500};
-  plot1D("h_metbins", -1, 0, SRvec.back().histMap, ";E^{miss}_{T} [GeV]", 4, metbinsI);
 
 
   return SRvec;
+}
+
+std::vector<SR> getStopControlRegionsNoBTagsTopological() {
+
+  std::vector<SR> CRvec;
+
+  // SR crbase;
+  // crbase.SetName("cr0bbase");
+  // crbase.SetVar("mt", 0, fInf);
+  // crbase.SetVar("met", 250, fInf);
+  // crbase.SetVar("nlep", 1, 2);
+  // crbase.SetVar("njet", 2, fInf);
+  // crbase.SetVar("nbjet", 0, 1);
+  // crbase.SetVar("dphijmet", 0.8, 3.14159);
+  // crbase.SetAllowDummyVars(1);
+  // CRvec.emplace_back(crbase);
+  // SR cr;
+
+  std::vector<SR> SRvec = getStopSignalRegions();
+  for (SR cr : SRvec) {
+    cr.SetName(cr.GetName().replace(0, 2, "cr0b"));
+    cr.SetAllowDummyVars(1);
+    cr.RemoveVar("mlb");
+    cr.RemoveVar("tmod");
+    cr.SetVar("nbjet", 0, 1);
+    CRvec.emplace_back(cr);
+  }
+
+  return CRvec;
 }
 
 std::vector<SR> getStopSignalRegions() {
@@ -271,32 +292,24 @@ std::vector<SR> getStopControlRegionsDilepton() {
 
   cr.SetAllowDummyVars(1);
   cr.SetName("cr2ltest");         // test for no cut
-  cr.SetVar("met_rl", 0, fInf);
+  cr.SetVar("met_rl", 100, fInf);
   CRvec.emplace_back(cr);
 
   cr.SetName("cr2ltest1");         // test
-  cr.SetVar("met_rl", 250, fInf);
+  cr.SetVar("nlep_rl", 2, 3);
   CRvec.emplace_back(cr);
 
   cr.SetName("cr2ltest2");         // test
-  cr.SetVar("njet", 2, fInf);
+  cr.SetVar("met_rl", 250, fInf);
   CRvec.emplace_back(cr);
 
-  cr.SetName("cr2ltest3");         // test
-  cr.SetVar("nlep_rl", 1, fInf);
-  CRvec.emplace_back(cr);
+  // cr.SetName("cr2ltest4");         // test
+  // cr.SetVar("mt_rl", 150, fInf);
+  // CRvec.emplace_back(cr);
 
-  cr.SetName("cr2ltest4");         // test
-  cr.SetVar("mt_rl", 150, fInf);
-  CRvec.emplace_back(cr);
-
-  cr.SetName("cr2ltest5");         // test
-  cr.SetVar("nbjet", 1, fInf);
-  CRvec.emplace_back(cr);
-
-  cr.SetName("cr2ltest6");         // test
-  cr.SetVar("dphijmet_rl", 0.8, 3.14159);
-  CRvec.emplace_back(cr);
+  // cr.SetName("cr2ltest5");         // test
+  // cr.SetVar("nbjet", 1, fInf);
+  // CRvec.emplace_back(cr);
 
   cr = crbase;
   cr.SetName("cr2lincl1");
