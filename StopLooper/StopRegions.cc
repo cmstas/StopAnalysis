@@ -376,7 +376,7 @@ std::vector<SR> getStopControlRegionsNoBTags() {
 
   SR crbase;
   crbase.SetName("cr0bbase");
-  crbase.SetVar("mt", 150, fInf);
+  crbase.SetVar("mt", 0, fInf);
   crbase.SetVar("met", 250, fInf);
   crbase.SetVar("nlep", 1, 2);
   crbase.SetVar("njet", 2, fInf);
@@ -418,6 +418,7 @@ std::vector<SR> getStopControlRegionsNoBTags() {
   cr = crbase;
   cr.SetName("cr0bincl1");
   cr.SetDetailName("2to3j_met250toInf");
+  cr.SetVar("mt", 150, fInf);
   cr.SetVar("njet", 2, 4);
   cr.SetVar("met", 250, fInf);
   CRvec.emplace_back(cr);
