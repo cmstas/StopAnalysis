@@ -95,6 +95,17 @@ std::vector<SR> getStopSignalRegionsTopological() {
 
   // Compressed regions
   sr.SetName("srI");
+  sr.SetDetailName("geq5j_lpt0to150");
+  sr.SetVar("mt", 150, fInf);
+  sr.SetVar("njet", 5, fInf);
+  sr.SetVar("nbjet", 1, fInf);
+  sr.SetVar("lep1pt", 0, 150);
+  sr.SetVar("met", 250, 350);
+  sr.SetVar("dphilmet", 0, 2);
+  sr.SetVar("dphijmet", 0.5, 3.1416);
+  SRvec.emplace_back(sr);
+  const float metbinsI[] = {250, 350, 450, 550, 1500};
+  plot1D("h_metbins", -1, 0, SRvec.back().histMap, ";E^{miss}_{T} [GeV]", 4, metbinsI);
 
 
   return SRvec;
@@ -197,6 +208,32 @@ std::vector<SR> getStopSignalRegions() {
   sr.SetName("srF2");
   sr.SetDetailName("geq4j_tmod0to10_mlb175toInf_met450toInf");
   sr.SetVar("met", 450, -1);
+  SRvec.emplace_back(sr);
+
+  sr.SetName("srI1");
+  sr.SetDetailName("geq5j_lpt0to150_met250to350");
+  sr.SetVar("mt", 150, -1);
+  sr.SetVar("njet", 5, -1);
+  sr.SetVar("nbjet", 1, -1);
+  sr.SetVar("lep1pt", 0, 150);
+  sr.SetVar("met", 250, 350);
+  sr.SetVar("dphilmet", 0, 2);
+  sr.SetVar("dphijmet", 0.5, 3.1416);
+  SRvec.emplace_back(sr);
+
+  sr.SetName("srI2");
+  sr.SetDetailName("geq5j_lpt0to150_met350to450");
+  sr.SetVar("met", 350, 450);
+  SRvec.emplace_back(sr);
+
+  sr.SetName("srI3");
+  sr.SetDetailName("geq5j_lpt0to150_met450to550");
+  sr.SetVar("met", 450, 550);
+  SRvec.emplace_back(sr);
+
+  sr.SetName("srI4");
+  sr.SetDetailName("geq5j_lpt0to150_met550toInf");
+  sr.SetVar("met", 550, -1);
   SRvec.emplace_back(sr);
 
 
