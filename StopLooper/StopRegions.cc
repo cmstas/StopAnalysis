@@ -260,7 +260,7 @@ std::vector<SR> getStopControlRegionsDilepton() {
   crbase.SetVar("mt_rl", 150, fInf);
   crbase.SetVar("met_rl", 250, fInf);
   crbase.SetVar("mt2w_rl", 100, fInf);
-  crbase.SetVar("tmod_rl", 0, fInf);
+  crbase.SetVar("tmod_rl", -fInf, fInf); // temporary until the inefficiency is understood
   crbase.SetVar("nlep_rl", 2, 3);
   crbase.SetVar("njet", 2, fInf);
   crbase.SetVar("nbjet", 1, fInf);
@@ -372,56 +372,71 @@ std::vector<SR> getStopControlRegionsDilepton() {
 
 std::vector<SR> getStopControlRegionsNoBTags() {
 
-  SR crbase;
-  crbase.SetName("cr0bbase");
-  crbase.SetVar("mt", 50, -1);
-  crbase.SetVar("met", 50, -1);
-  crbase.SetVar("mt2w", 100, -1);
-  crbase.SetVar("mlb", 0, -1);
-  crbase.SetVar("tmod", 0, 2);
-  crbase.SetVar("nlep", 1, 2);
-  crbase.SetVar("njet", 2, -1);
-  crbase.SetVar("nbjet", 0, -1);
-  crbase.SetVar("dphijmet", 0, 3.14159);
-  crbase.SetAllowDummyVars(1);
-
-  SR cr;
   std::vector<SR> CRvec;
 
-  // CR 0b
-  cr.SetAllowDummyVars(1);
-  cr.SetName("crtest");         // test for no cut
-  cr.SetVar("met", 0, fInf);
-  CRvec.emplace_back(cr);
+  SR crbase;
+  crbase.SetName("cr0bbase");
+  crbase.SetVar("mt", 150, fInf);
+  crbase.SetVar("met", 250, fInf);
+  crbase.SetVar("nlep", 1, 2);
+  crbase.SetVar("njet", 2, fInf);
+  crbase.SetVar("nbjet", 0, 1);
+  crbase.SetVar("dphijmet", 0.8, 3.14159);
+  crbase.SetAllowDummyVars(1);
+  CRvec.emplace_back(crbase);
 
-  cr.SetName("crtest1");         // test
+  SR cr;
+
+  // // CR tests
+  // cr.SetAllowDummyVars(1);
+  // cr.SetName("crtest");         // test for no cut
+  // cr.SetVar("met", 0, fInf);
+  // CRvec.emplace_back(cr);
+
+  // cr.SetName("crtest1");         // test
+  // cr.SetVar("met", 250, fInf);
+  // CRvec.emplace_back(cr);
+
+  // cr.SetName("crtest2");         // test
+  // cr.SetVar("njet", 2, fInf);
+  // CRvec.emplace_back(cr);
+
+  // cr.SetName("crtest3");         // test
+  // cr.SetVar("nlep", 1, fInf);
+  // CRvec.emplace_back(cr);
+
+  // cr.SetName("crtest4");         // test
+  // cr.SetVar("mt", 150, fInf);
+  // CRvec.emplace_back(cr);
+
+  // cr.SetName("crtest5");         // test
+  // cr.SetVar("tmod", 0, fInf);
+  // CRvec.emplace_back(cr);
+
+  
+  // CR0b 
+  cr = crbase;
+  cr.SetName("cr0bincl1");
+  cr.SetDetailName("2to3j_met250toInf");
+  cr.SetVar("njet", 2, 4);
   cr.SetVar("met", 250, fInf);
   CRvec.emplace_back(cr);
 
-  cr.SetName("crtest2");         // test
-  cr.SetVar("njet", 2, fInf);
+  cr.SetName("cr0bincl2");
+  cr.SetDetailName("geq4j_met250toInf");
+  cr.SetVar("njet", 4, fInf);
+  cr.SetVar("met", 250, fInf);
   CRvec.emplace_back(cr);
 
-  cr.SetName("crtest3");         // test
-  cr.SetVar("nlep", 1, fInf);
-  CRvec.emplace_back(cr);
-
-  cr.SetName("crtest4");         // test
-  cr.SetVar("mt", 150, fInf);
-  CRvec.emplace_back(cr);
-
-  cr.SetName("crtest5");         // test
-  cr.SetVar("tmod", 0, fInf);
-  CRvec.emplace_back(cr);
-
-  std::vector<SR> SRvec = getStopSignalRegions();
-
-  for (SR cr : SRvec) {
-    cr.SetName(cr.GetName().replace(0, 2, "cr0b"));
-    cr.SetAllowDummyVars(1);
-    cr.SetVar("nbjet", 0, 1);
-    CRvec.emplace_back(cr);
-  }
+  // std::vector<SR> SRvec = getStopSignalRegions();
+  // for (SR cr : SRvec) {
+  //   cr.SetName(cr.GetName().replace(0, 2, "cr0b"));
+  //   cr.SetAllowDummyVars(1);
+  //   cr.RemoveVar("mlb");
+  //   cr.RemoveVar("tmod");
+  //   cr.SetVar("nbjet", 0, 1);
+  //   CRvec.emplace_back(cr);
+  // }
 
   return CRvec;
 }
