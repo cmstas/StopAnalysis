@@ -23,7 +23,7 @@ for SAMPLE in ${Samples[@]}; do
 done
 
 # 2016 data for comparison
-INDIR=/nfs-7/userdata/stopRun2/analysis2016_SUS-16-051_35p9fbinv/v24/skim
+INDIR=/nfs-7/userdata/stopRun2/analysis2016_SUS-16-051_35p9fbinv/v24/output
 OUTDIR=output/data2016
 mkdir -p ${OUTDIR}
 mkdir -p ${LOGDIR}

@@ -44,16 +44,18 @@ void compareCR2lBase() {
   // vector<string> Hists = {"h_njets", "h_rlmet", "h_mt2w", "h_tmod", "h_nbjets", "h_dphijmet"};
   // vector<string> Hists = {"h_njets", "h_rlmet", "h_mt2w", "h_tmod", "h_nbjets", "h_dphijmet"};
 
-  vector<string> Dirs = {"cr0bbase", "cr0bA", "cr0bC"};
+  vector<string> Dirs = {"cr0bbase"};
   vector<string> Hists = {"h_metbins", "h_mt", "h_njets", "h_nbjets", "h_tmod", "h_mlepb"};
 
   for (auto dirstr : Dirs) {
     for (auto hn : Hists) {
-      for (string suf : {"", "_e", "_mu"}) {
+      for (string suf : {"", "_e", "_mu", "_barrele", "_endcape"}) {
         string hstr = hn + suf;
         vector<Color_t> vcolor;
         if (suf == "") vcolor.push_back(kAzure+7);
-        if (suf == "_mu") vcolor.push_back(kOrange+2);
+        else if (suf == "_mu") vcolor.push_back(kOrange+2);
+        else if (suf == "_barrele") vcolor.push_back(kCyan-3);
+        else if (suf == "_endcape") vcolor.push_back(kRed-9);
 
         auto hnew = (TH1F*) ifile_new->Get((dirstr+"/"+hstr).c_str());
         if (!hnew) { cout << "Can't find " << dirstr+"/"+hstr << endl; continue; }
