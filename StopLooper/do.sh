@@ -14,16 +14,17 @@ mkdir -p ${LOGDIR}
 # declare -a Samples=(data_singlemu)
 declare -a Samples=(data_singlemu data_singleel data_met data_jetht)
 
-for SAMPLE in ${Samples[@]}; do
-    echo ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} '>&' ${LOGDIR}/log_${SAMPLE}.txt
-    # ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
-    eval "nohup ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >&  ${LOGDIR}/log_${SAMPLE}.txt &"
-    # echo nice -n 10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
-    # eval "nohup nice -n 10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
-done
+# for SAMPLE in ${Samples[@]}; do
+#     echo ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} '>&' ${LOGDIR}/log_${SAMPLE}.txt
+#     # ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
+#     eval "nohup ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >&  ${LOGDIR}/log_${SAMPLE}.txt &"
+#     # echo nice -n 10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
+#     # eval "nohup nice -n 10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
+# done
 
 # 2016 data for comparison
 INDIR=/nfs-7/userdata/stopRun2/analysis2016_SUS-16-051_35p9fbinv/v24/output
+# INDIR=/nfs-7/userdata/stopRun2/analysis2016_SUS-16-051_35p9fbinv/v24/skim
 OUTDIR=output/data2016
 mkdir -p ${OUTDIR}
 mkdir -p ${LOGDIR}
@@ -61,3 +62,14 @@ declare -a Samples=(DYJetsToLL TTGJets TTWJets TTZ W1Jets W2Jets W3Jets W4Jets W
 
 # 2016 Signal
 declare -a Samples=(Signal_T2bW Signal_T2tb Signal_T2tt)
+
+# Monitor the running
+while : ; do
+    sleep 10
+    RunningJobs=`jobs`
+    [[ $RunningJobs == "" ]] && break
+done    
+echo All jobs are done!
+echo -e '\a'
+
+. temp.sh

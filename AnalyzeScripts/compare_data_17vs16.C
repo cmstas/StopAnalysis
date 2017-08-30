@@ -43,6 +43,7 @@ void compareCR2lBase() {
   // vector<string> Dirs = {"cr2ltest4", "cr2ltest5", "cr2ltest6", "cr2lbase"};
   // vector<string> Hists = {"h_njets", "h_rlmet", "h_mt2w", "h_tmod", "h_nbjets", "h_dphijmet"};
   // vector<string> Hists = {"h_njets", "h_rlmet", "h_mt2w", "h_tmod", "h_nbjets", "h_dphijmet"};
+  // vector<string> Hists = {"h_rlmet", "h_mll"};
 
   vector<string> Dirs = {"cr0bbase"};
   vector<string> Hists = {"h_metbins", "h_mt", "h_njets", "h_nbjets", "h_tmod", "h_mlepb"};
@@ -63,7 +64,7 @@ void compareCR2lBase() {
         if (!hold) { cout << "Can't find " << dirstr+"/"+hstr << endl; continue; }
 
         // hold->Scale(1.0*hnew->Integral()/hold->Integral());
-        hold->Scale(10.7/35.87);
+        hold->Scale(10.7/35.87 * 0.83); // correction factor from Zpeak
 
         float scale = hnew->Integral(0,-1)/hold->Integral(0,-1);
 

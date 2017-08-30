@@ -25,6 +25,7 @@ public:
   void SetName(std::string sr_name);
   void SetDetailName(std::string detail_name);
   void SetVar(std::string var_name, float lower_bound, float upper_bound);
+  void SetMETBins(std::vector<float> met_bins);
   void SetAllowDummyVars(int val);
 
   std::string GetName() const;
@@ -34,6 +35,8 @@ public:
   float GetUpperBound(std::string var_name) const;
   unsigned int GetNumberOfVariables() const;
   std::vector<std::string> GetListOfVariables() const;
+  int GetNMETBins();
+  float* GetMETBinsPtr();
 
   bool PassesSelection(std::map<std::string, float> values);
   void RemoveVar(std::string var_name);
@@ -49,6 +52,7 @@ private:
   std::string detailname_;
   std::map<std::string,std::pair<float,float>> bins_;
   std::vector<std::string> defaultplots_;
+  std::vector<float> metbins_;
   int kAllowDummyVars_;
 
 };
