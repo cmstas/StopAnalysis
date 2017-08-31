@@ -208,12 +208,15 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx,  Factoriz
           // get uncorrected jet p4 to use as input for corrections
         LorentzVector pfjet_p4_uncor = pfjets_p4().at(iJet) * cms3.pfjets_undoJEC().at(iJet);
 
+	double corr = 1;
+ 	if(applynewcorr){
           // get L1FastL2L3Residual total correction
           corrector->setRho   ( cms3.evt_fixgridfastjet_all_rho() );
           corrector->setJetA  ( cms3.pfjets_area().at(iJet)       );
           corrector->setJetPt ( pfjet_p4_uncor.pt()               );
           corrector->setJetEta( pfjet_p4_uncor.eta()              );
-          double corr = corrector->getCorrection();
+          corr = corrector->getCorrection();
+	}
 
           // check for negative correction
           if (corr < 0. && fabs(pfjet_p4_uncor.eta()) < 4.7) {
@@ -544,26 +547,26 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx,  Factoriz
    nGoodJets = 0;
 
     // fill info for ak8pfjets
-    for (size_t idx = 0; idx < ak8jets_p4().size(); ++idx)
-    {
-        if(pfjets_p4().at(idx).pt() < m_ak8_pt_cut) continue;
-        if(fabs(pfjets_p4().at(idx).eta()) > m_ak8_eta_cut) continue;
-        if(!isFastsim && m_ak8_passid && !isLoosePFJetV2(idx)) continue;
+  //   for (size_t idx = 0; idx < ak8jets_p4().size(); ++idx)
+  //   {
+  //       if(pfjets_p4().at(idx).pt() < m_ak8_pt_cut) continue;
+  //       if(fabs(pfjets_p4().at(idx).eta()) > m_ak8_eta_cut) continue;
+  //       if(!isFastsim && m_ak8_passid && !isLoosePFJetV2(idx)) continue;
 
-        ak8pfjets_p4.push_back(ak8jets_p4().at(idx));
-        ak8pfjets_tau1.push_back(ak8jets_nJettinessTau1().at(idx));
-        ak8pfjets_tau2.push_back(ak8jets_nJettinessTau2().at(idx));
-        ak8pfjets_tau3.push_back(ak8jets_nJettinessTau3().at(idx));
-        //ak8pfjets_top_mass.push_back(ak8jets_topJetMass().at(idx));
-        ak8pfjets_pruned_mass.push_back(ak8jets_prunedMass().at(idx));
-        ak8pfjets_trimmed_mass.push_back(ak8jets_trimmedMass().at(idx));
-        ak8pfjets_filtered_mass.push_back(ak8jets_filteredMass().at(idx));
-	//ak8pfjets_pu_id.push_back(ak8jets_pileupJetId().at(idx));    
-        ak8pfjets_parton_flavor.push_back(ak8jets_partonFlavour().at(idx));
+  //       ak8pfjets_p4.push_back(ak8jets_p4().at(idx));
+  //       ak8pfjets_tau1.push_back(ak8jets_nJettinessTau1().at(idx));
+  //       ak8pfjets_tau2.push_back(ak8jets_nJettinessTau2().at(idx));
+  //       ak8pfjets_tau3.push_back(ak8jets_nJettinessTau3().at(idx));
+  //       //ak8pfjets_top_mass.push_back(ak8jets_topJetMass().at(idx));
+  //       ak8pfjets_pruned_mass.push_back(ak8jets_prunedMass().at(idx));
+  //       ak8pfjets_trimmed_mass.push_back(ak8jets_trimmedMass().at(idx));
+  //       ak8pfjets_filtered_mass.push_back(ak8jets_filteredMass().at(idx));
+	// //ak8pfjets_pu_id.push_back(ak8jets_pileupJetId().at(idx));
+  //       ak8pfjets_parton_flavor.push_back(ak8jets_partonFlavour().at(idx));
 
-        nGoodJets++;
+  //       nGoodJets++;
 
-    }
+  //   }
     ak8GoodPFJets = nGoodJets;
     nGoodJets=0;
 

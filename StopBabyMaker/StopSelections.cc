@@ -54,13 +54,15 @@ bool PassJetPreSelections(unsigned int jetIdx,float pt, float eta, bool passjid,
           // get uncorrected jet p4 to use as input for corrections
         LorentzVector pfjet_p4_uncor = pfjets_p4().at(jetIdx) * cms3.pfjets_undoJEC().at(jetIdx);
 
+        double corr = 1;
+        if (applynewcorr) {
           // get L1FastL2L3Residual total correction
           corrector->setRho   ( cms3.evt_fixgridfastjet_all_rho() );
           corrector->setJetA  ( cms3.pfjets_area().at(jetIdx)       );
           corrector->setJetPt ( pfjet_p4_uncor.pt()               );
           corrector->setJetEta( pfjet_p4_uncor.eta()              );
-          double corr = corrector->getCorrection();
-
+          corr = corrector->getCorrection();
+        }
           // check for negative correction
           if (corr < 0. && fabs(pfjet_p4_uncor.eta()) < 4.7) {
             std::cout << "ScanChain::Looper: WARNING: negative jet correction: " << corr
