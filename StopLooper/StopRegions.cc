@@ -267,20 +267,9 @@ std::vector<SR> getStopControlRegionsDilepton() {
   SR crbase;
   crbase.SetAllowDummyVars(1);
 
-  crbase.SetName("cr2ltest");   // test
-  crbase.SetVar("mt_rl", 150, fInf);
-  crbase.SetVar("met_rl", 150, fInf);
-  crbase.SetVar("tmod_rl", -fInf, fInf);
-  crbase.SetVar("njet", 0, fInf);
-  crbase.SetVar("nbjet", 0, fInf);
-  crbase.SetVar("dphijmet_rl", 0.5, 3.14159);
-  crbase.SetVar("nlep_rl", 1, 3);
-  CRvec.emplace_back(crbase);
-
   crbase.SetName("cr2lbase");
   crbase.SetVar("mt_rl", 150, fInf);
   crbase.SetVar("met_rl", 250, fInf);
-  crbase.SetVar("mt2w_rl", 100, fInf);
   crbase.SetVar("tmod_rl", -fInf, fInf); // temporary until the inefficiency is understood
   crbase.SetVar("nlep_rl", 2, 3);
   crbase.SetVar("njet", 2, fInf);
@@ -291,20 +280,22 @@ std::vector<SR> getStopControlRegionsDilepton() {
   SR cr;
 
   cr.SetAllowDummyVars(1);
-  cr.SetName("cr2ltest");         // test for no cut
-  cr.SetVar("met_rl", 100, fInf);
-  CRvec.emplace_back(cr);
-
-  cr.SetName("cr2ltest1");         // test
-  cr.SetVar("nlep_rl", 2, 3);
+  cr.SetName("cr2ltest1");         // test for no cut
+  cr.SetVar("met", 50, fInf);
+  cr.SetVar("njet", 2, fInf);
   CRvec.emplace_back(cr);
 
   cr.SetName("cr2ltest2");         // test
-  cr.SetVar("met_rl", 250, fInf);
+  cr.SetVar("lep1pt", 35, fInf);
+  cr.SetVar("nlep", 2, 3);
+  CRvec.emplace_back(cr);
+
+  cr.SetName("cr2ltest4");         // test
+  cr.SetVar("met", 150, fInf);
   CRvec.emplace_back(cr);
 
   // cr.SetName("cr2ltest4");         // test
-  // cr.SetVar("mt_rl", 150, fInf);
+  // cr.SetVar("mt", 150, fInf);
   // CRvec.emplace_back(cr);
 
   // cr.SetName("cr2ltest5");         // test
@@ -389,7 +380,7 @@ std::vector<SR> getStopControlRegionsNoBTags() {
 
   SR crbase;
   crbase.SetName("cr0bbase");
-  crbase.SetVar("mt", 0, fInf);
+  crbase.SetVar("mt", 150, fInf);
   crbase.SetVar("met", 250, fInf);
   crbase.SetVar("nlep", 1, 2);
   crbase.SetVar("njet", 2, fInf);
@@ -400,27 +391,27 @@ std::vector<SR> getStopControlRegionsNoBTags() {
 
   SR cr;
 
-  // // CR tests
-  // cr.SetAllowDummyVars(1);
-  // cr.SetName("crtest");         // test for no cut
-  // cr.SetVar("met", 0, fInf);
-  // CRvec.emplace_back(cr);
+  // CR tests
+  cr.SetAllowDummyVars(1);
+  cr.SetName("crtest1");         // test for no cut
+  cr.SetVar("met", 150, fInf);
+  crbase.SetVar("nlep", 1, 2);
+  crbase.SetVar("nvleps", 1, 2);
+  crbase.SetVar("njet", 2, fInf);
+  crbase.SetVar("nbjet", 0, 1);
+  CRvec.emplace_back(cr);
 
-  // cr.SetName("crtest1");         // test
-  // cr.SetVar("met", 250, fInf);
-  // CRvec.emplace_back(cr);
+  cr.SetName("crtest2");         // test
+  cr.SetVar("dphijmet", 0.8, 3.14159);
+  CRvec.emplace_back(cr);
 
-  // cr.SetName("crtest2");         // test
-  // cr.SetVar("njet", 2, fInf);
-  // CRvec.emplace_back(cr);
+  cr.SetName("crtest3");         // test
+  cr.SetVar("met", 250, fInf);
+  CRvec.emplace_back(cr);
 
-  // cr.SetName("crtest3");         // test
-  // cr.SetVar("nlep", 1, fInf);
-  // CRvec.emplace_back(cr);
-
-  // cr.SetName("crtest4");         // test
-  // cr.SetVar("mt", 150, fInf);
-  // CRvec.emplace_back(cr);
+  cr.SetName("crtest4");         // test
+  cr.SetVar("mt", 150, fInf);
+  CRvec.emplace_back(cr);
 
   // cr.SetName("crtest5");         // test
   // cr.SetVar("tmod", 0, fInf);
