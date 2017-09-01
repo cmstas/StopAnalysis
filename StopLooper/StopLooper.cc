@@ -65,7 +65,7 @@ const bool applyISRWeights = true;
 // turn on to enable plots of MT2 with systematic variations applied. will only do variations for applied weights
 const bool doSystVariationPlots = true;
 // turn on to apply Nvtx reweighting to MC
-const bool doNvtxReweight = true;
+const bool doNvtxReweight = false;
 // turn on to apply nTrueInt reweighting to MC
 const bool doNTrueIntReweight = true;
 // turn on to apply json file to data
@@ -312,7 +312,7 @@ void StopLooper::looper(TChain* chain, string sample, string output_dir) {
       // fillHistosForSR();
 
       // fillHistosForCRemu();
-      // fillHistosForCR0b();
+      fillHistosForCR0b();
 
       values_["nlep_rl"] = (ngoodleps() == 1 && nvetoleps() >= 2 && lep2_p4().Pt() > 10)? 2 : ngoodleps();
       values_["mt_rl"] = mt_met_lep_rl();
@@ -322,8 +322,9 @@ void StopLooper::looper(TChain* chain, string sample, string output_dir) {
       values_["tmod_rl"] = topnessMod_rl();
       // values_["mlb_rl"] = Mlb_closestb();
       values_["mll"] = (lep1_p4() + lep2_p4()).M();
+      values_["osdilep"] = lep1_pdgid() == -lep2_pdgid();
 
-      fillHistosForCR2l();
+      // fillHistosForCR2l();
 
       // if (event > 10) break;  // for debugging purpose
     } // end of event loop
@@ -547,7 +548,7 @@ void StopLooper::fillHistosForCR0b(string suf) {
         plot1D("h_tmod"+s,     values_["tmod"]    , evtweight_, cr.histMap, ";modified topness"     , 20, -5, 15);
 
         const float met_bins[] = {0, 250, 350, 450, 550, 650, 800};
-        plot1D("h_metbins"+s,   values_["met"]    , evtweight_, cr.histMap, ";E^{miss}_{T} [GeV]"        , 6, met_bins);
+        plot1D("h_metbins"+s,   values_["met"]    , evtweight_, cr.histMap, ";E^{miss}_{T} [GeV]"   , 6, met_bins);
       };
       fillhists(suf);
       if ( abs(lep1_pdgid()) == 11 ) {
@@ -560,8 +561,12 @@ void StopLooper::fillHistosForCR0b(string suf) {
       else if ( abs(lep1_pdgid()) == 13 ) {
         fillhists(suf+"_mu");
       }
-      if (HLT_MET() || HLT_SingleEl())
-        fillhists(suf+"_passSingleLep");
+      if (HLT_SingleMu() || HLT_SingleEl())
+        fillhists(suf+"_hltsl");
+      if (HLT_MET())
+        fillhists(suf+"_hltmet");
+      if (HLT_MET_MHT())
+        fillhists(suf+"_hltmht");
 
     }
   }

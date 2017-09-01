@@ -393,23 +393,30 @@ std::vector<SR> getStopControlRegionsNoBTags() {
 
   // CR tests
   cr.SetAllowDummyVars(1);
-  cr.SetName("crtest1");         // test for no cut
+  cr.SetName("cr0btest1");         // test for no cut
   cr.SetVar("met", 150, fInf);
-  crbase.SetVar("nlep", 1, 2);
-  crbase.SetVar("nvleps", 1, 2);
-  crbase.SetVar("njet", 2, fInf);
-  crbase.SetVar("nbjet", 0, 1);
+  cr.SetVar("nlep", 1, 2);
+  cr.SetVar("nvleps", 1, 2);
+  cr.SetVar("njet", 2, fInf);
+  cr.SetVar("nbjet", 0, 1);
   CRvec.emplace_back(cr);
 
-  cr.SetName("crtest2");         // test
+  cr.SetName("cr0btestdilep");
+  cr.SetVar("nlep", 2, 3);
+  cr.SetVar("osdilep", 1, 2);
+  CRvec.emplace_back(cr);
+
+  cr.SetName("cr0btest2");         // test
+  cr.SetVar("nlep", 1, 2);
+  cr.RemoveVar("osdilep");
   cr.SetVar("dphijmet", 0.8, 3.14159);
   CRvec.emplace_back(cr);
 
-  cr.SetName("crtest3");         // test
+  cr.SetName("cr0btest3");         // test
   cr.SetVar("met", 250, fInf);
   CRvec.emplace_back(cr);
 
-  cr.SetName("crtest4");         // test
+  cr.SetName("cr0btest4");         // test
   cr.SetVar("mt", 150, fInf);
   CRvec.emplace_back(cr);
 
