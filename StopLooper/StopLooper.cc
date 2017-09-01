@@ -65,7 +65,7 @@ const bool applyISRWeights = true;
 // turn on to enable plots of MT2 with systematic variations applied. will only do variations for applied weights
 const bool doSystVariationPlots = true;
 // turn on to apply Nvtx reweighting to MC
-const bool doNvtxReweight = false;
+const bool doNvtxReweight = true;
 // turn on to apply nTrueInt reweighting to MC
 const bool doNTrueIntReweight = true;
 // turn on to apply json file to data
@@ -81,12 +81,12 @@ const bool fasterRuntime = true;
 void StopLooper::SetSignalRegions() {
 
   // SRVec = getStopSignalRegions();
-  // CR0bVec = getStopControlRegionsNoBTags();
+  CR0bVec = getStopControlRegionsNoBTags();
   CR2lVec = getStopControlRegionsDilepton();
   CRemuVec = getStopControlRegionsEMu();
 
   SRVec = getStopSignalRegionsTopological();
-  CR0bVec = getStopControlRegionsNoBTagsTopological();
+  // CR0bVec = getStopControlRegionsNoBTagsTopological();
 
   if (verbose) {
     cout << "SRVec.size = " << SRVec.size() << ", including the following:" << endl;
@@ -149,10 +149,24 @@ void StopLooper::looper(TChain* chain, string sample, string output_dir) {
   // const char* json_file = "../StopCORE/inputs/json_files/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON_snt.txt";
   // // 2017 dataset json, 10.09/fb (10.07 until 300780)
   // const char* json_file = "../StopCORE/inputs/json_files/Cert_294927-301141_13TeV_PromptReco_Collisions17_JSON_snt.txt";
+  // // 2017 dataset json, 8.32/fb 
+  // const char* json_file = "../StopCORE/inputs/json_files/Cert_294927-300575_13TeV_PromptReco_Collisions17_JSON_snt.txt";
 
   // Combined 2016 and 2017 json,
-  const char* json_file = "../StopCORE/inputs/json_files/Cert_271036-301141_13TeV_Combined1617_JSON_snt.txt";
+  // const char* json_file = "../StopCORE/inputs/json_files/Cert_271036-301141_13TeV_Combined1617_JSON_snt.txt";
+  const char* json_file = "../StopCORE/inputs/json_files/Cert_271036-300575_13TeV_Combined1617_JSON_snt.txt";
   const float kLumi = 35.87;
+
+  // Setup pileup re-weighting
+  if (doNvtxReweight) {
+    TFile f_purw("/home/users/sicheng/working/StopAnalysis/AnalyzeScripts/pu_reweighting_hists/nvtx_reweighting_alldata.root");
+    TH1F* h_nvtxscale = (TH1F*) f_purw.Get("h_nvtxscale_16to17");
+    if (!h_nvtxscale) throw invalid_argument("???");
+    for (int i = 1; i < 70; ++i) {
+      nvtxscale[i] = h_nvtxscale->GetBinContent(i);
+      cout << i << "  " << nvtxscale[i] << endl;
+    }
+  }
 
   // // Test the lumi is in the baby
   // set<pair<int,int>> lumi_ran;
@@ -162,10 +176,14 @@ void StopLooper::looper(TChain* chain, string sample, string output_dir) {
     set_goodrun_file(json_file);
   }
 
-  // sampleInfo::sampleUtil samp_info( sampleInfo::ID::k_single_mu );
   TFile dummy( (output_dir+"/dummy.root").c_str(), "RECREATE" );
   SetSignalRegions();
   // GenerateAllSRptrSets();
+
+  // Setup event weight calculation
+  sampleInfo::sampleUtil samp_info( sampleInfo::ID::k_single_mu ); // test
+  sysInfo::evtWgtInfo wgtInfo;
+  wgtInfo.setUp( samp_info.id );  
 
   int nDuplicates = 0;
   int nEvents = chain->GetEntries();
@@ -185,6 +203,7 @@ void StopLooper::looper(TChain* chain, string sample, string output_dir) {
     tree->SetCacheSize(128*1024*1024);
     babyAnalyzer.Init(tree);
 
+    bool is2016data = TString(currentFile->GetTitle()).Contains("Run2016");
     dummy.cd();
     // Loop over Events in current file
     if (nEventsTotal >= nEventsChain) continue;
@@ -224,14 +243,28 @@ void StopLooper::looper(TChain* chain, string sample, string output_dir) {
       ++nPassedTotal;
 
       // Calculate event weight
-      float MCscale_HF = 1;
+
+      // float scale_vary = 1.;
+      float MCscale_HF = 1.;
+      // if(apply_HFweight_up) MCscale_HF = GetHFWeight(1.5);
+      // if(apply_HFweight_down) MCscale_HF = GetHFWeight(0.5);
+
+      // float MCscale_met = 1.;
       float MCscaling = weight_PU(); // just for now, will put in SFs later
+
+
       if (sample.find("WJets") != string::npos)
         evtweight_ = kLumi * scale1fb() * MCscaling * MCscale_HF;
       else if (sample.find("data") != string::npos)
         evtweight_ = 1;
       else
         evtweight_ = kLumi * scale1fb() * MCscaling;
+
+      if (doNvtxReweight) {
+        if (nvtxs() > 69) continue;
+        if (is2016data)
+          evtweight_ *= nvtxscale[nvtxs()];
+      }
 
       // Fill the variables
 
@@ -242,6 +275,7 @@ void StopLooper::looper(TChain* chain, string sample, string output_dir) {
       values_["mlb"] = Mlb_closestb();
       values_["tmod"] = topnessMod();
       values_["nlep"] = ngoodleps();
+      values_["nvlep"] = nvetoleps();
       values_["njet"] = ngoodjets();
       values_["nbjet"] = ngoodbtags();
       values_["ntbtag"] = ntightbtags();
@@ -278,7 +312,7 @@ void StopLooper::looper(TChain* chain, string sample, string output_dir) {
       // fillHistosForSR();
 
       // fillHistosForCRemu();
-      fillHistosForCR0b();
+      // fillHistosForCR0b();
 
       values_["nlep_rl"] = (ngoodleps() == 1 && nvetoleps() >= 2 && lep2_p4().Pt() > 10)? 2 : ngoodleps();
       values_["mt_rl"] = mt_met_lep_rl();
@@ -287,6 +321,7 @@ void StopLooper::looper(TChain* chain, string sample, string output_dir) {
       values_["dphijmet_rl"]= mindphi_met_j1_j2_rl();
       values_["tmod_rl"] = topnessMod_rl();
       // values_["mlb_rl"] = Mlb_closestb();
+      values_["mll"] = (lep1_p4() + lep2_p4()).M();
 
       fillHistosForCR2l();
 
@@ -429,12 +464,16 @@ void StopLooper::fillHistosForCRemu(string suf) {
 
 void StopLooper::fillHistosForCR2l(string suf) {
 
+  // Trigger requirements
+  if ( !HLT_SingleEl() && !HLT_SingleMu() ) return;
+
+  // if (lep1_pdgid() != -lep2_pdgid()) return; // temporary for zpeak check
+
   for (auto& cr : CR2lVec) {
     if ( cr.PassesSelection(values_) ) {
 
-      // plot1D("h_finemet"+suf, pfmet_rl(), evtweight_, cr.histMap, ";E_{T}^{miss} [GeV]", 150, 0, 1500);
-
       auto fillhists = [&] (string s) {
+        plot1D("h_finemet"+s,  values_["met"]         , evtweight_, cr.histMap, ";E_{T}^{miss} [GeV]"   , 80,  0, 800);
         plot1D("h_met"+s,      values_["met"]         , evtweight_, cr.histMap, ";E_{T}^{miss} [GeV]"   , 24,  50, 650);
         plot1D("h_metphi"+s,   values_["metphi"]      , evtweight_, cr.histMap, ";#phi(E_{T}^{miss})"   , 40,  -4, 4);
         plot1D("h_rlmet"+s,    values_["met_rl"]      , evtweight_, cr.histMap, ";(E^{miss}+lep2)_{T} [GeV]" , 24,  50, 650);
@@ -449,18 +488,33 @@ void StopLooper::fillHistosForCR2l(string suf) {
         plot1D("h_lep1eta"+s,  values_["lep1eta"]     , evtweight_, cr.histMap, ";#eta (lep1)"          , 20, -5, 5);
         plot1D("h_mlepb"+s,    values_["mlb"]         , evtweight_, cr.histMap, ";M(l,b) [GeV]"         , 24,  0, 600);
         plot1D("h_dphijmet"+s, values_["dphijmet_rl"] , evtweight_, cr.histMap, ";#Delta #phi (j, met)" , 24,  0, 4);
+        plot1D("h_nvtxs"+s,          nvtxs()          , evtweight_, cr.histMap, ";N Vertexes"           , 70,  1, 71);
 
         const float met_bins[] = {0, 250, 350, 450, 550, 650, 800};
         plot1D("h_metbins"+s,   values_["met"]    , evtweight_, cr.histMap, ";E^{miss}_{T} [GeV]"        , 6, met_bins);
         plot1D("h_rlmetbins"+s, values_["met_rl"] , evtweight_, cr.histMap, ";(E^{miss}+lep2)_{T} [GeV]" , 6, met_bins);
 
         // Luminosity test at Z peak
-        float mll = (lep1_p4()+lep2_p4()).M();
-        if (80 < mll && mll < 100)
-          plot1D("h_mll"+s, mll, evtweight_, cr.histMap, ";M(ll) [GeV]", 70, 60, 130 );
-
+        if (lep1_pdgid() == -lep2_pdgid()) {
+          plot1D("h_mll"+s,   values_["mll"], evtweight_, cr.histMap, ";M(ll) [GeV]", 200, 0, 200 );
+          if (80 < values_["mll"] && values_["mll"] < 100) {
+            plot1D("h_zpt"+s, (lep1_p4() + lep2_p4()).pt(), evtweight_, cr.histMap, ";M(ll) [GeV]", 200, 0, 200 );
+            plot1D("h_njets_zpeak"+s,  values_["njet"]        , evtweight_, cr.histMap, ";njets"                , 12,  0, 12);
+          } else {
+            plot1D("h_njets_noz"+s,    values_["njet"]        , evtweight_, cr.histMap, ";njets"                , 12,  0, 12);
+          }
+          if (values_["njet"] == 2)
+            plot1D("h_mll_2j"+s,   values_["mll"], evtweight_, cr.histMap, ";M(ll) [GeV]", 200, 0, 200 );
+          else
+            plot1D("h_mll_g2j"+s,   values_["mll"], evtweight_, cr.histMap, ";M(ll) [GeV]", 200, 0, 200 );
+        }
       };
       fillhists(suf);
+
+      // if ( HLT_SingleMu() ) fillhists(suf+"_hltmu");
+      // if ( HLT_SingleEl() ) fillhists(suf+"_hltel");
+      // if ( HLT_MET() )      fillhists(suf+"_hltmet");
+
       if ( abs(lep1_pdgid()*lep2_pdgid()) == 121 )
         fillhists(suf+"_ee");
       else if ( abs(lep1_pdgid()*lep2_pdgid()) == 143 )
@@ -473,6 +527,9 @@ void StopLooper::fillHistosForCR2l(string suf) {
 }
 
 void StopLooper::fillHistosForCR0b(string suf) {
+
+  if ( !HLT_MET() && !HLT_SingleEl() && !HLT_SingleMu() ) return;
+
   for (auto& cr : CR0bVec) {
     if ( cr.PassesSelection(values_) ) {
       auto fillhists = [&] (string s) {
@@ -495,14 +552,17 @@ void StopLooper::fillHistosForCR0b(string suf) {
       fillhists(suf);
       if ( abs(lep1_pdgid()) == 11 ) {
         fillhists(suf+"_e");
-        if ( fabs(lep1_p4().eta()) < 1.1 )
-          fillhists(suf+"_barrele");
-        else
-          fillhists(suf+"_endcape");
+        // if ( fabs(lep1_p4().eta()) < 1.4 )
+        //   fillhists(suf+"_barrele");
+        // else
+        //   fillhists(suf+"_endcape");
       }
       else if ( abs(lep1_pdgid()) == 13 ) {
         fillhists(suf+"_mu");
       }
+      if (HLT_MET() || HLT_SingleEl())
+        fillhists(suf+"_passSingleLep");
+
     }
   }
 }
