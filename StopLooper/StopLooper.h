@@ -41,6 +41,9 @@ private:
   float evtweight_;
   std::map<std::string,float> values_;
 
+  // For testing
+  float nvtxscale[70];
+
 };
 
 #endif
