@@ -5,32 +5,29 @@
 #include "TString.h"
 #include "/home/users/sicheng/tas/Software/dataMCplotMaker/dataMCplotMaker.h"
 
-void compareCR2lBase();
+void compareControlRegions();
 
 void compare_data_17vs16()
 {
-  cout << "Executing macro compareCR2lBase()...\n";
-  compareCR2lBase();
+  cout << "Executing macro compareControlRegions()...\n";
+  compareControlRegions();
 
   return;
 }
 
-void compareCR2lBase() {
+void compareControlRegions() {
 
   // auto ifile_new = new TFile("../StopLooper/output/temp/data.root");
   // auto ifile_old = new TFile("../StopLooper/output/data2016/data.root");
 
-  // auto ifile_new = new TFile("../StopLooper/output/temp/all_data_Run2017.root");
-  // auto ifile_old = new TFile("../StopLooper/output/data2016/all_data_Run2016.root");
+  // auto ifile_new = new TFile("../StopLooper/output/temp2/data.root");
+  // auto ifile_old = new TFile("../StopLooper/output/temp1/data.root");
 
-  // auto ifile_new = new TFile("../StopLooper/output/temp/data_met.root");
-  // auto ifile_old = new TFile("../StopLooper/output/data2016/data_met.root");
+  auto ifile_new = new TFile("../StopLooper/output/temp4/data.root");
+  auto ifile_old = new TFile("../StopLooper/output/temp3/data.root");
 
-  // auto ifile_new = new TFile("../StopLooper/output/temp4/data.root");
-  // auto ifile_old = new TFile("../StopLooper/output/temp3/data.root");
-
-  auto ifile_new = new TFile("../StopLooper/output/temp2/data_singlemu.root");
-  auto ifile_old = new TFile("../StopLooper/output/temp1/data_single_muon.root");
+  // auto ifile_new = new TFile("../StopLooper/output/temp2/data_singlemu.root");
+  // auto ifile_old = new TFile("../StopLooper/output/temp1/data_single_muon.root");
 
   // auto ifile_new = new TFile("../StopLooper/output/temp/data_singlemu.root");
   // auto ifile_old = new TFile("../StopLooper/output/data2016/data_single_muon.root");
@@ -38,24 +35,21 @@ void compareCR2lBase() {
   // auto ifile_new = new TFile("../StopLooper/output/temp/data_singleel.root");
   // auto ifile_old = new TFile("../StopLooper/output/data2016/data_single_electron.root");
 
-  // auto ifile_new = new TFile("../StopLooper/output/temp/data_singleel.root");
-  // auto ifile_old = new TFile("../StopLooper/output/data2016/data_single_electron.root");
 
-  // vector<string> Dirs = {"cr2lbase", "cr2lincl1", "cr2lincl2"};
-  // vector<string> Hists = {"h_metbins", "h_rlmetbins", "h_njets", "h_nbjets", "h_tmod", "h_mlepb"};
-
-  // vector<string> Dirs = {"cr2ltest", "cr2ltest2", "cr2lbase"};
+  vector<string> Dirs = {"cr0btest1", "cr0btestdilep", "cr0bbase"};
+  vector<string> Hists = {"h_metbins", "h_met", "h_njets", "h_mt", "h_lep1pt"};
   // vector<string> Hists = {"h_njets", "h_rlmetbins", "h_tmod", "h_mlepb"};
 
-  // vector<string> Dirs = {"crtest", "crtest1", "crtest2", "crtest3", "crtest4"};
+
   // vector<string> Dirs = {"cr2ltest", "cr2ltest1", "cr2ltest2", "cr2lbase"};
-  // vector<string> Dirs = {"cr2ltest", "cr2ltest2", "cr2lbase"};
-  vector<string> Dirs = {"cr2ltest1"};
+  // vector<string> Dirs = {"cr2ltest1", "cr2ltest2", "cr2lbase"};
   // vector<string> Dirs = {"cr2ltest4", "cr2ltest5", "cr2ltest6", "cr2lbase"};
+  // vector<string> Dirs = {"cr2lbase", "cr2lincl1", "cr2lincl2"};
+  // vector<string> Hists = {"h_metbins", "h_rlmetbins", "h_njets", "h_nbjets", "h_tmod", "h_mlepb"};
   // vector<string> Hists = {"h_njets", "h_rlmet", "h_mt2w", "h_tmod", "h_nbjets", "h_dphijmet"};
   // vector<string> Hists = {"h_mll", "h_finemet", "h_met", "h_njets", "h_nbjets", "h_metphi", "h_lep1pt"};
   // vector<string> Hists = {"h_met", "h_njets_zpeak", "h_njets_noz", "h_mll_2j", "h_mll_g2j"};
-  vector<string> Hists = {"h_mll", "h_met", "h_nvtxs", "h_njets"};
+  // vector<string> Hists = {"h_mll", "h_met", "h_nvtxs", "h_njets"};
   // vector<string> Hists = {"h_nvtxs"};
 
   // vector<string> Dirs = {"cr0bbase"};
@@ -65,9 +59,9 @@ void compareCR2lBase() {
   for (auto dirstr : Dirs) {
     for (auto hn : Hists) {
       // for (string suf : {"", "_e", "_mu", "_barrele", "_endcape"}) {
-      // for (string suf : {"", "_ee", "_mumu"}) {
-      for (string suf : {""}) {
+      for (string suf : {"", "_e", "_mu", "_hltsl", "_hltmet"}) {
       // for (string suf : {"", "_ee", "_mumu", "_hltmet", "_hltmu", "_hltel"}) {
+      // for (string suf : {"", "_ee", "_mumu"}) {
         string hstr = hn + suf;
         vector<Color_t> vcolor;
         if (suf == "") vcolor.push_back(kAzure+7);
@@ -81,7 +75,6 @@ void compareCR2lBase() {
         auto hold = (TH1F*) ifile_old->Get((dirstr+"/"+hstr).c_str());
         if (!hold) { cout << "Can't find " << dirstr+"/"+hstr << endl; continue; }
 
-        // hold->Scale(1.0*hnew->Integral()/hold->Integral());
         hold->Scale(8.32/35.87);
 
         float scale = hnew->Integral(0,-1)/hold->Integral(0,-1);
@@ -92,6 +85,7 @@ void compareCR2lBase() {
         string oname = " --outputName plots/" + dirstr + "_" + hstr + "_compare.png";
         dataMCplotMaker(hnew, {hold}, {"data2016"}, "", "scale: "+to_string(scale), optstr+xlabel+oname, {}, {}, vcolor);
 
+        // // Produce nvtx reweighting files
         // hnew->Scale(1./hnew->Integral());
         // hold->Scale(1./hold->Integral());
         // hnew->Divide(hold);
