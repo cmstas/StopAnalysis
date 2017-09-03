@@ -149,7 +149,7 @@ void StopLooper::looper(TChain* chain, string sample, string output_dir) {
   // const char* json_file = "../StopCORE/inputs/json_files/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON_snt.txt";
   // // 2017 dataset json, 10.09/fb (10.07 until 300780)
   // const char* json_file = "../StopCORE/inputs/json_files/Cert_294927-301141_13TeV_PromptReco_Collisions17_JSON_snt.txt";
-  // // 2017 dataset json, 8.32/fb 
+  // // 2017 dataset json, 8.32/fb
   // const char* json_file = "../StopCORE/inputs/json_files/Cert_294927-300575_13TeV_PromptReco_Collisions17_JSON_snt.txt";
 
   // Combined 2016 and 2017 json,
@@ -183,7 +183,7 @@ void StopLooper::looper(TChain* chain, string sample, string output_dir) {
   // Setup event weight calculation
   sampleInfo::sampleUtil samp_info( sampleInfo::ID::k_single_mu ); // test
   sysInfo::evtWgtInfo wgtInfo;
-  wgtInfo.setUp( samp_info.id );  
+  wgtInfo.setUp( samp_info.id );
 
   int nDuplicates = 0;
   int nEvents = chain->GetEntries();
@@ -281,6 +281,7 @@ void StopLooper::looper(TChain* chain, string sample, string output_dir) {
       values_["ntbtag"] = ntightbtags();
       values_["dphijmet"] = mindphi_met_j1_j2();
       values_["dphilmet"] = fabs(lep1_p4().phi() - pfmet_phi());
+      values_["passvetos"] = PassTrackVeto() && PassTauVeto();
 
       values_["lep1pt"] = lep1_p4().pt();
       values_["lep1eta"] = lep1_p4().eta();
@@ -522,7 +523,7 @@ void StopLooper::fillHistosForCR2l(string suf) {
         fillhists(suf+"_emu");
       else if ( abs(lep1_pdgid()*lep2_pdgid()) == 169 )
         fillhists(suf+"_mumu");
-      
+
     }
   }
 }
@@ -530,6 +531,12 @@ void StopLooper::fillHistosForCR2l(string suf) {
 void StopLooper::fillHistosForCR0b(string suf) {
 
   if ( !HLT_MET() && !HLT_SingleEl() && !HLT_SingleMu() ) return;
+
+  if ( !(HLT_SingleEl() || HLT_SingleMu()) &&
+       !(HLT_MET() || HLT_MET_MHT() || HLT_MET100_MHT100() || HLT_MET110_MHT110() || HLT_MET120_MHT120()) ) return;
+
+  // Go to the fully efficient plateau of the lepton trigger
+  if ( (abs(lep1_pdgid()) == 11 && values_["lep1pt"] < 40) || (abs(lep1_pdgid()) == 13 && values_["lep1pt"] < 30) ) return;
 
   for (auto& cr : CR0bVec) {
     if ( cr.PassesSelection(values_) ) {
@@ -546,6 +553,7 @@ void StopLooper::fillHistosForCR0b(string suf) {
         plot1D("h_mlepb"+s,    values_["mlb_0b"]  , evtweight_, cr.histMap, ";M(l,b) [GeV]"         , 24,  0, 600);
         plot1D("h_dphijmet"+s, values_["dphijmet"], evtweight_, cr.histMap, ";#Delta #phi (j, met)" , 24,  0, 4);
         plot1D("h_tmod"+s,     values_["tmod"]    , evtweight_, cr.histMap, ";modified topness"     , 20, -5, 15);
+        plot1D("h_nvtxs"+s,        nvtxs()        , evtweight_, cr.histMap, ";N Vertexes"           , 70,  1, 71);
 
         const float met_bins[] = {0, 250, 350, 450, 550, 650, 800};
         plot1D("h_metbins"+s,   values_["met"]    , evtweight_, cr.histMap, ";E^{miss}_{T} [GeV]"   , 6, met_bins);

@@ -5,16 +5,15 @@ make -j 12 || return $?
 
 INDIR=/nfs-7/userdata/haweber/stopbabiesInteractive/2017_5p8fbinv
 
-OUTDIR=output/temp4
+OUTDIR=output/temp2
 LOGDIR=logs
 mkdir -p ${OUTDIR}
 mkdir -p ${LOGDIR}
 
 # declare -a Samples=(data_*_2017C data_*_2017B data_*_2017A)
-declare -a Samples=(data)
+# declare -a Samples=(data)
 # declare -a Samples=(data_singlemu)
-# declare -a Samples=(data_singlemu data_singleel data_met data_jetht)
-# declare -a Samples=(data_singlemu data_singleel data_met)
+declare -a Samples=(data_singlemu data data_met)
 
 for SAMPLE in ${Samples[@]}; do
     echo ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} '>&' ${LOGDIR}/log_${SAMPLE}.txt
@@ -28,14 +27,13 @@ done
 INDIR=/nfs-7/userdata/stopRun2/analysis2016_SUS-16-051_35p9fbinv/v24/output
 # INDIR=/nfs-7/userdata/stopRun2/analysis2016_SUS-16-051_35p9fbinv/v24/skim
 # OUTDIR=output/data2016
-OUTDIR=output/temp3
+OUTDIR=output/temp1
 mkdir -p ${OUTDIR}
 mkdir -p ${LOGDIR}
 
 # declare -a Samples=(data_single_muon)
-declare -a Samples=(data)
-# declare -a Samples=(data_single_muon data_single_electron data_met data_double_eg data_double_mu data_muon_eg)
-# declare -a Samples=(data_single_muon data_single_electron data_met)
+# declare -a Samples=(data)
+declare -a Samples=(data_single_muon data data_met)
 
 for SAMPLE in ${Samples[@]}; do
     echo ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} '>&' ${LOGDIR}/log_${SAMPLE}_2016.txt
