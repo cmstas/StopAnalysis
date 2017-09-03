@@ -14,6 +14,8 @@ std::vector<SR> getStopSignalRegionsTopological() {
   srbase.SetVar("mlb", 0, fInf);
   srbase.SetVar("tmod", -fInf, fInf);
   srbase.SetVar("nlep", 1, 2);
+  srbase.SetVar("nvlep", 1, 2);
+  srbase.SetVar("passvetos", 1, 2);
   srbase.SetVar("njet", 2, fInf);
   srbase.SetVar("nbjet", 1, fInf);
   srbase.SetVar("dphijmet", 0.8, 3.14159);
@@ -142,6 +144,8 @@ std::vector<SR> getStopSignalRegions() {
   srbase.SetVar("mlb", 0, fInf);
   srbase.SetVar("tmod", -fInf, fInf);
   srbase.SetVar("nlep", 1, 2);
+  srbase.SetVar("nvlep", 1, 2);
+  srbase.SetVar("passvetos", 1, 2);
   srbase.SetVar("njet", 2, fInf);
   srbase.SetVar("nbjet", 1, fInf);
   srbase.SetVar("dphijmet", 0.8, 3.14159);
@@ -271,6 +275,7 @@ std::vector<SR> getStopControlRegionsDilepton() {
   crbase.SetVar("mt_rl", 150, fInf);
   crbase.SetVar("met_rl", 250, fInf);
   crbase.SetVar("tmod_rl", -fInf, fInf); // temporary until the inefficiency is understood
+  crbase.SetVar("nvlep", 2, 3);
   crbase.SetVar("nlep_rl", 2, 3);
   crbase.SetVar("njet", 2, fInf);
   crbase.SetVar("nbjet", 1, fInf);
@@ -282,21 +287,24 @@ std::vector<SR> getStopControlRegionsDilepton() {
   cr.SetAllowDummyVars(1);
   cr.SetName("cr2ltest1");         // test for no cut
   cr.SetVar("met", 50, fInf);
+  cr.SetVar("nvlep", 2, 3);
+  cr.SetVar("nlep_rl", 2, 3);
   cr.SetVar("njet", 2, fInf);
+  cr.SetVar("nbjet", 1, fInf);
+  cr.SetVar("dphijmet_rl", 0.8, 3.14159);
   CRvec.emplace_back(cr);
 
   cr.SetName("cr2ltest2");         // test
   cr.SetVar("lep1pt", 35, fInf);
-  cr.SetVar("nlep", 2, 3);
+  CRvec.emplace_back(cr);
+
+  cr.SetName("cr2ltest3");         // test
+  cr.SetVar("mt", 150, fInf);
   CRvec.emplace_back(cr);
 
   cr.SetName("cr2ltest4");         // test
   cr.SetVar("met", 150, fInf);
   CRvec.emplace_back(cr);
-
-  // cr.SetName("cr2ltest4");         // test
-  // cr.SetVar("mt", 150, fInf);
-  // CRvec.emplace_back(cr);
 
   // cr.SetName("cr2ltest5");         // test
   // cr.SetVar("nbjet", 1, fInf);
@@ -381,8 +389,10 @@ std::vector<SR> getStopControlRegionsNoBTags() {
   SR crbase;
   crbase.SetName("cr0bbase");
   crbase.SetVar("mt", 150, fInf);
-  crbase.SetVar("met", 250, fInf);
+  crbase.SetVar("met", 150, fInf);
   crbase.SetVar("nlep", 1, 2);
+  crbase.SetVar("nvlep", 1, 2);
+  crbase.SetVar("passvetos", 1, 2);
   crbase.SetVar("njet", 2, fInf);
   crbase.SetVar("nbjet", 0, 1);
   crbase.SetVar("dphijmet", 0.8, 3.14159);
@@ -397,6 +407,7 @@ std::vector<SR> getStopControlRegionsNoBTags() {
   cr.SetVar("met", 150, fInf);
   cr.SetVar("nlep", 1, 2);
   cr.SetVar("nvleps", 1, 2);
+  cr.SetVar("passvetos", 1, 2);
   cr.SetVar("njet", 2, fInf);
   cr.SetVar("nbjet", 0, 1);
   CRvec.emplace_back(cr);
@@ -405,10 +416,10 @@ std::vector<SR> getStopControlRegionsNoBTags() {
   cr.SetVar("nlep", 2, 3);
   cr.SetVar("osdilep", 1, 2);
   CRvec.emplace_back(cr);
-
-  cr.SetName("cr0btest2");         // test
   cr.SetVar("nlep", 1, 2);
   cr.RemoveVar("osdilep");
+
+  cr.SetName("cr0btest2");         // test
   cr.SetVar("dphijmet", 0.8, 3.14159);
   CRvec.emplace_back(cr);
 

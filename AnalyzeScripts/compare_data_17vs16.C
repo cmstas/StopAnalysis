@@ -23,8 +23,8 @@ void compareControlRegions() {
   // auto ifile_new = new TFile("../StopLooper/output/temp2/data.root");
   // auto ifile_old = new TFile("../StopLooper/output/temp1/data.root");
 
-  auto ifile_new = new TFile("../StopLooper/output/temp4/data.root");
-  auto ifile_old = new TFile("../StopLooper/output/temp3/data.root");
+  auto ifile_new = new TFile("../StopLooper/output/temp2/data.root");
+  auto ifile_old = new TFile("../StopLooper/output/temp1/data.root");
 
   // auto ifile_new = new TFile("../StopLooper/output/temp2/data_singlemu.root");
   // auto ifile_old = new TFile("../StopLooper/output/temp1/data_single_muon.root");
@@ -59,7 +59,7 @@ void compareControlRegions() {
   for (auto dirstr : Dirs) {
     for (auto hn : Hists) {
       // for (string suf : {"", "_e", "_mu", "_barrele", "_endcape"}) {
-      for (string suf : {"", "_e", "_mu", "_hltsl", "_hltmet"}) {
+      for (string suf : {"", "_e", "_mu", "_hltsl", "_hltmet", "_hltmht"}) {
       // for (string suf : {"", "_ee", "_mumu", "_hltmet", "_hltmu", "_hltel"}) {
       // for (string suf : {"", "_ee", "_mumu"}) {
         string hstr = hn + suf;
@@ -80,7 +80,7 @@ void compareControlRegions() {
         float scale = hnew->Integral(0,-1)/hold->Integral(0,-1);
 
         // Try to use the dataMCplotMaker
-        string optstr = "--darkColorLines --lumi 10.7 --topYaxisTitle Entries --type Preliminary --dataName data2017 --outOfFrame";
+        string optstr = "--darkColorLines --lumi 8.3 --topYaxisTitle Entries --type Preliminary --dataName data2017 --outOfFrame";
         string xlabel = " --xAxisOverride " + string(hnew->GetXaxis()->GetTitle());
         string oname = " --outputName plots/" + dirstr + "_" + hstr + "_compare.png";
         dataMCplotMaker(hnew, {hold}, {"data2016"}, "", "scale: "+to_string(scale), optstr+xlabel+oname, {}, {}, vcolor);
