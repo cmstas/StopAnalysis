@@ -65,7 +65,7 @@ const bool applyISRWeights = true;
 // turn on to enable plots of MT2 with systematic variations applied. will only do variations for applied weights
 const bool doSystVariationPlots = true;
 // turn on to apply Nvtx reweighting to MC
-const bool doNvtxReweight = false;
+const bool doNvtxReweight = true;
 // turn on to apply nTrueInt reweighting to MC
 const bool doNTrueIntReweight = true;
 // turn on to apply json file to data
@@ -218,7 +218,10 @@ void StopLooper::looper(TChain* chain, string sample, string output_dir) {
       if ( is_data() ) {
         if ( applyjson && !goodrun(run(), ls()) ) continue;
 	duplicate_removal::DorkyEventIdentifier id(run(), evt(), ls());
-	if ( is_duplicate(id) ) continue;
+	if ( is_duplicate(id) ) {
+          ++nDuplicates;
+          continue;
+        }
         // lumi_ran.insert( make_pair(run(), ls()) );  // to test the lumi in baby
       }
 
@@ -325,7 +328,7 @@ void StopLooper::looper(TChain* chain, string sample, string output_dir) {
       values_["mll"] = (lep1_p4() + lep2_p4()).M();
       values_["osdilep"] = lep1_pdgid() == -lep2_pdgid();
 
-      // fillHistosForCR2l();
+      fillHistosForCR2l();
 
       // if (event > 10) break;  // for debugging purpose
     } // end of event loop
@@ -469,6 +472,7 @@ void StopLooper::fillHistosForCR2l(string suf) {
   // Trigger requirements
   if ( !HLT_SingleEl() && !HLT_SingleMu() ) return;
 
+  if ( (abs(lep1_pdgid()) == 11 && values_["lep1pt"] < 40) || (abs(lep1_pdgid()) == 13 && values_["lep1pt"] < 30) ) return;
   // if (lep1_pdgid() != -lep2_pdgid()) return; // temporary for zpeak check
 
   for (auto& cr : CR2lVec) {
@@ -532,8 +536,7 @@ void StopLooper::fillHistosForCR0b(string suf) {
 
   if ( !HLT_MET() && !HLT_SingleEl() && !HLT_SingleMu() ) return;
 
-  if ( !(HLT_SingleEl() || HLT_SingleMu()) &&
-       !(HLT_MET() || HLT_MET_MHT() || HLT_MET100_MHT100() || HLT_MET110_MHT110() || HLT_MET120_MHT120()) ) return;
+  if ( !(HLT_SingleEl() || HLT_SingleMu()) && !HLT_MET_MHT() ) return;
 
   // Go to the fully efficient plateau of the lepton trigger
   if ( (abs(lep1_pdgid()) == 11 && values_["lep1pt"] < 40) || (abs(lep1_pdgid()) == 13 && values_["lep1pt"] < 30) ) return;

@@ -5,7 +5,7 @@ make -j 12 || return $?
 
 INDIR=/nfs-7/userdata/haweber/stopbabiesInteractive/2017_5p8fbinv
 
-OUTDIR=output/temp2
+OUTDIR=output/temp4
 LOGDIR=logs
 mkdir -p ${OUTDIR}
 mkdir -p ${LOGDIR}
@@ -27,7 +27,7 @@ done
 INDIR=/nfs-7/userdata/stopRun2/analysis2016_SUS-16-051_35p9fbinv/v24/output
 # INDIR=/nfs-7/userdata/stopRun2/analysis2016_SUS-16-051_35p9fbinv/v24/skim
 # OUTDIR=output/data2016
-OUTDIR=output/temp1
+OUTDIR=output/temp3
 mkdir -p ${OUTDIR}
 mkdir -p ${LOGDIR}
 
