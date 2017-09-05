@@ -20,11 +20,11 @@ void compareControlRegions() {
   // auto ifile_new = new TFile("../StopLooper/output/temp/data.root");
   // auto ifile_old = new TFile("../StopLooper/output/data2016/data.root");
 
-  // auto ifile_new = new TFile("../StopLooper/output/temp2/data.root");
-  // auto ifile_old = new TFile("../StopLooper/output/temp1/data.root");
+  auto ifile_new = new TFile("../StopLooper/output/temp4/data.root");  // 3, 4 with Nvtx reweighting
+  auto ifile_old = new TFile("../StopLooper/output/temp3/data.root");
 
-  auto ifile_new = new TFile("../StopLooper/output/temp2/data.root");
-  auto ifile_old = new TFile("../StopLooper/output/temp1/data.root");
+  // auto ifile_new = new TFile("../StopLooper/output/temp2/data.root");  // 1, 2 without nvtx reweighting
+  // auto ifile_old = new TFile("../StopLooper/output/temp1/data.root");
 
   // auto ifile_new = new TFile("../StopLooper/output/temp2/data_singlemu.root");
   // auto ifile_old = new TFile("../StopLooper/output/temp1/data_single_muon.root");
@@ -36,8 +36,8 @@ void compareControlRegions() {
   // auto ifile_old = new TFile("../StopLooper/output/data2016/data_single_electron.root");
 
 
-  vector<string> Dirs = {"cr0btest1", "cr0btestdilep", "cr0bbase"};
-  vector<string> Hists = {"h_metbins", "h_met", "h_njets", "h_mt", "h_lep1pt"};
+  vector<string> Dirs = {"cr0btest2", "cr0btest3", "cr0bbase"};
+  vector<string> Hists = {"h_met", "h_njets", "h_mt", "h_tmod", "h_nvtxs", "h_mlepb", "h_lep1pt"};
   // vector<string> Hists = {"h_njets", "h_rlmetbins", "h_tmod", "h_mlepb"};
 
 
