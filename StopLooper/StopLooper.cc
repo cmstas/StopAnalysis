@@ -64,7 +64,7 @@ const bool applyDileptonTriggerWeights = true;
 const bool applyISRWeights = true;
 // turn on to enable plots of MT2 with systematic variations applied. will only do variations for applied weights
 const bool doSystVariationPlots = true;
-// turn on to apply Nvtx reweighting to MC
+// turn on to apply Nvtx reweighting to MC / data2016
 const bool doNvtxReweight = true;
 // turn on to apply nTrueInt reweighting to MC
 const bool doNTrueIntReweight = true;
@@ -315,7 +315,6 @@ void StopLooper::looper(TChain* chain, string sample, string output_dir) {
       // Filling histograms
       // fillHistosForSR();
 
-      // fillHistosForCRemu();
       fillHistosForCR0b();
 
       values_["nlep_rl"] = (ngoodleps() == 1 && nvetoleps() >= 2 && lep2_p4().Pt() > 10)? 2 : ngoodleps();
@@ -329,6 +328,7 @@ void StopLooper::looper(TChain* chain, string sample, string output_dir) {
       values_["osdilep"] = lep1_pdgid() == -lep2_pdgid();
 
       fillHistosForCR2l();
+      fillHistosForCRemu();
 
       // if (event > 10) break;  // for debugging purpose
     } // end of event loop
@@ -455,6 +455,13 @@ void StopLooper::fillHistosForCRemu(string suf) {
         plot1D("h_nbjets"+s,   values_["nbjet"]   , evtweight_, cr.histMap, ";nbjets"               , 6,   0, 6);
         plot1D("h_mlepb"+s,    values_["mlb_0b"]  , evtweight_, cr.histMap, ";M(l,b) [GeV]"         , 24,  0, 600);
         plot1D("h_dphijmet"+s, values_["dphijmet"], evtweight_, cr.histMap, ";#Delta #phi (j, met)" , 24,  0, 4);
+        plot1D("h_mll"+s,      values_["mll"]     , evtweight_, cr.histMap, ";M(ll) [GeV]"          , 100, 0, 500 );
+
+        // Temporary
+        if (60 < values_["mll"] && values_["mll"] < 120) {
+          plot1D("h_njets_sp"+s,  values_["njet"] , evtweight_, cr.histMap, ";njets"                , 12,  0, 12);
+          plot1D("h_nbjets_sp"+s, values_["nbjet"], evtweight_, cr.histMap, ";njets"                , 12,  0, 12);
+        }
 
         const float leppt_bins[] = {0, 30, 40, 50, 75, 100, 125, 200};
         plot1D("h_lep1ptbins"+s, values_["lep1pt"], evtweight_, cr.histMap, ";p_{T}(lep1) [GeV]"  , 7, leppt_bins);
@@ -472,7 +479,7 @@ void StopLooper::fillHistosForCR2l(string suf) {
   // Trigger requirements
   if ( !HLT_SingleEl() && !HLT_SingleMu() ) return;
 
-  if ( (abs(lep1_pdgid()) == 11 && values_["lep1pt"] < 40) || (abs(lep1_pdgid()) == 13 && values_["lep1pt"] < 30) ) return;
+  // if ( (abs(lep1_pdgid()) == 11 && values_["lep1pt"] < 40) || (abs(lep1_pdgid()) == 13 && values_["lep1pt"] < 30) ) return;
   // if (lep1_pdgid() != -lep2_pdgid()) return; // temporary for zpeak check
 
   for (auto& cr : CR2lVec) {
@@ -534,12 +541,7 @@ void StopLooper::fillHistosForCR2l(string suf) {
 
 void StopLooper::fillHistosForCR0b(string suf) {
 
-  if ( !HLT_MET() && !HLT_SingleEl() && !HLT_SingleMu() ) return;
-
-  if ( !(HLT_SingleEl() || HLT_SingleMu()) && !HLT_MET_MHT() ) return;
-
-  // Go to the fully efficient plateau of the lepton trigger
-  if ( (abs(lep1_pdgid()) == 11 && values_["lep1pt"] < 40) || (abs(lep1_pdgid()) == 13 && values_["lep1pt"] < 30) ) return;
+  if ( !(HLT_SingleEl() || HLT_SingleMu() || HLT_MET_MHT()) ) return;
 
   for (auto& cr : CR0bVec) {
     if ( cr.PassesSelection(values_) ) {
