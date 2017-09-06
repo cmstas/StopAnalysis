@@ -8,8 +8,11 @@ using namespace std;
 
 void compare_CRemu_efficiency_plots() {
 
-  auto ifile_new = new TFile("../StopLooper/output/temp/all_data_Run2017.root");
-  auto ifile_old = new TFile("../StopLooper/output/data2016/all_data_Run2016.root");
+  auto ifile_new = new TFile("../StopLooper/output/temp2/data.root");
+  auto ifile_old = new TFile("../StopLooper/output/temp1/data.root");
+
+  // auto ifile_new = new TFile("../StopLooper/output/temp2/data_singlemu.root");
+  // auto ifile_old = new TFile("../StopLooper/output/temp1/data_single_muon.root");
 
   auto ofile = new TFile("plots/HLT_MuE_data_compare.root", "RECREATE");
 
