@@ -8,11 +8,11 @@ using namespace std;
 
 void compare_CRemu_efficiency_plots() {
 
-  auto ifile_new = new TFile("../StopLooper/output/temp2/data.root");
-  auto ifile_old = new TFile("../StopLooper/output/temp1/data.root");
+  auto ifile_new = new TFile("../StopLooper/output/temp4/data_met.root");
+  auto ifile_old = new TFile("../StopLooper/output/temp3/data_met.root");
 
-  // auto ifile_new = new TFile("../StopLooper/output/temp2/data_singlemu.root");
-  // auto ifile_old = new TFile("../StopLooper/output/temp1/data_single_muon.root");
+  // auto ifile_new = new TFile("../StopLooper/output/temp6/data_muon_eg.root");
+  // auto ifile_old = new TFile("../StopLooper/output/temp3/data_muon_eg.root");
 
   auto ofile = new TFile("plots/HLT_MuE_data_compare.root", "RECREATE");
 
@@ -22,6 +22,7 @@ void compare_CRemu_efficiency_plots() {
 
   auto c1 = new TCanvas("c1", "c1", 600, 400);
   gStyle->SetOptStat("");
+  c1->SetGrid();
 
   TLatex cms(0.17, 0.83, "CMS");
   cms.SetNDC();
@@ -60,7 +61,7 @@ void compare_CRemu_efficiency_plots() {
       heff_new->GetYaxis()->SetRangeUser(0, 1.1);
       heff_new->GetYaxis()->SetTitle("HLT_MuE eff");
       heff_new->SetTitle("HLT_MuE efficiency in " + dirstr);
-      heff_new->Draw();
+      heff_new->Draw("");
       heff_new->Write(dirstr+"/"+hstr+"_eff_new");
 
       // eff old

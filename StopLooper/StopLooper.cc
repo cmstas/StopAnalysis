@@ -237,12 +237,6 @@ void StopLooper::looper(TChain* chain, string sample, string output_dir) {
       if ( !filt_badMuonFilter() ) continue;
       if ( !filt_badChargedCandidateFilter() ) continue;
 
-      // Place for some vetos
-      // if ( therecolepveto && nvetoleps()!=1 ) continue;
-      // if ( theisotrackveto && !PassTrackVeto() ) continue;
-      // if ( thetauveto && !PassTauVeto() ) continue;
-
-
       ++nPassedTotal;
 
       // Calculate event weight
@@ -295,6 +289,7 @@ void StopLooper::looper(TChain* chain, string sample, string output_dir) {
       values_["htratio"] = ak4_htratiom();
       values_["ht"]      = ak4_HT();
 
+      values_["passlep1pt"] = (abs(lep1_pdgid()) == 13 && lep1_p4().pt() > 40) || (abs(lep1_pdgid()) == 11 && lep1_p4().pt() > 45);
       // drlepb_  = dR_lep_leadb();
       // mhtsig_  = getMHTSig();
 
@@ -395,7 +390,7 @@ void StopLooper::fillHistosForSR(string suf) {
         plot1D("h_mt2w"+s,     values_["mt2w"]    , evtweight_, sr.histMap, ";MT2W [GeV]"           , 18,  50, 500);
         plot1D("h_met"+s,      values_["met"]     , evtweight_, sr.histMap, ";E_{T}^{miss} [GeV]"   , 24,  50, 650);
         plot1D("h_metphi"+s,   values_["metphi"]  , evtweight_, sr.histMap, ";#phi(E_{T}^{miss})"   , 24,  50, 650);
-        plot1D("h_lep1pt"+s,   values_["lep1pt"]  , evtweight_, sr.histMap, ";p_{T}(lep1) [GeV]"    , 20,  0, 200);
+        plot1D("h_lep1pt"+s,   values_["lep1pt"]  , evtweight_, sr.histMap, ";p_{T}(lep1) [GeV]"    , 30,  0, 300);
         plot1D("h_lep1eta"+s,  values_["lep1eta"] , evtweight_, sr.histMap, ";#eta (lep1)"          , 20, -5, 5);
         plot1D("h_nleps"+s,    values_["nlep"]    , evtweight_, sr.histMap, ";nleps"                ,  5,  0, 5);
         plot1D("h_njets"+s,    values_["njet"]    , evtweight_, sr.histMap, ";njets"                , 12,  0, 12);
@@ -420,6 +415,7 @@ void StopLooper::fillHistosForSR(string suf) {
 void StopLooper::fillHistosForCRemu(string suf) {
 
   // Trigger requirements
+  if ( !HLT_MET_MHT() ) return;
   if ( !(lep1_pdgid() * lep2_pdgid() == -143) ) return;
 
   // Basic cuts that are not supposed to change frequently
@@ -446,8 +442,8 @@ void StopLooper::fillHistosForCRemu(string suf) {
         plot1D("h_mt2w"+s,     values_["mt2w"]    , evtweight_, cr.histMap, ";MT2W [GeV]"           , 18,  50, 500);
         plot1D("h_met"+s,      values_["met"]     , evtweight_, cr.histMap, ";E_{T}^{miss} [GeV]"   , 24,  50, 650);
         plot1D("h_metphi"+s,   values_["metphi"]  , evtweight_, cr.histMap, ";#phi(E_{T}^{miss})"   , 24,  50, 650);
-        plot1D("h_lep1pt"+s,   values_["lep1pt"]  , evtweight_, cr.histMap, ";p_{T}(lep1) [GeV]"    , 20,  0, 200);
-        plot1D("h_lep2pt"+s,   values_["lep2pt"]  , evtweight_, cr.histMap, ";p_{T}(lep2) [GeV]"    , 20,  0, 200);
+        plot1D("h_lep1pt"+s,   values_["lep1pt"]  , evtweight_, cr.histMap, ";p_{T}(lep1) [GeV]"    , 30,  0, 300);
+        plot1D("h_lep2pt"+s,   values_["lep2pt"]  , evtweight_, cr.histMap, ";p_{T}(lep2) [GeV]"    , 30,  0, 300);
         plot1D("h_lep1eta"+s,  values_["lep1eta"] , evtweight_, cr.histMap, ";#eta (lep1)"          , 20, -5, 5);
         plot1D("h_lep2eta"+s,  values_["lep2eta"] , evtweight_, cr.histMap, ";#eta (lep2)"          , 20, -5, 5);
         plot1D("h_nleps"+s,    values_["nlep"]    , evtweight_, cr.histMap, ";nleps"                ,  5,  0, 5);
@@ -509,17 +505,15 @@ void StopLooper::fillHistosForCR2l(string suf) {
 
         // Luminosity test at Z peak
         if (lep1_pdgid() == -lep2_pdgid()) {
-          plot1D("h_mll"+s,   values_["mll"], evtweight_, cr.histMap, ";M(ll) [GeV]", 200, 0, 200 );
-          if (80 < values_["mll"] && values_["mll"] < 100) {
+          plot1D("h_mll"+s,   values_["mll"], evtweight_, cr.histMap, ";M(ll) [GeV]", 120, 0, 240 );
+          if (82 < values_["mll"] && values_["mll"] < 100) {
             plot1D("h_zpt"+s, (lep1_p4() + lep2_p4()).pt(), evtweight_, cr.histMap, ";M(ll) [GeV]", 200, 0, 200 );
-            plot1D("h_njets_zpeak"+s,  values_["njet"]        , evtweight_, cr.histMap, ";njets"                , 12,  0, 12);
+            plot1D("h_njets_zpeak"+s,  values_["njet"]    , evtweight_, cr.histMap, ";njets"                , 12,  0, 12);
+            plot1D("h_nbjets_zpeak"+s, values_["nbjet"]   , evtweight_, cr.histMap, ";nbjets"               ,  6,  0, 6);
           } else {
-            plot1D("h_njets_noz"+s,    values_["njet"]        , evtweight_, cr.histMap, ";njets"                , 12,  0, 12);
+            plot1D("h_njets_noz"+s,    values_["njet"]    , evtweight_, cr.histMap, ";njets"                , 12,  0, 12);
+            plot1D("h_nbjets_noz"+s,   values_["nbjet"]   , evtweight_, cr.histMap, ";nbjets"               ,  6,  0, 6);
           }
-          if (values_["njet"] == 2)
-            plot1D("h_mll_2j"+s,   values_["mll"], evtweight_, cr.histMap, ";M(ll) [GeV]", 200, 0, 200 );
-          else
-            plot1D("h_mll_g2j"+s,   values_["mll"], evtweight_, cr.histMap, ";M(ll) [GeV]", 200, 0, 200 );
         }
       };
       fillhists(suf);
@@ -545,6 +539,7 @@ void StopLooper::fillHistosForCR0b(string suf) {
 
   for (auto& cr : CR0bVec) {
     if ( cr.PassesSelection(values_) ) {
+      // if ( cr.GetLowerBound("met") < 200 && !(HLT_SingleEl() || HLT_SingleMu()) ) continue;
       auto fillhists = [&] (string s) {
         plot1D("h_mt"+s,       values_["mt"]      , evtweight_, cr.histMap, ";M_{T} [GeV]"          , 12,  0, 600);
         plot1D("h_mt2w"+s,     values_["mt2w"]    , evtweight_, cr.histMap, ";MT2W [GeV]"           , 18,  50, 500);
