@@ -181,85 +181,85 @@ std::vector<SR> getStopSignalRegions() {
   SRvec.emplace_back(sr);
 
 
-  sr = srbase;
-  sr.SetName("srB1");
-  sr.SetDetailName("2to3j_tmod10toInf_mlb175toInf_met250to450");
-  sr.SetVar("mlb", 175, -1);
-  sr.SetVar("met", 250, 450);
-  SRvec.emplace_back(sr);
+  // sr = srbase;
+  // sr.SetName("srB1");
+  // sr.SetDetailName("2to3j_tmod10toInf_mlb175toInf_met250to450");
+  // sr.SetVar("mlb", 175, -1);
+  // sr.SetVar("met", 250, 450);
+  // SRvec.emplace_back(sr);
 
-  sr.SetName("srB2");
-  sr.SetDetailName("2to3j_tmod10toInf_mlb175toInf_met450to600");
-  sr.SetVar("met", 450, 600);
-  SRvec.emplace_back(sr);
+  // sr.SetName("srB2");
+  // sr.SetDetailName("2to3j_tmod10toInf_mlb175toInf_met450to600");
+  // sr.SetVar("met", 450, 600);
+  // SRvec.emplace_back(sr);
 
-  sr.SetName("srB3");
-  sr.SetDetailName("2to3j_tmod10toInf_mlb175toInf_met600toInf");
-  sr.SetVar("met", 600, -1);
-  SRvec.emplace_back(sr);
-
-
-  sr.SetName("srH1");
-  sr.SetDetailName("geq4j_tmod10toInf_mlb175toInf_met250to450");
-  sr.SetVar("njet", 4, -1);
-  sr.SetVar("met", 250, 450);
-  SRvec.emplace_back(sr);
-
-  sr.SetName("srH2");
-  sr.SetDetailName("geq4j_tmod10toInf_mlb175toInf_met450toInf");
-  sr.SetVar("met", 450, -1);
-  SRvec.emplace_back(sr);
+  // sr.SetName("srB3");
+  // sr.SetDetailName("2to3j_tmod10toInf_mlb175toInf_met600toInf");
+  // sr.SetVar("met", 600, -1);
+  // SRvec.emplace_back(sr);
 
 
-  sr.SetName("srE1");
-  sr.SetDetailName("geq4j_tmod0to10_mlb0to175_met350to550");
-  sr.SetVar("tmod", 0, 10);
-  sr.SetVar("mlb", 0, 175);
-  sr.SetVar("met", 350, 550);
-  SRvec.emplace_back(sr);
+  // sr.SetName("srH1");
+  // sr.SetDetailName("geq4j_tmod10toInf_mlb175toInf_met250to450");
+  // sr.SetVar("njet", 4, -1);
+  // sr.SetVar("met", 250, 450);
+  // SRvec.emplace_back(sr);
 
-  sr.SetName("srE2");
-  sr.SetDetailName("geq4j_tmod0to10_mlb0to175_met550toInf");
-  sr.SetVar("met", 550, -1);
-  SRvec.emplace_back(sr);
+  // sr.SetName("srH2");
+  // sr.SetDetailName("geq4j_tmod10toInf_mlb175toInf_met450toInf");
+  // sr.SetVar("met", 450, -1);
+  // SRvec.emplace_back(sr);
 
 
-  sr.SetName("srF1");
-  sr.SetDetailName("geq4j_tmod0to10_mlb175toInf_met250to450");
-  sr.SetVar("mlb", 175, -1);
-  sr.SetVar("met", 250, 450);
-  SRvec.emplace_back(sr);
+  // sr.SetName("srE1");
+  // sr.SetDetailName("geq4j_tmod0to10_mlb0to175_met350to550");
+  // sr.SetVar("tmod", 0, 10);
+  // sr.SetVar("mlb", 0, 175);
+  // sr.SetVar("met", 350, 550);
+  // SRvec.emplace_back(sr);
 
-  sr.SetName("srF2");
-  sr.SetDetailName("geq4j_tmod0to10_mlb175toInf_met450toInf");
-  sr.SetVar("met", 450, -1);
-  SRvec.emplace_back(sr);
+  // sr.SetName("srE2");
+  // sr.SetDetailName("geq4j_tmod0to10_mlb0to175_met550toInf");
+  // sr.SetVar("met", 550, -1);
+  // SRvec.emplace_back(sr);
 
-  sr.SetName("srI1");
-  sr.SetDetailName("geq5j_lpt0to150_met250to350");
-  sr.SetVar("mt", 150, -1);
-  sr.SetVar("njet", 5, -1);
-  sr.SetVar("nbjet", 1, -1);
-  sr.SetVar("lep1pt", 0, 150);
-  sr.SetVar("met", 250, 350);
-  sr.SetVar("dphilmet", 0, 2);
-  sr.SetVar("dphijmet", 0.5, 3.1416);
-  SRvec.emplace_back(sr);
 
-  sr.SetName("srI2");
-  sr.SetDetailName("geq5j_lpt0to150_met350to450");
-  sr.SetVar("met", 350, 450);
-  SRvec.emplace_back(sr);
+  // sr.SetName("srF1");
+  // sr.SetDetailName("geq4j_tmod0to10_mlb175toInf_met250to450");
+  // sr.SetVar("mlb", 175, -1);
+  // sr.SetVar("met", 250, 450);
+  // SRvec.emplace_back(sr);
 
-  sr.SetName("srI3");
-  sr.SetDetailName("geq5j_lpt0to150_met450to550");
-  sr.SetVar("met", 450, 550);
-  SRvec.emplace_back(sr);
+  // sr.SetName("srF2");
+  // sr.SetDetailName("geq4j_tmod0to10_mlb175toInf_met450toInf");
+  // sr.SetVar("met", 450, -1);
+  // SRvec.emplace_back(sr);
 
-  sr.SetName("srI4");
-  sr.SetDetailName("geq5j_lpt0to150_met550toInf");
-  sr.SetVar("met", 550, -1);
-  SRvec.emplace_back(sr);
+  // sr.SetName("srI1");
+  // sr.SetDetailName("geq5j_lpt0to150_met250to350");
+  // sr.SetVar("mt", 150, -1);
+  // sr.SetVar("njet", 5, -1);
+  // sr.SetVar("nbjet", 1, -1);
+  // sr.SetVar("lep1pt", 0, 150);
+  // sr.SetVar("met", 250, 350);
+  // sr.SetVar("dphilmet", 0, 2);
+  // sr.SetVar("dphijmet", 0.5, 3.1416);
+  // SRvec.emplace_back(sr);
+
+  // sr.SetName("srI2");
+  // sr.SetDetailName("geq5j_lpt0to150_met350to450");
+  // sr.SetVar("met", 350, 450);
+  // SRvec.emplace_back(sr);
+
+  // sr.SetName("srI3");
+  // sr.SetDetailName("geq5j_lpt0to150_met450to550");
+  // sr.SetVar("met", 450, 550);
+  // SRvec.emplace_back(sr);
+
+  // sr.SetName("srI4");
+  // sr.SetDetailName("geq5j_lpt0to150_met550toInf");
+  // sr.SetVar("met", 550, -1);
+  // SRvec.emplace_back(sr);
 
 
   return SRvec;
@@ -285,14 +285,23 @@ std::vector<SR> getStopControlRegionsDilepton() {
   SR cr;
 
   cr.SetAllowDummyVars(1);
-  cr.SetName("cr2ltest1");         // test for no cut
+  cr.SetName("cr2ltest0");         // test for zpeak lumi
   cr.SetVar("met", 50, fInf);
   cr.SetVar("nvlep", 2, 3);
   cr.SetVar("nlep_rl", 2, 3);
-  cr.SetVar("lep1pt", 40, fInf);
+  cr.SetVar("passlep1pt", 1, 2); // mu 40, e 45
+  cr.SetVar("njet", 2, fInf);
+  CRvec.emplace_back(cr);
+
+  cr.SetName("cr2ltest1");         // test
+  cr.SetVar("met", 50, fInf);
+  cr.SetVar("nvlep", 2, 3);
+  cr.SetVar("nlep_rl", 2, 3);
+  // cr.SetVar("lep1pt", 40, fInf);
+  cr.SetVar("passlep1pt", 1, 2); // mu 40, e 45
   cr.SetVar("njet", 2, fInf);
   cr.SetVar("nbjet", 1, fInf);
-  cr.SetVar("dphijmet_rl", 0.8, 3.14159);
+  // cr.SetVar("dphijmet_rl", 0.8, 3.14159);
   CRvec.emplace_back(cr);
 
   cr.SetName("cr2ltest3");         // test
@@ -319,62 +328,62 @@ std::vector<SR> getStopControlRegionsDilepton() {
   CRvec.emplace_back(cr);
 
 
-  cr = crbase;
-  cr.SetName("cr2lB1");
-  cr.SetDetailName("2to3j_tmod10toInf_mlb175toInf_met250to450");
-  cr.SetVar("mlb", 175, -1);
-  cr.SetVar("ntbtag", 1, -1);
-  cr.SetVar("met_rl", 250, 450);
-  CRvec.emplace_back(cr);
+  // cr = crbase;
+  // cr.SetName("cr2lB1");
+  // cr.SetDetailName("2to3j_tmod10toInf_mlb175toInf_met250to450");
+  // cr.SetVar("mlb", 175, -1);
+  // cr.SetVar("ntbtag", 1, -1);
+  // cr.SetVar("met_rl", 250, 450);
+  // CRvec.emplace_back(cr);
 
-  cr.SetName("cr2lB2");
-  cr.SetDetailName("2to3j_tmod10toInf_mlb175toInf_met450to600");
-  cr.SetVar("met_rl", 450, 600);
-  CRvec.emplace_back(cr);
+  // cr.SetName("cr2lB2");
+  // cr.SetDetailName("2to3j_tmod10toInf_mlb175toInf_met450to600");
+  // cr.SetVar("met_rl", 450, 600);
+  // CRvec.emplace_back(cr);
 
-  cr.SetName("cr2lB3");
-  cr.SetDetailName("2to3j_tmod10toInf_mlb175toInf_met600toInf");
-  cr.SetVar("met_rl", 600, -1);
-  CRvec.emplace_back(cr);
-
-
-  cr.SetName("cr2lH1");
-  cr.SetDetailName("geq4j_tmod10toInf_mlb175toInf_met250to450");
-  cr.SetVar("njet", 4, -1);
-  cr.SetVar("met_rl", 250, 450);
-  CRvec.emplace_back(cr);
-
-  cr.SetName("cr2lH2");
-  cr.SetDetailName("geq4j_tmod10toInf_mlb175toInf_met450toInf");
-  cr.SetVar("met_rl", 450, -1);
-  CRvec.emplace_back(cr);
+  // cr.SetName("cr2lB3");
+  // cr.SetDetailName("2to3j_tmod10toInf_mlb175toInf_met600toInf");
+  // cr.SetVar("met_rl", 600, -1);
+  // CRvec.emplace_back(cr);
 
 
-  cr.SetName("cr2lE1");
-  cr.SetDetailName("geq4j_tmod0to10_mlb0to175_met350to550");
-  cr.SetVar("tmod_rl", 0, 10);
-  cr.SetVar("met_rl", 350, 550);
-  cr.SetVar("mlb", 0, 175);
-  cr.RemoveVar("ntbtag");
-  CRvec.emplace_back(cr);
+  // cr.SetName("cr2lH1");
+  // cr.SetDetailName("geq4j_tmod10toInf_mlb175toInf_met250to450");
+  // cr.SetVar("njet", 4, -1);
+  // cr.SetVar("met_rl", 250, 450);
+  // CRvec.emplace_back(cr);
 
-  cr.SetName("cr2lE2");
-  cr.SetDetailName("geq4j_tmod0to10_mlb0to175_met550toInf");
-  cr.SetVar("met_rl", 550, -1);
-  CRvec.emplace_back(cr);
+  // cr.SetName("cr2lH2");
+  // cr.SetDetailName("geq4j_tmod10toInf_mlb175toInf_met450toInf");
+  // cr.SetVar("met_rl", 450, -1);
+  // CRvec.emplace_back(cr);
 
 
-  cr.SetName("cr2lF1");
-  cr.SetDetailName("geq4j_tmod0to10_mlb175toInf_met250to450");
-  cr.SetVar("met_rl", 250, 450);
-  cr.SetVar("ntbtag", 1, -1);
-  cr.SetVar("mlb", 175, -1);
-  CRvec.emplace_back(cr);
+  // cr.SetName("cr2lE1");
+  // cr.SetDetailName("geq4j_tmod0to10_mlb0to175_met350to550");
+  // cr.SetVar("tmod_rl", 0, 10);
+  // cr.SetVar("met_rl", 350, 550);
+  // cr.SetVar("mlb", 0, 175);
+  // cr.RemoveVar("ntbtag");
+  // CRvec.emplace_back(cr);
 
-  cr.SetName("cr2lF2");
-  cr.SetDetailName("geq4j_tmod0to10_mlb175toInf_met450toInf");
-  cr.SetVar("met_rl", 450, -1);
-  CRvec.emplace_back(cr);
+  // cr.SetName("cr2lE2");
+  // cr.SetDetailName("geq4j_tmod0to10_mlb0to175_met550toInf");
+  // cr.SetVar("met_rl", 550, -1);
+  // CRvec.emplace_back(cr);
+
+
+  // cr.SetName("cr2lF1");
+  // cr.SetDetailName("geq4j_tmod0to10_mlb175toInf_met250to450");
+  // cr.SetVar("met_rl", 250, 450);
+  // cr.SetVar("ntbtag", 1, -1);
+  // cr.SetVar("mlb", 175, -1);
+  // CRvec.emplace_back(cr);
+
+  // cr.SetName("cr2lF2");
+  // cr.SetDetailName("geq4j_tmod0to10_mlb175toInf_met450toInf");
+  // cr.SetVar("met_rl", 450, -1);
+  // CRvec.emplace_back(cr);
 
   return CRvec;
 }
@@ -405,9 +414,11 @@ std::vector<SR> getStopControlRegionsNoBTags() {
   cr.SetVar("nlep", 1, 2);
   cr.SetVar("nvleps", 1, 2);
   cr.SetVar("passvetos", 1, 2);
-  cr.SetVar("lep1pt", 40, fInf);
+  // cr.SetVar("lep1pt", 40, fInf);
+  cr.SetVar("passlep1pt", 1, 2); // mu 40, e 45
   cr.SetVar("njet", 2, fInf);
   cr.SetVar("nbjet", 0, 1);
+  cr.SetVar("dphijmet", 0.8, 3.14159);
   CRvec.emplace_back(cr);
 
   cr.SetName("cr0btestdilep");
@@ -418,17 +429,22 @@ std::vector<SR> getStopControlRegionsNoBTags() {
   cr.RemoveVar("osdilep");
 
   cr.SetName("cr0btest2");         // test
-  cr.SetVar("dphijmet", 0.8, 3.14159);
+  cr.SetVar("mt", 150, fInf);
   CRvec.emplace_back(cr);
 
   cr.SetName("cr0btest3");         // test
   cr.SetVar("met", 250, fInf);
+  cr.RemoveVar("passLep1pt");
   cr.SetVar("lep1pt", 20, fInf);
   CRvec.emplace_back(cr);
 
-  cr.SetName("cr0btest4");         // test
-  cr.SetVar("mt", 150, fInf);
+  cr.SetName("crtest5");         // test
+  cr.SetVar("mt", 0, fInf);
   CRvec.emplace_back(cr);
+
+  // cr.SetName("cr0btest4");         // test
+  // cr.SetVar("dphijmet", 0.8, 3.14159);
+  // CRvec.emplace_back(cr);
 
   // cr.SetName("crtest5");         // test
   // cr.SetVar("tmod", 0, fInf);

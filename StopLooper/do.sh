@@ -3,18 +3,19 @@
 make -j 12 || return $?
 
 
-INDIR=/nfs-7/userdata/haweber/stopbabiesInteractive/2017_5p8fbinv
-
+# INDIR=/nfs-7/userdata/haweber/stopbabiesInteractive/2017_5p8fbinv
+INDIR=/nfs-7/userdata/haweber/tupler_babies/merged/Stop_1l/v2017/output/
 OUTDIR=output/temp4
 # OUTDIR=output/temp2
 LOGDIR=logs
 mkdir -p ${OUTDIR}
 mkdir -p ${LOGDIR}
 
-# declare -a Samples=(data_*_2017C data_*_2017B data_*_2017A)
-# declare -a Samples=(data)
+# declare -a Samples=(data_*2017C data_*2017B data_*2017A)
+# declare -a Samples=(data_2017)
+declare -a Samples=(data_met)
 # declare -a Samples=(data_singlemu)
-declare -a Samples=(data_singlemu data data_met)
+# declare -a Samples=(data_singlemu data data_met data_singleel)
 
 for SAMPLE in ${Samples[@]}; do
     echo ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} '>&' ${LOGDIR}/log_${SAMPLE}.txt
@@ -34,15 +35,17 @@ mkdir -p ${OUTDIR}
 mkdir -p ${LOGDIR}
 
 # declare -a Samples=(data_single_muon)
-# declare -a Samples=(data)
-declare -a Samples=(data_single_muon data data_met)
+# declare -a Samples=(data_2016)
+declare -a Samples=(data_met)
+# declare -a Samples=(data_single_muon data data_met data_single_electron)
+# declare -a Samples=(data_muon_eg)
 
 for SAMPLE in ${Samples[@]}; do
-    echo ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} '>&' ${LOGDIR}/log_${SAMPLE}_2016.txt
+    echo ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} '>&' ${LOGDIR}/log_${SAMPLE}.txt
     # ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
-    # eval "nohup ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}_2016.txt &"
+    # eval "nohup ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
     # echo nice -n 10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
-    eval "nohup nice -n -10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}_2016.txt &"
+    eval "nohup nice -n -10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
 done
 
 # 2016 MC for comparison
