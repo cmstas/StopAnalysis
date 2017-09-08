@@ -312,9 +312,16 @@ std::vector<SR> getStopControlRegionsDilepton() {
   cr.SetVar("met", 150, fInf);
   CRvec.emplace_back(cr);
 
-  // cr.SetName("cr2ltest5");         // test
-  // cr.SetVar("nbjet", 1, fInf);
-  // CRvec.emplace_back(cr);
+  cr.SetName("cr2ltest5");         // test
+  cr.SetVar("met", 250, fInf);
+  cr.RemoveVar("passlep1pt");
+  cr.SetVar("lep1pt", 20, fInf);
+  CRvec.emplace_back(cr);
+
+  cr = crbase;
+  cr.SetName("cr2lbase2");
+  cr.RemoveVar("dphijmet_rl");
+  CRvec.emplace_back(cr);
 
   cr = crbase;
   cr.SetName("cr2lincl1");
