@@ -264,6 +264,7 @@ void StopLooper::looper(TChain* chain, string sample, string output_dir) {
       }
 
       // Fill the variables
+      values_.clear();
 
       values_["mt"] = mt_met_lep();
       values_["met"] = pfmet();
@@ -397,7 +398,7 @@ void StopLooper::fillHistosForSR(string suf) {
         plot1D("h_nbjets"+s,   values_["nbjet"]   , evtweight_, sr.histMap, ";nbjets"               ,  6,  0, 6);
         plot1D("h_mlepb"+s,    values_["mlb"]     , evtweight_, sr.histMap, ";M(l,b) [GeV]"         , 24,  0, 600);
         plot1D("h_dphijmet"+s, values_["dphijmet"], evtweight_, sr.histMap, ";#Delta #phi (j, met)" , 24,  0, 4);
-        plot1D("h_tmod"+s,     values_["tmod"]    , evtweight_, sr.histMap, ";modified topness"     , 20, -5, 15);
+        plot1D("h_tmod"+s,     values_["tmod"]    , evtweight_, sr.histMap, ";modified topness"     , 25, -10, 15);
 
         const float met_bins[] = {0, 250, 350, 450, 550, 650, 800};
         plot1D("h_metbins"+s,   values_["met"]    , evtweight_, sr.histMap, ";E^{miss}_{T} [GeV]"        , 6, met_bins);
@@ -489,7 +490,7 @@ void StopLooper::fillHistosForCR2l(string suf) {
         plot1D("h_mt"+s,       values_["mt"]          , evtweight_, cr.histMap, ";M_{T} [GeV]"          , 12,  0, 600);
         plot1D("h_rlmt"+s,     values_["mt_rl"]       , evtweight_, cr.histMap, ";M_{T} (rl) [GeV]"     , 12,  0, 600);
         plot1D("h_mt2w"+s,     values_["mt2w_rl"]     , evtweight_, cr.histMap, ";MT2W"                 , 18,  50, 500);
-        plot1D("h_tmod"+s,     values_["tmod_rl"]     , evtweight_, cr.histMap, ";modified topness"     , 20, -5, 15);
+        plot1D("h_tmod"+s,     values_["tmod_rl"]     , evtweight_, cr.histMap, ";modified topness"     , 20, -10, 15);
         plot1D("h_njets"+s,    values_["njet"]        , evtweight_, cr.histMap, ";njets"                , 12,  0, 12);
         plot1D("h_nbjets"+s,   values_["nbjet"]       , evtweight_, cr.histMap, ";nbjets"               ,  6,  0, 6);
         plot1D("h_nleps"+s,    values_["nlep_rl"]     , evtweight_, cr.histMap, ";nleps (dilep)"        ,  5,  0, 5);
@@ -552,7 +553,7 @@ void StopLooper::fillHistosForCR0b(string suf) {
         plot1D("h_nbjets"+s,   values_["nbjet"]   , evtweight_, cr.histMap, ";nbjets"               ,  6,  0, 6);
         plot1D("h_mlepb"+s,    values_["mlb_0b"]  , evtweight_, cr.histMap, ";M(l,b) [GeV]"         , 24,  0, 600);
         plot1D("h_dphijmet"+s, values_["dphijmet"], evtweight_, cr.histMap, ";#Delta #phi (j, met)" , 24,  0, 4);
-        plot1D("h_tmod"+s,     values_["tmod"]    , evtweight_, cr.histMap, ";modified topness"     , 20, -5, 15);
+        plot1D("h_tmod"+s,     values_["tmod"]    , evtweight_, cr.histMap, ";modified topness"     , 25, -10, 15);
         plot1D("h_nvtxs"+s,        nvtxs()        , evtweight_, cr.histMap, ";N Vertexes"           , 70,  1, 71);
 
         const float met_bins[] = {0, 250, 350, 450, 550, 650, 800};
