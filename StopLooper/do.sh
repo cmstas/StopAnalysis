@@ -12,8 +12,8 @@ mkdir -p ${OUTDIR}
 mkdir -p ${LOGDIR}
 
 # declare -a Samples=(data_*2017C data_*2017B data_*2017A)
-# declare -a Samples=(data_2017)
-declare -a Samples=(data_met)
+declare -a Samples=(data_2017)
+# declare -a Samples=(data_met)
 # declare -a Samples=(data_singlemu)
 # declare -a Samples=(data_singlemu data data_met data_singleel)
 
@@ -35,8 +35,8 @@ mkdir -p ${OUTDIR}
 mkdir -p ${LOGDIR}
 
 # declare -a Samples=(data_single_muon)
-# declare -a Samples=(data_2016)
-declare -a Samples=(data_met)
+declare -a Samples=(data_2016)
+# declare -a Samples=(data_met)
 # declare -a Samples=(data_single_muon data data_met data_single_electron)
 # declare -a Samples=(data_muon_eg)
 
