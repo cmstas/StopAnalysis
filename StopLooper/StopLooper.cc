@@ -168,9 +168,6 @@ void StopLooper::looper(TChain* chain, string sample, string output_dir) {
     }
   }
 
-  // // Test the lumi is in the baby
-  // set<pair<int,int>> lumi_ran;
-
   if (applyjson) {
     cout << "Loading json file: " << json_file << endl;
     set_goodrun_file(json_file);
@@ -222,7 +219,6 @@ void StopLooper::looper(TChain* chain, string sample, string output_dir) {
           ++nDuplicates;
           continue;
         }
-        // lumi_ran.insert( make_pair(run(), ls()) );  // to test the lumi in baby
       }
 
       // Apply met filters
@@ -336,7 +332,6 @@ void StopLooper::looper(TChain* chain, string sample, string output_dir) {
   cout << "[StopLooper::looper] processed  " << nEventsTotal << " events" << endl;
   if ( nEventsChain != nEventsTotal )
     cout << "WARNING: number of events from files is not equal to total number of events" << endl;
-  // cout << "[StopLooper::looper] The min and max of the run ran were [" << lumi_ran.begin()->first << ", " << lumi_ran.rbegin()->first << "]" << endl;
 
   outfile_->cd();
 
@@ -361,12 +356,6 @@ void StopLooper::looper(TChain* chain, string sample, string output_dir) {
   outfile_->Close();
 
   bmark->Stop("benchmark");
-
-  // ofstream ofile("logs/lumi_ran.txt");
-  // for (auto ls : lumi_ran) {
-  //   ofile << ls.first << " " << ls.second << endl;
-  // }
-
   cout << endl;
   cout << nEventsTotal << " Events Processed, where " << nDuplicates << " duplicates were skipped, and ";
   cout << nPassedTotal << " Events passed all selections." << endl;

@@ -27,3 +27,4 @@ Additional plots of interest can be added anywhere in the looper
 * Get rid of the `dummy.root` (find a way to prevent hists from being destroyed after file close)
 * Add automation script to monitor the running looper proceed with further command when finishes
 * To make duplicate removal to work global for all data
+* To facilitate the looper with parallel programing
