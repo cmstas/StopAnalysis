@@ -5,6 +5,7 @@ make -j 12 || return $?
 
 # INDIR=/nfs-7/userdata/haweber/stopbabiesInteractive/2017_5p8fbinv
 INDIR=/nfs-7/userdata/haweber/tupler_babies/merged/Stop_1l/v2017/output/
+# OUTDIR=output/temp6
 OUTDIR=output/temp4
 # OUTDIR=output/temp2
 LOGDIR=logs
@@ -12,7 +13,8 @@ mkdir -p ${OUTDIR}
 mkdir -p ${LOGDIR}
 
 # declare -a Samples=(data_*2017C data_*2017B data_*2017A)
-declare -a Samples=(data_2017)
+# declare -a Samples=(data_2017)
+declare -a Samples=(data_2017dilep)
 # declare -a Samples=(data_met)
 # declare -a Samples=(data_singlemu)
 # declare -a Samples=(data_singlemu data data_met data_singleel)
@@ -29,13 +31,15 @@ done
 INDIR=/nfs-7/userdata/stopRun2/analysis2016_SUS-16-051_35p9fbinv/v24/output
 # INDIR=/nfs-7/userdata/stopRun2/analysis2016_SUS-16-051_35p9fbinv/v24/skim
 # OUTDIR=output/data2016
+# OUTDIR=output/temp5
 OUTDIR=output/temp3
 # OUTDIR=output/temp1
 mkdir -p ${OUTDIR}
 mkdir -p ${LOGDIR}
 
 # declare -a Samples=(data_single_muon)
-declare -a Samples=(data_2016)
+# declare -a Samples=(data_2016)
+declare -a Samples=(data_2016dilep)
 # declare -a Samples=(data_met)
 # declare -a Samples=(data_single_muon data data_met data_single_electron)
 # declare -a Samples=(data_muon_eg)

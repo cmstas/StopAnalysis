@@ -76,14 +76,15 @@ const bool ignoreScale1fb = false;
 const bool synchronizing = false;
 // not running the standard regions to speed up
 const bool fasterRuntime = true;
-
+// move the bool def here for member function usage
+bool is2016data = false;
 
 void StopLooper::SetSignalRegions() {
 
   // SRVec = getStopSignalRegions();
   CR0bVec = getStopControlRegionsNoBTags();
   CR2lVec = getStopControlRegionsDilepton();
-  CRemuVec = getStopControlRegionsEMu();
+  CRemuVec = getStopCrosscheckRegionsEMu();
 
   SRVec = getStopSignalRegionsTopological();
   // CR0bVec = getStopControlRegionsNoBTagsTopological();
@@ -200,7 +201,8 @@ void StopLooper::looper(TChain* chain, string sample, string output_dir) {
     tree->SetCacheSize(128*1024*1024);
     babyAnalyzer.Init(tree);
 
-    bool is2016data = TString(currentFile->GetTitle()).Contains("Run2016");
+    // bool is2016data = TString(currentFile->GetTitle()).Contains("Run2016");
+    is2016data = TString(currentFile->GetTitle()).Contains("Run2016");
     dummy.cd();
     // Loop over Events in current file
     if (nEventsTotal >= nEventsChain) continue;
@@ -272,6 +274,7 @@ void StopLooper::looper(TChain* chain, string sample, string output_dir) {
       values_["nvlep"] = nvetoleps();
       values_["njet"] = ngoodjets();
       values_["nbjet"] = ngoodbtags();
+      values_["nbtag"] = nanalysisbtags();
       values_["ntbtag"] = ntightbtags();
       values_["dphijmet"] = mindphi_met_j1_j2();
       values_["dphilmet"] = fabs(lep1_p4().phi() - pfmet_phi());
@@ -405,7 +408,7 @@ void StopLooper::fillHistosForSR(string suf) {
 void StopLooper::fillHistosForCRemu(string suf) {
 
   // Trigger requirements
-  if ( !HLT_MET_MHT() ) return;
+  // if ( !HLT_MET_MHT() ) return;
   if ( !(lep1_pdgid() * lep2_pdgid() == -143) ) return;
 
   // Basic cuts that are not supposed to change frequently
@@ -438,20 +441,49 @@ void StopLooper::fillHistosForCRemu(string suf) {
         plot1D("h_lep2eta"+s,  values_["lep2eta"] , evtweight_, cr.histMap, ";#eta (lep2)"          , 20, -5, 5);
         plot1D("h_nleps"+s,    values_["nlep"]    , evtweight_, cr.histMap, ";nleps"                ,  5,  0, 5);
         plot1D("h_njets"+s,    values_["njet"]    , evtweight_, cr.histMap, ";njets"                , 12,  0, 12);
-        plot1D("h_nbjets"+s,   values_["nbjet"]   , evtweight_, cr.histMap, ";nbjets"               , 6,   0, 6);
+        plot1D("h_nbjets"+s,   values_["nbjet"]   , evtweight_, cr.histMap, ";nbtags"               , 6,   0, 6);
+        plot1D("h_tmod"+s,     values_["tmod"]    , evtweight_, cr.histMap, ";modified topness"     , 30, -15, 15);
         plot1D("h_mlepb"+s,    values_["mlb_0b"]  , evtweight_, cr.histMap, ";M(l,b) [GeV]"         , 24,  0, 600);
         plot1D("h_dphijmet"+s, values_["dphijmet"], evtweight_, cr.histMap, ";#Delta #phi (j, met)" , 24,  0, 4);
         plot1D("h_mll"+s,      values_["mll"]     , evtweight_, cr.histMap, ";M(ll) [GeV]"          , 100, 0, 500 );
 
-        // Temporary
-        if (60 < values_["mll"] && values_["mll"] < 120) {
-          plot1D("h_njets_sp"+s,  values_["njet"] , evtweight_, cr.histMap, ";njets"                , 12,  0, 12);
-          plot1D("h_nbjets_sp"+s, values_["nbjet"], evtweight_, cr.histMap, ";njets"                , 12,  0, 12);
-        }
-
         const float leppt_bins[] = {0, 30, 40, 50, 75, 100, 125, 200};
         plot1D("h_lep1ptbins"+s, values_["lep1pt"], evtweight_, cr.histMap, ";p_{T}(lep1) [GeV]"  , 7, leppt_bins);
         plot1D("h_lep2ptbins"+s, values_["lep2pt"], evtweight_, cr.histMap, ";p_{T}(lep2) [GeV]"  , 7, leppt_bins);
+
+        // Temporary
+        // if (60 < values_["mll"] && values_["mll"] < 120) {
+        //   plot1D("h_njets_sp"+s,  values_["njet"] , evtweight_, cr.histMap, ";njets"                , 12,  0, 12);
+        //   plot1D("h_nbjets_sp"+s, values_["nbjet"], evtweight_, cr.histMap, ";njets"                , 12,  0, 12);
+        // }
+
+        // b-tagging eff test
+        if (values_["nbjet"] == 0)
+          plot1D("h_tmod_0b"+s, values_["tmod"]    , evtweight_, cr.histMap, ";modified topness"     , 30, -15, 15);
+        else
+          plot1D("h_tmod_wb"+s, values_["tmod"]    , evtweight_, cr.histMap, ";modified topness"     , 30, -15, 15);
+          
+        if (values_["tmod"] < 0) {
+
+          // Temporary test for jet-tagging eff
+          float evtwgt = evtweight_;
+          if (is2016data) {
+            if      (values_["njet"] == 2) evtwgt *= 1.0608;
+            else if (values_["njet"] == 3) evtwgt *= 0.969113;
+            else if (values_["njet"] == 4) evtwgt *= 0.950367;
+            else if (values_["njet"] == 5) evtwgt *= 0.883066;
+            else if (values_["njet"] == 6) evtwgt *= 0.840962;
+            else if (values_["njet"] == 7) evtwgt *= 1.08582;
+            else if (values_["njet"] == 8) evtwgt *= 1.14734;
+          }
+
+          plot1D("h_njets_t"+s,  values_["njet"] , evtwgt, cr.histMap, ";njets"                , 12,  0, 12);
+          plot1D("h_nbjets_t"+s, values_["nbjet"], evtwgt, cr.histMap, ";nbtags"               , 6,   0, 6);
+          if (values_["nbjet"] > 0) {
+            plot1D("h_njets_twb"+s,  values_["njet"] , evtwgt, cr.histMap, ";njets"            , 12,  0, 12);
+            plot1D("h_nbjets_twb"+s, values_["nbjet"], evtwgt, cr.histMap, ";nbtags"           , 6,   0, 6);
+          }
+        }
       };
       fillhists(suf);
       if (HLT_MuE())
@@ -463,13 +495,26 @@ void StopLooper::fillHistosForCRemu(string suf) {
 void StopLooper::fillHistosForCR2l(string suf) {
 
   // Trigger requirements
-  if ( !HLT_SingleEl() && !HLT_SingleMu() ) return;
+  if ( !(HLT_SingleEl() || HLT_SingleMu() || HLT_MET_MHT()) ) return;
 
   // if ( (abs(lep1_pdgid()) == 11 && values_["lep1pt"] < 40) || (abs(lep1_pdgid()) == 13 && values_["lep1pt"] < 30) ) return;
   // if (lep1_pdgid() != -lep2_pdgid()) return; // temporary for zpeak check
 
   for (auto& cr : CR2lVec) {
     if ( cr.PassesSelection(values_) ) {
+      if ( cr.GetLowerBound("met") < 200 && !(HLT_SingleEl() || HLT_SingleMu()) ) continue; // Temporary
+
+      float evtwgtsave = evtweight_;
+      if (is2016data) {
+        if      (values_["njet"] == 2) evtweight_ *= 0.966874;
+        else if (values_["njet"] == 3) evtweight_ *= 0.905649;
+        else if (values_["njet"] == 4) evtweight_ *= 0.874371;
+        else if (values_["njet"] == 5) evtweight_ *= 0.798184;
+        else if (values_["njet"] == 6) evtweight_ *= 0.82373;
+        else if (values_["njet"] == 7) evtweight_ *= 0.74897;
+        else if (values_["njet"] == 8) evtweight_ *= 0.67408;
+        else if (values_["njet"] == 9) evtweight_ *= 0.757544;
+      }
 
       auto fillhists = [&] (string s) {
         plot1D("h_finemet"+s,  values_["met"]         , evtweight_, cr.histMap, ";E_{T}^{miss} [GeV]"   , 80,  0, 800);
@@ -497,9 +542,14 @@ void StopLooper::fillHistosForCR2l(string suf) {
         if (lep1_pdgid() == -lep2_pdgid()) {
           plot1D("h_mll"+s,   values_["mll"], evtweight_, cr.histMap, ";M(ll) [GeV]", 120, 0, 240 );
           if (82 < values_["mll"] && values_["mll"] < 100) {
-            plot1D("h_zpt"+s, (lep1_p4() + lep2_p4()).pt(), evtweight_, cr.histMap, ";M(ll) [GeV]", 200, 0, 200 );
+            float zpt = (lep1_p4() + lep2_p4()).pt();
+            plot1D("h_zpt"+s,                 zpt         , evtweight_, cr.histMap, ";p_{T}(Z) [GeV]", 200, 0, 200 );
             plot1D("h_njets_zpeak"+s,  values_["njet"]    , evtweight_, cr.histMap, ";njets"                , 12,  0, 12);
             plot1D("h_nbjets_zpeak"+s, values_["nbjet"]   , evtweight_, cr.histMap, ";nbjets"               ,  6,  0, 6);
+            if (zpt > 20)
+              plot1D("h_nbjets_mzpt"+s, values_["nbjet"] , evtweight_, cr.histMap, ";nbjets"               ,  6,  0, 6);
+            if (zpt > 50)
+              plot1D("h_nbjets_hzpt"+s, values_["nbjet"] , evtweight_, cr.histMap, ";nbjets"               ,  6,  0, 6);
           } else {
             plot1D("h_njets_noz"+s,    values_["njet"]    , evtweight_, cr.histMap, ";njets"                , 12,  0, 12);
             plot1D("h_nbjets_noz"+s,   values_["nbjet"]   , evtweight_, cr.histMap, ";nbjets"               ,  6,  0, 6);
@@ -519,17 +569,19 @@ void StopLooper::fillHistosForCR2l(string suf) {
       else if ( abs(lep1_pdgid()*lep2_pdgid()) == 169 )
         fillhists(suf+"_mumu");
 
+      evtweight_ = evtwgtsave;
     }
   }
 }
 
 void StopLooper::fillHistosForCR0b(string suf) {
 
+  // Trigger requirements
   if ( !(HLT_SingleEl() || HLT_SingleMu() || HLT_MET_MHT()) ) return;
 
   for (auto& cr : CR0bVec) {
     if ( cr.PassesSelection(values_) ) {
-      // if ( cr.GetLowerBound("met") < 200 && !(HLT_SingleEl() || HLT_SingleMu()) ) continue;
+      if ( cr.GetLowerBound("met") < 200 && !(HLT_SingleEl() || HLT_SingleMu()) ) continue;
       auto fillhists = [&] (string s) {
         plot1D("h_mt"+s,       values_["mt"]      , evtweight_, cr.histMap, ";M_{T} [GeV]"          , 12,  0, 600);
         plot1D("h_mt2w"+s,     values_["mt2w"]    , evtweight_, cr.histMap, ";MT2W [GeV]"           , 18,  50, 500);
