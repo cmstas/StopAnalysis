@@ -26,32 +26,36 @@ void compareControlRegions() {
   // auto ifile_new = new TFile("../StopLooper/output/temp2/data_2017.root");   // 1, 2 without nvtx reweighting
   // auto ifile_old = new TFile("../StopLooper/output/temp1/data_2016.root");
 
-  auto ifile_new = new TFile("../StopLooper/output/temp6/data_2017.root");   // 5, 6 with Nvtx reweighting
-  auto ifile_old = new TFile("../StopLooper/output/temp5/data_2016.root");
+  // auto ifile_new = new TFile("../StopLooper/output/temp6/data_2017.root");   // 5, 6 with Nvtx reweighting
+  // auto ifile_old = new TFile("../StopLooper/output/temp5/data_2016.root");
 
-  // auto ifile_new = new TFile("../StopLooper/output/temp6/data_muon_eg.root");
-  // auto ifile_old = new TFile("../StopLooper/output/temp3/data_muon_eg.root");
+  // auto ifile_new = new TFile("../StopLooper/output/temp6/data_2017dilep.root");
+  // auto ifile_old = new TFile("../StopLooper/output/temp5/data_2016dilep.root");
+
+  auto ifile_new = new TFile("../StopLooper/output/temp4/data_2017dilep.root");
+  auto ifile_old = new TFile("../StopLooper/output/temp3/data_2016dilep.root");
 
   // vector<string> Dirs = {"cr0btest1", "cr0btest2", "cr0btest3"};
   // vector<string> Dirs = {"cr0btest1"};
   // vector<string> Hists = {"h_met", "h_njets", "h_mt", "h_tmod", "h_nvtxs", "h_mlepb", "h_lep1pt", "h_dphijmet"};
 
   // vector<string> Dirs = {"cremu1"};
-  // vector<string> Hists = {"h_njets", "h_njets_sp", "h_nbjets", "h_nbjets_sp", "h_mll", "h_met"};
+  // vector<string> Hists = {"h_njets", "h_nbjets", "h_mll", "h_met"};
+  // vector<string> Hists = {"h_tmod_0b", "h_tmod_wb", "h_nbjets", "h_nbjets_t", "h_njets_t", "h_nbjets_twb"};
 
   // vector<string> Dirs = {"cr2ltest", "cr2ltest1", "cr2ltest2", "cr2lbase"};
-  vector<string> Dirs = {"cr2lbase", "cr2lbase2", "cr2ltest5"};
+  // vector<string> Dirs = {"cr2lbase", "cr2lbase2", "cr2ltest5"};
   // vector<string> Dirs = {"cr0btest2", "cr0btest3", "cr2ltest1"};
-  // vector<string> Dirs = {"cr2ltest3", "cr2ltest4"};
+  vector<string> Dirs = {"cr2ltest0"};
   // vector<string> Dirs = {"cr2ltest4", "cr2ltest5", "cr2ltest6", "cr2lbase"};
   // vector<string> Dirs = {"cr2lbase", "cr2lincl1", "cr2lincl2"};
   // vector<string> Hists = {"h_metbins", "h_rlmetbins", "h_njets", "h_nbjets", "h_tmod", "h_mlepb"};
   // vector<string> Hists = {"h_njets", "h_rlmet", "h_mt2w", "h_tmod", "h_nbjets", "h_dphijmet"};
   // vector<string> Hists = {"h_mll", "h_finemet", "h_met", "h_njets", "h_nbjets", "h_metphi", "h_lep1pt"};
   // vector<string> Hists = {"h_met", "h_njets_zpeak", "h_njets_noz", "h_mll_2j", "h_mll_g2j"};
-  vector<string> Hists = {"h_mll", "h_rlmet", "h_rlmt", "h_met", "h_nvtxs", "h_mt", "h_njets", "h_nbjets", "h_tmod", "h_mlepb", "h_lep1pt", "h_dphijmet"};
+  // vector<string> Hists = {"h_mll", "h_rlmet", "h_rlmt", "h_met", "h_nvtxs", "h_mt", "h_njets", "h_nbjets", "h_tmod", "h_mlepb", "h_lep1pt", "h_dphijmet"};
   // vector<string> Hists = {"h_nvtxs", "h_mt", "h_met", "h_mll"};
-  // vector<string> Hists = {"h_tmod"};
+  vector<string> Hists = {"h_mll", "h_zpt", "h_njets", "h_njets_zpeak", "h_nbjets_zpeak", "h_nbjets_mzpt", "h_nbjets_hzpt"};
 
   // vector<string> Dirs = {"cr0bbase"};
   // vector<string> Hists = {"h_metbins", "h_mt", "h_njets", "h_nbjets", "h_tmod", "h_mlepb"};
@@ -62,8 +66,9 @@ void compareControlRegions() {
       // for (string suf : {"", "_e", "_mu", "_barrele", "_endcape"}) {
       // for (string suf : {"", "_e", "_mu", "_hltsl", "_hltmht"}) {
       // for (string suf : {"", "_ee", "_mumu", "_hltmet", "_hltmu", "_hltel"}) {
-      for (string suf : {"", "_ee", "_mumu", "_emu"}) {
-        // for (string suf : {""}) {
+      // for (string suf : {"", "_ee", "_mumu", "_emu"}) {
+      for (string suf : {""}) {
+      // for (string suf : {"_passHLT"}) {
         string hstr = hn + suf;
         vector<Color_t> vcolor;
         if (suf == "") vcolor.push_back(kAzure+7);
@@ -80,6 +85,11 @@ void compareControlRegions() {
         hold->Scale(8.32/35.87);
 
         float scale = hnew->Integral(0,-1)/hold->Integral(0,-1);
+
+        // Temporary
+        if (hn == "h_njets")
+          for (int i = 1; i < 13; ++i)
+            cout << "ratio for " << i-1 << " jets is: " << hnew->GetBinContent(i) / hold->GetBinContent(i) << endl;
 
         // Try to use the dataMCplotMaker
         string optstr = "--darkColorLines --lumi 8.3 --topYaxisTitle Entries --type Preliminary --dataName data2017 --outOfFrame";

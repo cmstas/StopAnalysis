@@ -272,6 +272,7 @@ std::vector<SR> getStopControlRegionsDilepton() {
   crbase.SetAllowDummyVars(1);
 
   crbase.SetName("cr2lbase");
+  crbase.SetVar("met", 50, fInf);
   crbase.SetVar("mt_rl", 150, fInf);
   crbase.SetVar("met_rl", 250, fInf);
   crbase.SetVar("tmod_rl", -fInf, fInf); // temporary until the inefficiency is understood
@@ -445,7 +446,7 @@ std::vector<SR> getStopControlRegionsNoBTags() {
   cr.SetVar("lep1pt", 20, fInf);
   CRvec.emplace_back(cr);
 
-  cr.SetName("crtest5");         // test
+  cr.SetName("cr0btest5");         // test
   cr.SetVar("mt", 0, fInf);
   CRvec.emplace_back(cr);
 
@@ -486,7 +487,7 @@ std::vector<SR> getStopControlRegionsNoBTags() {
   return CRvec;
 }
 
-std::vector<SR> getStopControlRegionsEMu() {
+std::vector<SR> getStopCrosscheckRegionsEMu() {
   std::vector<SR> CRvec;
 
   SR crbase;
