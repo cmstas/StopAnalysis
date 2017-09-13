@@ -1099,6 +1099,9 @@ Path /hadoop/cms/store/group/snt/run2_moriond17/TTTo2L2Nu_TuneCUETP8M2_ttHtranch
 #Name TTTo2L2Nu_alphaS01273_powheg_25ns
 #Path /hadoop/cms/store/group/snt/run2_25ns_80MiniAODv2/TTTo2L2Nu_TuneCUETP8M1_alphaS01273_13TeV-powheg-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/V08-00-05/
 
+SAMPLE
+Name ttbar_2017
+Path /hadoop/cms/store/user/namin/ProjectMetis/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8_RunIISummer17MiniAOD-92X_upgrade2017_realistic_v7-v1_MINIAODSIM_CMS4_V00-00-06/
 
 ## single top ##
 
@@ -1165,6 +1168,10 @@ Path /hadoop/cms/store/group/snt/run2_moriond17/DYJetsToLL_M-10to50_TuneCUETP8M1
 SAMPLE
 Name DYJetsToLL_m50_madgraph_pythia8_25ns
 Path /hadoop/cms/store/group/snt/run2_moriond17/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v2/V08-00-16/
+
+SAMPLE
+Name DYJetsToLL_M50_madgraph_pythia8_25ns
+Path /hadoop/cms/store/user/namin/ProjectMetis/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer17MiniAOD-92X_upgrade2017_realistic_v7-v1_MINIAODSIM_CMS4_V00-00-06/
 
 ## W+jets ##
 SAMPLE
