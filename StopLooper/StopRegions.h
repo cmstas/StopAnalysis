@@ -9,7 +9,7 @@ std::vector<SR> getStopSignalRegions();
 std::vector<SR> getStopControlRegions();
 std::vector<SR> getStopControlRegionsDilepton();
 std::vector<SR> getStopControlRegionsNoBTags();
-std::vector<SR> getStopControlRegionsEMu();
+std::vector<SR> getStopCrosscheckRegionsEMu();
 
 std::vector<SR> getStopSignalRegionsTopological();
 std::vector<SR> getStopControlRegionsNoBTagsTopological();
