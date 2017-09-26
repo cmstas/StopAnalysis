@@ -196,6 +196,9 @@ void babyMaker::MakeBabyNtuple(const char* output_name){
   jets.SetAK4Branches(BabyTree);
   jets_jup.SetAK4Branches(BabyTree);
   jets_jdown.SetAK4Branches(BabyTree);
+  jets.SetAK8Branches(BabyTree);
+  jets_jup.SetAK8Branches(BabyTree);
+  jets_jdown.SetAK8Branches(BabyTree);
 //  Taus.SetBranches(BabyTree);
 //  Tracks.SetBranches(BabyTree);
   gen_leps.SetBranches(BabyTree);
@@ -1513,8 +1516,8 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
 	}
       }
       // Lepton SFs
-      float lepSF_pt_cutoff = 99.999;
-      float lepSF_pt_min    = 10.001;
+      // float lepSF_pt_cutoff = 99.999;
+      // float lepSF_pt_min    = 10.001;
       
       double lepSF    = 1.0;
       double lepSF_Up = 1.0;
@@ -1525,8 +1528,8 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
       double vetoLepSF_Dn = 1.0;
 
 
-      float lepSF_FS_pt_cutoff = 199.999;
-      float lepSF_FS_pt_min    = 10.001;
+      // float lepSF_FS_pt_cutoff = 199.999;
+      // float lepSF_FS_pt_min    = 10.001;
 
       double lepSF_FS    = 1.0;
       double lepSF_FS_Up = 1.0;
