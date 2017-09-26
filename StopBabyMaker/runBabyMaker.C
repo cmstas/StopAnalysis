@@ -9,7 +9,6 @@
 
 using namespace std;
 
-
 vector<TString> load(char *type, const char *filename, char *input){
 
   vector<TString> output;
@@ -29,19 +28,19 @@ vector<TString> load(char *type, const char *filename, char *input){
       IN.getline(buffer, 500, '\n');
       sscanf(buffer, "Path\t%s", StringValue);
       if(add){
-	std::ostringstream addStream;
-	addStream << StringValue << filename;
-	TString addString = addStream.str().c_str();
-	output.push_back(addString);
+        std::ostringstream addStream;
+        addStream << StringValue << filename;
+        TString addString = addStream.str().c_str();
+        output.push_back(addString);
       }
     }
   }
   return output;
 }
-  
+
 
 int main(int argc, char **argv){
-  
+
   //
   // Input sanitation
   //
@@ -56,19 +55,19 @@ int main(int argc, char **argv){
   // Use arguments to set run parameters
   //
   int nevents = -1;
-  if(argc>2) nevents = atoi(argv[2]);  
-  
+  if(argc>2) nevents = atoi(argv[2]);
+
   int file=-1;
   if(argc>3) file = atoi(argv[3]);
-  
+
   char* dirpath = ".";
   if(argc>4) dirpath = argv[4];
-  
+
   //const char* filename = (file == -1 ? "*postprocess.root" : Form("%spostprocess.root"));
   const char* filename = (file == -1 ? "merged_ntuple_*.root" : Form("merged_ntuple_%i.root", file));
   //const char* filename = "ntuple_TTJets_HT-1200to2500_new.root";
   cout << filename << endl;
-  
+
   const char* suffix = file == -1 ? "" : Form("_%i", file);
 
   char *input = "sample_2017.dat";
@@ -83,9 +82,8 @@ int main(int argc, char **argv){
   //
   babyMaker *mylooper = new babyMaker();
 
-
   //
-  // Skim Parameters 
+  // Skim Parameters
   //
   mylooper->skim_nvtx            = 1;
   mylooper->skim_met             = 100;
@@ -110,16 +108,17 @@ int main(int argc, char **argv){
   mylooper->skim_jet_pt          = 30.0;
   mylooper->skim_jet_eta         = 2.4;
 
-  mylooper->skim_nBJets          = 0; 
+  mylooper->skim_nBJets          = 0;
 
   //temporarily set to false in order to take JECs from miniAOD directly for 2017 early data
   mylooper->applyJECfromFile   = false; //THIS FLAG DECIDES NOW TOO IF JESUP/DOWN VALUES ARE CALCULATED
   mylooper->JES_type           = 0;  //0 central, 1 up, -1 down; // not needed anymore
 
-  mylooper->applyBtagSFs       = true; 
+  mylooper->applyBtagSFs       = true;
   mylooper->applyLeptonSFs     = true;
   mylooper->applyVetoLeptonSFs = true;
   mylooper->apply2ndLepVeto    = false;
+  mylooper->isFastsim          = isFastsim;
 
   mylooper->skim_jet_ak8_pt    = 100.0;
   mylooper->skim_jet_ak8_eta   = 2.4;
@@ -144,9 +143,9 @@ int main(int argc, char **argv){
   mylooper->fillElID        =  false;
   mylooper->fillIso         =  false;
   mylooper->fillLepSynch    =  false;
-  
+
   // Input sanitation
-  if( !(mylooper->skim_goodLep_mu_pt > mylooper->skim_looseLep_mu_pt && 
+  if( !(mylooper->skim_goodLep_mu_pt > mylooper->skim_looseLep_mu_pt &&
         mylooper->skim_looseLep_mu_pt > mylooper->skim_vetoLep_mu_pt) ){
     cout << "   Problem with muon pT hierachy for good, loose, and veto pT!" << endl;
     cout << "     Exiting..." << endl;
