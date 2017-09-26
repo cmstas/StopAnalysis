@@ -124,65 +124,6 @@ babyMaker::babyMaker(){
 
 }
 
-void babyMaker::setSkimVariables(int nvtx, float met, int nGoodLep, float goodLep_el_pt, float goodLep_el_eta, float goodLep_mu_pt, float goodLep_mu_eta, float looseLep_el_pt, float looseLep_el_eta, float looseLep_mu_pt, float looseLep_mu_eta, float vetoLep_el_pt, float vetoLep_el_eta, float vetoLep_mu_pt, float vetoLep_mu_eta, bool apply2ndlepveto, int njets, float jet_pt, float jet_eta, float jet_ak8_pt, float jet_ak8_eta, int nbjets, int nphs, float phs_pt, float phs_eta, bool applyJEC, int JES_type_central_up_down,   bool applyLeptonSFs, bool applyVetoLeptonSFs, bool applyBtagSFs, bool isFastsim,bool filltaus_, bool filltracks_, bool fillZll_, bool fillPhoton_,bool fillMETfilt_, bool fill2ndlep_, bool fillExtraEvtVar_, bool fillAK4EF_, bool fillAK4_Other_, bool fillOverleps_, bool fillAK4Synch_, bool fillElID_, bool fillIso_, bool fillLepSynch_){
-
-  skim_nvtx            = nvtx;
-  skim_met             = met;
-  
-  skim_nGoodLep        = nGoodLep;
-  skim_goodLep_el_pt   = goodLep_el_pt;
-  skim_goodLep_el_eta  = goodLep_el_eta;
-  skim_goodLep_mu_pt   = goodLep_mu_pt;
-  skim_goodLep_mu_eta  = goodLep_mu_eta;
-  
-  skim_looseLep_el_pt  = looseLep_el_pt;
-  skim_looseLep_el_eta = looseLep_el_eta;
-  skim_looseLep_mu_pt  = looseLep_mu_pt;
-  skim_looseLep_mu_eta = looseLep_mu_eta;
-  
-  skim_vetoLep_el_pt   = vetoLep_el_pt;
-  skim_vetoLep_el_eta  = vetoLep_el_eta;
-  skim_vetoLep_mu_pt   = vetoLep_mu_pt;
-  skim_vetoLep_mu_eta  = vetoLep_mu_eta;
-  
-  skim_nJets           = njets;
-  skim_jet_pt          = jet_pt;
-  skim_jet_eta         = jet_eta;
-
-  skim_nBJets          = nbjets;
-
-  skim_jet_ak8_pt      = jet_ak8_pt;
-  skim_jet_ak8_eta     = jet_ak8_eta;
-
-  skim_nPhotons        = nphs;
-  skim_ph_pt           = phs_pt;
-  skim_ph_eta          = phs_eta;
-  skim_2ndlepveto      = apply2ndlepveto; 
-  applyJECfromFile     = applyJEC;//THIS FLAG DECIDES NOW TOO IF JESUP/DOWN VALUES ARE CALCULATED
-  JES_type 	       = JES_type_central_up_down;
-  skim_applyLeptonSFs  = applyLeptonSFs;
-  skim_applyVetoLeptonSFs  = applyVetoLeptonSFs;
-  skim_applyBtagSFs    = applyBtagSFs;
-  skim_isFastsim       = isFastsim;
-
-  filltaus   = filltaus_;
-  filltracks   =filltracks_;
-  fillZll   =fillZll_;
-  fillPhoton   =fillPhoton_;
-  fillMETfilt   =fillMETfilt_;
-  fill2ndlep   =fill2ndlep_;
-  fillExtraEvtVar   =fillExtraEvtVar_;
-
-  fillAK4EF   =fillAK4EF_;
-  fillAK4_Other   =fillAK4_Other_;
-  fillOverleps   =fillOverleps_;
-  fillAK4Synch   =fillAK4Synch_;
-  fillElID   =fillElID_;
-  fillIso   =fillIso_;
-  fillLepSynch   =fillLepSynch_;
-}
-
-
 void babyMaker::MakeBabyNtuple(const char* output_name){
 
   //histFile = new TFile(Form("%s/hist_%s", babypath, output_name), "RECREATE");
@@ -196,11 +137,8 @@ void babyMaker::MakeBabyNtuple(const char* output_name){
   jets.SetAK4Branches(BabyTree);
   jets_jup.SetAK4Branches(BabyTree);
   jets_jdown.SetAK4Branches(BabyTree);
-  jets.SetAK8Branches(BabyTree);
-  jets_jup.SetAK8Branches(BabyTree);
-  jets_jdown.SetAK8Branches(BabyTree);
-//  Taus.SetBranches(BabyTree);
-//  Tracks.SetBranches(BabyTree);
+  // Taus.SetBranches(BabyTree);
+  // Tracks.SetBranches(BabyTree);
   gen_leps.SetBranches(BabyTree);
   gen_nus.SetBranches(BabyTree);
   gen_qs.SetBranches(BabyTree);
@@ -208,6 +146,12 @@ void babyMaker::MakeBabyNtuple(const char* output_name){
   gen_susy.SetBranches(BabyTree);
 
   //optional
+  if(fillAK8){
+    jets.SetAK8Branches(BabyTree);
+    jets_jup.SetAK8Branches(BabyTree);
+    jets_jdown.SetAK8Branches(BabyTree);
+  }
+
   if(filltaus)  Taus.SetBranches(BabyTree);
   if(filltracks)  Tracks.SetBranches(BabyTree);
 
@@ -462,7 +406,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
   float ymin_h_mu_vetoLepEff = 1;
   float ymax_h_mu_vetoLepEff = 1;
   
-  if( (skim_applyLeptonSFs || skim_applyVetoLeptonSFs) && !isDataFromFileName){
+  if( (applyLeptonSFs || applyVetoLeptonSFs) && !isDataFromFileName){
 
     cout << "  Grabbing lepton scale factors " << endl;
     
@@ -894,6 +838,14 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
   jetcorr_filenames_pfL1FastJetL2L3.clear();
   std::string jetcorr_uncertainty_filename;
 
+  // JEC for AK8 Jets
+  std::vector<std::string> ak8jetcorr_filenames_pfL1FastJetL2L3;
+  FactorizedJetCorrector *ak8jet_corrector_pfL1FastJetL2L3(0);
+  JetCorrectionUncertainty* ak8jetcorr_uncertainty(0);
+  JetCorrectionUncertainty* ak8jetcorr_uncertainty_sys(0);
+  ak8jetcorr_filenames_pfL1FastJetL2L3.clear();
+  std::string ak8jetcorr_uncertainty_filename;
+
   // files for RunIISpring15 MC
   if (isDataFromFileName) {
 
@@ -932,11 +884,17 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
       jetcorr_uncertainty_filename = "jecfiles/Summer16_23Sep2016HV3_DATA/Summer16_23Sep2016HV3_DATA_Uncertainty_AK4PFchs.txt";
     }
     if(filestr.find("2017") != std::string::npos){//this is currently a dummy if someone sets a wrong flag in runBabyMaker
-      jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Summer16_23Sep2016HV3_DATA/Summer16_23Sep2016HV3_DATA_L1FastJet_AK4PFchs.txt");
-      jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Summer16_23Sep2016HV3_DATA/Summer16_23Sep2016HV3_DATA_L2Relative_AK4PFchs.txt");
-      jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Summer16_23Sep2016HV3_DATA/Summer16_23Sep2016HV3_DATA_L3Absolute_AK4PFchs.txt");
-      jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Summer16_23Sep2016HV3_DATA/Summer16_23Sep2016HV3_DATA_L2L3Residual_AK4PFchs.txt");
-      jetcorr_uncertainty_filename = "jecfiles/Summer16_23Sep2016HV3_DATA/Summer16_23Sep2016HV3_DATA_Uncertainty_AK4PFchs.txt";
+      jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Summer16_23Sep2016HV4_DATA/Summer16_23Sep2016HV4_DATA_L1FastJet_AK4PFchs.txt");
+      jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Summer16_23Sep2016HV4_DATA/Summer16_23Sep2016HV4_DATA_L2Relative_AK4PFchs.txt");
+      jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Summer16_23Sep2016HV4_DATA/Summer16_23Sep2016HV4_DATA_L3Absolute_AK4PFchs.txt");
+      jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Summer16_23Sep2016HV4_DATA/Summer16_23Sep2016HV4_DATA_L2L3Residual_AK4PFchs.txt");
+      jetcorr_uncertainty_filename = "jecfiles/Summer16_23Sep2016HV4_DATA/Summer16_23Sep2016HV3_DATA_Uncertainty_AK4PFchs.txt";
+
+      ak8jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Summer16_23Sep2016HV4_DATA/Summer16_23Sep2016HV4_DATA_L1FastJet_AK8PFchs.txt");
+      ak8jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Summer16_23Sep2016HV4_DATA/Summer16_23Sep2016HV4_DATA_L2Relative_AK8PFchs.txt");
+      ak8jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Summer16_23Sep2016HV4_DATA/Summer16_23Sep2016HV4_DATA_L3Absolute_AK8PFchs.txt");
+      ak8jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Summer16_23Sep2016HV4_DATA/Summer16_23Sep2016HV4_DATA_L2L3Residual_AK8PFchs.txt");
+      ak8jetcorr_uncertainty_filename = "jecfiles/Summer16_23Sep2016HV4_DATA/Summer16_23Sep2016HV3_DATA_Uncertainty_AK8PFchs.txt";
     }
 
     // Run independent from ICHEP
@@ -948,58 +906,66 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
   } 
   
   else if(isSignalFromFileName){
-    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Spring16_FastSimV1_L1FastJet_AK4PFchs.txt");
-    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Spring16_FastSimV1_L2Relative_AK4PFchs.txt");
-    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Spring16_FastSimV1_L3Absolute_AK4PFchs.txt");
-    jetcorr_uncertainty_filename = "jecfiles/Spring16_FastSimV1_Uncertainty_AK4PFchs.txt";
+    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Spring16/Spring16_FastSimV1_L1FastJet_AK4PFchs.txt");
+    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Spring16/Spring16_FastSimV1_L2Relative_AK4PFchs.txt");
+    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Spring16/Spring16_FastSimV1_L3Absolute_AK4PFchs.txt");
+    jetcorr_uncertainty_filename = "jecfiles/Spring16/Spring16_FastSimV1_Uncertainty_AK4PFchs.txt";
   }  
   
-  else {
-    
-    // ICHEP16 samples
-    if(filestr.find("Spring16") != std::string::npos){
-      jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Spring16_25nsV6_MC_L1FastJet_AK4PFchs.txt");
-      jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Spring16_25nsV6_MC_L2Relative_AK4PFchs.txt");
-      jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Spring16_25nsV6_MC_L3Absolute_AK4PFchs.txt");
+  // ICHEP16 samples
+  else if(filestr.find("Spring16") != std::string::npos){
+      jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Spring16/Spring16_25nsV6_MC_L1FastJet_AK4PFchs.txt");
+      jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Spring16/Spring16_25nsV6_MC_L2Relative_AK4PFchs.txt");
+      jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Spring16/Spring16_25nsV6_MC_L3Absolute_AK4PFchs.txt");
       jetcorr_uncertainty_filename = "jecfiles/Spring16_25nsV6_MC_Uncertainty_AK4PFchs.txt";
-    }
-    // Moriond17 samples
-    else{
-      jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Summer16_23Sep2016V3_MC/Summer16_23Sep2016V3_MC_L1FastJet_AK4PFchs.txt");
-      jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Summer16_23Sep2016V3_MC/Summer16_23Sep2016V3_MC_L2Relative_AK4PFchs.txt");
-      jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Summer16_23Sep2016V3_MC/Summer16_23Sep2016V3_MC_L3Absolute_AK4PFchs.txt");
-      jetcorr_uncertainty_filename = "jecfiles/Summer16_23Sep2016V3_MC/Summer16_23Sep2016V3_MC_Uncertainty_AK4PFchs.txt";
-    }
+  }
+
+  // Moriond17 samples
+  else{
+    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Summer16_23Sep2016V3_MC/Summer16_23Sep2016V3_MC_L1FastJet_AK4PFchs.txt");
+    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Summer16_23Sep2016V3_MC/Summer16_23Sep2016V3_MC_L2Relative_AK4PFchs.txt");
+    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Summer16_23Sep2016V3_MC/Summer16_23Sep2016V3_MC_L3Absolute_AK4PFchs.txt");
+    jetcorr_uncertainty_filename = "jecfiles/Summer16_23Sep2016V3_MC/Summer16_23Sep2016V3_MC_Uncertainty_AK4PFchs.txt";
+
+    ak8jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Summer16_23Sep2016V4_MC/Summer16_23Sep2016V4_MC_L1FastJet_AK4PFchs.txt");
+    ak8jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Summer16_23Sep2016V4_MC/Summer16_23Sep2016V4_MC_L2Relative_AK4PFchs.txt");
+    ak8jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Summer16_23Sep2016V4_MC/Summer16_23Sep2016V4_MC_L3Absolute_AK4PFchs.txt");
+    ak8jetcorr_uncertainty_filename = "jecfiles/Summer16_23Sep2016V4_MC/Summer16_23Sep2016V4_MC_Uncertainty_AK4PFchs.txt";
   }
 
   if(applyJECfromFile != 0) {
     cout << "applying JEC from the following files:" << endl;
-    for (unsigned int ifile = 0; ifile < jetcorr_filenames_pfL1FastJetL2L3.size(); ++ifile) {
-      cout << "   " << jetcorr_filenames_pfL1FastJetL2L3.at(ifile) << endl;
-    }
+    for (auto filename : jetcorr_filenames_pfL1FastJetL2L3)
+      cout << "   " << filename << endl;
+    for (auto filename : ak8jetcorr_filenames_pfL1FastJetL2L3)
+      cout << "   " << filename << endl;
 
-    jet_corrector_pfL1FastJetL2L3  = makeJetCorrector(jetcorr_filenames_pfL1FastJetL2L3);
+    jet_corrector_pfL1FastJetL2L3 = makeJetCorrector(jetcorr_filenames_pfL1FastJetL2L3);
+    ak8jet_corrector_pfL1FastJetL2L3 = makeJetCorrector(ak8jetcorr_filenames_pfL1FastJetL2L3);
     
     if (!isDataFromFileName && applyJECunc != 0) {
       cout << "applying JEC uncertainties with weight " << applyJECunc << " from file: " << endl
-	   << "   " << jetcorr_uncertainty_filename << endl;
+	   << "   " << jetcorr_uncertainty_filename << endl
+           << "   " << ak8jetcorr_uncertainty_filename << endl;
       jetcorr_uncertainty = new JetCorrectionUncertainty(jetcorr_uncertainty_filename);
+      ak8jetcorr_uncertainty = new JetCorrectionUncertainty(ak8jetcorr_uncertainty_filename);
     }
     jetcorr_uncertainty_sys = new JetCorrectionUncertainty(jetcorr_uncertainty_filename);
+    ak8jetcorr_uncertainty_sys = new JetCorrectionUncertainty(ak8jetcorr_uncertainty_filename);
   }
   else
     cout << "JECs taken from miniAOD directly" << endl;
   //
   // Get bad events from txt files
   //
-  //StopEvt.SetMetFilterEvents();
+  // StopEvt.SetMetFilterEvents();
   // btagging scale factor//
   //    
-   jets.InitBtagSFTool(skim_isFastsim); 
-   jets_jup.InitBtagSFTool(skim_isFastsim); 
-   jets_jdown.InitBtagSFTool(skim_isFastsim); 
-   //jets_jup.InitBtagSFTool(h_btag_eff_b,h_btag_eff_c,h_btag_eff_udsg, skim_isFastsim);   
-  // jets_jdown.InitBtagSFTool(h_btag_eff_b,h_btag_eff_c,h_btag_eff_udsg, skim_isFastsim);
+   jets.InitBtagSFTool(isFastsim); 
+   jets_jup.InitBtagSFTool(isFastsim); 
+   jets_jdown.InitBtagSFTool(isFastsim); 
+   // jets_jup.InitBtagSFTool(h_btag_eff_b,h_btag_eff_c,h_btag_eff_udsg, isFastsim);   
+   // jets_jdown.InitBtagSFTool(h_btag_eff_b,h_btag_eff_c,h_btag_eff_udsg, isFastsim);
 
   //
   // File Loop
@@ -1423,12 +1389,12 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
         mylepton.id  = -11*els_charge().at(eidx);
         mylepton.idx = eidx;
         mylepton.p4  = els_p4().at(eidx);
-	int overlapping_jet = getOverlappingJetIndex(mylepton.p4, pfjets_p4(), 0.4, skim_jet_pt, skim_jet_eta, false,jet_corrector_pfL1FastJetL2L3,applyJECfromFile,jetcorr_uncertainty,JES_type,skim_isFastsim);  //don't care about jid
+	int overlapping_jet = getOverlappingJetIndex(mylepton.p4, pfjets_p4(), 0.4, skim_jet_pt, skim_jet_eta, false,jet_corrector_pfL1FastJetL2L3,applyJECfromFile,jetcorr_uncertainty,JES_type,isFastsim);  //don't care about jid
 	if( overlapping_jet>=0) idx_alloverlapjets.push_back(overlapping_jet);  //overlap removal for all jets w.r.t. all leptons
 	if(applyJECfromFile) {//if no JEC file is defined - code cannot do up/down variations
-	  overlapping_jet = getOverlappingJetIndex(mylepton.p4, pfjets_p4(), 0.4, skim_jet_pt, skim_jet_eta, false,jet_corrector_pfL1FastJetL2L3,true,jetcorr_uncertainty_sys,1,skim_isFastsim);  //don't care about jid
+	  overlapping_jet = getOverlappingJetIndex(mylepton.p4, pfjets_p4(), 0.4, skim_jet_pt, skim_jet_eta, false,jet_corrector_pfL1FastJetL2L3,true,jetcorr_uncertainty_sys,1,isFastsim);  //don't care about jid
 	  if( overlapping_jet>=0) idx_alloverlapjets_jup.push_back(overlapping_jet);  //overlap removal for all jets w.r.t. all leptons
-	  overlapping_jet = getOverlappingJetIndex(mylepton.p4, pfjets_p4(), 0.4, skim_jet_pt, skim_jet_eta, false,jet_corrector_pfL1FastJetL2L3,true,jetcorr_uncertainty_sys,-1,skim_isFastsim);  //don't care about jid
+	  overlapping_jet = getOverlappingJetIndex(mylepton.p4, pfjets_p4(), 0.4, skim_jet_pt, skim_jet_eta, false,jet_corrector_pfL1FastJetL2L3,true,jetcorr_uncertainty_sys,-1,isFastsim);  //don't care about jid
 	  if( overlapping_jet>=0) idx_alloverlapjets_jdown.push_back(overlapping_jet);  //overlap removal for all jets w.r.t. all leptons
 	}
 
@@ -1451,12 +1417,12 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
         mylepton.id  = -13*mus_charge().at(midx);
         mylepton.idx = midx;
         mylepton.p4  = mus_p4().at(midx);
-	int overlapping_jet = getOverlappingJetIndex(mylepton.p4, pfjets_p4() , 0.4, skim_jet_pt, skim_jet_eta,false,jet_corrector_pfL1FastJetL2L3,applyJECfromFile,jetcorr_uncertainty,JES_type,skim_isFastsim);  //don't care about jid
+	int overlapping_jet = getOverlappingJetIndex(mylepton.p4, pfjets_p4() , 0.4, skim_jet_pt, skim_jet_eta,false,jet_corrector_pfL1FastJetL2L3,applyJECfromFile,jetcorr_uncertainty,JES_type,isFastsim);  //don't care about jid
 	if( overlapping_jet>=0) idx_alloverlapjets.push_back(overlapping_jet);  //overlap removal for all jets w.r.t. all leptons
 	if(applyJECfromFile) {//if no JEC file is defined - code cannot do up/down variations
-	  overlapping_jet = getOverlappingJetIndex(mylepton.p4, pfjets_p4() , 0.4, skim_jet_pt, skim_jet_eta,false,jet_corrector_pfL1FastJetL2L3,true,jetcorr_uncertainty_sys,1,skim_isFastsim);  //don't care about jid
+	  overlapping_jet = getOverlappingJetIndex(mylepton.p4, pfjets_p4() , 0.4, skim_jet_pt, skim_jet_eta,false,jet_corrector_pfL1FastJetL2L3,true,jetcorr_uncertainty_sys,1,isFastsim);  //don't care about jid
 	  if( overlapping_jet>=0) idx_alloverlapjets_jup.push_back(overlapping_jet);  //overlap removal for all jets w.r.t. all leptons
-	  overlapping_jet = getOverlappingJetIndex(mylepton.p4, pfjets_p4() , 0.4, skim_jet_pt, skim_jet_eta,false,jet_corrector_pfL1FastJetL2L3,true,jetcorr_uncertainty_sys,-1,skim_isFastsim);  //don't care about jid
+	  overlapping_jet = getOverlappingJetIndex(mylepton.p4, pfjets_p4() , 0.4, skim_jet_pt, skim_jet_eta,false,jet_corrector_pfL1FastJetL2L3,true,jetcorr_uncertainty_sys,-1,isFastsim);  //don't care about jid
 	  if( overlapping_jet>=0) idx_alloverlapjets_jdown.push_back(overlapping_jet);  //overlap removal for all jets w.r.t. all leptons	
 	}
 	
@@ -1536,7 +1502,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
       double lepSF_FS_Dn = 1.0;	
       
       // Lep1 SF
-      if(skim_applyLeptonSFs && !StopEvt.is_data && nVetoLeptons>0){
+      if(applyLeptonSFs && !StopEvt.is_data && nVetoLeptons>0){
 	
 	if(abs(lep1.pdgid) == pdg_el){
 	  int binX = h_el_SF->GetXaxis()->FindBin( std::max( std::min(xmax_h_el_SF, (float)lep1.p4.Pt()), xmin_h_el_SF ) );
@@ -1551,7 +1517,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
 	  lepSF_Up *= ( h_el_SF_tracking->GetBinContent(binX,binY) + h_el_SF_tracking->GetBinError(binX,binY) );
 	  lepSF_Dn *= ( h_el_SF_tracking->GetBinContent(binX,binY) - h_el_SF_tracking->GetBinError(binX,binY) );
 	  
-	  if(skim_isFastsim){
+	  if(isFastsim){
 	    int bin_FS  = h_el_FS->FindBin( std::max( std::min(xmax_h_el_FS, (float)lep1.p4.Pt()), xmin_h_el_FS ), std::max( std::min(ymax_h_el_FS, float(fabs(lep1.p4.Eta()))), ymin_h_el_FS ) );
 	    lepSF_FS    = h_el_FS->GetBinContent(bin_FS);
 	    lepSF_FS_Up = lepSF_FS + h_el_FS->GetBinError(bin_FS);
@@ -1572,7 +1538,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
 	  lepSF_Up *= ( h_mu_SF_tracking->GetBinContent(binX) + h_mu_SF_tracking->GetBinError(binX) );
 	  lepSF_Dn *= ( h_mu_SF_tracking->GetBinContent(binX) - h_mu_SF_tracking->GetBinError(binX) );
 	  
-	  if(skim_isFastsim){
+	  if(isFastsim){
 	    int bin_FS  = h_mu_FS->FindBin( std::max( std::min(xmax_h_mu_FS, (float)lep1.p4.Pt()), xmin_h_mu_FS ), std::max( std::min(ymax_h_mu_FS, float(fabs(lep1.p4.Eta()))), ymin_h_mu_FS ) );
 	    lepSF_FS    = h_mu_FS->GetBinContent(bin_FS);
 	    lepSF_FS_Up = lepSF_FS + h_mu_FS->GetBinError(bin_FS);
@@ -1584,7 +1550,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
       }
       
       // Lep2 SF
-      if( skim_applyLeptonSFs && !StopEvt.is_data && nVetoLeptons>1 ){
+      if( applyLeptonSFs && !StopEvt.is_data && nVetoLeptons>1 ){
 	
 	if(abs(lep2.pdgid) == pdg_el){
 
@@ -1595,7 +1561,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
 	    lepSF_Up *= ( lepSF + h_el_SF->GetBinError( binX, binY ) );
 	    lepSF_Dn *= ( lepSF - h_el_SF->GetBinError( binX, binY ) );
 	    
-	    if(skim_isFastsim){
+	    if(isFastsim){
 	      int bin_FS  = h_el_FS->FindBin( std::max( std::min(xmax_h_el_FS, (float)lep2.p4.Pt()), xmin_h_el_FS ), std::max( std::min(ymax_h_el_FS, float(fabs(lep2.p4.Eta())) ), ymin_h_el_FS ) );
 	      lepSF_FS    *= h_el_FS->GetBinContent(bin_FS);
 	      lepSF_FS_Up *= (lepSF_FS + h_el_FS->GetBinError(bin_FS));
@@ -1609,7 +1575,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
 	    lepSF_Up *= ( lepSF + h_el_SF_veto->GetBinError( binX, binY ) );
 	    lepSF_Dn *= ( lepSF - h_el_SF_veto->GetBinError( binX, binY ) );
 	    
-	    if(skim_isFastsim){
+	    if(isFastsim){
 	      int bin_FS  = h_el_veto_FS->FindBin( std::max( std::min(xmax_h_el_veto_FS, (float)lep2.p4.Pt()), xmin_h_el_veto_FS ), std::max( std::min(ymax_h_el_veto_FS,float(fabs(lep2.p4.Eta())) ),ymin_h_el_veto_FS ) );
 	      lepSF_FS    *= h_el_veto_FS->GetBinContent(bin_FS);
 	      lepSF_FS_Up *= (lepSF_FS + h_el_veto_FS->GetBinError(bin_FS));
@@ -1635,7 +1601,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
 	    lepSF_Up *= ( lepSF + h_mu_SF->GetBinError( binX, binY ) );
 	    lepSF_Dn *= ( lepSF - h_mu_SF->GetBinError( binX, binY ) );
 	    
-	    if(skim_isFastsim){
+	    if(isFastsim){
 	      int bin_FS  = h_mu_FS->FindBin( std::max( std::min(xmax_h_mu_FS, (float)lep2.p4.Pt()), xmin_h_mu_FS ), std::max( std::min(ymax_h_mu_FS, float(fabs(lep2.p4.Eta()) )), ymin_h_mu_FS ) );
 	      lepSF_FS    *= h_mu_FS->GetBinContent(bin_FS);
 	      lepSF_FS_Up *= lepSF_FS + h_mu_FS->GetBinError(bin_FS);
@@ -1650,7 +1616,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
 	    lepSF_Up *= ( lepSF + h_mu_SF_veto->GetBinError( binX, binY ) );
 	    lepSF_Dn *= ( lepSF - h_mu_SF_veto->GetBinError( binX, binY ) );
 	    
-	    if(skim_isFastsim){
+	    if(isFastsim){
 	      int bin_FS  = h_mu_veto_FS->FindBin( std::max( std::min(xmax_h_mu_veto_FS, (float)lep2.p4.Pt()), xmin_h_mu_veto_FS ), std::max( std::min(ymax_h_mu_veto_FS, float(fabs(lep2.p4.Eta()))), ymin_h_mu_veto_FS ) );
 	      lepSF_FS    *= h_mu_veto_FS->GetBinContent(bin_FS);
 	      lepSF_FS_Up *= lepSF_FS + h_mu_veto_FS->GetBinError(bin_FS);
@@ -1669,7 +1635,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
 
       
       // If only 1 reco lepton, and is2lep event, then find lost gen lepton
-      if( skim_applyVetoLeptonSFs && !StopEvt.is_data && nVetoLeptons==1 && StopEvt.is2lep ){
+      if( applyVetoLeptonSFs && !StopEvt.is_data && nVetoLeptons==1 && StopEvt.is2lep ){
 	
 	for(int iGen=0; iGen<(int)gen_leps.p4.size(); iGen++){
 	  if( abs(gen_leps.id.at(iGen))!=11 && abs(gen_leps.id.at(iGen))!=13 ) continue;
@@ -1745,34 +1711,34 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
 
       // save the sum of weights for normalization offline to n-babies.
       // comment: this has to go before the selection cuts - else you create a bias
-      if(!evt_isRealData() && skim_applyLeptonSFs) {
+      if(!evt_isRealData() && applyLeptonSFs) {
        counterhist->Fill(28,StopEvt.weight_lepSF);
        counterhist->Fill(29,StopEvt.weight_lepSF_up);
        counterhist->Fill(30,StopEvt.weight_lepSF_down);
       }
-      if(!evt_isRealData() && skim_applyVetoLeptonSFs){
+      if(!evt_isRealData() && applyVetoLeptonSFs){
 	counterhist->Fill(31,StopEvt.weight_vetoLepSF);
 	counterhist->Fill(32,StopEvt.weight_vetoLepSF_up);
 	counterhist->Fill(33,StopEvt.weight_vetoLepSF_down);
       }
-      if(!evt_isRealData() && skim_applyLeptonSFs && skim_isFastsim){
+      if(!evt_isRealData() && applyLeptonSFs && isFastsim){
 	counterhist->Fill(34,StopEvt.weight_lepSF_fastSim);
 	counterhist->Fill(35,StopEvt.weight_lepSF_fastSim_up);
 	counterhist->Fill(36,StopEvt.weight_lepSF_fastSim_down);
       }
       
       // Signal
-      if(isSignalFromFileName && !evt_isRealData() && skim_applyLeptonSFs) {
+      if(isSignalFromFileName && !evt_isRealData() && applyLeptonSFs) {
        counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,27,StopEvt.weight_lepSF);
        counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,28,StopEvt.weight_lepSF_up);
        counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,29,StopEvt.weight_lepSF_down);
       }
-      if(isSignalFromFileName && !evt_isRealData() && skim_applyVetoLeptonSFs){
+      if(isSignalFromFileName && !evt_isRealData() && applyVetoLeptonSFs){
 	counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,30,StopEvt.weight_vetoLepSF);
 	counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,31,StopEvt.weight_vetoLepSF_up);
 	counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,32,StopEvt.weight_vetoLepSF_down);
       }
-      if(isSignalFromFileName && !evt_isRealData() && skim_applyLeptonSFs && skim_isFastsim){
+      if(isSignalFromFileName && !evt_isRealData() && applyLeptonSFs && isFastsim){
 	counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,33,StopEvt.weight_lepSF_fastSim);
 	counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,34,StopEvt.weight_lepSF_fastSim_up);
 	counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,35,StopEvt.weight_lepSF_fastSim_down);
@@ -1864,39 +1830,39 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
 	jet_overlep1_idx = -9999;
 	jet_overlep2_idx = -9999;
         //applyJECfromFile=false;
-	if(nVetoLeptons>0) jet_overlep1_idx = getOverlappingJetIndex(lep1.p4, pfjets_p4(), 0.4, skim_jet_pt, skim_jet_eta, false,jet_corrector_pfL1FastJetL2L3,applyJECfromFile,jetcorr_uncertainty,JES_type,skim_isFastsim);  //don't care about jid
-	if(nVetoLeptons>1) jet_overlep2_idx = getOverlappingJetIndex(lep2.p4, pfjets_p4(), 0.4, skim_jet_pt, skim_jet_eta, false,jet_corrector_pfL1FastJetL2L3,applyJECfromFile,jetcorr_uncertainty,JES_type,skim_isFastsim);  //don't care about jid
+	if(nVetoLeptons>0) jet_overlep1_idx = getOverlappingJetIndex(lep1.p4, pfjets_p4(), 0.4, skim_jet_pt, skim_jet_eta, false,jet_corrector_pfL1FastJetL2L3,applyJECfromFile,jetcorr_uncertainty,JES_type,isFastsim);  //don't care about jid
+	if(nVetoLeptons>1) jet_overlep2_idx = getOverlappingJetIndex(lep2.p4, pfjets_p4(), 0.4, skim_jet_pt, skim_jet_eta, false,jet_corrector_pfL1FastJetL2L3,applyJECfromFile,jetcorr_uncertainty,JES_type,isFastsim);  //don't care about jid
 
 	// Jets and b-tag variables feeding the index for the jet overlapping the selected leptons
 	jets.SetJetSelection("ak4", skim_jet_pt, skim_jet_eta, true); //save only jets passing jid
 	jets.SetJetSelection("ak8", skim_jet_ak8_pt, skim_jet_ak8_eta, true); //save only jets passing jid
-        //jets.FillCommon(idx_alloverlapjets, jet_corrector_pfL1FastJetL2L3,btagprob_data,btagprob_mc,btagprob_heavy_UP, btagprob_heavy_DN, btagprob_light_UP,btagprob_light_DN,btagprob_FS_UP,btagprob_FS_DN,jet_overlep1_idx, jet_overlep2_idx,applyJECfromFile,jetcorr_uncertainty,JES_type, skim_applyBtagSFs, skim_isFastsim);
-        jets.FillCommon(idx_alloverlapjets, jet_corrector_pfL1FastJetL2L3,btagprob_data,btagprob_mc,btagprob_heavy_UP, btagprob_heavy_DN, btagprob_light_UP,btagprob_light_DN,btagprob_FS_UP,btagprob_FS_DN,loosebtagprob_data,loosebtagprob_mc,loosebtagprob_heavy_UP, loosebtagprob_heavy_DN, loosebtagprob_light_UP,loosebtagprob_light_DN,loosebtagprob_FS_UP,loosebtagprob_FS_DN,tightbtagprob_data,tightbtagprob_mc,tightbtagprob_heavy_UP, tightbtagprob_heavy_DN, tightbtagprob_light_UP,tightbtagprob_light_DN,tightbtagprob_FS_UP,tightbtagprob_FS_DN,jet_overlep1_idx, jet_overlep2_idx,applyJECfromFile,jetcorr_uncertainty,JES_type, skim_applyBtagSFs, skim_isFastsim);
+        //jets.FillCommon(idx_alloverlapjets, jet_corrector_pfL1FastJetL2L3,btagprob_data,btagprob_mc,btagprob_heavy_UP, btagprob_heavy_DN, btagprob_light_UP,btagprob_light_DN,btagprob_FS_UP,btagprob_FS_DN,jet_overlep1_idx, jet_overlep2_idx,applyJECfromFile,jetcorr_uncertainty,JES_type, applyBtagSFs, isFastsim);
+        jets.FillCommon(idx_alloverlapjets, jet_corrector_pfL1FastJetL2L3,btagprob_data,btagprob_mc,btagprob_heavy_UP, btagprob_heavy_DN, btagprob_light_UP,btagprob_light_DN,btagprob_FS_UP,btagprob_FS_DN,loosebtagprob_data,loosebtagprob_mc,loosebtagprob_heavy_UP, loosebtagprob_heavy_DN, loosebtagprob_light_UP,loosebtagprob_light_DN,loosebtagprob_FS_UP,loosebtagprob_FS_DN,tightbtagprob_data,tightbtagprob_mc,tightbtagprob_heavy_UP, tightbtagprob_heavy_DN, tightbtagprob_light_UP,tightbtagprob_light_DN,tightbtagprob_FS_UP,tightbtagprob_FS_DN,jet_overlep1_idx, jet_overlep2_idx,applyJECfromFile,jetcorr_uncertainty,JES_type, applyBtagSFs, isFastsim);
 
 	if(applyJECfromFile) {//if no JEC file is defined - code cannot do up/down variations
 	  //JEC up
 	  jet_overlep1_idx = -9999;
 	  jet_overlep2_idx = -9999;
-	  if(nVetoLeptons>0) jet_overlep1_idx = getOverlappingJetIndex(lep1.p4, pfjets_p4(), 0.4, skim_jet_pt, skim_jet_eta, false,jet_corrector_pfL1FastJetL2L3,true,jetcorr_uncertainty_sys,1,skim_isFastsim);  //don't care about jid
-	  if(nVetoLeptons>1) jet_overlep2_idx = getOverlappingJetIndex(lep2.p4, pfjets_p4(), 0.4, skim_jet_pt, skim_jet_eta, false,jet_corrector_pfL1FastJetL2L3,true,jetcorr_uncertainty_sys,1,skim_isFastsim);  //don't care about jid
+	  if(nVetoLeptons>0) jet_overlep1_idx = getOverlappingJetIndex(lep1.p4, pfjets_p4(), 0.4, skim_jet_pt, skim_jet_eta, false,jet_corrector_pfL1FastJetL2L3,true,jetcorr_uncertainty_sys,1,isFastsim);  //don't care about jid
+	  if(nVetoLeptons>1) jet_overlep2_idx = getOverlappingJetIndex(lep2.p4, pfjets_p4(), 0.4, skim_jet_pt, skim_jet_eta, false,jet_corrector_pfL1FastJetL2L3,true,jetcorr_uncertainty_sys,1,isFastsim);  //don't care about jid
 	
 	  // Jets and b-tag variables feeding the index for the jet overlapping the selected leptons
 	  jets_jup.SetJetSelection("ak4", skim_jet_pt, skim_jet_eta, true); //save only jets passing jid
 	  jets_jup.SetJetSelection("ak8", skim_jet_ak8_pt, skim_jet_ak8_eta, true); //save only jets passing jid
-	  //jets_jup.FillCommon(idx_alloverlapjets_jup, jet_corrector_pfL1FastJetL2L3,btagprob_data_jup,btagprob_mc_jup,btagprob_heavy_UP_jup, btagprob_heavy_DN_jup, btagprob_light_UP_jup,btagprob_light_DN_jup,btagprob_FS_UP_jup,btagprob_FS_DN_jup,jet_overlep1_idx, jet_overlep2_idx,true,jetcorr_uncertainty_sys,1, false, skim_isFastsim);
-	  jets_jup.FillCommon(idx_alloverlapjets_jup, jet_corrector_pfL1FastJetL2L3,btagprob_data_jup,btagprob_mc_jup,btagprob_heavy_UP_jup, btagprob_heavy_DN_jup, btagprob_light_UP_jup,btagprob_light_DN_jup,btagprob_FS_UP_jup,btagprob_FS_DN_jup,loosebtagprob_data_jup,loosebtagprob_mc_jup,loosebtagprob_heavy_UP_jup, loosebtagprob_heavy_DN_jup, loosebtagprob_light_UP_jup,loosebtagprob_light_DN_jup,loosebtagprob_FS_UP_jup,loosebtagprob_FS_DN_jup,tightbtagprob_data_jup,tightbtagprob_mc_jup,tightbtagprob_heavy_UP_jup, tightbtagprob_heavy_DN_jup, tightbtagprob_light_UP_jup,tightbtagprob_light_DN_jup,tightbtagprob_FS_UP_jup,tightbtagprob_FS_DN_jup,jet_overlep1_idx, jet_overlep2_idx,true,jetcorr_uncertainty_sys,1, false, skim_isFastsim);
+	  //jets_jup.FillCommon(idx_alloverlapjets_jup, jet_corrector_pfL1FastJetL2L3,btagprob_data_jup,btagprob_mc_jup,btagprob_heavy_UP_jup, btagprob_heavy_DN_jup, btagprob_light_UP_jup,btagprob_light_DN_jup,btagprob_FS_UP_jup,btagprob_FS_DN_jup,jet_overlep1_idx, jet_overlep2_idx,true,jetcorr_uncertainty_sys,1, false, isFastsim);
+	  jets_jup.FillCommon(idx_alloverlapjets_jup, jet_corrector_pfL1FastJetL2L3,btagprob_data_jup,btagprob_mc_jup,btagprob_heavy_UP_jup, btagprob_heavy_DN_jup, btagprob_light_UP_jup,btagprob_light_DN_jup,btagprob_FS_UP_jup,btagprob_FS_DN_jup,loosebtagprob_data_jup,loosebtagprob_mc_jup,loosebtagprob_heavy_UP_jup, loosebtagprob_heavy_DN_jup, loosebtagprob_light_UP_jup,loosebtagprob_light_DN_jup,loosebtagprob_FS_UP_jup,loosebtagprob_FS_DN_jup,tightbtagprob_data_jup,tightbtagprob_mc_jup,tightbtagprob_heavy_UP_jup, tightbtagprob_heavy_DN_jup, tightbtagprob_light_UP_jup,tightbtagprob_light_DN_jup,tightbtagprob_FS_UP_jup,tightbtagprob_FS_DN_jup,jet_overlep1_idx, jet_overlep2_idx,true,jetcorr_uncertainty_sys,1, false, isFastsim);
 	
 	  //JEC down
 	  jet_overlep1_idx = -9999;
 	  jet_overlep2_idx = -9999;
-	  if(nVetoLeptons>0) jet_overlep1_idx = getOverlappingJetIndex(lep1.p4, pfjets_p4(), 0.4, skim_jet_pt, skim_jet_eta, false,jet_corrector_pfL1FastJetL2L3,true,jetcorr_uncertainty_sys,-1,skim_isFastsim);  //don't care about jid
-	  if(nVetoLeptons>1) jet_overlep2_idx = getOverlappingJetIndex(lep2.p4, pfjets_p4(), 0.4, skim_jet_pt, skim_jet_eta, false,jet_corrector_pfL1FastJetL2L3,true,jetcorr_uncertainty_sys,-1,skim_isFastsim);  //don't care about jid
+	  if(nVetoLeptons>0) jet_overlep1_idx = getOverlappingJetIndex(lep1.p4, pfjets_p4(), 0.4, skim_jet_pt, skim_jet_eta, false,jet_corrector_pfL1FastJetL2L3,true,jetcorr_uncertainty_sys,-1,isFastsim);  //don't care about jid
+	  if(nVetoLeptons>1) jet_overlep2_idx = getOverlappingJetIndex(lep2.p4, pfjets_p4(), 0.4, skim_jet_pt, skim_jet_eta, false,jet_corrector_pfL1FastJetL2L3,true,jetcorr_uncertainty_sys,-1,isFastsim);  //don't care about jid
 	
 	  // Jets and b-tag variables feeding the index for the jet overlapping the selected leptons
 	  jets_jdown.SetJetSelection("ak4", skim_jet_pt, skim_jet_eta, true); //save only jets passing jid
 	  jets_jdown.SetJetSelection("ak8", skim_jet_ak8_pt, skim_jet_ak8_eta, true); //save only jets passing jid
-	  //jets_jdown.FillCommon(idx_alloverlapjets_jdown, jet_corrector_pfL1FastJetL2L3,btagprob_data_jdown,btagprob_mc_jdown,btagprob_heavy_UP_jdown, btagprob_heavy_DN_jdown, btagprob_light_UP_jdown,btagprob_light_DN_jdown,btagprob_FS_UP_jdown,btagprob_FS_DN_jdown,jet_overlep1_idx, jet_overlep2_idx,true,jetcorr_uncertainty_sys,-1, false, skim_isFastsim);
-	  jets_jdown.FillCommon(idx_alloverlapjets_jdown, jet_corrector_pfL1FastJetL2L3,btagprob_data_jdown,btagprob_mc_jdown,btagprob_heavy_UP_jdown, btagprob_heavy_DN_jdown, btagprob_light_UP_jdown,btagprob_light_DN_jdown,btagprob_FS_UP_jdown,btagprob_FS_DN_jdown,loosebtagprob_data_jdown,loosebtagprob_mc_jdown,loosebtagprob_heavy_UP_jdown, loosebtagprob_heavy_DN_jdown, loosebtagprob_light_UP_jdown,loosebtagprob_light_DN_jdown,loosebtagprob_FS_UP_jdown,loosebtagprob_FS_DN_jdown,tightbtagprob_data_jdown,tightbtagprob_mc_jdown,tightbtagprob_heavy_UP_jdown, tightbtagprob_heavy_DN_jdown, tightbtagprob_light_UP_jdown,tightbtagprob_light_DN_jdown,tightbtagprob_FS_UP_jdown,tightbtagprob_FS_DN_jdown,jet_overlep1_idx, jet_overlep2_idx,true,jetcorr_uncertainty_sys,-1, false, skim_isFastsim);
+	  //jets_jdown.FillCommon(idx_alloverlapjets_jdown, jet_corrector_pfL1FastJetL2L3,btagprob_data_jdown,btagprob_mc_jdown,btagprob_heavy_UP_jdown, btagprob_heavy_DN_jdown, btagprob_light_UP_jdown,btagprob_light_DN_jdown,btagprob_FS_UP_jdown,btagprob_FS_DN_jdown,jet_overlep1_idx, jet_overlep2_idx,true,jetcorr_uncertainty_sys,-1, false, isFastsim);
+	  jets_jdown.FillCommon(idx_alloverlapjets_jdown, jet_corrector_pfL1FastJetL2L3,btagprob_data_jdown,btagprob_mc_jdown,btagprob_heavy_UP_jdown, btagprob_heavy_DN_jdown, btagprob_light_UP_jdown,btagprob_light_DN_jdown,btagprob_FS_UP_jdown,btagprob_FS_DN_jdown,loosebtagprob_data_jdown,loosebtagprob_mc_jdown,loosebtagprob_heavy_UP_jdown, loosebtagprob_heavy_DN_jdown, loosebtagprob_light_UP_jdown,loosebtagprob_light_DN_jdown,loosebtagprob_FS_UP_jdown,loosebtagprob_FS_DN_jdown,tightbtagprob_data_jdown,tightbtagprob_mc_jdown,tightbtagprob_heavy_UP_jdown, tightbtagprob_heavy_DN_jdown, tightbtagprob_light_UP_jdown,tightbtagprob_light_DN_jdown,tightbtagprob_FS_UP_jdown,tightbtagprob_FS_DN_jdown,jet_overlep1_idx, jet_overlep2_idx,true,jetcorr_uncertainty_sys,-1, false, isFastsim);
 	}
 
 	bool isbadmuonjet = false;
@@ -1963,13 +1929,13 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
       }
       
       // SAVE B TAGGING SF 
-     if (!evt_isRealData() && skim_applyBtagSFs) {
+     if (!evt_isRealData() && applyBtagSFs) {
         StopEvt.weight_btagsf = btagprob_data / btagprob_mc;
         StopEvt.weight_btagsf_heavy_UP = btagprob_heavy_UP/btagprob_mc;
         StopEvt.weight_btagsf_light_UP = btagprob_light_UP/btagprob_mc;
         StopEvt.weight_btagsf_heavy_DN = btagprob_heavy_DN/btagprob_mc;
         StopEvt.weight_btagsf_light_DN = btagprob_light_DN/btagprob_mc;
-	if(skim_isFastsim){
+	if(isFastsim){
 	  StopEvt.weight_btagsf_fastsim_UP = btagprob_FS_UP/btagprob_mc;
 	  StopEvt.weight_btagsf_fastsim_DN = btagprob_FS_DN/btagprob_mc;
 	}
@@ -1978,7 +1944,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
         StopEvt.weight_tightbtagsf_light_UP = tightbtagprob_light_UP/tightbtagprob_mc;
         StopEvt.weight_tightbtagsf_heavy_DN = tightbtagprob_heavy_DN/tightbtagprob_mc;
         StopEvt.weight_tightbtagsf_light_DN = tightbtagprob_light_DN/tightbtagprob_mc;
-	if(skim_isFastsim){
+	if(isFastsim){
 	  StopEvt.weight_tightbtagsf_fastsim_UP = tightbtagprob_FS_UP/tightbtagprob_mc;
 	  StopEvt.weight_tightbtagsf_fastsim_DN = tightbtagprob_FS_DN/tightbtagprob_mc;
 	}
@@ -1987,7 +1953,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
         StopEvt.weight_loosebtagsf_light_UP = loosebtagprob_light_UP/btagprob_mc;
         StopEvt.weight_loosebtagsf_heavy_DN = loosebtagprob_heavy_DN/btagprob_mc;
         StopEvt.weight_loosebtagsf_light_DN = loosebtagprob_light_DN/btagprob_mc;
-	if(skim_isFastsim){
+	if(isFastsim){
 	  StopEvt.weight_loosebtagsf_fastsim_UP = loosebtagprob_FS_UP/loosebtagprob_mc;
 	  StopEvt.weight_loosebtagsf_fastsim_DN = loosebtagprob_FS_DN/loosebtagprob_mc;
 	}
@@ -1996,7 +1962,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
      }
      // save the sum of weights for normalization offline to n-babies.
      // comment: this has to go before the skim_nBJets - else you create a bias
-     if(!evt_isRealData() && skim_applyBtagSFs) {
+     if(!evt_isRealData() && applyBtagSFs) {
        counterhist->Fill(14,StopEvt.weight_btagsf);
        counterhist->Fill(15,StopEvt.weight_btagsf_heavy_UP);
        counterhist->Fill(16,StopEvt.weight_btagsf_light_UP);
@@ -2012,7 +1978,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
        counterhist->Fill(46,StopEvt.weight_loosebtagsf_light_UP);
        counterhist->Fill(47,StopEvt.weight_loosebtagsf_heavy_DN);
        counterhist->Fill(48,StopEvt.weight_loosebtagsf_light_DN);  
-       if(skim_isFastsim){
+       if(isFastsim){
 	 counterhist->Fill(23,StopEvt.weight_btagsf_fastsim_UP);
 	 counterhist->Fill(24,StopEvt.weight_btagsf_fastsim_DN);
 	 counterhist->Fill(42,StopEvt.weight_tightbtagsf_fastsim_UP);
@@ -2021,7 +1987,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
 	 counterhist->Fill(50,StopEvt.weight_loosebtagsf_fastsim_DN);
        }
      }
-     if(isSignalFromFileName && !evt_isRealData() && skim_applyBtagSFs){
+     if(isSignalFromFileName && !evt_isRealData() && applyBtagSFs){
        counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,14,StopEvt.weight_btagsf);
        counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,15,StopEvt.weight_btagsf_heavy_UP);
        counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,16,StopEvt.weight_btagsf_light_UP);
@@ -2037,7 +2003,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
        counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,46,StopEvt.weight_loosebtagsf_light_UP);
        counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,47,StopEvt.weight_loosebtagsf_heavy_DN);
        counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,48,StopEvt.weight_loosebtagsf_light_DN);
-       if(skim_isFastsim){
+       if(isFastsim){
 	 counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,22,StopEvt.weight_btagsf_fastsim_UP);
 	 counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,23,StopEvt.weight_btagsf_fastsim_DN);
 	 counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,42,StopEvt.weight_tightbtagsf_fastsim_UP);
@@ -2118,7 +2084,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
       if(StopEvt.nPhotons < skim_nPhotons) continue;
       int leadph = -1;//use this in case we have a wide photon selection (like loose id), but want to use specific photon
       for(unsigned int i = 0; i<ph.p4.size(); ++i){
-	int overlapping_jet = getOverlappingJetIndex(ph.p4.at(i), jets.ak4pfjets_p4, 0.4, skim_jet_pt, skim_jet_eta,false,jet_corrector_pfL1FastJetL2L3,applyJECfromFile,jetcorr_uncertainty,JES_type,skim_isFastsim);
+	int overlapping_jet = getOverlappingJetIndex(ph.p4.at(i), jets.ak4pfjets_p4, 0.4, skim_jet_pt, skim_jet_eta,false,jet_corrector_pfL1FastJetL2L3,applyJECfromFile,jetcorr_uncertainty,JES_type,isFastsim);
 	ph.overlapJetId.at(i) = overlapping_jet;
 	if(leadph!=-1 && ph.p4.at(i).Pt()<ph.p4.at(leadph).Pt()) continue;
 	if(StopEvt.ngoodleps>0 && ROOT::Math::VectorUtil::DeltaR(ph.p4.at(i), lep1.p4)<0.2) continue;
@@ -2144,7 +2110,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
       StopEvt.ak4pfjets_rho = evt_fixgridfastjet_all_rho();
 
       vector<int> jetIndexSortedCSV;
-      if(skim_isFastsim) jetIndexSortedCSV = JetUtil::JetIndexCSVsorted(jets.ak4pfjets_CSV, jets.ak4pfjets_p4, jets.ak4pfjets_loose_pfid, skim_jet_pt, skim_jet_eta, false);
+      if(isFastsim) jetIndexSortedCSV = JetUtil::JetIndexCSVsorted(jets.ak4pfjets_CSV, jets.ak4pfjets_p4, jets.ak4pfjets_loose_pfid, skim_jet_pt, skim_jet_eta, false);
       else jetIndexSortedCSV = JetUtil::JetIndexCSVsorted(jets.ak4pfjets_CSV, jets.ak4pfjets_p4, jets.ak4pfjets_loose_pfid, skim_jet_pt, skim_jet_eta, true);
       vector<LorentzVector> mybjets; vector<LorentzVector> myaddjets;
       for(unsigned int idx = 0; idx<jetIndexSortedCSV.size(); ++idx){
@@ -2157,14 +2123,14 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
       vector<LorentzVector> mybjets_jup; vector<LorentzVector> myaddjets_jup;
       vector<LorentzVector> mybjets_jdown; vector<LorentzVector> myaddjets_jdown;
       if(applyJECfromFile){
-	if(skim_isFastsim) jetIndexSortedCSV_jup = JetUtil::JetIndexCSVsorted(jets_jup.ak4pfjets_CSV, jets_jup.ak4pfjets_p4, jets_jup.ak4pfjets_loose_pfid, skim_jet_pt, skim_jet_eta, false);
+	if(isFastsim) jetIndexSortedCSV_jup = JetUtil::JetIndexCSVsorted(jets_jup.ak4pfjets_CSV, jets_jup.ak4pfjets_p4, jets_jup.ak4pfjets_loose_pfid, skim_jet_pt, skim_jet_eta, false);
 	else jetIndexSortedCSV_jup = JetUtil::JetIndexCSVsorted(jets_jup.ak4pfjets_CSV, jets_jup.ak4pfjets_p4, jets_jup.ak4pfjets_loose_pfid, skim_jet_pt, skim_jet_eta, true);
 	for(unsigned int idx = 0; idx<jetIndexSortedCSV_jup.size(); ++idx){
 	  if(jets_jup.ak4pfjets_passMEDbtag.at(jetIndexSortedCSV_jup[idx])==true) mybjets_jup.push_back(jets_jup.ak4pfjets_p4.at(jetIndexSortedCSV_jup[idx]) );
 	  else if(mybjets_jup.size()<=1 && (mybjets_jup.size()+myaddjets_jup.size())<3) myaddjets_jup.push_back(jets_jup.ak4pfjets_p4.at(jetIndexSortedCSV_jup[idx]) );
 	}
 	
-	if(skim_isFastsim) jetIndexSortedCSV_jdown = JetUtil::JetIndexCSVsorted(jets_jdown.ak4pfjets_CSV, jets_jdown.ak4pfjets_p4, jets_jdown.ak4pfjets_loose_pfid, skim_jet_pt, skim_jet_eta, false);
+	if(isFastsim) jetIndexSortedCSV_jdown = JetUtil::JetIndexCSVsorted(jets_jdown.ak4pfjets_CSV, jets_jdown.ak4pfjets_p4, jets_jdown.ak4pfjets_loose_pfid, skim_jet_pt, skim_jet_eta, false);
 	else jetIndexSortedCSV_jdown = JetUtil::JetIndexCSVsorted(jets_jdown.ak4pfjets_CSV, jets_jdown.ak4pfjets_p4, jets_jdown.ak4pfjets_loose_pfid, skim_jet_pt, skim_jet_eta, true);
 	for(unsigned int idx = 0; idx<jetIndexSortedCSV_jdown.size(); ++idx){
 	  if(jets_jdown.ak4pfjets_passMEDbtag.at(jetIndexSortedCSV_jdown[idx])==true) mybjets_jdown.push_back(jets_jdown.ak4pfjets_p4.at(jetIndexSortedCSV_jdown[idx]) );
@@ -2612,7 +2578,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
       if(vetotracks_v3<1) StopEvt.PassTrackVeto = true;
       else StopEvt.PassTrackVeto = false;
     
-      if(skim_2ndlepveto){
+      if(apply2ndLepVeto){
             if(StopEvt.nvetoleps!=1) continue;
             if(!StopEvt.PassTrackVeto) continue;
             if(!StopEvt.PassTauVeto) continue;
@@ -2978,11 +2944,11 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
     pileupfile->Close();
     delete pileupfile;
   }
-  if (skim_applyBtagSFs) {
+  if (applyBtagSFs) {
     jets.deleteBtagSFTool();
   }
 
-  if( !isDataFromFileName && (skim_applyLeptonSFs || skim_applyVetoLeptonSFs) ){
+  if( !isDataFromFileName && (applyLeptonSFs || applyVetoLeptonSFs) ){
     f_el_SF->Close();
     f_mu_SF_id->Close();
     f_mu_SF_iso->Close();
@@ -3014,7 +2980,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
   cout << "Events with at least " << skim_nGoodLep << " Good Lepton   " << nEvents_pass_skim_nGoodLep << endl;
   cout << "Events with at least " << skim_nJets << " Good Jets     " << nEvents_pass_skim_nJets << endl;
   cout << "Events with at least " << skim_nBJets << " Good BJets   " << nEvents_pass_skim_nBJets << endl;
-  cout << "Events passing 2nd Lep Veto " << skim_2ndlepveto << "    " << nEvents_pass_skim_2ndlepVeto << endl;
+  cout << "Events passing 2nd Lep Veto " << apply2ndLepVeto << "    " << nEvents_pass_skim_2ndlepVeto << endl;
   cout << "Events with MET > " << skim_met << " GeV             " << nEvents_pass_skim_met << endl;
   cout << "-----------------------------" << endl;
   cout << "CPU  Time:   " << Form( "%.01f", bmark->GetCpuTime("benchmark")  ) << endl;                                                                                          
