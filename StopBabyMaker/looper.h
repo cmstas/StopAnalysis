@@ -63,6 +63,7 @@ class babyMaker {
     int   skim_nJets;
     float skim_jet_pt;
     float skim_jet_eta;
+    int   skim_nBJets;
 
     float skim_jet_ak8_pt;
     float skim_jet_ak8_eta;
@@ -72,15 +73,12 @@ class babyMaker {
     float skim_ph_eta;
 
     bool applyJECfromFile;
-    int JES_type;
+    int  JES_type;
 
-    int skim_nBJets;
-    bool skim_2ndlepveto;
-
-    bool skim_applyBtagSFs;
-    bool skim_applyLeptonSFs; 
-    bool skim_applyVetoLeptonSFs; 
-    bool skim_isFastsim;
+    bool applyBtagSFs;
+    bool applyLeptonSFs; 
+    bool applyVetoLeptonSFs; 
+    bool apply2ndLepVeto;
 
     bool filltaus;
     bool filltracks;
@@ -90,6 +88,7 @@ class babyMaker {
     bool fill2ndlep;
     bool fillExtraEvtVar;
 
+    bool fillAK8;
     bool fillAK4EF;
     bool fillAK4_Other;
     bool fillOverleps;
@@ -98,8 +97,7 @@ class babyMaker {
     bool fillIso;
     bool fillLepSynch;
 
-    void setSkimVariables(int nvtx, float met, int nGoodLep, float goodLep_el_pt, float goodLep_el_eta, float goodLep_mu_pt, float goodLep_mu_eta, float looseLep_el_pt, float looseLep_el_eta, float looseLep_mu_pt, float looseLep_mu_eta, float vetoLep_el_pt, float vetoLep_el_eta, float vetoLep_mu_pt, float vetoLep_mu_eta, bool apply2ndlepveto, int njets, float jet_pt, float jet_eta, float jet_ak8_pt, float jet_ak8_eta, int nbjets, int nphs, float phs_pt, float phs_eta, bool applyJEC, int JES_type_central_up_down, bool applyLeptonSFs, bool applyVetoLeptonSFs, bool applyBtagSFs, bool isFastsim,bool filltaus_, bool filltracks_, bool fillZll_, bool fillPhoton_,bool fillMETfilt_, bool fill2ndlep_, bool fillExtraEvtVar_, bool fillAK4EF_, bool fillAK4_Other_, bool fillOverleps_, bool fillAK4Synch_, bool fillElID_, bool fillIso_, bool fillLepSynch_);
-
+    bool isFastsim;
 
   protected:
     TFile* BabyFile;
