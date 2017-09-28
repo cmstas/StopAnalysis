@@ -105,8 +105,8 @@ babyMaker::babyMaker(){
   gen_bosons = GenParticleTree("bosons_");
   gen_susy = GenParticleTree("susy_");
 
-//obsolete
-//   gen_tops = GenParticleTree("ts_");  //merged into gen_qs
+  //obsolete
+  //   gen_tops = GenParticleTree("ts_");  //merged into gen_qs
   //gen_els = GenParticleTree("els_");
   //gen_mus = GenParticleTree("mus_");
   //gen_taus = GenParticleTree("taus_");
@@ -173,7 +173,7 @@ void babyMaker::MakeBabyNtuple(const char* output_name){
   if(fillLepSynch)  lep2.SetBranches_SynchTools(BabyTree);
 
 
-//obsolete
+  //obsolete
   //gen_els.SetBranches(BabyTree);
   //gen_mus.SetBranches(BabyTree);
   //gen_taus.SetBranches(BabyTree);
@@ -208,7 +208,7 @@ void babyMaker::InitBabyNtuple(){
   gen_bosons.Reset();
   gen_susy.Reset();
 
-//obsolete
+  //obsolete
   //gen_els.Reset();
   //gen_mus.Reset();
   //gen_taus.Reset();
@@ -267,12 +267,12 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
   //unsigned int track_overlep1_idx = -9999;
   //unsigned int track_overlep2_idx = -9999;
 
-  if( nEvents >= 0 ) nEventsToDo = nEvents;
+  if (nEvents >= 0) nEventsToDo = nEvents;
   TObjArray *listOfFiles = chain->GetListOfFiles();
   TIter fileIter(listOfFiles);
   TFile *currentFile = 0;
   bool applyJECunc = false;
-  if(applyJECfromFile && (JES_type != 0)) applyJECunc = true;
+  if (applyJECfromFile && (JES_type != 0)) applyJECunc = true;
 
   //
   // JEC files
@@ -286,7 +286,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
     isSignalFromFileName = false;
     cout << ", running on DATA, based on file name: " << output_name<<endl;
   }
-  else if((filestr.find("SMS") != std::string::npos) || (filestr.find("Signal") != std::string::npos)){
+  else if ((filestr.find("SMS") != std::string::npos) || (filestr.find("Signal") != std::string::npos)) {
     isDataFromFileName = false;
     isSignalFromFileName = true;
     cout << ", running on SIGNAL, based on file name: " << output_name<<endl;
@@ -981,11 +981,11 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
     TString thisfilename = file.GetName();
     cout << "file name is " << file.GetName() << endl;
 
-    bool isbadrawMET = false;
-    if(thisfilename.Contains("V07-04-12_miniaodv1_FS")){
-      cout << "This file seems to have a badrawMET, thus MET needs to be recalculated" << endl;
-      isbadrawMET = true;
-    }
+    const bool isbadrawMET = false;
+    // if(thisfilename.Contains("V07-04-12_miniaodv1_FS")){
+    //   cout << "This file seems to have a badrawMET, thus MET needs to be recalculated" << endl;
+    //   isbadrawMET = true;
+    // }
 
     //
     // Loop over Events in current file
@@ -1317,16 +1317,15 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
         pair<float,float> newmet_jup;
         pair<float,float> newmet_jdown;
         if(!evt_isRealData() && applyJECunc){
-          if(JES_type > 0)  newmet = getT1CHSMET_fromMINIAOD(jet_corrector_pfL1FastJetL2L3, jetcorr_uncertainty,true,isbadrawMET);
-          else if(JES_type < 0)  newmet = getT1CHSMET_fromMINIAOD(jet_corrector_pfL1FastJetL2L3, jetcorr_uncertainty,false,isbadrawMET);
+          if      (JES_type > 0) newmet = getT1CHSMET_fromMINIAOD(jet_corrector_pfL1FastJetL2L3, jetcorr_uncertainty, true, isbadrawMET);
+          else if (JES_type < 0) newmet = getT1CHSMET_fromMINIAOD(jet_corrector_pfL1FastJetL2L3, jetcorr_uncertainty, false, isbadrawMET);
           else cout << "This should not happen" << endl;
         }
-        else if(isbadrawMET) newmet = getT1CHSMET_fromMINIAOD(jet_corrector_pfL1FastJetL2L3,NULL,0,isbadrawMET);
-        //else newmet = getT1CHSMET_fromMINIAOD(jet_corrector_pfL1FastJetL2L3);
+        // else if (isbadrawMET) newmet = getT1CHSMET_fromMINIAOD(jet_corrector_pfL1FastJetL2L3, NULL, 0, isbadrawMET);
         else newmet = getT1CHSMET_fromMINIAOD(jet_corrector_pfL1FastJetL2L3);
 
-        newmet_jup = getT1CHSMET_fromMINIAOD(jet_corrector_pfL1FastJetL2L3, jetcorr_uncertainty_sys,true,isbadrawMET);
-        newmet_jdown = getT1CHSMET_fromMINIAOD(jet_corrector_pfL1FastJetL2L3, jetcorr_uncertainty_sys,false,isbadrawMET);
+        newmet_jup   = getT1CHSMET_fromMINIAOD(jet_corrector_pfL1FastJetL2L3, jetcorr_uncertainty_sys, true, isbadrawMET);
+        newmet_jdown = getT1CHSMET_fromMINIAOD(jet_corrector_pfL1FastJetL2L3, jetcorr_uncertainty_sys, false, isbadrawMET);
 
         StopEvt.pfmet = newmet.first;
         StopEvt.pfmet_phi = newmet.second;
@@ -1455,7 +1454,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
       nVetoLeptons = GoodLeps.size() + LooseLeps.size() + VetoLeps.size();
 
       StopEvt.ngoodleps  = nGoodLeptons;
-//      StopEvt.nlooseleps = nLooseLeptons; //why are these needed?
+      // StopEvt.nlooseleps = nLooseLeptons; //why are these needed?
       StopEvt.nvetoleps  = nVetoLeptons;
 
       //std::cout << "[babymaker::looper]: filling lepton variables" << std::endl;
@@ -1838,6 +1837,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
         jets.SetJetSelection("ak8", skim_jet_ak8_pt, skim_jet_ak8_eta, true); //save only jets passing jid
         //jets.FillCommon(idx_alloverlapjets, jet_corrector_pfL1FastJetL2L3,btagprob_data,btagprob_mc,btagprob_heavy_UP, btagprob_heavy_DN, btagprob_light_UP,btagprob_light_DN,btagprob_FS_UP,btagprob_FS_DN,jet_overlep1_idx, jet_overlep2_idx,applyJECfromFile,jetcorr_uncertainty,JES_type, applyBtagSFs, isFastsim);
         jets.FillCommon(idx_alloverlapjets, jet_corrector_pfL1FastJetL2L3,btagprob_data,btagprob_mc,btagprob_heavy_UP, btagprob_heavy_DN, btagprob_light_UP,btagprob_light_DN,btagprob_FS_UP,btagprob_FS_DN,loosebtagprob_data,loosebtagprob_mc,loosebtagprob_heavy_UP, loosebtagprob_heavy_DN, loosebtagprob_light_UP,loosebtagprob_light_DN,loosebtagprob_FS_UP,loosebtagprob_FS_DN,tightbtagprob_data,tightbtagprob_mc,tightbtagprob_heavy_UP, tightbtagprob_heavy_DN, tightbtagprob_light_UP,tightbtagprob_light_DN,tightbtagprob_FS_UP,tightbtagprob_FS_DN,jet_overlep1_idx, jet_overlep2_idx,applyJECfromFile,jetcorr_uncertainty,JES_type, applyBtagSFs, isFastsim);
+        jets.FillAK8Jets(applyJECfromFile, ak8jet_corrector_pfL1FastJetL2L3, ak8jetcorr_uncertainty, JES_type);
 
         if(applyJECfromFile) {//if no JEC file is defined - code cannot do up/down variations
           //JEC up
@@ -1850,7 +1850,8 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
           jets_jup.SetJetSelection("ak4", skim_jet_pt, skim_jet_eta, true); //save only jets passing jid
           jets_jup.SetJetSelection("ak8", skim_jet_ak8_pt, skim_jet_ak8_eta, true); //save only jets passing jid
           //jets_jup.FillCommon(idx_alloverlapjets_jup, jet_corrector_pfL1FastJetL2L3,btagprob_data_jup,btagprob_mc_jup,btagprob_heavy_UP_jup, btagprob_heavy_DN_jup, btagprob_light_UP_jup,btagprob_light_DN_jup,btagprob_FS_UP_jup,btagprob_FS_DN_jup,jet_overlep1_idx, jet_overlep2_idx,true,jetcorr_uncertainty_sys,1, false, isFastsim);
-          jets_jup.FillCommon(idx_alloverlapjets_jup, jet_corrector_pfL1FastJetL2L3,btagprob_data_jup,btagprob_mc_jup,btagprob_heavy_UP_jup, btagprob_heavy_DN_jup, btagprob_light_UP_jup,btagprob_light_DN_jup,btagprob_FS_UP_jup,btagprob_FS_DN_jup,loosebtagprob_data_jup,loosebtagprob_mc_jup,loosebtagprob_heavy_UP_jup, loosebtagprob_heavy_DN_jup, loosebtagprob_light_UP_jup,loosebtagprob_light_DN_jup,loosebtagprob_FS_UP_jup,loosebtagprob_FS_DN_jup,tightbtagprob_data_jup,tightbtagprob_mc_jup,tightbtagprob_heavy_UP_jup, tightbtagprob_heavy_DN_jup, tightbtagprob_light_UP_jup,tightbtagprob_light_DN_jup,tightbtagprob_FS_UP_jup,tightbtagprob_FS_DN_jup,jet_overlep1_idx, jet_overlep2_idx,true,jetcorr_uncertainty_sys,1, false, isFastsim);
+          jets_jup.FillCommon(idx_alloverlapjets_jup, jet_corrector_pfL1FastJetL2L3, btagprob_data_jup, btagprob_mc_jup, btagprob_heavy_UP_jup, btagprob_heavy_DN_jup, btagprob_light_UP_jup,btagprob_light_DN_jup,btagprob_FS_UP_jup,btagprob_FS_DN_jup,loosebtagprob_data_jup,loosebtagprob_mc_jup,loosebtagprob_heavy_UP_jup, loosebtagprob_heavy_DN_jup, loosebtagprob_light_UP_jup,loosebtagprob_light_DN_jup,loosebtagprob_FS_UP_jup,loosebtagprob_FS_DN_jup,tightbtagprob_data_jup,tightbtagprob_mc_jup,tightbtagprob_heavy_UP_jup, tightbtagprob_heavy_DN_jup, tightbtagprob_light_UP_jup,tightbtagprob_light_DN_jup,tightbtagprob_FS_UP_jup,tightbtagprob_FS_DN_jup,jet_overlep1_idx, jet_overlep2_idx, true, jetcorr_uncertainty_sys, 1, false, isFastsim);
+          jets_jup.FillAK8Jets(true, ak8jet_corrector_pfL1FastJetL2L3, ak8jetcorr_uncertainty_sys, 1);
 
           //JEC down
           jet_overlep1_idx = -9999;
@@ -1862,7 +1863,8 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
           jets_jdown.SetJetSelection("ak4", skim_jet_pt, skim_jet_eta, true); //save only jets passing jid
           jets_jdown.SetJetSelection("ak8", skim_jet_ak8_pt, skim_jet_ak8_eta, true); //save only jets passing jid
           //jets_jdown.FillCommon(idx_alloverlapjets_jdown, jet_corrector_pfL1FastJetL2L3,btagprob_data_jdown,btagprob_mc_jdown,btagprob_heavy_UP_jdown, btagprob_heavy_DN_jdown, btagprob_light_UP_jdown,btagprob_light_DN_jdown,btagprob_FS_UP_jdown,btagprob_FS_DN_jdown,jet_overlep1_idx, jet_overlep2_idx,true,jetcorr_uncertainty_sys,-1, false, isFastsim);
-          jets_jdown.FillCommon(idx_alloverlapjets_jdown, jet_corrector_pfL1FastJetL2L3,btagprob_data_jdown,btagprob_mc_jdown,btagprob_heavy_UP_jdown, btagprob_heavy_DN_jdown, btagprob_light_UP_jdown,btagprob_light_DN_jdown,btagprob_FS_UP_jdown,btagprob_FS_DN_jdown,loosebtagprob_data_jdown,loosebtagprob_mc_jdown,loosebtagprob_heavy_UP_jdown, loosebtagprob_heavy_DN_jdown, loosebtagprob_light_UP_jdown,loosebtagprob_light_DN_jdown,loosebtagprob_FS_UP_jdown,loosebtagprob_FS_DN_jdown,tightbtagprob_data_jdown,tightbtagprob_mc_jdown,tightbtagprob_heavy_UP_jdown, tightbtagprob_heavy_DN_jdown, tightbtagprob_light_UP_jdown,tightbtagprob_light_DN_jdown,tightbtagprob_FS_UP_jdown,tightbtagprob_FS_DN_jdown,jet_overlep1_idx, jet_overlep2_idx,true,jetcorr_uncertainty_sys,-1, false, isFastsim);
+          jets_jdown.FillCommon(idx_alloverlapjets_jdown, jet_corrector_pfL1FastJetL2L3,btagprob_data_jdown,btagprob_mc_jdown,btagprob_heavy_UP_jdown, btagprob_heavy_DN_jdown, btagprob_light_UP_jdown,btagprob_light_DN_jdown,btagprob_FS_UP_jdown,btagprob_FS_DN_jdown,loosebtagprob_data_jdown,loosebtagprob_mc_jdown,loosebtagprob_heavy_UP_jdown, loosebtagprob_heavy_DN_jdown, loosebtagprob_light_UP_jdown,loosebtagprob_light_DN_jdown,loosebtagprob_FS_UP_jdown,loosebtagprob_FS_DN_jdown,tightbtagprob_data_jdown,tightbtagprob_mc_jdown,tightbtagprob_heavy_UP_jdown, tightbtagprob_heavy_DN_jdown, tightbtagprob_light_UP_jdown,tightbtagprob_light_DN_jdown,tightbtagprob_FS_UP_jdown, tightbtagprob_FS_DN_jdown, jet_overlep1_idx, jet_overlep2_idx, true, jetcorr_uncertainty_sys, -1, false, isFastsim);
+          jets_jdown.FillAK8Jets(true, ak8jet_corrector_pfL1FastJetL2L3, ak8jetcorr_uncertainty_sys, -1);
         }
 
         bool isbadmuonjet = false;
