@@ -252,18 +252,50 @@ Path /hadoop/cms/store/user/namin/ProjectMetis/WJetsToLNu_TuneCUETP8M1_13TeV-mad
 ## ttbar ##
 
 SAMPLE
-Name ttbar_powheg_pythia8_92X
+Name TT_powheg_pythia8_92X
 Path /hadoop/cms/store/user/namin/ProjectMetis/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8_RunIISummer17MiniAOD-92X_upgrade2017_realistic_v7-v1_MINIAODSIM_CMS4_V00-00-06/
+
+SAMPLE
+Name TTJets_amcatnlo_pythia8_92X
+Path /hadoop/cms/store/user/namin/ProjectMetis/TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISummer17MiniAOD-92X_upgrade2017_realistic_v10-v3_MINIAODSIM_CMS4_V00-00-06/
 
 ## DY + Jets ##
 
 SAMPLE
-Name /DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer17MiniAOD-92X_upgrade2017_realistic_v10-v1/MINIAODSIM
-Path /hadoop/cms/store/user/namin/ProjectMetis/DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer17MiniAOD-92X_upgrade2017_realistic_v10-v1_MINIAODSIM_CMS4_V00-00-06/
+Name DYJetsToLL_M-10to50_madgraph_pythia8_92X
+Path /hadoop/cms/store/user/namin/ProjectMetis/DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer17MiniAOD-92X_upgrade2017_realistic_v10-v1_MINIAODSIM_CMS4_V00-00-06/	
 
 SAMPLE
-Name /DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer17MiniAOD-92X_upgrade2017_realistic_v10_ext1-v1/MINIAODSIM
-Path /hadoop/cms/store/user/namin/ProjectMetis/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer17MiniAOD-92X_upgrade2017_realistic_v10_ext1-v1_MINIAODSIM_CMS4_V00-00-06/
+Name DYJetsToLL_M-50_madgraph_pythia8_92X
+Path /hadoop/cms/store/user/namin/ProjectMetis/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer17MiniAOD-92X_upgrade2017_realistic_v10_ext1-v2_MINIAODSIM_CMS4_V00-00-06/	
+
+SAMPLE
+Name DY1JetsToLL_M-50_madgraph_pythia8_92X
+Path /hadoop/cms/store/user/namin/ProjectMetis/DY1JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer17MiniAOD-92X_upgrade2017_realistic_v10-v1_MINIAODSIM_CMS4_V00-00-06/	
+
+SAMPLE
+Name DY2JetsToLL_M-50_madgraph_pythia8_92X
+Path /hadoop/cms/store/user/namin/ProjectMetis/DY2JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer17MiniAOD-92X_upgrade2017_realistic_v10-v1_MINIAODSIM_CMS4_V00-00-06/	
+
+SAMPLE
+Name DY3JetsToLL_M-50_madgraph_pythia8_92X
+Path /hadoop/cms/store/user/namin/ProjectMetis/DY3JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer17MiniAOD-92X_upgrade2017_realistic_v10-v2_MINIAODSIM_CMS4_V00-00-06/	
+
+SAMPLE
+Name DY4JetsToLL_M-50_madgraph_pythia8_92X
+Path /hadoop/cms/store/user/namin/ProjectMetis/DY4JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer17MiniAOD-92X_upgrade2017_realistic_v10-v2_MINIAODSIM_CMS4_V00-00-06/
+
+## Diboson
+
+SAMPLE
+Name WW_pythia8_92X
+Path /hadoop/cms/store/user/namin/ProjectMetis/WW_TuneCUETP8M1_13TeV-pythia8_RunIISummer17MiniAOD-92X_upgrade2017_realistic_v10-v2_MINIAODSIM_CMS4_V00-00-06/	
+SAMPLE
+Name WZ_pythia8_92X
+Path /hadoop/cms/store/user/namin/ProjectMetis/WZ_TuneCUETP8M1_13TeV-pythia8_RunIISummer17MiniAOD-92X_upgrade2017_realistic_v10-v2_MINIAODSIM_CMS4_V00-00-06/	
+SAMPLE
+Name ZZ_pythia8_92X
+Path /hadoop/cms/store/user/namin/ProjectMetis/ZZ_TuneCUETP8M1_13TeV-pythia8_RunIISummer17MiniAOD-92X_upgrade2017_realistic_v10-v2_MINIAODSIM_CMS4_V00-00-06/	
 
 
 #######################################################
