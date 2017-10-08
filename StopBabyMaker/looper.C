@@ -819,7 +819,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
   // Set JSON file
   //
   bool applyjson = false;
-  const char* json_file = "json_files/Cert_294927-299649_13TeV_PromptReco_Collisions17_JSON.txt";
+  const char* json_file = "json_files/Cert_294927-302663_13TeV_PromptReco_Collisions17_JSON.txt";
   set_goodrun_file_json(json_file);
 
   //
@@ -927,10 +927,10 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
     jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Summer16_23Sep2016V3_MC/Summer16_23Sep2016V3_MC_L3Absolute_AK4PFchs.txt");
     jetcorr_uncertainty_filename = "jecfiles/Summer16_23Sep2016V3_MC/Summer16_23Sep2016V3_MC_Uncertainty_AK4PFchs.txt";
 
-    ak8jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Summer16_23Sep2016V4_MC/Summer16_23Sep2016V4_MC_L1FastJet_AK4PFchs.txt");
-    ak8jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Summer16_23Sep2016V4_MC/Summer16_23Sep2016V4_MC_L2Relative_AK4PFchs.txt");
-    ak8jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Summer16_23Sep2016V4_MC/Summer16_23Sep2016V4_MC_L3Absolute_AK4PFchs.txt");
-    ak8jetcorr_uncertainty_filename = "jecfiles/Summer16_23Sep2016V4_MC/Summer16_23Sep2016V4_MC_Uncertainty_AK4PFchs.txt";
+    ak8jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Summer16_23Sep2016V4_MC/Summer16_23Sep2016V4_MC_L1FastJet_AK8PFchs.txt");
+    ak8jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Summer16_23Sep2016V4_MC/Summer16_23Sep2016V4_MC_L2Relative_AK8PFchs.txt");
+    ak8jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Summer16_23Sep2016V4_MC/Summer16_23Sep2016V4_MC_L3Absolute_AK8PFchs.txt");
+    ak8jetcorr_uncertainty_filename = "jecfiles/Summer16_23Sep2016V4_MC/Summer16_23Sep2016V4_MC_Uncertainty_AK8PFchs.txt";
   }
 
   if(applyJECfromFile != 0) {
@@ -2111,32 +2111,32 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
 
       StopEvt.ak4pfjets_rho = evt_fixgridfastjet_all_rho();
 
-      vector<int> jetIndexSortedCSV;
-      if(isFastsim) jetIndexSortedCSV = JetUtil::JetIndexCSVsorted(jets.ak4pfjets_CSV, jets.ak4pfjets_p4, jets.ak4pfjets_loose_pfid, skim_jet_pt, skim_jet_eta, false);
-      else jetIndexSortedCSV = JetUtil::JetIndexCSVsorted(jets.ak4pfjets_CSV, jets.ak4pfjets_p4, jets.ak4pfjets_loose_pfid, skim_jet_pt, skim_jet_eta, true);
+      vector<int> jetIndexSortedBdisc;
+      if(isFastsim) jetIndexSortedBdisc = JetUtil::JetIndexBdiscSorted(jets.ak4pfjets_deepCSV, jets.ak4pfjets_p4, jets.ak4pfjets_loose_pfid, skim_jet_pt, skim_jet_eta, false);
+      else jetIndexSortedBdisc = JetUtil::JetIndexBdiscSorted(jets.ak4pfjets_deepCSV, jets.ak4pfjets_p4, jets.ak4pfjets_loose_pfid, skim_jet_pt, skim_jet_eta, true);
       vector<LorentzVector> mybjets; vector<LorentzVector> myaddjets;
-      for(unsigned int idx = 0; idx<jetIndexSortedCSV.size(); ++idx){
-        if(jets.ak4pfjets_passMEDbtag.at(jetIndexSortedCSV[idx])==true) mybjets.push_back(jets.ak4pfjets_p4.at(jetIndexSortedCSV[idx]) );
-        else if(mybjets.size()<=1 && (mybjets.size()+myaddjets.size())<3) myaddjets.push_back(jets.ak4pfjets_p4.at(jetIndexSortedCSV[idx]) );
+      for(unsigned int idx = 0; idx<jetIndexSortedBdisc.size(); ++idx){
+        if(jets.ak4pfjets_passMEDbtag.at(jetIndexSortedBdisc[idx])==true) mybjets.push_back(jets.ak4pfjets_p4.at(jetIndexSortedBdisc[idx]) );
+        else if(mybjets.size()<=1 && (mybjets.size()+myaddjets.size())<3) myaddjets.push_back(jets.ak4pfjets_p4.at(jetIndexSortedBdisc[idx]) );
       }
 
-      vector<int> jetIndexSortedCSV_jup;
-      vector<int> jetIndexSortedCSV_jdown;
+      vector<int> jetIndexSortedBdisc_jup;
+      vector<int> jetIndexSortedBdisc_jdown;
       vector<LorentzVector> mybjets_jup; vector<LorentzVector> myaddjets_jup;
       vector<LorentzVector> mybjets_jdown; vector<LorentzVector> myaddjets_jdown;
       if(applyJECfromFile){
-        if(isFastsim) jetIndexSortedCSV_jup = JetUtil::JetIndexCSVsorted(jets_jup.ak4pfjets_CSV, jets_jup.ak4pfjets_p4, jets_jup.ak4pfjets_loose_pfid, skim_jet_pt, skim_jet_eta, false);
-        else jetIndexSortedCSV_jup = JetUtil::JetIndexCSVsorted(jets_jup.ak4pfjets_CSV, jets_jup.ak4pfjets_p4, jets_jup.ak4pfjets_loose_pfid, skim_jet_pt, skim_jet_eta, true);
-        for(unsigned int idx = 0; idx<jetIndexSortedCSV_jup.size(); ++idx){
-          if(jets_jup.ak4pfjets_passMEDbtag.at(jetIndexSortedCSV_jup[idx])==true) mybjets_jup.push_back(jets_jup.ak4pfjets_p4.at(jetIndexSortedCSV_jup[idx]) );
-          else if(mybjets_jup.size()<=1 && (mybjets_jup.size()+myaddjets_jup.size())<3) myaddjets_jup.push_back(jets_jup.ak4pfjets_p4.at(jetIndexSortedCSV_jup[idx]) );
+        if(isFastsim) jetIndexSortedBdisc_jup = JetUtil::JetIndexBdiscSorted(jets_jup.ak4pfjets_deepCSV, jets_jup.ak4pfjets_p4, jets_jup.ak4pfjets_loose_pfid, skim_jet_pt, skim_jet_eta, false);
+        else jetIndexSortedBdisc_jup = JetUtil::JetIndexBdiscSorted(jets_jup.ak4pfjets_deepCSV, jets_jup.ak4pfjets_p4, jets_jup.ak4pfjets_loose_pfid, skim_jet_pt, skim_jet_eta, true);
+        for(unsigned int idx = 0; idx<jetIndexSortedBdisc_jup.size(); ++idx){
+          if(jets_jup.ak4pfjets_passMEDbtag.at(jetIndexSortedBdisc_jup[idx])==true) mybjets_jup.push_back(jets_jup.ak4pfjets_p4.at(jetIndexSortedBdisc_jup[idx]) );
+          else if(mybjets_jup.size()<=1 && (mybjets_jup.size()+myaddjets_jup.size())<3) myaddjets_jup.push_back(jets_jup.ak4pfjets_p4.at(jetIndexSortedBdisc_jup[idx]) );
         }
 
-        if(isFastsim) jetIndexSortedCSV_jdown = JetUtil::JetIndexCSVsorted(jets_jdown.ak4pfjets_CSV, jets_jdown.ak4pfjets_p4, jets_jdown.ak4pfjets_loose_pfid, skim_jet_pt, skim_jet_eta, false);
-        else jetIndexSortedCSV_jdown = JetUtil::JetIndexCSVsorted(jets_jdown.ak4pfjets_CSV, jets_jdown.ak4pfjets_p4, jets_jdown.ak4pfjets_loose_pfid, skim_jet_pt, skim_jet_eta, true);
-        for(unsigned int idx = 0; idx<jetIndexSortedCSV_jdown.size(); ++idx){
-          if(jets_jdown.ak4pfjets_passMEDbtag.at(jetIndexSortedCSV_jdown[idx])==true) mybjets_jdown.push_back(jets_jdown.ak4pfjets_p4.at(jetIndexSortedCSV_jdown[idx]) );
-          else if(mybjets_jdown.size()<=1 && (mybjets_jdown.size()+myaddjets_jdown.size())<3) myaddjets_jdown.push_back(jets_jdown.ak4pfjets_p4.at(jetIndexSortedCSV_jdown[idx]) );
+        if(isFastsim) jetIndexSortedBdisc_jdown = JetUtil::JetIndexBdiscSorted(jets_jdown.ak4pfjets_deepCSV, jets_jdown.ak4pfjets_p4, jets_jdown.ak4pfjets_loose_pfid, skim_jet_pt, skim_jet_eta, false);
+        else jetIndexSortedBdisc_jdown = JetUtil::JetIndexBdiscSorted(jets_jdown.ak4pfjets_deepCSV, jets_jdown.ak4pfjets_p4, jets_jdown.ak4pfjets_loose_pfid, skim_jet_pt, skim_jet_eta, true);
+        for(unsigned int idx = 0; idx<jetIndexSortedBdisc_jdown.size(); ++idx){
+          if(jets_jdown.ak4pfjets_passMEDbtag.at(jetIndexSortedBdisc_jdown[idx])==true) mybjets_jdown.push_back(jets_jdown.ak4pfjets_p4.at(jetIndexSortedBdisc_jdown[idx]) );
+          else if(mybjets_jdown.size()<=1 && (mybjets_jdown.size()+myaddjets_jdown.size())<3) myaddjets_jdown.push_back(jets_jdown.ak4pfjets_p4.at(jetIndexSortedBdisc_jdown[idx]) );
         }
       }
       // looks like all the following variables need jets to be calculated.
@@ -2275,8 +2275,8 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
           StopEvt.Mlb_closestb_lep2 = (jets.ak4pfjets_p4.at(rankminDR_lep2[idx].second)+lep2.p4).M();
           break;
         }
-        if(nVetoLeptons>0) StopEvt.Mlb_lead_bdiscr = (jets.ak4pfjets_p4.at(jetIndexSortedCSV[0])+lep1.p4).M();
-        if(nVetoLeptons>1) StopEvt.Mlb_lead_bdiscr_lep2 = (jets.ak4pfjets_p4.at(jetIndexSortedCSV[0])+lep2.p4).M();
+        if(nVetoLeptons>0) StopEvt.Mlb_lead_bdiscr = (jets.ak4pfjets_p4.at(jetIndexSortedBdisc[0])+lep1.p4).M();
+        if(nVetoLeptons>1) StopEvt.Mlb_lead_bdiscr_lep2 = (jets.ak4pfjets_p4.at(jetIndexSortedBdisc[0])+lep2.p4).M();
         if(rankmaxDPhi.size()>=3) {
           StopEvt.Mjjj = (jets.ak4pfjets_p4.at(rankmaxDPhi[0].second)+jets.ak4pfjets_p4.at(rankmaxDPhi[1].second)+jets.ak4pfjets_p4.at(rankmaxDPhi[2].second)).M();
         }
@@ -2293,7 +2293,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
           StopEvt.Mlb_closestb_jup = (jets_jup.ak4pfjets_p4.at(rankminDR_jup[idx].second)+lep1.p4).M();
           break;
         }
-        if(nVetoLeptons>0) StopEvt.Mlb_lead_bdiscr_jup = (jets_jup.ak4pfjets_p4.at(jetIndexSortedCSV_jup[0])+lep1.p4).M();
+        if(nVetoLeptons>0) StopEvt.Mlb_lead_bdiscr_jup = (jets_jup.ak4pfjets_p4.at(jetIndexSortedBdisc_jup[0])+lep1.p4).M();
       }
       if(jets_jdown.ak4pfjets_p4.size()>0){
         for (unsigned int idx = 0; idx < rankminDR_jdown.size(); ++idx){
@@ -2302,7 +2302,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
           StopEvt.Mlb_closestb_jdown = (jets_jdown.ak4pfjets_p4.at(rankminDR_jdown[idx].second)+lep1.p4).M();
           break;
         }
-        if(nVetoLeptons>0) StopEvt.Mlb_lead_bdiscr_jdown = (jets_jdown.ak4pfjets_p4.at(jetIndexSortedCSV_jdown[0])+lep1.p4).M();
+        if(nVetoLeptons>0) StopEvt.Mlb_lead_bdiscr_jdown = (jets_jdown.ak4pfjets_p4.at(jetIndexSortedBdisc_jdown[0])+lep1.p4).M();
       }
 
       if(fillZll){
@@ -2402,7 +2402,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
             if(jets.ak4pfjets_passMEDbtag.at(oljind)==true) StopEvt.ph_ngoodbtags = jets.ngoodbtags-1;
           }
           vector<LorentzVector> jetsp4_phcleaned; jetsp4_phcleaned.clear();//used
-          vector<float>         jetsCSV_phcleaned; jetsCSV_phcleaned.clear();
+          vector<float>         jetsDeepCSV_phcleaned; jetsDeepCSV_phcleaned.clear();
           vector<bool>          jetsbtag_phcleaned; jetsbtag_phcleaned.clear();
           vector<float>         dummy_sigma_phcleaned; dummy_sigma_phcleaned.clear();//used
           int leadbidx = -1;
@@ -2410,7 +2410,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
           for (unsigned int idx = 0; idx < jets.ak4pfjets_p4.size(); ++idx){
             if((int)idx==oljind) continue;
             jetsp4_phcleaned.push_back(jets.ak4pfjets_p4.at(idx));
-            jetsCSV_phcleaned.push_back(jets.ak4pfjets_CSV.at(idx));
+            jetsDeepCSV_phcleaned.push_back(jets.ak4pfjets_deepCSV.at(idx));
             jetsbtag_phcleaned.push_back(jets.ak4pfjets_passMEDbtag.at(idx));
             dummy_sigma_phcleaned.push_back(dummy_sigma.at(idx));
             htph += jets.ak4pfjets_pt.at(idx);
@@ -2424,10 +2424,10 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
           StopEvt.ph_htosm = htosmph;
           StopEvt.ph_htratiom   = StopEvt.ph_htssm / (StopEvt.ph_htosm + StopEvt.ph_htssm);
           mybjets.clear(); myaddjets.clear();
-          for(unsigned int idx = 0; idx<jetIndexSortedCSV.size(); ++idx){
-            if(jetIndexSortedCSV[idx]==oljind) continue;
-            if(jets.ak4pfjets_passMEDbtag.at(jetIndexSortedCSV[idx])==true) mybjets.push_back(jets.ak4pfjets_p4.at(jetIndexSortedCSV[idx]) );
-            else if(mybjets.size()<=1 && (mybjets.size()+myaddjets.size())<3) myaddjets.push_back(jets.ak4pfjets_p4.at(jetIndexSortedCSV[idx]) );
+          for(unsigned int idx = 0; idx<jetIndexSortedBdisc.size(); ++idx){
+            if(jetIndexSortedBdisc[idx]==oljind) continue;
+            if(jets.ak4pfjets_passMEDbtag.at(jetIndexSortedBdisc[idx])==true) mybjets.push_back(jets.ak4pfjets_p4.at(jetIndexSortedBdisc[idx]) );
+            else if(mybjets.size()<=1 && (mybjets.size()+myaddjets.size())<3) myaddjets.push_back(jets.ak4pfjets_p4.at(jetIndexSortedBdisc[idx]) );
           }
           if(nVetoLeptons>0) {
             StopEvt.ph_mt_met_lep = calculateMt(lep1.p4, StopEvt.ph_met, StopEvt.ph_met_phi);
@@ -2449,8 +2449,8 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
           }//at least two jets
           if(jetsp4_phcleaned.size()>0){
             if(nVetoLeptons>0) {
-              StopEvt.ph_Mlb_lead_bdiscr = (jets.ak4pfjets_p4.at(jetIndexSortedCSV[0])+lep1.p4).M();
-              if(oljind==jetIndexSortedCSV[0]) StopEvt.ph_Mlb_lead_bdiscr = (jets.ak4pfjets_p4.at(jetIndexSortedCSV[1])+lep1.p4).M();//exists as index=0 doesn't count for jetsp4_phcleaned.size()
+              StopEvt.ph_Mlb_lead_bdiscr = (jets.ak4pfjets_p4.at(jetIndexSortedBdisc[0])+lep1.p4).M();
+              if(oljind==jetIndexSortedBdisc[0]) StopEvt.ph_Mlb_lead_bdiscr = (jets.ak4pfjets_p4.at(jetIndexSortedBdisc[1])+lep1.p4).M();//exists as index=0 doesn't count for jetsp4_phcleaned.size()
               if(leadbidx>=0) StopEvt.ph_dR_lep_leadb = dRbetweenVectors(jets.ak4pfjets_p4.at(leadbidx), lep1.p4);
               for (unsigned int idx = 0; idx < rankminDR.size(); ++idx){
                 if(rankminDR[idx].second==oljind) continue;
