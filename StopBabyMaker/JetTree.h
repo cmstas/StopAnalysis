@@ -60,17 +60,6 @@ public:
     int ntightbtags;
     int nanalysisbtags;
     float ak4_HT;
-
-    //int ngoodjets_jup;
-    //int ngoodjets_jdown;
-    //int ngoodbtags_jup;
-    //int ngoodbtags_jdown;
-    //int nloosebtags_jup;
-    //int nloosebtags_jdown;
-    //int ntightbtags_jup;
-    //int ntightbtags_jdown;
-    //int nanalysisbtags_jup;
-    //int nanalysisbtags_jdown;
     
     float ak4_htssm;
     float ak4_htosm;
@@ -144,7 +133,7 @@ public:
     vecd ak8pfjets_pruned_mass;
     vecd ak8pfjets_trimmed_mass;
     vecd ak8pfjets_filtered_mass;
-    vecd ak8pfjets_pu_id;    
+    vecd ak8pfjets_pu_id;
     veci ak8pfjets_parton_flavor;
      
     // genjets    
