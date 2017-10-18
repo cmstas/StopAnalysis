@@ -19,12 +19,12 @@
 #include "MCSelections.h"
 #include "StopSelections.h"
 #include "TriggerSelections.h"
-#include "stop_variables/mt2w.cc"
-#include "stop_variables/mt2w_bisect.cpp"
-#include "stop_variables/chi2.cc"
-#include "stop_variables/JetUtil.cc"
-#include "stop_variables/topness.cc"
-#include "stop_variables/MT2_implementations.cc"
+#include "stop_variables/mt2w.h"
+#include "stop_variables/mt2w_bisect.h"
+#include "stop_variables/chi2.h"
+#include "stop_variables/JetUtil.h"
+#include "stop_variables/topness.h"
+#include "stop_variables/MT2_implementations.h"
 #include "JetCorrector.h"
 #include "Tools/datasetinfo/getDatasetInfo.h"
 //#include "btagsf/BTagCalibrationStandalone.h"
@@ -826,7 +826,6 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
   // Set scale1fb file
   //
   DatasetInfoFromFile df;
-  df.loadFromFile("scale1fbfiles/scale1fbs.txt");
 
   //
   // JEC files
@@ -1698,7 +1697,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
       StopEvt.weight_lepSF      = lepSF;
       StopEvt.weight_lepSF_up   = lepSF_Up;
       StopEvt.weight_lepSF_down = lepSF_Dn;
-      if(lepSF==0) cout << "FUCK" << endl;
+      if(lepSF==0) cout << "LepSF is 0!" << endl;
 
       StopEvt.weight_vetoLepSF      = vetoLepSF;
       StopEvt.weight_vetoLepSF_up   = vetoLepSF_Up;
