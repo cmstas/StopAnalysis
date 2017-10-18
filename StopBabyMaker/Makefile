@@ -90,5 +90,4 @@ clean:
 	runBabyMaker \
 	LinkDef.cc \
 	LinkDef_rdict.pcm \
-	*.o *.d *.so \
-	echo "Done"
+	*.o *.d *.so
