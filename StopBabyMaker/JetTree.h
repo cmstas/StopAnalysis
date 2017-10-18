@@ -136,6 +136,7 @@ public:
     vecd ak8pfjets_pruned_mass;
     vecd ak8pfjets_trimmed_mass;
     vecd ak8pfjets_filtered_mass;
+    vecd ak8pfjets_softdrop_mass;
     vecd ak8pfjets_pu_id;
     veci ak8pfjets_parton_flavor;
      

@@ -313,9 +313,10 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx, Factorize
         ak4pfjets_phi.push_back(p4sCorrJets.at(jindex).phi());
         ak4pfjets_mass.push_back(p4sCorrJets.at(jindex).mass());
 
+        float value_deepCSV = getbtagvalue(deepCSV_prefix+"JetTags:probb",jindex) + getbtagvalue(deepCSV_prefix+"JetTags:probbb",jindex);
         dphi_ak4pfjet_met.push_back(getdphi(p4sCorrJets.at(jindex).phi(), evt_pfmetPhi()));//this can be false - due to correction to pfmet, but it gets corrected later
         ak4pfjets_CSV.push_back(pfjets_pfCombinedInclusiveSecondaryVertexV2BJetTag().at(jindex));
-        ak4pfjets_deepCSV.push_back(getbtagvalue("pfCombinedInclusiveSecondaryVertexV2BJetTags", jindex));
+        ak4pfjets_deepCSV.push_back(value_deepCSV);
         ak4pfjets_mva.push_back(getbtagvalue("pfCombinedMVAV2BJetTags", jindex));
         ak4pfjets_puid.push_back(loosePileupJetId(jindex));
         ak4pfjets_parton_flavor.push_back(pfjets_partonFlavour().at(jindex));
@@ -403,7 +404,7 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx, Factorize
 	  }
 	}	
 	//medium btag
-	if( getbtagvalue(deepCSV_prefix+"JetTags:probb",jindex) + getbtagvalue(deepCSV_prefix+"JetTags:probbb",jindex) > BTAG_MED ) {
+	if (value_deepCSV > BTAG_MED) {
              ak4pfjets_passMEDbtag.push_back(true);
              nbtags_med++;
              if(nbtags_med == 1){
@@ -456,12 +457,12 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx, Factorize
 	      }
            }
         }//finish medium
-        if(getbtagvalue(deepCSV_prefix+"JetTags:probb",jindex) + getbtagvalue(deepCSV_prefix+"JetTags:probbb",jindex) > btagdisc) {
-          btagdisc = getbtagvalue(deepCSV_prefix+"JetTags:probb",jindex) + getbtagvalue(deepCSV_prefix+"JetTags:probbb",jindex);
+        if (value_deepCSV > btagdisc) {
+          btagdisc = value_deepCSV;
 	  leadbtag_idx = jindex;
 	}
 	//loose btag
-	if(getbtagvalue(deepCSV_prefix+"JetTags:probb",jindex) + getbtagvalue(deepCSV_prefix+"JetTags:probbb",jindex) > BTAG_LSE) {
+	if (value_deepCSV > BTAG_LSE) {
              nbtags_loose++;
               if (!evt_isRealData()&&applyBtagSFs) {
                 loosebtagprob_data *= weight_loose_cent * effloose;
@@ -504,7 +505,7 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx, Factorize
            }
         }//finish loose
 	//tight btag
-	if(getbtagvalue(deepCSV_prefix+"JetTags:probb",jindex) + getbtagvalue(deepCSV_prefix+"JetTags:probbb",jindex) > BTAG_TGT) {
+	if (value_deepCSV > BTAG_TGT) {
              nbtags_tight++;
               if (!evt_isRealData()&&applyBtagSFs) {
                 tightbtagprob_data *= weight_tight_cent * efftight;
@@ -624,12 +625,14 @@ void JetTree::FillAK8Jets(bool applynewcorr, FactorizedJetCorrector* corrector, 
     ak8pfjets_tau2.push_back(ak8jets_nJettinessTau2().at(idx));
     ak8pfjets_tau3.push_back(ak8jets_nJettinessTau3().at(idx));
     ak8pfjets_pruned_mass.push_back(ak8jets_prunedMass().at(idx));
+    ak8pfjets_softdrop_mass.push_back(ak8jets_softdropMass().at(idx));
     ak8pfjets_parton_flavor.push_back(ak8jets_partonFlavour().at(idx));
 
     // Branches no longer in cms4
     // ak8pfjets_top_mass.push_back(ak8jets_topJetMass().at(idx));
     // ak8pfjets_trimmed_mass.push_back(ak8jets_trimmedMass().at(idx));
     // ak8pfjets_filtered_mass.push_back(ak8jets_filteredMass().at(idx));
+
     // ak8pfjets_pu_id.push_back(ak8jets_pileupJetId().at(idx));
   }
 
@@ -822,6 +825,7 @@ void JetTree::SetAK8Branches (TTree* tree)
     tree->Branch(Form("%sak8pfjets_pruned_mass", prefix_.c_str()) , &ak8pfjets_pruned_mass);
     tree->Branch(Form("%sak8pfjets_trimmed_mass", prefix_.c_str()) , &ak8pfjets_trimmed_mass);
     tree->Branch(Form("%sak8pfjets_filtered_mass", prefix_.c_str()) , &ak8pfjets_filtered_mass);
+    tree->Branch(Form("%sak8pfjets_softdrop_mass", prefix_.c_str()) , &ak8pfjets_softdrop_mass);
     tree->Branch(Form("%sak8pfjets_pu_id", prefix_.c_str()) , &ak8pfjets_pu_id);    
     tree->Branch(Form("%sak8pfjets_parton_flavor", prefix_.c_str()) , &ak8pfjets_parton_flavor);
     tree->Branch(Form("%sak8GoodPFJets", prefix_.c_str()) , &ak8GoodPFJets);  
