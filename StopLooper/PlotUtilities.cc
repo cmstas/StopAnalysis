@@ -661,8 +661,9 @@ void plot3D(string name, float xval, float yval, float zval, double weight, std:
 // -- New functions --
 // -------------------
 
-template<typename... Ts>
-void plot1d(string name, float xval, double weight, map<string, TH1*> &allhistos, Ts... args) {
+template<typename... TArgs>
+void plot1d(string name, float xval, double weight, map<string, TH1*> &allhistos, TArgs... args)
+{
   auto iter = allhistos.find(name);
   if (iter == allhistos.end()) {
     TH1D* currentHisto= new TH1D(name.c_str(), args...);
@@ -670,6 +671,21 @@ void plot1d(string name, float xval, double weight, map<string, TH1*> &allhistos
     currentHisto->Fill(xval, weight);
     allhistos.insert( pair<string, TH1D*>(name, currentHisto) );
   } else {
-    (*iter).second->Fill(xval, weight);
+    iter->second->Fill(xval, weight);
   }
 }
+
+template<typename... TArgs>
+void plot2d(string name, float xval, float yval, double weight, map<string, TH1*> &allhistos, TArgs... args)
+{
+  auto iter = allhistos.find(name);
+  if (iter == allhistos.end()) {
+    TH2D* currentHisto= new TH2D(name.c_str(), args...);
+    currentHisto->Sumw2();
+    currentHisto->Fill(xval, yval, weight);
+    allhistos.insert( pair<string, TH2D*>(name, currentHisto) );
+  } else {
+    ((TH2D*) iter->second)->Fill(xval, yval, weight);
+  }
+}
+
