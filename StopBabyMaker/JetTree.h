@@ -145,6 +145,7 @@ public:
     vecLorentzVector ak4genjets_p4;    
  
     // top tagger
+    bool doResolveTopMVA;
     ResolvedTopMVA* resTopMVA;
     std::vector<TopCand> resMVATopCands;
 

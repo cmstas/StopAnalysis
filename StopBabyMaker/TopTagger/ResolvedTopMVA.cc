@@ -17,9 +17,9 @@ std::map<TString, float> TopCand::calcTopCandVars() {
   vars["var_b_pt"]         = pfjets_p4().at(ib_).pt();
   vars["var_b_mass"]       = pfjets_p4().at(ib_).mass();
   vars["var_b_csv"]        = pfjets_pfCombinedInclusiveSecondaryVertexV2BJetTag().at(ib_);
-  vars["var_b_ptD"]        = pfjets_ptDistribution().at(ib_);
-  vars["var_b_axis1"]      = pfjets_axis1().at(ib_);
-  vars["var_b_mult"]       = pfjets_totalMultiplicity().at(ib_);
+  // vars["var_b_ptD"]        = pfjets_ptDistribution().at(ib_);
+  // vars["var_b_axis1"]      = pfjets_axis1().at(ib_);
+  // vars["var_b_mult"]       = pfjets_totalMultiplicity().at(ib_);
 
   vars["var_j2_pt"]        = pfjets_p4().at(ij2_).pt();
   vars["var_j2_mass"]      = pfjets_p4().at(ij2_).mass();
@@ -41,13 +41,14 @@ std::map<TString, float> TopCand::calcTopCandVars() {
   vars["var_topcand_ptDR"] = topcand.pt() * ROOT::Math::VectorUtil::DeltaR(pfjets_p4().at(ib_), wcand);
 
   vars["var_wcand_mass"]   = wcand.mass();
-  vars["var_wcand_ptDR"]   = wcand.pt() * ROOT::Math::VectorUtil::DeltaR(pfjets_p4().at(ij2_), pfjets_p4().at(ij3_));
+  vars["var_wcand_deltaR"] = ROOT::Math::VectorUtil::DeltaR(pfjets_p4().at(ij2_), pfjets_p4().at(ij3_));
+  vars["var_wcand_ptDR"]   = wcand.pt() * vars["var_wcand_deltaR"];
 
   vars["var_sd_0"]         = pfjets_p4().at(ij3_).pt() / (pfjets_p4().at(ij2_).pt() + pfjets_p4().at(ij3_).pt());
   vars["var_sd_n2"]        = vars.at("var_sd_0") / std::pow(vars.at("var_wcand_deltaR"), -2);
 
   vars["var_b_j2_mass"]    = (pfjets_p4().at(ib_) + pfjets_p4().at(ij2_)).mass();
-  vars["var_b_j2_mass"]    = (pfjets_p4().at(ib_) + pfjets_p4().at(ij3_)).mass();
+  vars["var_b_j3_mass"]    = (pfjets_p4().at(ib_) + pfjets_p4().at(ij3_)).mass();
 
   // vars["var_b_qgl"]        = topcand->b->qgl();
   // vars["var_b_cvsb"]       = topcand->b->cvsb();

@@ -5,14 +5,15 @@
 
 using namespace tas;
  
-const bool doResolveTopMVA = true;
-
-JetTree::JetTree() {
-  if (doResolveTopMVA) resTopMVA = new ResolvedTopMVA("TopTagger/resTop_xGBoost_v0.weights.xml", "BDT");
+JetTree::JetTree() : doResolveTopMVA(true) {
+  resTopMVA = new ResolvedTopMVA("TopTagger/resTop_xGBoost_v0.weights.xml", "BDT");
 }
 
-JetTree::JetTree(const std::string &prefix) : JetTree() {
-  prefix_ = prefix;
+JetTree::JetTree(const std::string &prefix) : prefix_(prefix), doResolveTopMVA(false) {
+  if (prefix == ""){
+    JetTree();
+    doResolveTopMVA = true;
+  }
 }
 
 void JetTree::InitBtagSFTool(bool isFastsim_) {
