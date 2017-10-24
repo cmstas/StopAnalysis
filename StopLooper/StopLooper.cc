@@ -134,7 +134,7 @@ void StopLooper::GenerateAllSRptrSets() {
   // allSRptrSets = generateSRptrSet(all_SRptrs);
 }
 
-void StopLooper::looper(TChain* chain, sampleInfo::sampleUtil sample, string samplestr, string output_dir) {
+void StopLooper::looper(TChain* chain, string samplestr, string output_dir) {
 
   // Benchmark
   TBenchmark *bmark = new TBenchmark();
@@ -180,6 +180,7 @@ void StopLooper::looper(TChain* chain, sampleInfo::sampleUtil sample, string sam
 
   is2016data = (samplestr.find("data_2016") == 0);
 
+  sampleInfo::sampleUtil sample;
   // Setup event weight calculation
   sysInfo::evtWgtInfo wgtInfo;
   wgtInfo.setUp( samp_info.id );

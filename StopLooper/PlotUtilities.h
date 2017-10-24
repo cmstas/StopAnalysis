@@ -67,8 +67,11 @@ void savePlots2Dir(std::map<string, TH2D*>& h_2d, TFile* outfile, const char* ou
 void savePlots12(std::map<string, TH1D*>&, std::map<string, TH2D*>&, const char* );
 
 // New functions
-template<typename... Ts>
-void plot1d(string name, float xval, double weight, map<string, TH1*> &allhistos, Ts... args)
+template<typename... TArgs>
+void plot1d(string name, float xval, double weight, map<string, TH1*> &allhistos, TArgs... args);
+
+template<typename... TArgs>
+void plot2d(string name, float xval, float yval, double weight, map<string, TH1*> &allhistos, TArgs... args);
 
 #endif
 
