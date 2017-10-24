@@ -8,6 +8,7 @@
 #include "StopSelections.h"
 #include "btagsf/BTagCalibrationStandalone.h"
 #include "TH2.h" 
+#include "TopTagger/ResolvedTopMVA.h"
 // forward declarations
 class TTree;
  
@@ -143,6 +144,10 @@ public:
     // genjets    
     vecLorentzVector ak4genjets_p4;    
  
+    // top tagger
+    ResolvedTopMVA* resTopMVA;
+    std::vector<TopCand> resMVATopCands;
+
 private:
     float m_ak4_pt_cut;
     float m_ak8_pt_cut;
