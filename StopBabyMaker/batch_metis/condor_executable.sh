@@ -31,7 +31,7 @@ popd > /dev/null
 
 # The output name is the sample name for stop baby
 SAMPLE_NAME=$OUTPUTNAME
-NEVENTS=1000                    # for test
+NEVENTS=-1
 ISFASTSIM=0
 # if [ ! -z ${EXE_ARGS[1]} ]; then
 #   ISFASTSIM=${EXE_ARGS[1]}
