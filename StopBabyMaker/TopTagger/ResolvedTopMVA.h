@@ -17,11 +17,17 @@
 
 class TopCand {
  public:
-  TopCand() {}
-  TopCand(const size_t ib, const size_t ij2, const size_t ij3) : disc(-1), ib_(ib), ij2_(ij2), ij3_(ij3) {
-    wcand = cms3.pfjets_p4().at(ij2) + cms3.pfjets_p4().at(ij3);
-    topcand = cms3.pfjets_p4().at(ib) + wcand;
+  TopCand() = delete;
+  TopCand(const size_t inb, const size_t inj2, const size_t inj3, const std::vector<LorentzVector>* jetp4vec)
+      : disc(-1), ib_(inb), ij2_(inj2), ij3_(inj3)
+  {
+    wcand = jetp4vec->at(ij2_) + jetp4vec->at(ij3_);
+    topcand = jetp4vec->at(ib_) + wcand;
   }
+
+  int getIdxForb()  const { return ib_; }
+  int getIdxForj2() const { return ij2_; }
+  int getIdxForj3() const { return ij3_; }
 
   bool passMassW(double range=40)   const { return std::abs(wcand.mass()-80)    <= range; }
   bool passMassTop(double range=80) const { return std::abs(topcand.mass()-175) <= range; }
@@ -31,14 +37,11 @@ class TopCand {
             ij2_==c.ij3_ || ij3_==c.ib_ || ij3_==c.ij2_ || ij3_==c.ij3_);
   }
 
-  std::map<TString,float> calcTopCandVars();
-
   LorentzVector wcand;
   LorentzVector topcand;
-
   double disc;
 
-  friend std::ostream &operator<<(std::ostream &os, const TopCand &c);
+  friend class ResolvedTopMVA;
 
  private:
   size_t ib_;
@@ -56,7 +59,19 @@ class ResolvedTopMVA {
   static constexpr double WP_LOOSE  = 0.83;
   static constexpr double WP_MEDIUM = 0.98;
   static constexpr double WP_TIGHT  = 0.99;
+
+  std::map<TString,float> calcTopCandVars(const TopCand& topjet);
   std::vector<TopCand> getTopCandidates(const double WP=WP_TIGHT);
+
+  void setJetVecPtrs(std::vector<LorentzVector>* p4vec, std::vector<float>* csvvec, std::vector<float>* cvslvec,
+                     std::vector<float>* ptDvec, std::vector<float>* axis1vec, std::vector<int>* multvec);
+
+  std::vector<LorentzVector>* p4vec;
+  std::vector<float>* csvvec;
+  std::vector<float>* cvslvec;
+  std::vector<float>* ptDvec;
+  std::vector<float>* axis1vec;
+  std::vector<int>* multvec;
 
  private:
   void initTopMVA();
