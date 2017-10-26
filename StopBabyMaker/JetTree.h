@@ -26,7 +26,7 @@ public:
     // constructor/destructor
     JetTree ();
     JetTree (const std::string &prefix);
-    virtual ~JetTree () {}
+    virtual ~JetTree ();
  
     void Reset ();
     void deleteBtagSFTool();
@@ -36,6 +36,7 @@ public:
     void SetAK4Branches_EF(TTree* tree);
     void SetAK4Branches_SynchTools (TTree* tree);
     void SetAK4Branches_Overleps (TTree* tree);
+    void SetAK4Branches_TopTag (TTree* tree);
     void SetAK8Branches (TTree* tree);
     void SetAK4Branches (TTree* tree);
     void SetAliases (TTree* tree);
@@ -54,7 +55,7 @@ public:
     // ak4 PF jets
     int ngoodjets;
     int nfailjets; //jets not passing loose jid
-    int ak8GoodPFJets;
+    int nGoodAK8PFJets;
     int nGoodGenJets;
     int ngoodbtags;
     int nloosebtags;
@@ -89,6 +90,11 @@ public:
     float ak4pfjets_leadMEDbjet_pt;
     vecd ak4pfjets_MEDbjet_pt;
     LorentzVector ak4pfjets_leadbtag_p4;
+
+    vecd ak4pfjets_cvsl;
+    vecd ak4pfjets_ptD;
+    vecd ak4pfjets_axis1;
+    veci ak4pfjets_mult;
 
     vecd ak4pfjets_chf;       
     vecd ak4pfjets_nhf;
@@ -147,7 +153,10 @@ public:
     // top tagger
     bool doResolveTopMVA;
     ResolvedTopMVA* resTopMVA;
-    std::vector<TopCand> resMVATopCands;
+    vecii topcands_ak4idx;
+    vecd topcands_disc;
+    vecLorentzVector topcands_p4;
+    vecLorentzVector topcands_Wp4;
 
 private:
     float m_ak4_pt_cut;
