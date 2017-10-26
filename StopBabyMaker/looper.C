@@ -151,6 +151,11 @@ void babyMaker::MakeBabyNtuple(const char* output_name){
     jets_jup.SetAK8Branches(BabyTree);
     jets_jdown.SetAK8Branches(BabyTree);
   }
+  if(fillTopTag){
+    jets.SetAK4Branches_TopTag(BabyTree);
+    // jets_jup.SetAK8Branches(BabyTree);
+    // jets_jdown.SetAK8Branches(BabyTree);
+  }
 
   if(filltaus)  Taus.SetBranches(BabyTree);
   if(filltracks)  Tracks.SetBranches(BabyTree);
