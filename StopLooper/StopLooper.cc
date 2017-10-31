@@ -41,7 +41,6 @@ using namespace stop_1l;
 using namespace selectionInfo;
 
 class SR;
-extern stop_1l_babyAnalyzer babyAnalyzer;
 
 const bool verbose = true;
 // turn on to apply weights to central value
@@ -65,7 +64,7 @@ const bool applyISRWeights = true;
 // turn on to enable plots of MT2 with systematic variations applied. will only do variations for applied weights
 const bool doSystVariationPlots = true;
 // turn on to apply Nvtx reweighting to MC / data2016
-const bool doNvtxReweight = true;
+const bool doNvtxReweight = false;
 // turn on to apply nTrueInt reweighting to MC
 const bool doNTrueIntReweight = true;
 // turn on to apply json file to data
@@ -156,13 +155,14 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir) {
   // Combined 2016 and 2017 json,
   // const char* json_file = "../StopCORE/inputs/json_files/Cert_271036-301141_13TeV_Combined1617_JSON_snt.txt";
   const char* json_file = "../StopCORE/inputs/json_files/Cert_271036-300575_13TeV_Combined1617_JSON_snt.txt";
-  const float kLumi = 35.87;
+  // const float kLumi = 35.87;
 
   // Setup pileup re-weighting
   if (doNvtxReweight) {
     TFile f_purw("/home/users/sicheng/working/StopAnalysis/AnalyzeScripts/pu_reweighting_hists/nvtx_reweighting_alldata.root");
     TH1F* h_nvtxscale = (TH1F*) f_purw.Get("h_nvtxscale_16to17");
     if (!h_nvtxscale) throw invalid_argument("???");
+    cout << "Doing nvtx reweighting! The scale factors are:" << endl;
     for (int i = 1; i < 70; ++i) {
       nvtxscale[i] = h_nvtxscale->GetBinContent(i);
       cout << i << "  " << nvtxscale[i] << endl;
@@ -180,10 +180,10 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir) {
 
   is2016data = (samplestr.find("data_2016") == 0);
 
-  sampleInfo::sampleUtil sample;
+  sampleInfo::sampleUtil sample(sampleInfo::ID::k_ttbar);
   // Setup event weight calculation
   sysInfo::evtWgtInfo wgtInfo;
-  wgtInfo.setUp( samp_info.id );
+  wgtInfo.setUp( sample.id );
   // wgtInfo.setUp( sample.id, useBTagSFs_fromFiles_, useLepSFs_fromFiles_, add2ndLepToMet_ );
   // wgtInfo.apply_cr2lTrigger_sf  = (apply_cr2lTrigger_sf_ && add2ndLepToMet_);
   // wgtInfo.apply_bTag_sf         = apply_bTag_sf_;
@@ -218,7 +218,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir) {
     babyAnalyzer.Init(tree);
 
     // Get weight histogram from baby
-    wgtInfo.getWeightHistogramFromBaby(file);
+    wgtInfo.getWeightHistogramFromBaby(&file);
 
     dummy.cd();
     // Loop over Events in current file
@@ -233,8 +233,8 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir) {
 
       if ( is_data() ) {
         if ( applyjson && !goodrun(run(), ls()) ) continue;
-	duplicate_removal::DorkyEventIdentifier id(run(), evt(), ls());
-	if ( is_duplicate(id) ) {
+        duplicate_removal::DorkyEventIdentifier id(run(), evt(), ls());
+        if ( is_duplicate(id) ) {
           ++nDuplicates;
           continue;
         }
@@ -268,10 +268,10 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir) {
       sysInfo::ID sysID = sysInfo::ID::k_nominal; // temporary for testing
       if (isCorridor)
         evtweight_ = sysInfo::GetEventWeight_corridor( sysID );
-      else if ( useTightTagHighMlb && useMetTTbarWgts )
-        evtweight_ = sysInfo::GetEventWeight_SRbulk( sysID );
-      else if ( useTightTagHighMlb && !useMetTTbarWgts )
-        evtweight_ = sysInfo::GetEventWeight_CR2lbulk( sysID );
+      // else if ( useTightTagHighMlb && useMetTTbarWgts )
+      //   evtweight_ = sysInfo::GetEventWeight_SRbulk( sysID );
+      // else if ( useTightTagHighMlb && !useMetTTbarWgts )
+      //   evtweight_ = sysInfo::GetEventWeight_CR2lbulk( sysID );
       else
         evtweight_ = sysInfo::GetEventWeight( sysID );
 
@@ -301,7 +301,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir) {
       // LorentzVector lep1lep2bb_TLV(0.0,0.0,0.0,0.0);
       // lep1lep2bb_TLV += lep1_p4();
       // if (nvetoleps() > 1) lep1lep2bb_TLV += lep2_p4();
-      
+
       // int jet1_idx = -1;
       // double max_csv = -99.9;
       // for (int iJet=0; iJet<(int)ak4pfjets_p4().size(); iJet++) {
@@ -311,7 +311,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir) {
       //   }
       // }
       // if (jet1_idx >= 0) lep1lep2bb_TLV += ak4pfjets_p4().at(jet1_idx);
-      
+
       // int jet2_idx = -1;
       // max_csv = -99.9;
       // for (int iJet=0; iJet<(int)ak4pfjets_p4().size(); iJet++) {
@@ -322,7 +322,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir) {
       //   }
       // }
       // if(jet2_idx>=0) lep1lep2bb_TLV += ak4pfjets_p4().at(jet2_idx);
-      
+
       // // Calculate p4 of (lep1 lep2 b b MET) system
       // double lep1lep2bbMet_pt = -99.9;
       // LorentzVector lep1lep2bbMet_TLV = lep1lep2bb_TLV;
@@ -345,6 +345,8 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir) {
       //   } // end loop over jets
       //   if(minBJetIdx>=0) lep2b_TLV += ak4pfjets_p4().at(minBJetIdx);
       // } // end if nvetoleps>1
+
+      testTopTaggingEffficiency();
 
 
       // Fill the variables
@@ -396,7 +398,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir) {
       // Filling histograms
       // fillHistosForSR();
 
-      fillHistosForCR0b();
+      // fillHistosForCR0b();
 
       values_["nlep_rl"] = (ngoodleps() == 1 && nvetoleps() >= 2 && lep2_p4().Pt() > 10)? 2 : ngoodleps();
       values_["mt_rl"] = mt_met_lep_rl();
@@ -408,8 +410,8 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir) {
       values_["mll"] = (lep1_p4() + lep2_p4()).M();
       values_["osdilep"] = lep1_pdgid() == -lep2_pdgid();
 
-      fillHistosForCR2l();
-      fillHistosForCRemu();
+      // fillHistosForCR2l();
+      // fillHistosForCRemu();
 
       // if (event > 10) break;  // for debugging purpose
     } // end of event loop
@@ -444,6 +446,23 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir) {
 
   wgtInfo.cleanUp();            // why do we need this?
 
+  auto writeRatioHists = [&] (const SR& sr) {
+    for (const auto& h : sr.histMap) {
+      if (h.first.find("hnom") != 0) continue;
+      string hname = h.first;
+      hname.erase(0, 4);
+      dummy.cd();
+      TH1F* h_ratio = (TH1F*) h.second->Clone(("ratio"+hname).c_str());
+      h_ratio->Divide(h_ratio, sr.histMap.at("hden"+hname), 1, 1, "B");
+
+      TDirectory * dir = (TDirectory*) outfile_->Get(sr.GetName().c_str());
+      if (dir == 0) dir = outfile_->mkdir(sr.GetName().c_str()); // shouldn't happen
+      dir->cd();
+      h_ratio->Write();
+    }
+  };
+  writeRatioHists(SRVec[0]);
+
   outfile_->Write();
   outfile_->Close();
 
@@ -452,8 +471,8 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir) {
   cout << nEventsTotal << " Events Processed, where " << nDuplicates << " duplicates were skipped, and ";
   cout << nPassedTotal << " Events passed all selections." << endl;
   cout << "------------------------------" << endl;
-  cout << "CPU  Time:	" << Form( "%.01f s", bmark->GetCpuTime("benchmark")  ) << endl;
-  cout << "Real Time:	" << Form( "%.01f s", bmark->GetRealTime("benchmark") ) << endl;
+  cout << "CPU  Time:   " << Form( "%.01f s", bmark->GetCpuTime("benchmark")  ) << endl;
+  cout << "Real Time:   " << Form( "%.01f s", bmark->GetRealTime("benchmark") ) << endl;
   cout << endl;
   delete bmark;
 
@@ -656,4 +675,103 @@ void StopLooper::fillHistosForCR0b(string suf) {
 
     }
   }
+}
+
+void StopLooper::testTopTaggingEffficiency(string suf) {
+  // Function to test the top tagging efficiencies and miss-tag rate
+  // The current tagger only works for hadronically decay tops
+
+  // First need to determine how many gen tops does hadronic decay
+  int nHadDecayTops = 2 - gen_nfromtleps_();  // 2 gentops for sure <-- checked
+  
+  int ntopcands = topcands_disc().size();
+  // Divide the events into tt->1l and tt->2l
+  // For tt->1l, test:
+  // 1. Raw nTopCand / all evts 2. Raw nTopCand / calculable <-- should be 1 
+  // 3. has TopCand.disc > 0 / all events 4. has TopCand.disc > 0 / raw TopCand > 0
+  // 5. count 2D vecTopCand.size(), TopCand.disc
+  if (nHadDecayTops == 1) {
+    int calculable = (ngoodbtags() > 0 && ngoodjets() > 2);
+    calculable += (ngoodjets() > 3);
+    float ratio_ntcandvscalable;
+    if (calculable != 0) ratio_ntcandvscalable = (float) topcands_disc().size() / calculable;
+    else ratio_ntcandvscalable = (ntopcands == 0)? -1/12 : 2.5;
+    plot1D("h_ratio_ntcandvscalable", ratio_ntcandvscalable, evtweight_, SRVec[0].histMap, ";N(topcand)", 7, -0.5, 3);
+
+    plot1D("h_ntopcand_raw", ntopcands, evtweight_, SRVec[0].histMap, ";N(topcand)", 4, 0, 4);
+    plot1D("h_calculable", calculable, evtweight_, SRVec[0].histMap, ";N(topcand)", 4, 0, 4);
+    int ntopcand0 = 0;
+    int ntopcandp5 = 0;
+    int ntopcandp9 = 0;
+    for (float disc : topcands_disc()) {
+      plot1D("h_topcand_disc", disc, evtweight_, SRVec[0].histMap, ";discriminator", 110, -1.1, 1.1);
+      if (disc > 0) ntopcand0++;
+      if (disc > 0.5) ntopcandp5++;
+      if (disc > 0.9) ntopcandp9++;
+    }
+    plot1D("h_ntopcandp9", ntopcandp9, evtweight_, SRVec[0].histMap, ";N(topcand)", 4, 0, 4);
+    plot2D("h2d_ntopcand0", ntopcands, ntopcand0, evtweight_, SRVec[0].histMap, ";N(all topcand);N(disc > 0)", 4, 0, 4, 4, 0, 4);
+    plot2D("h2d_ntopcandp5", ntopcands, ntopcandp5, evtweight_, SRVec[0].histMap, ";N(all topcand);N(disc > 0.5)", 4, 0, 4, 4, 0, 4);
+    plot2D("h2d_ntopcandp9", ntopcands, ntopcandp9, evtweight_, SRVec[0].histMap, ";N(all topcand);N(disc > 0.5)", 4, 0, 4, 4, 0, 4);
+
+    // Find the daughters of the hadronically decayed top
+
+    if (ntopcand0 == 1) {
+      bool isActualTopJet = true;
+      vector<int> jidxs = topcands_ak4idx().at(0);
+      vector<int> midxs;
+      plot1D("hden_disc", topcands_disc().at(0), evtweight_, SRVec[0].histMap, ";discriminator", 110, -1.1, 1.1);
+      plot1D("hden_pt", topcands_p4().at(0).pt(), evtweight_, SRVec[0].histMap, ";discriminator", 150, 0, 1500);
+
+      for (int j = 0; j < 3; ++j) {
+        int nMatchedGenqs = 0;
+        int genqidx = -1;
+        float minDR = 0.4;
+        for (size_t i = 0; i < genqs_id().size(); ++i) {
+          if (genqs_status().at(i) != 23 && genqs_status().at(i) != 1) continue;
+          float dr = ROOT::Math::VectorUtil::DeltaR(ak4pfjets_p4().at(jidxs[j]), genqs_p4().at(i));
+          if (dr > minDR) continue;
+          nMatchedGenqs++;
+          genqidx = i;
+          minDR = dr;
+        }
+        plot1D("h_nMatchedGenqs", nMatchedGenqs, evtweight_, SRVec[0].histMap, ";nMatchedGenqs", 4, 0, 4);
+        if (nMatchedGenqs < 1) {
+          isActualTopJet = false;
+          break;
+        }
+        plot1D("h_jqminDR", minDR, evtweight_, SRVec[0].histMap, ";min(#Delta R)", 41, 0, 0.41);
+        if (!genqs_isfromt().at(genqidx)) {
+          isActualTopJet = false;
+          break;
+        }
+        if (abs(genqs_id().at(genqidx)) == 5 && abs(genqs_motherid().at(genqidx)) == 6) {
+          int leptonictopidx = -1;
+          for (size_t l = 0; l < genleps_id().size(); ++l) {
+            if (genleps_isfromt().at(l)) {
+              leptonictopidx = genleps_gmotheridx().at(l);
+              break;
+            }
+          }
+          if (leptonictopidx > 0 && leptonictopidx != genqs_motheridx().at(genqidx)) {
+            midxs.push_back(genqidx);
+          } else {
+            isActualTopJet = false;
+            break;
+          }
+        }
+        else if (abs(genqs_motherid().at(genqidx)) == 24) {
+          midxs.push_back(genqidx);
+        }
+      }
+      if (midxs.size() != 3) isActualTopJet = false;
+      if (isActualTopJet) {
+        plot1D("hnom_disc", topcands_disc().at(0), evtweight_, SRVec[0].histMap, ";topcand discriminator", 110, -1.1, 1.1);
+        plot1D("hnom_pt", topcands_p4().at(0).pt(), evtweight_, SRVec[0].histMap, ";topcand pt", 150, 0, 1500);
+      }
+
+    }
+
+  }
+
 }

@@ -31,9 +31,7 @@ CXXFLAGS       += -I$(TOOLSPATH)
 CXXFLAGS       += -I$(DORKYPATH)
 
 CORELIB        = $(COREPATH)/CMS3_CORE.so
-STOPVARLIB     = ../StopBabyMaker/stop_variables/StopVariables.so
-
-
+STOPVARLIB     = ../StopBabyMaker/StopVariables.so
 
 stopCORE.so: sysInfo.o eventWeight_bTagSF.o eventWeight_lepSF.o selectionInfo.o categoryInfo.o genClassyInfo.o sampleInfo.o stop_1l_babyAnalyzer.o 
 	$(LD) $(LDFLAGS) $(SOFLAGS) -o stopCORE.so sysInfo.o eventWeight_bTagSF.o eventWeight_lepSF.o selectionInfo.o categoryInfo.o genClassyInfo.o sampleInfo.o stop_1l_babyAnalyzer.o $(GLIBS) -lGenVector -lEG $(CORELIB) $(STOPVARLIB) -Wl,-rpath,./
@@ -70,6 +68,6 @@ stop_1l_babyAnalyzer.o: stop_1l_babyAnalyzer.cc stop_1l_babyAnalyzer.h
 	$(CXX) $(CXXFLAGS) -c stop_1l_babyAnalyzer.cc
 
 .PHONY: clean
-clean:  
+clean:
 	rm -v -f \
 	*.o *.d *.so *.pcm *~; echo "Done"
