@@ -10,11 +10,9 @@ JetTree::JetTree() : doResolveTopMVA(true) {
   resTopMVA = new ResolvedTopMVA("TopTagger/resTop_xGBoost_v0.weights.xml", "BDT");
 }
 
-JetTree::JetTree(const std::string &prefix) : prefix_(prefix), doResolveTopMVA(false) {
-  if (prefix == "") {
-    JetTree();
-    doResolveTopMVA = true;
-  }
+JetTree::JetTree(const std::string &prefix) : prefix_(prefix), doResolveTopMVA(true) {
+  cout << __FILE__ << ':' << __LINE__ << ": prefix_= " << prefix_ << endl;
+  resTopMVA = new ResolvedTopMVA("TopTagger/resTop_xGBoost_v0.weights.xml", "BDT");
 }
 
 JetTree::~JetTree () {

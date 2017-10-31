@@ -6,7 +6,7 @@
 #include "SR.h"
 
 class StopLooper {
-public:
+ public:
   StopLooper() : evtweight_(1.) {}
   ~StopLooper() {}
 
@@ -20,11 +20,14 @@ public:
   void fillHistosForCR0b(std::string suffix = "");
   void fillHistosForCRemu(std::string suffix = "");
 
+  // Testing
+  void testTopTaggingEffficiency(std::string suffix = "");
+
   // Under development
   std::vector<SR*> FindSR(std::map<std::string,float>& values);
   void newFillHistosForCR(std::string suffix = "");
 
-protected:
+ protected:
   std::vector<SR> SRVec;
   std::vector<SR> CR2lVec;
   std::vector<SR> CR0bVec;
@@ -33,7 +36,7 @@ protected:
   // Under development
   std::map<std::string,SRptrSet> allSRptrSets;
 
-private:
+ private:
   // Global variable
   TFile* outfile_;
 

@@ -29,7 +29,7 @@ if __name__ == "__main__":
     task = CondorTask(
             sample = SNTSample(dataset=dataset_names[0]),
             files_per_output = 1,
-            tag = "v25",
+            tag = "v25_2",
             output_name = "TTJets_V07_test.root",
             executable = "condor_executable.sh",
             cmssw_version = "CMSSW_9_4_0_pre3",

@@ -3,29 +3,47 @@
 make -j 12 || return $?
 
 
-# INDIR=/nfs-7/userdata/haweber/stopbabiesInteractive/2017_5p8fbinv
-INDIR=/nfs-7/userdata/haweber/tupler_babies/merged/Stop_1l/v2017/output/
+INDIR=/nfs-7/userdata/haweber/stopbabiesInteractive/2017_5p8fbinv
+# INDIR=/nfs-7/userdata/haweber/tupler_babies/merged/Stop_1l/v2017/output/
 # OUTDIR=output/temp6
-OUTDIR=output/temp4
-# OUTDIR=output/temp2
+# OUTDIR=output/temp4
+OUTDIR=output/temp
 LOGDIR=logs
 mkdir -p ${OUTDIR}
 mkdir -p ${LOGDIR}
 
 # declare -a Samples=(data_*2017C data_*2017B data_*2017A)
 # declare -a Samples=(data_2017)
-declare -a Samples=(data_2017dilep)
-# declare -a Samples=(data_met)
+# declare -a Samples=(data_2017dilep)
+declare -a Samples=(data_met)
 # declare -a Samples=(data_singlemu)
 # declare -a Samples=(data_singlemu data data_met data_singleel)
 
+# for SAMPLE in ${Samples[@]}; do
+#     echo ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} '>&' ${LOGDIR}/log_${SAMPLE}.txt
+#     # ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
+#     # eval "nohup ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >&  ${LOGDIR}/log_${SAMPLE}.txt &"
+#     # echo nice -n 10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
+#     eval "nohup nice -n -10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
+# done
+
+# 2017 MC test
+INDIR=/hadoop/cms/store/user/sicheng/ProjectMetis/TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISummer17MiniAOD-92X_upgrade2017_realistic_v10-v3_MINIAODSIM_v25/merged
+OUTDIR=output/temp
+
+mkdir -p ${OUTDIR}
+mkdir -p ${LOGDIR}
+
+declare -a Samples=(TTJets)
+
 for SAMPLE in ${Samples[@]}; do
     echo ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} '>&' ${LOGDIR}/log_${SAMPLE}.txt
-    # ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
-    # eval "nohup ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >&  ${LOGDIR}/log_${SAMPLE}.txt &"
+    ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
+    # eval "nohup ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
     # echo nice -n 10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
-    eval "nohup nice -n -10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
+    # eval "nohup nice -n -10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
 done
+
 
 # 2016 data for comparison
 INDIR=/nfs-7/userdata/stopRun2/analysis2016_SUS-16-051_35p9fbinv/v24/output
@@ -44,13 +62,13 @@ declare -a Samples=(data_2016dilep)
 # declare -a Samples=(data_single_muon data data_met data_single_electron)
 # declare -a Samples=(data_muon_eg)
 
-for SAMPLE in ${Samples[@]}; do
-    echo ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} '>&' ${LOGDIR}/log_${SAMPLE}.txt
-    # ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
-    # eval "nohup ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
-    # echo nice -n 10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
-    eval "nohup nice -n -10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
-done
+# for SAMPLE in ${Samples[@]}; do
+#     echo ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} '>&' ${LOGDIR}/log_${SAMPLE}.txt
+#     # ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
+#     # eval "nohup ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
+#     # echo nice -n 10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
+#     eval "nohup nice -n -10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
+# done
 
 # 2016 MC for comparison
 INDIR=/nfs-7/userdata/stopRun2/analysis2016_SUS-16-051_35p9fbinv/v22/skim
