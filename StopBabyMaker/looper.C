@@ -126,9 +126,8 @@ babyMaker::babyMaker(){
 
 void babyMaker::MakeBabyNtuple(const char* output_name){
 
-  //histFile = new TFile(Form("%s/hist_%s", babypath, output_name), "RECREATE");
   BabyFile = new TFile(Form("%s/%s", babypath, output_name), "RECREATE");
-  BabyTree = new TTree("t", "Stop2015 Baby Ntuple");
+  BabyTree = new TTree("t", "Stop2017 Baby Ntuple");
 
   StopEvt.SetBranches(BabyTree);
   lep1.SetBranches(BabyTree);
@@ -153,8 +152,14 @@ void babyMaker::MakeBabyNtuple(const char* output_name){
   }
   if(fillTopTag){
     jets.SetAK4Branches_TopTag(BabyTree);
-    // jets_jup.SetAK8Branches(BabyTree);
-    // jets_jdown.SetAK8Branches(BabyTree);
+    jets_jup.SetAK4Branches_TopTag(BabyTree);
+    jets_jdown.SetAK4Branches_TopTag(BabyTree);
+
+    // Setup MVA Reader TopTagging for 
+    ResolvedTopMVA* resTopMVAptr =  new ResolvedTopMVA("TopTagger/resTop_xGBoost_v0.weights.xml", "BDT");
+    jets.InitTopMVA(resTopMVAptr);
+    jets_jup.InitTopMVA(resTopMVAptr);
+    jets_jdown.InitTopMVA(resTopMVAptr);
   }
 
   if(filltaus)  Taus.SetBranches(BabyTree);
@@ -231,6 +236,7 @@ void babyMaker::InitBabyNtuple(){
   //gen_lsp.Reset();
   //gen_stop.Reset();
   //gen_tops.Reset();
+
 }
 
 

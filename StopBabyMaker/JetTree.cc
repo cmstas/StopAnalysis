@@ -5,18 +5,21 @@
 
 using namespace tas;
  
-JetTree::JetTree() : doResolveTopMVA(true) {
+JetTree::JetTree() : doResolveTopMVA(false) {
   cout << __FILE__ << ':' << __LINE__ << ": prefix_= " << prefix_ << endl;
-  resTopMVA = new ResolvedTopMVA("TopTagger/resTop_xGBoost_v0.weights.xml", "BDT");
 }
 
-JetTree::JetTree(const std::string &prefix) : prefix_(prefix), doResolveTopMVA(true) {
+JetTree::JetTree(const std::string &prefix) : prefix_(prefix), doResolveTopMVA(false) {
   cout << __FILE__ << ':' << __LINE__ << ": prefix_= " << prefix_ << endl;
-  resTopMVA = new ResolvedTopMVA("TopTagger/resTop_xGBoost_v0.weights.xml", "BDT");
 }
 
 JetTree::~JetTree () {
   // delete resTopMVA;
+}
+
+void JetTree::InitTopMVA(ResolvedTopMVA* resTopMVAptr) {
+  doResolveTopMVA = true;
+  resTopMVA = resTopMVAptr;
 }
 
 void JetTree::InitBtagSFTool(bool isFastsim_) {

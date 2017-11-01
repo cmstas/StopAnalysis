@@ -31,6 +31,7 @@ public:
     void Reset ();
     void deleteBtagSFTool();
     void InitBtagSFTool(bool isFastsim_);
+    void InitTopMVA(ResolvedTopMVA* resTopMVAptr);
     void SetBranches (TTree* tree);
     void SetAK4Branches_Other(TTree* tree);
     void SetAK4Branches_EF(TTree* tree);
