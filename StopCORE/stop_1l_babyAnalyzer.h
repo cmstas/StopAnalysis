@@ -1,6 +1,6 @@
 // -*- C++ -*-
 // This is a header file generated with the command:
-// makeCMS3ClassFiles("/hadoop/cms/store/user/sicheng/ProjectMetis/TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISummer17MiniAOD-92X_upgrade2017_realistic_v10-v3_MINIAODSIM_v25_2/TTJets_V07_test_2.root", "t", "stop_1l_babyAnalyzer", "stop_1l", "babyAnalyzer")
+// makeCMS3ClassFiles("/home/users/sicheng/working/StopAnalysis/StopBabyMaker/TTJets_V07_test_1.root", "t", "stop_1l_babyAnalyzer", "stop_1l", "babyAnalyzer")
 
 #ifndef stop_1l_babyAnalyzer_H
 #define stop_1l_babyAnalyzer_H
@@ -1270,6 +1270,54 @@ class stop_1l_babyAnalyzer {
   vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > *topcands_Wp4_;
   TBranch *topcands_Wp4_branch;
   bool     topcands_Wp4_isLoaded;
+  vector<float> *jup_ak4pfjets_cvsl_;
+  TBranch *jup_ak4pfjets_cvsl_branch;
+  bool     jup_ak4pfjets_cvsl_isLoaded;
+  vector<float> *jup_ak4pfjets_ptD_;
+  TBranch *jup_ak4pfjets_ptD_branch;
+  bool     jup_ak4pfjets_ptD_isLoaded;
+  vector<float> *jup_ak4pfjets_axis1_;
+  TBranch *jup_ak4pfjets_axis1_branch;
+  bool     jup_ak4pfjets_axis1_isLoaded;
+  vector<int> *jup_ak4pfjets_mult_;
+  TBranch *jup_ak4pfjets_mult_branch;
+  bool     jup_ak4pfjets_mult_isLoaded;
+  vector<vector<int> > *jup_topcands_ak4idx_;
+  TBranch *jup_topcands_ak4idx_branch;
+  bool     jup_topcands_ak4idx_isLoaded;
+  vector<float> *jup_topcands_disc_;
+  TBranch *jup_topcands_disc_branch;
+  bool     jup_topcands_disc_isLoaded;
+  vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > *jup_topcands_p4_;
+  TBranch *jup_topcands_p4_branch;
+  bool     jup_topcands_p4_isLoaded;
+  vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > *jup_topcands_Wp4_;
+  TBranch *jup_topcands_Wp4_branch;
+  bool     jup_topcands_Wp4_isLoaded;
+  vector<float> *jdown_ak4pfjets_cvsl_;
+  TBranch *jdown_ak4pfjets_cvsl_branch;
+  bool     jdown_ak4pfjets_cvsl_isLoaded;
+  vector<float> *jdown_ak4pfjets_ptD_;
+  TBranch *jdown_ak4pfjets_ptD_branch;
+  bool     jdown_ak4pfjets_ptD_isLoaded;
+  vector<float> *jdown_ak4pfjets_axis1_;
+  TBranch *jdown_ak4pfjets_axis1_branch;
+  bool     jdown_ak4pfjets_axis1_isLoaded;
+  vector<int> *jdown_ak4pfjets_mult_;
+  TBranch *jdown_ak4pfjets_mult_branch;
+  bool     jdown_ak4pfjets_mult_isLoaded;
+  vector<vector<int> > *jdown_topcands_ak4idx_;
+  TBranch *jdown_topcands_ak4idx_branch;
+  bool     jdown_topcands_ak4idx_isLoaded;
+  vector<float> *jdown_topcands_disc_;
+  TBranch *jdown_topcands_disc_branch;
+  bool     jdown_topcands_disc_isLoaded;
+  vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > *jdown_topcands_p4_;
+  TBranch *jdown_topcands_p4_branch;
+  bool     jdown_topcands_p4_isLoaded;
+  vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > *jdown_topcands_Wp4_;
+  TBranch *jdown_topcands_Wp4_branch;
+  bool     jdown_topcands_Wp4_isLoaded;
   vector<TString> *tau_IDnames_;
   TBranch *tau_IDnames_branch;
   bool     tau_IDnames_isLoaded;
@@ -1843,6 +1891,22 @@ void LoadAllBranches();
   const vector<float> &topcands_disc();
   const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &topcands_p4();
   const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &topcands_Wp4();
+  const vector<float> &jup_ak4pfjets_cvsl();
+  const vector<float> &jup_ak4pfjets_ptD();
+  const vector<float> &jup_ak4pfjets_axis1();
+  const vector<int> &jup_ak4pfjets_mult();
+  const vector<vector<int> > &jup_topcands_ak4idx();
+  const vector<float> &jup_topcands_disc();
+  const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &jup_topcands_p4();
+  const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &jup_topcands_Wp4();
+  const vector<float> &jdown_ak4pfjets_cvsl();
+  const vector<float> &jdown_ak4pfjets_ptD();
+  const vector<float> &jdown_ak4pfjets_axis1();
+  const vector<int> &jdown_ak4pfjets_mult();
+  const vector<vector<int> > &jdown_topcands_ak4idx();
+  const vector<float> &jdown_topcands_disc();
+  const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &jdown_topcands_p4();
+  const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &jdown_topcands_Wp4();
   const vector<TString> &tau_IDnames();
   const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &tau_leadtrack_p4();
   const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &tau_leadneutral_p4();
@@ -2319,6 +2383,22 @@ namespace stop_1l {
   const vector<float> &topcands_disc();
   const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &topcands_p4();
   const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &topcands_Wp4();
+  const vector<float> &jup_ak4pfjets_cvsl();
+  const vector<float> &jup_ak4pfjets_ptD();
+  const vector<float> &jup_ak4pfjets_axis1();
+  const vector<int> &jup_ak4pfjets_mult();
+  const vector<vector<int> > &jup_topcands_ak4idx();
+  const vector<float> &jup_topcands_disc();
+  const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &jup_topcands_p4();
+  const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &jup_topcands_Wp4();
+  const vector<float> &jdown_ak4pfjets_cvsl();
+  const vector<float> &jdown_ak4pfjets_ptD();
+  const vector<float> &jdown_ak4pfjets_axis1();
+  const vector<int> &jdown_ak4pfjets_mult();
+  const vector<vector<int> > &jdown_topcands_ak4idx();
+  const vector<float> &jdown_topcands_disc();
+  const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &jdown_topcands_p4();
+  const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &jdown_topcands_Wp4();
   const vector<TString> &tau_IDnames();
   const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &tau_leadtrack_p4();
   const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &tau_leadneutral_p4();
