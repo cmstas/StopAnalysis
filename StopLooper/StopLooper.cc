@@ -692,7 +692,7 @@ void StopLooper::testTopTaggingEffficiency(string suf) {
   // 5. count 2D vecTopCand.size(), TopCand.disc
   if (nHadDecayTops == 1) {
     int calculable = (ngoodbtags() > 0 && ngoodjets() > 2);
-    calculable += (ngoodjets() > 3);
+    calculable += (ngoodjets() > 5);
     float ratio_ntcandvscalable;
     if (calculable != 0) ratio_ntcandvscalable = (float) topcands_disc().size() / calculable;
     else ratio_ntcandvscalable = (ntopcands == 0)? -1/12 : 2.5;
