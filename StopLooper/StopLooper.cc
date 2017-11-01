@@ -687,12 +687,14 @@ void StopLooper::testTopTaggingEffficiency(string suf) {
   int ntopcands = topcands_disc().size();
   // Divide the events into tt->1l and tt->2l
   // For tt->1l, test:
-  // 1. Raw nTopCand / all evts 2. Raw nTopCand / calculable <-- should be 1 
+  // 1. Raw nTopCand / all evts 2. Raw nTopCand / calculable <-- how many get overlap / rejected
   // 3. has TopCand.disc > 0 / all events 4. has TopCand.disc > 0 / raw TopCand > 0
   // 5. count 2D vecTopCand.size(), TopCand.disc
+
+  int calculable = (ngoodbtags() > 0 && ngoodjets() > 2);
+  calculable += (ngoodjets() > 5);
+
   if (nHadDecayTops == 1) {
-    int calculable = (ngoodbtags() > 0 && ngoodjets() > 2);
-    calculable += (ngoodjets() > 5);
     float ratio_ntcandvscalable;
     if (calculable != 0) ratio_ntcandvscalable = (float) topcands_disc().size() / calculable;
     else ratio_ntcandvscalable = (ntopcands == 0)? -1/12 : 2.5;
@@ -716,12 +718,13 @@ void StopLooper::testTopTaggingEffficiency(string suf) {
 
     // Find the daughters of the hadronically decayed top
 
-    if (ntopcand0 == 1) {
+    if (ntopcands >= 1) {
       bool isActualTopJet = true;
       vector<int> jidxs = topcands_ak4idx().at(0);
       vector<int> midxs;
       plot1D("hden_disc", topcands_disc().at(0), evtweight_, SRVec[0].histMap, ";discriminator", 110, -1.1, 1.1);
-      plot1D("hden_pt", topcands_p4().at(0).pt(), evtweight_, SRVec[0].histMap, ";discriminator", 150, 0, 1500);
+      if (ntopcandp9 >= 1)
+        plot1D("hden_pt", topcands_p4().at(0).pt(), evtweight_, SRVec[0].histMap, ";discriminator", 150, 0, 1500);
 
       for (int j = 0; j < 3; ++j) {
         int nMatchedGenqs = 0;
@@ -735,12 +738,14 @@ void StopLooper::testTopTaggingEffficiency(string suf) {
           genqidx = i;
           minDR = dr;
         }
-        plot1D("h_nMatchedGenqs", nMatchedGenqs, evtweight_, SRVec[0].histMap, ";nMatchedGenqs", 4, 0, 4);
+        if (ntopcandp9 >= 1)
+          plot1D("h_nMatchedGenqs", nMatchedGenqs, evtweight_, SRVec[0].histMap, ";nMatchedGenqs", 4, 0, 4);
         if (nMatchedGenqs < 1) {
           isActualTopJet = false;
           break;
         }
-        plot1D("h_jqminDR", minDR, evtweight_, SRVec[0].histMap, ";min(#Delta R)", 41, 0, 0.41);
+        if (ntopcandp9 >= 1)
+          plot1D("h_jqminDR", minDR, evtweight_, SRVec[0].histMap, ";min(#Delta R)", 41, 0, 0.41);
         if (!genqs_isfromt().at(genqidx)) {
           isActualTopJet = false;
           break;
@@ -767,11 +772,30 @@ void StopLooper::testTopTaggingEffficiency(string suf) {
       if (midxs.size() != 3) isActualTopJet = false;
       if (isActualTopJet) {
         plot1D("hnom_disc", topcands_disc().at(0), evtweight_, SRVec[0].histMap, ";topcand discriminator", 110, -1.1, 1.1);
-        plot1D("hnom_pt", topcands_p4().at(0).pt(), evtweight_, SRVec[0].histMap, ";topcand pt", 150, 0, 1500);
+        if (ntopcandp9 >= 1)
+          plot1D("hnom_pt", topcands_p4().at(0).pt(), evtweight_, SRVec[0].histMap, ";topcand pt", 150, 0, 1500);
+        else if (ntopcandp9 == 2)
+          cout << __LINE__ << ": Wow! this happends!" << endl;
       }
 
     }
-
   }
+  else if (nHadDecayTops == 0) {
+    plot1D("h_fakable", calculable, evtweight_, SRVec[0].histMap, ";N(topcand)", 4, 0, 4);
+    plot1D("h_nfakecand_raw", ntopcands, evtweight_, SRVec[0].histMap, ";N(topcand)", 4, 0, 4);
+
+    if (ntopcands > 0) {
+      plot1D("hden_fakep5_pt", topcands_p4().at(0).pt(), evtweight_, SRVec[0].histMap, ";fakecand pt", 150, 0, 1500);
+      plot1D("hden_fakep9_pt", topcands_p4().at(0).pt(), evtweight_, SRVec[0].histMap, ";fakecand pt", 150, 0, 1500);
+      for (float disc : topcands_disc()) {
+        plot1D("h_fakecand_disc", disc, evtweight_, SRVec[0].histMap, ";discriminator", 110, -1.1, 1.1);
+      }
+      if (topcands_disc().at(0) > 0.9)
+        plot1D("hnom_fakep9_pt", topcands_p4().at(0).pt(), evtweight_, SRVec[0].histMap, ";fakecand pt", 150, 0, 1500);
+      if (topcands_disc().at(0) > 0.5)
+        plot1D("hnom_fakep5_pt", topcands_p4().at(0).pt(), evtweight_, SRVec[0].histMap, ";fakecand pt", 150, 0, 1500);
+    }
+  }
+
 
 }
