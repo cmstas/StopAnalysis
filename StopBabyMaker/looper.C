@@ -290,22 +290,23 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
   //
   bool isDataFromFileName;
   bool isSignalFromFileName;
-  string filestr(output_name);
+  string outfilestr(output_name);
+  string filestr(chain->GetFile()->GetName());
   cout<<"output name "<< output_name;
   if (filestr.find("data") != std::string::npos) {
     isDataFromFileName = true;
     isSignalFromFileName = false;
-    cout << ", running on DATA, based on file name: " << output_name<<endl;
+    cout << ", running on DATA, based on input file name." << endl;
   }
-  else if ((filestr.find("SMS") != std::string::npos) || (filestr.find("Signal") != std::string::npos)) {
+  else if ((filestr.find("SMS") != std::string::npos) || (outfilestr.find("Signal") != std::string::npos)) {
     isDataFromFileName = false;
     isSignalFromFileName = true;
-    cout << ", running on SIGNAL, based on file name: " << output_name<<endl;
+    cout << ", running on SIGNAL, based on input file name." << endl;
   }
   else {
     isDataFromFileName = false;
     isSignalFromFileName = false;
-    cout << ", running on MC, based on file name: " << output_name<<endl;
+    cout << ", running on MC, based on input file name." << endl;
   }
 
 
