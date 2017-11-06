@@ -9,7 +9,7 @@
 
 using namespace std;
 
-vector<TString> load(char *type, const char *filename, char *input){
+vector<TString> loadFromSampleList(char *type, const char *filename, char *input){
 
   vector<TString> output;
   char buffer[500];
@@ -57,18 +57,18 @@ int main(int argc, char **argv){
   int nevents = -1;
   if(argc>2) nevents = atoi(argv[2]);
 
-  int file=-1;
-  if(argc>3) file = atoi(argv[3]);
+  int ifile=-1;
+  if(argc>3) ifile = atoi(argv[3]);
 
   char* dirpath = ".";
   if(argc>4) dirpath = argv[4];
 
-  //const char* filename = (file == -1 ? "*postprocess.root" : Form("%spostprocess.root"));
-  const char* filename = (file == -1 ? "merged_ntuple_*.root" : Form("merged_ntuple_%i.root", file));
+  //const char* filename = (ifile == -1 ? "*postprocess.root" : Form("%spostprocess.root"));
+  const char* filename = (ifile == -1 ? "merged_ntuple_*.root" : Form("merged_ntuple_%i.root", ifile));
   //const char* filename = "ntuple_TTJets_HT-1200to2500_new.root";
   cout << filename << endl;
 
-  const char* suffix = file == -1 ? "" : Form("_%i", file);
+  const char* suffix = ifile == -1 ? "" : Form("_%i", ifile);
 
   char *input = "sample_2017.dat";
   if(argc>5) input = argv[5];
@@ -166,20 +166,24 @@ int main(int argc, char **argv){
   //
   TChain *sample = new TChain("Events");
 
-  vector<TString> samplelist = load(argv[1], filename, input);//new
-  bool fileexists = true;
-  for(unsigned int i = 0; i<samplelist.size(); ++i){
-    if(file>=0){
-      //check if file exists - works not for *
-      ifstream infile(samplelist[i].Data());
-      fileexists = infile.good();
-    }
-    if(fileexists){
-      cout << "Add sample " << samplelist[i] << " to files to be processed." << endl;
-      sample->Add(samplelist[i].Data());
+  if (input[0] == '/') {
+    cout << "Add sample " << input << " to files to be processed." << endl;
+    sample->Add(input);
+  } else {
+    vector<TString> samplelist = loadFromSampleList(argv[1], filename, input);//new
+    bool fileexists = true;
+    for(unsigned int i = 0; i<samplelist.size(); ++i){
+      if(ifile>=0){
+        //check if ifile exists - works not for *
+        ifstream infile(samplelist[i].Data());
+        fileexists = infile.good();
+      }
+      if(fileexists){
+        cout << "Add sample " << samplelist[i] << " to files to be processed." << endl;
+        sample->Add(samplelist[i].Data());
+      }
     }
   }
-
 
   //
   // Run Looper
