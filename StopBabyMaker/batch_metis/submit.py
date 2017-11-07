@@ -28,17 +28,19 @@ if __name__ == "__main__":
 
     for dsname in dataset_names:
         cmsswver = "CMSSW_9_4_0_pre2"
+        scramarch = "slc6_amd64_gcc700"
         tarfile = "input.tar.gz"
         tag = "v25_3"
         maker_task = CondorTask(
                 sample = SNTSample(dataset=dsname),
                 files_per_output = 1,
                 tag = tag,
+                outdir_name = "stopBaby_" + dsname[5:34].strip("_"),
                 output_name = "stopbaby.root",
                 executable = "condor_executable.sh",
                 cmssw_version = cmsswver,
-                scram_arch = "slc6_amd64_gcc700",
-                arguments = "1", # isFastsim
+                scram_arch = scramarch,
+                arguments = "1" if dsname[:4] == "/SMS" else "0", # isFastsim
                 tarfile = tarfile,
                 condor_submit_params = {"sites": "UAF,T2_US_UCSD,UCSB"},
         )
@@ -47,15 +49,17 @@ if __name__ == "__main__":
                     dataset=dsname.replace("MINIAODSIM","MERGE"),
                     location=maker_task.get_outputdir(),
                 ),
-                executable = "metis/executables/condor_hadd.sh",
+                executable = "ProjectMetis/metis/executables/condor_hadd.sh",
                 open_dataset = False,
-                files_per_output = 50,
-                output_name = "merged_stopbaby.root",
+                files_per_output = 12,
+                outdir_name = "merged_stopBaby_" + dsname[5:34].strip("_"),
+                output_name = dsname[5:34].strip("_") + ".root",
                 condor_submit_params = {"sites":"UAF"},
                 output_is_tree = True,
                 check_expectedevents = True,
                 tag = tag,
                 cmssw_version = cmsswver,
+                scram_arch = scramarch,
         )
         maker_tasks.append(maker_task)
         merge_tasks.append(merge_task)
@@ -76,7 +80,7 @@ if __name__ == "__main__":
             total_summary[merge_task.get_sample().get_datasetname()] = merge_task.get_task_summary()
 
         # parse the total summary and write out the dashboard
-        StatsParser(data=total_summary, webdir="~/public_html/dump/metis/").do()
+        StatsParser(data=total_summary, webdir="~/public_html/dump/metis_stopbaby/").do()
 
         # 1 hr power nap
         time.sleep(10.*60)
