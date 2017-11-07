@@ -13,16 +13,29 @@ ISFASTSIM=$7
 
 OUTPUTNAME=$(echo $OUTPUTNAME | sed 's/\.root//')
 
-echo Number of arguments is $#, and they are:
-echo $@
-echo ----------------------------------------------
+echo -e "\n--- begin header output ---\n" #                     <----- section division
+echo "OUTPUTDIR: $OUTPUTDIR"
+echo "OUTPUTNAME: $OUTPUTNAME"
+echo "INPUTFILENAMES: $INPUTFILENAMES"
+echo "IFILE: $IFILE"
+echo "CMSSW_VERSION: $CMSSW_VERSION"
+echo "SCRAM_ARCH: $SCRAM_ARCH"
+
+echo "hostname: $(hostname)"
+echo "uname -a: $(uname -a)"
+echo "time: $(date +%s)"
+echo "args: $@"
+
+echo -e "\n--- end header output ---\n" #                       <----- section division
 ls -ltrha
 echo ----------------------------------------------
+
 # Unpack the passed in tarfile
 tar -xzf package.tar.gz
 cd input
 ls -ltrha
 echo ----------------------------------------------
+
 # Setup Enviroment
 export SCRAM_ARCH=$SCRAM_ARCH
 source /cvmfs/cms.cern.ch/cmsset_default.sh
