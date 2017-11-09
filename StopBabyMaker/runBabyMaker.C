@@ -167,8 +167,29 @@ int main(int argc, char **argv){
   TChain *sample = new TChain("Events");
 
   if (input[0] == '/') {
-    cout << "Add sample " << input << " to files to be processed." << endl;
-    sample->Add(input);
+    // Determine from hostname to see if need xrootd for the file
+    char hostname_cstr[64];
+    gethostname(hostname_cstr, 64);
+    TString hostname(hostname_cstr);
+    cout << ">>> Hostname is " << hostname << endl;
+    bool useXrootd = !hostname.Contains("t2.ucsd.edu");
+    if (useXrootd) cout << ">>> Using xrootd for the input files." << endl;
+
+    vector<TString> vecInFiles;
+    TString infiles(input);
+    while (infiles.Contains(',')) {
+      TString fn = infiles(0, infiles.Index(','));
+      vecInFiles.push_back( fn );
+      infiles.Remove(0, fn.Length()+1);
+    }
+    vecInFiles.push_back( infiles );
+
+    for (TString file : vecInFiles) {
+      if (useXrootd && file.Contains("/hadoop"))
+        file.ReplaceAll("/hadoop/cms", "root://cmsxrootd.fnal.gov/");
+      cout << "Add sample " << file << " to files to be processed." << endl;
+      sample->Add(file);
+    }
   } else {
     vector<TString> samplelist = loadFromSampleList(argv[1], filename, input);//new
     bool fileexists = true;
