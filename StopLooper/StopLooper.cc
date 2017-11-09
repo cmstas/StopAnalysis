@@ -683,7 +683,7 @@ void StopLooper::testTopTaggingEffficiency(string suf) {
 
   // First need to determine how many gen tops does hadronic decay
   int nHadDecayTops = 2 - gen_nfromtleps_();  // 2 gentops for sure <-- checked
-  
+
   int ntopcands = topcands_disc().size();
   // Divide the events into tt->1l and tt->2l
   // For tt->1l, test:
@@ -724,12 +724,9 @@ void StopLooper::testTopTaggingEffficiency(string suf) {
 
     if (ntopcands >= 1) {
       bool isActualTopJet = true;
+      float gentoppt = 0.;
       vector<int> jidxs = topcands_ak4idx().at(0);
       vector<int> midxs;
-      plot1D("hden_disc", topcands_disc().at(0), evtweight_, SRVec[0].histMap, ";discriminator", 1100, -1.1, 1.1);
-      if (ntopcandp9 >= 1)
-        plot1D("hden_pt", topcands_p4().at(0).pt(), evtweight_, SRVec[0].histMap, ";discriminator", 150, 0, 1500);
-
       for (int j = 0; j < 3; ++j) {
         int nMatchedGenqs = 0;
         int genqidx = -1;
@@ -742,19 +739,20 @@ void StopLooper::testTopTaggingEffficiency(string suf) {
           genqidx = i;
           minDR = dr;
         }
-        if (ntopcandp9 >= 1)
+        if (ntopcandp98 >= 1)
           plot1D("h_nMatchedGenqs", nMatchedGenqs, evtweight_, SRVec[0].histMap, ";nMatchedGenqs", 4, 0, 4);
         if (nMatchedGenqs < 1) {
           isActualTopJet = false;
           break;
         }
-        if (ntopcandp9 >= 1)
+        if (ntopcandp98 >= 1)
           plot1D("h_jqminDR", minDR, evtweight_, SRVec[0].histMap, ";min(#Delta R)", 41, 0, 0.41);
         if (!genqs_isfromt().at(genqidx)) {
           isActualTopJet = false;
           break;
         }
         if (abs(genqs_id().at(genqidx)) == 5 && abs(genqs_motherid().at(genqidx)) == 6) {
+          gentoppt = genqs_motherp4().at(genqidx).pt();
           int leptonictopidx = -1;
           for (size_t l = 0; l < genleps_id().size(); ++l) {
             if (genleps_isfromt().at(l)) {
@@ -774,14 +772,21 @@ void StopLooper::testTopTaggingEffficiency(string suf) {
         }
       }
       if (midxs.size() != 3) isActualTopJet = false;
+
+      plot1D("hden_disc", topcands_disc().at(0), evtweight_, SRVec[0].histMap, ";discriminator", 1100, -1.1, 1.1);
+      if (ntopcandp98 >= 1) {
+        plot1D("hden_pt", topcands_p4().at(0).pt(), evtweight_, SRVec[0].histMap, ";discriminator", 110, 0, 1100);
+        plot1D("hden_gentoppt", gentoppt, evtweight_, SRVec[0].histMap, ";p_{T}(gen top)", 110, 0, 1100);
+      }
       if (isActualTopJet) {
         plot1D("hnom_disc", topcands_disc().at(0), evtweight_, SRVec[0].histMap, ";topcand discriminator", 1100, -1.1, 1.1);
-        if (ntopcandp98 >= 1)
-          plot1D("hnom_pt", topcands_p4().at(0).pt(), evtweight_, SRVec[0].histMap, ";topcand pt", 150, 0, 1500);
-        else if (ntopcandp98 == 2)
-          cout << __LINE__ << ": Wow! this happends!" << endl;
-      }
+        if (ntopcandp98 >= 1) {
+          plot1D("hnom_pt", topcands_p4().at(0).pt(), evtweight_, SRVec[0].histMap, ";topcand pt", 110, 0, 1100);
+          plot1D("hnom_gentoppt", gentoppt, evtweight_, SRVec[0].histMap, ";p_{T}(gen top)", 110, 0, 1100);
+        }
+      } else if (ntopcandp98 > 0) {
 
+      }
     }
   }
   else if (nHadDecayTops == 0) {
@@ -789,19 +794,19 @@ void StopLooper::testTopTaggingEffficiency(string suf) {
     plot1D("h_nfakecand_raw", ntopcands, evtweight_, SRVec[0].histMap, ";N(topcand)", 4, 0, 4);
 
     if (ntopcands > 0) {
-      plot1D("hden_fakep5_pt", topcands_p4().at(0).pt(), evtweight_, SRVec[0].histMap, ";fakecand pt", 150, 0, 1500);
-      plot1D("hden_fakep9_pt", topcands_p4().at(0).pt(), evtweight_, SRVec[0].histMap, ";fakecand pt", 150, 0, 1500);
-      plot1D("hden_fakep98_pt", topcands_p4().at(0).pt(), evtweight_, SRVec[0].histMap, ";fakecand pt", 150, 0, 1500);
+      plot1D("hden_fakep5_pt", topcands_p4().at(0).pt(), evtweight_, SRVec[0].histMap, ";fakecand pt", 110, 0, 1100);
+      plot1D("hden_fakep9_pt", topcands_p4().at(0).pt(), evtweight_, SRVec[0].histMap, ";fakecand pt", 110, 0, 1100);
+      plot1D("hden_fakep98_pt", topcands_p4().at(0).pt(), evtweight_, SRVec[0].histMap, ";fakecand pt", 110, 0, 1100);
       for (float disc : topcands_disc()) {
         plot1D("h_fakecand_disc", disc, evtweight_, SRVec[0].histMap, ";discriminator", 110, -1.1, 1.1);
         plot1D("h_fakecand_finedisc", disc, evtweight_, SRVec[0].histMap, ";discriminator", 1100, -1.1, 1.1);
       }
       if (topcands_disc().at(0) > 0.98)
-        plot1D("hnom_fakep98_pt", topcands_p4().at(0).pt(), evtweight_, SRVec[0].histMap, ";fakecand pt", 150, 0, 1500);
+        plot1D("hnom_fakep98_pt", topcands_p4().at(0).pt(), evtweight_, SRVec[0].histMap, ";fakecand pt", 110, 0, 1100);
       if (topcands_disc().at(0) > 0.9)
-        plot1D("hnom_fakep9_pt", topcands_p4().at(0).pt(), evtweight_, SRVec[0].histMap, ";fakecand pt", 150, 0, 1500);
+        plot1D("hnom_fakep9_pt", topcands_p4().at(0).pt(), evtweight_, SRVec[0].histMap, ";fakecand pt", 110, 0, 1100);
       if (topcands_disc().at(0) > 0.5)
-        plot1D("hnom_fakep5_pt", topcands_p4().at(0).pt(), evtweight_, SRVec[0].histMap, ";fakecand pt", 150, 0, 1500);
+        plot1D("hnom_fakep5_pt", topcands_p4().at(0).pt(), evtweight_, SRVec[0].histMap, ";fakecand pt", 110, 0, 1100);
     }
   }
 
