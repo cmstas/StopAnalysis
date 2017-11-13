@@ -59,37 +59,41 @@ echo ----------------------------------------------
 ls -ltrha
 echo ----------------------------------------------
 
-# # Perform Skim
-# root -l -b -q skimBaby.C++'("'${SAMPLE_NAME}_${IFILE}.root'", "'${OUTPUT_NAMES}'")'
+# Rigorous sweeproot which checks ALL branches for ALL events.
+# If GetEntry() returns -1, then there was an I/O problem, so we will delete it
+python << EOL
+import ROOT as r
+import os
+import traceback
+foundBad = False
+try:
+    f1 = r.TFile("${OUTPUTNAME}_${IFILE}.root")
+    t = f1.Get("t")
+    nevts = t.GetEntries()
+    print "[SweepRoot] ntuple has %i events." % t.GetEntries()
+    if int(t.GetEntries()) <= 0:
+        foundBad = True
+    for i in range(0,t.GetEntries(),1):
+        if t.GetEntry(i) < 0:
+            foundBad = True
+            print "[RSR] found bad event %i" % i
+            break
+except Exception as ex:
+    msg = traceback.format_exc()
+    print "Encounter error during SweepRoot:"
+    print msg
+if foundBad:
+    print "[RSR] removing output file because it does not deserve to live"
+    os.system("rm ${OUTPUTNAME}_${IFILE}.root")
+else:
+    print "[RSR] passed the rigorous sweeproot"
+EOL
+
+echo -e "\n--- end running ---\n" #                             <----- section division
 
 # Copy back the output file
 gfal-copy -p -f -t 4200 --verbose file://`pwd`/${OUTPUTNAME}_${IFILE}.root gsiftp://gftp.t2.ucsd.edu${OUTPUTDIR}/${OUTPUTNAME}_${IFILE}.root --checksum ADLER32
 
-# # Need this for .so files
-# export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PWD
-
-# # Split Output files line into an array
-# OUTPUT_NAMES=(`echo $OUTPUT_NAMES | sed s/,/" "/g`)
-# echo "OUTPUT_NAMES=${OUTPUT_NAMES[*]}"
-
-# # Format output for gfal transfer
-# mv ${SAMPLE_NAME}_${IMERGED}.root ${OUTPUT_NAMES[0]}
-
-# # Perform Skim
-# #root -l -b -q skimBaby.C++'("'${OUTPUT_NAMES[0]}'", "'${OUTPUT_NAMES[1]}'")'
-
-# # ls -lrtha
-
-# #
-# # Sweep Root
-# #
-# for output in ${OUTPUT_NAMES[@]}; do
-#     RESULT=`root -l -b -q sweepRoot.C+'("'$output'")' | grep "result=" | sed s/result=//g`
-#     echo "RESULT=$RESULT"
-#     if [ "$RESULT" == "1" ]; then 
-# 	echo "$output failed sweepRoot...deleting..."
-# 	rm -rf $output
-#     fi
-# done
-
-# ls -lrtha
+echo -e "\n--- cleaning up ---\n" #                             <----- section division
+cd ..
+rm -r input.tar.gz input/
