@@ -1085,7 +1085,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
         StopEvt.weight_PUup   = hPUup  ->GetBinContent(hPUup  ->FindBin(StopEvt.pu_ntrue));
         StopEvt.weight_PUdown = hPUdown->GetBinContent(hPUdown->FindBin(StopEvt.pu_ntrue));
 
-        if (StopEvt.cms3tag.find("CMS4") == 0) {
+        if (StopEvt.cms3tag.find("CMS4") == 0 && !isSignalFromFileName) {
           float sgnMCweight = (genps_weight() > 0)? 1 : -1;
           StopEvt.scale1fb = sgnMCweight * df.getScale1fbFromFile(StopEvt.dataset, StopEvt.cms3tag);
           StopEvt.xsec     = sgnMCweight * df.getXsecFromFile(StopEvt.dataset, StopEvt.cms3tag);
