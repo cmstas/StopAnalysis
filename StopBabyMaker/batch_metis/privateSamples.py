@@ -39,6 +39,7 @@ if __name__ == "__main__":
                 dataset=dsname,
                 location=samploc,
             ),
+            # open_dataset = True,
             files_per_output = 1,
             tag = tag,
             cmssw_version = cmsswver,

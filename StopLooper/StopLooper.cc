@@ -78,6 +78,8 @@ const bool fasterRuntime = true;
 // set bool def here for member function usage
 bool is2016data = false;
 
+const float fInf = std::numeric_limits<float>::max();
+
 void StopLooper::SetSignalRegions() {
 
   // SRVec = getStopSignalRegions();
@@ -116,6 +118,8 @@ void StopLooper::SetSignalRegions() {
   createRangesHists(CR2lVec);
   createRangesHists(CRemuVec);
 
+  testVec.emplace_back("testTopTagging");
+  testVec.emplace_back("testCutflow");
 }
 
 
@@ -211,7 +215,8 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir) {
   TFile *currentFile = 0;
   while ( (currentFile = (TFile*)fileIter.Next()) ) {
 
-    TFile file( currentFile->GetTitle(), "READ" );
+    TString fname = currentFile->GetTitle();
+    TFile file( fname, "READ" );
     TTree *tree = (TTree*) file.Get("t");
     TTreeCache::SetLearnEntries(10);
     tree->SetCacheSize(128*1024*1024);
@@ -219,6 +224,8 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir) {
 
     // Get weight histogram from baby
     wgtInfo.getWeightHistogramFromBaby(&file);
+
+    bool is_signal = fname.Contains("SMS") || fname.Contains("Signal");
 
     dummy.cd();
     // Loop over Events in current file
@@ -249,104 +256,54 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir) {
 
       // Apply met filters
       // if (!filt_globalTightHalo2016()) continue; // problematic for 2017
-      if ( !filt_globalsupertighthalo2016() ) continue;
-      if ( !filt_hbhenoise() ) continue;
-      if ( !filt_hbheisonoise() )   continue;
-      if ( !filt_ecaltp() ) continue;
-      if ( !filt_eebadsc() ) continue;
-      if ( !filt_goodvtx() ) continue;
-      if ( firstGoodVtxIdx() == -1 ) continue;
-      if ( !filt_badMuonFilter() ) continue;
-      if ( !filt_badChargedCandidateFilter() ) continue;
+      if (!is_signal) {
+        if ( !filt_globalsupertighthalo2016() ) continue;
+        if ( !filt_hbhenoise() ) continue;
+        if ( !filt_hbheisonoise() )   continue;
+        if ( !filt_ecaltp() ) continue;
+        if ( !filt_eebadsc() ) continue;
+        if ( !filt_goodvtx() ) continue;
+        if ( firstGoodVtxIdx() == -1 ) continue;
+        if ( !filt_badMuonFilter() ) continue;
+        if ( !filt_badChargedCandidateFilter() ) continue;
+      }
+
+      TString dsname = dataset();
+      if (dsname.Contains("T2tt")) {
+        auto checkMassPt = [&](double mstop, double mlsp) { return (mass_stop() == mstop) && (mass_lsp() == mlsp); };
+        if (!checkMassPt(600, 450) && !checkMassPt(800, 200) && !checkMassPt(800, 600) && !checkMassPt(1200, 200))
+          continue;
+        plot2D("h_T2tt_masspts", mass_stop(), mass_lsp() , evtweight_, testVec[1].histMap, ";M(stop) [GeV]; M(lsp) [GeV]", 100, 300, 1300, 80, 0, 800);
+      }
 
       ++nPassedTotal;
 
       // Calculate event weight
-      wgtInfo.getEventWeights(); // what does this do?
+      // wgtInfo.getEventWeights(); // what does this do?    // <-- breaks on signal samples
 
-      bool isCorridor = true;   // for testing purpose
-      sysInfo::ID sysID = sysInfo::ID::k_nominal; // temporary for testing
-      if (isCorridor)
-        evtweight_ = sysInfo::GetEventWeight_corridor( sysID );
-      // else if ( useTightTagHighMlb && useMetTTbarWgts )
-      //   evtweight_ = sysInfo::GetEventWeight_SRbulk( sysID );
-      // else if ( useTightTagHighMlb && !useMetTTbarWgts )
-      //   evtweight_ = sysInfo::GetEventWeight_CR2lbulk( sysID );
-      else
-        evtweight_ = sysInfo::GetEventWeight( sysID );
-
-      if (doNvtxReweight) {
-        if (nvtxs() > 69) continue;
-        if (is2016data)
-          evtweight_ *= nvtxscale[nvtxs()];
+      if (!is_data() && !is_signal) {
+        evtweight_ = scale1fb();
       }
+      // bool isCorridor = true;   // for testing purpose
+      // sysInfo::ID sysID = sysInfo::ID::k_nominal; // temporary for testing
+      // if (isCorridor)
+      //   evtweight_ = sysInfo::GetEventWeight_corridor( sysID );
+      // // else if ( useTightTagHighMlb && useMetTTbarWgts )
+      // //   evtweight_ = sysInfo::GetEventWeight_SRbulk( sysID );
+      // // else if ( useTightTagHighMlb && !useMetTTbarWgts )
+      // //   evtweight_ = sysInfo::GetEventWeight_CR2lbulk( sysID );
+      // else
+      //   evtweight_ = sysInfo::GetEventWeight( sysID );
 
-      // // Find the gen pT of the ttbar system
-      // double ttbarPt = -99.9;
-      // LorentzVector genTTbar_LV;
-      // int nFoundGenTop=0;
-      // if (sampleIsTTbar) {
-      //   for (int iGen=0; iGen<(int)genqs_p4().size(); iGen++) {
-      //     if ( abs(genqs_id().at(iGen))==6 && genqs_isLastCopy().at(iGen) ) {
-      //       genTTbar_LV += genqs_p4().at(iGen);
-      //       nFoundGenTop++;
-      //     } // end if last copy of top
-      //   } // end loop over gen quarks
-
-      //   if ( nFoundGenTop == 2 ) ttbarPt = genTTbar_LV.Pt();
-      // } // end if sample is ttbar
-
-
-      // // Calculate p4 of (lep1 lep2 b b) system
-      // LorentzVector lep1lep2bb_TLV(0.0,0.0,0.0,0.0);
-      // lep1lep2bb_TLV += lep1_p4();
-      // if (nvetoleps() > 1) lep1lep2bb_TLV += lep2_p4();
-
-      // int jet1_idx = -1;
-      // double max_csv = -99.9;
-      // for (int iJet=0; iJet<(int)ak4pfjets_p4().size(); iJet++) {
-      //   if (ak4pfjets_CSV().at(iJet) > max_csv) {
-      //     jet1_idx = iJet;
-      //     max_csv  = ak4pfjets_CSV().at(iJet);
-      //   }
+      // if (doNvtxReweight) {
+      //   if (nvtxs() > 69) continue;
+      //   if (is2016data)
+      //     evtweight_ *= nvtxscale[nvtxs()];
       // }
-      // if (jet1_idx >= 0) lep1lep2bb_TLV += ak4pfjets_p4().at(jet1_idx);
 
-      // int jet2_idx = -1;
-      // max_csv = -99.9;
-      // for (int iJet=0; iJet<(int)ak4pfjets_p4().size(); iJet++) {
-      //   if (iJet == jet1_idx) continue;
-      //   if (ak4pfjets_CSV().at(iJet) > max_csv) {
-      //     jet2_idx = iJet;
-      //     max_csv = ak4pfjets_CSV().at(iJet);
-      //   }
-      // }
-      // if(jet2_idx>=0) lep1lep2bb_TLV += ak4pfjets_p4().at(jet2_idx);
 
-      // // Calculate p4 of (lep1 lep2 b b MET) system
-      // double lep1lep2bbMet_pt = -99.9;
-      // LorentzVector lep1lep2bbMet_TLV = lep1lep2bb_TLV;
-      // LorentzVector met_TLV( pfmet()*cos(pfmet_phi()), pfmet()*sin(pfmet_phi()), 0.0, pfmet() );
-      // lep1lep2bbMet_TLV += met_TLV;
-      // lep1lep2bbMet_pt = lep1lep2bbMet_TLV.Pt();
-
-      // // Calculate mlb using lep2 instead of lep1
-      // LorentzVector lep2b_TLV(0.0,0.0,0.0,0.0);
-      // double minDr = 99.9;
-      // int minBJetIdx = -99;
-      // if(nvetoleps()>1) {
-      //   lep2b_TLV += lep2_p4();
-      //   for(int iJet=0; iJet<(int)ak4pfjets_p4().size(); iJet++) {
-      //     if(!ak4pfjets_passMEDbtag().at(iJet)) continue;
-      //     if(ROOT::Math::VectorUtil::DeltaR(ak4pfjets_p4().at(iJet),lep2_p4())<minDr) {
-      //       minDr = ROOT::Math::VectorUtil::DeltaR(ak4pfjets_p4().at(iJet),lep2_p4());
-      //       minBJetIdx = iJet;
-      //     }
-      //   } // end loop over jets
-      //   if(minBJetIdx>=0) lep2b_TLV += ak4pfjets_p4().at(minBJetIdx);
-      // } // end if nvetoleps>1
-
-      testTopTaggingEffficiency();
+      // Temporary test for
+      testTopTaggingEffficiency(testVec[0]);
 
 
       // Fill the variables
@@ -395,6 +352,8 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir) {
         }
       }
 
+      fillCutFlowHistos(testVec[1]);
+
       // Filling histograms
       // fillHistosForSR();
 
@@ -439,6 +398,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir) {
     }
   };
 
+  writeHistsToFile(testVec);
   writeHistsToFile(SRVec);
   writeHistsToFile(CR0bVec);
   writeHistsToFile(CR2lVec);
@@ -461,7 +421,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir) {
       h_ratio->Write();
     }
   };
-  writeRatioHists(SRVec[0]);
+  writeRatioHists(testVec[0]);
 
   outfile_->Write();
   outfile_->Close();
@@ -677,7 +637,7 @@ void StopLooper::fillHistosForCR0b(string suf) {
   }
 }
 
-void StopLooper::testTopTaggingEffficiency(string suf) {
+void StopLooper::testTopTaggingEffficiency(SR& sr) {
   // Function to test the top tagging efficiencies and miss-tag rate
   // The current tagger only works for hadronically decay tops
 
@@ -698,27 +658,27 @@ void StopLooper::testTopTaggingEffficiency(string suf) {
     float ratio_ntcandvscalable;
     if (calculable != 0) ratio_ntcandvscalable = (float) topcands_disc().size() / calculable;
     else ratio_ntcandvscalable = (ntopcands == 0)? -1/12 : 2.5;
-    plot1D("h_ratio_ntcandvscalable", ratio_ntcandvscalable, evtweight_, SRVec[0].histMap, ";N(topcand)", 7, -0.5, 3);
+    plot1D("h_ratio_ntcandvscalable", ratio_ntcandvscalable, evtweight_, sr.histMap, ";N(topcand)", 7, -0.5, 3);
 
-    plot1D("h_ntopcand_raw", ntopcands, evtweight_, SRVec[0].histMap, ";N(topcand)", 4, 0, 4);
-    plot1D("h_calculable", calculable, evtweight_, SRVec[0].histMap, ";N(topcand)", 4, 0, 4);
+    plot1D("h_ntopcand_raw", ntopcands, evtweight_, sr.histMap, ";N(topcand)", 4, 0, 4);
+    plot1D("h_calculable", calculable, evtweight_, sr.histMap, ";N(topcand)", 4, 0, 4);
     int ntopcand0 = 0;
     int ntopcandp5 = 0;
     int ntopcandp9 = 0;
     int ntopcandp98 = 0;
     for (float disc : topcands_disc()) {
-      plot1D("h_topcand_disc", disc, evtweight_, SRVec[0].histMap, ";discriminator", 110, -1.1, 1.1);
-      plot1D("h_topcand_finedisc", disc, evtweight_, SRVec[0].histMap, ";discriminator", 1100, -1.1, 1.1);
+      plot1D("h_topcand_disc", disc, evtweight_, sr.histMap, ";discriminator", 110, -1.1, 1.1);
+      plot1D("h_topcand_finedisc", disc, evtweight_, sr.histMap, ";discriminator", 1100, -1.1, 1.1);
       if (disc > 0) ntopcand0++;
       if (disc > 0.5) ntopcandp5++;
       if (disc > 0.9) ntopcandp9++;
       if (disc > 0.98) ntopcandp98++;
     }
-    plot1D("h_ntopcandp9", ntopcandp9, evtweight_, SRVec[0].histMap, ";N(topcand)", 4, 0, 4);
-    plot2D("h2d_ntopcand0", ntopcands, ntopcand0, evtweight_, SRVec[0].histMap, ";N(all topcand);N(disc > 0)", 4, 0, 4, 4, 0, 4);
-    plot2D("h2d_ntopcandp5", ntopcands, ntopcandp5, evtweight_, SRVec[0].histMap, ";N(all topcand);N(disc > 0.5)", 4, 0, 4, 4, 0, 4);
-    plot2D("h2d_ntopcandp9", ntopcands, ntopcandp9, evtweight_, SRVec[0].histMap, ";N(all topcand);N(disc > 0.9)", 4, 0, 4, 4, 0, 4);
-    plot2D("h2d_ntopcandp98", ntopcands, ntopcandp98, evtweight_, SRVec[0].histMap, ";N(all topcand);N(disc > 0.9)", 4, 0, 4, 4, 0, 4);
+    plot1D("h_ntopcandp9", ntopcandp9, evtweight_, sr.histMap, ";N(topcand)", 4, 0, 4);
+    plot2D("h2d_ntopcand0", ntopcands, ntopcand0, evtweight_, sr.histMap, ";N(all topcand);N(disc > 0)", 4, 0, 4, 4, 0, 4);
+    plot2D("h2d_ntopcandp5", ntopcands, ntopcandp5, evtweight_, sr.histMap, ";N(all topcand);N(disc > 0.5)", 4, 0, 4, 4, 0, 4);
+    plot2D("h2d_ntopcandp9", ntopcands, ntopcandp9, evtweight_, sr.histMap, ";N(all topcand);N(disc > 0.9)", 4, 0, 4, 4, 0, 4);
+    plot2D("h2d_ntopcandp98", ntopcands, ntopcandp98, evtweight_, sr.histMap, ";N(all topcand);N(disc > 0.9)", 4, 0, 4, 4, 0, 4);
 
     // Find the daughters of the hadronically decayed top
 
@@ -740,13 +700,13 @@ void StopLooper::testTopTaggingEffficiency(string suf) {
           minDR = dr;
         }
         if (ntopcandp98 >= 1)
-          plot1D("h_nMatchedGenqs", nMatchedGenqs, evtweight_, SRVec[0].histMap, ";nMatchedGenqs", 4, 0, 4);
+          plot1D("h_nMatchedGenqs", nMatchedGenqs, evtweight_, sr.histMap, ";nMatchedGenqs", 4, 0, 4);
         if (nMatchedGenqs < 1) {
           isActualTopJet = false;
           break;
         }
         if (ntopcandp98 >= 1)
-          plot1D("h_jqminDR", minDR, evtweight_, SRVec[0].histMap, ";min(#Delta R)", 41, 0, 0.41);
+          plot1D("h_jqminDR", minDR, evtweight_, sr.histMap, ";min(#Delta R)", 41, 0, 0.41);
         if (!genqs_isfromt().at(genqidx)) {
           isActualTopJet = false;
           break;
@@ -773,16 +733,16 @@ void StopLooper::testTopTaggingEffficiency(string suf) {
       }
       if (midxs.size() != 3) isActualTopJet = false;
 
-      plot1D("hden_disc", topcands_disc().at(0), evtweight_, SRVec[0].histMap, ";discriminator", 1100, -1.1, 1.1);
+      plot1D("hden_disc", topcands_disc().at(0), evtweight_, sr.histMap, ";discriminator", 1100, -1.1, 1.1);
       if (ntopcandp98 >= 1) {
-        plot1D("hden_pt", topcands_p4().at(0).pt(), evtweight_, SRVec[0].histMap, ";discriminator", 110, 0, 1100);
-        plot1D("hden_gentoppt", gentoppt, evtweight_, SRVec[0].histMap, ";p_{T}(gen top)", 110, 0, 1100);
+        plot1D("hden_pt", topcands_p4().at(0).pt(), evtweight_, sr.histMap, ";discriminator", 110, 0, 1100);
+        plot1D("hden_gentoppt", gentoppt, evtweight_, sr.histMap, ";p_{T}(gen top)", 110, 0, 1100);
       }
       if (isActualTopJet) {
-        plot1D("hnom_disc", topcands_disc().at(0), evtweight_, SRVec[0].histMap, ";topcand discriminator", 1100, -1.1, 1.1);
+        plot1D("hnom_disc", topcands_disc().at(0), evtweight_, sr.histMap, ";topcand discriminator", 1100, -1.1, 1.1);
         if (ntopcandp98 >= 1) {
-          plot1D("hnom_pt", topcands_p4().at(0).pt(), evtweight_, SRVec[0].histMap, ";topcand pt", 110, 0, 1100);
-          plot1D("hnom_gentoppt", gentoppt, evtweight_, SRVec[0].histMap, ";p_{T}(gen top)", 110, 0, 1100);
+          plot1D("hnom_pt", topcands_p4().at(0).pt(), evtweight_, sr.histMap, ";topcand pt", 110, 0, 1100);
+          plot1D("hnom_gentoppt", gentoppt, evtweight_, sr.histMap, ";p_{T}(gen top)", 110, 0, 1100);
         }
       } else if (ntopcandp98 > 0) {
 
@@ -790,25 +750,142 @@ void StopLooper::testTopTaggingEffficiency(string suf) {
     }
   }
   else if (nHadDecayTops == 0) {
-    plot1D("h_fakable", calculable, evtweight_, SRVec[0].histMap, ";N(topcand)", 4, 0, 4);
-    plot1D("h_nfakecand_raw", ntopcands, evtweight_, SRVec[0].histMap, ";N(topcand)", 4, 0, 4);
+    plot1D("h_fakable", calculable, evtweight_, sr.histMap, ";N(topcand)", 4, 0, 4);
+    plot1D("h_nfakecand_raw", ntopcands, evtweight_, sr.histMap, ";N(topcand)", 4, 0, 4);
 
     if (ntopcands > 0) {
-      plot1D("hden_fakep5_pt", topcands_p4().at(0).pt(), evtweight_, SRVec[0].histMap, ";fakecand pt", 110, 0, 1100);
-      plot1D("hden_fakep9_pt", topcands_p4().at(0).pt(), evtweight_, SRVec[0].histMap, ";fakecand pt", 110, 0, 1100);
-      plot1D("hden_fakep98_pt", topcands_p4().at(0).pt(), evtweight_, SRVec[0].histMap, ";fakecand pt", 110, 0, 1100);
+      plot1D("hden_fakep5_pt", topcands_p4().at(0).pt(), evtweight_, sr.histMap, ";fakecand pt", 110, 0, 1100);
+      plot1D("hden_fakep9_pt", topcands_p4().at(0).pt(), evtweight_, sr.histMap, ";fakecand pt", 110, 0, 1100);
+      plot1D("hden_fakep98_pt", topcands_p4().at(0).pt(), evtweight_, sr.histMap, ";fakecand pt", 110, 0, 1100);
       for (float disc : topcands_disc()) {
-        plot1D("h_fakecand_disc", disc, evtweight_, SRVec[0].histMap, ";discriminator", 110, -1.1, 1.1);
-        plot1D("h_fakecand_finedisc", disc, evtweight_, SRVec[0].histMap, ";discriminator", 1100, -1.1, 1.1);
+        plot1D("h_fakecand_disc", disc, evtweight_, sr.histMap, ";discriminator", 110, -1.1, 1.1);
+        plot1D("h_fakecand_finedisc", disc, evtweight_, sr.histMap, ";discriminator", 1100, -1.1, 1.1);
       }
       if (topcands_disc().at(0) > 0.98)
-        plot1D("hnom_fakep98_pt", topcands_p4().at(0).pt(), evtweight_, SRVec[0].histMap, ";fakecand pt", 110, 0, 1100);
+        plot1D("hnom_fakep98_pt", topcands_p4().at(0).pt(), evtweight_, sr.histMap, ";fakecand pt", 110, 0, 1100);
       if (topcands_disc().at(0) > 0.9)
-        plot1D("hnom_fakep9_pt", topcands_p4().at(0).pt(), evtweight_, SRVec[0].histMap, ";fakecand pt", 110, 0, 1100);
+        plot1D("hnom_fakep9_pt", topcands_p4().at(0).pt(), evtweight_, sr.histMap, ";fakecand pt", 110, 0, 1100);
       if (topcands_disc().at(0) > 0.5)
-        plot1D("hnom_fakep5_pt", topcands_p4().at(0).pt(), evtweight_, SRVec[0].histMap, ";fakecand pt", 110, 0, 1100);
+        plot1D("hnom_fakep5_pt", topcands_p4().at(0).pt(), evtweight_, sr.histMap, ";fakecand pt", 110, 0, 1100);
     }
   }
+}
 
+void StopLooper::fillCutFlowHistos(SR& sr) {
+
+  auto fillCFhist = [&](string&& hname, auto& cutflow, auto& cfvallow, auto& cfvalupp, auto& cfnames) {
+    int ncuts = cutflow.size();
+    if (sr.histMap.count(hname) == 0) {
+      plot1D(hname, 0, 1, sr.histMap, "cutflow;icut", ncuts+1, 0, ncuts+1);
+      sr.histMap[hname]->GetXaxis()->SetBinLabel(1, "base");
+      for (int icf = 0; icf < ncuts; ++icf)
+        sr.histMap[hname]->GetXaxis()->SetBinLabel(icf+2, cfnames[icf].c_str());
+    } else {
+      plot1D(hname, 0, 1, sr.histMap, "cutflow;icut", ncuts+1, 0, ncuts+1);
+    }
+    for (int icf = 0; icf < ncuts; ++icf) {
+      string cut = cutflow[icf];
+      if (values_[cut] >= cfvallow[icf] && values_[cut] < cfvalupp[icf]) {
+        plot1D(hname, icf+1, 1, sr.histMap, "cutflow;icut", ncuts+1, 0, ncuts+1);
+      } else {
+        break;
+      }
+    }
+  };
+
+  const vector<string> cfnames1 = {"met",  "mt",};
+  const vector<string> cutflow1 = {"met",  "mt",};
+  const vector<float> cfvallow1 = {  250,  100 ,};
+  const vector<float> cfvalupp1 = { fInf, fInf ,};
+  fillCFhist("h_cutflow1_notop", cutflow1, cfvallow1, cfvalupp1, cfnames1);
+  if (topcands_disc().size() > 0 && topcands_disc()[0] > 0.98)
+    fillCFhist("h_cutflow1_hastop", cutflow1, cfvallow1, cfvalupp1, cfnames1);
+
+  const vector<string> cfnames2 = {  "mt",  "mlb",};
+  const vector<string> cutflow2 = {  "mt",  "mlb",};
+  const vector<float> cfvallow2 = {  150 ,   100 ,};
+  const vector<float> cfvalupp2 = { fInf ,  fInf ,};
+  fillCFhist("h_cutflow2_notop", cutflow2, cfvallow2, cfvalupp2, cfnames2);
+  if (topcands_disc().size() > 0 && topcands_disc()[0] > 0.98)
+    fillCFhist("h_cutflow2_hastop", cutflow2, cfvallow2, cfvalupp2, cfnames2);
+
+  const vector<string> cfnames3 = { "njet4", "njet5",};
+  const vector<string> cutflow3 = {  "njet",  "njet",};
+  const vector<float> cfvallow3 = {      4 ,      5 ,};
+  const vector<float> cfvalupp3 = {   fInf ,   fInf ,};
+  fillCFhist("h_cutflow3_notop", cutflow3, cfvallow3, cfvalupp3, cfnames3);
+  if (topcands_disc().size() > 0 && topcands_disc()[0] > 0.98)
+    fillCFhist("h_cutflow3_hastop", cutflow3, cfvallow3, cfvalupp3, cfnames3);
+
+
+}
+
+
+void StopLooper::temporaryAnalysisDump(string suffix) {
+
+  // // Find the gen pT of the ttbar system
+  // double ttbarPt = -99.9;
+  // LorentzVector genTTbar_LV;
+  // int nFoundGenTop=0;
+  // if (sampleIsTTbar) {
+  //   for (int iGen=0; iGen<(int)genqs_p4().size(); iGen++) {
+  //     if ( abs(genqs_id().at(iGen))==6 && genqs_isLastCopy().at(iGen) ) {
+  //       genTTbar_LV += genqs_p4().at(iGen);
+  //       nFoundGenTop++;
+  //     } // end if last copy of top
+  //   } // end loop over gen quarks
+
+  //   if ( nFoundGenTop == 2 ) ttbarPt = genTTbar_LV.Pt();
+  // } // end if sample is ttbar
+
+
+  // // Calculate p4 of (lep1 lep2 b b) system
+  // LorentzVector lep1lep2bb_TLV(0.0,0.0,0.0,0.0);
+  // lep1lep2bb_TLV += lep1_p4();
+  // if (nvetoleps() > 1) lep1lep2bb_TLV += lep2_p4();
+
+  // int jet1_idx = -1;
+  // double max_csv = -99.9;
+  // for (int iJet=0; iJet<(int)ak4pfjets_p4().size(); iJet++) {
+  //   if (ak4pfjets_CSV().at(iJet) > max_csv) {
+  //     jet1_idx = iJet;
+  //     max_csv  = ak4pfjets_CSV().at(iJet);
+  //   }
+  // }
+  // if (jet1_idx >= 0) lep1lep2bb_TLV += ak4pfjets_p4().at(jet1_idx);
+
+  // int jet2_idx = -1;
+  // max_csv = -99.9;
+  // for (int iJet=0; iJet<(int)ak4pfjets_p4().size(); iJet++) {
+  //   if (iJet == jet1_idx) continue;
+  //   if (ak4pfjets_CSV().at(iJet) > max_csv) {
+  //     jet2_idx = iJet;
+  //     max_csv = ak4pfjets_CSV().at(iJet);
+  //   }
+  // }
+  // if(jet2_idx>=0) lep1lep2bb_TLV += ak4pfjets_p4().at(jet2_idx);
+
+  // // Calculate p4 of (lep1 lep2 b b MET) system
+  // double lep1lep2bbMet_pt = -99.9;
+  // LorentzVector lep1lep2bbMet_TLV = lep1lep2bb_TLV;
+  // LorentzVector met_TLV( pfmet()*cos(pfmet_phi()), pfmet()*sin(pfmet_phi()), 0.0, pfmet() );
+  // lep1lep2bbMet_TLV += met_TLV;
+  // lep1lep2bbMet_pt = lep1lep2bbMet_TLV.Pt();
+
+  // // Calculate mlb using lep2 instead of lep1
+  // LorentzVector lep2b_TLV(0.0,0.0,0.0,0.0);
+  // double minDr = 99.9;
+  // int minBJetIdx = -99;
+  // if(nvetoleps()>1) {
+  //   lep2b_TLV += lep2_p4();
+  //   for(int iJet=0; iJet<(int)ak4pfjets_p4().size(); iJet++) {
+  //     if(!ak4pfjets_passMEDbtag().at(iJet)) continue;
+  //     if(ROOT::Math::VectorUtil::DeltaR(ak4pfjets_p4().at(iJet),lep2_p4())<minDr) {
+  //       minDr = ROOT::Math::VectorUtil::DeltaR(ak4pfjets_p4().at(iJet),lep2_p4());
+  //       minBJetIdx = iJet;
+  //     }
+  //   } // end loop over jets
+  //   if(minBJetIdx>=0) lep2b_TLV += ak4pfjets_p4().at(minBJetIdx);
+  // } // end if nvetoleps>1
 
 }
