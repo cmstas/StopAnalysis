@@ -28,13 +28,27 @@ declare -a Samples=(data_met)
 # done
 
 # 2017 MC test
-INDIR=/hadoop/cms/store/user/sicheng/ProjectMetis/TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISummer17MiniAOD-92X_upgrade2017_realistic_v10-v3_MINIAODSIM_v25/merged
+INDIR=/nfs-7/userdata/sicheng/stopbabies/merged_v25_4
 OUTDIR=output/temp
 
 mkdir -p ${OUTDIR}
 mkdir -p ${LOGDIR}
 
+# declare -a Samples=(TTJets W2Jets W3Jets W4Jets)
 declare -a Samples=(TTJets)
+
+# for SAMPLE in ${Samples[@]}; do
+#     echo ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} '>&' ${LOGDIR}/log_${SAMPLE}.txt
+#     ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
+#     # eval "nohup ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
+#     # echo nice -n 10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
+#     # eval "nohup nice -n -10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
+# done
+
+# 2016 signal remade
+# INDIR=/nfs-7/userdata/sicheng/stopbabies/skimmed_v25_4
+# declare -a Samples=(SMS_T2bW SMS_T2tb SMS_T2tt)
+declare -a Samples=(SMS_T2tt_mStop-400to1200)
 
 for SAMPLE in ${Samples[@]}; do
     echo ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} '>&' ${LOGDIR}/log_${SAMPLE}.txt
@@ -43,7 +57,6 @@ for SAMPLE in ${Samples[@]}; do
     # echo nice -n 10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
     # eval "nohup nice -n -10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
 done
-
 
 # 2016 data for comparison
 INDIR=/nfs-7/userdata/stopRun2/analysis2016_SUS-16-051_35p9fbinv/v24/output
@@ -88,17 +101,13 @@ declare -a Samples=(DYJetsToLL TTGJets TTWJets TTZ W1Jets W2Jets W3Jets W4Jets W
 #     # eval "nohup nice -n 10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}_2016.txt &"
 # done
 
-
-# 2016 Signal
-declare -a Samples=(Signal_T2bW Signal_T2tb Signal_T2tt)
-
 # Monitor the running
 while : ; do
     sleep 5
-    RunningJobs=`jobs`
+    RunningJobs=`jobs | grep runStopLooper`
     [[ $RunningJobs == "" ]] && break
 done    
-echo All jobs are done!
-echo -e '\a'
+
+echo -e 'All jobs are done!\a'
 
 # . temp.sh

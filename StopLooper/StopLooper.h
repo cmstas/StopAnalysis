@@ -20,8 +20,12 @@ class StopLooper {
   void fillHistosForCR0b(std::string suffix = "");
   void fillHistosForCRemu(std::string suffix = "");
 
+  // Analysis
+  void temporaryAnalysisDump(std::string suffix = "");
+
   // Testing
-  void testTopTaggingEffficiency(std::string suffix = "");
+  void testTopTaggingEffficiency(SR& sr);
+  void fillCutFlowHistos(SR& sr);
 
   // Under development
   std::vector<SR*> FindSR(std::map<std::string,float>& values);
@@ -32,6 +36,8 @@ class StopLooper {
   std::vector<SR> CR2lVec;
   std::vector<SR> CR0bVec;
   std::vector<SR> CRemuVec;
+
+  std::vector<SR> testVec;
 
   // Under development
   std::map<std::string,SRptrSet> allSRptrSets;
