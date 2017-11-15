@@ -18,9 +18,11 @@
 #include <iostream>
 #include <cmath>
 
-H cumulate (const H &in, bool increasing)
+using namespace std;
+
+TH1D cumulate (const TH1D &in, bool increasing)
 {
-    H h_out(in.GetName() + TString("tmp"), in.GetTitle(), in.GetNbinsX(),
+    TH1D h_out(in.GetName() + TString("tmp"), in.GetTitle(), in.GetNbinsX(),
             in.GetBinLowEdge(1), in.GetBinLowEdge(in.GetNbinsX() + 1));
     h_out.Sumw2();
     h_out.SetFillColor(in.GetFillColor());
@@ -48,16 +50,16 @@ H cumulate (const H &in, bool increasing)
     return h_out;
 }
 
-TGraph eff_rej (const H &signal, H &background, bool normalize, bool increasing)
+TGraph eff_rej (const TH1D &signal, TH1D &background, bool normalize, bool increasing)
 {
-    H sig = *(TH1D*)signal.Clone("h_tmp_s");
+    TH1D sig = *(TH1D*)signal.Clone("h_tmp_s");
     if (normalize)
         sig.Scale(1 / sig.Integral(0, sig.GetNbinsX() + 1));
-    H bg = *(TH1D*)background.Clone("h_tmp_bg");
+    TH1D bg = *(TH1D*)background.Clone("h_tmp_bg");
     if (normalize)
         bg.Scale(1 / bg.Integral(0, bg.GetNbinsX() + 1));
-    H sig_cum = cumulate(sig, increasing);
-    H bg_cum = cumulate(bg, increasing);
+    TH1D sig_cum = cumulate(sig, increasing);
+    TH1D bg_cum = cumulate(bg, increasing);
     TGraph ret(signal.GetNbinsX());
     for (int i = 1; i <= signal.GetNbinsX(); ++i) {
         const double x = sig_cum.GetBinCenter(i);
