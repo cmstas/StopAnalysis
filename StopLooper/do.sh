@@ -34,8 +34,20 @@ OUTDIR=output/temp
 mkdir -p ${OUTDIR}
 mkdir -p ${LOGDIR}
 
-# declare -a Samples=(TTJets W2Jets W3Jets W4Jets)
-declare -a Samples=(TTJets)
+declare -a Samples=(TTJets W2Jets W3Jets W4Jets)
+# declare -a Samples=(TTJets)
+
+for SAMPLE in ${Samples[@]}; do
+    # echo ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} '>&' ${LOGDIR}/log_${SAMPLE}.txt
+    # ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
+    echo nice -n 10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
+    eval "nohup nice -n -10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
+done
+
+# 2016 signal remade
+# INDIR=/nfs-7/userdata/sicheng/stopbabies/skimmed_v25_4
+# declare -a Samples=(SMS_T2bW SMS_T2tb SMS_T2tt)
+declare -a Samples=(SMS_T2tt_mStop-400to1200)
 
 # for SAMPLE in ${Samples[@]}; do
 #     echo ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} '>&' ${LOGDIR}/log_${SAMPLE}.txt
@@ -44,19 +56,6 @@ declare -a Samples=(TTJets)
 #     # echo nice -n 10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
 #     # eval "nohup nice -n -10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
 # done
-
-# 2016 signal remade
-# INDIR=/nfs-7/userdata/sicheng/stopbabies/skimmed_v25_4
-# declare -a Samples=(SMS_T2bW SMS_T2tb SMS_T2tt)
-declare -a Samples=(SMS_T2tt_mStop-400to1200)
-
-for SAMPLE in ${Samples[@]}; do
-    echo ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} '>&' ${LOGDIR}/log_${SAMPLE}.txt
-    ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
-    # eval "nohup ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
-    # echo nice -n 10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
-    # eval "nohup nice -n -10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
-done
 
 # 2016 data for comparison
 INDIR=/nfs-7/userdata/stopRun2/analysis2016_SUS-16-051_35p9fbinv/v24/output

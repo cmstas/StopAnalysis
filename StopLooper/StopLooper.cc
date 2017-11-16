@@ -311,7 +311,6 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir) {
 
       values_["mt"] = mt_met_lep();
       values_["met"] = pfmet();
-      values_["metphi"] = pfmet_phi();
       values_["mt2w"] = MT2W();
       values_["mlb"] = Mlb_closestb();
       values_["tmod"] = topnessMod();
@@ -319,22 +318,30 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir) {
       values_["nvlep"] = nvetoleps();
       values_["njet"] = ngoodjets();
       values_["nbjet"] = ngoodbtags();
-      values_["nbtag"] = nanalysisbtags();
-      values_["ntbtag"] = ntightbtags();
       values_["dphijmet"] = mindphi_met_j1_j2();
-      values_["dphilmet"] = fabs(lep1_p4().phi() - pfmet_phi());
       values_["passvetos"] = PassTrackVeto() && PassTauVeto();
 
       values_["lep1pt"] = lep1_p4().pt();
-      values_["lep1eta"] = lep1_p4().eta();
+      values_["dphilmet"] = fabs(lep1_p4().phi() - pfmet_phi());
 
+      values_["lep1eta"] = lep1_p4().eta();
+      values_["metphi"] = pfmet_phi();
+      values_["nbtag"]  = nanalysisbtags();
+      values_["ntbtag"] = ntightbtags();
       values_["chi2"]    = hadronic_top_chi2();
       values_["leadbpt"] = ak4pfjets_leadbtag_p4().pt();
       values_["mlb_0b"]   = (ak4pfjets_leadbtag_p4() + lep1_p4()).M();
-      values_["htratio"] = ak4_htratiom();
       values_["ht"]      = ak4_HT();
+      values_["htratio"] = ak4_htratiom();
 
+      values_["dphilmet"] = fabs(lep1_p4().phi() - pfmet_phi());
       values_["passlep1pt"] = (abs(lep1_pdgid()) == 13 && lep1_p4().pt() > 40) || (abs(lep1_pdgid()) == 11 && lep1_p4().pt() > 45);
+
+      // Filling histograms for SR
+      fillHistosForSR();
+
+      testCutFlowHistos(testVec[1]);
+
       // drlepb_  = dR_lep_leadb();
       // mhtsig_  = getMHTSig();
 
@@ -351,11 +358,6 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir) {
           jet_flavour.push_back( abs(ak4pfjets_hadron_flavor().at(iJet)) );
         }
       }
-
-      fillCutFlowHistos(testVec[1]);
-
-      // Filling histograms
-      // fillHistosForSR();
 
       // fillHistosForCR0b();
 
@@ -449,6 +451,7 @@ void StopLooper::fillHistosForSR(string suf) {
       auto fillhists = [&] (string s) {
         plot1D("h_mt"+s,       values_["mt"]      , evtweight_, sr.histMap, ";M_{T} [GeV]"          , 12,  0, 600);
         plot1D("h_mt2w"+s,     values_["mt2w"]    , evtweight_, sr.histMap, ";MT2W [GeV]"           , 18,  50, 500);
+        plot1D("h_metbins"+s,  values_["met"]     , evtweight_, sr.histMap, ";E_{T}^{miss} [GeV]"   , 24,  50, 650);
         plot1D("h_met"+s,      values_["met"]     , evtweight_, sr.histMap, ";E_{T}^{miss} [GeV]"   , 24,  50, 650);
         plot1D("h_metphi"+s,   values_["metphi"]  , evtweight_, sr.histMap, ";#phi(E_{T}^{miss})"   , 24,  50, 650);
         plot1D("h_lep1pt"+s,   values_["lep1pt"]  , evtweight_, sr.histMap, ";p_{T}(lep1) [GeV]"    , 30,  0, 300);
@@ -469,8 +472,11 @@ void StopLooper::fillHistosForSR(string suf) {
       else if ( abs(lep1_pdgid()) == 13 )
         fillhists(suf+"_mu");
 
+      if (topcands_disc().size() > 0 && topcands_disc()[0] > 0.98)
+        fillhists("_wtc"+suf);
     }
   }
+  // SRVec[0].PassesSelectionPrintFirstFail(values_);
 }
 
 void StopLooper::fillHistosForCRemu(string suf) {
@@ -771,7 +777,7 @@ void StopLooper::testTopTaggingEffficiency(SR& sr) {
   }
 }
 
-void StopLooper::fillCutFlowHistos(SR& sr) {
+void StopLooper::testCutFlowHistos(SR& sr) {
 
   auto fillCFhist = [&](string&& hname, auto& cutflow, auto& cfvallow, auto& cfvalupp, auto& cfnames) {
     int ncuts = cutflow.size();
@@ -797,25 +803,25 @@ void StopLooper::fillCutFlowHistos(SR& sr) {
   const vector<string> cutflow1 = {"met",  "mt",};
   const vector<float> cfvallow1 = {  250,  100 ,};
   const vector<float> cfvalupp1 = { fInf, fInf ,};
-  fillCFhist("h_cutflow1_notop", cutflow1, cfvallow1, cfvalupp1, cfnames1);
+  fillCFhist("h_cutflow1_org", cutflow1, cfvallow1, cfvalupp1, cfnames1);
   if (topcands_disc().size() > 0 && topcands_disc()[0] > 0.98)
-    fillCFhist("h_cutflow1_hastop", cutflow1, cfvallow1, cfvalupp1, cfnames1);
+    fillCFhist("h_cutflow1_wtc", cutflow1, cfvallow1, cfvalupp1, cfnames1);
 
   const vector<string> cfnames2 = {  "mt",  "mlb",};
   const vector<string> cutflow2 = {  "mt",  "mlb",};
   const vector<float> cfvallow2 = {  150 ,   100 ,};
   const vector<float> cfvalupp2 = { fInf ,  fInf ,};
-  fillCFhist("h_cutflow2_notop", cutflow2, cfvallow2, cfvalupp2, cfnames2);
+  fillCFhist("h_cutflow2_org", cutflow2, cfvallow2, cfvalupp2, cfnames2);
   if (topcands_disc().size() > 0 && topcands_disc()[0] > 0.98)
-    fillCFhist("h_cutflow2_hastop", cutflow2, cfvallow2, cfvalupp2, cfnames2);
+    fillCFhist("h_cutflow2_wtc", cutflow2, cfvallow2, cfvalupp2, cfnames2);
 
   const vector<string> cfnames3 = { "njet4", "njet5",};
   const vector<string> cutflow3 = {  "njet",  "njet",};
   const vector<float> cfvallow3 = {      4 ,      5 ,};
   const vector<float> cfvalupp3 = {   fInf ,   fInf ,};
-  fillCFhist("h_cutflow3_notop", cutflow3, cfvallow3, cfvalupp3, cfnames3);
+  fillCFhist("h_cutflow3_org", cutflow3, cfvallow3, cfvalupp3, cfnames3);
   if (topcands_disc().size() > 0 && topcands_disc()[0] > 0.98)
-    fillCFhist("h_cutflow3_hastop", cutflow3, cfvallow3, cfvalupp3, cfnames3);
+    fillCFhist("h_cutflow3_wtc", cutflow3, cfvallow3, cfvalupp3, cfnames3);
 
 
 }
