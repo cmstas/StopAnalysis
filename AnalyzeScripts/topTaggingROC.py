@@ -14,11 +14,11 @@ if __name__ == "__main__":
 
     f1 = r.TFile("../StopLooper/output/temp/TTJets.root")
 
-    hcalcable = f1.Get("srbase/h_calculable")
-    hfakeable = f1.Get("srbase/h_fakable")
+    hcalcable = f1.Get("testTopTagging/h_calculable")
+    hfakeable = f1.Get("testTopTagging/h_fakable")
 
-    hgood = f1.Get("srbase/h_topcand_finedisc")
-    hfake = f1.Get("srbase/h_fakecand_finedisc")
+    hgood = f1.Get("testTopTagging/h_topcand_finedisc")
+    hfake = f1.Get("testTopTagging/h_fakecand_finedisc")
 
     h_tageffs = r.TH1F("h_tageffs", ";disc;portion", 1100, -1.1, 1.1)
     h_fkrates = r.TH1F("h_fakerates", ";disc;portion", 1100, -1.1, 1.1)
