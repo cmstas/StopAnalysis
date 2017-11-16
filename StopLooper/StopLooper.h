@@ -25,7 +25,7 @@ class StopLooper {
 
   // Testing
   void testTopTaggingEffficiency(SR& sr);
-  void fillCutFlowHistos(SR& sr);
+  void testCutFlowHistos(SR& sr);
 
   // Under development
   std::vector<SR*> FindSR(std::map<std::string,float>& values);

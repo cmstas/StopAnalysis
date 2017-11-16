@@ -42,6 +42,9 @@ public:
   void RemoveVar(std::string var_name);
   void Clear();
 
+  // Function for debug
+  bool PassesSelectionPrintFirstFail(std::map<std::string, float> values);
+
   // used for plotting
   std::map<std::string, TH1*> histMap;
 

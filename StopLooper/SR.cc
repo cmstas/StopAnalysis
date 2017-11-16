@@ -69,7 +69,7 @@ int SR::GetNMETBins() {
 }
 
 bool SR::PassesSelection(map<string, float> values) {
-  float ep = 0.000001;
+  const float ep = 0.000001;
   if ((kAllowDummyVars_ == 0 && GetNumberOfVariables() != values.size()) ||
       (kAllowDummyVars_ == 1 && GetNumberOfVariables()  > values.size())) {
     cout << "Number of variables to cut on != number of variables in signal region. Passed " << values.size() << ", expected " << GetNumberOfVariables() << endl;
@@ -82,20 +82,47 @@ bool SR::PassesSelection(map<string, float> values) {
       float cut_upper = (it->second).second;
       if (value < cut_lower) return false;
       if (( abs(cut_upper + 1.0) > ep ) && (value >= cut_upper)) return false;
-      // if (value < cut_lower && it->first != "met") {
-      //   cout << __LINE__ <<": var " << it->first << ": value= " << value << ", cut_lower= " << cut_lower << ": cr: " << srname_ << endl;
-      //   return false;
-      // }
-      // if (( abs(cut_upper + 1.0) > ep ) && (value >= cut_upper)) {
-      //   cout << __LINE__ <<": var " << it->first << ": value= " << value << ", cut_upper= " << cut_upper << ": cr: " << srname_ << endl;
-      //   return false;
-      // }
     }
     else if (!kAllowDummyVars_) {
       throw invalid_argument("Cut variable " + it->first + " not found in values");
     }
   }
   ++yield_;
+  return true;
+}
+
+int debug_print_count_SR_cc = 0;
+const int k_debug_print_limit_SR_cc = 100;
+
+bool SR::PassesSelectionPrintFirstFail(map<string, float> values) {
+  const float ep = 0.000001;
+  if ((kAllowDummyVars_ == 0 && GetNumberOfVariables() != values.size()) ||
+      (kAllowDummyVars_ == 1 && GetNumberOfVariables()  > values.size())) {
+    cout << "Number of variables to cut on != number of variables in signal region. Passed " << values.size() << ", expected " << GetNumberOfVariables() << endl;
+    throw invalid_argument(srname_ + ": Number of variables to cut on != number of variables in signal region");
+  }
+  for (auto it = bins_.begin(); it != bins_.end(); it++) {
+    if (values.find(it->first) != values.end()) { //check that we actually have bounds set for this variable
+      float value = values[it->first];
+      float cut_lower = (it->second).first;
+      float cut_upper = (it->second).second;
+      // if (value < cut_lower) return false;
+      // if (( abs(cut_upper + 1.0) > ep ) && (value >= cut_upper)) return false;
+      if (value < cut_lower) {
+        if (debug_print_count_SR_cc++ < k_debug_print_limit_SR_cc)
+          cout << __LINE__ <<": var " << it->first << ": value= " << value << ", cut_lower= " << cut_lower << ": sr: " << srname_ << endl;
+        return false;
+      }
+      if (( abs(cut_upper + 1.0) > ep ) && (value >= cut_upper)) {
+        if (debug_print_count_SR_cc++ < k_debug_print_limit_SR_cc)
+          cout << __LINE__ <<": var " << it->first << ": value= " << value << ", cut_upper= " << cut_upper << ": sr: " << srname_ << endl;
+        return false;
+      }
+    }
+    else if (!kAllowDummyVars_) {
+      throw invalid_argument("Cut variable " + it->first + " not found in values");
+    }
+  }
   return true;
 }
 

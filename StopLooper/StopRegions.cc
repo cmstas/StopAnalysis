@@ -4,9 +4,9 @@
 const float fInf = std::numeric_limits<float>::max();
 
 std::vector<SR> getStopSignalRegionsTopological() {
-  SR base;
 
   SR srbase;
+  srbase.SetAllowDummyVars(1);
   srbase.SetName("srbase");
   srbase.SetVar("mt", 150, fInf);
   srbase.SetVar("met", 250, fInf);
