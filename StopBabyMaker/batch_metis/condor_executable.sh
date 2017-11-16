@@ -96,4 +96,4 @@ gfal-copy -p -f -t 4200 --verbose file://`pwd`/${OUTPUTNAME}_${IFILE}.root gsift
 
 echo -e "\n--- cleaning up ---\n" #                             <----- section division
 cd ..
-rm -r input.tar.gz input/
+rm -r package.tar.gz input/

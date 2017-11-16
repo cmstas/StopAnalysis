@@ -30,8 +30,8 @@ if __name__ == "__main__":
     merge_tasks = []
 
     for dsname, samploc in cms4_samples.items():
-        cmsswver = "CMSSW_9_4_0_pre3"
-        scramarch = "slc6_amd64_gcc700"
+        cmsswver = "CMSSW_9_4_0"
+        scramarch = "slc6_amd64_gcc630"
         tarfile = "input.tar.gz"
         tag = "v25_4"
         maker_task = CondorTask(
@@ -48,7 +48,7 @@ if __name__ == "__main__":
             executable = "condor_executable.sh",
             outdir_name = "stopBaby_" + dsname,
             output_name = "stopbaby.root",
-            arguments = "1" if dsname[:2] == "T2" else "0", # isFastsim
+            arguments = "1" if "SMS" in dsname else "0", # isFastsim
             condor_submit_params = {"sites": "UAF,T2_US_UCSD,UCSB"},
             # no_load_from_backup = True,
         )
