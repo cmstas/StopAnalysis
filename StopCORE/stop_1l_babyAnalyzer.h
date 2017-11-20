@@ -1,6 +1,6 @@
 // -*- C++ -*-
 // This is a header file generated with the command:
-// makeCMS3ClassFiles("/home/users/sicheng/working/StopAnalysis/StopBabyMaker/TTJets_V07_test_1.root", "t", "stop_1l_babyAnalyzer", "stop_1l", "babyAnalyzer")
+// makeCMS3ClassFiles("/hadoop/cms/store/user/sicheng/ProjectMetis/stopBaby_SMS_T2tt_mStop-400to1200_madgraph_v26_1/stopbaby_64.root", "t", "stop_1l_babyAnalyzer", "stop_1l", "babyAnalyzer")
 
 #ifndef stop_1l_babyAnalyzer_H
 #define stop_1l_babyAnalyzer_H
@@ -673,6 +673,12 @@ class stop_1l_babyAnalyzer {
   vector<float> *ph_drMinParton_;
   TBranch *ph_drMinParton_branch;
   bool     ph_drMinParton_isLoaded;
+  int      njets20_;
+  TBranch *njets20_branch;
+  bool     njets20_isLoaded;
+  int      nbtag30_;
+  TBranch *nbtag30_branch;
+  bool     nbtag30_isLoaded;
   int      ngoodjets_;
   TBranch *ngoodjets_branch;
   bool     ngoodjets_isLoaded;
@@ -733,6 +739,12 @@ class stop_1l_babyAnalyzer {
   vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > *ak4genjets_p4_;
   TBranch *ak4genjets_p4_branch;
   bool     ak4genjets_p4_isLoaded;
+  int      jup_njets20_;
+  TBranch *jup_njets20_branch;
+  bool     jup_njets20_isLoaded;
+  int      jup_nbtag30_;
+  TBranch *jup_nbtag30_branch;
+  bool     jup_nbtag30_isLoaded;
   int      jup_ngoodjets_;
   TBranch *jup_ngoodjets_branch;
   bool     jup_ngoodjets_isLoaded;
@@ -793,6 +805,12 @@ class stop_1l_babyAnalyzer {
   vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > *jup_ak4genjets_p4_;
   TBranch *jup_ak4genjets_p4_branch;
   bool     jup_ak4genjets_p4_isLoaded;
+  int      jdown_njets20_;
+  TBranch *jdown_njets20_branch;
+  bool     jdown_njets20_isLoaded;
+  int      jdown_nbtag30_;
+  TBranch *jdown_nbtag30_branch;
+  bool     jdown_nbtag30_isLoaded;
   int      jdown_ngoodjets_;
   TBranch *jdown_ngoodjets_branch;
   bool     jdown_ngoodjets_isLoaded;
@@ -1692,6 +1710,8 @@ void LoadAllBranches();
   const vector<int> &ph_mcMatchId();
   const vector<float> &ph_genIso04();
   const vector<float> &ph_drMinParton();
+  const int &njets20();
+  const int &nbtag30();
   const int &ngoodjets();
   const int &ngoodbtags();
   const int &nloosebtags();
@@ -1712,6 +1732,8 @@ void LoadAllBranches();
   const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &ak4pfjets_leadMEDbjet_p4();
   const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &ak4pfjets_leadbtag_p4();
   const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &ak4genjets_p4();
+  const int &jup_njets20();
+  const int &jup_nbtag30();
   const int &jup_ngoodjets();
   const int &jup_ngoodbtags();
   const int &jup_nloosebtags();
@@ -1732,6 +1754,8 @@ void LoadAllBranches();
   const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &jup_ak4pfjets_leadMEDbjet_p4();
   const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &jup_ak4pfjets_leadbtag_p4();
   const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &jup_ak4genjets_p4();
+  const int &jdown_njets20();
+  const int &jdown_nbtag30();
   const int &jdown_ngoodjets();
   const int &jdown_ngoodbtags();
   const int &jdown_nloosebtags();
@@ -2184,6 +2208,8 @@ namespace stop_1l {
   const vector<int> &ph_mcMatchId();
   const vector<float> &ph_genIso04();
   const vector<float> &ph_drMinParton();
+  const int &njets20();
+  const int &nbtag30();
   const int &ngoodjets();
   const int &ngoodbtags();
   const int &nloosebtags();
@@ -2204,6 +2230,8 @@ namespace stop_1l {
   const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &ak4pfjets_leadMEDbjet_p4();
   const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &ak4pfjets_leadbtag_p4();
   const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &ak4genjets_p4();
+  const int &jup_njets20();
+  const int &jup_nbtag30();
   const int &jup_ngoodjets();
   const int &jup_ngoodbtags();
   const int &jup_nloosebtags();
@@ -2224,6 +2252,8 @@ namespace stop_1l {
   const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &jup_ak4pfjets_leadMEDbjet_p4();
   const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &jup_ak4pfjets_leadbtag_p4();
   const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &jup_ak4genjets_p4();
+  const int &jdown_njets20();
+  const int &jdown_nbtag30();
   const int &jdown_ngoodjets();
   const int &jdown_ngoodbtags();
   const int &jdown_nloosebtags();

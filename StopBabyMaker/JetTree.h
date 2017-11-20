@@ -54,6 +54,8 @@ public:
    // branch objects
  
     // ak4 PF jets
+    int njets20;
+    int nbtag30;
     int ngoodjets;
     int nfailjets; //jets not passing loose jid
     int nGoodAK8PFJets;
