@@ -67,6 +67,8 @@ const bool doSystVariationPlots = true;
 const bool doNvtxReweight = false;
 // turn on to apply nTrueInt reweighting to MC
 const bool doNTrueIntReweight = true;
+// turn on top tagging studies, off for 2016 data/mc
+const bool doTopTagging = false;
 // turn on to apply json file to data
 const bool applyjson = true;
 // ignore scale1fb to run over test samples
@@ -168,8 +170,8 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir) {
     if (!h_nvtxscale) throw invalid_argument("???");
     cout << "Doing nvtx reweighting! The scale factors are:" << endl;
     for (int i = 1; i < 70; ++i) {
-      nvtxscale[i] = h_nvtxscale->GetBinContent(i);
-      cout << i << "  " << nvtxscale[i] << endl;
+      nvtxscale_[i] = h_nvtxscale->GetBinContent(i);
+      cout << i << "  " << nvtxscale_[i] << endl;
     }
   }
 
@@ -225,7 +227,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir) {
     // Get weight histogram from baby
     wgtInfo.getWeightHistogramFromBaby(&file);
 
-    bool is_signal = fname.Contains("SMS") || fname.Contains("Signal");
+    is_signal_ = fname.Contains("SMS") || fname.Contains("Signal");
 
     dummy.cd();
     // Loop over Events in current file
@@ -256,7 +258,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir) {
 
       // Apply met filters
       // if (!filt_globalTightHalo2016()) continue; // problematic for 2017
-      if (!is_signal) {
+      if (!is_signal_) {
         if ( !filt_globalsupertighthalo2016() ) continue;
         if ( !filt_hbhenoise() ) continue;
         if ( !filt_hbheisonoise() )   continue;
@@ -281,9 +283,10 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir) {
       // Calculate event weight
       // wgtInfo.getEventWeights(); // what does this do?    // <-- breaks on signal samples
 
-      if (!is_data() && !is_signal) {
+      if (!is_data() && !is_signal_) {
         evtweight_ = scale1fb();
       }
+
       // bool isCorridor = true;   // for testing purpose
       // sysInfo::ID sysID = sysInfo::ID::k_nominal; // temporary for testing
       // if (isCorridor)
@@ -295,12 +298,11 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir) {
       // else
       //   evtweight_ = sysInfo::GetEventWeight( sysID );
 
-      // if (doNvtxReweight) {
-      //   if (nvtxs() > 69) continue;
-      //   if (is2016data)
-      //     evtweight_ *= nvtxscale[nvtxs()];
-      // }
-
+      if (doNvtxReweight) {
+        if (nvtxs() > 69) continue;
+        if (is2016data)
+          evtweight_ *= nvtxscale_[nvtxs()];
+      }
 
       // Temporary test for
       testTopTaggingEffficiency(testVec[0]);
@@ -317,7 +319,8 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir) {
       values_["nlep"] = ngoodleps();
       values_["nvlep"] = nvetoleps();
       values_["njet"] = ngoodjets();
-      values_["nbjet"] = ngoodbtags();
+      values_["nbjet"] = ngoodbtags();  // nbtag30();
+      values_["ntbtag"] = ntightbtags();
       values_["dphijmet"] = mindphi_met_j1_j2();
       values_["passvetos"] = PassTrackVeto() && PassTauVeto();
 
@@ -327,7 +330,6 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir) {
       values_["lep1eta"] = lep1_p4().eta();
       values_["metphi"] = pfmet_phi();
       values_["nbtag"]  = nanalysisbtags();
-      values_["ntbtag"] = ntightbtags();
       values_["chi2"]    = hadronic_top_chi2();
       values_["leadbpt"] = ak4pfjets_leadbtag_p4().pt();
       values_["mlb_0b"]   = (ak4pfjets_leadbtag_p4() + lep1_p4()).M();
@@ -336,11 +338,13 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir) {
 
       values_["dphilmet"] = fabs(lep1_p4().phi() - pfmet_phi());
       values_["passlep1pt"] = (abs(lep1_pdgid()) == 13 && lep1_p4().pt() > 40) || (abs(lep1_pdgid()) == 11 && lep1_p4().pt() > 45);
+      // values_["j1csv"] = ak4pfjets_deepCSV().at(0);  // j1 csv for the compressed region
+      values_["j1csv"] = (ak4pfjets_CSV().size())? ak4pfjets_CSV().at(0) : -1;
 
       // Filling histograms for SR
       fillHistosForSR();
 
-      testCutFlowHistos(testVec[1]);
+      // testCutFlowHistos(testVec[1]);
 
       // drlepb_  = dR_lep_leadb();
       // mhtsig_  = getMHTSig();
@@ -451,7 +455,6 @@ void StopLooper::fillHistosForSR(string suf) {
       auto fillhists = [&] (string s) {
         plot1D("h_mt"+s,       values_["mt"]      , evtweight_, sr.histMap, ";M_{T} [GeV]"          , 12,  0, 600);
         plot1D("h_mt2w"+s,     values_["mt2w"]    , evtweight_, sr.histMap, ";MT2W [GeV]"           , 18,  50, 500);
-        plot1D("h_metbins"+s,  values_["met"]     , evtweight_, sr.histMap, ";E_{T}^{miss} [GeV]"   , 24,  50, 650);
         plot1D("h_met"+s,      values_["met"]     , evtweight_, sr.histMap, ";E_{T}^{miss} [GeV]"   , 24,  50, 650);
         plot1D("h_metphi"+s,   values_["metphi"]  , evtweight_, sr.histMap, ";#phi(E_{T}^{miss})"   , 24,  50, 650);
         plot1D("h_lep1pt"+s,   values_["lep1pt"]  , evtweight_, sr.histMap, ";p_{T}(lep1) [GeV]"    , 30,  0, 300);
@@ -464,7 +467,14 @@ void StopLooper::fillHistosForSR(string suf) {
         plot1D("h_tmod"+s,     values_["tmod"]    , evtweight_, sr.histMap, ";modified topness"     , 25, -10, 15);
 
         const float met_bins[] = {0, 250, 350, 450, 550, 650, 800};
-        plot1D("h_metbins"+s,   values_["met"]    , evtweight_, sr.histMap, ";E^{miss}_{T} [GeV]"        , 6, met_bins);
+        plot1D("h_metbins"+s,   values_["met"]    , evtweight_, sr.histMap, ";E^{miss}_{T} [GeV]"   , 6, met_bins);
+
+        if (is_signal_) {
+          string masspt_suf = "_" + to_string((int) mass_stop()) + "_" + to_string((int) mass_lsp());
+          plot1D("h_metbins"+masspt_suf+s, values_["met"], evtweight_, sr.histMap, ";E^{miss}_{T} [GeV]" , 6, met_bins);
+        }
+        if (doTopTagging && topcands_disc().size() > 0)
+          plot1D("h_leadtopcand_disc", topcands_disc()[0], evtweight_, sr.histMap, ";top discriminator", 110, -1.1, 1.1);
       };
       fillhists(suf);
       if ( abs(lep1_pdgid()) == 11 )
@@ -472,7 +482,7 @@ void StopLooper::fillHistosForSR(string suf) {
       else if ( abs(lep1_pdgid()) == 13 )
         fillhists(suf+"_mu");
 
-      if (topcands_disc().size() > 0 && topcands_disc()[0] > 0.98)
+      if (doTopTagging && topcands_disc().size() > 0 && topcands_disc()[0] > 0.98)
         fillhists("_wtc"+suf);
     }
   }
@@ -646,6 +656,7 @@ void StopLooper::fillHistosForCR0b(string suf) {
 void StopLooper::testTopTaggingEffficiency(SR& sr) {
   // Function to test the top tagging efficiencies and miss-tag rate
   // The current tagger only works for hadronically decay tops
+  if (!doTopTagging) return;
 
   // First need to determine how many gen tops does hadronic decay
   int nHadDecayTops = 2 - gen_nfromtleps_();  // 2 gentops for sure <-- checked
@@ -657,17 +668,25 @@ void StopLooper::testTopTaggingEffficiency(SR& sr) {
   // 3. has TopCand.disc > 0 / all events 4. has TopCand.disc > 0 / raw TopCand > 0
   // 5. count 2D vecTopCand.size(), TopCand.disc
 
+  // int calculable = (ngoodbtags() > 0 && ngoodjets() > 2);
+  // calculable += (ngoodjets() > 5);
+  // int n4jets = (ngoodbtags() > 0 && ngoodjets() > 3);
+
   int calculable = (ngoodbtags() > 0 && ngoodjets() > 2);
   calculable += (ngoodjets() > 5);
+  int n4jets = (ngoodbtags() > 0 && ngoodjets() > 3);
 
   if (nHadDecayTops == 1) {
+    plot1D("h_calculable", calculable, evtweight_, sr.histMap, ";N(events)", 4, 0, 4);
+    plot1D("h_n4jets", n4jets, evtweight_, sr.histMap, ";N(4j events)", 4, 0, 4);
+    if (n4jets == 0) return;
+
     float ratio_ntcandvscalable;
     if (calculable != 0) ratio_ntcandvscalable = (float) topcands_disc().size() / calculable;
     else ratio_ntcandvscalable = (ntopcands == 0)? -1/12 : 2.5;
     plot1D("h_ratio_ntcandvscalable", ratio_ntcandvscalable, evtweight_, sr.histMap, ";N(topcand)", 7, -0.5, 3);
 
     plot1D("h_ntopcand_raw", ntopcands, evtweight_, sr.histMap, ";N(topcand)", 4, 0, 4);
-    plot1D("h_calculable", calculable, evtweight_, sr.histMap, ";N(topcand)", 4, 0, 4);
     int ntopcand0 = 0;
     int ntopcandp5 = 0;
     int ntopcandp9 = 0;
@@ -684,7 +703,7 @@ void StopLooper::testTopTaggingEffficiency(SR& sr) {
     plot2D("h2d_ntopcand0", ntopcands, ntopcand0, evtweight_, sr.histMap, ";N(all topcand);N(disc > 0)", 4, 0, 4, 4, 0, 4);
     plot2D("h2d_ntopcandp5", ntopcands, ntopcandp5, evtweight_, sr.histMap, ";N(all topcand);N(disc > 0.5)", 4, 0, 4, 4, 0, 4);
     plot2D("h2d_ntopcandp9", ntopcands, ntopcandp9, evtweight_, sr.histMap, ";N(all topcand);N(disc > 0.9)", 4, 0, 4, 4, 0, 4);
-    plot2D("h2d_ntopcandp98", ntopcands, ntopcandp98, evtweight_, sr.histMap, ";N(all topcand);N(disc > 0.9)", 4, 0, 4, 4, 0, 4);
+    plot2D("h2d_ntopcandp98", ntopcands, ntopcandp98, evtweight_, sr.histMap, ";N(all topcand);N(disc > 0.98)", 4, 0, 4, 4, 0, 4);
 
     // Find the daughters of the hadronically decayed top
 
@@ -756,7 +775,9 @@ void StopLooper::testTopTaggingEffficiency(SR& sr) {
     }
   }
   else if (nHadDecayTops == 0) {
-    plot1D("h_fakable", calculable, evtweight_, sr.histMap, ";N(topcand)", 4, 0, 4);
+    plot1D("h_fakable", calculable, evtweight_, sr.histMap, ";N(events)", 4, 0, 4);
+    plot1D("h_fak4j", n4jets, evtweight_, sr.histMap, ";N(events)", 4, 0, 4);
+    if (n4jets == 0) return;
     plot1D("h_nfakecand_raw", ntopcands, evtweight_, sr.histMap, ";N(topcand)", 4, 0, 4);
 
     if (ntopcands > 0) {
@@ -799,30 +820,40 @@ void StopLooper::testCutFlowHistos(SR& sr) {
     }
   };
 
+  string masspt_suf = (is_signal_)? "_" + to_string((int) mass_stop()) + "_" + to_string((int) mass_lsp()) : "";
+
   const vector<string> cfnames1 = {"met",  "mt",};
   const vector<string> cutflow1 = {"met",  "mt",};
   const vector<float> cfvallow1 = {  250,  100 ,};
   const vector<float> cfvalupp1 = { fInf, fInf ,};
   fillCFhist("h_cutflow1_org", cutflow1, cfvallow1, cfvalupp1, cfnames1);
-  if (topcands_disc().size() > 0 && topcands_disc()[0] > 0.98)
+  if (is_signal_) fillCFhist("h_cutflow1"+masspt_suf+"_org", cutflow1, cfvallow1, cfvalupp1, cfnames1);
+  if (doTopTagging && topcands_disc().size() > 0 && topcands_disc()[0] > 0.98) {
     fillCFhist("h_cutflow1_wtc", cutflow1, cfvallow1, cfvalupp1, cfnames1);
+    if (is_signal_) fillCFhist("h_cutflow1"+masspt_suf+"c", cutflow1, cfvallow1, cfvalupp1, cfnames1);
+  }
 
   const vector<string> cfnames2 = {  "mt",  "mlb",};
   const vector<string> cutflow2 = {  "mt",  "mlb",};
   const vector<float> cfvallow2 = {  150 ,   100 ,};
   const vector<float> cfvalupp2 = { fInf ,  fInf ,};
   fillCFhist("h_cutflow2_org", cutflow2, cfvallow2, cfvalupp2, cfnames2);
-  if (topcands_disc().size() > 0 && topcands_disc()[0] > 0.98)
+  if (is_signal_) fillCFhist("h_cutflow2"+masspt_suf+"_org", cutflow2, cfvallow2, cfvalupp2, cfnames2);
+  if (doTopTagging && topcands_disc().size() > 0 && topcands_disc()[0] > 0.98) {
     fillCFhist("h_cutflow2_wtc", cutflow2, cfvallow2, cfvalupp2, cfnames2);
+    if (is_signal_) fillCFhist("h_cutflow2"+masspt_suf+"_wtc", cutflow2, cfvallow2, cfvalupp2, cfnames2);
+  }
 
   const vector<string> cfnames3 = { "njet4", "njet5",};
   const vector<string> cutflow3 = {  "njet",  "njet",};
   const vector<float> cfvallow3 = {      4 ,      5 ,};
   const vector<float> cfvalupp3 = {   fInf ,   fInf ,};
   fillCFhist("h_cutflow3_org", cutflow3, cfvallow3, cfvalupp3, cfnames3);
-  if (topcands_disc().size() > 0 && topcands_disc()[0] > 0.98)
+  if (is_signal_) fillCFhist("h_cutflow3"+masspt_suf+"_org", cutflow3, cfvallow3, cfvalupp3, cfnames3);
+  if (doTopTagging && topcands_disc().size() > 0 && topcands_disc()[0] > 0.98) {
     fillCFhist("h_cutflow3_wtc", cutflow3, cfvallow3, cfvalupp3, cfnames3);
-
+    if (is_signal_) fillCFhist("h_cutflow3"+masspt_suf+"_wtc", cutflow3, cfvallow3, cfvalupp3, cfnames3);
+  }
 
 }
 

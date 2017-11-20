@@ -108,8 +108,9 @@ bool SR::PassesSelectionPrintFirstFail(map<string, float> values) {
       float cut_upper = (it->second).second;
       // if (value < cut_lower) return false;
       // if (( abs(cut_upper + 1.0) > ep ) && (value >= cut_upper)) return false;
+      const string k_suppress_vals = "met,dphijmet,mt";
       if (value < cut_lower) {
-        if (debug_print_count_SR_cc++ < k_debug_print_limit_SR_cc)
+        if (k_suppress_vals.find(it->first) == string::npos && debug_print_count_SR_cc++ < k_debug_print_limit_SR_cc)
           cout << __LINE__ <<": var " << it->first << ": value= " << value << ", cut_lower= " << cut_lower << ": sr: " << srname_ << endl;
         return false;
       }
