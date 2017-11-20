@@ -12,7 +12,8 @@ from metis.Utils import do_cmd
 if __name__ == "__main__":
 
     cms4_samples = {
-        "TTJets_amcnlo": "/hadoop/cms/store/user/sicheng/ProjectMetis/TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISummer17MiniAOD-92X_upgrade2017_realistic_v10-v3_MINIAODSIM_CMS4_V00-00-07_test",
+        "TTJets_amcnlo" : "/hadoop/cms/store/user/sicheng/ProjectMetis/TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISummer17MiniAOD-92X_upgrade2017_realistic_v10-v3_MINIAODSIM_CMS4_V00-00-07_test",
+        "ttbar_powheg" : "/hadoop/cms/store/user/sicheng/ProjectMetis/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8_RunIISummer17MiniAOD-92X_upgrade2017_realistic_v10_ext1-v1_MINIAODSIM_CMS4_V00-00-07_test2",
         "SMS_T2tt_mStop-400to1200_madgraph" : "/hadoop/cms/store/user/sicheng/ProjectMetis/SMS-T2tt_mStop-400to1200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MINIAODSIM_CMS4_V00-00-02_test",
         "SMS_T2bt_madgraph" : "/hadoop/cms/store/user/sicheng/ProjectMetis/SMS-T2bt_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MINIAODSIM_CMS4_V00-00-02_test",
         "SMS_T2bW_madgraph" : "/hadoop/cms/store/user/sicheng/ProjectMetis/SMS-T2bW_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MINIAODSIM_CMS4_V00-00-02_test",
@@ -33,7 +34,7 @@ if __name__ == "__main__":
         cmsswver = "CMSSW_9_4_0"
         scramarch = "slc6_amd64_gcc630"
         tarfile = "input.tar.gz"
-        tag = "v25_4"
+        tag = "v26_1"
         maker_task = CondorTask(
             sample = DirectorySample(
                 dataset=dsname,
@@ -67,8 +68,8 @@ if __name__ == "__main__":
             output_is_tree = True,
             # check_expectedevents = True,
             tag = tag,
-            cmssw_version = cmsswver,
-            scram_arch = scramarch,
+            cmssw_version = "CMSSW_9_2_8",
+            scram_arch = "slc6_amd64_gcc530",
             no_load_from_backup = True,
         )
         maker_tasks.append(maker_task)
