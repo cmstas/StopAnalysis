@@ -1,7 +1,10 @@
-#include "PlotUtilities.h"
 #include "StopRegions.h"
 
 const float fInf = std::numeric_limits<float>::max();
+
+static const float BTAG_MED = 0.6324;  // DeepCSV working points
+static const float BTAG_LSE = 0.2219;
+static const float BTAG_TGT = 0.9432;
 
 std::vector<SR> getStopSignalRegionsTopological() {
 
@@ -10,14 +13,15 @@ std::vector<SR> getStopSignalRegionsTopological() {
   srbase.SetName("srbase");
   srbase.SetVar("mt", 150, fInf);
   srbase.SetVar("met", 250, fInf);
-  srbase.SetVar("mt2w", 0, fInf);
-  srbase.SetVar("mlb", 0, fInf);
-  srbase.SetVar("tmod", -fInf, fInf);
+  // srbase.SetVar("mt2w", 0, fInf);
   srbase.SetVar("nlep", 1, 2);
   srbase.SetVar("nvlep", 1, 2);
   srbase.SetVar("passvetos", 1, 2);
   srbase.SetVar("njet", 2, fInf);
   srbase.SetVar("nbjet", 1, fInf);
+  srbase.SetVar("ntbtag", 0, fInf);
+  srbase.SetVar("mlb", 0, fInf);
+  srbase.SetVar("tmod", -fInf, fInf);
   srbase.SetVar("dphijmet", 0.8, 3.14159);
 
   SR sr;
@@ -32,8 +36,8 @@ std::vector<SR> getStopSignalRegionsTopological() {
   sr.SetDetailName("2to3j_tmod10toInf_mlb0to175");
   sr.SetVar("njet", 2, 4);
   sr.SetVar("tmod", 10, fInf);
-  sr.SetVar("mlb", 175, fInf);
-  sr.SetVar("met", 250, fInf);
+  sr.SetVar("mlb", 0, 175);
+  sr.SetVar("ntbtag", 0, fInf);
   sr.SetMETBins({250, 350, 450, 600, 1500});
   SRvec.emplace_back(sr);
 
@@ -42,6 +46,7 @@ std::vector<SR> getStopSignalRegionsTopological() {
   sr.SetVar("njet", 2, 4);
   sr.SetVar("tmod", 10, fInf);
   sr.SetVar("mlb", 175, fInf);
+  sr.SetVar("ntbtag", 1, fInf);
   sr.SetMETBins({250, 450, 600, 1500});
   SRvec.emplace_back(sr);
 
@@ -50,54 +55,67 @@ std::vector<SR> getStopSignalRegionsTopological() {
   sr.SetVar("njet", 4, fInf);
   sr.SetVar("tmod", -fInf, 0);
   sr.SetVar("mlb", 0, 175);
+  sr.SetVar("ntbtag", 0, fInf);
   sr.SetMETBins({250, 350, 450, 550, 650, 1500});
   SRvec.emplace_back(sr);
 
   sr.SetName("srD");
   sr.SetDetailName("geq4j_tmodlt0_mlb175toInf");
+  sr.SetVar("njet", 4, fInf);
   sr.SetVar("tmod", -fInf, 0);
   sr.SetVar("mlb", 175, fInf);
+  sr.SetVar("ntbtag", 1, fInf);
   sr.SetMETBins({250, 350, 450, 550, 1500});
   SRvec.emplace_back(sr);
 
   sr.SetName("srE");
   sr.SetDetailName("geq4j_tmod0to10_mlb0to175");
+  sr.SetVar("njet", 4, fInf);
   sr.SetVar("tmod", 0, 10);
   sr.SetVar("mlb", 0, 175);
+  sr.SetVar("ntbtag", 0, fInf);
   sr.SetMETBins({250, 350, 450, 1500});
   SRvec.emplace_back(sr);
 
   sr.SetName("srF");
   sr.SetDetailName("geq4j_tmod0to10_mlb175toInf");
+  sr.SetVar("njet", 4, fInf);
   sr.SetVar("tmod", 0, 10);
   sr.SetVar("mlb", 175, fInf);
+  sr.SetVar("ntbtag", 1, fInf);
   sr.SetMETBins({250, 450, 1500});
   SRvec.emplace_back(sr);
 
   sr.SetName("srG");
-  sr.SetDetailName("geq4j_tmod0to10_mlb0to175");
-  sr.SetVar("tmod", 0, 10);
+  sr.SetDetailName("geq4j_tmod10toInf_mlb0to175");
+  sr.SetVar("njet", 4, fInf);
+  sr.SetVar("tmod", 10, fInf);
   sr.SetVar("mlb", 0, 175);
+  sr.SetVar("ntbtag", 0, fInf);
   sr.SetMETBins({250, 350, 450, 600, 1500});
   SRvec.emplace_back(sr);
 
   sr.SetName("srH");
   sr.SetDetailName("geq4j_tmod10toInf_mlb175toInf");
-  sr.SetVar("njet", 4, -1);
-  sr.SetVar("met", 250, 450);
+  sr.SetVar("njet", 4, fInf);
+  sr.SetVar("tmod", 10, fInf);
+  sr.SetVar("mlb", 175, fInf);
+  sr.SetVar("ntbtag", 1, fInf);
   sr.SetMETBins({250, 450, 1500});
   SRvec.emplace_back(sr);
 
   // Compressed regions
+  sr = srbase;
   sr.SetName("srI");
-  sr.SetDetailName("geq5j_lpt0to150");
+  sr.SetDetailName("geq5j_lpt0to150_j1notb");
   sr.SetVar("mt", 150, fInf);
+  sr.SetVar("met", 250, 350);
   sr.SetVar("njet", 5, fInf);
   sr.SetVar("nbjet", 1, fInf);
   sr.SetVar("lep1pt", 0, 150);
-  sr.SetVar("met", 250, 350);
   sr.SetVar("dphilmet", 0, 2);
   sr.SetVar("dphijmet", 0.5, 3.1416);
+  sr.SetVar("j1csv", 0, BTAG_MED);  // Require j1 not b-tagged, need medium WP
   sr.SetMETBins({250, 350, 450, 550, 1500});
   SRvec.emplace_back(sr);
 
