@@ -195,6 +195,9 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx, Factorize
     float htosm = 0.;
     float htratiom = 0.;
 
+    njets20 = 0;
+    nbtag30 = 0;
+
     // Figure out which convention is in use for DeepCSV discriminator names
     // and store it statically so we don't have to re-find it for every event
     static TString deepCSV_prefix = "NULL";
@@ -310,11 +313,14 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx, Factorize
 	if(skipthis) continue; //remove all overlaps from jet collection
 
         //Jet selections
-        if(p4sCorrJets.at(jindex).pt() < m_ak4_pt_cut) continue;
+        if(p4sCorrJets.at(jindex).pt() < 20.0) continue;
         if(fabs(p4sCorrJets.at(jindex).eta()) > m_ak4_eta_cut) continue;
 	if(!isLoosePFJetV2(jindex)) ++nFailJets;
         if(!isFastsim && m_ak4_passid && !isLoosePFJetV2(jindex)) continue;
-        nGoodJets++;
+        njets20++;
+        bool is_jetpt30 = (p4sCorrJets.at(jindex).pt() >= m_ak4_pt_cut);
+        if (is_jetpt30) nGoodJets++;
+
         ak4pfjets_p4.push_back(p4sCorrJets.at(jindex));
         ak4pfjets_pt.push_back(p4sCorrJets.at(jindex).pt());
         ak4pfjets_eta.push_back(p4sCorrJets.at(jindex).eta());
@@ -322,7 +328,6 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx, Factorize
         ak4pfjets_mass.push_back(p4sCorrJets.at(jindex).mass());
 
         float value_deepCSV = getbtagvalue(deepCSV_prefix+"JetTags:probb",jindex) + getbtagvalue(deepCSV_prefix+"JetTags:probbb",jindex);
-        // float value_deepCSV = pfjets_pfDeepCSVJetTagsprobbPlusprobbb().at(jindex);
         dphi_ak4pfjet_met.push_back(getdphi(p4sCorrJets.at(jindex).phi(), evt_pfmetPhi()));//this can be false - due to correction to pfmet, but it gets corrected later
         ak4pfjets_CSV.push_back(pfjets_pfCombinedInclusiveSecondaryVertexV2BJetTag().at(jindex));
         ak4pfjets_deepCSV.push_back(value_deepCSV);
@@ -416,11 +421,12 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx, Factorize
 	    weight_tight_UP   *= reader_tight_fastsim   ->eval(flavor, eta_cutoff, pt_cutoff);//this is still just btagSF
 	    weight_tight_DN   *= reader_tight_fastsim   ->eval(flavor, eta_cutoff, pt_cutoff);//this is still just btagSF
 	  }
-	}	
+	}
 	//medium btag
 	if (value_deepCSV > BTAG_MED) {
              ak4pfjets_passMEDbtag.push_back(true);
              nbtags_med++;
+             if (is_jetpt30) nbtag30++;
              if(nbtags_med == 1){
                 ak4pfjets_leadMEDbjet_pt = p4sCorrJets.at(jindex).pt();  //plot leading bjet pT
                 ak4pfjets_leadMEDbjet_p4 = p4sCorrJets.at(jindex);
@@ -814,11 +820,13 @@ void JetTree::Reset ()
     ak4pfjets_leadMEDbjet_p4 = LorentzVector(0,0, 0,0);
     ak4pfjets_leadbtag_p4 = LorentzVector(0,0, 0,0);
   
+    njets20       = -9999;  
     ngoodjets     = -9999;  
     nfailjets     = -9999;  
     ak4_HT 	  = -9999.; 
     nGoodAK8PFJets = -9999;
     nGoodGenJets  = -9999;
+    nbtag30       = -9999;
     ngoodbtags    = -9999;
     nloosebtags    = -9999;
     ntightbtags    = -9999;
@@ -827,6 +835,8 @@ void JetTree::Reset ()
  
 void JetTree::SetAK4Branches (TTree* tree)
 {
+    tree->Branch(Form("%snjets20", prefix_.c_str()) , &njets20);
+    tree->Branch(Form("%snbtag30", prefix_.c_str()) , &nbtag30);
     tree->Branch(Form("%sngoodjets", prefix_.c_str()) , &ngoodjets);
     tree->Branch(Form("%sngoodbtags", prefix_.c_str()) , &ngoodbtags);
     tree->Branch(Form("%snloosebtags", prefix_.c_str()) , &nloosebtags);
