@@ -47,11 +47,12 @@ class StopLooper {
   TFile* outfile_;
 
   // Event specific variables
+  bool is_signal_;
   float evtweight_;
   std::map<std::string,float> values_;
 
   // For nvtx reweighting
-  float nvtxscale[70];
+  float nvtxscale_[70];
 
 };
 
