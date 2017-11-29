@@ -161,7 +161,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir) {
   // Combined 2016 and 2017 json,
   // const char* json_file = "../StopCORE/inputs/json_files/Cert_271036-301141_13TeV_Combined1617_JSON_snt.txt";
   const char* json_file = "../StopCORE/inputs/json_files/Cert_271036-300575_13TeV_Combined1617_JSON_snt.txt";
-  // const float kLumi = 35.87;
+  const float kLumi = 35.87;
 
   // Setup pileup re-weighting
   if (doNvtxReweight) {
@@ -224,10 +224,19 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir) {
     tree->SetCacheSize(128*1024*1024);
     babyAnalyzer.Init(tree);
 
-    // Get weight histogram from baby
-    wgtInfo.getWeightHistogramFromBaby(&file);
-
     is_signal_ = fname.Contains("SMS") || fname.Contains("Signal");
+
+    // Get weight histogram from baby
+    TH3D* h_sig_counter = nullptr;
+    TH2D* h_sig_counter_nEvents = nullptr;
+    TH1D* h_bkg_counter = nullptr;
+    if ( is_signal_ ) {
+      h_sig_counter = (TH3D*) file.Get("h_counterSMS");
+      h_sig_counter_nEvents = (TH2D*) file.Get("histNEvts");
+    }
+    else if ( !is_data() ) {
+      h_bkg_counter = (TH1D*) file.Get("h_counter");
+    }
 
     dummy.cd();
     // Loop over Events in current file
@@ -273,7 +282,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir) {
       TString dsname = dataset();
       if (dsname.Contains("T2tt")) {
         auto checkMassPt = [&](double mstop, double mlsp) { return (mass_stop() == mstop) && (mass_lsp() == mlsp); };
-        if (!checkMassPt(600, 450) && !checkMassPt(800, 200) && !checkMassPt(800, 600) && !checkMassPt(1200, 200))
+        if (!checkMassPt(600, 450) && !checkMassPt(900, 300) && !checkMassPt(800, 200) && !checkMassPt(800, 600) && !checkMassPt(1200, 200))
           continue;
         plot2D("h_T2tt_masspts", mass_stop(), mass_lsp() , evtweight_, testVec[1].histMap, ";M(stop) [GeV]; M(lsp) [GeV]", 100, 300, 1300, 80, 0, 800);
       }
@@ -283,8 +292,15 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir) {
       // Calculate event weight
       // wgtInfo.getEventWeights(); // what does this do?    // <-- breaks on signal samples
 
-      if (!is_data() && !is_signal_) {
-        evtweight_ = scale1fb();
+      int nEventsSample;
+      if (!is_data()) {
+        if (is_signal_) {
+          nEventsSample = h_sig_counter_nEvents->GetBinContent(h_sig_counter->FindBin(mass_stop(), mass_lsp()));
+          evtweight_ = kLumi * xsec() * 1000 / nEventsSample;
+        } else {
+          nEventsSample = h_bkg_counter->GetBinContent(22);
+          evtweight_ = kLumi * scale1fb();
+        }
       }
 
       // bool isCorridor = true;   // for testing purpose
@@ -297,7 +313,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir) {
       // //   evtweight_ = sysInfo::GetEventWeight_CR2lbulk( sysID );
       // else
       //   evtweight_ = sysInfo::GetEventWeight( sysID );
-
+      
       if (doNvtxReweight) {
         if (nvtxs() > 69) continue;
         if (is2016data)
@@ -338,8 +354,10 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir) {
 
       values_["dphilmet"] = fabs(lep1_p4().phi() - pfmet_phi());
       values_["passlep1pt"] = (abs(lep1_pdgid()) == 13 && lep1_p4().pt() > 40) || (abs(lep1_pdgid()) == 11 && lep1_p4().pt() > 45);
-      // values_["j1csv"] = ak4pfjets_deepCSV().at(0);  // j1 csv for the compressed region
-      values_["j1csv"] = (ak4pfjets_CSV().size())? ak4pfjets_CSV().at(0) : -1;
+      if (doTopTagging)
+        values_["j1csv"] = ak4pfjets_deepCSV().at(0);  // j1 csv for the compressed region
+      else
+        values_["j1csv"] = (ak4pfjets_CSV().size())? ak4pfjets_CSV().at(0) : -1;
 
       // Filling histograms for SR
       fillHistosForSR();
@@ -470,8 +488,8 @@ void StopLooper::fillHistosForSR(string suf) {
         plot1D("h_metbins"+s,   values_["met"]    , evtweight_, sr.histMap, ";E^{miss}_{T} [GeV]"   , 6, met_bins);
 
         if (is_signal_) {
-          string masspt_suf = "_" + to_string((int) mass_stop()) + "_" + to_string((int) mass_lsp());
-          plot1D("h_metbins"+masspt_suf+s, values_["met"], evtweight_, sr.histMap, ";E^{miss}_{T} [GeV]" , 6, met_bins);
+          string masspt_hn = "h_metbins_" + to_string((int) mass_stop()) + "_" + to_string((int) mass_lsp()) + s;
+          plot1D(masspt_hn, values_["met"], evtweight_, sr.histMap, ";E^{miss}_{T} [GeV]" , sr.GetNMETBins(), sr.GetMETBinsPtr());
         }
         if (doTopTagging && topcands_disc().size() > 0)
           plot1D("h_leadtopcand_disc", topcands_disc()[0], evtweight_, sr.histMap, ";top discriminator", 110, -1.1, 1.1);

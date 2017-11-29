@@ -6,12 +6,12 @@ import numpy as np
 # sys.path.insert(0,'/home/users/sicheng/tas/Software/dataMCplotMaker/')
 # from dataMCplotMaker import dataMCplot
 
-def getYieldsFromSRs(f, srNames):
+def getYieldsFromSRs(f, srNames, suf = ''):
     yield_org = []
     yield_wtc = []
     for sr in srNames:
-        horg = f.Get(sr+'/h_metbins')
-        hwtc = f.Get(sr+'/h_metbins_wtc')
+        horg = f.Get(sr+'/h_metbins'+suf)
+        hwtc = f.Get(sr+'/h_metbins'+suf+'_wtc')
         if not horg:
             yield_org.append(0)
         else:
@@ -31,24 +31,27 @@ def getYieldsForAllSRs(f, srNames, suf = ''):
         hwtc = f.Get(sr+'/h_metbins'+suf+'_wtc')
         if not horg:
             print "Can't find", sr+'/h_metbins'+suf, "!!!"
-            return
+            continue
         for ibin in range(1, horg.GetNbinsX()+1):
-            yield_org.append(int(horg.GetBinContent(ibin)))
+            yield_org.append(round(horg.GetBinContent(ibin),2))
             if not hwtc:
                 yield_wtc.append(0)
             else:
-                yield_wtc.append(int(horg.GetBinContent(ibin)))
+                yield_wtc.append(round(horg.GetBinContent(ibin), 2))
 
     return yield_org, yield_wtc
 
-def printAllSRYieldTable(srNames, yield_org):
+def printAllSRYieldTable(srNames, yield_org, is_signal=False):
 
     print    ' | {:<9s}'.format(''),
     # for sr in srNames:
     #     print '| {:^8s}'.format(sr),
     print '|\n |  original',
     for i in range(len(yield_org)):
-        print '|{:3d}'.format(yield_org[i]),
+        if is_signal:
+            print '|{:2.2f}'.format(yield_org[i]),
+        else:
+            print '|{:3.1f}'.format(yield_org[i]),
     print '|'
 
 def printYieldComparisonTable(srNames, yield_org, yield_wtc):
@@ -98,6 +101,8 @@ if __name__ == '__main__':
     # f1 = r.TFile('../StopLooper/output/temp_v26_1/TTJets.root')
     # f1 = r.TFile('../StopLooper/output/samples2016/ttbar.root')
     f1 = r.TFile('../StopLooper/output/samples2016/data_2016.root')
+    f2 = r.TFile('../StopLooper/output/samples2016/ttbar.root')
+    f3 = r.TFile('../StopLooper/output/samples2016/Signal_T2tt_mStop_400to1200.root')
 
     # printCutflowNumbers(f1, 'testCutflow', 'cutflow1')
     # printCutflowNumbers(f1, 'testCutflow', 'cutflow2')
@@ -108,15 +113,28 @@ if __name__ == '__main__':
     # printCutflowNumbers(f2, 'testCutflow', 'cutflow3')
 
 
-    srNames = ['srbase', 'srA', 'srB', 'srC', 'srD', 'srE', 'srF', 'srG', 'srH', 'srI',]
-    # print '\n +-------------------------------- ttbar ---------------------------------------------'
-    print '\n |-------------------------------- data2016 ---------------------------------------------'
-    y1_org, y1_wtc = getYieldsFromSRs(f1, srNames)
-    printYieldComparisonTable(srNames, y1_org, y1_wtc)
+    # srNames = ['srbase', 'srA', 'srB', 'srC', 'srD', 'srE', 'srF', 'srG', 'srH', 'srI',]
+    # # print '\n +-------------------------------- ttbar ---------------------------------------------'
+    # print '\n |-------------------------------- data2016 ---------------------------------------------'
+    # y1_org, y1_wtc = getYieldsFromSRs(f1, srNames)
+    # printYieldComparisonTable(srNames, y1_org, y1_wtc)
 
+    print '\n |-------------------------------- data2016 ---------------------------------------------'
     srNames = ['srA', 'srB', 'srC', 'srD', 'srE', 'srF', 'srG', 'srH', 'srI',]
     y1_org, y1_wtc = getYieldsForAllSRs(f1, srNames)
     printAllSRYieldTable(srNames, y1_org)
+
+    print '\n |-------------------------------- ttbar2016 ---------------------------------------------'
+    y2_org, y2_wtc = getYieldsForAllSRs(f2, srNames)
+    printAllSRYieldTable(srNames, y2_org)
+
+    # print '\n |-------------------------------- T2tt2016, mStop 800, mLSP 600 ---------------------------------------------'
+    # y3_org, y3_wtc = getYieldsForAllSRs(f3, srNames, '_800_600')
+    # printAllSRYieldTable(srNames, y3_org, is_signal=True)
+
+    print '\n |-------------------------------- T2tt2016, mStop 900, mLSP 300 ---------------------------------------------'
+    y3_org, y3_wtc = getYieldsForAllSRs(f3, srNames, '_900_300')
+    printAllSRYieldTable(srNames, y3_org, is_signal=True)
 
     # print '\n +-------------------------------------------------------------'
     # y2_org, y2_wtc = getYieldsFromSRs(f2, srNames)
