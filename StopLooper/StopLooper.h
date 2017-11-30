@@ -12,6 +12,7 @@ class StopLooper {
 
   void SetSignalRegions();
   void GenerateAllSRptrSets();
+  void GetEventWeight();
 
   void looper(TChain* chain, std::string sample, std::string outputdir);
 
