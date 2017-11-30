@@ -68,7 +68,7 @@ const bool doNvtxReweight = false;
 // turn on to apply nTrueInt reweighting to MC
 const bool doNTrueIntReweight = true;
 // turn on top tagging studies, off for 2016 data/mc
-const bool doTopTagging = false;
+const bool doTopTagging = true;
 // turn on to apply json file to data
 const bool applyjson = true;
 // ignore scale1fb to run over test samples
@@ -139,6 +139,31 @@ void StopLooper::GenerateAllSRptrSets() {
   // allSRptrSets = generateSRptrSet(all_SRptrs);
 }
 
+void StopLooper::GetEventWeight() {
+
+  enum sf {diLepTrig, cr2lTrig, bTag, bTagEffHF, bTagEffLF, bTag_FS, bTag_tight, bTagEffHF_tight, bTagEffLF_tight, bTag_tight_FS,
+           lep, vetoLep, tau, lepFS, topPt, metRes, metTTbar, ttbarSysPt, ISO, nuPt, Wwidth, hfXsec, pdf, alphas, q2, lumi, PU, xsec};
+
+  // Setup event weight calculation
+  // sysInfo::evtWgtInfo wgtInfo;
+  // wgtInfo.setUp( sample.id );
+  // wgtInfo.setUp( sample.id, useBTagSFs_fromFiles_, useLepSFs_fromFiles_, add2ndLepToMet_ );
+  // wgtInfo.apply_cr2lTrigger_sf  = (apply_cr2lTrigger_sf_ && add2ndLepToMet_);
+  // wgtInfo.apply_bTag_sf         = apply_bTag_sf_;
+  // wgtInfo.apply_lep_sf          = apply_lep_sf_;
+  // wgtInfo.apply_vetoLep_sf      = apply_vetoLep_sf_;
+  // wgtInfo.apply_tau_sf          = apply_tau_sf_;
+  // wgtInfo.apply_lepFS_sf        = apply_lepFS_sf_;
+  // wgtInfo.apply_topPt_sf        = apply_topPt_sf_;
+  // wgtInfo.apply_metRes_sf       = apply_metRes_sf_;
+  // wgtInfo.apply_metTTbar_sf     = apply_metTTbar_sf_;
+  // wgtInfo.apply_ttbarSysPt_sf   = apply_ttbarSysPt_sf_;
+  // wgtInfo.apply_ISR_sf          = apply_ISR_sf_;
+  // wgtInfo.apply_pu_sf           = apply_pu_sf_;
+  // wgtInfo.apply_sample_sf       = apply_sample_sf_;
+
+}
+
 void StopLooper::looper(TChain* chain, string samplestr, string output_dir) {
 
   // Benchmark
@@ -187,23 +212,6 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir) {
   is2016data = (samplestr.find("data_2016") == 0);
 
   sampleInfo::sampleUtil sample(sampleInfo::ID::k_ttbar);
-  // Setup event weight calculation
-  sysInfo::evtWgtInfo wgtInfo;
-  wgtInfo.setUp( sample.id );
-  // wgtInfo.setUp( sample.id, useBTagSFs_fromFiles_, useLepSFs_fromFiles_, add2ndLepToMet_ );
-  // wgtInfo.apply_cr2lTrigger_sf  = (apply_cr2lTrigger_sf_ && add2ndLepToMet_);
-  // wgtInfo.apply_bTag_sf         = apply_bTag_sf_;
-  // wgtInfo.apply_lep_sf          = apply_lep_sf_;
-  // wgtInfo.apply_vetoLep_sf      = apply_vetoLep_sf_;
-  // wgtInfo.apply_tau_sf          = apply_tau_sf_;
-  // wgtInfo.apply_lepFS_sf        = apply_lepFS_sf_;
-  // wgtInfo.apply_topPt_sf        = apply_topPt_sf_;
-  // wgtInfo.apply_metRes_sf       = apply_metRes_sf_;
-  // wgtInfo.apply_metTTbar_sf     = apply_metTTbar_sf_;
-  // wgtInfo.apply_ttbarSysPt_sf   = apply_ttbarSysPt_sf_;
-  // wgtInfo.apply_ISR_sf          = apply_ISR_sf_;
-  // wgtInfo.apply_pu_sf           = apply_pu_sf_;
-  // wgtInfo.apply_sample_sf       = apply_sample_sf_;
 
   int nDuplicates = 0;
   int nEvents = chain->GetEntries();
@@ -226,7 +234,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir) {
 
     is_signal_ = fname.Contains("SMS") || fname.Contains("Signal");
 
-    // Get weight histogram from baby
+    // Get event weight histogram from baby
     TH3D* h_sig_counter = nullptr;
     TH2D* h_sig_counter_nEvents = nullptr;
     TH1D* h_bkg_counter = nullptr;
@@ -314,7 +322,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir) {
       // else
       //   evtweight_ = sysInfo::GetEventWeight( sysID );
       
-      if (doNvtxReweight) {
+      if (doNvtxReweight && is_data()) {
         if (nvtxs() > 69) continue;
         if (is2016data)
           evtweight_ *= nvtxscale_[nvtxs()];
@@ -427,8 +435,6 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir) {
   writeHistsToFile(CR0bVec);
   writeHistsToFile(CR2lVec);
   writeHistsToFile(CRemuVec);
-
-  wgtInfo.cleanUp();            // why do we need this?
 
   auto writeRatioHists = [&] (const SR& sr) {
     for (const auto& h : sr.histMap) {

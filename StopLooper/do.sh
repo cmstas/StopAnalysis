@@ -30,10 +30,10 @@ declare -a Samples=(data_met)
 # 2017 MC test
 # INDIR=/nfs-7/userdata/sicheng/stopbabies/merged_v25_4
 # OUTDIR=output/temp
-# INDIR=/nfs-7/userdata/sicheng/stopbabies/merged_v26_1
-# OUTDIR=output/temp_v26_1
-INDIR=/nfs-7/userdata/stopRun2/analysis2016_SUS-16-051_35p9fbinv/v22/skim
-OUTDIR=output/samples2016
+INDIR=/nfs-7/userdata/sicheng/stopbabies/merged_v26_1
+OUTDIR=output/temp_v26_1
+# INDIR=/nfs-7/userdata/stopRun2/analysis2016_SUS-16-051_35p9fbinv/v22/skim
+# OUTDIR=output/samples2016
 
 mkdir -p ${OUTDIR}
 mkdir -p ${LOGDIR}
@@ -42,7 +42,8 @@ mkdir -p ${LOGDIR}
 # declare -a Samples=(ttbar)
 # declare -a Samples=(TTJets)
 # declare -a Samples=(SMS_T2tt_mStop-400to1200)
-declare -a Samples=(ttbar Signal_T2tt_mStop_400to1200)
+declare -a Samples=(ttbar TTJets SMS_T2tt_mStop-400to1200)
+# declare -a Samples=(ttbar Signal_T2tt_mStop_400to1200)
 
 for SAMPLE in ${Samples[@]}; do
     # echo ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} '>&' ${LOGDIR}/log_${SAMPLE}.txt
