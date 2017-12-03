@@ -34,7 +34,7 @@ if __name__ == "__main__":
         cmsswver = "CMSSW_9_4_0"
         scramarch = "slc6_amd64_gcc630"
         tarfile = "input.tar.gz"
-        tag = "v26_1"
+        tag = "v26_2"
         maker_task = CondorTask(
             sample = DirectorySample(
                 dataset=dsname,
