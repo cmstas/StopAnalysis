@@ -114,9 +114,9 @@ std::vector<SR> getStopSignalRegionsTopological() {
   sr.SetVar("njet", 5, fInf);
   sr.SetVar("nbjet", 1, fInf);
   sr.SetVar("lep1pt", 0, 150);
-  sr.SetVar("dphilmet", 0, 2);
+  sr.SetVar("dphilmet", 0, 2.0);
   sr.SetVar("dphijmet", 0.5, 3.1416);
-  sr.SetVar("j1csv", 0, BTAG_MED);  // Require j1 not b-tagged, need medium WP
+  sr.SetVar("j1csv", -fInf, BTAG_MED);  // Require j1 not b-tagged, need medium WP
   sr.SetMETBins({250, 350, 450, 550, 1500});
   SRvec.emplace_back(sr);
 

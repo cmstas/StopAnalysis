@@ -68,7 +68,7 @@ const bool doNvtxReweight = false;
 // turn on to apply nTrueInt reweighting to MC
 const bool doNTrueIntReweight = true;
 // turn on top tagging studies, off for 2016 data/mc
-const bool doTopTagging = true;
+const bool doTopTagging = false;
 // turn on to apply json file to data
 const bool applyjson = true;
 // ignore scale1fb to run over test samples
@@ -287,6 +287,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir) {
         if ( !filt_badChargedCandidateFilter() ) continue;
       }
 
+      // For testing on only subset of mass points
       TString dsname = dataset();
       if (dsname.Contains("T2tt")) {
         auto checkMassPt = [&](double mstop, double mlsp) { return (mass_stop() == mstop) && (mass_lsp() == mlsp); };
@@ -311,17 +312,6 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir) {
         }
       }
 
-      // bool isCorridor = true;   // for testing purpose
-      // sysInfo::ID sysID = sysInfo::ID::k_nominal; // temporary for testing
-      // if (isCorridor)
-      //   evtweight_ = sysInfo::GetEventWeight_corridor( sysID );
-      // // else if ( useTightTagHighMlb && useMetTTbarWgts )
-      // //   evtweight_ = sysInfo::GetEventWeight_SRbulk( sysID );
-      // // else if ( useTightTagHighMlb && !useMetTTbarWgts )
-      // //   evtweight_ = sysInfo::GetEventWeight_CR2lbulk( sysID );
-      // else
-      //   evtweight_ = sysInfo::GetEventWeight( sysID );
-      
       if (doNvtxReweight && is_data()) {
         if (nvtxs() > 69) continue;
         if (is2016data)
