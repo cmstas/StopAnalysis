@@ -7,10 +7,11 @@
 
 class StopLooper {
  public:
-  StopLooper() : evtweight_(1.) {}
+  StopLooper() : evtweight_(1.) , jestype_(0) {}
   ~StopLooper() {}
 
   void SetSignalRegions();
+  void SetJetEnergyScaleType(int jestype) { jestype_ = jestype; }
   void GenerateAllSRptrSets();
   void GetEventWeight();
 
@@ -50,6 +51,7 @@ class StopLooper {
   // Event specific variables
   bool is_signal_;
   float evtweight_;
+  int jestype_;
   std::map<std::string,float> values_;
 
   // For nvtx reweighting

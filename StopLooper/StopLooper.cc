@@ -287,6 +287,9 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir) {
         if ( !filt_badChargedCandidateFilter() ) continue;
       }
 
+      // Require at least 1 good vertex
+      if (nvtxs() < 1) continue;
+
       // For testing on only subset of mass points
       TString dsname = dataset();
       if (dsname.Contains("T2tt")) {
@@ -325,37 +328,79 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir) {
       // Fill the variables
       values_.clear();
 
-      values_["mt"] = mt_met_lep();
-      values_["met"] = pfmet();
-      values_["mt2w"] = MT2W();
-      values_["mlb"] = Mlb_closestb();
-      values_["tmod"] = topnessMod();
+      /// Common variables for all JES type
       values_["nlep"] = ngoodleps();
       values_["nvlep"] = nvetoleps();
-      values_["njet"] = ngoodjets();
-      values_["nbjet"] = ngoodbtags();  // nbtag30();
-      values_["ntbtag"] = ntightbtags();
-      values_["dphijmet"] = mindphi_met_j1_j2();
+      values_["lep1pt"] = lep1_p4().pt();
       values_["passvetos"] = PassTrackVeto() && PassTauVeto();
 
-      values_["lep1pt"] = lep1_p4().pt();
-      values_["dphilmet"] = fabs(lep1_p4().phi() - pfmet_phi());
-
+      /// Values only for hist filling or testing
+      values_["chi2"] = hadronic_top_chi2();
       values_["lep1eta"] = lep1_p4().eta();
-      values_["metphi"] = pfmet_phi();
-      values_["nbtag"]  = nanalysisbtags();
-      values_["chi2"]    = hadronic_top_chi2();
-      values_["leadbpt"] = ak4pfjets_leadbtag_p4().pt();
-      values_["mlb_0b"]   = (ak4pfjets_leadbtag_p4() + lep1_p4()).M();
-      values_["ht"]      = ak4_HT();
-      values_["htratio"] = ak4_htratiom();
-
-      values_["dphilmet"] = fabs(lep1_p4().phi() - pfmet_phi());
       values_["passlep1pt"] = (abs(lep1_pdgid()) == 13 && lep1_p4().pt() > 40) || (abs(lep1_pdgid()) == 11 && lep1_p4().pt() > 45);
-      if (doTopTagging)
-        values_["j1csv"] = ak4pfjets_deepCSV().at(0);  // j1 csv for the compressed region
-      else
-        values_["j1csv"] = (ak4pfjets_CSV().size())? ak4pfjets_CSV().at(0) : -1;
+
+      /// JES type dependent variables
+      if (jestype_ == 0) {
+        values_["mt"] = mt_met_lep();
+        values_["met"] = pfmet();
+        values_["mt2w"] = MT2W();
+        values_["mlb"] = Mlb_closestb();
+        values_["tmod"] = topnessMod();
+        values_["njet"] = ngoodjets();
+        values_["nbjet"] = ngoodbtags();  // nbtag30();
+        values_["nbtag"]  = nanalysisbtags();
+        values_["dphijmet"] = mindphi_met_j1_j2();
+        values_["dphilmet"] = lep1_dphiMET();
+        values_["j1passbtag"] = (ngoodjets())? ak4pfjets_passMEDbtag().at(0) : 0;
+
+        values_["ht"] = ak4_HT();
+        values_["metphi"] = pfmet_phi();
+        values_["ntbtag"] = ntightbtags();
+        values_["leadbpt"] = ak4pfjets_leadbtag_p4().pt();
+        values_["mlb_0b"] = (ak4pfjets_leadbtag_p4() + lep1_p4()).M();
+        values_["htratio"] = ak4_htratiom();
+
+      } else if (jestype_ == 1) {
+        values_["mt"] = mt_met_lep_jup();
+        values_["met"] = pfmet_jup();
+        values_["mt2w"] = MT2W_jup();
+        values_["mlb"] = Mlb_closestb_jup();
+        values_["tmod"] = topnessMod_jup();
+        values_["njet"] = jup_ngoodjets();
+        values_["nbjet"] = jup_ngoodbtags();  // nbtag30();
+        values_["nbtag"]  = jup_nanalysisbtags();
+        values_["dphijmet"] = mindphi_met_j1_j2_jup();
+        values_["dphilmet"] = fabs(lep1_p4().phi() - pfmet_phi_jup());
+        values_["j1passbtag"] = (ngoodjets())? jup_ak4pfjets_passMEDbtag().at(0) : 0;
+
+        values_["ht"] = jup_ak4_HT();
+        values_["metphi"] = pfmet_phi_jup();
+        values_["ntbtag"] = jup_ntightbtags();
+        values_["leadbpt"] = jup_ak4pfjets_leadbtag_p4().pt();
+        values_["mlb_0b"] = (jup_ak4pfjets_leadbtag_p4() + lep1_p4()).M();
+        values_["htratio"] = jup_ak4_htratiom();
+
+      } else if (jestype_ == -1) {
+        values_["mt"] = mt_met_lep_jdown();
+        values_["met"] = pfmet_jdown();
+        values_["mt2w"] = MT2W_jdown();
+        values_["mlb"] = Mlb_closestb_jdown();
+        values_["tmod"] = topnessMod_jdown();
+        values_["njet"] = jdown_ngoodjets();
+        values_["nbjet"] = jdown_ngoodbtags();  // nbtag30();
+        values_["ntbtag"] = jdown_ntightbtags();
+        values_["dphijmet"] = mindphi_met_j1_j2_jdown();
+        values_["dphilmet"] = fabs(lep1_p4().phi() - pfmet_phi_jdown());
+        values_["j1passbtag"] = (ngoodjets())? jdown_ak4pfjets_passMEDbtag().at(0) : 0;
+
+        values_["ht"] = jdown_ak4_HT();
+        values_["metphi"] = pfmet_phi_jdown();
+        values_["nbtag"]  = jdown_nanalysisbtags();
+        values_["leadbpt"] = jdown_ak4pfjets_leadbtag_p4().pt();
+        values_["mlb_0b"] = (jdown_ak4pfjets_leadbtag_p4() + lep1_p4()).M();
+        values_["htratio"] = jdown_ak4_htratiom();
+
+      }
 
       // Filling histograms for SR
       fillHistosForSR();
@@ -382,15 +427,32 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir) {
       // fillHistosForCR0b();
 
       values_["nlep_rl"] = (ngoodleps() == 1 && nvetoleps() >= 2 && lep2_p4().Pt() > 10)? 2 : ngoodleps();
-      values_["mt_rl"] = mt_met_lep_rl();
-      values_["mt2w_rl"] = MT2W_rl();
-      values_["met_rl"] = pfmet_rl();
-      values_["dphijmet_rl"]= mindphi_met_j1_j2_rl();
-      values_["tmod_rl"] = topnessMod_rl();
-      // values_["mlb_rl"] = Mlb_closestb();
-      values_["mll"] = (lep1_p4() + lep2_p4()).M();
       values_["osdilep"] = lep1_pdgid() == -lep2_pdgid();
+      values_["mll"] = (lep1_p4() + lep2_p4()).M();
+      // values_["mlb_rl"] = Mlb_closestb();
 
+      if (jestype_ == 0) {
+        values_["mt_rl"] = mt_met_lep_rl();
+        values_["mt2w_rl"] = MT2W_rl();
+        values_["met_rl"] = pfmet_rl();
+        values_["dphijmet_rl"]= mindphi_met_j1_j2_rl();
+        values_["dphilmet_rl"] = lep1_dphiMET_rl();
+        values_["tmod_rl"] = topnessMod_rl();
+      } else if (jestype_ == 1) {
+        values_["mt_rl"] = mt_met_lep_rl_jup();
+        values_["mt2w_rl"] = MT2W_rl_jup();
+        values_["met_rl"] = pfmet_rl_jup();
+        values_["dphijmet_rl"]= mindphi_met_j1_j2_rl_jup();
+        values_["dphilmet_rl"] = lep1_dphiMET_rl_jup();
+        values_["tmod_rl"] = topnessMod_rl_jup();
+      } else if (jestype_ == -1) {
+        values_["mt_rl"] = mt_met_lep_rl_jdown();
+        values_["mt2w_rl"] = MT2W_rl_jdown();
+        values_["met_rl"] = pfmet_rl_jdown();
+        values_["dphijmet_rl"]= mindphi_met_j1_j2_rl_jdown();
+        values_["dphilmet_rl"] = lep1_dphiMET_rl_jdown();
+        values_["tmod_rl"] = topnessMod_rl_jdown();
+      }
       // fillHistosForCR2l();
       // fillHistosForCRemu();
 
@@ -461,6 +523,13 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir) {
 
 
 void StopLooper::fillHistosForSR(string suf) {
+
+  // Trigger requirements
+  if (doTopTagging) { // 2017 Triggers
+    if (not ( (abs(lep1_pdgid()) == 11 && HLT_SingleEl()) || (abs(lep1_pdgid()) == 13 && HLT_SingleMu()) || HLT_MET_MHT() )) return; 
+  } else { // 2016 MET Triggers
+    if (not ( (abs(lep1_pdgid()) == 11 && HLT_SingleEl()) || (abs(lep1_pdgid()) == 13 && HLT_SingleMu()) ||(HLT_MET() || HLT_MET110_MHT110() || HLT_MET120_MHT120()) )) return;
+  }
 
   for (auto& sr : SRVec) {
     if ( sr.PassesSelection(values_) ) {
@@ -559,7 +628,7 @@ void StopLooper::fillHistosForCRemu(string suf) {
 void StopLooper::fillHistosForCR2l(string suf) {
 
   // Trigger requirements
-  if ( !(HLT_SingleEl() || HLT_SingleMu() || HLT_MET_MHT()) ) return;
+  if ( !((abs(lep1_pdgid()) == 11 && HLT_SingleEl()) || (abs(lep1_pdgid()) == 13 && HLT_SingleMu()) || HLT_MET_MHT()) ) return;
 
   // if ( (abs(lep1_pdgid()) == 11 && values_["lep1pt"] < 40) || (abs(lep1_pdgid()) == 13 && values_["lep1pt"] < 30) ) return;
   // if (lep1_pdgid() != -lep2_pdgid()) return; // temporary for zpeak check
@@ -622,7 +691,7 @@ void StopLooper::fillHistosForCR2l(string suf) {
 void StopLooper::fillHistosForCR0b(string suf) {
 
   // Trigger requirements
-  if ( !(HLT_SingleEl() || HLT_SingleMu() || HLT_MET_MHT()) ) return;
+  if ( !((abs(lep1_pdgid()) == 11 && HLT_SingleEl()) || (abs(lep1_pdgid()) == 13 && HLT_SingleMu()) || HLT_MET_MHT()) ) return;
 
   for (auto& cr : CR0bVec) {
     if ( cr.PassesSelection(values_) ) {
