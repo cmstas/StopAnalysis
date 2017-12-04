@@ -2,9 +2,6 @@
 
 const float fInf = std::numeric_limits<float>::max();
 
-static const float BTAG_MED = 0.6324;  // DeepCSV working points
-static const float BTAG_LSE = 0.2219;
-static const float BTAG_TGT = 0.9432;
 
 std::vector<SR> getStopSignalRegionsTopological() {
 
@@ -13,15 +10,14 @@ std::vector<SR> getStopSignalRegionsTopological() {
   srbase.SetName("srbase");
   srbase.SetVar("mt", 150, fInf);
   srbase.SetVar("met", 250, fInf);
-  // srbase.SetVar("mt2w", 0, fInf);
   srbase.SetVar("nlep", 1, 2);
   srbase.SetVar("nvlep", 1, 2);
   srbase.SetVar("passvetos", 1, 2);
   srbase.SetVar("njet", 2, fInf);
   srbase.SetVar("nbjet", 1, fInf);
-  srbase.SetVar("ntbtag", 0, fInf);
-  srbase.SetVar("mlb", 0, fInf);
-  srbase.SetVar("tmod", -fInf, fInf);
+  // srbase.SetVar("ntbtag", 0, fInf);
+  // srbase.SetVar("mlb", 0, fInf);
+  // srbase.SetVar("tmod", -fInf, fInf);
   srbase.SetVar("dphijmet", 0.8, 3.14159);
   srbase.SetMETBins({0, 250, 350, 450, 550, 650, 800});
 
@@ -110,13 +106,12 @@ std::vector<SR> getStopSignalRegionsTopological() {
   sr.SetName("srI");
   sr.SetDetailName("geq5j_lpt0to150_j1notb");
   sr.SetVar("mt", 150, fInf);
-  sr.SetVar("met", 250, 350);
   sr.SetVar("njet", 5, fInf);
   sr.SetVar("nbjet", 1, fInf);
   sr.SetVar("lep1pt", 0, 150);
   sr.SetVar("dphilmet", 0, 2.0);
   sr.SetVar("dphijmet", 0.5, 3.1416);
-  sr.SetVar("j1csv", -fInf, BTAG_MED);  // Require j1 not b-tagged, need medium WP
+  sr.SetVar("j1passbtag", 0, 1);  // Require j1 not b-tagged
   sr.SetMETBins({250, 350, 450, 550, 1500});
   SRvec.emplace_back(sr);
 
@@ -477,8 +472,8 @@ std::vector<SR> getStopControlRegionsNoBTags() {
   // cr.SetVar("tmod", 0, fInf);
   // CRvec.emplace_back(cr);
 
-  
-  // CR0b 
+
+  // CR0b
   cr = crbase;
   cr.SetName("cr0bincl1");
   cr.SetDetailName("2to3j_met250toInf");
