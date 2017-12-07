@@ -88,25 +88,24 @@ bool CompareIndexValueSmallest(const std::pair<double, int>& firstElem, const st
 //           //
 //===========//
 
-babyMaker::babyMaker(){
-
-  StopEvt = EventTree();
-  lep1 = LeptonTree("lep1_");
-  lep2 = LeptonTree("lep2_");
-  ph = PhotonTree("ph_");
-  jets = JetTree();
-  jets_jup = JetTree("jup_");
-  jets_jdown = JetTree("jdown_");
-  Taus = TauTree();
-  Tracks = IsoTracksTree();
-  gen_leps = GenParticleTree("leps_");
-  gen_nus = GenParticleTree("nus_");
-  gen_qs  = GenParticleTree("qs_");
-  gen_bosons = GenParticleTree("bosons_");
-  gen_susy = GenParticleTree("susy_");
-
+babyMaker::babyMaker() :
+    StopEvt(),
+    lep1("lep1_"),
+    lep2("lep2_"),
+    ph("ph_"),
+    jets(),
+    jets_jup("jup_"),
+    jets_jdown("jdown_"),
+    Taus(),
+    Tracks(),
+    gen_leps("leps_"),
+    gen_nus("nus_"),
+    gen_qs ("qs_"),
+    gen_bosons("bosons_"),
+    gen_susy("susy_")
+{
   //obsolete
-  //   gen_tops = GenParticleTree("ts_");  //merged into gen_qs
+  //gen_tops = GenParticleTree("ts_");  //merged into gen_qs
   //gen_els = GenParticleTree("els_");
   //gen_mus = GenParticleTree("mus_");
   //gen_taus = GenParticleTree("taus_");
@@ -120,8 +119,6 @@ babyMaker::babyMaker(){
   //gen_zs  = GenParticleTree("zs_");
   //gen_phs = GenParticleTree("phs_");
   //gen_hs  = GenParticleTree("hs_");
-
-
 }
 
 void babyMaker::MakeBabyNtuple(const char* output_name){
@@ -831,7 +828,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
   // Set JSON file
   //
   bool applyjson = false;
-  const char* json_file = "json_files/Cert_294927-302663_13TeV_PromptReco_Collisions17_JSON.txt";
+  const char* json_file = "json_files/Cert_294927-306462_13TeV_PromptReco_Collisions17_JSON.txt";
   set_goodrun_file_json(json_file);
 
   //
@@ -1065,12 +1062,10 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
       //////////////////////////////////////////
       // If data, check against good run list//
       /////////////////////////////////////////
-      if(applyjson){
-        if( evt_isRealData() && !goodrun(evt_run(), evt_lumiBlock()) ) continue;
-      }
-      if( evt_isRealData() ) {
+      if ( evt_isRealData() ) {
+        if ( applyjson && !goodrun(evt_run(), evt_lumiBlock()) ) continue;
         DorkyEventIdentifier id(evt_run(), evt_event(), evt_lumiBlock());
-        if (is_duplicate(id) ) continue;
+        if ( is_duplicate(id) ) continue;
       }
 
       //

@@ -66,7 +66,7 @@ int main(int argc, char **argv){
   //const char* filename = (ifile == -1 ? "*postprocess.root" : Form("%spostprocess.root"));
   const char* filename = (ifile == -1 ? "merged_ntuple_*.root" : Form("merged_ntuple_%i.root", ifile));
   //const char* filename = "ntuple_TTJets_HT-1200to2500_new.root";
-  cout << "[runBabyMaker] The output file will be: " << filename << endl;
+  // cout << "[runBabyMaker] The output file will be: " << filename << endl;
 
   const char* suffix = ifile == -1 ? "" : Form("_%i", ifile);
 
@@ -86,7 +86,7 @@ int main(int argc, char **argv){
   // Skim Parameters
   //
   mylooper->skim_nvtx            = 1;
-  mylooper->skim_met             = 100;
+  mylooper->skim_met             = 50;
 
   mylooper->skim_nGoodLep        = 1;
   mylooper->skim_goodLep_el_pt   = 20.0;
@@ -137,7 +137,7 @@ int main(int argc, char **argv){
   mylooper->fillExtraEvtVar =  false;
 
   mylooper->fillAK8         =  true;
-  mylooper->fillTopTag      =  true;
+  mylooper->fillTopTag      =  false;
   mylooper->fillAK4EF       =  false;
   mylooper->fillAK4_Other   =  false;
   mylooper->fillOverleps    =  false;
