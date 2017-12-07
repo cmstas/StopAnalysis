@@ -68,7 +68,7 @@ const bool doNvtxReweight = false;
 // turn on to apply nTrueInt reweighting to MC
 const bool doNTrueIntReweight = true;
 // turn on top tagging studies, off for 2016 data/mc
-const bool doTopTagging = false;
+const bool doTopTagging = true;
 // turn on to apply json file to data
 const bool applyjson = true;
 // ignore scale1fb to run over test samples
@@ -76,7 +76,7 @@ const bool ignoreScale1fb = false;
 // to test synchronization with the standard Analysis
 const bool synchronizing = false;
 // not running the standard regions to speed up
-const bool fasterRuntime = true;
+const bool runYieldsOnly = false;
 // set bool def here for member function usage
 bool is2016data = false;
 
@@ -164,17 +164,17 @@ void StopLooper::GetEventWeight() {
 
 }
 
-void StopLooper::looper(TChain* chain, string samplestr, string output_dir) {
+void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int jes_type) {
 
   // Benchmark
   TBenchmark *bmark = new TBenchmark();
   bmark->Start("benchmark");
 
-  // gROOT->cd();
   TString output_name = Form("%s/%s.root",output_dir.c_str(),samplestr.c_str());
   cout << "[StopLooper::looper] creating output file: " << output_name << endl;  outfile_ = new TFile(output_name.Data(),"RECREATE") ;
 
   outfile_ = new TFile(output_name.Data(), "RECREATE") ;
+  jestype_ = jes_type;
 
   // // full 2016 dataset json, 35.87/fb:
   // const char* json_file = "../StopCORE/inputs/json_files/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON_snt.txt";
@@ -183,10 +183,13 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir) {
   // // 2017 dataset json, 8.32/fb
   // const char* json_file = "../StopCORE/inputs/json_files/Cert_294927-300575_13TeV_PromptReco_Collisions17_JSON_snt.txt";
 
+  // Full 2017 dataset json, 41.96/fb
+  const char* json_file = "../StopBabyMaker/json_files/Cert_294927-306462_13TeV_PromptReco_Collisions17_JSON_snt.txt";
+  const float kLumi = 41.96;
+
   // Combined 2016 and 2017 json,
   // const char* json_file = "../StopCORE/inputs/json_files/Cert_271036-301141_13TeV_Combined1617_JSON_snt.txt";
-  const char* json_file = "../StopCORE/inputs/json_files/Cert_271036-300575_13TeV_Combined1617_JSON_snt.txt";
-  const float kLumi = 35.87;
+  // const char* json_file = "../StopCORE/inputs/json_files/Cert_271036-300575_13TeV_Combined1617_JSON_snt.txt";
 
   // Setup pileup re-weighting
   if (doNvtxReweight) {
@@ -407,23 +410,6 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir) {
 
       // testCutFlowHistos(testVec[1]);
 
-      // drlepb_  = dR_lep_leadb();
-      // mhtsig_  = getMHTSig();
-
-      // Some stuff to do with MC
-      if ( !is_data() ) {
-        vector<float> jet_pt;
-        vector<float> jet_eta;
-        vector<float> jet_CSV;
-        vector<int>   jet_flavour;
-        for (unsigned iJet=0; iJet < ak4pfjets_p4().size(); iJet++) {
-          jet_pt.push_back( ak4pfjets_p4().at(iJet).Pt() );
-          jet_eta.push_back( ak4pfjets_p4().at(iJet).Eta() );
-          jet_CSV.push_back( ak4pfjets_CSV().at(iJet) );
-          jet_flavour.push_back( abs(ak4pfjets_hadron_flavor().at(iJet)) );
-        }
-      }
-
       // fillHistosForCR0b();
 
       values_["nlep_rl"] = (ngoodleps() == 1 && nvetoleps() >= 2 && lep2_p4().Pt() > 10)? 2 : ngoodleps();
@@ -526,7 +512,7 @@ void StopLooper::fillHistosForSR(string suf) {
 
   // Trigger requirements
   if (doTopTagging) { // 2017 Triggers
-    if (not ( (abs(lep1_pdgid()) == 11 && HLT_SingleEl()) || (abs(lep1_pdgid()) == 13 && HLT_SingleMu()) || HLT_MET_MHT() )) return; 
+    if (not ( (abs(lep1_pdgid()) == 11 && HLT_SingleEl()) || (abs(lep1_pdgid()) == 13 && HLT_SingleMu()) || HLT_MET_MHT() )) return;
   } else { // 2016 MET Triggers
     if (not ( (abs(lep1_pdgid()) == 11 && HLT_SingleEl()) || (abs(lep1_pdgid()) == 13 && HLT_SingleMu()) ||(HLT_MET() || HLT_MET110_MHT110() || HLT_MET120_MHT120()) )) return;
   }
@@ -764,6 +750,14 @@ void StopLooper::testTopTaggingEffficiency(SR& sr) {
     plot1D("h_n4jets", n4jets, evtweight_, sr.histMap, ";N(4j events)", 4, 0, 4);
     if (n4jets == 0) return;
 
+    // Hadronic chi2 for comparison
+    /// Define a disc variable that look similar
+    float chi2_disc = -log(hadronic_top_chi2()) / 8;
+    if (fabs(chi2_disc) >= 1.0) chi2_disc = std::copysign(0.99999, chi2_disc);
+    plot1D("h_chi2_disc1", chi2_disc, evtweight_, sr.histMap, ";discriminator", 220, -1.1, 1.1);
+    chi2_disc = std::copysign(pow(fabs(chi2_disc), 0.1), chi2_disc);
+    plot1D("h_chi2_disc2", chi2_disc, evtweight_, sr.histMap, ";discriminator", 220, -1.1, 1.1);
+
     float ratio_ntcandvscalable;
     if (calculable != 0) ratio_ntcandvscalable = (float) topcands_disc().size() / calculable;
     else ratio_ntcandvscalable = (ntopcands == 0)? -1/12 : 2.5;
@@ -861,6 +855,13 @@ void StopLooper::testTopTaggingEffficiency(SR& sr) {
     plot1D("h_fakable", calculable, evtweight_, sr.histMap, ";N(events)", 4, 0, 4);
     plot1D("h_fak4j", n4jets, evtweight_, sr.histMap, ";N(events)", 4, 0, 4);
     if (n4jets == 0) return;
+
+    float chi2_disc = -log(hadronic_top_chi2()) / 8;
+    if (fabs(chi2_disc) >= 1.0) chi2_disc = std::copysign(0.99999, chi2_disc);
+    plot1D("h_chi2fake_disc1", chi2_disc, evtweight_, sr.histMap, ";discriminator", 220, -1.1, 1.1);
+    chi2_disc = std::copysign(pow(fabs(chi2_disc), 0.1), chi2_disc);
+    plot1D("h_chi2fake_disc2", chi2_disc, evtweight_, sr.histMap, ";discriminator", 220, -1.1, 1.1);
+
     plot1D("h_nfakecand_raw", ntopcands, evtweight_, sr.histMap, ";N(topcand)", 4, 0, 4);
 
     if (ntopcands > 0) {
@@ -942,6 +943,7 @@ void StopLooper::testCutFlowHistos(SR& sr) {
 
 
 void StopLooper::temporaryAnalysisDump(string suffix) {
+
 
   // // Find the gen pT of the ttbar system
   // double ttbarPt = -99.9;

@@ -15,7 +15,7 @@ class StopLooper {
   void GenerateAllSRptrSets();
   void GetEventWeight();
 
-  void looper(TChain* chain, std::string sample, std::string outputdir);
+  void looper(TChain* chain, std::string sample, std::string outputdir, int jestype = 0);
 
   void fillHistosForSR(std::string suffix = "");
   void fillHistosForCR2l(std::string suffix = "");
