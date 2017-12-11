@@ -29,16 +29,19 @@ int main(int argc, char** argv)
   bool doData2016 = false;
   bool doData2016dilep = false;
 
-  if (sample == "data_2017") {
+  if (sample == "data_2017all") {
     doData2017B = true;
     doData2017C = true;
   }
-  else if (sample == "data_2017B") doData2017B = true;
-  else if (sample == "data_2017C") doData2017C = true;
+  // else if (sample == "data_2017B") doData2017B = true;
+  // else if (sample == "data_2017C") doData2017C = true;
   else if (sample == "data_2017dilep") doData2017dilep = true;
   else if (sample == "data_2016") doData2016 = true;
   else if (sample == "data_2016dilep") doData2016dilep = true;
-  else {
+  else if (sample == "data_2016all") {
+    doData2016 = true;
+    doData2016dilep = true;
+  } else {
     cout << __FILE__ << ':' << __LINE__ << ": infile= " << infile << endl;
     ch->Add(infile);
   }

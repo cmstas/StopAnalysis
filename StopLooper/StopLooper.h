@@ -55,7 +55,7 @@ class StopLooper {
   std::map<std::string,float> values_;
 
   // For nvtx reweighting
-  float nvtxscale_[70];
+  float nvtxscale_[100];
 
 };
 
