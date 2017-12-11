@@ -32,34 +32,39 @@ void compareControlRegions() {
   // auto ifile_new = new TFile("../StopLooper/output/temp6/data_2017dilep.root");
   // auto ifile_old = new TFile("../StopLooper/output/temp5/data_2016dilep.root");
 
-  auto ifile_new = new TFile("../StopLooper/output/temp4/data_2017dilep.root");
-  auto ifile_old = new TFile("../StopLooper/output/temp3/data_2016dilep.root");
+  // auto ifile_new = new TFile("../StopLooper/output/temp4/data_2017dilep.root");
+  // auto ifile_old = new TFile("../StopLooper/output/temp3/data_2016dilep.root");
 
-  // vector<string> Dirs = {"cr0btest1", "cr0btest2", "cr0btest3"};
-  // vector<string> Dirs = {"cr0btest1"};
-  // vector<string> Hists = {"h_met", "h_njets", "h_mt", "h_tmod", "h_nvtxs", "h_mlepb", "h_lep1pt", "h_dphijmet"};
+  // auto ifile_new = new TFile("../StopLooper/output/data2017_rwgtd/data_2017D.root");
+  auto ifile_new = new TFile("../StopLooper/output/data2017_rwgtd/all_data_2017.root");
+  auto ifile_old = new TFile("../StopLooper/output/data2016/data_2016all.root");
 
-  // vector<string> Dirs = {"cremu1"};
+
+  // // For nvtx reweighting purpose
+  // vector<string> Dirs = {"testCutflow"};
+  // vector<string> Hists = {"h_nvtxs"};
+
   // vector<string> Hists = {"h_njets", "h_nbjets", "h_mll", "h_met"};
   // vector<string> Hists = {"h_tmod_0b", "h_tmod_wb", "h_nbjets", "h_nbjets_t", "h_njets_t", "h_nbjets_twb"};
 
-  // vector<string> Dirs = {"cr2ltest", "cr2ltest1", "cr2ltest2", "cr2lbase"};
-  // vector<string> Dirs = {"cr2lbase", "cr2lbase2", "cr2ltest5"};
-  // vector<string> Dirs = {"cr0btest2", "cr0btest3", "cr2ltest1"};
-  vector<string> Dirs = {"cr2ltest0"};
-  // vector<string> Dirs = {"cr2ltest4", "cr2ltest5", "cr2ltest6", "cr2lbase"};
-  // vector<string> Dirs = {"cr2lbase", "cr2lincl1", "cr2lincl2"};
-  // vector<string> Hists = {"h_metbins", "h_rlmetbins", "h_njets", "h_nbjets", "h_tmod", "h_mlepb"};
   // vector<string> Hists = {"h_njets", "h_rlmet", "h_mt2w", "h_tmod", "h_nbjets", "h_dphijmet"};
   // vector<string> Hists = {"h_mll", "h_finemet", "h_met", "h_njets", "h_nbjets", "h_metphi", "h_lep1pt"};
   // vector<string> Hists = {"h_met", "h_njets_zpeak", "h_njets_noz", "h_mll_2j", "h_mll_g2j"};
   // vector<string> Hists = {"h_mll", "h_rlmet", "h_rlmt", "h_met", "h_nvtxs", "h_mt", "h_njets", "h_nbjets", "h_tmod", "h_mlepb", "h_lep1pt", "h_dphijmet"};
-  // vector<string> Hists = {"h_nvtxs", "h_mt", "h_met", "h_mll"};
-  vector<string> Hists = {"h_mll", "h_zpt", "h_njets", "h_njets_zpeak", "h_nbjets_zpeak", "h_nbjets_mzpt", "h_nbjets_hzpt"};
+  // vector<string> Hists = {"h_mll", "h_zpt", "h_njets", "h_njets_zpeak", "h_nbjets_zpeak", "h_nbjets_mzpt", "h_nbjets_hzpt"};
 
-  // vector<string> Dirs = {"cr0bbase"};
-  // vector<string> Hists = {"h_metbins", "h_mt", "h_njets", "h_nbjets", "h_tmod", "h_mlepb"};
-  // vector<string> Hists = {"h_metbins", "h_mt", "h_njets", "h_nbjets", "h_tmod", "h_mlepb"};
+  // vector<string> Dirs = {"cr0btest1", "cr0btest2", "cr0btest3", "cr0bbase"};
+  // // vector<string> Hists = {"h_metbins", "h_mt", "h_njets", "h_nbjets", "h_tmod", "h_mlepb"};
+  // vector<string> Hists = {"h_met", "h_njets", "h_mt", "h_tmod", "h_nvtxs", "h_mlepb", "h_lep1pt", "h_dphijmet"};
+
+  // vector<string> Dirs = {"cr2ltest3", "cr2ltest1", "cr2ltest4", "cr2lbase"};
+  // vector<string> Hists = {"h_metbins", "h_rlmetbins", "h_njets", "h_nbjets", "h_tmod", "h_mlepb"};
+  // vector<string> Hists = {"h_mll", "h_rlmet", "h_rlmt", "h_met", "h_nvtxs", "h_mt", "h_njets", "h_nbjets", "h_tmod", "h_mlepb", "h_lep1pt", "h_dphijmet"};
+
+  // vector<string> Dirs = {"cr2lbase"};
+  // vector<string> Hists = {"h_rlmet", "h_rlmt", "h_rlmet_u", "h_rlmt_u", "h_met", "h_mt", "h_met_u", "h_mt_u", "h_njets", "h_nbjets", "h_tmod", "h_mlepb",};
+  vector<string> Dirs = {"cr0bbase"};
+  vector<string> Hists = {"h_met", "h_mt", "h_met_u", "h_mt_u", "h_njets", "h_tmod", "h_mlepb",};
 
   for (auto dirstr : Dirs) {
     for (auto hn : Hists) {
@@ -82,27 +87,50 @@ void compareControlRegions() {
         auto hold = (TH1F*) ifile_old->Get((dirstr+"/"+hstr).c_str());
         if (!hold) { cout << "Can't find " << dirstr+"/"+hstr << endl; continue; }
 
-        hold->Scale(8.32/35.87);
+        hnew->Scale(35.87/41.96);
+        // hold->Scale(41.96/35.87);
 
         float scale = hnew->Integral(0,-1)/hold->Integral(0,-1);
 
         // Temporary
-        if (hn == "h_njets")
-          for (int i = 1; i < 13; ++i)
-            cout << "ratio for " << i-1 << " jets is: " << hnew->GetBinContent(i) / hold->GetBinContent(i) << endl;
+        // if (hn == "h_njets")
+        //   for (int i = 1; i < 13; ++i)
+        //     cout << "ratio for " << i-1 << " jets is: " << hnew->GetBinContent(i) / hold->GetBinContent(i) << endl;
+
+        // Resetting the plot scale
+        hnew = (TH1F*) hnew->Clone();
+        hold = (TH1F*) hold->Clone();
+        if (hn == "h_njets") {
+          hnew->GetXaxis()->SetRangeUser(2, 11);
+          hold->GetXaxis()->SetRangeUser(2, 11);
+        } else if (hn == "h_met") {
+          hnew->GetXaxis()->SetRangeUser(150, 650);
+          hold->GetXaxis()->SetRangeUser(150, 650);
+        } else if (hn == "h_mt") {
+          hnew->GetXaxis()->SetRangeUser(150, 600);
+          hold->GetXaxis()->SetRangeUser(150, 600);
+        }
 
         // Try to use the dataMCplotMaker
-        string optstr = "--darkColorLines --lumi 8.3 --topYaxisTitle Entries --type Preliminary --dataName data2017 --outOfFrame";
+        string optstr = "--darkColorLines --topYaxisTitle Entries --type Preliminary --outOfFrame";
         string xlabel = " --xAxisOverride " + string(hnew->GetXaxis()->GetTitle());
-        string oname = " --outputName plots/" + dirstr + "_" + hstr + "_compare.png";
-        dataMCplotMaker(hnew, {hold}, {"data2016"}, "", "scale: "+to_string(scale), optstr+xlabel+oname, {}, {}, vcolor);
+        string oname = " --outputName plots/" + dirstr + "_" + hstr + "_compare.pdf";
+        if (hn.find("h_n") != string::npos || hn.find("phi") != string::npos || !TString(hnew->GetXaxis()->GetTitle()).Contains("[GeV]"))
+          optstr += " --noDivisionLabel";
+        optstr += " --topYaxisTitle Ratio  --dataName 2017 data (42.0 fb^{-1}, scaled to 35.9 fb^{-1})";
+        optstr += " --legendRight -0.5 --legendUp 0.12 --overrideLumi 13 TeV";
+        dataMCplotMaker(hnew, {hold}, {"2016 data (35.9 fb^{-1})"}, "", "", optstr+xlabel+oname, {}, {}, vcolor);
 
-        // // Produce nvtx reweighting files
+        // // Produce nvtx reweighting files, only do it once with the loosest Dir and only h_nvtxs in Hists
         // hnew->Scale(1./hnew->Integral());
         // hold->Scale(1./hold->Integral());
-        // hnew->Divide(hold);
+        // auto h_16to17 = (TH1F*) hnew->Clone();
+        // auto h_17to16 = (TH1F*) hold->Clone();
+        // h_16to17->Divide(hold);
+        // h_17to16->Divide(hnew);
         // TFile temp("nvtx_reweighting_alldata.root", "RECREATE");
-        // hnew->Write("h_nvtxscale_16to17");
+        // h_16to17->Write("h_nvtxscale_16to17");
+        // h_17to16->Write("h_nvtxscale_17to16");
         // temp.Close();
 
       }

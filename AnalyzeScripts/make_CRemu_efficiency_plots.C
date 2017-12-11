@@ -41,7 +41,7 @@ void compare_CRemu_efficiency_plots() {
   data.SetTextFont(52);
   data.SetTextSize(0.0456);
 
-  TLatex lumi(0.85, 0.82, "2.89 fb^{-1} (13 TeV)");
+  TLatex lumi(0.85, 0.82, "41.96 fb^{-1} (13 TeV)");
   lumi.SetNDC();
   lumi.SetTextAlign(31);
   lumi.SetTextFont(42);
@@ -102,7 +102,7 @@ void compare_CRemu_efficiency_plots() {
 
 }
 
-void make_CRemu_efficiency_plots(TString ifdir = "../StopLooper/output/temp/", TString ifname = "all_data_Run2017.root") {
+void make_CRemu_efficiency_plots(TString ifdir = "../StopLooper/output/temp_v25_7", TString ifname = "all_data_Run2017.root") {
 
   compare_CRemu_efficiency_plots();
   return;
@@ -135,7 +135,7 @@ void make_CRemu_efficiency_plots(TString ifdir = "../StopLooper/output/temp/", T
   data.SetTextFont(52);
   data.SetTextSize(0.0456);
 
-  TLatex lumi(0.85, 0.82, "2.89 fb^{-1} (13 TeV)");
+  TLatex lumi(0.85, 0.82, "41.96 fb^{-1} (13 TeV)");
   lumi.SetNDC();
   lumi.SetTextAlign(31);
   lumi.SetTextFont(42);

@@ -309,12 +309,6 @@ std::vector<SR> getStopControlRegionsDilepton() {
   CRvec.emplace_back(cr);
 
   cr.SetName("cr2ltest1");         // test
-  cr.SetVar("met", 50, fInf);
-  cr.SetVar("nvlep", 2, 3);
-  cr.SetVar("nlep_rl", 2, 3);
-  // cr.SetVar("lep1pt", 40, fInf);
-  cr.SetVar("passlep1pt", 1, 2); // mu 40, e 45
-  cr.SetVar("njet", 2, fInf);
   cr.SetVar("nbjet", 1, fInf);
   // cr.SetVar("dphijmet_rl", 0.8, 3.14159);
   CRvec.emplace_back(cr);
@@ -417,7 +411,7 @@ std::vector<SR> getStopControlRegionsNoBTags() {
   SR crbase;
   crbase.SetName("cr0bbase");
   crbase.SetVar("mt", 150, fInf);
-  crbase.SetVar("met", 150, fInf);
+  crbase.SetVar("met", 250, fInf);
   crbase.SetVar("nlep", 1, 2);
   crbase.SetVar("nvlep", 1, 2);
   crbase.SetVar("passvetos", 1, 2);
