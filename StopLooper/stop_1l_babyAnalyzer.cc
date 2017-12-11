@@ -519,10 +519,14 @@ void stop_1l_babyAnalyzer::Init(TTree *tree) {
   if (ph_genIso04_branch) ph_genIso04_branch->SetAddress(&ph_genIso04_);
   ph_drMinParton_branch = tree->GetBranch("ph_drMinParton");
   if (ph_drMinParton_branch) ph_drMinParton_branch->SetAddress(&ph_drMinParton_);
-  njets20_branch = tree->GetBranch("njets20");
-  if (njets20_branch) njets20_branch->SetAddress(&njets20_);
-  nbtag30_branch = tree->GetBranch("nbtag30");
-  if (nbtag30_branch) nbtag30_branch->SetAddress(&nbtag30_);
+  nskimjets_branch = tree->GetBranch("nskimjets");
+  if (nskimjets_branch) nskimjets_branch->SetAddress(&nskimjets_);
+  nskimbtagmed_branch = tree->GetBranch("nskimbtagmed");
+  if (nskimbtagmed_branch) nskimbtagmed_branch->SetAddress(&nskimbtagmed_);
+  nskimbtagloose_branch = tree->GetBranch("nskimbtagloose");
+  if (nskimbtagloose_branch) nskimbtagloose_branch->SetAddress(&nskimbtagloose_);
+  nskimbtagtight_branch = tree->GetBranch("nskimbtagtight");
+  if (nskimbtagtight_branch) nskimbtagtight_branch->SetAddress(&nskimbtagtight_);
   ngoodjets_branch = tree->GetBranch("ngoodjets");
   if (ngoodjets_branch) ngoodjets_branch->SetAddress(&ngoodjets_);
   ngoodbtags_branch = tree->GetBranch("ngoodbtags");
@@ -555,10 +559,14 @@ void stop_1l_babyAnalyzer::Init(TTree *tree) {
   if (ak4pfjets_loose_puid_branch) ak4pfjets_loose_puid_branch->SetAddress(&ak4pfjets_loose_puid_);
   ak4pfjets_loose_pfid_branch = tree->GetBranch("ak4pfjets_loose_pfid");
   if (ak4pfjets_loose_pfid_branch) ak4pfjets_loose_pfid_branch->SetAddress(&ak4pfjets_loose_pfid_);
-  jup_njets20_branch = tree->GetBranch("jup_njets20");
-  if (jup_njets20_branch) jup_njets20_branch->SetAddress(&jup_njets20_);
-  jup_nbtag30_branch = tree->GetBranch("jup_nbtag30");
-  if (jup_nbtag30_branch) jup_nbtag30_branch->SetAddress(&jup_nbtag30_);
+  jup_nskimjets_branch = tree->GetBranch("jup_nskimjets");
+  if (jup_nskimjets_branch) jup_nskimjets_branch->SetAddress(&jup_nskimjets_);
+  jup_nskimbtagmed_branch = tree->GetBranch("jup_nskimbtagmed");
+  if (jup_nskimbtagmed_branch) jup_nskimbtagmed_branch->SetAddress(&jup_nskimbtagmed_);
+  jup_nskimbtagloose_branch = tree->GetBranch("jup_nskimbtagloose");
+  if (jup_nskimbtagloose_branch) jup_nskimbtagloose_branch->SetAddress(&jup_nskimbtagloose_);
+  jup_nskimbtagtight_branch = tree->GetBranch("jup_nskimbtagtight");
+  if (jup_nskimbtagtight_branch) jup_nskimbtagtight_branch->SetAddress(&jup_nskimbtagtight_);
   jup_ngoodjets_branch = tree->GetBranch("jup_ngoodjets");
   if (jup_ngoodjets_branch) jup_ngoodjets_branch->SetAddress(&jup_ngoodjets_);
   jup_ngoodbtags_branch = tree->GetBranch("jup_ngoodbtags");
@@ -591,10 +599,14 @@ void stop_1l_babyAnalyzer::Init(TTree *tree) {
   if (jup_ak4pfjets_loose_puid_branch) jup_ak4pfjets_loose_puid_branch->SetAddress(&jup_ak4pfjets_loose_puid_);
   jup_ak4pfjets_loose_pfid_branch = tree->GetBranch("jup_ak4pfjets_loose_pfid");
   if (jup_ak4pfjets_loose_pfid_branch) jup_ak4pfjets_loose_pfid_branch->SetAddress(&jup_ak4pfjets_loose_pfid_);
-  jdown_njets20_branch = tree->GetBranch("jdown_njets20");
-  if (jdown_njets20_branch) jdown_njets20_branch->SetAddress(&jdown_njets20_);
-  jdown_nbtag30_branch = tree->GetBranch("jdown_nbtag30");
-  if (jdown_nbtag30_branch) jdown_nbtag30_branch->SetAddress(&jdown_nbtag30_);
+  jdown_nskimjets_branch = tree->GetBranch("jdown_nskimjets");
+  if (jdown_nskimjets_branch) jdown_nskimjets_branch->SetAddress(&jdown_nskimjets_);
+  jdown_nskimbtagmed_branch = tree->GetBranch("jdown_nskimbtagmed");
+  if (jdown_nskimbtagmed_branch) jdown_nskimbtagmed_branch->SetAddress(&jdown_nskimbtagmed_);
+  jdown_nskimbtagloose_branch = tree->GetBranch("jdown_nskimbtagloose");
+  if (jdown_nskimbtagloose_branch) jdown_nskimbtagloose_branch->SetAddress(&jdown_nskimbtagloose_);
+  jdown_nskimbtagtight_branch = tree->GetBranch("jdown_nskimbtagtight");
+  if (jdown_nskimbtagtight_branch) jdown_nskimbtagtight_branch->SetAddress(&jdown_nskimbtagtight_);
   jdown_ngoodjets_branch = tree->GetBranch("jdown_ngoodjets");
   if (jdown_ngoodjets_branch) jdown_ngoodjets_branch->SetAddress(&jdown_ngoodjets_);
   jdown_ngoodbtags_branch = tree->GetBranch("jdown_ngoodbtags");
@@ -1207,8 +1219,10 @@ void stop_1l_babyAnalyzer::GetEntry(unsigned int idx) {
   ph_mcMatchId_isLoaded = false;
   ph_genIso04_isLoaded = false;
   ph_drMinParton_isLoaded = false;
-  njets20_isLoaded = false;
-  nbtag30_isLoaded = false;
+  nskimjets_isLoaded = false;
+  nskimbtagmed_isLoaded = false;
+  nskimbtagloose_isLoaded = false;
+  nskimbtagtight_isLoaded = false;
   ngoodjets_isLoaded = false;
   ngoodbtags_isLoaded = false;
   nloosebtags_isLoaded = false;
@@ -1229,8 +1243,10 @@ void stop_1l_babyAnalyzer::GetEntry(unsigned int idx) {
   ak4pfjets_leadMEDbjet_p4_isLoaded = false;
   ak4pfjets_leadbtag_p4_isLoaded = false;
   ak4genjets_p4_isLoaded = false;
-  jup_njets20_isLoaded = false;
-  jup_nbtag30_isLoaded = false;
+  jup_nskimjets_isLoaded = false;
+  jup_nskimbtagmed_isLoaded = false;
+  jup_nskimbtagloose_isLoaded = false;
+  jup_nskimbtagtight_isLoaded = false;
   jup_ngoodjets_isLoaded = false;
   jup_ngoodbtags_isLoaded = false;
   jup_nloosebtags_isLoaded = false;
@@ -1251,8 +1267,10 @@ void stop_1l_babyAnalyzer::GetEntry(unsigned int idx) {
   jup_ak4pfjets_leadMEDbjet_p4_isLoaded = false;
   jup_ak4pfjets_leadbtag_p4_isLoaded = false;
   jup_ak4genjets_p4_isLoaded = false;
-  jdown_njets20_isLoaded = false;
-  jdown_nbtag30_isLoaded = false;
+  jdown_nskimjets_isLoaded = false;
+  jdown_nskimbtagmed_isLoaded = false;
+  jdown_nskimbtagloose_isLoaded = false;
+  jdown_nskimbtagtight_isLoaded = false;
   jdown_ngoodjets_isLoaded = false;
   jdown_ngoodbtags_isLoaded = false;
   jdown_nloosebtags_isLoaded = false;
@@ -1700,8 +1718,10 @@ void stop_1l_babyAnalyzer::LoadAllBranches() {
   if (ph_mcMatchId_branch != 0) ph_mcMatchId();
   if (ph_genIso04_branch != 0) ph_genIso04();
   if (ph_drMinParton_branch != 0) ph_drMinParton();
-  if (njets20_branch != 0) njets20();
-  if (nbtag30_branch != 0) nbtag30();
+  if (nskimjets_branch != 0) nskimjets();
+  if (nskimbtagmed_branch != 0) nskimbtagmed();
+  if (nskimbtagloose_branch != 0) nskimbtagloose();
+  if (nskimbtagtight_branch != 0) nskimbtagtight();
   if (ngoodjets_branch != 0) ngoodjets();
   if (ngoodbtags_branch != 0) ngoodbtags();
   if (nloosebtags_branch != 0) nloosebtags();
@@ -1722,8 +1742,10 @@ void stop_1l_babyAnalyzer::LoadAllBranches() {
   if (ak4pfjets_leadMEDbjet_p4_branch != 0) ak4pfjets_leadMEDbjet_p4();
   if (ak4pfjets_leadbtag_p4_branch != 0) ak4pfjets_leadbtag_p4();
   if (ak4genjets_p4_branch != 0) ak4genjets_p4();
-  if (jup_njets20_branch != 0) jup_njets20();
-  if (jup_nbtag30_branch != 0) jup_nbtag30();
+  if (jup_nskimjets_branch != 0) jup_nskimjets();
+  if (jup_nskimbtagmed_branch != 0) jup_nskimbtagmed();
+  if (jup_nskimbtagloose_branch != 0) jup_nskimbtagloose();
+  if (jup_nskimbtagtight_branch != 0) jup_nskimbtagtight();
   if (jup_ngoodjets_branch != 0) jup_ngoodjets();
   if (jup_ngoodbtags_branch != 0) jup_ngoodbtags();
   if (jup_nloosebtags_branch != 0) jup_nloosebtags();
@@ -1744,8 +1766,10 @@ void stop_1l_babyAnalyzer::LoadAllBranches() {
   if (jup_ak4pfjets_leadMEDbjet_p4_branch != 0) jup_ak4pfjets_leadMEDbjet_p4();
   if (jup_ak4pfjets_leadbtag_p4_branch != 0) jup_ak4pfjets_leadbtag_p4();
   if (jup_ak4genjets_p4_branch != 0) jup_ak4genjets_p4();
-  if (jdown_njets20_branch != 0) jdown_njets20();
-  if (jdown_nbtag30_branch != 0) jdown_nbtag30();
+  if (jdown_nskimjets_branch != 0) jdown_nskimjets();
+  if (jdown_nskimbtagmed_branch != 0) jdown_nskimbtagmed();
+  if (jdown_nskimbtagloose_branch != 0) jdown_nskimbtagloose();
+  if (jdown_nskimbtagtight_branch != 0) jdown_nskimbtagtight();
   if (jdown_ngoodjets_branch != 0) jdown_ngoodjets();
   if (jdown_ngoodbtags_branch != 0) jdown_ngoodbtags();
   if (jdown_nloosebtags_branch != 0) jdown_nloosebtags();
@@ -4795,30 +4819,56 @@ const vector<float> &stop_1l_babyAnalyzer::ph_drMinParton() {
   return *ph_drMinParton_;
 }
 
-const int &stop_1l_babyAnalyzer::njets20() {
-  if (not njets20_isLoaded) {
-    if (njets20_branch != 0) {
-      njets20_branch->GetEntry(index);
+const int &stop_1l_babyAnalyzer::nskimjets() {
+  if (not nskimjets_isLoaded) {
+    if (nskimjets_branch != 0) {
+      nskimjets_branch->GetEntry(index);
     } else {
-      printf("branch njets20_branch does not exist!\n");
+      printf("branch nskimjets_branch does not exist!\n");
       exit(1);
     }
-    njets20_isLoaded = true;
+    nskimjets_isLoaded = true;
   }
-  return njets20_;
+  return nskimjets_;
 }
 
-const int &stop_1l_babyAnalyzer::nbtag30() {
-  if (not nbtag30_isLoaded) {
-    if (nbtag30_branch != 0) {
-      nbtag30_branch->GetEntry(index);
+const int &stop_1l_babyAnalyzer::nskimbtagmed() {
+  if (not nskimbtagmed_isLoaded) {
+    if (nskimbtagmed_branch != 0) {
+      nskimbtagmed_branch->GetEntry(index);
     } else {
-      printf("branch nbtag30_branch does not exist!\n");
+      printf("branch nskimbtagmed_branch does not exist!\n");
       exit(1);
     }
-    nbtag30_isLoaded = true;
+    nskimbtagmed_isLoaded = true;
   }
-  return nbtag30_;
+  return nskimbtagmed_;
+}
+
+const int &stop_1l_babyAnalyzer::nskimbtagloose() {
+  if (not nskimbtagloose_isLoaded) {
+    if (nskimbtagloose_branch != 0) {
+      nskimbtagloose_branch->GetEntry(index);
+    } else {
+      printf("branch nskimbtagloose_branch does not exist!\n");
+      exit(1);
+    }
+    nskimbtagloose_isLoaded = true;
+  }
+  return nskimbtagloose_;
+}
+
+const int &stop_1l_babyAnalyzer::nskimbtagtight() {
+  if (not nskimbtagtight_isLoaded) {
+    if (nskimbtagtight_branch != 0) {
+      nskimbtagtight_branch->GetEntry(index);
+    } else {
+      printf("branch nskimbtagtight_branch does not exist!\n");
+      exit(1);
+    }
+    nskimbtagtight_isLoaded = true;
+  }
+  return nskimbtagtight_;
 }
 
 const int &stop_1l_babyAnalyzer::ngoodjets() {
@@ -5081,30 +5131,56 @@ const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l
   return *ak4genjets_p4_;
 }
 
-const int &stop_1l_babyAnalyzer::jup_njets20() {
-  if (not jup_njets20_isLoaded) {
-    if (jup_njets20_branch != 0) {
-      jup_njets20_branch->GetEntry(index);
+const int &stop_1l_babyAnalyzer::jup_nskimjets() {
+  if (not jup_nskimjets_isLoaded) {
+    if (jup_nskimjets_branch != 0) {
+      jup_nskimjets_branch->GetEntry(index);
     } else {
-      printf("branch jup_njets20_branch does not exist!\n");
+      printf("branch jup_nskimjets_branch does not exist!\n");
       exit(1);
     }
-    jup_njets20_isLoaded = true;
+    jup_nskimjets_isLoaded = true;
   }
-  return jup_njets20_;
+  return jup_nskimjets_;
 }
 
-const int &stop_1l_babyAnalyzer::jup_nbtag30() {
-  if (not jup_nbtag30_isLoaded) {
-    if (jup_nbtag30_branch != 0) {
-      jup_nbtag30_branch->GetEntry(index);
+const int &stop_1l_babyAnalyzer::jup_nskimbtagmed() {
+  if (not jup_nskimbtagmed_isLoaded) {
+    if (jup_nskimbtagmed_branch != 0) {
+      jup_nskimbtagmed_branch->GetEntry(index);
     } else {
-      printf("branch jup_nbtag30_branch does not exist!\n");
+      printf("branch jup_nskimbtagmed_branch does not exist!\n");
       exit(1);
     }
-    jup_nbtag30_isLoaded = true;
+    jup_nskimbtagmed_isLoaded = true;
   }
-  return jup_nbtag30_;
+  return jup_nskimbtagmed_;
+}
+
+const int &stop_1l_babyAnalyzer::jup_nskimbtagloose() {
+  if (not jup_nskimbtagloose_isLoaded) {
+    if (jup_nskimbtagloose_branch != 0) {
+      jup_nskimbtagloose_branch->GetEntry(index);
+    } else {
+      printf("branch jup_nskimbtagloose_branch does not exist!\n");
+      exit(1);
+    }
+    jup_nskimbtagloose_isLoaded = true;
+  }
+  return jup_nskimbtagloose_;
+}
+
+const int &stop_1l_babyAnalyzer::jup_nskimbtagtight() {
+  if (not jup_nskimbtagtight_isLoaded) {
+    if (jup_nskimbtagtight_branch != 0) {
+      jup_nskimbtagtight_branch->GetEntry(index);
+    } else {
+      printf("branch jup_nskimbtagtight_branch does not exist!\n");
+      exit(1);
+    }
+    jup_nskimbtagtight_isLoaded = true;
+  }
+  return jup_nskimbtagtight_;
 }
 
 const int &stop_1l_babyAnalyzer::jup_ngoodjets() {
@@ -5367,30 +5443,56 @@ const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l
   return *jup_ak4genjets_p4_;
 }
 
-const int &stop_1l_babyAnalyzer::jdown_njets20() {
-  if (not jdown_njets20_isLoaded) {
-    if (jdown_njets20_branch != 0) {
-      jdown_njets20_branch->GetEntry(index);
+const int &stop_1l_babyAnalyzer::jdown_nskimjets() {
+  if (not jdown_nskimjets_isLoaded) {
+    if (jdown_nskimjets_branch != 0) {
+      jdown_nskimjets_branch->GetEntry(index);
     } else {
-      printf("branch jdown_njets20_branch does not exist!\n");
+      printf("branch jdown_nskimjets_branch does not exist!\n");
       exit(1);
     }
-    jdown_njets20_isLoaded = true;
+    jdown_nskimjets_isLoaded = true;
   }
-  return jdown_njets20_;
+  return jdown_nskimjets_;
 }
 
-const int &stop_1l_babyAnalyzer::jdown_nbtag30() {
-  if (not jdown_nbtag30_isLoaded) {
-    if (jdown_nbtag30_branch != 0) {
-      jdown_nbtag30_branch->GetEntry(index);
+const int &stop_1l_babyAnalyzer::jdown_nskimbtagmed() {
+  if (not jdown_nskimbtagmed_isLoaded) {
+    if (jdown_nskimbtagmed_branch != 0) {
+      jdown_nskimbtagmed_branch->GetEntry(index);
     } else {
-      printf("branch jdown_nbtag30_branch does not exist!\n");
+      printf("branch jdown_nskimbtagmed_branch does not exist!\n");
       exit(1);
     }
-    jdown_nbtag30_isLoaded = true;
+    jdown_nskimbtagmed_isLoaded = true;
   }
-  return jdown_nbtag30_;
+  return jdown_nskimbtagmed_;
+}
+
+const int &stop_1l_babyAnalyzer::jdown_nskimbtagloose() {
+  if (not jdown_nskimbtagloose_isLoaded) {
+    if (jdown_nskimbtagloose_branch != 0) {
+      jdown_nskimbtagloose_branch->GetEntry(index);
+    } else {
+      printf("branch jdown_nskimbtagloose_branch does not exist!\n");
+      exit(1);
+    }
+    jdown_nskimbtagloose_isLoaded = true;
+  }
+  return jdown_nskimbtagloose_;
+}
+
+const int &stop_1l_babyAnalyzer::jdown_nskimbtagtight() {
+  if (not jdown_nskimbtagtight_isLoaded) {
+    if (jdown_nskimbtagtight_branch != 0) {
+      jdown_nskimbtagtight_branch->GetEntry(index);
+    } else {
+      printf("branch jdown_nskimbtagtight_branch does not exist!\n");
+      exit(1);
+    }
+    jdown_nskimbtagtight_isLoaded = true;
+  }
+  return jdown_nskimbtagtight_;
 }
 
 const int &stop_1l_babyAnalyzer::jdown_ngoodjets() {
@@ -8571,8 +8673,10 @@ const vector<float> &ph_mass() { return babyAnalyzer.ph_mass(); }
 const vector<int> &ph_mcMatchId() { return babyAnalyzer.ph_mcMatchId(); }
 const vector<float> &ph_genIso04() { return babyAnalyzer.ph_genIso04(); }
 const vector<float> &ph_drMinParton() { return babyAnalyzer.ph_drMinParton(); }
-const int &njets20() { return babyAnalyzer.njets20(); }
-const int &nbtag30() { return babyAnalyzer.nbtag30(); }
+const int &nskimjets() { return babyAnalyzer.nskimjets(); }
+const int &nskimbtagmed() { return babyAnalyzer.nskimbtagmed(); }
+const int &nskimbtagloose() { return babyAnalyzer.nskimbtagloose(); }
+const int &nskimbtagtight() { return babyAnalyzer.nskimbtagtight(); }
 const int &ngoodjets() { return babyAnalyzer.ngoodjets(); }
 const int &ngoodbtags() { return babyAnalyzer.ngoodbtags(); }
 const int &nloosebtags() { return babyAnalyzer.nloosebtags(); }
@@ -8593,8 +8697,10 @@ const vector<bool> &ak4pfjets_loose_pfid() { return babyAnalyzer.ak4pfjets_loose
 const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &ak4pfjets_leadMEDbjet_p4() { return babyAnalyzer.ak4pfjets_leadMEDbjet_p4(); }
 const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &ak4pfjets_leadbtag_p4() { return babyAnalyzer.ak4pfjets_leadbtag_p4(); }
 const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &ak4genjets_p4() { return babyAnalyzer.ak4genjets_p4(); }
-const int &jup_njets20() { return babyAnalyzer.jup_njets20(); }
-const int &jup_nbtag30() { return babyAnalyzer.jup_nbtag30(); }
+const int &jup_nskimjets() { return babyAnalyzer.jup_nskimjets(); }
+const int &jup_nskimbtagmed() { return babyAnalyzer.jup_nskimbtagmed(); }
+const int &jup_nskimbtagloose() { return babyAnalyzer.jup_nskimbtagloose(); }
+const int &jup_nskimbtagtight() { return babyAnalyzer.jup_nskimbtagtight(); }
 const int &jup_ngoodjets() { return babyAnalyzer.jup_ngoodjets(); }
 const int &jup_ngoodbtags() { return babyAnalyzer.jup_ngoodbtags(); }
 const int &jup_nloosebtags() { return babyAnalyzer.jup_nloosebtags(); }
@@ -8615,8 +8721,10 @@ const vector<bool> &jup_ak4pfjets_loose_pfid() { return babyAnalyzer.jup_ak4pfje
 const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &jup_ak4pfjets_leadMEDbjet_p4() { return babyAnalyzer.jup_ak4pfjets_leadMEDbjet_p4(); }
 const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &jup_ak4pfjets_leadbtag_p4() { return babyAnalyzer.jup_ak4pfjets_leadbtag_p4(); }
 const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &jup_ak4genjets_p4() { return babyAnalyzer.jup_ak4genjets_p4(); }
-const int &jdown_njets20() { return babyAnalyzer.jdown_njets20(); }
-const int &jdown_nbtag30() { return babyAnalyzer.jdown_nbtag30(); }
+const int &jdown_nskimjets() { return babyAnalyzer.jdown_nskimjets(); }
+const int &jdown_nskimbtagmed() { return babyAnalyzer.jdown_nskimbtagmed(); }
+const int &jdown_nskimbtagloose() { return babyAnalyzer.jdown_nskimbtagloose(); }
+const int &jdown_nskimbtagtight() { return babyAnalyzer.jdown_nskimbtagtight(); }
 const int &jdown_ngoodjets() { return babyAnalyzer.jdown_ngoodjets(); }
 const int &jdown_ngoodbtags() { return babyAnalyzer.jdown_ngoodbtags(); }
 const int &jdown_nloosebtags() { return babyAnalyzer.jdown_nloosebtags(); }
