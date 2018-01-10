@@ -126,12 +126,12 @@ float JetTree::getBtagEffFromFile(float pt, float eta, int mcFlavour, int WP, bo
 //      return 1.;
     //}
     // only use pt bins up to 400 GeV for charm and udsg
-    float pt_cutoff = std::max(20.,std::min(399.,double(pt)));
+    float pt_cutoff = std::max(30.,std::min(399.,double(pt)));
     TH2D* h(0);
     if(WP==1){
       if (abs(mcFlavour) == 5) {
 	h = h_btag_eff_b;
-	pt_cutoff = std::max(20.,std::min(599.,double(pt)));
+	pt_cutoff = std::max(30.,std::min(599.,double(pt)));
       }
       else if (abs(mcFlavour) == 4) {
 	h = h_btag_eff_c;
@@ -143,7 +143,7 @@ float JetTree::getBtagEffFromFile(float pt, float eta, int mcFlavour, int WP, bo
     if(WP==0){
       if (abs(mcFlavour) == 5) {
 	h = h_loose_btag_eff_b;
-	pt_cutoff = std::max(20.,std::min(599.,double(pt)));
+	pt_cutoff = std::max(30.,std::min(599.,double(pt)));
       }
       else if (abs(mcFlavour) == 4) {
 	h = h_loose_btag_eff_c;
@@ -155,7 +155,7 @@ float JetTree::getBtagEffFromFile(float pt, float eta, int mcFlavour, int WP, bo
     if(WP==2){
       if (abs(mcFlavour) == 5) {
 	h = h_tight_btag_eff_b;
-	pt_cutoff = std::max(20.,std::min(599.,double(pt)));
+	pt_cutoff = std::max(30.,std::min(599.,double(pt)));
       }
       else if (abs(mcFlavour) == 4) {
 	h = h_tight_btag_eff_c;
@@ -380,7 +380,8 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx, Factorize
 	  effloose = getBtagEffFromFile(p4sCorrJets[jindex].pt(),p4sCorrJets[jindex].eta(), pfjets_hadronFlavour().at(jindex), 0, isFastsim);
 	  eff      = getBtagEffFromFile(p4sCorrJets[jindex].pt(),p4sCorrJets[jindex].eta(), pfjets_hadronFlavour().at(jindex), 1, isFastsim);
 	  efftight = getBtagEffFromFile(p4sCorrJets[jindex].pt(),p4sCorrJets[jindex].eta(), pfjets_hadronFlavour().at(jindex), 2, isFastsim);
-	  //cout << eff << " " << effloose << " " << efftight << endl;
+          if (eff == 0 || efftight == 0)
+            cerr << "JetTree.cc: Error: 0 btag eff from file found! :" << eff << " " << effloose << " " << efftight << ", pt = " << p4sCorrJets[jindex].pt() << endl;
 	  // cout<<"read uncertainty from btagsf reader:"<<endl;
 	  if (flavor == BTagEntry::FLAV_UDSG) {
 	    weight_cent = reader_light   ->eval(flavor, eta_cutoff, pt_cutoff);
