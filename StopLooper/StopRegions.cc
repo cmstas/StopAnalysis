@@ -115,6 +115,22 @@ std::vector<SR> getStopSignalRegionsTopological() {
   sr.SetMETBins({250, 350, 450, 550, 1500});
   SRvec.emplace_back(sr);
 
+  // Signal regions with top tagging
+  sr = srbase;
+  sr.SetName("srJ");
+  sr.SetDetailName("geq4j_tmodlt0_mlb0tInf");
+  sr.SetVar("njet", 4, fInf);
+  sr.SetVar("tmod", -fInf, 0);
+  sr.SetVar("ntbtag", 0, fInf);
+  sr.SetVar("ntopcand", 1, fInf);
+  sr.SetMETBins({250, 350, 450, 550, 650, 1500});
+  SRvec.emplace_back(sr);
+
+  sr.SetName("srK");
+  sr.SetDetailName("geq4j_tmod0toInf_mlb0tInf");
+  sr.SetVar("tmod", 0, fInf);
+  sr.SetMETBins({250, 350, 450, 550, 650, 1500});
+  SRvec.emplace_back(sr);
 
   return SRvec;
 }
@@ -123,25 +139,35 @@ std::vector<SR> getStopControlRegionsNoBTagsTopological() {
 
   std::vector<SR> CRvec;
 
-  // SR crbase;
-  // crbase.SetName("cr0bbase");
-  // crbase.SetVar("mt", 0, fInf);
-  // crbase.SetVar("met", 250, fInf);
-  // crbase.SetVar("nlep", 1, 2);
-  // crbase.SetVar("njet", 2, fInf);
-  // crbase.SetVar("nbjet", 0, 1);
-  // crbase.SetVar("dphijmet", 0.8, 3.14159);
-  // crbase.SetAllowDummyVars(1);
-  // CRvec.emplace_back(crbase);
-  // SR cr;
-
   std::vector<SR> SRvec = getStopSignalRegions();
   for (SR cr : SRvec) {
     cr.SetName(cr.GetName().replace(0, 2, "cr0b"));
     cr.SetAllowDummyVars(1);
-    cr.RemoveVar("mlb");
-    cr.RemoveVar("tmod");
+    // cr.RemoveVar("mlb");
+    // cr.RemoveVar("tmod");
+    cr.RemoveVar("ntbtag");
     cr.SetVar("nbjet", 0, 1);
+    CRvec.emplace_back(cr);
+  }
+
+  return CRvec;
+}
+
+std::vector<SR> getStopControlRegionsDileptonTopological() {
+
+  std::vector<SR> CRvec;
+
+  std::vector<SR> SRvec = getStopSignalRegions();
+  for (SR cr : SRvec) {
+    cr.SetName(cr.GetName().replace(0, 2, "cr2l"));
+    cr.SetAllowDummyVars(1);
+    for (std::string var : {"met", "mt", "dphijmet", "nlep"}) {
+      cr.SetVar(var+"_rl", cr.GetLowerBound(var), cr.GetUpperBound(var));
+      cr.RemoveVar(var);
+    }
+    cr.RemoveVar("passvetos");
+    cr.SetVar("nvlep", 2, 3);
+    cr.SetVar("nlep_rl", 2, 3);
     CRvec.emplace_back(cr);
   }
 
@@ -193,87 +219,6 @@ std::vector<SR> getStopSignalRegions() {
   sr.SetDetailName("2to3j_tmod10toInf_mlb0to175_met600toInf");
   sr.SetVar("met", 600, -1);
   SRvec.emplace_back(sr);
-
-
-  // sr = srbase;
-  // sr.SetName("srB1");
-  // sr.SetDetailName("2to3j_tmod10toInf_mlb175toInf_met250to450");
-  // sr.SetVar("mlb", 175, -1);
-  // sr.SetVar("met", 250, 450);
-  // SRvec.emplace_back(sr);
-
-  // sr.SetName("srB2");
-  // sr.SetDetailName("2to3j_tmod10toInf_mlb175toInf_met450to600");
-  // sr.SetVar("met", 450, 600);
-  // SRvec.emplace_back(sr);
-
-  // sr.SetName("srB3");
-  // sr.SetDetailName("2to3j_tmod10toInf_mlb175toInf_met600toInf");
-  // sr.SetVar("met", 600, -1);
-  // SRvec.emplace_back(sr);
-
-
-  // sr.SetName("srH1");
-  // sr.SetDetailName("geq4j_tmod10toInf_mlb175toInf_met250to450");
-  // sr.SetVar("njet", 4, -1);
-  // sr.SetVar("met", 250, 450);
-  // SRvec.emplace_back(sr);
-
-  // sr.SetName("srH2");
-  // sr.SetDetailName("geq4j_tmod10toInf_mlb175toInf_met450toInf");
-  // sr.SetVar("met", 450, -1);
-  // SRvec.emplace_back(sr);
-
-
-  // sr.SetName("srE1");
-  // sr.SetDetailName("geq4j_tmod0to10_mlb0to175_met350to550");
-  // sr.SetVar("tmod", 0, 10);
-  // sr.SetVar("mlb", 0, 175);
-  // sr.SetVar("met", 350, 550);
-  // SRvec.emplace_back(sr);
-
-  // sr.SetName("srE2");
-  // sr.SetDetailName("geq4j_tmod0to10_mlb0to175_met550toInf");
-  // sr.SetVar("met", 550, -1);
-  // SRvec.emplace_back(sr);
-
-
-  // sr.SetName("srF1");
-  // sr.SetDetailName("geq4j_tmod0to10_mlb175toInf_met250to450");
-  // sr.SetVar("mlb", 175, -1);
-  // sr.SetVar("met", 250, 450);
-  // SRvec.emplace_back(sr);
-
-  // sr.SetName("srF2");
-  // sr.SetDetailName("geq4j_tmod0to10_mlb175toInf_met450toInf");
-  // sr.SetVar("met", 450, -1);
-  // SRvec.emplace_back(sr);
-
-  // sr.SetName("srI1");
-  // sr.SetDetailName("geq5j_lpt0to150_met250to350");
-  // sr.SetVar("mt", 150, -1);
-  // sr.SetVar("njet", 5, -1);
-  // sr.SetVar("nbjet", 1, -1);
-  // sr.SetVar("lep1pt", 0, 150);
-  // sr.SetVar("met", 250, 350);
-  // sr.SetVar("dphilmet", 0, 2);
-  // sr.SetVar("dphijmet", 0.5, 3.1416);
-  // SRvec.emplace_back(sr);
-
-  // sr.SetName("srI2");
-  // sr.SetDetailName("geq5j_lpt0to150_met350to450");
-  // sr.SetVar("met", 350, 450);
-  // SRvec.emplace_back(sr);
-
-  // sr.SetName("srI3");
-  // sr.SetDetailName("geq5j_lpt0to150_met450to550");
-  // sr.SetVar("met", 450, 550);
-  // SRvec.emplace_back(sr);
-
-  // sr.SetName("srI4");
-  // sr.SetDetailName("geq5j_lpt0to150_met550toInf");
-  // sr.SetVar("met", 550, -1);
-  // SRvec.emplace_back(sr);
 
 
   return SRvec;
@@ -450,7 +395,7 @@ std::vector<SR> getStopControlRegionsNoBTags() {
 
   cr.SetName("cr0btest3");         // test
   cr.SetVar("met", 250, fInf);
-  cr.RemoveVar("passLep1pt");
+  cr.RemoveVar("passlep1pt");
   cr.SetVar("lep1pt", 20, fInf);
   CRvec.emplace_back(cr);
 
