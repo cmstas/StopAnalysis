@@ -13,5 +13,6 @@ std::vector<SR> getStopCrosscheckRegionsEMu();
 
 std::vector<SR> getStopSignalRegionsTopological();
 std::vector<SR> getStopControlRegionsNoBTagsTopological();
+std::vector<SR> getStopControlRegionsDileptonTopological();
 
 #endif // STOPREGIONS_H
