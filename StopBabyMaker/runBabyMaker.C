@@ -108,8 +108,8 @@ int main(int argc, char **argv){
   mylooper->skim_vetoLep_mu_eta  = 2.4;
 
   mylooper->skim_nJets           = 2;
-  mylooper->skim_jet_pt          = 30.0;  // current btagsf does not support jet with pt < 30,
-  mylooper->skim_jet_eta         = 2.4;   // program will proceed with sf value at 30 without warning
+  mylooper->skim_jet_pt          = 20.0;
+  mylooper->skim_jet_eta         = 2.4;
 
   mylooper->skim_nBJets          = 0;
 
