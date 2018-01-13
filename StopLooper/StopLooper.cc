@@ -46,9 +46,9 @@ const bool verbose = true;
 // turn on to apply weights to central value
 const bool applyWeights = false;
 // turn on to apply btag sf - take from files defined in eventWeight_btagSF.cc
-const bool applyBtagSFfromFiles = true; // default true
+const bool applyBtagSFfromFiles = false; // default false
 // turn on to apply lepton sf to central value - reread from files
-const bool applyLeptonSFfromFiles = true; // default true
+const bool applyLeptonSFfromFiles = false; // default false
 // turn on to enable plots of metbins with systematic variations applied. will only do variations for applied weights
 const bool doSystVariations = true;
 // turn on to apply Nvtx reweighting to MC / data2016
@@ -64,7 +64,7 @@ const bool ignoreScale1fb = false;
 // to test synchronization with the standard Analysis
 const bool synchronizing = false;
 // not running the standard regions to speed up
-const bool runYieldsOnly = false;
+const bool runYieldsOnly = true;
 // set bool def here for member function usage
 bool is2016data = false;
 
@@ -73,12 +73,13 @@ const float fInf = std::numeric_limits<float>::max();
 void StopLooper::SetSignalRegions() {
 
   // SRVec = getStopSignalRegions();
-  CR0bVec = getStopControlRegionsNoBTags();
-  CR2lVec = getStopControlRegionsDilepton();
+  // CR0bVec = getStopControlRegionsNoBTags();
+  // CR2lVec = getStopControlRegionsDilepton();
   CRemuVec = getStopCrosscheckRegionsEMu();
 
   SRVec = getStopSignalRegionsTopological();
-  // CR0bVec = getStopControlRegionsNoBTagsTopological();
+  CR0bVec = getStopControlRegionsNoBTagsTopological();
+  CR2lVec = getStopControlRegionsDileptonTopological();
 
   if (verbose) {
     cout << "SRVec.size = " << SRVec.size() << ", including the following:" << endl;
@@ -137,7 +138,6 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
   cout << "[StopLooper::looper] creating output file: " << output_name << endl;  outfile_ = new TFile(output_name.Data(),"RECREATE") ;
 
   outfile_ = new TFile(output_name.Data(), "RECREATE") ;
-  jestype_ = jes_type;
 
   // // full 2016 dataset json, 35.87/fb:
   // const char* json_file = "../StopCORE/inputs/json_files/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON_snt.txt";
@@ -307,105 +307,119 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
       values_["lep1eta"] = lep1_p4().eta();
       values_["passlep1pt"] = (abs(lep1_pdgid()) == 13 && lep1_p4().pt() > 40) || (abs(lep1_pdgid()) == 11 && lep1_p4().pt() > 45);
 
-      /// JES type dependent variables
-      if (jestype_ == 0) {
-        values_["mt"] = mt_met_lep();
-        values_["met"] = pfmet();
-        values_["mt2w"] = MT2W();
-        values_["mlb"] = Mlb_closestb();
-        values_["tmod"] = topnessMod();
-        values_["njet"] = ngoodjets();
-        values_["nbjet"] = nbtagsCSV;
-        values_["nbtag"]  = nanalysisbtags();
-        values_["dphijmet"] = mindphi_met_j1_j2();
-        values_["dphilmet"] = lep1_dphiMET();
-        values_["j1passbtag"] = (ngoodjets())? ak4pfjets_passMEDbtag().at(0) : 0;
+      for (int jestype = 0; jestype < ((doSystVariations && !is_data())? 3 : 1); ++jestype) {
+        string suffix = "";
 
-        values_["ht"] = ak4_HT();
-        values_["metphi"] = pfmet_phi();
-        values_["ntbtag"] = ntightbtags();
-        values_["leadbpt"] = ak4pfjets_leadbtag_p4().pt();
-        values_["mlb_0b"] = (ak4pfjets_leadbtag_p4() + lep1_p4()).M();
-        values_["htratio"] = ak4_htratiom();
+        /// JES type dependent variables
+        if (jestype == 0) {
+          values_["mt"] = mt_met_lep();
+          values_["met"] = pfmet();
+          values_["mt2w"] = MT2W();
+          values_["mlb"] = Mlb_closestb();
+          values_["mlb_0b"] = (lep1_p4() + ak4pfjets_leadbtag_p4()).M();
+          values_["tmod"] = topnessMod();
+          values_["njet"] = ngoodjets();
+          values_["nbjet"] = ngoodbtags();
+          values_["nbtag"]  = nanalysisbtags();
+          values_["dphijmet"] = mindphi_met_j1_j2();
+          values_["dphilmet"] = lep1_dphiMET();
+          values_["j1passbtag"] = (ngoodjets())? ak4pfjets_passMEDbtag().at(0) : 0;
 
-      } else if (jestype_ == 1) {
-        values_["mt"] = mt_met_lep_jup();
-        values_["met"] = pfmet_jup();
-        values_["mt2w"] = MT2W_jup();
-        values_["mlb"] = Mlb_closestb_jup();
-        values_["tmod"] = topnessMod_jup();
-        values_["njet"] = jup_ngoodjets();
-        values_["nbjet"] = jup_ngoodbtags();  // nbtag30();
-        values_["nbtag"]  = jup_nanalysisbtags();
-        values_["dphijmet"] = mindphi_met_j1_j2_jup();
-        values_["dphilmet"] = fabs(lep1_p4().phi() - pfmet_phi_jup());
-        values_["j1passbtag"] = (ngoodjets())? jup_ak4pfjets_passMEDbtag().at(0) : 0;
+          values_["ht"] = ak4_HT();
+          values_["metphi"] = pfmet_phi();
+          values_["ntbtag"] = ntightbtags();
+          values_["leadbpt"] = ak4pfjets_leadbtag_p4().pt();
+          values_["mlb_0b"] = (ak4pfjets_leadbtag_p4() + lep1_p4()).M();
+          values_["htratio"] = ak4_htratiom();
 
-        values_["ht"] = jup_ak4_HT();
-        values_["metphi"] = pfmet_phi_jup();
-        values_["ntbtag"] = jup_ntightbtags();
-        values_["leadbpt"] = jup_ak4pfjets_leadbtag_p4().pt();
-        values_["mlb_0b"] = (jup_ak4pfjets_leadbtag_p4() + lep1_p4()).M();
-        values_["htratio"] = jup_ak4_htratiom();
 
-      } else if (jestype_ == -1) {
-        values_["mt"] = mt_met_lep_jdown();
-        values_["met"] = pfmet_jdown();
-        values_["mt2w"] = MT2W_jdown();
-        values_["mlb"] = Mlb_closestb_jdown();
-        values_["tmod"] = topnessMod_jdown();
-        values_["njet"] = jdown_ngoodjets();
-        values_["nbjet"] = jdown_ngoodbtags();  // nbtag30();
-        values_["ntbtag"] = jdown_ntightbtags();
-        values_["dphijmet"] = mindphi_met_j1_j2_jdown();
-        values_["dphilmet"] = fabs(lep1_p4().phi() - pfmet_phi_jdown());
-        values_["j1passbtag"] = (ngoodjets())? jdown_ak4pfjets_passMEDbtag().at(0) : 0;
+        } else if (jestype == 1) {
+          values_["mt"] = mt_met_lep_jup();
+          values_["met"] = pfmet_jup();
+          values_["mt2w"] = MT2W_jup();
+          values_["mlb"] = Mlb_closestb_jup();
+          values_["mlb_0b"] = (lep1_p4() + jup_ak4pfjets_leadbtag_p4()).M();
+          values_["tmod"] = topnessMod_jup();
+          values_["njet"] = jup_ngoodjets();
+          values_["nbjet"] = jup_ngoodbtags();  // nbtag30();
+          values_["nbtag"]  = jup_nanalysisbtags();
+          values_["dphijmet"] = mindphi_met_j1_j2_jup();
+          values_["dphilmet"] = fabs(lep1_p4().phi() - pfmet_phi_jup());
+          values_["j1passbtag"] = (ngoodjets())? jup_ak4pfjets_passMEDbtag().at(0) : 0;
 
-        values_["ht"] = jdown_ak4_HT();
-        values_["metphi"] = pfmet_phi_jdown();
-        values_["nbtag"]  = jdown_nanalysisbtags();
-        values_["leadbpt"] = jdown_ak4pfjets_leadbtag_p4().pt();
-        values_["mlb_0b"] = (jdown_ak4pfjets_leadbtag_p4() + lep1_p4()).M();
-        values_["htratio"] = jdown_ak4_htratiom();
+          values_["ht"] = jup_ak4_HT();
+          values_["metphi"] = pfmet_phi_jup();
+          values_["ntbtag"] = jup_ntightbtags();
+          values_["leadbpt"] = jup_ak4pfjets_leadbtag_p4().pt();
+          values_["mlb_0b"] = (jup_ak4pfjets_leadbtag_p4() + lep1_p4()).M();
+          values_["htratio"] = jup_ak4_htratiom();
 
+          suffix = "_jesUp";
+          evtWgt.jes_type = evtWgtInfo::k_JESUp;
+        } else if (jestype == 2) {
+          values_["mt"] = mt_met_lep_jdown();
+          values_["met"] = pfmet_jdown();
+          values_["mt2w"] = MT2W_jdown();
+          values_["mlb"] = Mlb_closestb_jdown();
+          values_["mlb_0b"] = (lep1_p4() + jdown_ak4pfjets_leadbtag_p4()).M();
+          values_["tmod"] = topnessMod_jdown();
+          values_["njet"] = jdown_ngoodjets();
+          values_["nbjet"] = jdown_ngoodbtags();  // nbtag30();
+          values_["ntbtag"] = jdown_ntightbtags();
+          values_["dphijmet"] = mindphi_met_j1_j2_jdown();
+          values_["dphilmet"] = fabs(lep1_p4().phi() - pfmet_phi_jdown());
+          values_["j1passbtag"] = (ngoodjets())? jdown_ak4pfjets_passMEDbtag().at(0) : 0;
+
+          values_["ht"] = jdown_ak4_HT();
+          values_["metphi"] = pfmet_phi_jdown();
+          values_["nbtag"]  = jdown_nanalysisbtags();
+          values_["leadbpt"] = jdown_ak4pfjets_leadbtag_p4().pt();
+          values_["mlb_0b"] = (jdown_ak4pfjets_leadbtag_p4() + lep1_p4()).M();
+          values_["htratio"] = jdown_ak4_htratiom();
+
+          suffix = "_jesDn";
+          evtWgt.jes_type = evtWgtInfo::k_JESDown;
+        }
+
+        // Filling histograms for SR
+        fillHistosForSR(suffix);
+
+        // testCutFlowHistos(testVec[1]);
+
+        // Temporary variable for CR0b before better solution to express this
+        values_["is0b"] = (values_["nbjet"] == 0 || (values_["nbjet"] >= 1 && values_["ntbtag"] == 0 && values_["mlb"] > 175.0));
+        fillHistosForCR0b(suffix);
+
+        values_["nlep_rl"] = (ngoodleps() == 1 && nvetoleps() >= 2 && lep2_p4().Pt() > 10)? 2 : ngoodleps();
+        values_["osdilep"] = lep1_pdgid() == -lep2_pdgid();
+        values_["mll"] = (lep1_p4() + lep2_p4()).M();
+        // values_["mlb_rl"] = Mlb_closestb();
+
+        if (jestype_ == 0) {
+          values_["mt_rl"] = mt_met_lep_rl();
+          values_["mt2w_rl"] = MT2W_rl();
+          values_["met_rl"] = pfmet_rl();
+          values_["dphijmet_rl"]= mindphi_met_j1_j2_rl();
+          values_["dphilmet_rl"] = lep1_dphiMET_rl();
+          values_["tmod_rl"] = topnessMod_rl();
+        } else if (jestype_ == 1) {
+          values_["mt_rl"] = mt_met_lep_rl_jup();
+          values_["mt2w_rl"] = MT2W_rl_jup();
+          values_["met_rl"] = pfmet_rl_jup();
+          values_["dphijmet_rl"]= mindphi_met_j1_j2_rl_jup();
+          values_["dphilmet_rl"] = lep1_dphiMET_rl_jup();
+          values_["tmod_rl"] = topnessMod_rl_jup();
+        } else if (jestype_ == -1) {
+          values_["mt_rl"] = mt_met_lep_rl_jdown();
+          values_["mt2w_rl"] = MT2W_rl_jdown();
+          values_["met_rl"] = pfmet_rl_jdown();
+          values_["dphijmet_rl"]= mindphi_met_j1_j2_rl_jdown();
+          values_["dphilmet_rl"] = lep1_dphiMET_rl_jdown();
+          values_["tmod_rl"] = topnessMod_rl_jdown();
+        }
+        fillHistosForCR2l(suffix);
+        fillHistosForCRemu(suffix);
       }
-
-      // Filling histograms for SR
-      fillHistosForSR();
-
-      // testCutFlowHistos(testVec[1]);
-
-      // fillHistosForCR0b();
-
-      values_["nlep_rl"] = (ngoodleps() == 1 && nvetoleps() >= 2 && lep2_p4().Pt() > 10)? 2 : ngoodleps();
-      values_["osdilep"] = lep1_pdgid() == -lep2_pdgid();
-      values_["mll"] = (lep1_p4() + lep2_p4()).M();
-      // values_["mlb_rl"] = Mlb_closestb();
-
-      if (jestype_ == 0) {
-        values_["mt_rl"] = mt_met_lep_rl();
-        values_["mt2w_rl"] = MT2W_rl();
-        values_["met_rl"] = pfmet_rl();
-        values_["dphijmet_rl"]= mindphi_met_j1_j2_rl();
-        values_["dphilmet_rl"] = lep1_dphiMET_rl();
-        values_["tmod_rl"] = topnessMod_rl();
-      } else if (jestype_ == 1) {
-        values_["mt_rl"] = mt_met_lep_rl_jup();
-        values_["mt2w_rl"] = MT2W_rl_jup();
-        values_["met_rl"] = pfmet_rl_jup();
-        values_["dphijmet_rl"]= mindphi_met_j1_j2_rl_jup();
-        values_["dphilmet_rl"] = lep1_dphiMET_rl_jup();
-        values_["tmod_rl"] = topnessMod_rl_jup();
-      } else if (jestype_ == -1) {
-        values_["mt_rl"] = mt_met_lep_rl_jdown();
-        values_["mt2w_rl"] = MT2W_rl_jdown();
-        values_["met_rl"] = pfmet_rl_jdown();
-        values_["dphijmet_rl"]= mindphi_met_j1_j2_rl_jdown();
-        values_["dphilmet_rl"] = lep1_dphiMET_rl_jdown();
-        values_["tmod_rl"] = topnessMod_rl_jdown();
-      }
-      // fillHistosForCR2l();
-      // fillHistosForCRemu();
 
       // if (event > 10) break;  // for debugging purpose
     } // end of event loop
@@ -523,7 +537,7 @@ void StopLooper::fillHistosForSR(string suf) {
         fillhists("_wtc"+suf);
 
       if (doSystVariations) {
-        for (int isyst = 3; isyst < evtWgtInfo::systID::k_nSyst; ++isyst) {
+        for (int isyst = 1; isyst < evtWgtInfo::systID::k_nSyst; ++isyst) {
           auto syst = (evtWgtInfo::systID) isyst;
           if (evtWgt.doingSystematic(syst))
             plot1D("h_metbins_"+evtWgt.getLabel(syst), values_["met"], evtWgt.getWeight(syst), sr.histMap, ";E^{miss}_{T} [GeV]", sr.GetNMETBins(), sr.GetMETBinsPtr());
@@ -539,8 +553,9 @@ void StopLooper::fillHistosForCR2l(string suf) {
   // Trigger requirements
   if (!is2016data) { // 2017 Triggers
     if (not ( (abs(lep1_pdgid()) == 11 && HLT_SingleEl()) || (abs(lep1_pdgid()) == 13 && HLT_SingleMu()) || HLT_MET_MHT() )) return;
-  } else { // 2016 MET Triggers
-    if (not ( (abs(lep1_pdgid()) == 11 && HLT_SingleEl()) || (abs(lep1_pdgid()) == 13 && HLT_SingleMu()) ||(HLT_MET() || HLT_MET110_MHT110() || HLT_MET120_MHT120()) )) return;
+  } else { // 2016 CR2l Triggers
+    if (not ( (abs(lep1_pdgid()) == 11 && HLT_SingleEl()) || (abs(lep1_pdgid()) == 13 && HLT_SingleMu()) || (HLT_MET() || HLT_MET110_MHT110() || HLT_MET120_MHT120()) )) return;
+    // if (not (HLT_DiEl() && abs(lep1_pdgid())+abs(lep2_pdgid())==22) || (HLT_DiMu() && abs(lep1_pdgid())+abs(lep2_pdgid())==26) || (HLT_MuE()  && abs(lep1_pdgid())+abs(lep2_pdgid())==24) ) return;
   }
 
   // if ( (abs(lep1_pdgid()) == 11 && values_["lep1pt"] < 40) || (abs(lep1_pdgid()) == 13 && values_["lep1pt"] < 30) ) return;
@@ -606,7 +621,7 @@ void StopLooper::fillHistosForCR2l(string suf) {
         fillhists(suf+"_mumu");
 
       if (doSystVariations) {
-        for (int isyst = 3; isyst < evtWgtInfo::systID::k_nSyst; ++isyst) {
+        for (int isyst = 1; isyst < evtWgtInfo::systID::k_nSyst; ++isyst) {
           auto syst = (evtWgtInfo::systID) isyst;
           if (evtWgt.doingSystematic(syst))
             plot1D("h_metbins_"+evtWgt.getLabel(syst), values_["met_rl"], evtWgt.getWeight(syst), cr.histMap,
@@ -653,19 +668,19 @@ void StopLooper::fillHistosForCR0b(string suf) {
         plot1D("h_nvtxs"+s,        nvtxs()        , evtweight_, cr.histMap, ";Number of vertices"   , 70,  1, 71);
       };
       fillhists(suf);
-      if ( abs(lep1_pdgid()) == 11 ) {
-        fillhists(suf+"_e");
-      }
-      else if ( abs(lep1_pdgid()) == 13 ) {
-        fillhists(suf+"_mu");
-      }
+      // if ( abs(lep1_pdgid()) == 11 ) {
+      //   fillhists(suf+"_e");
+      // }
+      // else if ( abs(lep1_pdgid()) == 13 ) {
+      //   fillhists(suf+"_mu");
+      // }
       // if (HLT_SingleMu() || HLT_SingleEl())
       //   fillhists(suf+"_hltsl");
       // if (HLT_MET_MHT())
       //   fillhists(suf+"_hltmht");
 
       if (doSystVariations) {
-        for (int isyst = 3; isyst < evtWgtInfo::systID::k_nSyst; ++isyst) {
+        for (int isyst = 1; isyst < evtWgtInfo::systID::k_nSyst; ++isyst) {
           auto syst = (evtWgtInfo::systID) isyst;
           if (evtWgt.doingSystematic(syst))
             plot1D("h_metbins_"+evtWgt.getLabel(syst), values_["met"], evtWgt.getWeight(syst), cr.histMap,

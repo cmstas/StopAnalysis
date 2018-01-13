@@ -54,12 +54,12 @@ declare -a Samples=(TTJets)
 # declare -a Samples=(Signal_T2tt_mStop_400to1200)
 # declare -a Samples=(merged_TTJets) # merged_SMS_T2bW
 
-for SAMPLE in ${Samples[@]}; do
-    # echo ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} '>&' ${LOGDIR}/log_${SAMPLE}.txt
-    ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
-    # echo nice -n 10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
-    # eval "nohup nice -n -10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
-done
+# for SAMPLE in ${Samples[@]}; do
+#     # echo ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} '>&' ${LOGDIR}/log_${SAMPLE}.txt
+#     # ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
+#     echo nice -n 10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
+#     eval "nohup nice -n -10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
+# done
 
 # 2016 signal remade
 # INDIR=/nfs-7/userdata/sicheng/stopbabies/skimmed_v25_4
@@ -83,8 +83,8 @@ declare -a Samples=(stopbaby)
 # done
 
 # 2016 data for comparison
-INDIR=/nfs-7/userdata/stopRun2/analysis2016_SUS-16-051_35p9fbinv/v24/output
-# INDIR=/nfs-7/userdata/stopRun2/analysis2016_SUS-16-051_35p9fbinv/v24/skim
+# INDIR=/nfs-7/userdata/stopRun2/analysis2016_SUS-16-051_35p9fbinv/v24/output
+INDIR=/nfs-7/userdata/stopRun2/analysis2016_SUS-16-051_35p9fbinv/v24/skim
 # OUTDIR=output/data2016_rwgtd
 OUTDIR=output/data2016
 # OUTDIR=output/temp5
@@ -95,19 +95,20 @@ mkdir -p ${OUTDIR}
 mkdir -p ${LOGDIR}
 
 # declare -a Samples=(data_single_muon)
-declare -a Samples=(data_2016all)
+declare -a Samples=(data_2016B data_2016C data_2016D data_2016E data_2016F data_2016G data_2016H)
+# declare -a Samples=(data_2016B)
 # declare -a Samples=(data_2016all data_2016dilep)
 # declare -a Samples=(data_single_muon)
 # declare -a Samples=(data_single_muon data data_met data_single_electron)
 # declare -a Samples=(data_muon_eg)
 
-# for SAMPLE in ${Samples[@]}; do
-#     # echo ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} '>&' ${LOGDIR}/log_${SAMPLE}.txt
-#     # ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
-#     # eval "nohup ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
-#     echo nice -n 10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
-#     eval "nohup nice -n -10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
-# done
+for SAMPLE in ${Samples[@]}; do
+    # echo ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} '>&' ${LOGDIR}/log_${SAMPLE}.txt
+    # ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
+    # eval "nohup ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
+    echo nice -n 10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
+    eval "nohup nice -n -10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
+done
 
 # 2016 MC for comparison
 INDIR=/nfs-7/userdata/stopRun2/analysis2016_SUS-16-051_35p9fbinv/v22/skim
@@ -132,9 +133,13 @@ while : ; do
     sleep 5
     RunningJobs=`jobs | grep runStopLooper`
     [[ $RunningJobs == "" ]] && break
-done    
+done
 
 echo -e 'All jobs are done!\a'
+
+pushd output/data2016
+hadd -f all_data_2016.root data_2016?.root > /dev/null
+popd > /dev/null
 
 # Special operations on output files
 # . temp.sh output/data2017_rwgtd

@@ -550,6 +550,8 @@ void evtWgtInfo::initializeWeights() {
   mLSP = 0;
   mChargino = 0;
 
+  jes_type = 0;
+
   nEvents = 1.0;
   xsec = 1.0;
   xsec_err = 0.0;
@@ -2420,11 +2422,13 @@ inline void evtWgtInfo::getPileupWeight( double &weight_pu, double &weight_pu_up
 
 bool evtWgtInfo::doingSystematic( systID isyst ) {
   if (is_data_) return false;  // <-- is this needed? or should it not be here?
+  if (isyst > k_JESDown && jes_type != 0) return false;
   switch (isyst) {
     case k_nominal:
     case k_JESUp:
+      return jes_type == k_JESUp;
     case k_JESDown:
-      return false;  // <-- todo: decide actions for this later
+      return jes_type == k_JESDown;  // <-- todo: decide actions for this later
     case k_diLepTriggerUp:
     case k_diLepTriggerDown:
       return apply_diLepTrigger_sf;

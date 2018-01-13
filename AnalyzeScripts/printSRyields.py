@@ -178,6 +178,11 @@ if __name__ == '__main__':
     f3 = r.TFile('../StopLooper/output/samples2016/Signal_T2tt_mStop_400to1200.root')
     f4 = r.TFile('../StopLooper/output/samples2016/ttbar_diLept.root')
 
+    # f4 = r.TFile('../StopLooper/output/temp/TTJets.root')
+    # f2 = r.TFile('../StopLooper/output/temp_v26_2/ttbar.root')
+    # f3 = r.TFile('../StopLooper/output/temp_v26_2/SMS_T2tt_mStop-400to1200.root')
+    f1 = r.TFile('../StopLooper/output/data2016/all_data_2016.root')
+
     # printCutflowNumbers(f1, 'testCutflow', 'cutflow1')
     # printCutflowNumbers(f1, 'testCutflow', 'cutflow2')
     # printCutflowNumbers(f1, 'testCutflow', 'cutflow3')
@@ -200,21 +205,31 @@ if __name__ == '__main__':
     y1_org, y1_wtc = getYieldsForAllSRs(f1, srNames)
     printAllSRYieldTable(srNames, y1_org)
 
-    print '\n |-------------------------------- 2016 ttbar_powheg ---------------------------------------------'
-    y2_org, y2_wtc = getYieldsForAllSRs(f2, srNames)
-    printAllSRYieldTable(srNames, y2_org)
+    print '\n |-------------------------------- CR0b ---------------------------------------------'
+    srNames = ['cr0bA', 'cr0bB', 'cr0bC', 'cr0bD', 'cr0bE', 'cr0bF', 'cr0bG', 'cr0bH', 'cr0bI',]
+    y1_org, y1_wtc = getYieldsForAllSRs(f1, srNames)
+    printAllSRYieldTable(srNames, y1_org)
 
-    print '\n |-------------------------------- 2016 ttbar_diLept ---------------------------------------------'
-    y4_org, y4_wtc = getYieldsForAllSRs(f4, srNames)
-    printAllSRYieldTable(srNames, y4_org)
+    print '\n |-------------------------------- CR2l ---------------------------------------------'
+    srNames = ['cr2lA', 'cr2lB', 'cr2lC', 'cr2lD', 'cr2lE', 'cr2lF', 'cr2lG', 'cr2lH', 'cr2lI',]
+    y1_org, y1_wtc = getYieldsForAllSRs(f1, srNames)
+    printAllSRYieldTable(srNames, y1_org)
 
-    # # print '\n |-------------------------------- 2016 T2tt, mStop 800, mLSP 600 ---------------------------------------------'
-    # # y3_org, y3_wtc = getYieldsForAllSRs(f3, srNames, '_800_600')
-    # # printAllSRYieldTable(srNames, y3_org, is_signal=True)
+    # print '\n |-------------------------------- 2016 ttbar_powheg ---------------------------------------------'
+    # y2_org, y2_wtc = getYieldsForAllSRs(f2, srNames)
+    # printAllSRYieldTable(srNames, y2_org)
 
-    print '\n |-------------------------------- 2016 T2tt, mStop 900, mLSP 300 ---------------------------------------------'
-    y3_org, y3_wtc = getYieldsForAllSRs(f3, srNames, '_900_300')
-    printAllSRYieldTable(srNames, y3_org, is_signal=True)
+    # print '\n |-------------------------------- 2016 ttbar_diLept ---------------------------------------------'
+    # y4_org, y4_wtc = getYieldsForAllSRs(f4, srNames)
+    # printAllSRYieldTable(srNames, y4_org)
+
+    # print '\n |-------------------------------- 2016 T2tt, mStop 800, mLSP 600 ---------------------------------------------'
+    # y3_org, y3_wtc = getYieldsForAllSRs(f3, srNames, '_800_600')
+    # printAllSRYieldTable(srNames, y3_org, is_signal=True)
+
+    # print '\n |-------------------------------- 2016 T2tt, mStop 900, mLSP 300 ---------------------------------------------'
+    # y3_org, y3_wtc = getYieldsForAllSRs(f3, srNames, '_900_300')
+    # printAllSRYieldTable(srNames, y3_org, is_signal=True)
 
     # print '\n |-------------------------------- 2016 T2tt, mStop 1200, mLSP 200 ---------------------------------------------'
     # y4_org, y4_wtc = getYieldsForAllSRs(f3, srNames, '_1200_200')
@@ -259,3 +274,22 @@ if __name__ == '__main__':
     # ye5_org, ye5_wtc = getYErrsFromSRs(f3, srNames, '_1200_200')
     # printYieldAndErrComparisonTable(srNames, sy5_org, sy5_wtc, ye5_org, ye5_wtc)
 
+    # print '\n |----------------------------------- TTJets_amcnlo ---------------------------------------'
+    # y4_org, y4_wtc = getYieldsForAllSRs(f4, srNames)
+    # printAllSRYieldTable(srNames, y4_org)
+
+    # print '\n |------------------------------ TTJets_amcnlo bTagSF_HFUp --------------------------------'
+    # y4_org, y4_wtc = getYieldsForAllSRs(f4, srNames, "_bTagEffHFUp")
+    # printAllSRYieldTable(srNames, y4_org)
+
+    # print '\n |------------------------------ TTJets_amcnlo bTagSF_HFDn --------------------------------'
+    # y4_org, y4_wtc = getYieldsForAllSRs(f4, srNames, "_bTagEffHFDn")
+    # printAllSRYieldTable(srNames, y4_org)
+
+    # print '\n |------------------------------ TTJets_amcnlo bTagSF_LFUp --------------------------------'
+    # y4_org, y4_wtc = getYieldsForAllSRs(f4, srNames, "_bTagEffLFUp")
+    # printAllSRYieldTable(srNames, y4_org)
+
+    # print '\n |------------------------------ TTJets_amcnlo bTagSF_LFDn --------------------------------'
+    # y4_org, y4_wtc = getYieldsForAllSRs(f4, srNames, "_bTagEffLFDn")
+    # printAllSRYieldTable(srNames, y4_org)

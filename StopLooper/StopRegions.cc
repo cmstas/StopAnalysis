@@ -16,8 +16,8 @@ std::vector<SR> getStopSignalRegionsTopological() {
   srbase.SetVar("njet", 2, fInf);
   srbase.SetVar("nbjet", 1, fInf);
   // srbase.SetVar("ntbtag", 0, fInf);
-  // srbase.SetVar("mlb", 0, fInf);
-  // srbase.SetVar("tmod", -fInf, fInf);
+  srbase.SetVar("mlb", 0, fInf);
+  srbase.SetVar("tmod", -fInf, fInf);
   srbase.SetVar("dphijmet", 0.8, 3.14159);
   srbase.SetMETBins({0, 250, 350, 450, 550, 650, 800});
 
@@ -139,14 +139,17 @@ std::vector<SR> getStopControlRegionsNoBTagsTopological() {
 
   std::vector<SR> CRvec;
 
-  std::vector<SR> SRvec = getStopSignalRegions();
+  std::vector<SR> SRvec = getStopSignalRegionsTopological();
   for (SR cr : SRvec) {
     cr.SetName(cr.GetName().replace(0, 2, "cr0b"));
     cr.SetAllowDummyVars(1);
     // cr.RemoveVar("mlb");
     // cr.RemoveVar("tmod");
     cr.RemoveVar("ntbtag");
-    cr.SetVar("nbjet", 0, 1);
+    cr.RemoveVar("nbjet");
+    cr.SetVar("is0b", 1, 2);
+    cr.SetVar("mlb_0b", cr.GetLowerBound("mlb"), cr.GetUpperBound("mlb"));
+    cr.RemoveVar("mlb");
     CRvec.emplace_back(cr);
   }
 
@@ -157,17 +160,21 @@ std::vector<SR> getStopControlRegionsDileptonTopological() {
 
   std::vector<SR> CRvec;
 
-  std::vector<SR> SRvec = getStopSignalRegions();
+  std::vector<SR> SRvec = getStopSignalRegionsTopological();
   for (SR cr : SRvec) {
     cr.SetName(cr.GetName().replace(0, 2, "cr2l"));
     cr.SetAllowDummyVars(1);
-    for (std::string var : {"met", "mt", "dphijmet", "nlep"}) {
+    for (std::string var : {"met", "mt", "dphijmet", "nlep", "tmod"}) {
       cr.SetVar(var+"_rl", cr.GetLowerBound(var), cr.GetUpperBound(var));
       cr.RemoveVar(var);
     }
     cr.RemoveVar("passvetos");
-    cr.SetVar("nvlep", 2, 3);
-    cr.SetVar("nlep_rl", 2, 3);
+    cr.SetVar("nvlep", 2, fInf);
+    cr.SetVar("nlep_rl", 2, fInf);
+    if (cr.GetName() == "cr2lI") {
+      cr.SetVar("dphilmet_rl", cr.GetLowerBound("dphilmet"), cr.GetUpperBound("dphilmet"));
+      cr.RemoveVar("dphilmet");
+    }
     CRvec.emplace_back(cr);
   }
 
@@ -180,7 +187,6 @@ std::vector<SR> getStopSignalRegions() {
   SR srbase;
   srbase.SetVar("mt", 150, fInf);
   srbase.SetVar("met", 250, fInf);
-  srbase.SetVar("mt2w", 0, fInf);
   srbase.SetVar("mlb", 0, fInf);
   srbase.SetVar("tmod", -fInf, fInf);
   srbase.SetVar("nlep", 1, 2);

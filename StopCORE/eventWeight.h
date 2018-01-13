@@ -144,6 +144,8 @@ class evtWgtInfo {
   int mLSP;
   int mChargino;
 
+  int jes_type;
+
   int    nEvents;
   double xsec;
   double xsec_err;
