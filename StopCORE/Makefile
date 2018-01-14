@@ -14,9 +14,9 @@ SOFLAGS       = -shared
 
 
 CXXFLAGS      += $(ROOTCFLAGS)
-LIBS           = $(ROOTLIBS) 
+LIBS           = $(ROOTLIBS)
 
-NGLIBS         = $(ROOTGLIBS) 
+NGLIBS         = $(ROOTGLIBS)
 NGLIBS        += -lMinuit
 GLIBS          = $(filter-out -lNew, $(NGLIBS))
 
@@ -33,16 +33,29 @@ CXXFLAGS       += -I$(DORKYPATH)
 CORELIB        = $(COREPATH)/CMS3_CORE.so
 STOPVARLIB     = ../StopBabyMaker/StopVariables.so
 
-stopCORE.so: sysInfo.o eventWeight_bTagSF.o eventWeight_lepSF.o selectionInfo.o categoryInfo.o genClassyInfo.o sampleInfo.o stop_1l_babyAnalyzer.o 
-	$(LD) $(LDFLAGS) $(SOFLAGS) -o stopCORE.so sysInfo.o eventWeight_bTagSF.o eventWeight_lepSF.o selectionInfo.o categoryInfo.o genClassyInfo.o sampleInfo.o stop_1l_babyAnalyzer.o $(GLIBS) -lGenVector -lEG $(CORELIB) $(STOPVARLIB) -Wl,-rpath,./
+TOOLSLIB = ../CORE/Tools/btagsf/BTagCalibrationStandalone.o
+
+# stopCORE.so: sysInfo.o eventWeight_bTagSF.o eventWeight_lepSF.o selectionInfo.o categoryInfo.o genClassyInfo.o sampleInfo.o stop_1l_babyAnalyzer.o 
+# 	$(LD) $(LDFLAGS) $(SOFLAGS) -o stopCORE.so sysInfo.o eventWeight_bTagSF.o eventWeight_lepSF.o selectionInfo.o categoryInfo.o genClassyInfo.o sampleInfo.o stop_1l_babyAnalyzer.o $(GLIBS) -lGenVector -lEG $(CORELIB) $(STOPVARLIB) -Wl,-rpath,./
+
+stopCORE.so: eventWeight.o eventWeight_bTagSF.o eventWeight_lepSF.o stop_1l_babyAnalyzer.o 
+	$(LD) $(LDFLAGS) $(SOFLAGS) -o stopCORE.so eventWeight.o eventWeight_bTagSF.o eventWeight_lepSF.o stop_1l_babyAnalyzer.o $(GLIBS) -lGenVector -lEG $(TOOLSLIB) $(STOPVARLIB) -Wl,-rpath,./
+
+
+# stopCORE.so: eventWeight.o eventWeight_bTagSF.o eventWeight_lepSF.o stop_1l_babyAnalyzer.o 
+# 	$(LD) $(LDFLAGS) $(SOFLAGS) -o stopCORE.so eventWeight.o eventWeight_bTagSF.o eventWeight_lepSF.o stop_1l_babyAnalyzer.o $(GLIBS) -lGenVector -lEG $(CORELIB) $(STOPVARLIB) -Wl,-rpath,./
 
 
 sysInfo.o: sysInfo.h sysInfo.cc stop_1l_babyAnalyzer.h stop_1l_babyAnalyzer.cc eventWeight_lepSF.h eventWeight_lepSF.cc eventWeight_bTagSF.h eventWeight_bTagSF.cc
 	$(CXX) $(CXXFLAGS) -c sysInfo.cc
 
 
-eventWeight_bTagSF.o: eventWeight_bTagSF.cc eventWeight_bTagSF.h 
-	$(CXX) $(CXXFLAGS) -c eventWeight_bTagSF.cc 
+eventWeight.o: eventWeight.cc eventWeight.h
+	$(CXX) $(CXXFLAGS) -c eventWeight.cc
+
+
+eventWeight_bTagSF.o: eventWeight_bTagSF.cc eventWeight_bTagSF.h
+	$(CXX) $(CXXFLAGS) -c eventWeight_bTagSF.cc
 
 
 eventWeight_lepSF.o: eventWeight_lepSF.cc eventWeight_lepSF.h

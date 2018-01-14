@@ -10,11 +10,11 @@ eventWeight_bTagSF::eventWeight_bTagSF( bool isFastsim ){
   BTAG_MED = 0.8484;
   BTAG_TGT = 0.9535;
 
-  std::cout << "    Loading btag SFs..." << std::endl << std::endl;
+  std::cout << "[eventWeight_bTagSF] Loading btag SFs..." << std::endl;
    
   // 25s version of SFs
-  calib         = new BTagCalibration("csvv2", "../StopCORE/inputs/btagsf/CSVv2_Moriond17_B_H.csv"); // Moriond17 SFs
-  calib_fastsim = new BTagCalibration("CSV", "../StopCORE/inputs/btagsf/fastsim_csvv2_ttbar_26_1_2017.csv"); // Moriond17 SFs
+  calib         = new BTagCalibration("DeepCSV", "../StopBabyMaker/btagsf/DeepCSV_Moriond17_B_H.csv"); // DeepCSV version of SFs
+  calib_fastsim = new BTagCalibration("deepcsv", "../StopBabyMaker/btagsf/fastsim_deepcsv_ttbar_26_1_2017.csv"); // DeepCSV fastsim version of SFs
 
   reader_heavy      = new BTagCalibrationReader(calib, BTagEntry::OP_MEDIUM, "comb", "central"); // central
   reader_heavy_UP   = new BTagCalibrationReader(calib, BTagEntry::OP_MEDIUM, "comb", "up");  // sys up
@@ -46,60 +46,24 @@ eventWeight_bTagSF::eventWeight_bTagSF( bool isFastsim ){
   reader_tight_fastsim_UP = new BTagCalibrationReader(calib_fastsim, BTagEntry::OP_TIGHT, "fastsim", "up");  // sys up
   reader_tight_fastsim_DN = new BTagCalibrationReader(calib_fastsim, BTagEntry::OP_TIGHT, "fastsim", "down");  // sys down
 
-  TH2D* h_btag_eff_b_temp = NULL;
-  TH2D* h_btag_eff_c_temp = NULL;
-  TH2D* h_btag_eff_udsg_temp = NULL;
-
-  TH2D* h_tight_btag_eff_b_temp = NULL;
-  TH2D* h_tight_btag_eff_c_temp = NULL;
-  TH2D* h_tight_btag_eff_udsg_temp = NULL;
-
-  TH2D* h_loose_btag_eff_b_temp = NULL;
-  TH2D* h_loose_btag_eff_c_temp = NULL;
-  TH2D* h_loose_btag_eff_udsg_temp = NULL;
-
-  if(sampleIsFastsim){
-    feff =  new TFile("../StopCORE/inputs/btagsf/BTagEff_76X_T2ttT2bWT2tb.root");
-
-    h_btag_eff_b_temp = (TH2D*) feff->Get("MediumBEfficiency");
-    h_btag_eff_c_temp = (TH2D*) feff->Get("MediumCEfficiency");
-    h_btag_eff_udsg_temp = (TH2D*) feff->Get("MediumLEfficiency");
-
-    h_tight_btag_eff_b_temp = (TH2D*) feff->Get("TightBEfficiency");
-    h_tight_btag_eff_c_temp = (TH2D*) feff->Get("TightCEfficiency");
-    h_tight_btag_eff_udsg_temp = (TH2D*) feff->Get("TightLEfficiency");
-
-    h_loose_btag_eff_b_temp = (TH2D*) feff->Get("LooseBEfficiency");
-    h_loose_btag_eff_c_temp = (TH2D*) feff->Get("LooseCEfficiency");
-    h_loose_btag_eff_udsg_temp = (TH2D*) feff->Get("LooseLEfficiency");
+  if(isFastsim){
+    // Created using https://github.com/cmstas/bTagEfficiencyTools. Todo: change to deepCSV later
+    feff =  new TFile("../StopBabyMaker/btagsf/btageff__SMS-T1bbbb-T1qqqq_25ns_Moriond17.root");
   } else {
-    feff =  new TFile("../StopCORE/inputs/btagsf/BTagEff_Moriond17_TTandW.root");
-
-    h_btag_eff_b_temp = (TH2D*) feff->Get("MediumBEfficiency");
-    h_btag_eff_c_temp = (TH2D*) feff->Get("MediumCEfficiency");
-    h_btag_eff_udsg_temp = (TH2D*) feff->Get("MediumLEfficiency");
-
-    h_tight_btag_eff_b_temp = (TH2D*) feff->Get("TightBEfficiency");
-    h_tight_btag_eff_c_temp = (TH2D*) feff->Get("TightCEfficiency");
-    h_tight_btag_eff_udsg_temp = (TH2D*) feff->Get("TightLEfficiency");
-
-    h_loose_btag_eff_b_temp = (TH2D*) feff->Get("LooseBEfficiency");
-    h_loose_btag_eff_c_temp = (TH2D*) feff->Get("LooseCEfficiency");
-    h_loose_btag_eff_udsg_temp = (TH2D*) feff->Get("LooseLEfficiency");
+    // Todo: create efficiency in the phase space of the stop analysis
+    feff =  new TFile("../StopBabyMaker/btagsf/btageff__ttbar_powheg_pythia8_25ns_Moriond17_deepCSV.root");
   }
+  if (!feff) throw std::invalid_argument("eventWeight_bTagSF.cc: btagsf file does not exist!");
 
-  h_btag_eff_b = (TH2D*) h_btag_eff_b_temp->Clone("h_btag_eff_b");
-  h_btag_eff_c = (TH2D*) h_btag_eff_c_temp->Clone("h_btag_eff_c");
-  h_btag_eff_udsg = (TH2D*) h_btag_eff_udsg_temp->Clone("h_btag_eff_udsg");
-
-  h_tight_btag_eff_b = (TH2D*) h_tight_btag_eff_b_temp->Clone("h_tight_btag_eff_b");
-  h_tight_btag_eff_c = (TH2D*) h_tight_btag_eff_c_temp->Clone("h_tight_btag_eff_c");
-  h_tight_btag_eff_udsg = (TH2D*) h_tight_btag_eff_udsg_temp->Clone("h_tight_btag_eff_udsg");
-
-  h_loose_btag_eff_b = (TH2D*) h_loose_btag_eff_b_temp->Clone("h_loose_btag_eff_b");
-  h_loose_btag_eff_c = (TH2D*) h_loose_btag_eff_c_temp->Clone("h_loose_btag_eff_c");
-  h_loose_btag_eff_udsg = (TH2D*) h_loose_btag_eff_udsg_temp->Clone("h_loose_btag_eff_udsg");
-   
+  h_btag_eff_b = (TH2D*) feff->Get("h2_BTaggingEff_csv_med_Eff_b")->Clone("h_btag_eff_b");
+  h_btag_eff_c = (TH2D*) feff->Get("h2_BTaggingEff_csv_med_Eff_c")->Clone("h_btag_eff_c");
+  h_btag_eff_udsg = (TH2D*) feff->Get("h2_BTaggingEff_csv_med_Eff_udsg")->Clone("h_btag_eff_udsg");
+  h_tight_btag_eff_b = (TH2D*) feff->Get("h2_BTaggingEff_csv_tight_Eff_b")->Clone("h_tight_btag_eff_b");
+  h_tight_btag_eff_c = (TH2D*) feff->Get("h2_BTaggingEff_csv_tight_Eff_c")->Clone("h_tight_btag_eff_c");
+  h_tight_btag_eff_udsg = (TH2D*) feff->Get("h2_BTaggingEff_csv_tight_Eff_udsg")->Clone("h_tight_btag_eff_udsg");
+  h_loose_btag_eff_b = (TH2D*) feff->Get("h2_BTaggingEff_csv_loose_Eff_b")->Clone("h_loose_btag_eff_b");
+  h_loose_btag_eff_c = (TH2D*) feff->Get("h2_BTaggingEff_csv_loose_Eff_c")->Clone("h_loose_btag_eff_c");
+  h_loose_btag_eff_udsg = (TH2D*) feff->Get("h2_BTaggingEff_csv_loose_Eff_udsg")->Clone("h_loose_btag_eff_udsg");
 
 }
 
@@ -107,7 +71,6 @@ eventWeight_bTagSF::eventWeight_bTagSF( bool isFastsim ){
 
 eventWeight_bTagSF::~eventWeight_bTagSF(){
   
-
   delete calib;
   delete reader_heavy;
   delete reader_heavy_UP;
@@ -201,7 +164,7 @@ void eventWeight_bTagSF::getBTagWeight( int WP, std::vector< double > jet_pt, st
     int biny=-99;
     TH2D* h_eff = NULL;
 
-    double pt_eff  = std::max(20.0, std::min(399.0, jet_pt[iJet]));
+    double pt_eff  = std::max(30.0, std::min(399.0, jet_pt[iJet])); // min 30 GeV in the eff hist
     double eta_eff = std::min(2.39, fabs(jet_eta[iJet]) );
     
     double pt_reader  = std::max(30.0, std::min(669.0, jet_pt[iJet]));
@@ -211,7 +174,7 @@ void eventWeight_bTagSF::getBTagWeight( int WP, std::vector< double > jet_pt, st
     // bJets
     if( abs(jet_flavour[iJet])==5 ){
       flavor = BTagEntry::FLAV_B;
-      pt_eff     = std::max(20.0,std::min(599.0, jet_pt[iJet])); // max pt of 600.0 GeV for b
+      pt_eff = std::max(30.0,std::min(599.0, jet_pt[iJet])); // max pt of 600.0 GeV for b
 
       if( WP==0 ) h_eff = h_loose_btag_eff_b;
       if( WP==1 ) h_eff = h_btag_eff_b;
