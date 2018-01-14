@@ -2,21 +2,19 @@
 #define eventWeight_bTagSF_H
 
 // SNT CORE
-//#ifndef __CINT__
+// #ifndef __CINT__
 #include "../CORE/Tools/btagsf/BTagCalibrationStandalone.h"
 // #include "btagsf/BTagCalibrationStandalone.h"
-//#include "BTagCalibrationStandalone.h"
-//#include "CondFormats/BTauObjects/interface/BTagCalibration.h"
-//#endif /* __CINT __ */
+// #include "CondFormats/BTauObjects/interface/BTagCalibration.h"
+// #endif /* __CINT __ */
 
 // ROOT
 #include "TFile.h"
 #include "TH2.h"
 
-// C
+// C++
 #include <string>
 #include <vector>
-
 
 //
 // CLASS

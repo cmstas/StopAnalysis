@@ -53,7 +53,7 @@ eventWeight_lepSF::eventWeight_lepSF( bool isFastsim ){
   ymin_h_mu_vetoLepEff = 1.0;
   ymax_h_mu_vetoLepEff = 1.0;
 
-  cout << "    Loading lepton scale factors..." << endl << endl;
+  cout << "[eventWeight_lepSF] Loading lepton scale factors..." << endl;
     
   // Electron file
   f_el_SF          = new TFile("../StopCORE/inputs/lepsf/Moriond17/scaleFactors.root", "read");

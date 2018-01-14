@@ -3,6 +3,7 @@
 
 #include "TFile.h"
 #include "TChain.h"
+#include "../StopCORE/eventWeight.h"
 #include "SR.h"
 
 class StopLooper {
@@ -13,7 +14,6 @@ class StopLooper {
   void SetSignalRegions();
   void SetJetEnergyScaleType(int jestype) { jestype_ = jestype; }
   void GenerateAllSRptrSets();
-  void GetEventWeight();
 
   void looper(TChain* chain, std::string sample, std::string outputdir, int jestype = 0);
 
@@ -43,6 +43,8 @@ class StopLooper {
 
   // Under development
   std::map<std::string,SRptrSet> allSRptrSets;
+
+  evtWgtInfo evtWgt;
 
  private:
   // Global variable

@@ -35,7 +35,7 @@ void compareControlRegions() {
   // auto ifile_new = new TFile("../StopLooper/output/temp4/data_2017dilep.root");
   // auto ifile_old = new TFile("../StopLooper/output/temp3/data_2016dilep.root");
 
-  // auto ifile_new = new TFile("../StopLooper/output/data2017_rwgtd/data_2017D.root");
+  // auto ifile_new = new TFile("../StopLooper/output/data2017_rwgtd/data_2017F.root");
   auto ifile_new = new TFile("../StopLooper/output/data2017_rwgtd/all_data_2017.root");
   auto ifile_old = new TFile("../StopLooper/output/data2016/data_2016all.root");
 
@@ -54,25 +54,28 @@ void compareControlRegions() {
   // vector<string> Hists = {"h_mll", "h_zpt", "h_njets", "h_njets_zpeak", "h_nbjets_zpeak", "h_nbjets_mzpt", "h_nbjets_hzpt"};
 
   // vector<string> Dirs = {"cr0btest1", "cr0btest2", "cr0btest3", "cr0bbase"};
-  // // vector<string> Hists = {"h_metbins", "h_mt", "h_njets", "h_nbjets", "h_tmod", "h_mlepb"};
+  // vector<string> Hists = {"h_metbins", "h_mt", "h_njets", "h_nbjets", "h_tmod", "h_mlepb"};
   // vector<string> Hists = {"h_met", "h_njets", "h_mt", "h_tmod", "h_nvtxs", "h_mlepb", "h_lep1pt", "h_dphijmet"};
 
+  vector<string> Dirs = {"cr0bbase"};
+  vector<string> Hists = {"h_met"};
+
   // vector<string> Dirs = {"cr2ltest3", "cr2ltest1", "cr2ltest4", "cr2lbase"};
-  // vector<string> Hists = {"h_metbins", "h_rlmetbins", "h_njets", "h_nbjets", "h_tmod", "h_mlepb"};
+  // // vector<string> Hists = {"h_metbins", "h_rlmetbins", "h_njets", "h_nbjets", "h_tmod", "h_mlepb"};
   // vector<string> Hists = {"h_mll", "h_rlmet", "h_rlmt", "h_met", "h_nvtxs", "h_mt", "h_njets", "h_nbjets", "h_tmod", "h_mlepb", "h_lep1pt", "h_dphijmet"};
 
   // vector<string> Dirs = {"cr2lbase"};
   // vector<string> Hists = {"h_rlmet", "h_rlmt", "h_rlmet_u", "h_rlmt_u", "h_met", "h_mt", "h_met_u", "h_mt_u", "h_njets", "h_nbjets", "h_tmod", "h_mlepb",};
-  vector<string> Dirs = {"cr0bbase"};
-  vector<string> Hists = {"h_met", "h_mt", "h_met_u", "h_mt_u", "h_njets", "h_tmod", "h_mlepb",};
+  // vector<string> Dirs = {"cr0bbase"};
+  // vector<string> Hists = {"h_met", "h_mt", "h_met_u", "h_mt_u", "h_njets", "h_tmod", "h_mlepb",};
 
   for (auto dirstr : Dirs) {
     for (auto hn : Hists) {
       // for (string suf : {"", "_e", "_mu", "_barrele", "_endcape"}) {
-      // for (string suf : {"", "_e", "_mu", "_hltsl", "_hltmht"}) {
+      for (string suf : {"", "_e", "_mu"}) {
       // for (string suf : {"", "_ee", "_mumu", "_hltmet", "_hltmu", "_hltel"}) {
       // for (string suf : {"", "_ee", "_mumu", "_emu"}) {
-      for (string suf : {""}) {
+      // for (string suf : {""}) {
       // for (string suf : {"_passHLT"}) {
         string hstr = hn + suf;
         vector<Color_t> vcolor;
@@ -87,8 +90,9 @@ void compareControlRegions() {
         auto hold = (TH1F*) ifile_old->Get((dirstr+"/"+hstr).c_str());
         if (!hold) { cout << "Can't find " << dirstr+"/"+hstr << endl; continue; }
 
-        hnew->Scale(35.87/41.96);
+        // hnew->Scale(35.87/41.96);
         // hold->Scale(41.96/35.87);
+        hold->Scale(hnew->Integral(0,-1) / hold->Integral(0,-1));
 
         float scale = hnew->Integral(0,-1)/hold->Integral(0,-1);
 
@@ -114,7 +118,7 @@ void compareControlRegions() {
         // Try to use the dataMCplotMaker
         string optstr = "--darkColorLines --topYaxisTitle Entries --type Preliminary --outOfFrame";
         string xlabel = " --xAxisOverride " + string(hnew->GetXaxis()->GetTitle());
-        string oname = " --outputName plots/" + dirstr + "_" + hstr + "_compare.pdf";
+        string oname = " --outputName plots/" + dirstr + "_" + hstr + "_compare.png";
         if (hn.find("h_n") != string::npos || hn.find("phi") != string::npos || !TString(hnew->GetXaxis()->GetTitle()).Contains("[GeV]"))
           optstr += " --noDivisionLabel";
         optstr += " --topYaxisTitle Ratio  --dataName 2017 data (42.0 fb^{-1}, scaled to 35.9 fb^{-1})";

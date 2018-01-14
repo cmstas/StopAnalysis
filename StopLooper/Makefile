@@ -45,8 +45,7 @@ TOOLSSOURCES = ../CORE/Tools/goodrun.cc ../CORE/Tools/dorky/dorky.cc
 TOOLSOBJECTS = $(TOOLSSOURCES:.cc=.o)
 TOOLSLIB = libCORETools.so
 
-# LIBS = $(LIB) $(CORELIB) $(TOOLSLIB)
-LIBS = $(LIB) $(TOOLSLIB)
+LIBS = $(LIB) $(CORELIB) $(TOOLSLIB)
 
 EXE = runStopLooper
 
