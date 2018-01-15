@@ -71,7 +71,7 @@ std::vector<SR> getStopSignalRegionsTopological() {
   sr.SetVar("tmod", 0, 10);
   sr.SetVar("mlb", 0, 175);
   sr.SetVar("ntbtag", 0, fInf);
-  sr.SetMETBins({250, 350, 450, 1500});
+  sr.SetMETBins({250, 350, 550, 1500});
   SRvec.emplace_back(sr);
 
   sr.SetName("srF");
