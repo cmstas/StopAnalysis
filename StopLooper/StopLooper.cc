@@ -35,7 +35,7 @@
 #include "SR.h"
 #include "StopRegions.h"
 #include "StopLooper.h"
-#include "PlotUtilities.h"
+#include "Utilities.h"
 
 using namespace std;
 using namespace stop_1l;
@@ -67,9 +67,14 @@ const bool synchronizing = false;
 // not running the standard regions to speed up
 const bool runYieldsOnly = true;
 // set bool def here for member function usage
+const bool printPassedEvents = true;
+
 bool is2016data = false;
+bool printOnce1 = false;
 
 const float fInf = std::numeric_limits<float>::max();
+
+std::ofstream ofile;
 
 void StopLooper::SetSignalRegions() {
 
@@ -138,6 +143,8 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
   TString output_name = Form("%s/%s.root",output_dir.c_str(),samplestr.c_str());
   cout << "[StopLooper::looper] creating output file: " << output_name << endl;  outfile_ = new TFile(output_name.Data(),"RECREATE") ;
 
+  if (printPassedEvents) ofile.open("passEventList.txt");
+
   outfile_ = new TFile(output_name.Data(), "RECREATE") ;
 
   // // full 2016 dataset json, 35.87/fb:
@@ -179,7 +186,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
   // GenerateAllSRptrSets();
 
   // Setup the event weight calculator
-  
+
   evtWgt.Setup(samplestr, applyBtagSFfromFiles, applyLeptonSFfromFiles);
   evtWgt.setDefaultSystematics(0);
 
@@ -252,6 +259,13 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
         if ( firstGoodVtxIdx() == -1 ) continue;
         if ( !filt_badMuonFilter() ) continue;
         if ( !filt_badChargedCandidateFilter() ) continue;
+
+        if ( !filt_met() ) continue;
+        if ( !filt_jetWithBadMuon() ) continue;
+        if ( !filt_pfovercalomet() ) continue;
+        if ( filt_duplicatemuons() ) continue;
+        if ( filt_badmuons() ) continue;
+        if ( !filt_nobadmuons() ) continue;
       }
 
       // Require at least 1 good vertex
@@ -271,7 +285,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
       // Calculate event weight
       // wgtInfo.getEventWeights(); // what does this do?    // <-- breaks on signal samples
       /// weights need re-calculation for every event, but only do if event get selected
-      evtWgt.resetWeights();  
+      evtWgt.resetWeights();
 
       int nEventsSample;
       if (!is_data()) {
@@ -337,7 +351,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
           values_["ntbtag"] = ntightbtags();
           values_["leadbpt"] = ak4pfjets_leadbtag_p4().pt();
           values_["mlb_0b"] = (ak4pfjets_leadbtag_p4() + lep1_p4()).M();
-          values_["htratio"] = ak4_htratiom();
+          // values_["htratio"] = ak4_htratiom();
 
         } else if (jestype == 1) {
           values_["mt"] = mt_met_lep_jup();
@@ -358,7 +372,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
           values_["ntbtag"] = jup_ntightbtags();
           values_["leadbpt"] = jup_ak4pfjets_leadbtag_p4().pt();
           values_["mlb_0b"] = (jup_ak4pfjets_leadbtag_p4() + lep1_p4()).M();
-          values_["htratio"] = jup_ak4_htratiom();
+          // values_["htratio"] = jup_ak4_htratiom();
 
           suffix = "_jesUp";
           evtWgt.jes_type = evtWgtInfo::k_JESUp;
@@ -381,7 +395,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
           values_["nbtag"]  = jdown_nanalysisbtags();
           values_["leadbpt"] = jdown_ak4pfjets_leadbtag_p4().pt();
           values_["mlb_0b"] = (jdown_ak4pfjets_leadbtag_p4() + lep1_p4()).M();
-          values_["htratio"] = jdown_ak4_htratiom();
+          // values_["htratio"] = jdown_ak4_htratiom();
 
           suffix = "_jesDn";
           evtWgt.jes_type = evtWgtInfo::k_JESDown;
@@ -478,6 +492,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
 
   outfile_->Write();
   outfile_->Close();
+  if (printPassedEvents) ofile.close();
 
   bmark->Stop("benchmark");
   cout << endl;
@@ -560,8 +575,10 @@ void StopLooper::fillHistosForCR2l(string suf) {
   if (!is2016data) { // 2017 Triggers
     if (not ( (abs(lep1_pdgid()) == 11 && HLT_SingleEl()) || (abs(lep1_pdgid()) == 13 && HLT_SingleMu()) || HLT_MET_MHT() )) return;
   } else { // 2016 CR2l Triggers
-    if (not ( (abs(lep1_pdgid()) == 11 && HLT_SingleEl()) || (abs(lep1_pdgid()) == 13 && HLT_SingleMu()) || (HLT_MET() || HLT_MET110_MHT110() || HLT_MET120_MHT120()) )) return;
+    // if (not ( (abs(lep1_pdgid()) == 11 && HLT_SingleEl()) || (abs(lep1_pdgid()) == 13 && HLT_SingleMu()) || (HLT_MET() || HLT_MET110_MHT110() || HLT_MET120_MHT120()) )) return;
     // if (not (HLT_DiEl() && abs(lep1_pdgid())+abs(lep2_pdgid())==22) || (HLT_DiMu() && abs(lep1_pdgid())+abs(lep2_pdgid())==26) || (HLT_MuE()  && abs(lep1_pdgid())+abs(lep2_pdgid())==24) ) return;
+    if (not ( ( HLT_SingleEl() && (abs(lep1_pdgid())==11 || abs(lep2_pdgid())==11) ) || ( HLT_SingleMu() && (abs(lep1_pdgid())==13 || abs(lep2_pdgid())==13) ) ||
+              ( HLT_MET()) || ( HLT_MET110_MHT110()) || ( HLT_MET120_MHT120()) )) return;
   }
 
   // if ( (abs(lep1_pdgid()) == 11 && values_["lep1pt"] < 40) || (abs(lep1_pdgid()) == 13 && values_["lep1pt"] < 30) ) return;
@@ -633,6 +650,14 @@ void StopLooper::fillHistosForCR2l(string suf) {
             plot1D("h_metbins_"+evtWgt.getLabel(syst), values_["met_rl"], evtWgt.getWeight(syst), cr.histMap,
                    ";E^{miss}_{T} [GeV]", cr.GetNMETBins(), cr.GetMETBinsPtr());
         }
+      }
+      // Debugging
+      if (printPassedEvents && suf == "" && cr.GetName() == "cr2lA" && pfmet_rl() < 350) {
+        if (!printOnce1) { for (auto& v : values_) ofile << ' ' << v.first; ofile << endl; printOnce1 = true; }
+        ofile << run() << ' ' << ls() << ' ' << evt() << ' ' << cr.GetName();
+        // if (run() == 277168) for (auto& v : values_) ofile << ' ' << v.second;
+        ofile << ' ' << pfmet() << ' ' << mt_met_lep() << ' ' << Mlb_closestb() << ' ' << topnessMod() << ' ' << ngoodjets() << ' ' << ngoodbtags() << ' ' << mindphi_met_j1_j2();
+        ofile << endl;
       }
     }
   }

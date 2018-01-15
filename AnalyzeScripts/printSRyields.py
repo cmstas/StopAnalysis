@@ -182,8 +182,9 @@ if __name__ == '__main__':
     # f2 = r.TFile('../StopLooper/output/temp_v26_2/ttbar.root')
     # f3 = r.TFile('../StopLooper/output/temp_v26_2/SMS_T2tt_mStop-400to1200.root')
     # f1 = r.TFile('../StopLooper/output/data2016/all_data_2016.root')
-    f1 = r.TFile('../StopLooper/output/temp8/all_mc_2016.root')
+    # f1 = r.TFile('../StopLooper/output/temp8/all_mc_2016.root')
     # f1 = r.TFile('../StopLooper/output/temp8/data_single_lepton_met.root')
+    f1 = r.TFile('../StopLooper/output/temp/data_2016.root')
 
     # printCutflowNumbers(f1, 'testCutflow', 'cutflow1')
     # printCutflowNumbers(f1, 'testCutflow', 'cutflow2')
