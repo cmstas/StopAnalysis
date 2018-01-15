@@ -38,8 +38,8 @@ TOOLSLIB = ../CORE/Tools/btagsf/BTagCalibrationStandalone.o
 # stopCORE.so: sysInfo.o eventWeight_bTagSF.o eventWeight_lepSF.o selectionInfo.o categoryInfo.o genClassyInfo.o sampleInfo.o stop_1l_babyAnalyzer.o 
 # 	$(LD) $(LDFLAGS) $(SOFLAGS) -o stopCORE.so sysInfo.o eventWeight_bTagSF.o eventWeight_lepSF.o selectionInfo.o categoryInfo.o genClassyInfo.o sampleInfo.o stop_1l_babyAnalyzer.o $(GLIBS) -lGenVector -lEG $(CORELIB) $(STOPVARLIB) -Wl,-rpath,./
 
-stopCORE.so: eventWeight.o eventWeight_bTagSF.o eventWeight_lepSF.o stop_1l_babyAnalyzer.o 
-	$(LD) $(LDFLAGS) $(SOFLAGS) -o stopCORE.so eventWeight.o eventWeight_bTagSF.o eventWeight_lepSF.o stop_1l_babyAnalyzer.o $(GLIBS) -lGenVector -lEG $(TOOLSLIB) $(STOPVARLIB) -Wl,-rpath,./
+stopCORE.so: eventWeight.o eventWeight_bTagSF.o eventWeight_lepSF.o stop_1l_babyAnalyzer.o sampleInfo.o
+	$(LD) $(LDFLAGS) $(SOFLAGS) -o stopCORE.so eventWeight.o eventWeight_bTagSF.o eventWeight_lepSF.o stop_1l_babyAnalyzer.o sampleInfo.o $(GLIBS) -lGenVector -lEG $(TOOLSLIB) $(STOPVARLIB) -Wl,-rpath,./
 
 
 # stopCORE.so: eventWeight.o eventWeight_bTagSF.o eventWeight_lepSF.o stop_1l_babyAnalyzer.o 

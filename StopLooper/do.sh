@@ -102,31 +102,37 @@ declare -a Samples=(data_2016B data_2016C data_2016D data_2016E data_2016F data_
 # declare -a Samples=(data_single_muon data data_met data_single_electron)
 # declare -a Samples=(data_muon_eg)
 
-for SAMPLE in ${Samples[@]}; do
-    # echo ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} '>&' ${LOGDIR}/log_${SAMPLE}.txt
-    # ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
-    # eval "nohup ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
-    echo nice -n 10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
-    eval "nohup nice -n -10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
-done
+# for SAMPLE in ${Samples[@]}; do
+#     # echo ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} '>&' ${LOGDIR}/log_${SAMPLE}.txt
+#     # ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
+#     # eval "nohup ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
+#     echo nice -n 10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
+#     eval "nohup nice -n -10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
+# done
 
 # 2016 MC for comparison
 INDIR=/nfs-7/userdata/stopRun2/analysis2016_SUS-16-051_35p9fbinv/v22/skim
-OUTDIR=output/samples2016
+OUTDIR=output/mc2016
 
 mkdir -p ${OUTDIR}
 mkdir -p ${LOGDIR}
 
-declare -a Samples=(ttbar_powheg ttbar_diLept DYJetsToLL ttbar_singleLept WJetsToLNu)
+declare -a Samples=()
+Samples+=( ttbar_diLept  )    # ttbar 
+Samples+=( ttbar_singleLeptFromT_madgraph_pythia8_ext1 ttbar_singleLeptFromTbar_madgraph_pythia8_ext1 )    # ttbar
+Samples+=( t_sch_4f t_tch_4f tbar_tch t_tW_5f t_tbarW_5f ) # singleT
+Samples+=( W1Jets W2Jets W3Jets W4JetsToLNu_madgraph_pythia8_25ns DYJets )            # Vjets : Wjets + DY
+Samples+=( ttWJets ttZJets WW WZ ZZ )                      # rare  : ttV + diboson
+
 # declare -a Samples=(DYJetsToLL TTGJets TTWJets TTZ W1Jets W2Jets W3Jets W4Jets W4Jets WJetsToLNu WW WZ ZZ tZq ttbar ttWJets ttZJets t_sch t_tW t_tbarW t_tch tbar_tch)
 
-# for SAMPLE in ${Samples[@]}; do
-#     echo ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
-#     # ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
-#     eval "nohup ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
-#     # echo nice -n 10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
-#     # eval "nohup nice -n 10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}_2016.txt &"
-# done
+for SAMPLE in ${Samples[@]}; do
+    # echo ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
+    # ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
+    # eval "nohup ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
+    echo nice -n 10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
+    eval "nohup nice -n -10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}_2016.txt &"
+done
 
 # Monitor the running
 while : ; do
@@ -137,9 +143,19 @@ done
 
 echo -e 'All jobs are done!\a'
 
-pushd output/data2016
-hadd -f all_data_2016.root data_2016?.root > /dev/null
-popd > /dev/null
+# # Merge outputs
+# pushd output/data2016
+# hadd -f all_data_2016.root data_2016?.root > /dev/null
+# popd > /dev/null
+
+pushd output/mc2016
+hadd -f ttbar_singleLept.root ttbar_singleLeptFrom*ext1.root > /dev/null 
+hadd -f ttbar.root    ttbar_diLept.root ttbar_singleLept.root > /dev/null
+hadd -f singleT.root  t_sch_4f.root t_tch_4f.root tbar_tch.root t_tW_5f.root t_tbarW_5f.root  > /dev/null
+hadd -f Vjets.root    W1Jets.root W2Jets.root W3Jets.root W4Jets*.root DYJets.root > /dev/null
+hadd -f rare.root     ttWJets.root ttZJets.root WW.root WZ.root ZZ.root  > /dev/null
+hadd -f all_mc_2016.root  ttbar.root singleT.root Vjets.root rare.root > /dev/null
+popd > /dev/null 
 
 # Special operations on output files
 # . temp.sh output/data2017_rwgtd

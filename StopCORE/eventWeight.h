@@ -264,12 +264,15 @@ class evtWgtInfo {
   double sf_xsec_up;
   double sf_xsec_dn;
 
+  double sf_extra_file;  // special weight that only initialized at constructor
 
   evtWgtInfo();
   void Setup( std::string sample, bool useBTagUtils=false, bool useLepSFUtils=false);
   void Cleanup();
   void resetWeights() { event_ready = false; add2ndLepToMet = false; }
   void getCounterHistogramFromBaby( TFile *sourceFile );
+  void setExtraFileWeight(double sf_extra) { sf_extra_file = sf_extra; }
+
   void initializeWeights();
   void calculateWeightsForEvent( bool nominalOnly=false );
   void getSusyMasses( int &mStop, int &mLSP );

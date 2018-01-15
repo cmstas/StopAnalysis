@@ -4,6 +4,7 @@
 #include "TString.h"
 
 #include "StopLooper.h"
+#include "../StopCORE/sampleInfo.h"
 
 using namespace std;
 
@@ -21,7 +22,29 @@ int main(int argc, char** argv)
 
   TChain *ch = new TChain("t");
   TString infile = Form("%s/%s*.root", input_dir.c_str(), sample.c_str());
- 
+
+  auto fillChain = [&](sampleInfo::sampleUtil sample, TChain* chain) {
+    string inputdir = sample.baby_i_o.first;
+    for (auto fname : sample.inputBabies) {
+      string filepath = inputdir + fname;
+      chain->Add(filepath.c_str());
+    }
+  };
+
+  if (sample == "all_2016") {
+    sampleInfo::vect_id sampleList = sampleInfo::getSampleList_SR();
+    for (auto sampleid : sampleList) {
+      sampleInfo::sampleUtil sample(sampleid);
+      string samplestr = sample.label;
+      TChain *chain = new TChain("t");
+      fillChain(sample, chain);
+      StopLooper stop;
+      stop.looper(chain, samplestr, output_dir);
+      delete chain;
+    }
+    return 0;
+  }
+
   // 2017Data
   bool doData2017B = false;
   bool doData2017C = false;
@@ -98,7 +121,7 @@ int main(int argc, char** argv)
     ch->Add(Form("%s/data_muon_eg_Run2017C_MINIAOD_PromptReco-v2.root", input_dir.c_str()));
     ch->Add(Form("%s/data_muon_eg_Run2017C_MINIAOD_PromptReco-v3.root", input_dir.c_str()));
   }
-  
+
   if (doData2016Sync) {
     ch->Add("/hadoop/cms/store/user/haweber/AutoTwopler_babies/Stop_1l_v24/MET_Run2016B-03Feb2017_ver2-v2/skim/*.root");
     ch->Add("/hadoop/cms/store/user/haweber/AutoTwopler_babies/Stop_1l_v24/MET_Run2016C-03Feb2017-v1/skim/*.root");

@@ -14,6 +14,7 @@
 #include "TVector2.h"
 #include "TBenchmark.h"
 #include "TMath.h"
+#include "TString.h"
 #include "TLorentzVector.h"
 #include "TF1.h"
 
@@ -42,7 +43,7 @@ using namespace stop_1l;
 
 class SR;
 
-const bool verbose = true;
+const bool verbose = false;
 // turn on to apply weights to central value
 const bool applyWeights = false;
 // turn on to apply btag sf - take from files defined in eventWeight_btagSF.cc
@@ -213,6 +214,11 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
       h_sig_counter_nEvents = (TH2D*) file.Get("histNEvts");
     }
     evtWgt.getCounterHistogramFromBaby(&file);
+    // Extra file weight for extension dataset, only ttbar_diLept seems affected now
+    if (fname.Contains("ttbar_diLept_madgraph_pythia8_ext1"))
+      evtWgt.setExtraFileWeight(23198554.0 / (23198554.0+5689986.0));
+    else if (fname.Contains("ttbar_diLept_madgraph_pythia8"))
+      evtWgt.setExtraFileWeight(5689986.0 / (23198554.0+5689986.0));
 
     dummy.cd();
     // Loop over Events in current file
@@ -307,7 +313,8 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
       values_["lep1eta"] = lep1_p4().eta();
       values_["passlep1pt"] = (abs(lep1_pdgid()) == 13 && lep1_p4().pt() > 40) || (abs(lep1_pdgid()) == 11 && lep1_p4().pt() > 45);
 
-      for (int jestype = 0; jestype < ((doSystVariations && !is_data())? 3 : 1); ++jestype) {
+      // for (int jestype = 0; jestype < ((doSystVariations && !is_data())? 3 : 1); ++jestype) {
+      for (int jestype = 0; jestype < 1; ++jestype) {
         string suffix = "";
 
         /// JES type dependent variables
@@ -331,7 +338,6 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
           values_["leadbpt"] = ak4pfjets_leadbtag_p4().pt();
           values_["mlb_0b"] = (ak4pfjets_leadbtag_p4() + lep1_p4()).M();
           values_["htratio"] = ak4_htratiom();
-
 
         } else if (jestype == 1) {
           values_["mt"] = mt_met_lep_jup();
