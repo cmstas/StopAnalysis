@@ -437,6 +437,7 @@ evtWgtInfo::evtWgtInfo() {
 
   // Initialize event weights and related variables
   initializeWeights();
+  sf_extra_file = 1.0;
 
 }
 
@@ -795,6 +796,8 @@ void evtWgtInfo::calculateWeightsForEvent(bool nominalOnly) {
   evt_wgt *= sf_pu;
   // Apply sample weight (for WJets stitching)
   evt_wgt *= sf_sample;
+  // Apply any extra weight that was passed in
+  evt_wgt *= sf_extra_file;
 
   //
   // Systematic Weights
@@ -2091,9 +2094,9 @@ void evtWgtInfo::getTTbarSysPtSF( double &weight_ttbarSysPt, double &weight_ttba
   int jet1_idx = -1;
   double max_deepcsv = -99.9;
   for (int iJet=0; iJet<(int)babyAnalyzer.ak4pfjets_p4().size(); iJet++) {
-    if ( babyAnalyzer.ak4pfjets_deepCSV().at(iJet) > max_deepcsv ) {
+    if ( babyAnalyzer.ak4pfjets_CSV().at(iJet) > max_deepcsv ) {
       jet1_idx = iJet;
-      max_deepcsv  = babyAnalyzer.ak4pfjets_deepCSV().at(iJet);
+      max_deepcsv  = babyAnalyzer.ak4pfjets_CSV().at(iJet);
     }
   }
   if (jet1_idx>=0) system_LV += babyAnalyzer.ak4pfjets_p4().at(jet1_idx);
@@ -2103,9 +2106,9 @@ void evtWgtInfo::getTTbarSysPtSF( double &weight_ttbarSysPt, double &weight_ttba
   max_deepcsv = -99.9;
   for (int iJet=0; iJet<(int)babyAnalyzer.ak4pfjets_p4().size(); iJet++) {
     if ( iJet==jet1_idx ) continue;
-    if ( babyAnalyzer.ak4pfjets_deepCSV().at(iJet) > max_deepcsv ) {
+    if ( babyAnalyzer.ak4pfjets_CSV().at(iJet) > max_deepcsv ) {
       jet2_idx = iJet;
-      max_deepcsv = babyAnalyzer.ak4pfjets_deepCSV().at(iJet);
+      max_deepcsv = babyAnalyzer.ak4pfjets_CSV().at(iJet);
     }
   }
   if (jet2_idx>=0) system_LV += babyAnalyzer.ak4pfjets_p4().at(jet2_idx);
