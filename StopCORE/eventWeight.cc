@@ -431,8 +431,8 @@ evtWgtInfo::evtWgtInfo() {
   h_recoEff_tau         = nullptr;
 
   // Utilty Var Constants
-  // lumi = 35.867;         // 2016 lumi
-  lumi = 41.96;         // 2017 lumi  <-- todo: need clever way of doing this / more easily configurable
+  lumi = 35.867;         // 2016 lumi
+  // lumi = 41.96;         // 2017 lumi  <-- todo: need clever way of doing this / more easily configurable
   lumi_err = lumi*0.026; // 2.6% uncertainty for Moriond17
 
   // Initialize event weights and related variables
@@ -2499,6 +2499,7 @@ string evtWgtInfo::findSampleType( string samplestr ) {
 
   if (sample.Contains("data")) return "data";
   else if (sample.Contains("ttbar") || sample.Contains("TT_")) return "ttbar";
+  else if (sample.Contains("ttW") || sample.Contains("t_tW") || sample.Contains("t_tbarW")) return "ttW";
   else if (sample.Contains("W") && sample.Contains("Jets")) return "wjets";
 
   return samplestr;
