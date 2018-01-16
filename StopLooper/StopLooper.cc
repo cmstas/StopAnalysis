@@ -105,7 +105,7 @@ void StopLooper::SetSignalRegions() {
         plot1D("h_"+var+"_"+"HI",   1, sr.GetUpperBound(var), sr.histMap, "", 1, 0, 2);
       }
       if (sr.GetNMETBins() > 0) {
-        plot1D("h_metbins", -1, 0, sr.histMap, ";E^{miss}_{T} [GeV]", sr.GetNMETBins(), sr.GetMETBinsPtr());
+        plot1D("h_metbins", -1, 0, sr.histMap, sr.GetName()+"_"+sr.GetDetailName()+";E^{miss}_{T} [GeV]", sr.GetNMETBins(), sr.GetMETBinsPtr());
       }
     }
   };
@@ -190,7 +190,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
   evtWgt.Setup(samplestr, applyBtagSFfromFiles, applyLeptonSFfromFiles);
   evtWgt.setDefaultSystematics(0);
 
-  is2016data = (samplestr.find("data_2016") == 0);
+  if (samplestr.find("data_2016") || samplestr == "data_single_lepton_met") is2016data = true;
 
   int nDuplicates = 0;
   int nEvents = chain->GetEntries();
@@ -221,11 +221,19 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
       h_sig_counter_nEvents = (TH2D*) file.Get("histNEvts");
     }
     evtWgt.getCounterHistogramFromBaby(&file);
-    // Extra file weight for extension dataset, only ttbar_diLept seems affected now
+    // Extra file weight for extension dataset, should move these code to other places
     if (fname.Contains("ttbar_diLept_madgraph_pythia8_ext1"))
       evtWgt.setExtraFileWeight(23198554.0 / (23198554.0+5689986.0));
     else if (fname.Contains("ttbar_diLept_madgraph_pythia8"))
       evtWgt.setExtraFileWeight(5689986.0 / (23198554.0+5689986.0));
+    else if (fname.Contains("t_tW_5f_powheg_pythia8_noHadDecays_ext1"))
+      evtWgt.setExtraFileWeight((3145334.0)/(4473156.0+3145334.0));
+    else if (fname.Contains("t_tW_5f_powheg_pythia8_noHadDecays"))
+      evtWgt.setExtraFileWeight((4473156.0)/(4473156.0+3145334.0));
+    else if (fname.Contains("t_tbarW_5f_powheg_pythia8_noHadDecays_ext1"))
+      evtWgt.setExtraFileWeight((3146940.0)/(5029568.0+3146940.0));
+    else if (fname.Contains("t_tbarW_5f_powheg_pythia8_noHadDecays"))
+      evtWgt.setExtraFileWeight((5029568.0)/(5029568.0+3146940.0));
 
     dummy.cd();
     // Loop over Events in current file
@@ -249,23 +257,25 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
 
       // Apply met filters
       // if (!filt_globalTightHalo2016()) continue; // problematic for 2017
-      if (!is_signal_) {
-        if ( !filt_globalsupertighthalo2016() ) continue;
-        if ( !filt_hbhenoise() ) continue;
-        if ( !filt_hbheisonoise() )   continue;
-        if ( !filt_ecaltp() ) continue;
-        if ( !filt_eebadsc() ) continue;
+      if (is_data()) {
+        if (is2016data) {
+          if ( !filt_met() ) continue;  // contains globalTightHalo2016 and other things in the else clause
+          if ( filt_duplicatemuons() ) continue;
+          if ( filt_badmuons() ) continue;
+          if ( !filt_nobadmuons() ) continue;
+        } else {
+          if ( !filt_globalsupertighthalo2016() ) continue;
+          if ( !filt_hbhenoise() ) continue;
+          if ( !filt_hbheisonoise() )   continue;
+          if ( !filt_ecaltp() ) continue;
+          if ( !filt_eebadsc() ) continue;
+        }
         if ( !filt_goodvtx() ) continue;
         if ( firstGoodVtxIdx() == -1 ) continue;
         if ( !filt_badMuonFilter() ) continue;
         if ( !filt_badChargedCandidateFilter() ) continue;
-
-        if ( !filt_met() ) continue;
         if ( !filt_jetWithBadMuon() ) continue;
         if ( !filt_pfovercalomet() ) continue;
-        if ( filt_duplicatemuons() ) continue;
-        if ( filt_badmuons() ) continue;
-        if ( !filt_nobadmuons() ) continue;
       }
 
       // Require at least 1 good vertex
@@ -327,8 +337,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
       values_["lep1eta"] = lep1_p4().eta();
       values_["passlep1pt"] = (abs(lep1_pdgid()) == 13 && lep1_p4().pt() > 40) || (abs(lep1_pdgid()) == 11 && lep1_p4().pt() > 45);
 
-      // for (int jestype = 0; jestype < ((doSystVariations && !is_data())? 3 : 1); ++jestype) {
-      for (int jestype = 0; jestype < 1; ++jestype) {
+      for (int jestype = 0; jestype < ((doSystVariations && !is_data())? 3 : 1); ++jestype) {
         string suffix = "";
 
         /// JES type dependent variables
@@ -365,7 +374,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
           values_["nbtag"]  = jup_nanalysisbtags();
           values_["dphijmet"] = mindphi_met_j1_j2_jup();
           values_["dphilmet"] = fabs(lep1_p4().phi() - pfmet_phi_jup());
-          values_["j1passbtag"] = (ngoodjets())? jup_ak4pfjets_passMEDbtag().at(0) : 0;
+          values_["j1passbtag"] = (jup_ngoodjets())? jup_ak4pfjets_passMEDbtag().at(0) : 0;
 
           values_["ht"] = jup_ak4_HT();
           values_["metphi"] = pfmet_phi_jup();
@@ -388,7 +397,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
           values_["ntbtag"] = jdown_ntightbtags();
           values_["dphijmet"] = mindphi_met_j1_j2_jdown();
           values_["dphilmet"] = fabs(lep1_p4().phi() - pfmet_phi_jdown());
-          values_["j1passbtag"] = (ngoodjets())? jdown_ak4pfjets_passMEDbtag().at(0) : 0;
+          values_["j1passbtag"] = (jdown_ngoodjets())? jdown_ak4pfjets_passMEDbtag().at(0) : 0;
 
           values_["ht"] = jdown_ak4_HT();
           values_["metphi"] = pfmet_phi_jdown();
