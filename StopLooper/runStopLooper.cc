@@ -33,6 +33,7 @@ int main(int argc, char** argv)
 
   if (sample == "all_2016") {
     sampleInfo::vect_id sampleList = sampleInfo::getSampleList_SR();
+    // sampleInfo::vect_id sampleList = sampleInfo::vect_id{sampleInfo::ID::k_ttbar_singleLeptFromT_madgraph_pythia8_ext1};
     for (auto sampleid : sampleList) {
       sampleInfo::sampleUtil sample(sampleid);
       string samplestr = sample.label;

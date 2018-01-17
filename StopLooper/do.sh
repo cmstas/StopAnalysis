@@ -89,14 +89,15 @@ INDIR=/nfs-7/userdata/stopRun2/analysis2016_SUS-16-051_35p9fbinv/v24/skim
 # OUTDIR=output/data2016
 # OUTDIR=output/temp5
 # OUTDIR=output/samples2016
-OUTDIR=output/temp
+OUTDIR=output/temp8
 
 mkdir -p ${OUTDIR}
 mkdir -p ${LOGDIR}
 
 # declare -a Samples=(data_single_muon)
 # declare -a Samples=(data_2016B data_2016C data_2016D data_2016E data_2016F data_2016G data_2016H)
-declare -a Samples=(data_2016)
+# declare -a Samples=(data_2016)
+declare -a Samples=(all_2016)
 # declare -a Samples=(data_2016all data_2016dilep)
 # declare -a Samples=(data_single_muon)
 # declare -a Samples=(data_single_muon data data_met data_single_electron)
