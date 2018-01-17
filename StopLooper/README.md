@@ -20,6 +20,15 @@ Then simply do
 The signal and control region are defined in the file `StopRegions.cc`, making use of the `SR` class.
 The current active function for singal regions is `getStopSignalRegionsTopological()`, and `getStopControlRegionsNoBTags()` for 0 b-tagged CR, etc...
 
+### Output format
+The output of the looper are by default root files with yield histograms for each sample that ran over.
+The yield histogram is named `h_metbins` and there's one for each topological region. 
+The yield histograms with systematic variations can be found under the same SR folder.
+
+Currently the analysis that can be done directly on these yield histograms has not be developed yet. 
+As a temporary (or long term) subsititue, use the script `../AnalysisScripts/transformOutput.py` (still under development)
+to transform the yields into the old format, and the existing scripts of the analysis can be used from this point.
+
 ### Control the plots for SR and CR
 The plots to be made for each SR and CR are defined in the function `StopLooper::fillHistosForSR()`. 
 Additional plots of interest can be added anywhere into the looper by the `plot1D` function.
