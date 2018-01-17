@@ -522,7 +522,7 @@ void StopLooper::fillHistosForSR(string suf) {
   // Trigger requirements
   if (doTopTagging) { // 2017 Triggers
     if (not ( (abs(lep1_pdgid()) == 11 && HLT_SingleEl()) || (abs(lep1_pdgid()) == 13 && HLT_SingleMu()) || HLT_MET_MHT() )) return;
-  } else { // 2016 MET Triggers
+  } else if (is_data()) { // 2016 MET Triggers
     if (not ( (abs(lep1_pdgid()) == 11 && HLT_SingleEl()) || (abs(lep1_pdgid()) == 13 && HLT_SingleMu()) ||(HLT_MET() || HLT_MET110_MHT110() || HLT_MET120_MHT120()) )) return;
   }
 
@@ -573,6 +573,15 @@ void StopLooper::fillHistosForSR(string suf) {
             plot1D("h_metbins_"+evtWgt.getLabel(syst), values_["met"], evtWgt.getWeight(syst), sr.histMap, ";E^{miss}_{T} [GeV]", sr.GetNMETBins(), sr.GetMETBinsPtr());
         }
       }
+      // Debugging
+      if (printPassedEvents && sr.GetName() == "srC" && suf == "" && pfmet_rl() < 350) {
+        // if (!printOnce1) { for (auto& v : values_) ofile << ' ' << v.first; ofile << endl; printOnce1 = true; }
+        ofile << run() << ' ' << ls() << ' ' << evt() << ' ' << sr.GetName();
+        // if (run() == 277168) for (auto& v : values_) ofile << ' ' << v.second;
+        ofile << ' ' << evtweight_ << ' ' << evtWgt.getWeight(evtWgtInfo::systID::k_bTagEffHFUp) << ' ' << evtWgt.getLabel(evtWgtInfo::systID::k_bTagEffHFUp);
+        // ofile << ' ' << evtweight_ << ' ' << pfmet() << ' ' << mt_met_lep() << ' ' << Mlb_closestb() << ' ' << topnessMod() << ' ' << ngoodjets() << ' ' << ngoodbtags() << ' ' << mindphi_met_j1_j2() << ' ' << pfmet_rl();
+        ofile << endl;
+      }
     }
   }
   // SRVec[0].PassesSelectionPrintFirstFail(values_);
@@ -581,9 +590,9 @@ void StopLooper::fillHistosForSR(string suf) {
 void StopLooper::fillHistosForCR2l(string suf) {
 
   // Trigger requirements
-  if (!is2016data) { // 2017 Triggers
+  if (doTopTagging) { // 2017 Triggers
     if (not ( (abs(lep1_pdgid()) == 11 && HLT_SingleEl()) || (abs(lep1_pdgid()) == 13 && HLT_SingleMu()) || HLT_MET_MHT() )) return;
-  } else { // 2016 CR2l Triggers
+  } else if (is_data()) { // 2016 CR2l Triggers
     // if (not ( (abs(lep1_pdgid()) == 11 && HLT_SingleEl()) || (abs(lep1_pdgid()) == 13 && HLT_SingleMu()) || (HLT_MET() || HLT_MET110_MHT110() || HLT_MET120_MHT120()) )) return;
     // if (not (HLT_DiEl() && abs(lep1_pdgid())+abs(lep2_pdgid())==22) || (HLT_DiMu() && abs(lep1_pdgid())+abs(lep2_pdgid())==26) || (HLT_MuE()  && abs(lep1_pdgid())+abs(lep2_pdgid())==24) ) return;
     if (not ( ( HLT_SingleEl() && (abs(lep1_pdgid())==11 || abs(lep2_pdgid())==11) ) || ( HLT_SingleMu() && (abs(lep1_pdgid())==13 || abs(lep2_pdgid())==13) ) ||
@@ -596,8 +605,7 @@ void StopLooper::fillHistosForCR2l(string suf) {
   for (auto& cr : CR2lVec) {
     if ( cr.PassesSelection(values_) ) {
 
-      evtWgt.add2ndLepToMet = true;
-      evtweight_ = evtWgt.getWeight(evtWgtInfo::k_nominal);
+      evtweight_ = evtWgt.getWeight(evtWgtInfo::k_nominal, true);
 
       auto fillhists = [&] (string s) {
         const float met_bins[] = {0, 250, 350, 450, 550, 650, 800};
@@ -656,17 +664,9 @@ void StopLooper::fillHistosForCR2l(string suf) {
         for (int isyst = 1; isyst < evtWgtInfo::systID::k_nSyst; ++isyst) {
           auto syst = (evtWgtInfo::systID) isyst;
           if (evtWgt.doingSystematic(syst))
-            plot1D("h_metbins_"+evtWgt.getLabel(syst), values_["met_rl"], evtWgt.getWeight(syst), cr.histMap,
+            plot1D("h_metbins_"+evtWgt.getLabel(syst), values_["met_rl"], evtWgt.getWeight(syst, true), cr.histMap,
                    ";E^{miss}_{T} [GeV]", cr.GetNMETBins(), cr.GetMETBinsPtr());
         }
-      }
-      // Debugging
-      if (printPassedEvents && suf == "" && cr.GetName() == "cr2lA" && pfmet_rl() < 350) {
-        if (!printOnce1) { for (auto& v : values_) ofile << ' ' << v.first; ofile << endl; printOnce1 = true; }
-        ofile << run() << ' ' << ls() << ' ' << evt() << ' ' << cr.GetName();
-        // if (run() == 277168) for (auto& v : values_) ofile << ' ' << v.second;
-        ofile << ' ' << pfmet() << ' ' << mt_met_lep() << ' ' << Mlb_closestb() << ' ' << topnessMod() << ' ' << ngoodjets() << ' ' << ngoodbtags() << ' ' << mindphi_met_j1_j2();
-        ofile << endl;
       }
     }
   }
@@ -675,9 +675,9 @@ void StopLooper::fillHistosForCR2l(string suf) {
 void StopLooper::fillHistosForCR0b(string suf) {
 
   // Trigger requirements
-  if (!is2016data) { // 2017 Triggers
+  if (doTopTagging) { // 2017 Triggers
     if (not ( (abs(lep1_pdgid()) == 11 && HLT_SingleEl()) || (abs(lep1_pdgid()) == 13 && HLT_SingleMu()) || HLT_MET_MHT() )) return;
-  } else { // 2016 MET Triggers
+  } else if (is_data()) { // 2016 MET Triggers
     if (not ( (abs(lep1_pdgid()) == 11 && HLT_SingleEl()) || (abs(lep1_pdgid()) == 13 && HLT_SingleMu()) ||(HLT_MET() || HLT_MET110_MHT110() || HLT_MET120_MHT120()) )) return;
   }
 
@@ -1001,76 +1001,5 @@ void StopLooper::testCutFlowHistos(SR& sr) {
     fillCFhist("h_cutflow3_wtc", cutflow3, cfvallow3, cfvalupp3, cfnames3);
     if (is_signal_) fillCFhist("h_cutflow3"+masspt_suf+"_wtc", cutflow3, cfvallow3, cfvalupp3, cfnames3);
   }
-
-}
-
-
-void StopLooper::temporaryAnalysisDump(string suffix) {
-
-
-  // // Find the gen pT of the ttbar system
-  // double ttbarPt = -99.9;
-  // LorentzVector genTTbar_LV;
-  // int nFoundGenTop=0;
-  // if (sampleIsTTbar) {
-  //   for (int iGen=0; iGen<(int)genqs_p4().size(); iGen++) {
-  //     if ( abs(genqs_id().at(iGen))==6 && genqs_isLastCopy().at(iGen) ) {
-  //       genTTbar_LV += genqs_p4().at(iGen);
-  //       nFoundGenTop++;
-  //     } // end if last copy of top
-  //   } // end loop over gen quarks
-
-  //   if ( nFoundGenTop == 2 ) ttbarPt = genTTbar_LV.Pt();
-  // } // end if sample is ttbar
-
-
-  // // Calculate p4 of (lep1 lep2 b b) system
-  // LorentzVector lep1lep2bb_TLV(0.0,0.0,0.0,0.0);
-  // lep1lep2bb_TLV += lep1_p4();
-  // if (nvetoleps() > 1) lep1lep2bb_TLV += lep2_p4();
-
-  // int jet1_idx = -1;
-  // double max_csv = -99.9;
-  // for (int iJet=0; iJet<(int)ak4pfjets_p4().size(); iJet++) {
-  //   if (ak4pfjets_CSV().at(iJet) > max_csv) {
-  //     jet1_idx = iJet;
-  //     max_csv  = ak4pfjets_CSV().at(iJet);
-  //   }
-  // }
-  // if (jet1_idx >= 0) lep1lep2bb_TLV += ak4pfjets_p4().at(jet1_idx);
-
-  // int jet2_idx = -1;
-  // max_csv = -99.9;
-  // for (int iJet=0; iJet<(int)ak4pfjets_p4().size(); iJet++) {
-  //   if (iJet == jet1_idx) continue;
-  //   if (ak4pfjets_CSV().at(iJet) > max_csv) {
-  //     jet2_idx = iJet;
-  //     max_csv = ak4pfjets_CSV().at(iJet);
-  //   }
-  // }
-  // if(jet2_idx>=0) lep1lep2bb_TLV += ak4pfjets_p4().at(jet2_idx);
-
-  // // Calculate p4 of (lep1 lep2 b b MET) system
-  // double lep1lep2bbMet_pt = -99.9;
-  // LorentzVector lep1lep2bbMet_TLV = lep1lep2bb_TLV;
-  // LorentzVector met_TLV( pfmet()*cos(pfmet_phi()), pfmet()*sin(pfmet_phi()), 0.0, pfmet() );
-  // lep1lep2bbMet_TLV += met_TLV;
-  // lep1lep2bbMet_pt = lep1lep2bbMet_TLV.Pt();
-
-  // // Calculate mlb using lep2 instead of lep1
-  // LorentzVector lep2b_TLV(0.0,0.0,0.0,0.0);
-  // double minDr = 99.9;
-  // int minBJetIdx = -99;
-  // if(nvetoleps()>1) {
-  //   lep2b_TLV += lep2_p4();
-  //   for(int iJet=0; iJet<(int)ak4pfjets_p4().size(); iJet++) {
-  //     if(!ak4pfjets_passMEDbtag().at(iJet)) continue;
-  //     if(ROOT::Math::VectorUtil::DeltaR(ak4pfjets_p4().at(iJet),lep2_p4())<minDr) {
-  //       minDr = ROOT::Math::VectorUtil::DeltaR(ak4pfjets_p4().at(iJet),lep2_p4());
-  //       minBJetIdx = iJet;
-  //     }
-  //   } // end loop over jets
-  //   if(minBJetIdx>=0) lep2b_TLV += ak4pfjets_p4().at(minBJetIdx);
-  // } // end if nvetoleps>1
 
 }
