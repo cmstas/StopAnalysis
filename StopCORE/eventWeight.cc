@@ -2467,12 +2467,14 @@ bool evtWgtInfo::doingSystematic( systID isyst ) {
     case k_WwidthSF_Down:
     case k_hfXsec_Up:
     case k_hfXsec_Down:
+      return false;
     case k_pdfUp:
     case k_pdfDown:
     case k_alphasUp:
     case k_alphasDown:
     case k_q2Up:
     case k_q2Down:
+      return true;  // <-- deduced from bkgEstimate_diLepton.C
     case k_lumiUp:
     case k_lumiDown:
       return false;  // <-- todo: look this up

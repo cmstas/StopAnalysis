@@ -1306,7 +1306,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
       }
 
       if( zToNuNu )    { StopEvt.isZtoNuNu=1; StopEvt.is0lep=0; StopEvt.is1lep=0; StopEvt.is2lep=0; }
-      else if( ee0lep ){ StopEvt.isZtoNuNu=0; StopEvt.is0lep=1;    StopEvt.is1lep=0; StopEvt.is2lep=0; }
+      else if( ee0lep ){ StopEvt.isZtoNuNu=0; StopEvt.is0lep=1; StopEvt.is1lep=0; StopEvt.is2lep=0; }
       else if( ee1lep ){ StopEvt.isZtoNuNu=0; StopEvt.is0lep=0; StopEvt.is1lep=1; StopEvt.is2lep=0; }
       else if( ge2lep ){ StopEvt.isZtoNuNu=0; StopEvt.is0lep=0; StopEvt.is1lep=0; StopEvt.is2lep=1; }
 
