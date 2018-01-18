@@ -17,21 +17,7 @@ class StopLooper {
 
   void looper(TChain* chain, std::string sample, std::string outputdir, int jestype = 0);
 
-  void fillHistosForSR(std::string suffix = "");
-  void fillHistosForCR2l(std::string suffix = "");
-  void fillHistosForCR0b(std::string suffix = "");
-  void fillHistosForCRemu(std::string suffix = "");
-
-  // Analysis
   void temporaryAnalysisDump(std::string suffix = "");
-
-  // Testing
-  void testTopTaggingEffficiency(SR& sr);
-  void testCutFlowHistos(SR& sr);
-
-  // Under development
-  std::vector<SR*> FindSR(std::map<std::string,float>& values);
-  void newFillHistosForCR(std::string suffix = "");
 
  protected:
   std::vector<SR> SRVec;
@@ -41,8 +27,21 @@ class StopLooper {
 
   std::vector<SR> testVec;
 
+  // Analysis
+  void fillYieldHistos(SR& sr, float met, std::string suffix = "", bool is_cr2l = false);
+  void fillHistosForSR(std::string suffix = "");
+  void fillHistosForCR2l(std::string suffix = "");
+  void fillHistosForCR0b(std::string suffix = "");
+  void fillHistosForCRemu(std::string suffix = "");
+
+  // Testing
+  void testTopTaggingEffficiency(SR& sr);
+  void testCutFlowHistos(SR& sr);
+
   // Under development
   std::map<std::string,SRptrSet> allSRptrSets;
+  std::vector<SR*> FindSR(std::map<std::string,float>& values);
+  void newFillHistosForCR(std::string suffix = "");
 
   evtWgtInfo evtWgt;
 
@@ -52,6 +51,7 @@ class StopLooper {
 
   // Event specific variables
   bool is_signal_;
+  bool is_bkg_;
   float evtweight_;
   int jestype_;
   std::map<std::string,float> values_;

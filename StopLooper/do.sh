@@ -150,13 +150,13 @@ echo -e 'All jobs are done!\a'
 # popd > /dev/null
 
 # pushd output/mc2016
-# hadd -f ttbar_singleLept.root ttbar_singleLeptFrom*ext1.root > /dev/null 
-# hadd -f ttbar.root    ttbar_diLept.root ttbar_singleLept.root > /dev/null
-# hadd -f singleT.root  t_sch_4f.root t_tch_4f.root tbar_tch.root t_tW_5f.root t_tbarW_5f.root  > /dev/null
-# hadd -f Vjets.root    W1Jets.root W2Jets.root W3Jets.root W4Jets*.root DYJets.root > /dev/null
-# hadd -f rare.root     ttWJets.root ttZJets.root WW.root WZ.root ZZ.root  > /dev/null
-# hadd -f all_mc_2016.root  ttbar.root singleT.root Vjets.root rare.root > /dev/null
-# popd > /dev/null 
+pushd output/temp8
+hadd -f ttbar_25ns.root    ttbar_diLept*.root ttbar_singleLept*.root > /dev/null
+hadd -f singleT_25ns.root  t_sch_4f*.root t_tch_4f*.root tbar_tch*.root t_tW_5f*.root t_tbarW_5f*.root  > /dev/null
+hadd -f Vjets_25ns.root    W1Jets*.root W2Jets*.root W3Jets*.root W4Jets*.root DYJets*.root > /dev/null
+hadd -f rare_25ns.root     ttWJets*.root ttZJets*.root WW*.root WZ*.root ZZ*.root  > /dev/null
+hadd -f allBkg_25ns.root   ttbar_25ns.root singleT_25ns.root Vjets_25ns.root rare_25ns.root > /dev/null
+popd > /dev/null
 
 # Special operations on output files
 # . temp.sh output/data2017_rwgtd
