@@ -214,8 +214,6 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx, Factorize
     } // end if prefix == "NULL"
 
     //apply JEC
-    LorentzVector pfjet_p4_cor;
-    LorentzVector pfjet_p4_uncor;
     vector<float> newjecorr;
     newjecorr.clear();
     vector<pair <int, LorentzVector> > sortedJets_pt;
@@ -621,11 +619,13 @@ void JetTree::FillAK8Jets(bool applynewcorr, FactorizedJetCorrector* corrector, 
 
     float corr = 1;
     if(applynewcorr){
+      LorentzVector ak8jet_p4_uncor = ak8jets_p4().at(idx) * ak8jets_undoJEC().at(idx);
+
       // get L1FastL2L3Residual total correction
       corrector->setRho   ( evt_fixgridfastjet_all_rho() );
       corrector->setJetA  ( ak8jets_area().at(idx)       );
-      corrector->setJetPt ( ak8jets_p4()[idx].pt()       );
-      corrector->setJetEta( ak8jets_p4()[idx].eta()      );
+      corrector->setJetPt ( ak8jet_p4_uncor.pt()       );
+      corrector->setJetEta( ak8jet_p4_uncor.eta()      );
       corr = corrector->getCorrection();
 
       // check for negative correction
@@ -644,8 +644,7 @@ void JetTree::FillAK8Jets(bool applynewcorr, FactorizedJetCorrector* corrector, 
       }
 
       // apply new JEC to p4
-      // newjecorr.push_back(corr);
-      ak8pfjets_p4.push_back(ak8jets_p4()[idx] * corr * var);
+      ak8pfjets_p4.push_back(ak8jet_p4_uncor * corr * var);
     } else {
       ak8pfjets_p4.push_back(ak8jets_p4().at(idx));
     }
@@ -656,6 +655,15 @@ void JetTree::FillAK8Jets(bool applynewcorr, FactorizedJetCorrector* corrector, 
     ak8pfjets_pruned_mass.push_back(ak8jets_prunedMass().at(idx));
     ak8pfjets_softdrop_mass.push_back(ak8jets_softdropMass().at(idx));
     ak8pfjets_parton_flavor.push_back(ak8jets_partonFlavour().at(idx));
+
+    // Branches from deepAK8 object tagging
+    ak8pfjets_deepdisc_qcd.push_back(ak8jets_deep_rawdisc_qcd().at(idx));
+    ak8pfjets_deepdisc_top.push_back(ak8jets_deep_rawdisc_top().at(idx));
+    ak8pfjets_deepdisc_w.push_back(ak8jets_deep_rawdisc_w().at(idx));
+    ak8pfjets_deepdisc_z.push_back(ak8jets_deep_rawdisc_z().at(idx));
+    ak8pfjets_deepdisc_zbb.push_back(ak8jets_deep_rawdisc_zbb().at(idx));
+    ak8pfjets_deepdisc_hbb.push_back(ak8jets_deep_rawdisc_hbb().at(idx));
+    ak8pfjets_deepdisc_h4q.push_back(ak8jets_deep_rawdisc_h4q().at(idx));
 
     // Branches no longer in cms4
     // ak8pfjets_top_mass.push_back(ak8jets_topJetMass().at(idx));
@@ -804,11 +812,16 @@ void JetTree::Reset ()
     ak8pfjets_tau3.clear();
     ak8pfjets_top_mass.clear();
     ak8pfjets_pruned_mass.clear();
-    ak8pfjets_trimmed_mass.clear();
     ak8pfjets_softdrop_mass.clear();
-    ak8pfjets_filtered_mass.clear();
     ak8pfjets_pu_id.clear();    
     ak8pfjets_parton_flavor.clear();
+    ak8pfjets_deepdisc_qcd.clear();
+    ak8pfjets_deepdisc_top.clear();
+    ak8pfjets_deepdisc_w.clear();
+    ak8pfjets_deepdisc_z.clear();
+    ak8pfjets_deepdisc_zbb.clear();
+    ak8pfjets_deepdisc_hbb.clear();
+    ak8pfjets_deepdisc_h4q.clear();
  
     ak4genjets_p4.clear();
  
@@ -872,12 +885,18 @@ void JetTree::SetAK8Branches (TTree* tree)
     tree->Branch(Form("%sak8pfjets_tau3", prefix_.c_str()) , &ak8pfjets_tau3);
     tree->Branch(Form("%sak8pfjets_top_mass", prefix_.c_str()) , &ak8pfjets_top_mass);
     tree->Branch(Form("%sak8pfjets_pruned_mass", prefix_.c_str()) , &ak8pfjets_pruned_mass);
-    tree->Branch(Form("%sak8pfjets_trimmed_mass", prefix_.c_str()) , &ak8pfjets_trimmed_mass);
-    tree->Branch(Form("%sak8pfjets_filtered_mass", prefix_.c_str()) , &ak8pfjets_filtered_mass);
     tree->Branch(Form("%sak8pfjets_softdrop_mass", prefix_.c_str()) , &ak8pfjets_softdrop_mass);
     tree->Branch(Form("%sak8pfjets_pu_id", prefix_.c_str()) , &ak8pfjets_pu_id);    
     tree->Branch(Form("%sak8pfjets_parton_flavor", prefix_.c_str()) , &ak8pfjets_parton_flavor);
     tree->Branch(Form("%snGoodAK8PFJets", prefix_.c_str()) , &nGoodAK8PFJets);
+
+    tree->Branch(Form("%sak8pfjets_deepdisc_qcd", prefix_.c_str()) , &ak8pfjets_deepdisc_qcd);
+    tree->Branch(Form("%sak8pfjets_deepdisc_top", prefix_.c_str()) , &ak8pfjets_deepdisc_top);
+    tree->Branch(Form("%sak8pfjets_deepdisc_w", prefix_.c_str()) , &ak8pfjets_deepdisc_w);
+    tree->Branch(Form("%sak8pfjets_deepdisc_z", prefix_.c_str()) , &ak8pfjets_deepdisc_z);
+    tree->Branch(Form("%sak8pfjets_deepdisc_zbb", prefix_.c_str()) , &ak8pfjets_deepdisc_zbb);
+    tree->Branch(Form("%sak8pfjets_deepdisc_hbb", prefix_.c_str()) , &ak8pfjets_deepdisc_hbb);
+    tree->Branch(Form("%sak8pfjets_deepdisc_h4q", prefix_.c_str()) , &ak8pfjets_deepdisc_h4q);
 }
 
 void JetTree::SetAK4Branches_Overleps (TTree* tree)

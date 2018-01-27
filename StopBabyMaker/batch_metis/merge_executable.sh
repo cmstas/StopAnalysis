@@ -112,7 +112,7 @@ for mergeout in ${OUTPUTNAME}*.root; do
 done
 
 for skimout in skimmed_*.root; do
-    gfal-copy -p -f -t 4200 --verbose file://`pwd`/$skimout gsiftp://gftp.t2.ucsd.edu${skimout_folder}/${mergeout} --checksum ADLER32
+    gfal-copy -p -f -t 4200 --verbose file://`pwd`/$skimout gsiftp://gftp.t2.ucsd.edu${skimout_folder}/${skimout:8} --checksum ADLER32
 done
 
 echo -e "\n--- cleaning up ---\n" #                             <----- section division

@@ -20,4 +20,5 @@
 # ./runBabyMaker ttbar_madgraph_pythia8_25ns 10000 1 
 # ./runBabyMaker stopbaby -1 55 ./ /hadoop/cms/store/user/namin/ProjectMetis/DoubleMuon_Run2017D-PromptReco-v1_MINIAOD_CMS4_V00-00-06/merged_ntuple_55.root 0 
 
-./runBabyMaker stopbaby -1 4 ./ /hadoop/cms/store/user/sicheng/ProjectMetis/TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISummer17MiniAOD-92X_upgrade2017_realistic_v10-v3_MINIAODSIM_CMS4_V00-00-07_test/merged_ntuple_12.root 0 
+# ./runBabyMaker stopbaby 3000 4 ./ /hadoop/cms/store/user/sicheng/ProjectMetis/TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISummer17MiniAOD-92X_upgrade2017_realistic_v10-v3_MINIAODSIM_CMS4_V00-00-07_test/merged_ntuple_12.root 0
+./runBabyMaker stopbaby 3000 1 ./ /hadoop/cms/store/user/sicheng/ProjectMetis/TTJets_DiLept_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1_MINIAODSIM_CMS4_V00-00-02_toptag/merged_ntuple_60.root 0
