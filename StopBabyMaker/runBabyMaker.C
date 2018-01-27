@@ -89,7 +89,7 @@ int main(int argc, char **argv){
   // Skim Parameters
   //
   mylooper->skim_nvtx            = 1;
-  mylooper->skim_met             = 50;
+  mylooper->skim_met             = 100;
 
   mylooper->skim_nGoodLep        = 1;
   mylooper->skim_goodLep_el_pt   = 20.0;
@@ -124,7 +124,7 @@ int main(int argc, char **argv){
   mylooper->apply2ndLepVeto    = false;
   mylooper->isFastsim          = isFastsim;
 
-  mylooper->skim_jet_ak8_pt    = 100.0;
+  mylooper->skim_jet_ak8_pt    = 200.0;
   mylooper->skim_jet_ak8_eta   = 2.4;
 
   mylooper->skim_nPhotons      = 0;
