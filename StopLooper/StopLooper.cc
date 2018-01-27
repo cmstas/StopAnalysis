@@ -59,7 +59,7 @@ const bool doNvtxReweight = false;
 // turn on to apply nTrueInt reweighting to MC
 const bool doNTrueIntReweight = true;
 // turn on top tagging studies, off for 2016 data/mc
-const bool doTopTagging = false;
+const bool doTopTagging = true;
 // turn on to apply json file to data
 const bool applyjson = true;
 // ignore scale1fb to run over test samples
@@ -356,7 +356,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
           values_["nbtag"]  = nanalysisbtags();
           values_["dphijmet"] = mindphi_met_j1_j2();
           values_["dphilmet"] = lep1_dphiMET();
-          values_["j1passbtag"] = (ngoodjets())? ak4pfjets_passMEDbtag().at(0) : 0;
+          values_["j1passbtag"] = (ngoodjets() > 0)? ak4pfjets_passMEDbtag().at(0) : 0;
 
           values_["ht"] = ak4_HT();
           values_["metphi"] = pfmet_phi();
@@ -378,7 +378,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
           values_["nbtag"]  = jup_nanalysisbtags();
           values_["dphijmet"] = mindphi_met_j1_j2_jup();
           values_["dphilmet"] = fabs(lep1_p4().phi() - pfmet_phi_jup());
-          values_["j1passbtag"] = (jup_ngoodjets())? jup_ak4pfjets_passMEDbtag().at(0) : 0;
+          values_["j1passbtag"] = (jup_ngoodjets() > 0)? jup_ak4pfjets_passMEDbtag().at(0) : 0;
 
           values_["ht"] = jup_ak4_HT();
           values_["metphi"] = pfmet_phi_jup();
@@ -400,7 +400,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
           values_["ntbtag"] = jdown_ntightbtags();
           values_["dphijmet"] = mindphi_met_j1_j2_jdown();
           values_["dphilmet"] = fabs(lep1_p4().phi() - pfmet_phi_jdown());
-          values_["j1passbtag"] = (jdown_ngoodjets())? jdown_ak4pfjets_passMEDbtag().at(0) : 0;
+          values_["j1passbtag"] = (jdown_ngoodjets() > 0)? jdown_ak4pfjets_passMEDbtag().at(0) : 0;
 
           values_["ht"] = jdown_ak4_HT();
           values_["metphi"] = pfmet_phi_jdown();
@@ -790,6 +790,8 @@ void StopLooper::testTopTaggingEffficiency(SR& sr) {
   // Function to test the top tagging efficiencies and miss-tag rate
   // The current tagger only works for hadronically decay tops
   if (!doTopTagging) return;
+  // Temporary for consistency accross samples
+  if (pfmet() < 100 && pfmet_rl() < 100) return;
 
   // First need to determine how many gen tops does hadronic decay
   int nHadDecayTops = 2 - gen_nfromtleps_();  // 2 gentops for sure <-- checked
@@ -828,6 +830,8 @@ void StopLooper::testTopTaggingEffficiency(SR& sr) {
     plot1D("h_ratio_ntcandvscalable", ratio_ntcandvscalable, evtweight_, sr.histMap, ";N(topcand)", 7, -0.5, 3);
 
     plot1D("h_ntopcand_raw", ntopcands, evtweight_, sr.histMap, ";N(topcand)", 4, 0, 4);
+    if (ntopcands > 0)
+      plot1D("h_leadcand_disc", topcands_disc().at(0), evtweight_, sr.histMap, ";lead topcand discriminator", 110, -1.1, 1.1);
     int ntopcand0 = 0;
     int ntopcandp5 = 0;
     int ntopcandp9 = 0;
@@ -847,6 +851,64 @@ void StopLooper::testTopTaggingEffficiency(SR& sr) {
     plot2D("h2d_ntopcandp98", ntopcands, ntopcandp98, evtweight_, sr.histMap, ";N(all topcand);N(disc > 0.98)", 4, 0, 4, 4, 0, 4);
 
     // Find the daughters of the hadronically decayed top
+    /// First find the leptonic decayed top
+    int leptonictopidx = -1;
+    for (size_t l = 0; l < genleps_id().size(); ++l) {
+      if (genleps_isfromt().at(l)) {
+        leptonictopidx = genleps_gmotheridx().at(l);
+        break;
+      }
+    }
+    vector<int> jets_fromhadtop;
+    int bjetidx = -1;
+    for (size_t q = 0; q < genqs_id().size(); ++q) {
+      if (genqs_status().at(q) != 23 && genqs_status().at(q) != 1) continue;
+      if (genqs_isfromt().at(q) && genqs_motheridx().at(q) != leptonictopidx) {
+        int jetidx = -1;
+        float minDR = 0.4;
+        for (size_t j = 0; j < ak4pfjets_p4().size(); ++j) {
+          float dr = ROOT::Math::VectorUtil::DeltaR(ak4pfjets_p4().at(j), genqs_p4().at(q));
+          if (dr < minDR) {
+            minDR = dr;
+            jetidx = j;
+          }
+        }
+        if (minDR < 0.4) {
+          jets_fromhadtop.push_back(jetidx);
+          if (abs(genqs_id().at(q)) == 5) bjetidx = jetidx;
+        }
+      }
+    }
+
+    if (jets_fromhadtop.size() < 3) {
+      // Check all jets from top decay are within the list
+      if (ntopcandp98 < 1)
+        plot1D("h_category", 0, evtweight_, sr.histMap, ";category for toptagging", 8, 0, 8);
+      else
+        plot1D("h_category", 1, evtweight_, sr.histMap, ";category for toptagging", 8, 0, 8);
+    } else if (ntopcands < 1) {
+      plot1D("h_category", 7, evtweight_, sr.histMap, ";category for toptagging", 8, 0, 8);
+    } else {
+      plot1D("h_bfromt_csv", ak4pfjets_CSV().at(bjetidx), evtweight_, sr.histMap, ";CSVv2 (gen b)", 100, 0, 1);
+      plot1D("h_bfromt_deepcsv", ak4pfjets_deepCSV().at(bjetidx), evtweight_, sr.histMap, ";CSVv2 (gen b)", 100, 0, 1);
+      plot1D("h_allaccepted_disc", topcands_disc().at(0), evtweight_, sr.histMap, ";lead topcand discriminator", 110, -1.1, 1.1);
+
+      vector<int> jidxs = topcands_ak4idx().at(0);
+      bool isRealTop = std::is_permutation(jidxs.begin(), jidxs.end(), jets_fromhadtop.begin());
+      if (ntopcandp98 < 1) {
+        if (jidxs.at(0) != bjetidx)
+          plot1D("h_category", 2, evtweight_, sr.histMap, ";category for toptagging", 8, 0, 8);
+        else if (isRealTop)
+          plot1D("h_category", 3, evtweight_, sr.histMap, ";category for toptagging", 8, 0, 8);
+        else
+          plot1D("h_category", 4, evtweight_, sr.histMap, ";category for toptagging", 8, 0, 8);
+      } else {
+        if (!isRealTop)
+          plot1D("h_category", 5, evtweight_, sr.histMap, ";category for toptagging", 8, 0, 8);
+        else
+          plot1D("h_category", 6, evtweight_, sr.histMap, ";category for toptagging", 8, 0, 8);
+      }
+    }
 
     if (ntopcands >= 1) {
       bool isActualTopJet = true;
@@ -879,13 +941,6 @@ void StopLooper::testTopTaggingEffficiency(SR& sr) {
         }
         if (abs(genqs_id().at(genqidx)) == 5 && abs(genqs_motherid().at(genqidx)) == 6) {
           gentoppt = genqs_motherp4().at(genqidx).pt();
-          int leptonictopidx = -1;
-          for (size_t l = 0; l < genleps_id().size(); ++l) {
-            if (genleps_isfromt().at(l)) {
-              leptonictopidx = genleps_gmotheridx().at(l);
-              break;
-            }
-          }
           if (leptonictopidx > 0 && leptonictopidx != genqs_motheridx().at(genqidx)) {
             midxs.push_back(genqidx);
           } else {
@@ -899,13 +954,13 @@ void StopLooper::testTopTaggingEffficiency(SR& sr) {
       }
       if (midxs.size() != 3) isActualTopJet = false;
 
-      plot1D("hden_disc", topcands_disc().at(0), evtweight_, sr.histMap, ";discriminator", 1100, -1.1, 1.1);
+      plot1D("hden_disc", topcands_disc().at(0), evtweight_, sr.histMap, ";discriminator", 110, -1.1, 1.1);
       if (ntopcandp98 >= 1) {
         plot1D("hden_pt", topcands_p4().at(0).pt(), evtweight_, sr.histMap, ";discriminator", 110, 0, 1100);
         plot1D("hden_gentoppt", gentoppt, evtweight_, sr.histMap, ";p_{T}(gen top)", 110, 0, 1100);
       }
       if (isActualTopJet) {
-        plot1D("hnom_disc", topcands_disc().at(0), evtweight_, sr.histMap, ";topcand discriminator", 1100, -1.1, 1.1);
+        plot1D("hnom_disc", topcands_disc().at(0), evtweight_, sr.histMap, ";topcand discriminator", 110, -1.1, 1.1);
         if (ntopcandp98 >= 1) {
           plot1D("hnom_pt", topcands_p4().at(0).pt(), evtweight_, sr.histMap, ";topcand pt", 110, 0, 1100);
           plot1D("hnom_gentoppt", gentoppt, evtweight_, sr.histMap, ";p_{T}(gen top)", 110, 0, 1100);
