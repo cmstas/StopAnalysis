@@ -14,23 +14,23 @@ if __name__ == "__main__":
     cms4_samples = {
         
         # Essential parts of the Moriond 16 samples
-        # "ttbar_diLept_madgraph_ext1" : "/hadoop/cms/store/user/sicheng/ProjectMetis/TTJets_DiLept_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1_MINIAODSIM_CMS4_V00-00-02_toptag",
+        "ttbar_diLept_madgraph_ext1" : "/hadoop/cms/store/user/sicheng/ProjectMetis/TTJets_DiLept_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1_MINIAODSIM_CMS4_V00-00-02_toptag",
         "ttbar_singleLeptFromT_madgraph_ext1" : "/hadoop/cms/store/user/sicheng/ProjectMetis/TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1_MINIAODSIM_CMS4_V00-00-02_toptag",
-        # "ttbar_singleLeptFromTbar_madgraph_ext1" : "/hadoop/cms/store/user/sicheng/ProjectMetis/TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1_MINIAODSIM_CMS4_V00-00-02_toptag",
+        "ttbar_singleLeptFromTbar_madgraph_ext1" : "/hadoop/cms/store/user/sicheng/ProjectMetis/TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1_MINIAODSIM_CMS4_V00-00-02_toptag",
 
         "t_tW_top_5f_powheg_noHadDecays_ext1" : "/hadoop/cms/store/user/sicheng/ProjectMetis/ST_tW_top_5f_NoFullyHadronicDecays_13TeV-powheg_TuneCUETP8M1_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1_MINIAODSIM_CMS4_V00-00-02_toptag",
         "t_tW_antitop_5f_powheg_noHadDecays_ext1" : "/hadoop/cms/store/user/sicheng/ProjectMetis/ST_tW_antitop_5f_NoFullyHadronicDecays_13TeV-powheg_TuneCUETP8M1_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1_MINIAODSIM_CMS4_V00-00-02_toptag",
 
-        # "W1JetsToLNu_madgraph" : "/hadoop/cms/store/user/sicheng/ProjectMetis/W1JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_CMS4_V00-00-02_toptag",
-        # "W2JetsToLNu_madgraph" : "/hadoop/cms/store/user/sicheng/ProjectMetis/W2JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_CMS4_V00-00-02_toptag",
+        "W1JetsToLNu_madgraph" : "/hadoop/cms/store/user/sicheng/ProjectMetis/W1JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_CMS4_V00-00-02_toptag",
+        "W2JetsToLNu_madgraph" : "/hadoop/cms/store/user/sicheng/ProjectMetis/W2JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_CMS4_V00-00-02_toptag",
         "W3JetsToLNu_madgraph_ext1" : "/hadoop/cms/store/user/sicheng/ProjectMetis/W3JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1_MINIAODSIM_CMS4_V00-00-02_toptag",
-        # "W4JetsToLNu_madgraph_ext2" : "/hadoop/cms/store/user/sicheng/ProjectMetis/W4JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext2-v1_MINIAODSIM_CMS4_V00-00-02_toptag",
-        # "W1JetsToLNu_NuPt200_madgraph" : "/hadoop/cms/store/user/sicheng/ProjectMetis/W1JetsToLNu_NuPt-200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_CMS4_V00-00-02_toptag",
+        "W4JetsToLNu_madgraph_ext2" : "/hadoop/cms/store/user/sicheng/ProjectMetis/W4JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext2-v1_MINIAODSIM_CMS4_V00-00-02_toptag",
+        "W1JetsToLNu_NuPt200_madgraph" : "/hadoop/cms/store/user/sicheng/ProjectMetis/W1JetsToLNu_NuPt-200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_CMS4_V00-00-02_toptag",
         "W2JetsToLNu_NuPt200_madgraph" : "/hadoop/cms/store/user/sicheng/ProjectMetis/W2JetsToLNu_NuPt-200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_CMS4_V00-00-02_toptag",
-        # "W3JetsToLNu_NuPt200_madgraph" : "/hadoop/cms/store/user/sicheng/ProjectMetis/W3JetsToLNu_NuPt-200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_CMS4_V00-00-02_toptag",
+        "W3JetsToLNu_NuPt200_madgraph" : "/hadoop/cms/store/user/sicheng/ProjectMetis/W3JetsToLNu_NuPt-200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_CMS4_V00-00-02_toptag",
         "W4JetsToLNu_NuPt200_madgraph" : "/hadoop/cms/store/user/sicheng/ProjectMetis/W4JetsToLNu_NuPt-200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_backup_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2_MINIAODSIM_CMS4_V00-00-02_toptag",
 
-        # "TTZToLLNuNu_M10_amcnlo_ext2" : "/hadoop/cms/store/user/sicheng/ProjectMetis/TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext2-v1_MINIAODSIM_CMS4_V00-00-02_toptag",
+        "TTZToLLNuNu_M10_amcnlo_ext2" : "/hadoop/cms/store/user/sicheng/ProjectMetis/TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext2-v1_MINIAODSIM_CMS4_V00-00-02_toptag",
         "WZTo1L3Nu_amcnlo" : "/hadoop/cms/store/user/sicheng/ProjectMetis/WZTo1L3Nu_13TeV_amcatnloFXFX_madspin_pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_CMS4_V00-00-02_toptag",
 
         # Singals
