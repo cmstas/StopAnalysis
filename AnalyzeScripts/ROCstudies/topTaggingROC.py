@@ -2,20 +2,28 @@ import os
 import sys
 import ROOT as r
 import numpy as np
+from math import sqrt
 
 # sys.path.insert(0,'/home/users/sicheng/tas/Software/dataMCplotMaker/')
 # from dataMCplotMaker import dataMCplot
 
-def makeROClist(hgood, hfake):
+def makeROClist(hgood, hfake, *args, **kwargs):
+
+    raw_yields = kwargs.get("raw_yields", False)
 
     bindiv = hgood.GetNbinsX() / 2.2
     startbin = hgood.FindBin(1)
-    stopbin = 172               # human define for aesthetic 
+    stopbin = hgood.GetNbinsX()+1 # human define for aesthetic
+    cut_at_eff = 0.7             # human define for aesthetic
     print "startbin is", startbin
     print "bindiv is", bindiv
 
     ngood = hgood.Integral()
     nfake = hfake.Integral()
+
+    if raw_yields:
+        ngood = 1
+        nfake = 1
 
     lst_eff = np.array([], dtype=float)
     lst_fkr = np.array([], dtype=float)
@@ -24,15 +32,18 @@ def makeROClist(hgood, hfake):
     for i in range(1, stopbin):
         ibin = startbin - i
         disc = 1 - i / bindiv
-        
+
         tageff = hgood.Integral(ibin, -1) / ngood
         fkrate = hfake.Integral(ibin, -1) / nfake
+
+        if not raw_yields and tageff > cut_at_eff: break
 
         lst_eff = np.append(lst_eff, tageff)
         lst_fkr = np.append(lst_fkr, fkrate)
         lst_tpt = np.append(lst_tpt, disc)
-        
+
     return lst_eff, lst_fkr, lst_tpt
+
 
 if __name__ == "__main__":
 
@@ -40,78 +51,84 @@ if __name__ == "__main__":
 
     r.gROOT.SetBatch(1)
 
-    f1 = r.TFile("../StopLooper/output/temp_v26_2/TTJets.root")
+    # f1 = r.TFile("../../StopLooper/output/temp9/SMS_T2tt_mStop_400to1200.root")
+    # f2 = r.TFile("../../StopLooper/output/temp9/allBkg_25ns.root")
+    # hgood = f1.Get("srbase/h_leadtopcand_disc")
+    # hfake = f2.Get("srbase/h_leadtopcand_disc")
 
-    hcalcable = f1.Get("testTopTagging/h_calculable")
-    hfakeable = f1.Get("testTopTagging/h_fakable")
+    f1 = r.TFile("../../StopLooper/output/temp/TTJets_v25_4.root")
+    f2 = f1
+    hgood = f1.Get("testTopTagging/h_lead_topcand_finedisc")
+    hfake = f1.Get("testTopTagging/h_lead_fakecand_finedisc")
 
-    hgood = f1.Get("testTopTagging/h_topcand_finedisc")
-    hfake = f1.Get("testTopTagging/h_fakecand_finedisc")
-
-    h_tageffs = r.TH1F("h_tageffs", ";disc;portion", 1100, -1.1, 1.1)
-    h_fkrates = r.TH1F("h_fakerates", ";disc;portion", 1100, -1.1, 1.1)
+    if not hgood: print "Cannot find hgood!"
+    if not hfake: print "Cannot find hfake!"
 
     ngood = hgood.Integral()
     nfake = hfake.Integral()
 
-    # ngood = hcalcable.Integral()
-    # nfake = hfakeable.Integral()
+    lst_tageff, lst_fkrate, lst_disc = makeROClist(hgood, hfake)
 
-    lst_tageff = np.array([], dtype=float)
-    lst_fkrate = np.array([], dtype=float)
-
-    edgebin = hgood.FindBin(1)
-    print "edgebin is", edgebin
-    for i in range(1, 601):
-        ibin = edgebin - i
-        disc = 1 - i / 500.0
-        
-        tageff = hgood.Integral(ibin, -1) / ngood
-        fkrate = hfake.Integral(ibin, -1) / nfake
-
-        h_tageffs.Fill(ibin, tageff)
-        h_fkrates.Fill(ibin, fkrate)
-
-        lst_tageff = np.append(lst_tageff, tageff)
-        lst_fkrate = np.append(lst_fkrate, fkrate)
-        
-        if disc == 0.98 or disc == 0.9:
-            print disc, tageff, fkrate
+    for i, disc in enumerate(lst_disc):
+        if disc == 0.98 or disc == 0.9 or disc == 0.5:
+            print disc, lst_tageff[i], lst_fkrate[i]
         if disc == 0.98 :
-            p98_tageff = np.array([tageff], dtype=float)
-            p98_fkrate = np.array([fkrate], dtype=float)
+            p98_tageff = np.array([lst_tageff[i]], dtype=float)
+            p98_fkrate = np.array([lst_fkrate[i]], dtype=float)
+
+    lst_sigyld, lst_bkgyld, lst_disc = makeROClist(hgood, hfake, raw_yields=True)
+    # lst_sigyld /= 52.
+    print lst_sigyld[-1], lst_bkgyld[-1]
+    lst_sigyld *= 34.03 / lst_sigyld[-1]
+    lst_bkgyld *= 825.9 / lst_bkgyld[-1]
+    print lst_sigyld[-1], lst_bkgyld[-1]
+
+    lst_StoSnB = np.array([lst_sigyld[i] / sqrt(lst_sigyld[i]+lst_bkgyld[i]) for i in range(len(lst_sigyld))], dtype=float)
+    lst_StoB = np.array([lst_sigyld[i] / sqrt(lst_bkgyld[i]) for i in range(len(lst_sigyld))], dtype=float)
+    # print lst_sigyld, lst_bkgyld, lst_disc, lst_StoSnB
 
     groc = r.TGraph(lst_tageff.size, lst_tageff, lst_fkrate)
+    gstob = r.TGraph(lst_disc.size, lst_disc, lst_StoSnB)
 
-    print p98_tageff, p98_fkrate
-    gp98 = r.TGraph(p98_tageff.size, p98_tageff, p98_fkrate)
+    c1 = r.TCanvas("c1", "c1", 800, 600)
 
-    c1 = r.TCanvas("c1", "c1", 600, 400)
+    gstob.SetTitle("Graph for signal significane (S/#sqrt{S+B}) vs disc")
+    gstob.GetXaxis().SetTitle("top discriminator")
+    gstob.GetYaxis().SetTitle("S / #sqrt{S+B}")
+    gstob.Draw()
+
+    c1.Print("stob_srbase_toptag.pdf")
+
+    c1.Clear()
 
     groc.SetTitle("Graph for fake rate vs tagging efficiency")
-    groc.GetXaxis().SetTitle("tag eff.")
+    groc.GetXaxis().SetTitle("tagging eff.")
     groc.GetYaxis().SetTitle("fake rate")
+
+    # groc.SetTitle("Graph for background vs signal efficiency")
+    # groc.GetXaxis().SetTitle("sig eff.")
+    # groc.GetYaxis().SetTitle("bkg eff.")
+
     groc.Draw()
 
-    gp98.SetMarkerSize(2)
-    gp98.SetMarkerColor(r.kRed)
-    gp98.SetMarkerStyle(8)
-    gp98.Draw("same")
-
-    c1.Print("roc_calcable.pdf")
+    c1.Print("roc_srbase_toptag.pdf")
 
     # c1.Clear()
 
-    f2 = r.TFile("../StopLooper/output/temp_v26_2/TTJets.root")
+    hgood = f1.Get("testTopTagging/h_chi2_disc1")
+    hfake = f2.Get("testTopTagging/h_chi2fake_disc1")
 
-    hgood = f2.Get("testTopTagging/h_chi2_disc2")
-    hfake = f2.Get("testTopTagging/h_chi2fake_disc2")
+    # hgood = f1.Get("srbase/h_chi2_disc")
+    # hfake = f2.Get("srbase/h_chi2_disc")
+
+    if not hgood: print "Cannot find hgood!"
+    if not hfake: print "Cannot find hfake!"
 
     lst_eff, lst_fkr, _ = makeROClist(hgood, hfake)
 
     chi2roc = r.TGraph(lst_eff.size, lst_eff, lst_fkr)
     chi2roc.SetLineColor(r.kBlue)
-    chi2roc.SetTitle("Graph for fake rate vs tagging efficiency for Chi2")
+    chi2roc.SetTitle("Graph for fake rate vs tagging efficiency")
     chi2roc.GetXaxis().SetTitle("tag eff.")
     chi2roc.GetYaxis().SetTitle("fake rate")
     chi2roc.Draw("same")
@@ -121,4 +138,4 @@ if __name__ == "__main__":
     leg.AddEntry(chi2roc, "had chi2")
     leg.Draw()
 
-    c1.Print("roc_chi2.pdf")
+    c1.Print("roc_srbase_chi2.pdf")

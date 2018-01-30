@@ -126,12 +126,12 @@ def printYieldAndErrComparisonTable(srNames, yield_org, yield_wtc, yerr_org, yer
         print '| {:^13s}'.format(sr),
     print '|\n |  original',
     for i in range(len(srNames)):
-        print '| {:6.1f}'.format(yield_org[i]), '± {:<4.1f}'.format(yerr_org[i]),
+        print '| {:6.2f}'.format(yield_org[i]), '± {:<4.2f}'.format(yerr_org[i]),
         hden.SetBinContent(i+1, yield_org[i])
         hden.SetBinError(i+1, yerr_org[i])
     print '|\n | w/ toptag',
     for i in range(len(srNames)):
-        print '| {:6.1f}'.format(yield_wtc[i]), '± {:<4.1f}'.format(yerr_wtc[i]),
+        print '| {:6.2f}'.format(yield_wtc[i]), '± {:<4.2f}'.format(yerr_wtc[i]),
         hnum.SetBinContent(i+1, yield_wtc[i])
         hnum.SetBinError(i+1, yerr_wtc[i])
     print '|\n |     ratio',
@@ -141,7 +141,7 @@ def printYieldAndErrComparisonTable(srNames, yield_org, yield_wtc, yerr_org, yer
             print '| {:^6s} ± {:^4s}'.format('--', '--'),
         else:
             # p = yield_wtc[i] / yield_org[i]
-            # print '| {:5.1f}%'.format(100. * p), '± {:3.1f}%'.format(100. * sqrt(p * (1-p) / yield_org[i])),
+            # print '| {:5.2f}%'.format(100. * p), '± {:3.2f}%'.format(100. * sqrt(p * (1-p) / yield_org[i])),
             print '| {:5.1f}%'.format(100. * heff.GetEfficiency(i+1)), '± {:<3.1f}%'.format(100. * heff.GetEfficiencyErrorUp(i+1)),
     print '|\n |-----------------------------------------------------------------------------------------'
 
@@ -166,34 +166,17 @@ if __name__ == '__main__':
 
     r.gROOT.SetBatch(1)
 
-    # f1 = r.TFile('../StopLooper/output/temp/TTJets.root')
-    # f2 = r.TFile('../StopLooper/output/temp/SMS_T2tt_mStop-400to1200.root')
-    # # f2 = r.TFile('../StopLooper/output/temp_v26_1/T2tt_btag20.root')
-    # f4 = r.TFile('../StopLooper/output/temp_v26_1/TTJets.root')
-    # f2 = r.TFile('../StopLooper/output/temp_v26_1/ttbar.root')
-    # f3 = r.TFile('../StopLooper/output/temp_v26_1/SMS_T2tt_mStop-400to1200.root')
-
     f1 = r.TFile('../StopLooper/output/samples2016/data_2016.root')
     f2 = r.TFile('../StopLooper/output/samples2016/ttbar_powheg.root')
     f3 = r.TFile('../StopLooper/output/samples2016/Signal_T2tt_mStop_400to1200.root')
     f4 = r.TFile('../StopLooper/output/samples2016/ttbar_diLept.root')
 
-    # f4 = r.TFile('../StopLooper/output/temp/TTJets.root')
-    # f2 = r.TFile('../StopLooper/output/temp_v26_2/ttbar.root')
-    # f3 = r.TFile('../StopLooper/output/temp_v26_2/SMS_T2tt_mStop-400to1200.root')
-    # f1 = r.TFile('../StopLooper/output/data2016/all_data_2016.root')
     f1 = r.TFile('../StopLooper/output/temp8/all_mc_2016.root')
-    # f1 = r.TFile('../StopLooper/output/temp8/data_single_lepton_met.root')
-    # f1 = r.TFile('../StopLooper/output/temp/data_2016.root')
+
+    f2 = r.TFile('../StopLooper/output/temp9/allBkg_25ns.root')
+    f3 = r.TFile('../StopLooper/output/temp9/SMS_T2tt_mStop_400to1200.root')
 
     # printCutflowNumbers(f1, 'testCutflow', 'cutflow1')
-    # printCutflowNumbers(f1, 'testCutflow', 'cutflow2')
-    # printCutflowNumbers(f1, 'testCutflow', 'cutflow3')
-
-    # printCutflowNumbers(f2, 'testCutflow', 'cutflow1')
-    # printCutflowNumbers(f2, 'testCutflow', 'cutflow2')
-    # printCutflowNumbers(f2, 'testCutflow', 'cutflow3')
-
 
     srNames = ['srbase', 'srA', 'srB', 'srC', 'srD', 'srE', 'srF', 'srG', 'srH', 'srI',]
 
@@ -203,20 +186,20 @@ if __name__ == '__main__':
     # # printYieldComparisonTable(srNames, y1_org, y1_wtc)
     # printYieldAndErrComparisonTable(srNames, y1_org, y1_wtc, ye1_org, ye1_wtc)
 
-    print '\n |-------------------------------- 2016 data ---------------------------------------------'
-    srNames = ['srA', 'srB', 'srC', 'srD', 'srE', 'srF', 'srG', 'srH', 'srI',]
-    y1_org, y1_wtc = getYieldsForAllSRs(f1, srNames)
-    printAllSRYieldTable(srNames, y1_org)
+    # print '\n |-------------------------------- 2016 data ---------------------------------------------'
+    # srNames = ['srA', 'srB', 'srC', 'srD', 'srE', 'srF', 'srG', 'srH', 'srI',]
+    # y1_org, y1_wtc = getYieldsForAllSRs(f1, srNames)
+    # printAllSRYieldTable(srNames, y1_org)
 
-    print '\n |-------------------------------- CR0b ---------------------------------------------'
-    srNames = ['cr0bA', 'cr0bB', 'cr0bC', 'cr0bD', 'cr0bE', 'cr0bF', 'cr0bG', 'cr0bH', 'cr0bI',]
-    y1_org, y1_wtc = getYieldsForAllSRs(f1, srNames)
-    printAllSRYieldTable(srNames, y1_org)
+    # print '\n |-------------------------------- CR0b ---------------------------------------------'
+    # srNames = ['cr0bA', 'cr0bB', 'cr0bC', 'cr0bD', 'cr0bE', 'cr0bF', 'cr0bG', 'cr0bH', 'cr0bI',]
+    # y1_org, y1_wtc = getYieldsForAllSRs(f1, srNames)
+    # printAllSRYieldTable(srNames, y1_org)
 
-    print '\n |-------------------------------- CR2l ---------------------------------------------'
-    srNames = ['cr2lA', 'cr2lB', 'cr2lC', 'cr2lD', 'cr2lE', 'cr2lF', 'cr2lG', 'cr2lH', 'cr2lI',]
-    y1_org, y1_wtc = getYieldsForAllSRs(f1, srNames)
-    printAllSRYieldTable(srNames, y1_org)
+    # print '\n |-------------------------------- CR2l ---------------------------------------------'
+    # srNames = ['cr2lA', 'cr2lB', 'cr2lC', 'cr2lD', 'cr2lE', 'cr2lF', 'cr2lG', 'cr2lH', 'cr2lI',]
+    # y1_org, y1_wtc = getYieldsForAllSRs(f1, srNames)
+    # printAllSRYieldTable(srNames, y1_org)
 
     # print '\n |-------------------------------- 2016 ttbar_powheg ---------------------------------------------'
     # y2_org, y2_wtc = getYieldsForAllSRs(f2, srNames)
@@ -240,7 +223,7 @@ if __name__ == '__main__':
 
     # print '\n +-------------------------------------------------------------'
 
-    # srNames = ['srC', 'srD', 'srE', 'srF', 'srG', 'srH', 'srI',]
+    srNames = ['srC', 'srD', 'srE', 'srF', 'srG', 'srH', 'srI',]
 
     # print '\n |----------------------------------- ttbar_powheg ----------------------------------------'
     # y2_org, y2_wtc = getYieldsFromSRs(f2, srNames)
@@ -252,25 +235,40 @@ if __name__ == '__main__':
     # # ye4_org, ye4_wtc = getYErrsFromSRs(f4, srNames)
     # # printYieldAndErrComparisonTable(srNames, y4_org, y4_wtc, ye4_org, ye4_wtc)
 
-    # print '\n |-------------------------------- mStop 600, mLSP 450 ------------------------------------'
-    # sy1_org, sy1_wtc = getYieldsFromSRs(f3, srNames, '_600_450')
-    # ye1_org, ye1_wtc = getYErrsFromSRs(f3, srNames, '_600_450')
-    # printYieldAndErrComparisonTable(srNames, sy1_org, sy1_wtc, ye1_org, ye1_wtc)
+    print '\n |----------------------------------- allBkg_25ns ----------------------------------------'
+    y2_org, y2_wtc = getYieldsFromSRs(f2, srNames)
+    ye2_org, ye2_wtc = getYErrsFromSRs(f2, srNames)
+    printYieldAndErrComparisonTable(srNames, y2_org, y2_wtc, ye2_org, ye2_wtc)
 
-    # print '\n |-------------------------------- mStop 800, mLSP 200 ------------------------------------'
-    # sy2_org, sy2_wtc = getYieldsFromSRs(f3, srNames, '_800_200')
-    # ye2_org, ye2_wtc = getYErrsFromSRs(f3, srNames, '_800_200')
-    # printYieldAndErrComparisonTable(srNames, sy2_org, sy2_wtc, ye2_org, ye2_wtc)
+    print '\n |-------------------------------- mStop 600, mLSP 450 ------------------------------------'
+    sy1_org, sy1_wtc = getYieldsFromSRs(f3, srNames, '_600_450')
+    ye1_org, ye1_wtc = getYErrsFromSRs(f3, srNames, '_600_450')
+    printYieldAndErrComparisonTable(srNames, sy1_org, sy1_wtc, ye1_org, ye1_wtc)
 
-    # print '\n |-------------------------------- mStop 800, mLSP 600 ------------------------------------'
-    # sy3_org, sy3_wtc = getYieldsFromSRs(f3, srNames, '_800_600')
-    # ye3_org, ye3_wtc = getYErrsFromSRs(f3, srNames, '_800_600')
-    # printYieldAndErrComparisonTable(srNames, sy3_org, sy3_wtc, ye3_org, ye3_wtc)
+    print '\n |-------------------------------- mStop 800, mLSP 400 ------------------------------------'
+    sy2_org, sy2_wtc = getYieldsFromSRs(f3, srNames, '_800_400')
+    ye2_org, ye2_wtc = getYErrsFromSRs(f3, srNames, '_800_400')
+    printYieldAndErrComparisonTable(srNames, sy2_org, sy2_wtc, ye2_org, ye2_wtc)
 
-    # print '\n |-------------------------------- mStop 900, mLSP 300 ------------------------------------'
-    # sy4_org, sy4_wtc = getYieldsFromSRs(f3, srNames, '_900_300')
-    # ye4_org, ye4_wtc = getYErrsFromSRs(f3, srNames, '_900_300')
-    # printYieldAndErrComparisonTable(srNames, sy4_org, sy4_wtc, ye4_org, ye4_wtc)
+    print '\n |-------------------------------- mStop 800, mLSP 500 ------------------------------------'
+    sy3_org, sy3_wtc = getYieldsFromSRs(f3, srNames, '_800_500')
+    ye3_org, ye3_wtc = getYErrsFromSRs(f3, srNames, '_800_500')
+    printYieldAndErrComparisonTable(srNames, sy3_org, sy3_wtc, ye3_org, ye3_wtc)
+
+    print '\n |-------------------------------- mStop 800, mLSP 600 ------------------------------------'
+    sy3_org, sy3_wtc = getYieldsFromSRs(f3, srNames, '_800_600')
+    ye3_org, ye3_wtc = getYErrsFromSRs(f3, srNames, '_800_600')
+    printYieldAndErrComparisonTable(srNames, sy3_org, sy3_wtc, ye3_org, ye3_wtc)
+
+    print '\n |-------------------------------- mStop 900, mLSP 600 ------------------------------------'
+    sy4_org, sy4_wtc = getYieldsFromSRs(f3, srNames, '_900_600')
+    ye4_org, ye4_wtc = getYErrsFromSRs(f3, srNames, '_900_600')
+    printYieldAndErrComparisonTable(srNames, sy4_org, sy4_wtc, ye4_org, ye4_wtc)
+
+    print '\n |-------------------------------- mStop 900, mLSP 700 ------------------------------------'
+    sy4_org, sy4_wtc = getYieldsFromSRs(f3, srNames, '_900_700')
+    ye4_org, ye4_wtc = getYErrsFromSRs(f3, srNames, '_900_700')
+    printYieldAndErrComparisonTable(srNames, sy4_org, sy4_wtc, ye4_org, ye4_wtc)
 
     # print '\n |-------------------------------- mStop 1200, mLSP 200 -----------------------------------'
     # sy5_org, sy5_wtc = getYieldsFromSRs(f3, srNames, '_1200_200')
