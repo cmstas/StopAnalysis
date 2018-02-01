@@ -431,8 +431,9 @@ evtWgtInfo::evtWgtInfo() {
   h_recoEff_tau         = nullptr;
 
   // Utilty Var Constants
-  lumi = 35.867;         // 2016 lumi
+  // lumi = 35.867;         // 2016 lumi
   // lumi = 41.96;         // 2017 lumi  <-- todo: need clever way of doing this / more easily configurable
+  lumi = 120;             // projected 2018 lumi
   lumi_err = lumi*0.026; // 2.6% uncertainty for Moriond17
 
   // Initialize event weights and related variables

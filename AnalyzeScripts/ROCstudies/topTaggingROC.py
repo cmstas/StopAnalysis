@@ -31,6 +31,7 @@ def makeROClist(hgood, hfake, *args, **kwargs):
 
     for i in range(1, stopbin):
         ibin = startbin - i
+        if ibin < 0: break
         disc = 1 - i / bindiv
 
         tageff = hgood.Integral(ibin, -1) / ngood
@@ -44,6 +45,11 @@ def makeROClist(hgood, hfake, *args, **kwargs):
 
     return lst_eff, lst_fkr, lst_tpt
 
+
+def StoBErr(s, b, se, be):
+    v = (s+2*b)**2 * se**2 + s**2 * be**2
+    v /= 4*(s+b)**3
+    return sqrt(v)
 
 if __name__ == "__main__":
 
@@ -89,6 +95,10 @@ if __name__ == "__main__":
 
     groc = r.TGraph(lst_tageff.size, lst_tageff, lst_fkrate)
     gstob = r.TGraph(lst_disc.size, lst_disc, lst_StoSnB)
+    print lst_disc[-100:]
+    # print lst_sigyld[-100:]
+    # print lst_bkgyld[-100:]
+    # print lst_StoSnB[-100:]
 
     c1 = r.TCanvas("c1", "c1", 800, 600)
 

@@ -157,7 +157,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
 
   // Full 2017 dataset json, 41.96/fb
   // const char* json_file = "../StopBabyMaker/json_files/Cert_294927-306462_13TeV_PromptReco_Collisions17_JSON_snt.txt";
-  const float kLumi = 41.96;
+  const float kLumi = 120;
 
   // Combined 2016 and 2017 json,
   // const char* json_file = "../StopCORE/inputs/json_files/Cert_271036-301141_13TeV_Combined1617_JSON_snt.txt";
@@ -293,6 +293,9 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
         // if (massdiff < 200 || massdiff > 300 || mass_lsp() < 400 || mass_stop() > 900) continue;
         // plot2D("h_T2tt_masspts", mass_stop(), mass_lsp() , evtweight_, testVec[1].histMap, ";M(stop) [GeV]; M(lsp) [GeV]", 100, 300, 1300, 80, 0, 800);
       }
+
+      // Only events nupt < 200 for WNJetsToLNu samples
+      if (dsname.Contains("JetsToLNu") && !dsname.Contains("NuPt-200") && nupt() > 200) continue;
 
       ++nPassedTotal;
 
