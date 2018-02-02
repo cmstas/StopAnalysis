@@ -71,9 +71,9 @@ declare -a Samples=(all_2016)
 # Samples+=( W1Jets W2Jets W3Jets W4JetsToLNu_madgraph_pythia8_25ns DYJets )            # Vjets : Wjets + DY
 # Samples+=( ttWJets ttZJets WW WZ ZZ )                      # rare  : ttV + diboson
 
-# INDIR=/nfs-7/userdata/sicheng/stopbabies/merged_v25_9
-INDIR=/nfs-7/userdata/sicheng/stopbabies/skimmed_v25_9
-OUTDIR=output/temp9
+INDIR=/nfs-7/userdata/sicheng/stopbabies/merged_v25_9
+# INDIR=/nfs-7/userdata/sicheng/stopbabies/skimmed_v25_9
+OUTDIR=output/temp11
 
 mkdir -p ${OUTDIR}
 mkdir -p ${LOGDIR}
@@ -92,7 +92,7 @@ done
 
 # 2016 signal
 INDIR=/nfs-7/userdata/sicheng/stopbabies/skimmed_v25_9
-OUTDIR=output/temp9
+OUTDIR=output/temp12
 
 mkdir -p ${OUTDIR}
 mkdir -p ${LOGDIR}
@@ -113,12 +113,17 @@ done
 
 echo -e 'All jobs are done!\a'
 
-pushd output/temp9
-hadd -f ttbar_25ns.root    ttbar_diLept*.root ttbar_singleLept*.root > /dev/null
-hadd -f singleT_25ns.root  t_tW_*.root  > /dev/null
-hadd -f Vjets_25ns.root    W1Jets*.root W2Jets*.root W3Jets*.root W4Jets*.root > /dev/null
-hadd -f rare_25ns.root     TTZ*.root WZ*.root  > /dev/null
-hadd -f allBkg_25ns.root   ttbar_25ns.root singleT_25ns.root Vjets_25ns.root rare_25ns.root > /dev/null
+# pushd output/temp9
+# hadd -f ttbar_25ns.root    ttbar_diLept*.root ttbar_singleLept*.root > /dev/null
+# hadd -f singleT_25ns.root  t_tW_*.root  > /dev/null
+# hadd -f Vjets_25ns.root    W1Jets*.root W2Jets*.root W3Jets*.root W4Jets*.root > /dev/null
+# hadd -f rare_25ns.root     TTZ*.root WZ*.root  > /dev/null
+# hadd -f allBkg_25ns.root   ttbar_25ns.root singleT_25ns.root Vjets_25ns.root rare_25ns.root > /dev/null
+# popd > /dev/null
+
+pushd output/temp11
+cp ttbar_diLept.root ttbar_2lep.root
+hadd -f ttbar_1lep.root  ttbar_singleLept*.root > /dev/null
 popd > /dev/null
 
 # Special operations on output files

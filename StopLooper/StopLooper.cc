@@ -285,13 +285,14 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
       // For testing on only subset of mass points
       TString dsname = dataset();
       if (dsname.Contains("T2tt")) {
-        auto checkMassPt = [&](double mstop, double mlsp) { return (mass_stop() == mstop) && (mass_lsp() == mlsp); };
-        if (!checkMassPt(600, 400) && !checkMassPt(650, 400) && !checkMassPt(800, 400) && !checkMassPt(800, 600) && !checkMassPt(800, 500) &&
-            !checkMassPt(700, 400) && !checkMassPt(700, 450) && !checkMassPt(700, 500) && !checkMassPt(900, 700) && !checkMassPt(900, 600))
-          continue;
-        // float massdiff = mass_stop() - mass_lsp();
+        // auto checkMassPt = [&](double mstop, double mlsp) { return (mass_stop() == mstop) && (mass_lsp() == mlsp); };
+        // if (!checkMassPt(600, 400) && !checkMassPt(650, 400) && !checkMassPt(800, 400) && !checkMassPt(800, 600) && !checkMassPt(800, 500) &&
+        //     !checkMassPt(700, 400) && !checkMassPt(700, 450) && !checkMassPt(700, 500) && !checkMassPt(900, 700) && !checkMassPt(900, 600))
+        //   continue;
+        float massdiff = mass_stop() - mass_lsp();
         // if (massdiff < 200 || massdiff > 300 || mass_lsp() < 400 || mass_stop() > 900) continue;
-        // plot2D("h_T2tt_masspts", mass_stop(), mass_lsp() , evtweight_, testVec[1].histMap, ";M(stop) [GeV]; M(lsp) [GeV]", 100, 300, 1300, 80, 0, 800);
+        if ((massdiff < 400 || mass_lsp() < 400) && mass_stop() < 1200) continue;
+        plot2D("h_T2tt_masspts", mass_stop(), mass_lsp() , evtweight_, testVec[1].histMap, ";M(stop) [GeV]; M(lsp) [GeV]", 100, 300, 1300, 80, 0, 800);
       }
 
       // Only events nupt < 200 for WNJetsToLNu samples
@@ -419,13 +420,13 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
         }
 
         // Filling histograms for SR
-        fillHistosForSR(suffix);
+        // fillHistosForSR(suffix);
 
         // testCutFlowHistos(testVec[1]);
 
         // Temporary variable for CR0b before better solution to express this
         values_["is0b"] = (values_["nbjet"] == 0 || (values_["nbjet"] >= 1 && values_["ntbtag"] == 0 && values_["mlb"] > 175.0));
-        fillHistosForCR0b(suffix);
+        // fillHistosForCR0b(suffix);
 
         values_["nlep_rl"] = (ngoodleps() == 1 && nvetoleps() >= 2 && lep2_p4().Pt() > 10)? 2 : ngoodleps();
         values_["osdilep"] = lep1_pdgid() == -lep2_pdgid();
@@ -454,8 +455,8 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
           values_["dphilmet_rl"] = lep1_dphiMET_rl_jdown();
           values_["tmod_rl"] = topnessMod_rl_jdown();
         }
-        fillHistosForCR2l(suffix);
-        fillHistosForCRemu(suffix);
+        // fillHistosForCR2l(suffix);
+        // fillHistosForCRemu(suffix);
       }
 
       // if (event > 10) break;  // for debugging purpose
@@ -613,7 +614,7 @@ void StopLooper::fillHistosForSR(string suf) {
     };
     // if (sr.GetName().find("base") != string::npos) // only plot for base regions
     fillKineHists(suf);
-    if (is_signal_) fillKineHists("_"+to_string((int)mass_stop())+"_"+to_string((int)mass_lsp()) + suf);
+    // if (is_signal_) fillKineHists("_"+to_string((int)mass_stop())+"_"+to_string((int)mass_lsp()) + suf);
 
     // Re-using fillKineHists with different suffix for extra/checking categories
     // if ( abs(lep1_pdgid()) == 11 )
@@ -625,6 +626,16 @@ void StopLooper::fillHistosForSR(string suf) {
       fillYieldHistos(sr, values_["met"], "_wtc"+suf);
       // fillKineHists("_wtc"+suf);
     }
+    if (doTopTagging && ak8pfjets_p4().size() > 0) {
+      for (auto disc : ak8pfjets_deepdisc_top()) {
+        if (disc > 0.9) {
+          fillYieldHistos(sr, values_["met"], "_wdt"+suf);
+          break;
+        }
+      }
+      // fillKineHists("_wtc"+suf);
+    }
+
   }
   // SRVec[0].PassesSelectionPrintFirstFail(values_);
 }
@@ -811,62 +822,57 @@ void StopLooper::testTopTaggingEffficiency(SR& sr) {
   // Temporary for consistency accross samples
   if (pfmet() < 100 && pfmet_rl() < 100) return;
 
+  int n4jets = (ngoodbtags() > 0 && ngoodjets() > 3);
+
   // First need to determine how many gen tops does hadronic decay
   int nHadDecayTops = 2 - gen_nfromtleps_();  // 2 gentops for sure <-- checked
 
   int ntopcands = topcands_disc().size();
+  float lead_disc = (ntopcands > 0)? topcands_disc().at(0) : -1.1;
+
+  // Hadronic chi2 for comparison
+  // Define a disc variable that look similar to resolve top discriminator
+  float chi2_disc = -log(hadronic_top_chi2()) / 8;
+  if (fabs(chi2_disc) >= 1.0) chi2_disc = std::copysign(0.99999, chi2_disc);
+  float chi2_disc2 = std::copysign(pow(fabs(chi2_disc), 0.1), chi2_disc);
+
+  float lead_ak8_pt = 0;
+  float lead_deepdisc = -0.1;
+  float lead_deepdisc_W = -0.1;
+  float lead_bindisc = -0.1;
+  float lead_bindisc_W = -0.1;
+  float lead_tridisc = -0.1;
+  float lead_tridisc_W = -0.1;
+
+  for (size_t iak8 = 0; iak8 < ak8pfjets_p4().size(); ++iak8) {
+    float pt = ak8pfjets_p4()[iak8].pt();
+    float disc_top = ak8pfjets_deepdisc_top().at(iak8);
+    float disc_W = ak8pfjets_deepdisc_w().at(iak8);
+    float disc_qcd = ak8pfjets_deepdisc_qcd().at(iak8);
+
+    float bindisc = disc_top / (disc_top + disc_qcd);
+    float bindisc_W = disc_W / (disc_W + disc_qcd);
+
+    float den_tri = disc_top + disc_W + disc_qcd;
+    float tridisc = disc_top / den_tri;
+    float tridisc_W = disc_W / den_tri;
+
+    if (pt > lead_ak8_pt) lead_ak8_pt = pt;
+    if (disc_top > lead_deepdisc) lead_deepdisc = disc_top;
+    if (disc_W > lead_deepdisc_W) lead_deepdisc_W = disc_W;
+    if (bindisc > lead_bindisc) lead_bindisc = bindisc;
+    if (bindisc_W > lead_bindisc_W) lead_bindisc_W = bindisc_W;
+    if (tridisc > lead_tridisc) lead_tridisc = tridisc;
+    if (tridisc_W > lead_tridisc_W) lead_tridisc_W = tridisc_W;
+  }
+
+  plot1D("h_lead_deepdisc_W", lead_deepdisc_W, evtweight_, sr.histMap, ";lead AK8 deepdisc W", 120, -0.1, 1.1);
+  plot1D("h_lead_bindisc_W", lead_bindisc_W, evtweight_, sr.histMap, ";lead AK8 bindisc W", 120, -0.1, 1.1);
+  plot1D("h_lead_tridisc_W", lead_tridisc_W, evtweight_, sr.histMap, ";lead AK8 bindisc W", 120, -0.1, 1.1);
+
   // Divide the events into tt->1l and tt->2l
-
-  int calculable = (ngoodbtags() > 0 && ngoodjets() > 2);
-  calculable += (ngoodjets() > 5);
-  int n4jets = (ngoodbtags() > 0 && ngoodjets() > 3);
-
   if (nHadDecayTops == 1) {
-    plot1D("h_calculable", calculable, evtweight_, sr.histMap, ";N(events)", 4, 0, 4);
-    plot1D("h_n4jets", n4jets, evtweight_, sr.histMap, ";N(4j events)", 4, 0, 4);
-    if (n4jets == 0) return;
-
-    // Hadronic chi2 for comparison
-    /// Define a disc variable that look similar
-    float chi2_disc = -log(hadronic_top_chi2()) / 8;
-    if (fabs(chi2_disc) >= 1.0) chi2_disc = std::copysign(0.99999, chi2_disc);
-    plot1D("h_chi2_disc1", chi2_disc, evtweight_, sr.histMap, ";discriminator", 220, -1.1, 1.1);
-    chi2_disc = std::copysign(pow(fabs(chi2_disc), 0.1), chi2_disc);
-    plot1D("h_chi2_disc2", chi2_disc, evtweight_, sr.histMap, ";discriminator", 220, -1.1, 1.1);
-
-    float ratio_ntcandvscalable;
-    if (calculable != 0) ratio_ntcandvscalable = (float) topcands_disc().size() / calculable;
-    else ratio_ntcandvscalable = (ntopcands == 0)? -1/12 : 2.5;
-    plot1D("h_ratio_ntcandvscalable", ratio_ntcandvscalable, evtweight_, sr.histMap, ";N(topcand)", 7, -0.5, 3);
-
-    plot1D("h_ntopcand_raw", ntopcands, evtweight_, sr.histMap, ";N(topcand)", 4, 0, 4);
-    if (ntopcands > 0) {
-      plot1D("h_lead_topcand_disc", topcands_disc().at(0), evtweight_, sr.histMap, ";lead topcand discriminator", 110, -1.1, 1.1);
-      plot1D("h_lead_topcand_finedisc", topcands_disc().at(0), evtweight_, sr.histMap, ";lead topcand discriminator", 1100, -1.1, 1.1);
-    } else {
-      plot1D("h_lead_topcand_disc", -1.1, evtweight_, sr.histMap, ";lead topcand discriminator", 110, -1.1, 1.1);
-      plot1D("h_lead_topcand_finedisc", -1.1, evtweight_, sr.histMap, ";lead topcand discriminator", 1100, -1.1, 1.1);
-    }
-    int ntopcand0 = 0;
-    int ntopcandp5 = 0;
-    int ntopcandp9 = 0;
-    int ntopcandp98 = 0;
-    for (float disc : topcands_disc()) {
-      plot1D("h_topcand_disc", disc, evtweight_, sr.histMap, ";discriminator", 110, -1.1, 1.1);
-      plot1D("h_topcand_finedisc", disc, evtweight_, sr.histMap, ";discriminator", 1100, -1.1, 1.1);
-      if (disc > 0) ntopcand0++;
-      if (disc > 0.5) ntopcandp5++;
-      if (disc > 0.9) ntopcandp9++;
-      if (disc > 0.98) ntopcandp98++;
-    }
-    plot1D("h_ntopcandp9", ntopcandp9, evtweight_, sr.histMap, ";N(topcand)", 4, 0, 4);
-    plot2D("h2d_ntopcand0", ntopcands, ntopcand0, evtweight_, sr.histMap, ";N(all topcand);N(disc > 0)", 4, 0, 4, 4, 0, 4);
-    plot2D("h2d_ntopcandp5", ntopcands, ntopcandp5, evtweight_, sr.histMap, ";N(all topcand);N(disc > 0.5)", 4, 0, 4, 4, 0, 4);
-    plot2D("h2d_ntopcandp9", ntopcands, ntopcandp9, evtweight_, sr.histMap, ";N(all topcand);N(disc > 0.9)", 4, 0, 4, 4, 0, 4);
-    plot2D("h2d_ntopcandp98", ntopcands, ntopcandp98, evtweight_, sr.histMap, ";N(all topcand);N(disc > 0.98)", 4, 0, 4, 4, 0, 4);
-
-    // Find the daughters of the hadronically decayed top
-    /// First find the leptonic decayed top
+    // Locate leptonic top, will be used to find the hadronic top
     int leptonictopidx = -1;
     for (size_t l = 0; l < genleps_id().size(); ++l) {
       if (genleps_isfromt().at(l)) {
@@ -874,11 +880,27 @@ void StopLooper::testTopTaggingEffficiency(SR& sr) {
         break;
       }
     }
+    // Find the daughters of the hadronically decayed top
+    // int hadtopidx = -1;
     vector<int> jets_fromhadtop;
+    // vector<int> genq_fromhadtop;
+    vector<int> ak8s_fromhadtop;
     int bjetidx = -1;
+    int topak8idx = -1;
     for (size_t q = 0; q < genqs_id().size(); ++q) {
-      if (genqs_status().at(q) != 23 && genqs_status().at(q) != 1) continue;
-      if (genqs_isfromt().at(q) && genqs_motheridx().at(q) != leptonictopidx) {
+      if (!genqs_isLastCopy().at(q)) continue;
+      if (abs(genqs_id()[q]) == 6 && genqs__genpsidx().at(q) != leptonictopidx) {
+        float minDR = 0.8;
+        for (size_t j = 0; j < ak8pfjets_p4().size(); ++j) {
+          float dr = ROOT::Math::VectorUtil::DeltaR(ak8pfjets_p4().at(j), genqs_p4().at(q));
+          if (dr < minDR) {
+            minDR = dr;
+            topak8idx = j;
+          }
+        }
+      }
+      if (genqs_isfromt().at(q) && genqs_motheridx().at(q) != leptonictopidx && genqs_gmotheridx().at(q) != leptonictopidx) {
+        // genq_fromhadtop.push_back(q);
         int jetidx = -1;
         float minDR = 0.4;
         for (size_t j = 0; j < ak4pfjets_p4().size(); ++j) {
@@ -892,12 +914,63 @@ void StopLooper::testTopTaggingEffficiency(SR& sr) {
           jets_fromhadtop.push_back(jetidx);
           if (abs(genqs_id().at(q)) == 5) bjetidx = jetidx;
         }
+        if (topak8idx >= 0) {
+          float dr = ROOT::Math::VectorUtil::DeltaR(ak8pfjets_p4().at(topak8idx), genqs_p4().at(q));
+          if (dr > 0.8) topak8idx = -2;
+        }
       }
+    }
+
+    // Test plots for the merged tagger
+    if (lead_ak8_pt > 400) {
+      plot1D("h_nak8jets_1hadtop", ak8pfjets_p4().size(), evtweight_, sr.histMap, ";Number of AK8 jets", 7, 0, 7);
+      plot1D("h_lead_deepdisc_top", lead_deepdisc, evtweight_, sr.histMap, ";lead AK8 deepdisc top", 120, -0.1, 1.1);
+      plot1D("h_lead_bindisc_top", lead_bindisc, evtweight_, sr.histMap, ";lead AK8 bindisc top", 120, -0.1, 1.1);
+      plot1D("h_lead_tridisc_top", lead_tridisc, evtweight_, sr.histMap, ";lead AK8 tridisc top", 120, -0.1, 1.1);
+
+      plot2D("h2d_lead_deepdisc_topW", lead_deepdisc, lead_deepdisc_W, evtweight_, sr.histMap, ";lead AK8 deepdisc top; lead AK8 deepdisc W", 120, -0.1, 1.1, 120, -0.1, 1.1);
+      plot2D("h2d_lead_bindisc_topW", lead_bindisc, lead_bindisc_W, evtweight_, sr.histMap, ";lead AK8 bindisc top; lead AK8 bindisc W", 120, -0.1, 1.1, 120, -0.1, 1.1);
+    }
+
+    if (topak8idx >= 0) {
+      float truetop_deepdisc = ak8pfjets_deepdisc_top().at(topak8idx);
+      float truetop_bindisc = truetop_deepdisc / (truetop_deepdisc + ak8pfjets_deepdisc_qcd().at(topak8idx));
+      float truetop_tridisc = truetop_deepdisc / (truetop_deepdisc + ak8pfjets_deepdisc_qcd().at(topak8idx) + ak8pfjets_deepdisc_w().at(topak8idx));
+      plot1D("h_truth_deepdisc_top", truetop_deepdisc, evtweight_, sr.histMap, ";truth-matched AK8 deepdisc top", 120, -0.1, 1.1);
+      plot1D("h_truth_bindisc_top", truetop_bindisc, evtweight_, sr.histMap, ";truth-matched AK8 bindisc top", 120, -0.1, 1.1);
+      plot1D("h_truth_tridisc_top", truetop_tridisc, evtweight_, sr.histMap, ";truth-matched AK8 tridisc top", 120, -0.1, 1.1);
+
+      float truetop_deepdisc_W = ak8pfjets_deepdisc_w().at(topak8idx);
+      float truetop_bindisc_W = truetop_deepdisc_W / (truetop_deepdisc_W + ak8pfjets_deepdisc_qcd().at(topak8idx));
+      plot1D("h_truth_deepdisc_W", truetop_deepdisc_W, evtweight_, sr.histMap, ";truth-matched to top AK8 deepdisc W", 120, -0.1, 1.1);
+      plot1D("h_truth_bindisc_W", truetop_bindisc_W, evtweight_, sr.histMap, ";truth-matched to top AK8 bindisc W", 120, -0.1, 1.1);
+
+    } else if (topak8idx == -2) {
+      plot1D("h_missedsubjet_deepdisc", lead_deepdisc, evtweight_, sr.histMap, ";lead AK8 deepdisc top", 120, -0.1, 1.1);
+    } else {
+      plot1D("h_missed_deepdisc", lead_deepdisc, evtweight_, sr.histMap, ";lead AK8 deepdisc top", 120, -0.1, 1.1);
+    }
+
+    // Test plots for the resolved tagger
+    if (n4jets == 0) return;
+    plot1D("h_n4jets", n4jets, evtweight_, sr.histMap, ";N(4j events)", 4, 0, 4);
+
+    plot1D("h_chi2_disc1", chi2_disc, evtweight_, sr.histMap, ";discriminator", 220, -1.1, 1.1);
+    plot1D("h_chi2_disc2", chi2_disc2, evtweight_, sr.histMap, ";discriminator", 220, -1.1, 1.1);
+
+    plot1D("h_ntopcand_raw", ntopcands, evtweight_, sr.histMap, ";N(topcand)", 4, 0, 4);
+
+    plot1D("h_lead_topcand_disc", lead_disc, evtweight_, sr.histMap, ";lead topcand discriminator", 110, -1.1, 1.1);
+    plot1D("h_lead_topcand_finedisc", lead_disc, evtweight_, sr.histMap, ";lead topcand discriminator", 1100, -1.1, 1.1);
+
+    for (float disc : topcands_disc()) {
+      plot1D("h_all_topcand_disc", disc, evtweight_, sr.histMap, ";discriminator", 110, -1.1, 1.1);
+      plot1D("h_all_topcand_finedisc", disc, evtweight_, sr.histMap, ";discriminator", 1100, -1.1, 1.1);
     }
 
     if (jets_fromhadtop.size() < 3) {
       // Check all jets from top decay are within the list
-      if (ntopcandp98 < 1)
+      if (lead_disc < 0.98)
         plot1D("h_category", 0, evtweight_, sr.histMap, ";category for toptagging", 8, 0, 8);
       else
         plot1D("h_category", 1, evtweight_, sr.histMap, ";category for toptagging", 8, 0, 8);
@@ -912,7 +985,7 @@ void StopLooper::testTopTaggingEffficiency(SR& sr) {
 
       vector<int> jidxs = topcands_ak4idx().at(0);
       bool isRealTop = std::is_permutation(jidxs.begin(), jidxs.end(), jets_fromhadtop.begin());
-      if (ntopcandp98 < 1) {
+      if (lead_disc < 0.98) {
         if (jidxs.at(0) != bjetidx)
           plot1D("h_category", 2, evtweight_, sr.histMap, ";category for toptagging", 8, 0, 8);
         else if (isRealTop)
@@ -944,13 +1017,13 @@ void StopLooper::testTopTaggingEffficiency(SR& sr) {
           genqidx = i;
           minDR = dr;
         }
-        if (ntopcandp98 >= 1)
+        if (lead_disc >= 0.98)
           plot1D("h_nMatchedGenqs", nMatchedGenqs, evtweight_, sr.histMap, ";nMatchedGenqs", 4, 0, 4);
         if (nMatchedGenqs < 1) {
           isActualTopJet = false;
           break;
         }
-        if (ntopcandp98 >= 1)
+        if (lead_disc >= 0.98)
           plot1D("h_jqminDR", minDR, evtweight_, sr.histMap, ";min(#Delta R)", 41, 0, 0.41);
         if (!genqs_isfromt().at(genqidx)) {
           isActualTopJet = false;
@@ -972,57 +1045,52 @@ void StopLooper::testTopTaggingEffficiency(SR& sr) {
       if (midxs.size() != 3) isActualTopJet = false;
 
       plot1D("hden_disc", topcands_disc().at(0), evtweight_, sr.histMap, ";discriminator", 110, -1.1, 1.1);
-      if (ntopcandp98 >= 1) {
+      if (lead_disc >= 0.98) {
         plot1D("hden_pt", topcands_p4().at(0).pt(), evtweight_, sr.histMap, ";discriminator", 110, 0, 1100);
         plot1D("hden_gentoppt", gentoppt, evtweight_, sr.histMap, ";p_{T}(gen top)", 110, 0, 1100);
       }
       if (isActualTopJet) {
         plot1D("hnom_disc", topcands_disc().at(0), evtweight_, sr.histMap, ";topcand discriminator", 110, -1.1, 1.1);
-        if (ntopcandp98 >= 1) {
+        if (lead_disc >= 0.98) {
           plot1D("hnom_pt", topcands_p4().at(0).pt(), evtweight_, sr.histMap, ";topcand pt", 110, 0, 1100);
           plot1D("hnom_gentoppt", gentoppt, evtweight_, sr.histMap, ";p_{T}(gen top)", 110, 0, 1100);
         }
-      } else if (ntopcandp98 > 0) {
-
       }
     }
   }
   else if (nHadDecayTops == 0) {
-    plot1D("h_fakable", calculable, evtweight_, sr.histMap, ";N(events)", 4, 0, 4);
-    plot1D("h_fak4j", n4jets, evtweight_, sr.histMap, ";N(events)", 4, 0, 4);
-    if (n4jets == 0) return;
 
-    float chi2_disc = -log(hadronic_top_chi2()) / 8;
-    if (fabs(chi2_disc) >= 1.0) chi2_disc = std::copysign(0.99999, chi2_disc);
+    if (lead_ak8_pt > 400) {
+      plot1D("h_nak8jets_0hadtop", ak8pfjets_p4().size(), evtweight_, sr.histMap, ";Number of AK8 jets", 7, 0, 7);
+      plot1D("h_lead_deepdisc_faketop", lead_deepdisc, evtweight_, sr.histMap, ";lead AK8 deepdisc top", 120, -0.1, 1.1);
+      plot1D("h_lead_bindisc_faketop", lead_bindisc, evtweight_, sr.histMap, ";lead AK8 bindisc top", 120, -0.1, 1.1);
+      plot1D("h_lead_tridisc_faketop", lead_tridisc, evtweight_, sr.histMap, ";lead AK8 tridisc top", 120, -0.1, 1.1);
+    }
+
+    if (n4jets == 0) return;
+    plot1D("h_fak4j", n4jets, evtweight_, sr.histMap, ";N(events)", 4, 0, 4);
+
     plot1D("h_chi2fake_disc1", chi2_disc, evtweight_, sr.histMap, ";discriminator", 220, -1.1, 1.1);
-    chi2_disc = std::copysign(pow(fabs(chi2_disc), 0.1), chi2_disc);
-    plot1D("h_chi2fake_disc2", chi2_disc, evtweight_, sr.histMap, ";discriminator", 220, -1.1, 1.1);
+    plot1D("h_chi2fake_disc2", chi2_disc2, evtweight_, sr.histMap, ";discriminator", 220, -1.1, 1.1);
 
     plot1D("h_nfakecand_raw", ntopcands, evtweight_, sr.histMap, ";N(topcand)", 4, 0, 4);
 
-    if (ntopcands > 0) {
-      plot1D("h_lead_fakecand_disc", topcands_disc().at(0), evtweight_, sr.histMap, ";lead topcand discriminator", 110, -1.1, 1.1);
-      plot1D("h_lead_fakecand_finedisc", topcands_disc().at(0), evtweight_, sr.histMap, ";lead topcand discriminator", 1100, -1.1, 1.1);
-    } else {
-      plot1D("h_lead_fakecand_disc", -1.1, evtweight_, sr.histMap, ";lead topcand discriminator", 110, -1.1, 1.1);
-      plot1D("h_lead_fakecand_finedisc", -1.1, evtweight_, sr.histMap, ";lead topcand discriminator", 1100, -1.1, 1.1);
-    }
+    plot1D("h_lead_fakecand_disc", lead_disc, evtweight_, sr.histMap, ";lead topcand discriminator", 110, -1.1, 1.1);
+    plot1D("h_lead_fakecand_finedisc", lead_disc, evtweight_, sr.histMap, ";lead topcand discriminator", 1100, -1.1, 1.1);
 
-    if (ntopcands > 0) {
-      plot1D("hden_fakep5_pt", topcands_p4().at(0).pt(), evtweight_, sr.histMap, ";fakecand pt", 110, 0, 1100);
-      plot1D("hden_fakep9_pt", topcands_p4().at(0).pt(), evtweight_, sr.histMap, ";fakecand pt", 110, 0, 1100);
-      plot1D("hden_fakep98_pt", topcands_p4().at(0).pt(), evtweight_, sr.histMap, ";fakecand pt", 110, 0, 1100);
-      for (float disc : topcands_disc()) {
-        plot1D("h_fakecand_disc", disc, evtweight_, sr.histMap, ";discriminator", 110, -1.1, 1.1);
-        plot1D("h_fakecand_finedisc", disc, evtweight_, sr.histMap, ";discriminator", 1100, -1.1, 1.1);
-      }
-      if (topcands_disc().at(0) > 0.98)
-        plot1D("hnom_fakep98_pt", topcands_p4().at(0).pt(), evtweight_, sr.histMap, ";fakecand pt", 110, 0, 1100);
-      if (topcands_disc().at(0) > 0.9)
-        plot1D("hnom_fakep9_pt", topcands_p4().at(0).pt(), evtweight_, sr.histMap, ";fakecand pt", 110, 0, 1100);
-      if (topcands_disc().at(0) > 0.5)
-        plot1D("hnom_fakep5_pt", topcands_p4().at(0).pt(), evtweight_, sr.histMap, ";fakecand pt", 110, 0, 1100);
+    plot1D("hden_fakep5_pt", lead_disc, evtweight_, sr.histMap, ";fakecand pt", 110, 0, 1100);
+    plot1D("hden_fakep9_pt", lead_disc, evtweight_, sr.histMap, ";fakecand pt", 110, 0, 1100);
+    plot1D("hden_fakep98_pt", lead_disc, evtweight_, sr.histMap, ";fakecand pt", 110, 0, 1100);
+    for (float disc : topcands_disc()) {
+      plot1D("h_fakecand_disc", disc, evtweight_, sr.histMap, ";discriminator", 110, -1.1, 1.1);
+      plot1D("h_fakecand_finedisc", disc, evtweight_, sr.histMap, ";discriminator", 1100, -1.1, 1.1);
     }
+    if (lead_disc > 0.98)
+      plot1D("hnom_fakep98_pt", lead_disc, evtweight_, sr.histMap, ";fakecand pt", 110, 0, 1100);
+    if (lead_disc > 0.9)
+      plot1D("hnom_fakep9_pt", lead_disc, evtweight_, sr.histMap, ";fakecand pt", 110, 0, 1100);
+    if (lead_disc > 0.5)
+      plot1D("hnom_fakep5_pt", lead_disc, evtweight_, sr.histMap, ";fakecand pt", 110, 0, 1100);
   }
 }
 
