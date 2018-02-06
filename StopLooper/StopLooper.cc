@@ -59,7 +59,7 @@ const bool doNvtxReweight = false;
 // turn on to apply nTrueInt reweighting to MC
 const bool doNTrueIntReweight = true;
 // turn on top tagging studies, off for 2016 data/mc
-const bool doTopTagging = true;
+const bool doTopTagging = false;
 // turn on to apply json file to data
 const bool applyjson = true;
 // ignore scale1fb to run over test samples
@@ -84,9 +84,13 @@ void StopLooper::SetSignalRegions() {
   // CR2lVec = getStopControlRegionsDilepton();
   CRemuVec = getStopCrosscheckRegionsEMu();
 
-  SRVec = getStopSignalRegionsTopological();
-  CR0bVec = getStopControlRegionsNoBTagsTopological();
-  CR2lVec = getStopControlRegionsDileptonTopological();
+  // SRVec = getStopSignalRegionsTopological();
+  // CR0bVec = getStopControlRegionsNoBTagsTopological();
+  // CR2lVec = getStopControlRegionsDileptonTopological();
+
+  SRVec = getStopSignalRegionsBinInTopTag();
+  CR0bVec = getStopControlRegionsNoBTagsBinInTopTag();
+  CR2lVec = getStopControlRegionsDileptonBinInTopTag();
 
   if (verbose) {
     cout << "SRVec.size = " << SRVec.size() << ", including the following:" << endl;
@@ -289,9 +293,9 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
         // if (!checkMassPt(600, 400) && !checkMassPt(650, 400) && !checkMassPt(800, 400) && !checkMassPt(800, 600) && !checkMassPt(800, 500) &&
         //     !checkMassPt(700, 400) && !checkMassPt(700, 450) && !checkMassPt(700, 500) && !checkMassPt(900, 700) && !checkMassPt(900, 600))
         //   continue;
-        float massdiff = mass_stop() - mass_lsp();
-        // if (massdiff < 200 || massdiff > 300 || mass_lsp() < 400 || mass_stop() > 900) continue;
-        if ((massdiff < 400 || mass_lsp() < 400) && mass_stop() < 1200) continue;
+        // float massdiff = mass_stop() - mass_lsp();
+        // if (massdiff < 200 || massdiff > 400 || mass_lsp() < 400 || mass_stop() > 900) continue;
+        // // if (massdiff < 300 || (mass_lsp() < 400 && mass_stop() < 700)) continue;
         plot2D("h_T2tt_masspts", mass_stop(), mass_lsp() , evtweight_, testVec[1].histMap, ";M(stop) [GeV]; M(lsp) [GeV]", 100, 300, 1300, 80, 0, 800);
       }
 
@@ -340,6 +344,9 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
       values_["nvlep"] = nvetoleps();
       values_["lep1pt"] = lep1_p4().pt();
       values_["passvetos"] = PassTrackVeto() && PassTauVeto();
+
+      // For toptagging, add correct switch later
+      values_["leadtopdisc"] = (topcands_disc().size())? topcands_disc()[0] : -2;
 
       /// Values only for hist filling or testing
       values_["chi2"] = hadronic_top_chi2();
@@ -420,13 +427,13 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
         }
 
         // Filling histograms for SR
-        // fillHistosForSR(suffix);
+        fillHistosForSR(suffix);
 
         // testCutFlowHistos(testVec[1]);
 
         // Temporary variable for CR0b before better solution to express this
         values_["is0b"] = (values_["nbjet"] == 0 || (values_["nbjet"] >= 1 && values_["ntbtag"] == 0 && values_["mlb"] > 175.0));
-        // fillHistosForCR0b(suffix);
+        fillHistosForCR0b(suffix);
 
         values_["nlep_rl"] = (ngoodleps() == 1 && nvetoleps() >= 2 && lep2_p4().Pt() > 10)? 2 : ngoodleps();
         values_["osdilep"] = lep1_pdgid() == -lep2_pdgid();
@@ -455,7 +462,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
           values_["dphilmet_rl"] = lep1_dphiMET_rl_jdown();
           values_["tmod_rl"] = topnessMod_rl_jdown();
         }
-        // fillHistosForCR2l(suffix);
+        fillHistosForCR2l(suffix);
         // fillHistosForCRemu(suffix);
       }
 
@@ -530,12 +537,10 @@ void StopLooper::fillYieldHistos(SR& sr, float met, string suf, bool is_cr2l) {
   evtweight_ = evtWgt.getWeight(evtWgtInfo::systID(jestype_), is_cr2l);
 
   auto fillhists = [&](string s) {
+    if (is_signal_) s = "_" + to_string((int) mass_stop()) + "_" + to_string((int) mass_lsp()) + s;
     plot1D("h_metbins"+s+suf, met, evtweight_, sr.histMap, ";E^{miss}_{T} [GeV]" , sr.GetNMETBins(), sr.GetMETBinsPtr());
-    if (is_signal_) {
-      string masspt_hn = "h_metbins_" + to_string((int) mass_stop()) + "_" + to_string((int) mass_lsp()) + s + suf;
-      plot1D(masspt_hn, met, evtweight_, sr.histMap, ";E^{miss}_{T} [GeV]" , sr.GetNMETBins(), sr.GetMETBinsPtr());
-    }
-    if (doSystVariations && is_bkg_ && jestype_ == 0) {
+
+    if (doSystVariations && (is_bkg_ || is_signal_) && jestype_ == 0) {
       // Only run once when JES type == 0. JES variation dealt with above. No need for signals?
       for (int isyst = 3; isyst < evtWgtInfo::k_nSyst; ++isyst) {
         auto syst = (evtWgtInfo::systID) isyst;

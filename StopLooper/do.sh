@@ -47,7 +47,7 @@ declare -a Samples=(TTJets)
 # 2016 data for comparison
 # INDIR=/nfs-7/userdata/stopRun2/analysis2016_SUS-16-051_35p9fbinv/v24/output
 INDIR=/nfs-7/userdata/stopRun2/analysis2016_SUS-16-051_35p9fbinv/v24/skim
-OUTDIR=output/temp8
+OUTDIR=output/temp14
 
 mkdir -p ${OUTDIR}
 mkdir -p ${LOGDIR}
@@ -64,16 +64,17 @@ declare -a Samples=(all_2016)
 # 2016 MC
 
 # INDIR=/nfs-7/userdata/stopRun2/analysis2016_SUS-16-051_35p9fbinv/v22/skim
-# OUTDIR=output/mc2016
+# declare -a Samples=()
 # Samples+=( ttbar_diLept  )    # ttbar
 # Samples+=( ttbar_singleLeptFromT_madgraph_pythia8_ext1 ttbar_singleLeptFromTbar_madgraph_pythia8_ext1 )    # ttbar
 # Samples+=( t_sch_4f t_tch_4f tbar_tch t_tW_5f t_tbarW_5f ) # singleT
 # Samples+=( W1Jets W2Jets W3Jets W4JetsToLNu_madgraph_pythia8_25ns DYJets )            # Vjets : Wjets + DY
 # Samples+=( ttWJets ttZJets WW WZ ZZ )                      # rare  : ttV + diboson
+# Samples+=( Signal_T2tt )
 
-INDIR=/nfs-7/userdata/sicheng/stopbabies/merged_v25_9
-# INDIR=/nfs-7/userdata/sicheng/stopbabies/skimmed_v25_9
-OUTDIR=output/temp11
+# INDIR=/nfs-7/userdata/sicheng/stopbabies/merged_v25_9
+INDIR=/nfs-7/userdata/sicheng/stopbabies/skimmed_v25_9
+OUTDIR=output/temp13
 
 mkdir -p ${OUTDIR}
 mkdir -p ${LOGDIR}
@@ -92,12 +93,17 @@ done
 
 # 2016 signal
 INDIR=/nfs-7/userdata/sicheng/stopbabies/skimmed_v25_9
-OUTDIR=output/temp12
+# INDIR=/nfs-7/userdata/stopRun2/analysis2016_SUS-16-051_35p9fbinv/v22_usegenMET/skim
+OUTDIR=output/temp13
 
 mkdir -p ${OUTDIR}
 mkdir -p ${LOGDIR}
 
-declare -a Samples=(SMS_T2tt_mStop_400to1200)
+declare -a Samples=()
+Samples+=( SMS_T2tt_mStop_400to1200_madgraph_0 SMS_T2tt_mStop_400to1200_madgraph_1 SMS_T2tt_mStop_400to1200_madgraph_2 )
+Samples+=( SMS_T2tt_mStop_400to1200_madgraph_3 SMS_T2tt_mStop_400to1200_madgraph_4 SMS_T2tt_mStop_400to1200_madgraph_5 )
+Samples+=( SMS_T2tt_mStop_400to1200_madgraph_6 SMS_T2tt_mStop_400to1200_madgraph_7 )
+# declare -a Samples=(Signal_T2tt_m)
 
 for SAMPLE in ${Samples[@]}; do
     echo ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} '>&' ${LOGDIR}/log_${SAMPLE}.txt
@@ -113,18 +119,34 @@ done
 
 echo -e 'All jobs are done!\a'
 
-# pushd output/temp9
-# hadd -f ttbar_25ns.root    ttbar_diLept*.root ttbar_singleLept*.root > /dev/null
-# hadd -f singleT_25ns.root  t_tW_*.root  > /dev/null
-# hadd -f Vjets_25ns.root    W1Jets*.root W2Jets*.root W3Jets*.root W4Jets*.root > /dev/null
-# hadd -f rare_25ns.root     TTZ*.root WZ*.root  > /dev/null
+pushd output/temp13
+hadd -f ttbar_25ns.root    ttbar_diLept*.root ttbar_singleLept*.root > /dev/null
+hadd -f singleT_25ns.root  t_tW_*.root  > /dev/null
+hadd -f Vjets_25ns.root    W1Jets*.root W2Jets*.root W3Jets*.root W4Jets*.root > /dev/null
+hadd -f rare_25ns.root     TTZ*.root WZ*.root  > /dev/null
+hadd -f allBkg_25ns.root   ttbar_25ns.root singleT_25ns.root Vjets_25ns.root rare_25ns.root > /dev/null
+hadd -f SMS_T2tt.root      SMS_T2tt_mStop_400to1200_madgraph_?.root > /dev/null
+popd > /dev/null
+
+# pushd output/temp14
+# hadd -f ttbar_25ns.root    ttbar*Lept*.root > /dev/null
+# hadd -f singleT_25ns.root  t_*.root tbar_*.root > /dev/null
+# hadd -f Vjets_25ns.root    W?Jets*.root DYJets*.root > /dev/null
+# hadd -f rare_25ns.root     ttZ*.root WZ*.root ttW*.root WW*.root ZZ*.root > /dev/null
 # hadd -f allBkg_25ns.root   ttbar_25ns.root singleT_25ns.root Vjets_25ns.root rare_25ns.root > /dev/null
 # popd > /dev/null
 
-pushd output/temp11
-cp ttbar_diLept.root ttbar_2lep.root
-hadd -f ttbar_1lep.root  ttbar_singleLept*.root > /dev/null
-popd > /dev/null
+# pushd output/temp13 > /dev/null
+# cp ttbar_diLept.root lostlepton.root
+# hadd -f 1lepFromTop.root ttbar_singleLept*.root singleT_25ns.root > /dev/null
+# cp Vjets_25ns.root 1lepFromW.root
+# hadd -f ZToNuNu.root TTZToLLNuNu.root WZTo1L3Nu.root > /dev/null
+# popd > /dev/null
+
+# pushd output/temp11
+# cp ttbar_diLept.root ttbar_2lep.root
+# hadd -f ttbar_1lep.root  ttbar_singleLept*.root > /dev/null
+# popd > /dev/null
 
 # Special operations on output files
 # . temp.sh output/data2017_rwgtd

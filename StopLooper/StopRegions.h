@@ -5,14 +5,18 @@
 #include "TTree.h"
 #include "SR.h"
 
-std::vector<SR> getStopSignalRegions();
-std::vector<SR> getStopControlRegions();
-std::vector<SR> getStopControlRegionsDilepton();
-std::vector<SR> getStopControlRegionsNoBTags();
-std::vector<SR> getStopCrosscheckRegionsEMu();
+std::vector<SR> getStopControlRegionsNoBTagsTopological(std::vector<SR>&& SRvec);
+std::vector<SR> getStopControlRegionsDileptonTopological(std::vector<SR>&& SRvec);
 
 std::vector<SR> getStopSignalRegionsTopological();
 std::vector<SR> getStopControlRegionsNoBTagsTopological();
 std::vector<SR> getStopControlRegionsDileptonTopological();
+
+std::vector<SR> getStopSignalRegionsBinInTopTag();
+std::vector<SR> getStopControlRegionsNoBTagsBinInTopTag();
+std::vector<SR> getStopControlRegionsDileptonBinInTopTag();
+
+std::vector<SR> getStopCrosscheckRegionsEMu();
+std::vector<SR> getStopInclusiveRegionsTopological();
 
 #endif // STOPREGIONS_H
