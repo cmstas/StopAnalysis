@@ -1,5 +1,6 @@
-if [ $# -eq 0 ]
-then
+#! /bin/bash
+
+if [ $# -eq 0 ]; then
     echo You should provide at least the signal.
     exit 0
 fi
@@ -7,48 +8,27 @@ fi
 #check cmssw and if it contains HiggsCombine
 if [ -z $CMSSW_BASE ]; then
     echo "CMSSW_BASE var not set, run cmsenv, exiting..."
-    exit 0;
+    exit 1
 fi
 DIRECTORY=`echo $CMSSW_BASE/src/HiggsAnalysis`
 if [ ! -d "$DIRECTORY" ]; then
     echo "Your CMSSW release does not have HiggsCombined installed. Please do."
     echo "Please read https://twiki.cern.ch/twiki/bin/viewauth/CMS/SWGuideHiggsAnalysisCombinedLimit"
     echo "You should have ${DIRECTORY}. Exiting..."
-    exit 0;
+    exit 1
 fi
 
-thedir='datacards12fbinv/correlated/'
+carddir='datacards/correlated/'
 fakedata=false
-dataisbg=false
-maxbins=15
+maxbins=50
 signal=$1
-    
 
 #signal='T2tt_425_325'
 
-if [ $# -gt 1 ]
-then
-    fakedata=$2
-fi
+[ $# -gt 1 ] && carddir=$2
+[ $# -gt 2 ] && maxbins=$3
 
-if [ $# -gt 2 ]
-then
-    dataisbg=$3
-fi
-    
-
-if [ "$fakedata" = true ]
-then
-    thedir=`echo ${thedir}fakedata/`
-else
-    thedir=`echo ${thedir}`
-fi
-
-#echo ${thedir}
-
-
-
-Name=`echo datacard_${signal}`
+Name=datacard_${signal}
 
 #echo ${Name}
 
@@ -56,27 +36,24 @@ combinestring=combineCards.py
 validcommand=false
 
 counter=0
-for i in `seq 1 ${maxbins}`;
-do
-    #echo $i
-    #echo "${thedir}${Name}_${i}.txt"
-    if [ ! -e "${thedir}${Name}_b${i}.txt" ] && [ ! -f "${thedir}${Name}_b${i}.txt" ] && [ ! -s "${thedir}${Name}_b${i}.txt" ]
-    then
-	nonvalidfile=`echo ${thedir}${Name}_b${i}.txt`
-	continue
+for i in `seq 1 ${maxbins}`; do
+    ifile=${carddir}/${Name}_bin${i}.txt
+    if [ ! -e "$ifile" ] && [ ! -f "$ifile" ] && [ ! -s "$ifile" ]; then
+        invalidfile=$ifile
+        continue
     fi
     counter=$((counter+1))
     validcommand=true
     chnum=$(($i + 1))
-    combinestring=`echo ${combinestring} ch${i}=${thedir}${Name}_b${i}.txt`
+    combinestring="${combinestring} ch${i}=$ifile"
     #echo ${combinestring}
 done
 
-if [ "$validcommand" = true ]
-then
-    eval ${combinestring} -S > ${thedir}combinedcards/${Name}.txt
+if [ $validcommand = true ]; then
+    mkdir -p ${carddir}combinedcards/
+    eval ${combinestring} -S > ${carddir}combinedcards/${Name}.txt
     #echo ${combinestring}
-    echo "Combined cards for ${Name} into ${thedir}combinedcards/${Name}.txt"
-#else
-#    echo "Some input file did not exist. Didnt combine ${thedir}combinedcards/${Name}.txt"
+    echo "Combined cards for ${Name} into ${carddir}combinedcards/${Name}.txt"
+else
+    echo "Input file $invalidfile does not exist. Didn't combine ${carddir}combinedcards/${Name}.txt"
 fi
