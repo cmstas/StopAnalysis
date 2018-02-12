@@ -36,10 +36,7 @@
 
 using namespace std;
 
-TString inputdir = "/hadoop/cms/store/user/haweber/condor/limits2016_12p7fbinv/";
-TString outputdir = "rootfiles2016_12p7fbinv/";
-
-void Make2DLimitHistos(TString signaltype, bool prefit, bool fakedata, bool nosigunc, bool nobkgunc, int xsecupdown, int compressed, bool dropsigcont, bool correlated);
+// void Make2DLimitHistos(TString signaltype, bool prefit, bool fakedata, bool nosigunc, bool nobkgunc, int xsecupdown, int compressed, bool dropsigcont, bool correlated);
 TH2F* InterpolateThisHistogram(TH2F *hold);
 TGraph2D* GetInterpolatingGraph(TH2F *hold);
 TH2F* PassThisHistogram(TH2F *hold);
@@ -58,7 +55,7 @@ inline TString MakeOutputDir(TString dir){
 }
 
 
-void Make2DLimitHistos(TString signaltype, bool prefit, bool fakedata, bool nosigunc, bool nobkgunc, int xsecupdown, int compressed, bool dropsigcont, bool correlated){
+void Make2DLimitHistos(TString signaltype="std_T2tt", TString indir="limits", bool prefit=true){
 
   TH1D *hxsec;
   TFile *fxsec = new TFile("xsec_stop_13TeV.root","READ");
@@ -68,37 +65,24 @@ void Make2DLimitHistos(TString signaltype, bool prefit, bool fakedata, bool nosi
   }
   hxsec = (TH1D*)fxsec->Get("stop");
   
-  int mStopLow  = 100;
+  int mStopLow  = 600;
   int mStopHigh = 1250;
   int mStopStep = 25;
   int mLSPLow   = 0;
-  int mLSPHigh  = 700;
+  int mLSPHigh  = 750;
   int mLSPStep  = 25;
   int nbinsx = (mStopHigh - mStopLow)/mStopStep;
   int nbinsy = (mLSPHigh - mLSPLow)/mLSPStep;
   
-  TString myoutputdir = outputdir;
-  if(correlated) myoutputdir = myoutputdir + "correlated/";
-  if(compressed==1) myoutputdir = myoutputdir + "compressed/";
-  if(nosigunc&&nobkgunc) myoutputdir = myoutputdir + "nounc/";
-  else if(nosigunc) myoutputdir = myoutputdir + "nosigunc/";
-  else if(nobkgunc) myoutputdir = myoutputdir + "nobkgunc/";
-  if(dropsigcont) myoutputdir = myoutputdir + "dropsigcont/";
-  if(fakedata)   myoutputdir = myoutputdir + "fakedata/";
-  cout << "make directory " << myoutputdir << endl;
-  MakeOutputDir(myoutputdir);
-  TString myinputdir = inputdir;
-  if(correlated) myinputdir = myinputdir + "correlated/";
-  if(compressed==1) myinputdir = myinputdir + "compressed/";
-  if(nosigunc&&nobkgunc) myinputdir = myinputdir + "nounc/";
-  else if(nosigunc) myinputdir = myinputdir + "nosigunc/";
-  else if(nobkgunc) myinputdir = myinputdir + "nobkgunc/";
-  if(dropsigcont) myinputdir = myinputdir + "dropsigcont/";
-  if(fakedata)   myinputdir = myinputdir + "fakedata/";
-  cout << "inputs from " << myinputdir << endl;
+  if (!indir.EndsWith("/")) indir += "/";
+  cout << "inputs from " << indir << endl;
+  TString outputdir = indir;
+  outputdir.ReplaceAll("limits", "output");
+  cout << "make directory " << outputdir << endl;
+  MakeOutputDir(outputdir);
 
-  TString outfilename = myoutputdir + "Limits2DHistograms_"+signaltype+"_prefit.root";
-  if(!prefit) outfilename = myoutputdir + "Limits2DHistograms_"+signaltype+"_postfit.root";
+  TString outfilename = outputdir + "Limits2DHistograms_"+signaltype+"_prefit.root";
+  if(!prefit) outfilename = outputdir + "Limits2DHistograms_"+signaltype+"_postfit.root";
   TFile *file = new TFile(outfilename, "recreate");
   file->cd();
   TH2F *hExpOrg   = new TH2F("hExpOrg",   "hExp"  , nbinsx, mStopLow, mStopHigh, nbinsy, mLSPLow, mLSPHigh);
@@ -153,31 +137,32 @@ void Make2DLimitHistos(TString signaltype, bool prefit, bool fakedata, bool nosi
 
   cout << "First create 2d limit histograms" << endl;
   for(int stop = mStopLow; stop<=mStopHigh; stop += mStopStep){
-    string tarfile = "tar_Limits_Asymptotic_PostFit" + (string)signaltype.Data() + "_" + to_string(stop) + ".tar.gz";
-    if(prefit) tarfile = "tar_Limits_Asymptotic_PreFit" + (string)signaltype.Data() + "_" + to_string(stop) + ".tar.gz";
-    string cpcommand = "cp " + (string)myinputdir.Data() + tarfile + " temp/.";
-    string tarcommand = "tar --directory temp -xzvf temp/" + tarfile;
-    string rmcommand1 = "rm temp/" + tarfile;
-    string rmcommand2 = "rm temp/*.root";
-    system(cpcommand.c_str());
-    //system("ls");
-    system(tarcommand.c_str());
-    //system ("cd ..");
-    system(rmcommand1.c_str());
+    // string tarfile = "tar_Limits_Asymptotic_PostFit" + (string)signaltype.Data() + "_" + to_string(stop) + ".tar.gz";
+    // if(prefit) tarfile = "tar_Limits_Asymptotic_PreFit" + (string)signaltype.Data() + "_" + to_string(stop) + ".tar.gz";
+    // string cpcommand = "cp " + (string)myinputdir.Data() + tarfile + " temp/.";
+    // string tarcommand = "tar --directory temp -xzvf temp/" + tarfile;
+    // string rmcommand1 = "rm temp/" + tarfile;
+    // string rmcommand2 = "rm temp/*.root";
+    // system(cpcommand.c_str());
+    // //system("ls");
+    // system(tarcommand.c_str());
+    // //system ("cd ..");
+    // system(rmcommand1.c_str());
     for(int lsp = mLSPLow; lsp<=mLSPHigh; lsp += mLSPStep){
       if(signaltype.Contains("T2bW")&&stop==350&&lsp==100) continue;
       TString limitfilebase = "Limits_Asymptotic_";
       if(prefit) limitfilebase = limitfilebase + "PreFit_";
-      if(!prefit) limitfilebase = limitfilebase + "PostFit_";
-      TString signalname = signaltype + "_" + std::to_string(stop) + "_" + std::to_string(lsp);
-      TString limitfile = "temp/" + limitfilebase + signalname + ".root";
+      else       limitfilebase = limitfilebase + "PostFit_";
+      TString signalname = signaltype + "_" + std::to_string(stop) + "_" + ((lsp == 0)? "1" : std::to_string(lsp));
+      TString limitfile = indir + limitfilebase + signalname + ".root";
       //cout << limitfile << endl;
       ifstream infile(limitfile.Data());
       bool exists = infile.good();
       if(!exists) {
-	//cout << "No limit name for " << signalname << " - exit" << endl;
+	// cout << "No limit name for " << signalname << " - exit" << endl;
 	continue;
       }
+      if (lsp == 0) lsp = 1;
       cout << "Limit file exists for " << signalname << endl;
       double obs    = -1.0; //observed limit
       double obsm1s  = -1.0; //observed limit - 1 sigma theory
@@ -228,8 +213,9 @@ void Make2DLimitHistos(TString signaltype, bool prefit, bool fakedata, bool nosi
       //xsecupdown
       hObs1pOrg->Fill(stop,lsp,obs*xsec/(xsec+xsecunc)   );
       hObs1mOrg->Fill(stop,lsp,obs*xsec/(xsec-xsecunc)   );
+      if (lsp == 1) lsp = 0;
     }//lsp
-    system(rmcommand2.c_str());
+    // system(rmcommand2.c_str());
   }//stop
   cout << "Now interpolate these histograms" << endl;  
   hExp   = (TH2F*)InterpolateThisHistogram(hExpOrg);

@@ -1,3 +1,4 @@
+const double scale = 1;
 
 void copyYieldHist(TFile* fin, TFile* fout, TString gentype) {
 
@@ -20,6 +21,14 @@ void copyYieldHist(TFile* fin, TFile* fout, TString gentype) {
       TH1D* hin = (TH1D*) indir->Get(hname);
       outdir->cd();
       TH1D* hout = (TH1D*) hin->Clone(hname.ReplaceAll(gentype, ""));
+      for (int i = 1; i <= hout->GetNbinsX(); ++i) {
+        // zero out negative yields
+        if (hout->GetBinContent(i) < 0) {
+          hout->SetBinContent(i, 0);
+          hout->SetBinError(i, 0);
+        }
+      }
+      if (scale != 1) hout->Scale(scale);
       hout->Write();
     }
     if (!outdir->Get("h_metbins")) {
@@ -38,7 +47,8 @@ void copyYieldHist(TFile* fin, TFile* fout, TString gentype) {
   }
 }
 
-void fakeBkgEstimates(string input_dir="../StopLooper/output/temp13", string output_dir="../StopLooper/output/temp13") {
+void fakeBkgEstimates(string input_dir="../StopLooper/output/temp_4bins/", string output_dir="") {
+  if (output_dir == "") output_dir = input_dir;
 
   // set input files (global pointers)
   TFile* fallbkg = new TFile(Form("%s/allBkg_25ns.root",input_dir.c_str()));

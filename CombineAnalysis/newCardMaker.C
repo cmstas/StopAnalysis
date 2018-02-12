@@ -361,9 +361,10 @@ void makeCardsForPoint(TString sigpoint, TString outdir) {
   }
 }
 
-
-// void newCardMaker(string signal="T2tt_800_400", string input_dir="../StopLooper/output/temp12", string output_dir="datacards/temp12") {
-void makeCards(string signal="T2tt_800_400", string input_dir="../StopLooper/output/temp12", string output_dir="datacards/temp12") {
+// Make cards for a single mass point
+void newCardMaker(int single_point, string signal="T2tt_800_400", string input_dir="../StopLooper/output/temp12", string output_dir="datacards/temp12") {
+  cout << "Making cards for single mass point: " << signal << endl;
+  system(Form("mkdir -p %s", output_dir.c_str()));
 
   // set input files (global pointers)
   fsig = new TFile(Form("%s/SMS_T2tt.root",input_dir.c_str()));
@@ -385,8 +386,10 @@ void makeCards(string signal="T2tt_800_400", string input_dir="../StopLooper/out
 }
 
 
-// void makeCardsScan(string signal="T2tt", string input_dir="../StopLooper/output/temp12", string output_dir="datacards/temp12") {
+// Make cards for all scan
 void newCardMaker(string signal="T2tt", string input_dir="../StopLooper/output/temp13", string output_dir="datacards/scan_temp13") {
+  cout << "Making cards for " << signal  << " scan!" << endl;
+  system(Form("mkdir -p %s", output_dir.c_str()));
 
   // Benchmark
   TBenchmark *bmark = new TBenchmark();
@@ -409,31 +412,23 @@ void newCardMaker(string signal="T2tt", string input_dir="../StopLooper/output/t
     return;
   }
 
-  // ----------------------------------------
-  //  cards definitions
-  // ----------------------------------------
-  
-  // makeCardsForPoint("T2tt_800_400", output_dir.c_str());
-  // makeCardsForPoint("T2tt_800_500", output_dir.c_str());
-  // makeCardsForPoint("T2tt_800_600", output_dir.c_str());
-  // makeCardsForPoint("T2tt_900_600", output_dir.c_str());
-
   bool is_scan = true;
   set<pair<int, int> > signal_points;
 
   if (is_scan) {
     verbose = false;
-    for (int im1 = 600; im1 <= 1200; im1 += 25) {
-      for (int im2 = 400; im2 <= 650; im2 += 25) {
+    for (int im1 = 600; im1 <= 1250; im1 += 25) {
+      for (int im2 = 0; im2 <= 750; im2 += 25) {
         if (im1 - im2 < 200) continue;
-        TString hname_sig = Form("srbase/h_metbins_%d_%d", im1, im2);
+        TString hname_sig = Form("srbase/h_metbins_%d_%d", im1, ((im2 == 0)? 1 : im2));
         TH1D* hpoint = (TH1D*) fsig->Get(hname_sig);
         // if (!hpoint) { cout << "Cannot find yield hist " << hname_sig << " in " << fsig->GetName() << endl; continue; }
         if (!hpoint) continue; 
-        // int result = makeCardForOneBin(dir, ibin, signame, ++nbintot);
-        // cout << "Doing " << Form("%s_%d_%d", signal.c_str(), im1, im2) << endl;
+        if (im2 == 0) im2 = 1;
+        cout << "Making cards for point: " << Form("%s_%d_%d", signal.c_str(), im1, im2) << endl;
         makeCardsForPoint(Form("%s_%d_%d", signal.c_str(), im1, im2), output_dir.c_str());
         signal_points.insert( make_pair(im1,im2) );
+        if (im2 == 1) im2 = 0;
       } // scanM2 loop
     } // scanM1 loop
   }
@@ -442,8 +437,8 @@ void newCardMaker(string signal="T2tt", string input_dir="../StopLooper/output/t
     TString filename = Form("%s/points_%s.txt", output_dir.c_str(), signal.c_str());
     ofstream ofile;
     ofile.open(filename);
-    cout << "--------------------------------------------" << endl
-         << "- saw nonzero signal entries for the following points: " << endl;
+    cout << "--------------------------------------------" << endl;
+         // << "- saw nonzero signal entries for the following points: " << endl;
     for (set<pair<int,int> >::iterator it=signal_points.begin(); it!=signal_points.end(); ++it) {
       // cout << signal << "_" << (*it).first << "_" << (*it).second << endl;
       ofile << signal << "_" << (*it).first << "_" << (*it).second << endl;

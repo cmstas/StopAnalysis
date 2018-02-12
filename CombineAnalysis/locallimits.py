@@ -2,7 +2,7 @@
 
 # Multiprocessing example taken from: https://github.com/cmstas/SSAnalysis/blob/master/cards/limitsTable_general.py
 
-import os, ROOT, array, re
+import os, sys, ROOT, array, re
 from multiprocessing.dummy import Pool as ThreadPool
 import time, random
 
@@ -13,6 +13,8 @@ dolimits = True
 
 carddir = 'datacards/scan_temp13'
 combineddir = carddir + '/combinedcards'
+limitdir = 'limits/'+carddir.split('/')[-1]
+
 
 os.nice(10)
 
@@ -40,11 +42,18 @@ def run_asymptotic(card):
         masspt = 'PreFit_'+re.findall(r'datacard_([A-Za-z0-9_\./\\-]*).txt', card)[0]
         cmdstr = 'combine -M Asymptotic '+card+' -n '+masspt
         os.system("timeout 25m "+ cmdstr +" >& "+ logname +" || echo 'Triggered timeout of 25m'") # --run expected --noFitAsimov
-        os.system("mv higgsCombine{0}.Asymptotic.mH120.root limits/Limits_Asymptotic_{0}.root".format(masspt)) # --run expected --noFitAsimov
+        os.system("mv higgsCombine{0}.Asymptotic.mH120.root {1}/Limits_Asymptotic_{0}.root".format(masspt,limitdir)) # --run expected --noFitAsimov
         return logname
 
 
 if __name__ == "__main__":
+
+    if len(sys.argv) > 1:
+        carddir = sys.argv[1]
+        combineddir = carddir + '/combinedcards'
+        limitdir = 'limits/'+carddir.split('/')[-1]
+
+    print "Doing limits from cards in ", carddir
 
     ext_cards = os.listdir(carddir)
     ext_cards = filter(lambda x : "std_T2tt" in x and "bin1.txt" in x, ext_cards)
@@ -60,7 +69,7 @@ if __name__ == "__main__":
 
     # print cards
 
-    os.system('mkdir -p limits')
+    os.system('mkdir -p '+limitdir)
     limits = []
     for result in pool.imap_unordered(run_asymptotic, cards):
         limits.append(result)
