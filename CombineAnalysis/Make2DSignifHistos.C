@@ -1,3 +1,4 @@
+// -*- C++ -*-
 #include "TList.h"
 #include "TMath.h"
 #include "TString.h"

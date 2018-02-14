@@ -215,7 +215,7 @@ int makeCardForOneBin(TString dir, int metbin, TString signame, int bin, TString
 
   *fLogStream << "------------" << endl << "# observations " << endl;
   *fLogStream << "bin         " << bin << endl;
-  *fLogStream << "observation " << int(data) << endl; //use int if one uses fake data
+  *fLogStream << "observation " << data << endl; // use float for data as to check against exp for fake data
   *fLogStream << "------------" << endl;
   *fLogStream << "#now we list all expected number of events" << endl;
   *fLogStream << "bin          " << bin << "       " << bin << "       " << bin << "       " << bin << "       " << bin << "       " << endl;
@@ -419,7 +419,8 @@ void newCardMaker(string signal="T2tt", string input_dir="../StopLooper/output/t
     verbose = false;
     for (int im1 = 600; im1 <= 1250; im1 += 25) {
       for (int im2 = 0; im2 <= 750; im2 += 25) {
-        if (im1 - im2 < 200) continue;
+        if (im1 < 900 && im2 < 400) continue;
+        if (im1 - im2 < 400) continue;
         TString hname_sig = Form("srbase/h_metbins_%d_%d", im1, ((im2 == 0)? 1 : im2));
         TH1D* hpoint = (TH1D*) fsig->Get(hname_sig);
         // if (!hpoint) { cout << "Cannot find yield hist " << hname_sig << " in " << fsig->GetName() << endl; continue; }

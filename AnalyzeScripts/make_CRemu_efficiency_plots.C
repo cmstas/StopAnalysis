@@ -1,3 +1,4 @@
+// -*- C++ -*-
 #include <iostream>
 #include <vector>
 #include "TH1F.h"

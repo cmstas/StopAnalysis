@@ -1,3 +1,4 @@
+// -*- C++ -*-
 const double scale = 1;
 
 void copyYieldHist(TFile* fin, TFile* fout, TString gentype) {

@@ -1,3 +1,4 @@
+// -*- C++ -*-
 #include "TROOT.h"
 #include "Riostream.h"
 #include "TFile.h"

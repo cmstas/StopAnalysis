@@ -50,11 +50,11 @@ $(STOPVARLIB): $(STOPVARSOURCE) $(STOPVARSOURCE:.cc=.h)
 	cd stop_variables && $(MAKE) -j4 && cd ..; \
 	mv stop_variables/StopVariables.so .
 
-runBabyMaker.o: runBabyMaker.C looper.h
-	$(CXX) $(CXXFLAGS) -c runBabyMaker.C
+runBabyMaker.o: runBabyMaker.cc looper.h
+	$(CXX) $(CXXFLAGS) -c runBabyMaker.cc
 
-looper.o: looper.C looper.h EventTree.h TauTree.h IsoTracksTree.h GenParticleTree.h LeptonTree.h PhotonTree.h StopSelections.h
-	$(CXX) $(CXXFLAGS) -c looper.C
+looper.o: looper.cc looper.h EventTree.h TauTree.h IsoTracksTree.h GenParticleTree.h LeptonTree.h PhotonTree.h StopSelections.h
+	$(CXX) $(CXXFLAGS) -c looper.cc
 
 EventTree.o: EventTree.cc EventTree.h StopSelections.h
 	$(CXX) $(CXXFLAGS) -c EventTree.cc

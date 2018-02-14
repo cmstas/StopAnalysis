@@ -1,3 +1,4 @@
+// -*- C++ -*-
 #include "Riostream.h"
 #include "TChain.h"
 #include "TFile.h"
