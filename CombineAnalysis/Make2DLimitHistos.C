@@ -78,7 +78,7 @@ void Make2DLimitHistos(TString signaltype="std_T2tt", TString indir="limits", bo
   if (!indir.EndsWith("/")) indir += "/";
   cout << "inputs from " << indir << endl;
   TString outputdir = indir;
-  outputdir.ReplaceAll("limits", "output");
+  outputdir += "histo/";
   cout << "make directory " << outputdir << endl;
   MakeOutputDir(outputdir);
 

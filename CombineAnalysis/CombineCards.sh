@@ -20,7 +20,7 @@ fi
 
 carddir='datacards/correlated/'
 fakedata=false
-maxbins=50
+maxbins=128
 signal=$1
 
 #signal='T2tt_425_325'

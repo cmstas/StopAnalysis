@@ -41,7 +41,7 @@ def run_asymptotic(card):
         logname = card[:-4]+"_asym.log"
         masspt = 'PreFit_'+re.findall(r'datacard_([A-Za-z0-9_\./\\-]*).txt', card)[0]
         cmdstr = 'combine -M Asymptotic '+card+' -n '+masspt
-        os.system("timeout 25m "+ cmdstr +" >& "+ logname +" || echo 'Triggered timeout of 25m'") # --run expected --noFitAsimov
+        os.system("timeout 25m "+ cmdstr +" >& "+ logname +" || echo 'Job failed or triggered timeout of 25m'") # --run expected --noFitAsimov
         os.system("mv higgsCombine{0}.Asymptotic.mH120.root {1}/Limits_Asymptotic_{0}.root".format(masspt,limitdir)) # --run expected --noFitAsimov
         return logname
 
