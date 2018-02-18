@@ -50,7 +50,7 @@ class StopLooper {
   TFile* outfile_;
 
   // Event specific variables
-  bool is_signal_;
+  bool is_fastsim_;
   bool is_bkg_;
   float evtweight_;
   int jestype_;

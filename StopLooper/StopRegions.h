@@ -12,9 +12,22 @@ std::vector<SR> getStopSignalRegionsTopological();
 std::vector<SR> getStopControlRegionsNoBTagsTopological();
 std::vector<SR> getStopControlRegionsDileptonTopological();
 
-std::vector<SR> getStopSignalRegionsBinInTopTag();
-std::vector<SR> getStopControlRegionsNoBTagsBinInTopTag();
-std::vector<SR> getStopControlRegionsDileptonBinInTopTag();
+std::vector<SR> getStopSignalRegionsAddResTagBin();
+std::vector<SR> getStopControlRegionsNoBTagsAddResTagBin();
+std::vector<SR> getStopControlRegionsDileptonAddResTagBin();
+
+std::vector<SR> getStopSignalRegionsAddTopTagBins();
+std::vector<SR> getStopControlRegionsNoBTagsAddTopTagBins();
+std::vector<SR> getStopControlRegionsDileptonAddTopTagBins();
+
+std::vector<SR> getStopSignalRegionsBinInResolvedTag();
+std::vector<SR> getStopControlRegionsNoBTagsBinInResolvedTag();
+std::vector<SR> getStopControlRegionsDileptonBinInResolvedTag();
+
+std::vector<SR> getStopSignalRegionsBinInMergedTag();
+std::vector<SR> getStopControlRegionsNoBTagsBinInMergedTag();
+std::vector<SR> getStopControlRegionsDileptonBinInMergedTag();
+
 
 std::vector<SR> getStopCrosscheckRegionsEMu();
 std::vector<SR> getStopInclusiveRegionsTopological();

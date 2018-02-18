@@ -74,7 +74,7 @@ declare -a Samples=(all_2016)
 
 # INDIR=/nfs-7/userdata/sicheng/stopbabies/merged_v25_9
 INDIR=/nfs-7/userdata/sicheng/stopbabies/skimmed_v25_9
-OUTDIR=output/temp13
+OUTDIR=output/temp_4bins
 
 mkdir -p ${OUTDIR}
 mkdir -p ${LOGDIR}
@@ -86,6 +86,7 @@ Samples+=( W1Jets W2Jets W3Jets W4Jets)       # Vjets : Wjets + DY
 Samples+=( TTZToLLNuNu WZTo1L3Nu )            # rare  : ttV + diboson
 
 for SAMPLE in ${Samples[@]}; do
+    # ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
     echo ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} '>&' ${LOGDIR}/log_${SAMPLE}.txt
     eval "nohup nice -n -10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
 done
@@ -94,7 +95,7 @@ done
 # 2016 signal
 INDIR=/nfs-7/userdata/sicheng/stopbabies/skimmed_v25_9
 # INDIR=/nfs-7/userdata/stopRun2/analysis2016_SUS-16-051_35p9fbinv/v22_usegenMET/skim
-OUTDIR=output/temp13
+OUTDIR=output/temp_4bins
 
 mkdir -p ${OUTDIR}
 mkdir -p ${LOGDIR}
@@ -117,10 +118,11 @@ while : ; do
     [[ $RunningJobs == "" ]] && break
 done
 
-echo -e 'All jobs are done!\a'
+echo -e 'All background jobs done!\a'
 
-pushd output/temp13
-hadd -f ttbar_25ns.root    ttbar_diLept*.root ttbar_singleLept*.root > /dev/null
+# Local merge for the v25_9 babies
+pushd output/temp_4bins
+hadd -f ttbar_25ns.root    ttbar_*Lept*.root > /dev/null
 hadd -f singleT_25ns.root  t_tW_*.root  > /dev/null
 hadd -f Vjets_25ns.root    W1Jets*.root W2Jets*.root W3Jets*.root W4Jets*.root > /dev/null
 hadd -f rare_25ns.root     TTZ*.root WZ*.root  > /dev/null
@@ -128,25 +130,18 @@ hadd -f allBkg_25ns.root   ttbar_25ns.root singleT_25ns.root Vjets_25ns.root rar
 hadd -f SMS_T2tt.root      SMS_T2tt_mStop_400to1200_madgraph_?.root > /dev/null
 popd > /dev/null
 
+# # Local merge for the moriond17 samples
 # pushd output/temp14
 # hadd -f ttbar_25ns.root    ttbar*Lept*.root > /dev/null
-# hadd -f singleT_25ns.root  t_*.root tbar_*.root > /dev/null
+# hadd -f singleT_25ns.root  t_t*_noHadDecays*.root > /dev/null
 # hadd -f Vjets_25ns.root    W?Jets*.root DYJets*.root > /dev/null
 # hadd -f rare_25ns.root     ttZ*.root WZ*.root ttW*.root WW*.root ZZ*.root > /dev/null
 # hadd -f allBkg_25ns.root   ttbar_25ns.root singleT_25ns.root Vjets_25ns.root rare_25ns.root > /dev/null
 # popd > /dev/null
 
-# pushd output/temp13 > /dev/null
-# cp ttbar_diLept.root lostlepton.root
-# hadd -f 1lepFromTop.root ttbar_singleLept*.root singleT_25ns.root > /dev/null
-# cp Vjets_25ns.root 1lepFromW.root
-# hadd -f ZToNuNu.root TTZToLLNuNu.root WZTo1L3Nu.root > /dev/null
-# popd > /dev/null
-
+# # Temporary merge for toptagging studies
 # pushd output/temp11
 # cp ttbar_diLept.root ttbar_2lep.root
 # hadd -f ttbar_1lep.root  ttbar_singleLept*.root > /dev/null
+# hadd -f SMS_T2tt.root    SMS_T2tt_mStop_400to1200_madgraph_?.root > /dev/null
 # popd > /dev/null
-
-# Special operations on output files
-# . temp.sh output/data2017_rwgtd

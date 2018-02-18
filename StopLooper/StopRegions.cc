@@ -36,7 +36,7 @@ std::vector<SR> getStopControlRegionsDilepton(std::vector<SR>&& SRvec) {
     cr.RemoveVar("passvetos");
     cr.SetVar("nvlep", 2, fInf);
     cr.SetVar("nlep_rl", 2, fInf);
-    if (cr.GetName().find("cr2lI") != std::string::npos) {
+    if (cr.GetName().find("cr2lI") == 0) {
       cr.SetVar("dphilmet_rl", cr.GetLowerBound("dphilmet"), cr.GetUpperBound("dphilmet"));
       cr.RemoveVar("dphilmet");
     }
@@ -59,6 +59,7 @@ std::vector<SR> getStopSignalRegionsTopological() {
   srbase.SetVar("njet", 2, fInf);
   srbase.SetVar("nbjet", 1, fInf);
   srbase.SetVar("ntbtag", 0, fInf);
+  // srbase.SetVar("nbtag", 1, fInf);
   srbase.SetVar("mlb", 0, fInf);
   srbase.SetVar("tmod", -fInf, fInf);
   srbase.SetVar("dphijmet", 0.8, 3.14159);
@@ -210,8 +211,9 @@ std::vector<SR> getStopInclusiveRegionsTopological() {
   srbase.SetVar("nvlep", 1, 2);
   srbase.SetVar("passvetos", 1, 2);
   srbase.SetVar("njet", 2, fInf);
-  srbase.SetVar("nbjet", 1, fInf);
-  srbase.SetVar("ntbtag", 0, fInf);
+  // srbase.SetVar("nbjet", 1, fInf);
+  // srbase.SetVar("ntbtag", 0, fInf);
+  srbase.SetVar("nbtag", 1, 2);
   srbase.SetVar("mlb", 0, fInf);
   srbase.SetVar("tmod", -fInf, fInf);
   srbase.SetVar("dphijmet", 0.8, 3.14159);
@@ -309,7 +311,7 @@ std::vector<SR> getStopInclusiveRegionsTopological() {
   return SRvec;
 }
 
-std::vector<SR> getStopSignalRegionsBinInTopTag() {
+std::vector<SR> getStopSignalRegionsAddResTagBin() {
 
   std::vector<SR> orgSRvec = getStopSignalRegionsTopological();
   std::vector<SR> SRvec;
@@ -320,14 +322,14 @@ std::vector<SR> getStopSignalRegionsBinInTopTag() {
     } else {
       std::string srname = sr.GetName();
 
-      sr.SetName(srname+"wtc");
+      sr.SetName(srname+"wrt");
       sr.SetAllowDummyVars(1);
-      sr.SetVar("leadtopdisc", 0.9, 1);
+      sr.SetVar("resttag", 0.9, 1);
       SRvec.emplace_back(sr);
 
-      sr.SetName(srname+"ntc");
+      sr.SetName(srname+"nrt");
       sr.SetAllowDummyVars(1);
-      sr.SetVar("leadtopdisc", -2, 0.9);
+      sr.SetVar("resttag", -2, 0.9);
       SRvec.emplace_back(sr);
     }
   }
@@ -335,10 +337,192 @@ std::vector<SR> getStopSignalRegionsBinInTopTag() {
   return SRvec;
 }
 
-std::vector<SR> getStopControlRegionsNoBTagsBinInTopTag() {
-  return getStopControlRegionsNoBTags( getStopSignalRegionsBinInTopTag() );
+std::vector<SR> getStopControlRegionsNoBTagsAddResTagBin() {
+  return getStopControlRegionsNoBTags( getStopSignalRegionsAddResTagBin() );
 }
 
-std::vector<SR> getStopControlRegionsDileptonBinInTopTag() {
-  return getStopControlRegionsDilepton( getStopSignalRegionsBinInTopTag() );
+std::vector<SR> getStopControlRegionsDileptonAddResTagBin() {
+  return getStopControlRegionsDilepton( getStopSignalRegionsAddResTagBin() );
+}
+
+std::vector<SR> getStopSignalRegionsAddTopTagBins() {
+
+  const float wpResTop = 0.9;
+  const float wpDeepTop = 0.6;
+
+  std::vector<SR> orgSRvec = getStopSignalRegionsTopological();
+  std::vector<SR> SRvec;
+
+  for (SR sr : orgSRvec) {
+    if (sr.GetName() == "srbase") {
+      SRvec.emplace_back(sr);
+    }
+    else if (sr.GetLowerBound("njet") < 4) {
+      std::string srname = sr.GetName();
+      sr.SetAllowDummyVars(1);
+
+      sr.SetName(srname+"_ndt");
+      sr.SetVar("deepttag", -2, wpDeepTop);
+      SRvec.emplace_back(sr);
+
+      sr.SetName(srname+"_wdt");
+      sr.SetVar("deepttag", wpDeepTop, 1);
+      SRvec.emplace_back(sr);
+    }
+    else if (sr.GetLowerBound("njet") == 4) {
+      std::string srname = sr.GetName();
+
+      sr.SetName(srname+"_ntt");
+      sr.SetVar("deepttag", -1, wpDeepTop);
+      sr.SetVar("resttag", -2, wpResTop);
+      SRvec.emplace_back(sr);
+
+      sr.SetName(srname+"_wdt");
+      sr.SetVar("deepttag", wpDeepTop, 1);
+      // sr.SetVar("resttag", -2, 1);
+      sr.SetVar("resttag", -2, wpResTop);
+      SRvec.emplace_back(sr);
+
+      sr.SetName(srname+"_wrt");
+      sr.SetVar("deepttag", -1, wpDeepTop);
+      // sr.SetVar("deepttag", -1, 1);
+      sr.SetVar("resttag", wpResTop, 1);
+      SRvec.emplace_back(sr);
+
+      sr.SetName(srname+"_wrdt");
+      sr.SetVar("deepttag", wpDeepTop, 1);
+      sr.SetVar("resttag", wpResTop, 1);
+      // sr.SetMETBins({250, 500, 1500});
+      SRvec.emplace_back(sr);
+
+    }
+    else {
+      SRvec.emplace_back(sr);
+    }
+  }
+
+  return SRvec;
+}
+
+std::vector<SR> getStopControlRegionsNoBTagsAddTopTagBins() {
+  return getStopControlRegionsNoBTags( getStopSignalRegionsAddTopTagBins() );
+}
+
+std::vector<SR> getStopControlRegionsDileptonAddTopTagBins() {
+  return getStopControlRegionsDilepton( getStopSignalRegionsAddTopTagBins() );
+}
+
+std::vector<SR> getStopSignalRegionsBinInResolvedTag() {
+  // Replace the tmod bin with the top tagger bin
+
+  const float wpResTop = 0.9;
+  const float wpDeepTop = 0.6;
+
+  std::vector<SR> orgSRvec = getStopSignalRegionsTopological();
+  std::vector<SR> SRvec;
+
+  for (SR sr : orgSRvec) {
+    if (sr.GetName() == "srbase") {
+      SRvec.emplace_back(sr);
+      continue;
+    }
+
+    sr.SetAllowDummyVars(1);
+    if (sr.GetLowerBound("njet") == 4) {
+      std::string name = sr.GetDetailName();
+      if (sr.GetUpperBound("tmod") == 0) {
+        sr.SetVar("resttag", -2, -1);
+        name.replace(name.find("tmodlt0"), 8, "norestag");
+      }
+      else if (sr.GetLowerBound("tmod") == 0) {
+        sr.SetVar("resttag", -1, wpResTop);
+        name.replace(name.find("tmod0to10"), 9, "restaglt0p9");
+      }
+      else if (sr.GetLowerBound("tmod") == 10) {
+        sr.SetVar("resttag", wpResTop, 1);
+        name.replace(name.find("tmod10toInf"), 11, "restaggt0p9");
+      }
+      sr.SetDetailName(name);
+      sr.SetVar("tmod", -fInf, fInf);
+      // sr.RemoveVar("tmod");
+    }
+
+    std::string srname = sr.GetName();
+    sr.SetName(srname+"_ndt");
+    sr.SetVar("deepttag", -2, wpDeepTop);
+    SRvec.emplace_back(sr);
+
+    sr.SetName(srname+"_wdt");
+    sr.SetVar("deepttag", wpDeepTop, 1);
+    // sr.SetMETBins({250, 500, 1500});
+    SRvec.emplace_back(sr);
+
+  }
+
+  // printf("%s:%d: printf here!\n", __FILE__, __LINE__);
+  return SRvec;
+}
+
+std::vector<SR> getStopControlRegionsNoBTagsBinInResolvedTag() {
+  return getStopControlRegionsNoBTags( getStopSignalRegionsBinInResolvedTag() );
+}
+
+std::vector<SR> getStopControlRegionsDileptonBinInResolvedTag() {
+  return getStopControlRegionsDilepton( getStopSignalRegionsBinInResolvedTag() );
+}
+
+std::vector<SR> getStopSignalRegionsBinInMergedTag() {
+  // Replace the tmod bin with the top tagger bin
+
+  // const float wpResTop = 0.9;
+  const float wpDeepTop = 0.6;
+
+  std::vector<SR> orgSRvec = getStopSignalRegionsTopological();
+  std::vector<SR> SRvec;
+
+  for (SR sr : orgSRvec) {
+    if (sr.GetName() == "srbase") {
+      SRvec.emplace_back(sr);
+      continue;
+    }
+    sr.SetAllowDummyVars(1);
+    std::string srname = sr.GetName();
+    std::string dname = sr.GetDetailName();
+
+    if (sr.GetUpperBound("tmod") == 0) {
+      sr.SetVar("deepttag", -1, 0);
+      dname.replace(dname.find("tmodlt0"), 8, "nomergetag");
+    }
+    else if (sr.GetLowerBound("tmod") == 0) {
+      sr.SetVar("deepttag", 0, wpDeepTop);
+      dname.replace(dname.find("tmod0to10"), 9, "mergetaglt0p6");
+    }
+    else if (sr.GetLowerBound("tmod") == 10) {
+      sr.SetVar("deepttag", wpDeepTop, 1);
+      dname.replace(dname.find("tmod10toInf"), 11, "mergetaggt0p6");
+    }
+    sr.SetDetailName(dname);
+    sr.SetVar("tmod", -fInf, fInf);
+
+    // sr.SetName(srname+"_ndt");
+    // sr.SetVar("resttag", -2, wpResTop);
+    // SRvec.emplace_back(sr);
+
+    // sr.SetName(srname+"_wdt");
+    // sr.SetVar("resttag", wpResTop, 1);
+    // sr.SetMETBins({250, 500, 1500});
+    SRvec.emplace_back(sr);
+
+  }
+
+  // printf("%s:%d: printf here!\n", __FILE__, __LINE__);
+  return SRvec;
+}
+
+std::vector<SR> getStopControlRegionsNoBTagsBinInMergedTag() {
+  return getStopControlRegionsNoBTags( getStopSignalRegionsBinInMergedTag() );
+}
+
+std::vector<SR> getStopControlRegionsDileptonBinInMergedTag() {
+  return getStopControlRegionsDilepton( getStopSignalRegionsBinInMergedTag() );
 }
