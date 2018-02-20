@@ -387,7 +387,7 @@ void newCardMaker(int single_point, string signal="T2tt_800_400", string input_d
 
 
 // Make cards for all scan
-void newCardMaker(string signal="T2tt", string input_dir="../StopLooper/output/temp13", string output_dir="datacards/scan_temp13") {
+int newCardMaker(string signal="T2tt", string input_dir="../StopLooper/output/temp13", string output_dir="datacards/scan_temp13") {
   cout << "Making cards for " << signal  << " scan!" << endl;
   system(Form("mkdir -p %s", output_dir.c_str()));
 
@@ -409,7 +409,7 @@ void newCardMaker(string signal="T2tt", string input_dir="../StopLooper/output/t
 
   if ( f2l->IsZombie() || f1l->IsZombie() ||  f1ltop->IsZombie() || fznunu->IsZombie() || fsig->IsZombie() || fdata->IsZombie() ) {
     std::cout << "Input file does not exist" << std::endl;
-    return;
+    return -1;
   }
 
   bool is_scan = true;

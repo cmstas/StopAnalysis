@@ -36,6 +36,10 @@ void copyYieldHist(TFile* fin, TFile* fout, TString gentype) {
       cout << "Didn't find yield hist for " << gentype << " in " << fin->GetName() << ":" << srname << "/. Faking a 0 one!" << endl;
       outdir->cd();
       TH1D* hout = (TH1D*) fin->Get(srname + "/h_metbins")->Clone("h_metbins");
+      for (int i = 1; i <= hout->GetNbinsX(); ++i) {
+        hout->SetBinContent(i, 0);
+        hout->SetBinError(i, 0);
+      }
       hout->Write();
     }
     // if (gentype == "_2lep") {
@@ -48,11 +52,12 @@ void copyYieldHist(TFile* fin, TFile* fout, TString gentype) {
   }
 }
 
-void fakeBkgEstimates(string input_dir="../StopLooper/output/temp_4bins/", string output_dir="") {
+int fakeBkgEstimates(string input_dir="../StopLooper/output/temp_4bins/", string output_dir="") {
   if (output_dir == "") output_dir = input_dir;
 
   // set input files (global pointers)
   TFile* fallbkg = new TFile(Form("%s/allBkg_25ns.root",input_dir.c_str()));
+  if (fallbkg->IsZombie()) return -1;
 
   TFile* f2l = new TFile(Form("%s/lostlepton.root",output_dir.c_str()), "RECREATE");
   TFile* f1l = new TFile(Form("%s/1lepFromW.root",output_dir.c_str()), "RECREATE");
@@ -64,4 +69,5 @@ void fakeBkgEstimates(string input_dir="../StopLooper/output/temp_4bins/", strin
   copyYieldHist(fallbkg, f1ltop, "_1lepTop");
   copyYieldHist(fallbkg, fznunu, "_Znunu");
 
+  return 0;
 }
