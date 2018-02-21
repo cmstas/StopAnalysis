@@ -213,10 +213,10 @@ std::vector<SR> getStopInclusiveRegionsTopological() {
   srbase.SetVar("njet", 2, fInf);
   // srbase.SetVar("nbjet", 1, fInf);
   // srbase.SetVar("ntbtag", 0, fInf);
-  srbase.SetVar("nbtag", 1, 2);
+  srbase.SetVar("nbtag", 1, fInf);
   srbase.SetVar("mlb", 0, fInf);
   srbase.SetVar("tmod", -fInf, fInf);
-  srbase.SetVar("dphijmet", 0.8, 3.14159);
+  srbase.SetVar("dphijmet", 0.0, 3.1416);
   srbase.SetMETBins({0, 250, 350, 450, 550, 650, 800});
 
   SR sr;
@@ -226,13 +226,23 @@ std::vector<SR> getStopInclusiveRegionsTopological() {
 
   // SR 2-3j
 
+  sr = srbase;
+  sr.SetName("srDeepTag");
+  sr.SetVar("deepttag", 0.6, 1);
+  SRvec.emplace_back(sr);
+
+  sr = srbase;
+  sr.SetName("srResTag");
+  sr.SetVar("resttag", 0.9, 1);
+  SRvec.emplace_back(sr);
+
   // Inclusive regions
   sr = srbase;
   sr.SetName("srNJet1");
   sr.SetDetailName("2to3j");
   sr.SetVar("njet", 2, 4);
   sr.SetVar("tmod", -fInf, fInf);
-  sr.SetVar("nbtag", 1, 2);
+  sr.SetVar("nbtag", 1, fInf);
   sr.SetMETBins({250, 1500});
   SRvec.emplace_back(sr);
 
@@ -273,7 +283,7 @@ std::vector<SR> getStopInclusiveRegionsTopological() {
   sr.SetDetailName("ge4j_tmod10toInf");
   sr.SetVar("njet", 4, fInf);
   sr.SetVar("tmod", 10, fInf);
-  sr.SetMETBins({150, 250, 350, 450, 600, 1500});
+  sr.SetMETBins({250, 350, 450, 600, 1500});
   SRvec.emplace_back(sr);
 
   sr = srbase;
