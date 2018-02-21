@@ -8,11 +8,12 @@ def makeROClist(hgood, hfake, *args, **kwargs):
 
     raw_yields = kwargs.get("raw_yields", False)
     ak8evt_only = kwargs.get("ak8evt_only", False)
+    get_errors = kwargs.get("get_errors", False)
 
     bindiv = hgood.GetNbinsX() / 1.2
     startbin = hgood.FindBin(1)
     stopbin = hgood.FindBin(0) if ak8evt_only else 0
-    cut_at_eff = 0.5             # human define for aesthetic
+    cut_at_eff = 0.7             # human define for aesthetic
     print "startbin is", startbin
     print "bindiv is", bindiv
 
@@ -22,20 +23,30 @@ def makeROClist(hgood, hfake, *args, **kwargs):
     lst_eff = np.array([], dtype=float)
     lst_fkr = np.array([], dtype=float)
     lst_tpt = np.array([], dtype=float)
+    lst_terr = np.array([], dtype=float)
+    lst_ferr = np.array([], dtype=float)
 
     for i in range(1, hgood.GetNbinsX()+1):
         ibin = startbin - i
         if ibin < stopbin: break
         disc = 1 - i / bindiv
 
-        tageff = hgood.Integral(ibin, -1) / ngood
-        fkrate = hfake.Integral(ibin, -1) / nfake
+        terr = r.Double()
+        ferr = r.Double()
+        tageff = hgood.IntegralAndError(ibin, -1, terr) / ngood
+        fkrate = hfake.IntegralAndError(ibin, -1, ferr) / nfake
 
         if not raw_yields and tageff > cut_at_eff: break
 
         lst_eff = np.append(lst_eff, tageff)
         lst_fkr = np.append(lst_fkr, fkrate)
         lst_tpt = np.append(lst_tpt, disc)
+        if get_errors:
+            lst_terr = np.append(lst_terr, terr / ngood)
+            lst_ferr = np.append(lst_ferr, ferr / nfake)
+
+    if get_errors:
+        return lst_eff, lst_fkr, lst_tpt, lst_terr, lst_ferr
 
     return lst_eff, lst_fkr, lst_tpt
 
@@ -138,6 +149,7 @@ if __name__ == "__main__":
     # leg.AddEntry(grocb, "binerized")
     # leg.Draw()
 
+    # c1.Print("roc_rawvsbin_dm600.pdf")
 
     # fxra = r.TFile("temp.root")
     # gak4 = fxra.Get("roc_ltc_dm600")
@@ -153,20 +165,24 @@ if __name__ == "__main__":
 
     c1.Clear()
 
-    hgood = f1.Get("srNJet2/h_lead_deepdisc_top")
-    hfake = f2.Get("srNJet2/h_lead_deepdisc_top")
+    hgood = f1.Get("srbase/h_lead_deepdisc_top")
+    hfake = f2.Get("srbase/h_lead_deepdisc_top")
 
-    lst_sigyld, lst_bkgyld, lst_disc = makeROClist(hgood, hfake, raw_yields=True)
+    # lst_sigyld, lst_bkgyld, lst_disc = makeROClist(hgood, hfake, raw_yields=True)
+    lst_sigyld, lst_bkgyld, lst_disc, lst_sigerr, lst_bkgerr = makeROClist(hgood, hfake, raw_yields=True, get_errors=True)
     # lst_sigyld /= 52.
-    print lst_sigyld[-1], lst_bkgyld[-1]
+    # print lst_sigyld[-1], lst_bkgyld[-1]
     lst_sigyld /= 36.0;
-    print lst_sigyld[-1], lst_bkgyld[-1]
+    lst_sigerr /= 36.0;
+    # print lst_sigyld[-1], lst_bkgyld[-1]
 
-    lst_StoSnB = np.array([lst_sigyld[i] / sqrt(lst_sigyld[i]+lst_bkgyld[i]) for i in range(len(lst_sigyld))], dtype=float)
+    lst_StoN = np.array([lst_sigyld[i] / sqrt(lst_sigyld[i]+lst_bkgyld[i]) for i in range(len(lst_sigyld))], dtype=float)
+    lst_StoNerr = np.array([StoNErr(lst_sigyld[i],lst_bkgyld[i],lst_sigerr[i],lst_bkgerr[i]) for i in range(len(lst_sigyld))], dtype=float)
     # lst_StoB = np.array([lst_sigyld[i] / sqrt(lst_bkgyld[i]) for i in range(len(lst_sigyld))], dtype=float)
     # print lst_sigyld, lst_bkgyld, lst_disc, lst_StoSnB
 
-    gstob = r.TGraph(lst_disc.size, lst_disc, lst_StoSnB)
+    gstob = r.TGraphErrors(lst_disc.size, lst_disc, lst_StoN, r.nullptr, lst_StoNerr)
+    # gstob = r.TGraphErrors(lst_disc.size, lst_disc, lst_StoN)
 
     gstob.SetTitle("Graph for signal significane (S/#sqrt{S+B}) vs disc")
     gstob.GetXaxis().SetTitle("top discriminator")
@@ -174,16 +190,16 @@ if __name__ == "__main__":
     gstob.SetLineWidth(3)
     gstob.Draw()
 
-    c1.Print("stob_deepdisc_top_NJet2.pdf")
+    c1.Print("stob_deepdisc_top_base.pdf")
 
     c1.Clear()
 
     f1 = r.TFile("../../StopLooper/output/temp11/SMS_T2tt_ge1100_dm600_incl.root")
     f2 = r.TFile("../../StopLooper/output/temp11/allBkg_25ns.root")
 
-    leg = r.TLegend(0.17, 0.6, 0.36, 0.8)
+    leg = r.TLegend(0.14, 0.6, 0.36, 0.85)
 
-    srlist = ['srNJetTMod1', 'srNJet2']
+    srlist = ['srNJet1', 'srNJet2']
     colors = [r.kBlack, r.kCyan]
     grs = []
     for i, sr in enumerate(srlist):
@@ -216,10 +232,15 @@ if __name__ == "__main__":
     gchi2.SetLineWidth(3)
     gchi2.Draw("same")
     leg.AddEntry(gchi2, "ge4j, had #chi^{2}")
+    gtmod = fxra.Get("roc_tmod_dm600_ge4j")
+    gtmod.SetLineColor(r.kMagenta)
+    gtmod.SetLineWidth(3)
+    gtmod.Draw("same")
+    leg.AddEntry(gtmod, "ge4j, tmod")
 
     leg.Draw()
 
-    c1.Print("rocs_incl_mvr_dm600.pdf")
+    # c1.Print("rocs_incl_mvr_dm600.pdf")
 
     # c1.Clear()
 

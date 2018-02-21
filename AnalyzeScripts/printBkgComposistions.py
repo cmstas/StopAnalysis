@@ -28,7 +28,7 @@ def getYieldAndErrsFromTopoSRs(f, srNames, suf = ''):
     yields = []
     yerrs = []
     for sr in srNames:
-        hist = f.Get(sr+'/h_metbins'+suf)
+        hist = f.Get(sr+'/h_metbins'+suf+'_bTagEffLFUp')
         if not hist:
             yields.append(0)
             yerrs.append(0)
@@ -78,8 +78,8 @@ if __name__ == '__main__':
 
     f1 = r.TFile('../StopLooper/output/temp_org/allBkg_25ns.root')
     f2 = r.TFile('../StopLooper/output/temp_org/SMS_T2tt.root')
-    f3 = r.TFile('../StopLooper/output/addmtagbin/allBkg_25ns.root')
-    f4 = r.TFile('../StopLooper/output/addmtagbin/SMS_T2tt.root')
+    f3 = r.TFile('../StopLooper/output/add2binsM/allBkg_25ns.root')
+    f4 = r.TFile('../StopLooper/output/add2binsM/SMS_T2tt.root')
 
     srNames = ['srA', 'srB', 'srC', 'srD', 'srE', 'srF', 'srG', 'srH', 'srI',]
 
@@ -95,21 +95,28 @@ if __name__ == '__main__':
 
     # tab.print_table()
 
-    srNames = ['srA', 'srB', 'srC', 'srD', 'srE', 'srF', 'srG', 'srH',]
-    wtcNames = ['srA_wdt', 'srB_wdt', 'srC_wdt', 'srD_wdt', 'srE_wdt', 'srF_wdt', 'srG_wdt', 'srH_wdt',]
-    ntcNames = ['srA_ndt', 'srB_ndt', 'srC_ntt', 'srD_ntt', 'srE_ntt', 'srF_ntt', 'srG_ntt', 'srH_ntt',]
+    # srNames = ['srA', 'srB', 'srC', 'srD', 'srE', 'srF', 'srG', 'srH',]
+    # wdtNames = ['srA_wdt', 'srB_wdt', 'srC_wdt', 'srD_wdt', 'srE_wdt', 'srF_wdt', 'srG_wdt', 'srH_wdt',]
+    # wrtNames = ['srA_wrt', 'srB_wrt', 'srC_wrt', 'srD_wrt', 'srE_wrt', 'srF_wrt', 'srG_wrt', 'srH_wrt',]
+    # ntcNames = ['srA_ndt', 'srB_ndt', 'srC_ntt', 'srD_ntt', 'srE_ntt', 'srF_ntt', 'srG_ntt', 'srH_ntt',]
 
-    # srNames = ['cr0bC', 'cr0bD', 'cr0bE', 'cr0bF', 'cr0bG', 'cr0bH',]
-    # wtcNames = ['cr0bCwtc', 'cr0bDwtc', 'cr0bEwtc', 'cr0bFwtc', 'cr0bGwtc', 'cr0bHwtc',]
-    # ntcNames = ['cr0bCntc', 'cr0bDntc', 'cr0bEntc', 'cr0bFntc', 'cr0bGntc', 'cr0bHntc',]
+    srNames = ['cr0bA', 'cr0bB', 'cr0bC', 'cr0bD', 'cr0bE', 'cr0bF', 'cr0bG', 'cr0bH',]
+    wdtNames = ['cr0bA_wdt', 'cr0bB_wdt', 'cr0bC_wdt', 'cr0bD_wdt', 'cr0bE_wdt', 'cr0bF_wdt', 'cr0bG_wdt', 'cr0bH_wdt',]
+    wrtNames = ['cr0bA_wrt', 'cr0bB_wrt', 'cr0bC_wrt', 'cr0bD_wrt', 'cr0bE_wrt', 'cr0bF_wrt', 'cr0bG_wrt', 'cr0bH_wrt',]
+    ntcNames = ['cr0bA_ndt', 'cr0bB_ndt', 'cr0bC_ntt', 'cr0bD_ntt', 'cr0bE_ntt', 'cr0bF_ntt', 'cr0bG_ntt', 'cr0bH_ntt',]
+
     scale = 120. / 40.
 
     bkgs = ['2lep', '1lepW', '1lepTop', 'Znunu']
     tab = Table()
     tab.set_column_names(['srName']+srNames)
     for bg in bkgs:
-        ylds, errs = getYieldAndErrsFromTopoSRs(f3, wtcNames, '_'+bg)
+        ylds, errs = getYieldAndErrsFromTopoSRs(f3, wdtNames, '_'+bg)
         tab.add_row([bg+' mtag bin'] + [E(y,e).round(2) * scale for y, e in zip(ylds, errs)])
+    tab.add_line()
+    for bg in bkgs:
+        ylds, errs = getYieldAndErrsFromTopoSRs(f3, wrtNames, '_'+bg)
+        tab.add_row([bg+' rtag bin'] + [E(y,e).round(2) * scale for y, e in zip(ylds, errs)])
     tab.add_line()
     for bg in bkgs:
         ylds, errs = getYieldAndErrsFromTopoSRs(f3, ntcNames, '_'+bg)
@@ -118,37 +125,37 @@ if __name__ == '__main__':
     bgylds, bgerrs = getYieldAndErrsFromTopoSRs(f1, srNames)
     bylds_org = [E(y,e).round(2) * scale for y, e in zip(bgylds, bgerrs)]
     tab.add_row(['Total background'] + bylds_org)
-    wdtylds, wdterrs = getYieldAndErrsFromTopoSRs(f3, wtcNames)
-    bylds_wdt = [E(y,e).round(2) * scale for y, e in zip(wdtylds, wdterrs)]
-    tab.add_row(['Total bkg mtag'] + bylds_wdt)
-    beff = getPercentage(bylds_wdt, bylds_org)
-    tab.add_row(['mtag efficiency'] + beff)
+    # wdtylds, wdterrs = getYieldAndErrsFromTopoSRs(f3, wdtNames)
+    # bylds_wdt = [E(y,e).round(2) * scale for y, e in zip(wdtylds, wdterrs)]
+    # tab.add_row(['Total bkg mtag'] + bylds_wdt)
+    # beff = getPercentage(bylds_wdt, bylds_org)
+    # tab.add_row(['mtag efficiency'] + beff)
     tab.add_line()
 
-    for sigpt in ['_1200_50', '_800_400']:
-        # ylds, errs = getYieldAndErrsFromTopoSRs(f4, wtcNames, sigpt)
-        # tab.add_row(['T2tt'+sigpt+' wtb'] + [E(y,e).round(2) for y, e in zip(ylds, errs)])
-        # ylds, errs = getYieldAndErrsFromTopoSRs(f4, ntcNames, sigpt)
-        # tab.add_row(['T2tt'+sigpt+' ntb'] + [E(y,e).round(2) for y, e in zip(ylds, errs)])
+    # for sigpt in ['_1200_50', '_800_400']:
+    #     # ylds, errs = getYieldAndErrsFromTopoSRs(f4, wdtNames, sigpt)
+    #     # tab.add_row(['T2tt'+sigpt+' wtb'] + [E(y,e).round(2) for y, e in zip(ylds, errs)])
+    #     # ylds, errs = getYieldAndErrsFromTopoSRs(f4, ntcNames, sigpt)
+    #     # tab.add_row(['T2tt'+sigpt+' ntb'] + [E(y,e).round(2) for y, e in zip(ylds, errs)])
 
-        sigylds, sigerrs = getYieldAndErrsFromTopoSRs(f2, srNames, sigpt)
-        sylds_org = [E(y,e).round(2) * scale for y, e in zip(sigylds, sigerrs)]
-        tab.add_row(['T2tt'+sigpt+' org'] + sylds_org)
-        wdtylds, wdterrs = getYieldAndErrsFromTopoSRs(f4, wtcNames, sigpt)
-        sylds_wdt = [E(y,e).round(2) * scale for y, e in zip(wdtylds, wdterrs)]
-        tab.add_row(['T2tt'+sigpt+' mtag'] + sylds_wdt)
-        seff = getPercentage(sylds_wdt, sylds_org)
-        tab.add_row(['T2tt'+sigpt+' eff'] + seff)
+    #     sigylds, sigerrs = getYieldAndErrsFromTopoSRs(f2, srNames, sigpt)
+    #     sylds_org = [E(y,e).round(2) * scale for y, e in zip(sigylds, sigerrs)]
+    #     tab.add_row(['T2tt'+sigpt+' org'] + sylds_org)
+    #     wdtylds, wdterrs = getYieldAndErrsFromTopoSRs(f4, wdtNames, sigpt)
+    #     sylds_wdt = [E(y,e).round(2) * scale for y, e in zip(wdtylds, wdterrs)]
+    #     tab.add_row(['T2tt'+sigpt+' mtag'] + sylds_wdt)
+    #     seff = getPercentage(sylds_wdt, sylds_org)
+    #     tab.add_row(['T2tt'+sigpt+' eff'] + seff)
 
-        # tab.add_line()
-        ssb_org = [get_StoSB(s,b).round(2) for s,b in zip(sylds_org, bylds_org)]
-        tab.add_row(['S/sqrt(S+B) org'] + ssb_org)
-        ssb_wdt = [get_StoSB(s,b).round(2) for s,b in zip(sylds_wdt, bylds_wdt)]
-        tab.add_row(['S/sqrt(S+B) mtag'] + ssb_wdt)
+    #     # tab.add_line()
+    #     ssb_org = [get_StoSB(s,b).round(2) for s,b in zip(sylds_org, bylds_org)]
+    #     tab.add_row(['S/sqrt(S+B) org'] + ssb_org)
+    #     ssb_wdt = [get_StoSB(s,b).round(2) for s,b in zip(sylds_wdt, bylds_wdt)]
+    #     tab.add_row(['S/sqrt(S+B) mtag'] + ssb_wdt)
 
-        tab.add_line()
+    #     tab.add_line()
 
-    # tab.print_table()
+    tab.print_table()
 
 
 
@@ -192,14 +199,14 @@ if __name__ == '__main__':
     # tab3.add_row(['2 tags bkg'] + [y.round(2) for y in sum(bylds_rdt,[])])
     # tab3.add_row(['2 tags sig'] + [y.round(2) for y in sum(sylds_rdt,[])])
 
-    colnames = [sr.split('_')[0] for sr in wdtNames]
-    tab3.set_column_names(['srName'] + colnames)
-    for bn, names in zip(['no tag', 'mer tag', 'res tag', '2 tags'], [ntcNames, wdtNames, wrtNames, rdtNames]):
-        bylds = [E(y,e).round(2) * scale for y, e in zip(*getYieldAndErrsFromTopoSRs(f5, names))]
-        sylds = [E(y,e).round(2) * scale for y, e in zip(*getYieldAndErrsFromTopoSRs(f6, names, '_1200_50'))]
-        tab3.add_row(['bkg '+bn] + bylds)
-        tab3.add_row(['sig '+bn] + sylds)
+    # colnames = [sr.split('_')[0] for sr in wdtNames]
+    # tab3.set_column_names(['srName'] + colnames)
+    # for bn, names in zip(['no tag', 'mer tag', 'res tag', '2 tags'], [ntcNames, wdtNames, wrtNames, rdtNames]):
+    #     bylds = [E(y,e).round(2) * scale for y, e in zip(*getYieldAndErrsFromTopoSRs(f5, names))]
+    #     sylds = [E(y,e).round(2) * scale for y, e in zip(*getYieldAndErrsFromTopoSRs(f6, names, '_1200_50'))]
+    #     tab3.add_row(['bkg '+bn] + bylds)
+    #     tab3.add_row(['sig '+bn] + sylds)
 
-        tab3.add_line()
+    #     tab3.add_line()
 
-    tab3.print_table()
+    # tab3.print_table()

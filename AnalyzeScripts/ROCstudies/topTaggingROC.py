@@ -57,15 +57,15 @@ if __name__ == "__main__":
 
     r.gROOT.SetBatch(1)
 
-    # f1 = r.TFile("../../StopLooper/output/temp9/SMS_T2tt_mStop_400to1200.root")
-    # f2 = r.TFile("../../StopLooper/output/temp9/allBkg_25ns.root")
-    # hgood = f1.Get("srbase/h_leadtopcand_disc")
-    # hfake = f2.Get("srbase/h_leadtopcand_disc")
+    f1 = r.TFile("../../StopLooper/output/temp11/SMS_T2tt.root")
+    f2 = r.TFile("../../StopLooper/output/temp11/allBkg_25ns.root")
+    hgood = f1.Get("srNJet2/h_leadtopcand_finedisc")
+    hfake = f2.Get("srNJet2/h_leadtopcand_finedisc")
 
-    f1 = r.TFile("../../StopLooper/output/temp/TTJets_v25_4.root")
-    f2 = f1
-    hgood = f1.Get("testTopTagging/h_lead_topcand_finedisc")
-    hfake = f1.Get("testTopTagging/h_lead_fakecand_finedisc")
+    # f1 = r.TFile("../../StopLooper/output/temp/TTJets_v25_4.root")
+    # f2 = f1
+    # hgood = f1.Get("testTopTagging/h_lead_topcand_finedisc")
+    # hfake = f1.Get("testTopTagging/h_lead_fakecand_finedisc")
 
     if not hgood: print "Cannot find hgood!"
     if not hfake: print "Cannot find hfake!"
@@ -95,7 +95,7 @@ if __name__ == "__main__":
 
     groc = r.TGraph(lst_tageff.size, lst_tageff, lst_fkrate)
     gstob = r.TGraph(lst_disc.size, lst_disc, lst_StoSnB)
-    print lst_disc[-100:]
+    # print lst_disc[-100:]
     # print lst_sigyld[-100:]
     # print lst_bkgyld[-100:]
     # print lst_StoSnB[-100:]
@@ -107,13 +107,14 @@ if __name__ == "__main__":
     gstob.GetYaxis().SetTitle("S / #sqrt{S+B}")
     gstob.Draw()
 
-    c1.Print("stob_srbase_toptag.pdf")
+    c1.Print("stob_srNJet2_toptag.pdf")
 
     c1.Clear()
 
     groc.SetTitle("Graph for fake rate vs tagging efficiency")
     groc.GetXaxis().SetTitle("tagging eff.")
     groc.GetYaxis().SetTitle("fake rate")
+    groc.SetLineWidth(2)
 
     # groc.SetTitle("Graph for background vs signal efficiency")
     # groc.GetXaxis().SetTitle("sig eff.")
@@ -121,15 +122,15 @@ if __name__ == "__main__":
 
     groc.Draw()
 
-    c1.Print("roc_srbase_toptag.pdf")
+    c1.Print("roc_srNJet2_toptag.pdf")
 
     # c1.Clear()
 
-    hgood = f1.Get("testTopTagging/h_chi2_disc1")
-    hfake = f2.Get("testTopTagging/h_chi2fake_disc1")
+    # hgood = f1.Get("testTopTagging/h_chi2_disc1")
+    # hfake = f2.Get("testTopTagging/h_chi2fake_disc1")
 
-    # hgood = f1.Get("srbase/h_chi2_disc")
-    # hfake = f2.Get("srbase/h_chi2_disc")
+    hgood = f1.Get("srNJet2/h_chi2_disc")
+    hfake = f2.Get("srNJet2/h_chi2_disc")
 
     if not hgood: print "Cannot find hgood!"
     if not hfake: print "Cannot find hfake!"
@@ -138,6 +139,7 @@ if __name__ == "__main__":
 
     chi2roc = r.TGraph(lst_eff.size, lst_eff, lst_fkr)
     chi2roc.SetLineColor(r.kBlue)
+    chi2roc.SetLineWidth(2)
     chi2roc.SetTitle("Graph for fake rate vs tagging efficiency")
     chi2roc.GetXaxis().SetTitle("tag eff.")
     chi2roc.GetYaxis().SetTitle("fake rate")
@@ -148,4 +150,34 @@ if __name__ == "__main__":
     leg.AddEntry(chi2roc, "had chi2")
     leg.Draw()
 
-    c1.Print("roc_srbase_chi2.pdf")
+    c1.Print("roc_srNJet2_chi2.pdf")
+
+    hgood = f1.Get("srNJet2/h_tmod_finedisc")
+    hfake = f2.Get("srNJet2/h_tmod_finedisc")
+
+    if not hgood: print "Cannot find hgood!"
+    if not hfake: print "Cannot find hfake!"
+
+    lst_eff, lst_fkr, _ = makeROClist(hgood, hfake)
+
+    tmodroc = r.TGraph(lst_eff.size, lst_eff, lst_fkr)
+    tmodroc.SetLineColor(r.kRed)
+    tmodroc.SetLineWidth(2)
+    tmodroc.SetTitle("Graph for fake rate vs tagging efficiency")
+    tmodroc.GetXaxis().SetTitle("tag eff.")
+    tmodroc.GetYaxis().SetTitle("fake rate")
+    tmodroc.Draw("same")
+
+    # leg = r.TLegend(0.2, 0.7, 0.36, 0.8)
+    # leg.AddEntry(groc, "top tagger")
+    leg.AddEntry(tmodroc, "tmod")
+    leg.Draw()
+
+    c1.Print("roc_srNJet2_tmod.pdf")
+
+    fout = r.TFile("temp2.root", "update")
+    groc.Write("roc_ltc_dm600_ge4j")
+    chi2roc.Write("roc_chi2_dm600_ge4j")
+    tmodroc.Write("roc_tmod_dm600_ge4j")
+    fout.Close()
+
