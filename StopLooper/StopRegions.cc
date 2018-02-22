@@ -29,17 +29,14 @@ std::vector<SR> getStopControlRegionsDilepton(std::vector<SR>&& SRvec) {
   for (SR cr : SRvec) {
     cr.SetName(cr.GetName().replace(0, 2, "cr2l"));
     cr.SetAllowDummyVars(1);
-    for (std::string var : {"met", "mt", "dphijmet", "nlep", "tmod"}) {
+    for (std::string var : {"met", "mt", "dphijmet", "nlep", "tmod", "dphilmet"}) {
+      if (!cr.VarExists(var)) continue;
       cr.SetVar(var+"_rl", cr.GetLowerBound(var), cr.GetUpperBound(var));
       cr.RemoveVar(var);
     }
     cr.RemoveVar("passvetos");
     cr.SetVar("nvlep", 2, fInf);
     cr.SetVar("nlep_rl", 2, fInf);
-    if (cr.GetName().find("cr2lI") == 0) {
-      cr.SetVar("dphilmet_rl", cr.GetLowerBound("dphilmet"), cr.GetUpperBound("dphilmet"));
-      cr.RemoveVar("dphilmet");
-    }
     CRvec.emplace_back(cr);
   }
 
@@ -453,8 +450,8 @@ std::vector<SR> getStopSignalRegionsBinInResolvedTag() {
         name.replace(name.find("tmod10toInf"), 11, "restaggt0p9");
       }
       sr.SetDetailName(name);
-      sr.SetVar("tmod", -fInf, fInf);
-      // sr.RemoveVar("tmod");
+      // sr.SetVar("tmod", -fInf, fInf);
+      sr.RemoveVar("tmod");
     }
 
     std::string srname = sr.GetName();
@@ -500,11 +497,11 @@ std::vector<SR> getStopSignalRegionsBinInMergedTag() {
     std::string dname = sr.GetDetailName();
 
     if (sr.GetUpperBound("tmod") == 0) {
-      sr.SetVar("deepttag", -1, 0);
+      sr.SetVar("deepttag", -1, 0.02);
       dname.replace(dname.find("tmodlt0"), 8, "nomergetag");
     }
     else if (sr.GetLowerBound("tmod") == 0) {
-      sr.SetVar("deepttag", 0, wpDeepTop);
+      sr.SetVar("deepttag", 0.02, wpDeepTop);
       dname.replace(dname.find("tmod0to10"), 9, "mergetaglt0p6");
     }
     else if (sr.GetLowerBound("tmod") == 10) {

@@ -39,6 +39,7 @@ public:
   float* GetMETBinsPtr();
 
   bool PassesSelection(std::map<std::string, float> values);
+  bool VarExists(std::string var_name) const;
   void RemoveVar(std::string var_name);
   void Clear();
 

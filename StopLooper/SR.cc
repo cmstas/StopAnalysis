@@ -41,10 +41,14 @@ unsigned int SR::GetYield() const {
 }
 
 float SR::GetLowerBound(string var_name) const {
+  if (!bins_.count(var_name))
+    throw invalid_argument("Variable " + var_name + " not defined in SR " + srname_ + " ! Cannot get lower bound!");
   return (bins_.at(var_name)).first;
 }
 
 float SR::GetUpperBound(string var_name) const {
+  if (!bins_.count(var_name))
+    throw invalid_argument("Variable " + var_name + " not defined in SR " + srname_ + " ! Cannot get upper bound!");
   return (bins_.at(var_name)).second;
 }
 
@@ -54,7 +58,7 @@ unsigned int SR::GetNumberOfVariables() const {
 
 vector<string> SR::GetListOfVariables() const {
   vector<string> vars;
-  for(auto it = bins_.begin(); it != bins_.end(); ++it) {
+  for (auto it = bins_.begin(); it != bins_.end(); ++it) {
     vars.push_back(it->first);
   }
   return vars;
@@ -125,6 +129,10 @@ bool SR::PassesSelectionPrintFirstFail(map<string, float> values) {
     }
   }
   return true;
+}
+
+bool SR::VarExists(std::string var_name) const {
+  return bins_.count(var_name);
 }
 
 void SR::RemoveVar(string var_name) {
