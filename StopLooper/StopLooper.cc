@@ -569,9 +569,11 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
         if (h.first.find("HI") != string::npos || h.first.find("LOW") != string::npos) continue;
         if (h.first.find("metbins") != string::npos) {
           int nbin = h.second->GetNbinsX();
-          double err = 0;
-          h.second->SetBinContent(nbin, h.second->IntegralAndError(nbin, -1, err));
-          h.second->SetBinError(nbin, err);
+          if (h.second->GetBinContent(nbin+1) > 0){
+            double err = 0;
+            h.second->SetBinContent(nbin, h.second->IntegralAndError(nbin, -1, err));
+            h.second->SetBinError(nbin, err);
+          }
         }
         h.second->Write();
       }

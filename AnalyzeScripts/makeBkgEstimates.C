@@ -1,4 +1,5 @@
 // -*- C++ -*-
+const bool useMetExtrapolation = true;
 
 void dataDrivenFromCR(TFile* fdata, TFile* fmc, TFile* fout, TString ddtype, TString gentype) {
   // Additional hists to consider: dataStats, MCstats, impurity
@@ -24,15 +25,34 @@ void dataDrivenFromCR(TFile* fdata, TFile* fmc, TFile* fout, TString ddtype, TSt
     if (!fmc->Get(hname_MC_CR)) {
       cout << "Couldn't find yield hist for " << hist_MC_CR << " in " << fmc->GetName() << "!!" << endl;
       cout << "This should not happend! Can not use data driven on this region! Use MC yields directly use TF from other SR!" << endl;
-      continue;  // <-- actions to add
+      continue;  // <-- actions to be added
     }
     if (!fmc->Get(hname_MC_SR)) {
       cout << "Couldn't find yield hist for " << hist_MC_SR << " in " << fmc->GetName() << ". Cannot define TF!" << endl;
-      continue;  // <-- actions to add
+      continue;  // <-- actions to be added
     }
     if (!fdata->Get(hname_data_CR)) {
       cout << "Couldn't find yield hist for " << hist_data_CR << " in " << fmc->GetName() << ". Use yield from MC!" << endl;
-      continue;  // <-- actions to add
+      continue;  // <-- actions to be added
+    }
+
+    int lastbin = hist_data_CR->GetNbinsX();
+    int extr_start_bin = lastbin; // the bin to start extrapolation, if == lastbin means no MET extrapolation is needed
+
+    const double extr_threshold = 5;  // minimum number of events in a bin to not need an MET extrapolation
+    if (useMetExtrapolation) {
+      double err = 0;
+      double ylds = 0;
+      for (; extr_start_bin > 0; --extr_start_bin) {
+        ylds = hist_data_CR->IntegralAndError(extr_start_bin, -1, err);
+        if (ylds > extr_threshold) break;
+      }
+      if (extr_start_bin != lastbin)
+        cout << "Doing MET extrapolation for  " << crname << "  from bin " << extr_start_bin << " to bin " << lastbin << " (last bin)!" << endl;
+      for (int ibin = extr_start_bin; ibin < lastbin; ++ibin) {
+        hist_data_CR->SetBinContent(ibin, ylds);
+        hist_data_CR->SetBinError(ibin, err);
+      }
     }
 
     TH1D* centralHist;
@@ -57,6 +77,15 @@ void dataDrivenFromCR(TFile* fdata, TFile* fmc, TFile* fout, TString ddtype, TSt
         hist_MC_SR = (TH1D*) fmc->Get(hname_MC_SR)->Clone(hnameSR);
       }
 
+      if (useMetExtrapolation && extr_start_bin != lastbin) {
+        double err = 0;
+        double ylds = hist_MC_CR->IntegralAndError(extr_start_bin, -1, err);
+        for (int ibin = extr_start_bin; ibin < lastbin; ++ibin) {
+          hist_MC_CR->SetBinContent(ibin, ylds);
+          hist_MC_CR->SetBinError(ibin, err);
+        }
+      }
+
       auto alphaHist = (TH1D*) hist_MC_SR->Clone(hname+"_alpha");
       alphaHist->Divide(hist_MC_CR);
 
@@ -79,7 +108,8 @@ void dataDrivenFromCR(TFile* fdata, TFile* fmc, TFile* fout, TString ddtype, TSt
     // Create alphaHist for dataStats
     auto h_dataStats = (TH1D*) centralHist->Clone("h_metbins_dataStats");
     auto h_MCStats = (TH1D*) centralHist->Clone("h_metbins_MCStats");
-    for (int ibin = 1; ibin <= hist_data_CR->GetNbinsX(); ++ibin) {
+    for (int ibin = 1; ibin <= extr_start_bin; ++ibin) {
+      // If not doing met extrapolation, extr_start_bin will equal to lastbin 
       double data_error_thisbin = (hist_data_CR->GetBinContent(ibin) < 0.01)? 0 : hist_data_CR->GetBinError(ibin) / hist_data_CR->GetBinContent(ibin);
       h_dataStats->SetBinError(ibin, data_error_thisbin * h_dataStats->GetBinContent(ibin));
 
@@ -89,6 +119,14 @@ void dataDrivenFromCR(TFile* fdata, TFile* fmc, TFile* fout, TString ddtype, TSt
 
       h_MCStats->SetBinError(ibin, MC_error_thisbin * h_MCStats->GetBinContent(ibin));
     }
+    for (int ibin = extr_start_bin+1; ibin <= lastbin; ++ibin) {
+      // If doing met extrapolation, the bins following extr_start_bin for data and MC CR will be set to have 0 stat error
+      // TODO: verify that this is the right thing to do
+      h_dataStats->SetBinError(ibin, 0);
+      double MC_SR_error_thisbin = (hist_MC_SR->GetBinContent(ibin) < 1e-5)? 0 : hist_MC_SR->GetBinError(ibin) / hist_MC_SR->GetBinContent(ibin);
+      h_MCStats->SetBinError(ibin, MC_SR_error_thisbin * h_MCStats->GetBinContent(ibin));
+    }
+
     h_dataStats->Write();
     h_MCStats->Write();
 
