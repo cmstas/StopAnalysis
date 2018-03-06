@@ -66,7 +66,7 @@ for in_file in ${OUTPUTNAME}*.root; do
     echo "Will skim $in_folder/*.root into $out_file"
     root -l -b -q skimBaby.C++'("'${in_file}'", "skimmed_'${in_file}'")'
 done
-rename skimmed_merged skimmed *.root
+# rename skimmed_merged skimmed *.root
 
 echo ----------------------------------------------
 ls -ltrha

@@ -14,27 +14,57 @@ if __name__ == "__main__":
     cms4_samples = {
         
         # Essential parts of the Moriond 16 samples
-        "ttbar_diLept_madgraph_ext1" : "/hadoop/cms/store/user/sicheng/ProjectMetis/TTJets_DiLept_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1_MINIAODSIM_CMS4_V00-00-02_toptag",
-        "ttbar_singleLeptFromT_madgraph_ext1" : "/hadoop/cms/store/user/sicheng/ProjectMetis/TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1_MINIAODSIM_CMS4_V00-00-02_toptag",
-        "ttbar_singleLeptFromTbar_madgraph_ext1" : "/hadoop/cms/store/user/sicheng/ProjectMetis/TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1_MINIAODSIM_CMS4_V00-00-02_toptag",
+        # "ttbar_diLept_madgraph_ext1" : "/hadoop/cms/store/user/sicheng/ProjectMetis/TTJets_DiLept_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1_MINIAODSIM_CMS4_V00-00-02_toptag",
+        # "ttbar_singleLeptFromT_madgraph_ext1" : "/hadoop/cms/store/user/sicheng/ProjectMetis/TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1_MINIAODSIM_CMS4_V00-00-02_toptag",
+        # "ttbar_singleLeptFromTbar_madgraph_ext1" : "/hadoop/cms/store/user/sicheng/ProjectMetis/TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1_MINIAODSIM_CMS4_V00-00-02_toptag",
 
-        "t_tW_top_5f_powheg_noHadDecays_ext1" : "/hadoop/cms/store/user/sicheng/ProjectMetis/ST_tW_top_5f_NoFullyHadronicDecays_13TeV-powheg_TuneCUETP8M1_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1_MINIAODSIM_CMS4_V00-00-02_toptag",
-        "t_tW_antitop_5f_powheg_noHadDecays_ext1" : "/hadoop/cms/store/user/sicheng/ProjectMetis/ST_tW_antitop_5f_NoFullyHadronicDecays_13TeV-powheg_TuneCUETP8M1_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1_MINIAODSIM_CMS4_V00-00-02_toptag",
+        # "t_tW_top_5f_powheg_noHadDecays_ext1" : "/hadoop/cms/store/user/sicheng/ProjectMetis/ST_tW_top_5f_NoFullyHadronicDecays_13TeV-powheg_TuneCUETP8M1_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1_MINIAODSIM_CMS4_V00-00-02_toptag",
+        # "t_tW_antitop_5f_powheg_noHadDecays_ext1" : "/hadoop/cms/store/user/sicheng/ProjectMetis/ST_tW_antitop_5f_NoFullyHadronicDecays_13TeV-powheg_TuneCUETP8M1_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1_MINIAODSIM_CMS4_V00-00-02_toptag",
 
-        "W1JetsToLNu_madgraph" : "/hadoop/cms/store/user/sicheng/ProjectMetis/W1JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_CMS4_V00-00-02_toptag",
-        "W2JetsToLNu_madgraph" : "/hadoop/cms/store/user/sicheng/ProjectMetis/W2JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_CMS4_V00-00-02_toptag",
-        "W3JetsToLNu_madgraph_ext1" : "/hadoop/cms/store/user/sicheng/ProjectMetis/W3JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1_MINIAODSIM_CMS4_V00-00-02_toptag",
-        "W4JetsToLNu_madgraph_ext2" : "/hadoop/cms/store/user/sicheng/ProjectMetis/W4JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext2-v1_MINIAODSIM_CMS4_V00-00-02_toptag",
-        "W1JetsToLNu_NuPt200_madgraph" : "/hadoop/cms/store/user/sicheng/ProjectMetis/W1JetsToLNu_NuPt-200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_CMS4_V00-00-02_toptag",
-        "W2JetsToLNu_NuPt200_madgraph" : "/hadoop/cms/store/user/sicheng/ProjectMetis/W2JetsToLNu_NuPt-200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_CMS4_V00-00-02_toptag",
-        "W3JetsToLNu_NuPt200_madgraph" : "/hadoop/cms/store/user/sicheng/ProjectMetis/W3JetsToLNu_NuPt-200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_CMS4_V00-00-02_toptag",
-        "W4JetsToLNu_NuPt200_madgraph" : "/hadoop/cms/store/user/sicheng/ProjectMetis/W4JetsToLNu_NuPt-200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_backup_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2_MINIAODSIM_CMS4_V00-00-02_toptag",
+        # "W1JetsToLNu_madgraph" : "/hadoop/cms/store/user/sicheng/ProjectMetis/W1JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_CMS4_V00-00-02_toptag",
+        # "W2JetsToLNu_madgraph" : "/hadoop/cms/store/user/sicheng/ProjectMetis/W2JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_CMS4_V00-00-02_toptag",
+        # "W3JetsToLNu_madgraph_ext1" : "/hadoop/cms/store/user/sicheng/ProjectMetis/W3JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1_MINIAODSIM_CMS4_V00-00-02_toptag",
+        # "W4JetsToLNu_madgraph_ext2" : "/hadoop/cms/store/user/sicheng/ProjectMetis/W4JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext2-v1_MINIAODSIM_CMS4_V00-00-02_toptag",
+        # "W1JetsToLNu_NuPt200_madgraph" : "/hadoop/cms/store/user/sicheng/ProjectMetis/W1JetsToLNu_NuPt-200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_CMS4_V00-00-02_toptag",
+        # "W2JetsToLNu_NuPt200_madgraph" : "/hadoop/cms/store/user/sicheng/ProjectMetis/W2JetsToLNu_NuPt-200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_CMS4_V00-00-02_toptag",
+        # "W3JetsToLNu_NuPt200_madgraph" : "/hadoop/cms/store/user/sicheng/ProjectMetis/W3JetsToLNu_NuPt-200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_CMS4_V00-00-02_toptag",
+        # "W4JetsToLNu_NuPt200_madgraph" : "/hadoop/cms/store/user/sicheng/ProjectMetis/W4JetsToLNu_NuPt-200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_backup_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2_MINIAODSIM_CMS4_V00-00-02_toptag",
 
-        "TTZToLLNuNu_M10_amcnlo_ext2" : "/hadoop/cms/store/user/sicheng/ProjectMetis/TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext2-v1_MINIAODSIM_CMS4_V00-00-02_toptag",
-        "WZTo1L3Nu_amcnlo" : "/hadoop/cms/store/user/sicheng/ProjectMetis/WZTo1L3Nu_13TeV_amcatnloFXFX_madspin_pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_CMS4_V00-00-02_toptag",
+        # "TTZToLLNuNu_M10_amcnlo_ext2" : "/hadoop/cms/store/user/sicheng/ProjectMetis/TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext2-v1_MINIAODSIM_CMS4_V00-00-02_toptag",
+        # "WZTo1L3Nu_amcnlo" : "/hadoop/cms/store/user/sicheng/ProjectMetis/WZTo1L3Nu_13TeV_amcatnloFXFX_madspin_pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_CMS4_V00-00-02_toptag",
 
         # Singals
-        "SMS_T2tt_mStop_400to1200_madgraph" : "/hadoop/cms/store/user/sicheng/ProjectMetis/SMS-T2tt_mStop-400to1200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MINIAODSIM_CMS4_V00-00-02_toptag",
+        # "SMS_T2tt_mStop_400to1200_madgraph" : "/hadoop/cms/store/user/sicheng/ProjectMetis/SMS-T2tt_mStop-400to1200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MINIAODSIM_CMS4_V00-00-02_toptag",
+        # "SMS_T2bW_madgraph" : "/hadoop/cms/store/user/sicheng/ProjectMetis/SMS-T2bW_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MINIAODSIM_CMS4_V00-00-02_toptag",
+        "SMS_T2bt_madgraph" : "/hadoop/cms/store/user/sicheng/ProjectMetis/SMS-T2bt_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MINIAODSIM_CMS4_V00-00-02_toptag",
+        "SMS_TChiWH_WToLNu_HToBB_madgraph" : "/hadoop/cms/store/user/sicheng/ProjectMetis/SMS-TChiWH_WToLNu_HToBB_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUSummer16Fast_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_CMS4_V00-00-02_toptag",
+
+        # Data
+        "data_2016B_singlemu" : "/hadoop/cms/store/user/sicheng/ProjectMetis/SingleMuon_Run2016B-03Feb2017_ver2-v2_MINIAOD_CMS4_V00-00-02_toptag",
+        "data_2016C_singlemu" : "/hadoop/cms/store/user/sicheng/ProjectMetis/SingleMuon_Run2016C-03Feb2017-v1_MINIAOD_CMS4_V00-00-02_toptag",
+        "data_2016D_singlemu" : "/hadoop/cms/store/user/sicheng/ProjectMetis/SingleMuon_Run2016D-03Feb2017-v1_MINIAOD_CMS4_V00-00-02_toptag",
+        "data_2016E_singlemu" : "/hadoop/cms/store/user/sicheng/ProjectMetis/SingleMuon_Run2016E-03Feb2017-v1_MINIAOD_CMS4_V00-00-02_toptag",
+        "data_2016F_singlemu" : "/hadoop/cms/store/user/sicheng/ProjectMetis/SingleMuon_Run2016F-03Feb2017-v1_MINIAOD_CMS4_V00-00-02_toptag",
+        "data_2016G_singlemu" : "/hadoop/cms/store/user/sicheng/ProjectMetis/SingleMuon_Run2016G-03Feb2017-v1_MINIAOD_CMS4_V00-00-02_toptag",
+        "data_2016H_singlemu_ver2" : "/hadoop/cms/store/user/sicheng/ProjectMetis/SingleMuon_Run2016H-03Feb2017_ver2-v1_MINIAOD_CMS4_V00-00-02_toptag",
+        "data_2016H_singlemu_ver3" : "/hadoop/cms/store/user/sicheng/ProjectMetis/SingleMuon_Run2016H-03Feb2017_ver3-v1_MINIAOD_CMS4_V00-00-02_toptag",
+        "data_2016B_singleel" : "/hadoop/cms/store/user/sicheng/ProjectMetis/SingleElectron_Run2016B-03Feb2017_ver2-v2_MINIAOD_CMS4_V00-00-02_toptag",
+        "data_2016C_singleel" : "/hadoop/cms/store/user/sicheng/ProjectMetis/SingleElectron_Run2016C-03Feb2017-v1_MINIAOD_CMS4_V00-00-02_toptag",
+        "data_2016D_singleel" : "/hadoop/cms/store/user/sicheng/ProjectMetis/SingleElectron_Run2016D-03Feb2017-v1_MINIAOD_CMS4_V00-00-02_toptag",
+        "data_2016E_singleel" : "/hadoop/cms/store/user/sicheng/ProjectMetis/SingleElectron_Run2016E-03Feb2017-v1_MINIAOD_CMS4_V00-00-02_toptag",
+        "data_2016F_singleel" : "/hadoop/cms/store/user/sicheng/ProjectMetis/SingleElectron_Run2016F-03Feb2017-v1_MINIAOD_CMS4_V00-00-02_toptag",
+        "data_2016G_singleel" : "/hadoop/cms/store/user/sicheng/ProjectMetis/SingleElectron_Run2016G-03Feb2017-v1_MINIAOD_CMS4_V00-00-02_toptag",
+        "data_2016H_singleel_ver2" : "/hadoop/cms/store/user/sicheng/ProjectMetis/SingleElectron_Run2016H-03Feb2017_ver2-v1_MINIAOD_CMS4_V00-00-02_toptag",
+        "data_2016H_singleel_ver3" : "/hadoop/cms/store/user/sicheng/ProjectMetis/SingleElectron_Run2016H-03Feb2017_ver3-v1_MINIAOD_CMS4_V00-00-02_toptag",
+        "data_2016B_met" : "/hadoop/cms/store/user/sicheng/ProjectMetis/MET_Run2016B-03Feb2017_ver2-v2_MINIAOD_CMS4_V00-00-02_toptag",
+        "data_2016C_met" : "/hadoop/cms/store/user/sicheng/ProjectMetis/MET_Run2016C-03Feb2017-v1_MINIAOD_CMS4_V00-00-02_toptag",
+        "data_2016D_met" : "/hadoop/cms/store/user/sicheng/ProjectMetis/MET_Run2016D-03Feb2017-v1_MINIAOD_CMS4_V00-00-02_toptag",
+        "data_2016E_met" : "/hadoop/cms/store/user/sicheng/ProjectMetis/MET_Run2016E-03Feb2017-v1_MINIAOD_CMS4_V00-00-02_toptag",
+        "data_2016F_met" : "/hadoop/cms/store/user/sicheng/ProjectMetis/MET_Run2016F-03Feb2017-v1_MINIAOD_CMS4_V00-00-02_toptag",
+        "data_2016G_met" : "/hadoop/cms/store/user/sicheng/ProjectMetis/MET_Run2016G-03Feb2017-v1_MINIAOD_CMS4_V00-00-02_toptag",
+        "data_2016H_met_ver2" : "/hadoop/cms/store/user/sicheng/ProjectMetis/MET_Run2016H-03Feb2017_ver2-v1_MINIAOD_CMS4_V00-00-02_toptag",
+        "data_2016H_met_ver3" : "/hadoop/cms/store/user/sicheng/ProjectMetis/MET_Run2016H-03Feb2017_ver3-v1_MINIAOD_CMS4_V00-00-02_toptag",
+
     }
 
 
@@ -49,14 +79,14 @@ if __name__ == "__main__":
         cmsswver = "CMSSW_9_4_1"
         scramarch = "slc6_amd64_gcc630"
         tarfile = "input.tar.gz"
-        tag = "v25_9"
+        tag = "v25_10"
         maker_task = CondorTask(
             sample = DirectorySample(
                 dataset=dsname,
                 location=samploc,
             ),
-            # open_dataset = True,
-            files_per_output = 1,
+            # open_dataset = True if dsname.startswith("data_2016H_singleel") else False,
+            files_per_output = 20 if dsname.startswith("data") else 1,
             tag = tag,
             cmssw_version = cmsswver,
             scram_arch = scramarch,
@@ -64,8 +94,9 @@ if __name__ == "__main__":
             executable = "condor_executable.sh",
             outdir_name = "stopBaby_" + dsname,
             output_name = "stopbaby.root",
-            arguments = "1" if "SMS" in dsname else "0", # isFastsim
-            condor_submit_params = {"sites": "UAF,T2_US_UCSD,UCSB"},
+            arguments = "1" if dsname.startswith("SMS") else "0", # isFastsim
+            condor_submit_params = {"sites": "UAF"},
+            # condor_submit_params = {"sites": "UAF,T2_US_UCSD,UCSB"},
             # no_load_from_backup = True,
         )
         merge_task = CondorTask(
@@ -78,7 +109,7 @@ if __name__ == "__main__":
             tarfile = "merge_scripts.tar.gz",
             files_per_output = 100000,
             output_dir = maker_task.get_outputdir() + "/merged",
-            output_name = "merged_" + dsname + ".root",
+            output_name = dsname + ".root",
             condor_submit_params = {"sites":"UAF"},
             output_is_tree = True,
             # check_expectedevents = True,

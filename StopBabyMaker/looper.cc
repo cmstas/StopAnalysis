@@ -1346,7 +1346,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
 
         StopEvt.pfmet = newmet.first;
         StopEvt.pfmet_phi = newmet.second;
-        if(evt_isRealData() && thisFile.Contains("03Feb2017")){
+        if(evt_isRealData() && thisFile.Contains("03Feb2017") && !thisFile.Contains("CMS4")){
           StopEvt.pfmet = evt_muegclean_pfmet();
           StopEvt.pfmet_phi = evt_muegclean_pfmetPhi();
           StopEvt.pfmet_original = newmet.first;
@@ -1361,14 +1361,14 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
       else{
         StopEvt.pfmet = evt_pfmet();
         StopEvt.pfmet_phi = evt_pfmetPhi();
-        if(evt_isRealData() && thisFile.Contains("03Feb2017")){
+        if(evt_isRealData() && thisFile.Contains("03Feb2017") && !thisFile.Contains("CMS4")){
           StopEvt.pfmet = evt_muegclean_pfmet();
           StopEvt.pfmet_phi = evt_muegclean_pfmetPhi();
           StopEvt.pfmet_original = evt_pfmetPhi();
           StopEvt.pfmet_original_phi = evt_pfmetPhi();
         }
       }
-      if(evt_isRealData() && thisFile.Contains("03Feb2017")){
+      if(evt_isRealData() && thisFile.Contains("03Feb2017") && !thisFile.Contains("CMS4")){
         StopEvt.pfmet_egclean = evt_egclean_pfmet();
         StopEvt.pfmet_egclean_phi = evt_egclean_pfmetPhi();
         StopEvt.pfmet_muegclean = evt_muegclean_pfmet();
