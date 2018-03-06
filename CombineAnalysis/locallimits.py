@@ -53,10 +53,14 @@ if __name__ == "__main__":
         combineddir = carddir + '/combinedcards'
         limitdir = 'limits/'+carddir.split('/')[-1]
 
+    sigscan = "std_T2tt"
+    if len(sys.argv) > 2:
+        sigscan = sys.argv[2]
+
     print "Doing limits from cards in ", carddir
 
     ext_cards = os.listdir(carddir)
-    ext_cards = filter(lambda x : "std_T2tt" in x and "bin1.txt" in x, ext_cards)
+    ext_cards = filter(lambda x : sigscan in x and "bin1.txt" in x, ext_cards)
 
     sigs = [ x[9:-9] for x in ext_cards]
     # print sigs

@@ -79,7 +79,7 @@ std::ofstream ofile;
 
 void StopLooper::SetSignalRegions() {
 
-  // SRVec = getStopSignalRegionsTopological();
+  SRVec = getStopSignalRegionsTopological();
   CR0bVec = getStopControlRegionsNoBTagsTopological();
   CR2lVec = getStopControlRegionsDileptonTopological();
 
@@ -87,11 +87,11 @@ void StopLooper::SetSignalRegions() {
   // CR0bVec = getStopControlRegionsNoBTagsAddTopTagBins();
   // CR2lVec = getStopControlRegionsDileptonAddTopTagBins();
 
-  // SRVec = getStopSignalRegionsBinInMergedTag();
-  // CR0bVec = getStopControlRegionsNoBTagsBinInMergedTag();
-  // CR2lVec = getStopControlRegionsDileptonBinInMergedTag();
+  // SRVec = getStopSignalRegionsBooleanTopTags();
+  // CR0bVec = getStopControlRegionsNoBTagsBooleanTopTags();
+  // CR2lVec = getStopControlRegionsDileptonBooleanTopTags();
 
-  SRVec = getStopInclusiveRegionsTopological();
+  // SRVec = getStopInclusiveRegionsTopological();
   // CRemuVec = getStopCrosscheckRegionsEMu();
 
   if (verbose) {
@@ -304,6 +304,15 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
         // if (massdiff < 200 || massdiff > 400 || mass_lsp() < 400 || mass_stop() > 900) continue;
         // if (massdiff < 300 || (mass_lsp() < 400 && mass_stop() < 700)) continue;
         plot2D("h_T2tt_masspts", mass_stop(), mass_lsp() , evtweight_, testVec[1].histMap, ";M(stop) [GeV]; M(lsp) [GeV]", 100, 300, 1300, 80, 0, 800);
+      } else if (dsname.Contains("T2bW")) {
+        float massdiff = mass_stop() - mass_lsp();
+        if (mass_lsp() < 300 && mass_stop() < 800) continue;
+        if (massdiff < 400) continue;
+        // if (massdiff < 900 || mass_stop() < 1000) continue;
+        // auto checkMassPt = [&](double mstop, double mlsp) { return (mass_stop() == mstop) && (mass_lsp() == mlsp); };
+        // if (!checkMassPt(800, 400) && !checkMassPt(800, 600) && !checkMassPt(1000, 50) && !checkMassPt(1000, 200)) continue;
+        plot2D("h_T2bW_masspts", mass_stop(), mass_lsp() , evtweight_, testVec[1].histMap, ";M(stop) [GeV]; M(lsp) [GeV]", 100, 300, 1300, 80, 0, 800);
+
       }
 
       // Only events nupt < 200 for WNJetsToLNu samples
@@ -336,28 +345,51 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
       // plot1D("h_nvtxs", nvtxs(), evtweight_, testVec[1].histMap, ";Number of vertices" , 100,  1, 101);
 
       // Temporary test for top tagging efficiency
-      testTopTaggingEffficiency(testVec[0]);
+      // testTopTaggingEffficiency(testVec[0]);
 
       // nbtag for CSV valued btags -- for comparison between the 2016 analysis
       int nbtagsCSV = 0;
       for (float csv : ak4pfjets_CSV())
         if (csv > 0.8484) nbtagsCSV++;
 
+      bool pass_deeptop_tag = false;
       float lead_restopdisc = -1.1;
-      float lead_deepdisc = -0.1;
+      float lead_deepdisc_top = -0.1;
+      float lead_deepdisc_W = -0.1;
+      float lead_bindisc_top = -0.1;
+      float lead_bindisc_W = -0.1;
+      int iak8_top = -1;
+      int iak8_W = -1;
 
       if (doTopTagging) {
         lead_restopdisc = (topcands_disc().size())? topcands_disc()[0] : -1.1;
-        for (auto disc : ak8pfjets_deepdisc_top()) {
-          if (disc > lead_deepdisc) lead_deepdisc = disc;
+        for (size_t iak8 = 0; iak8 < ak8pfjets_deepdisc_top().size(); ++iak8) {
+          float disc = ak8pfjets_deepdisc_top()[iak8];
+          if (disc > lead_deepdisc_top) {
+            lead_deepdisc_top = disc;
+            iak8_top = iak8;
+          }
+          if (disc > 0.7 || (ak8pfjets_p4().at(iak8).pt() > 500 && disc > 0.3))
+            pass_deeptop_tag = true;
+
+          float bindisc = disc / (disc + ak8pfjets_deepdisc_qcd().at(iak8));
+          if (bindisc > lead_bindisc_top) lead_bindisc_top = bindisc;
+
+          float discW = ak8pfjets_deepdisc_w()[iak8];
+          if (discW > lead_deepdisc_W) {
+            lead_deepdisc_W = discW;
+            iak8_W = iak8;
+          }
+          float bindiscW = discW / (discW + ak8pfjets_deepdisc_qcd().at(iak8));
+          if (bindiscW > lead_bindisc_W) lead_bindisc_W = bindiscW;
         }
 
         // The following part of the code trys to give the merged tag higher priority for by recognizing a resolved tag only
         // after overlap removal with the merged tag. The current resolved tag scheme need to change to fully support this
-        // if (lead_deepdisc > 0 && topcands_disc().size()) {
+        // if (lead_deepdisc_top > 0 && topcands_disc().size()) {
         //   size_t iak8 = 0;
         //   for (; iak8 < ak8pfjets_p4().size(); ++iak8)
-        //     if (ak8pfjets_deepdisc_top().at(iak8) == lead_deepdisc) break;
+        //     if (ak8pfjets_deepdisc_top().at(iak8) == lead_deepdisc_top) break;
         //   if (ak8pfjets_p4().at(iak8).pt() > 600) {
         //     lead_restopdisc = -1.1;
         //     for (size_t itc = 0; itc < topcands_disc().size(); ++itc) {
@@ -386,7 +418,14 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
 
       // For toptagging, add correct switch later
       values_["resttag"] = lead_restopdisc;
-      values_["deepttag"] = lead_deepdisc;
+      values_["deepttag"] = lead_deepdisc_top;
+      values_["deepWtag"] = lead_deepdisc_W;
+      values_["binttag"] = lead_bindisc_top;
+      values_["binWtag"] = lead_bindisc_W;
+      values_["topak8pt"] = (iak8_top < 0)? 0 : ak8pfjets_p4().at(iak8_top).pt();
+      values_["Wak8pt"] = (iak8_W < 0)? 0 : ak8pfjets_p4().at(iak8_W).pt();
+      values_["passdeepttag"] = pass_deeptop_tag;
+      values_["passresttag"] = lead_restopdisc > 0.9;
 
       /// Values only for hist filling or testing
       values_["chi2"] = hadronic_top_chi2();
@@ -528,6 +567,12 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
       dir->cd();
       for (auto& h : sr.histMap) {
         if (h.first.find("HI") != string::npos || h.first.find("LOW") != string::npos) continue;
+        if (h.first.find("metbins") != string::npos) {
+          int nbin = h.second->GetNbinsX();
+          double err = 0;
+          h.second->SetBinContent(nbin, h.second->IntegralAndError(nbin, -1, err));
+          h.second->SetBinError(nbin, err);
+        }
         h.second->Write();
       }
     }
@@ -645,6 +690,22 @@ void StopLooper::fillHistosForSR(string suf) {
       plot1D("h_dphijmet"+s, values_["dphijmet"], evtweight_, sr.histMap, ";#Delta#phi(jet,#slash{E}_{T})" , 24,  0, 4);
       plot1D("h_tmod"+s,     values_["tmod"]    , evtweight_, sr.histMap, ";Modified topness"        , 25, -10, 15);
       if (doTopTagging) {
+        plot1D("h_nak8jets", ak8pfjets_deepdisc_top().size(), evtweight_, sr.histMap, ";Number of AK8 jets", 7, 0, 7);
+        plot1D("h_resttag", values_["resttag"], evtweight_, sr.histMap, ";resolved top tag", 110, -1.1, 1.1);
+        plot1D("h_deepttag", values_["deepttag"], evtweight_, sr.histMap, ";deepAK8 top tag", 120, -0.1, 1.1);
+        plot1D("h_binttag", values_["binttag"], evtweight_, sr.histMap, ";deepAK8 binarized top disc", 120, -0.1, 1.1);
+        plot1D("h_deepWtag", values_["deepWtag"], evtweight_, sr.histMap, ";deepAK8 W tag", 120, -0.1, 1.1);
+        plot1D("h_binWtag", values_["binWtag"], evtweight_, sr.histMap, ";deepAK8 binarized W disc", 120, -0.1, 1.1);
+
+        // Temporary test
+        // if (values_["deepAK8pt"] > 400) plot1D("h_deepttag_400", values_["deepttag"], evtweight_, sr.histMap, ";deepAK8 top tag", 120, -0.1, 1.1);
+        // if (values_["deepAK8pt"] > 500) plot1D("h_deepttag_500", values_["deepttag"], evtweight_, sr.histMap, ";deepAK8 top tag", 120, -0.1, 1.1);
+        // if (values_["deepAK8pt"] > 600) plot1D("h_deepttag_600", values_["deepttag"], evtweight_, sr.histMap, ";deepAK8 top tag", 120, -0.1, 1.1);
+
+        // if (values_["deepttag"] > 0.6) plot1D("h_deepttag0p6_pt"+s, values_["deepAK8pt"], evtweight_, sr.histMap, ";p_{T}(AK8) [GeV]", 75, 0, 1500);
+        // if (values_["deepttag"] > 0.4) plot1D("h_deepttag0p4_pt"+s, values_["deepAK8pt"], evtweight_, sr.histMap, ";p_{T}(AK8) [GeV]", 75, 0, 1500);
+        // if (values_["deepttag"] > 0.2) plot1D("h_deepttag0p2_pt"+s, values_["deepAK8pt"], evtweight_, sr.histMap, ";p_{T}(AK8) [GeV]", 75, 0, 1500);
+
         if (values_["njet"] >= 4) {
           float lead_topcand_disc = (topcands_disc().size() > 0)? topcands_disc()[0] : -1.1;
           plot1D("h_leadtopcand_disc"+s, lead_topcand_disc, evtweight_, sr.histMap, ";top discriminator", 110, -1.1, 1.1);
@@ -666,9 +727,7 @@ void StopLooper::fillHistosForSR(string suf) {
           plot2D("h2d_mlb_restag", values_["resttag"], values_["mlb"], evtweight_, sr.histMap, ";lead topcand disc;M_{lb}", 55, -1.1, 1.1, 50, -10, 15);
           plot2D("h2d_dphijmet_restag", values_["resttag"], values_["dphijmet"], evtweight_, sr.histMap, ";lead topcand disc;#Delta#phi(jet,#slash{E}_{T})", 55, -1.1, 1.1, 40, 0, 4);
         }
-        plot1D("h_nak8jets", ak8pfjets_deepdisc_top().size(), evtweight_, sr.histMap, ";Number of AK8 jets", 7, 0, 7);
         plot2D("h2d_njets_nak8", ak8pfjets_deepdisc_top().size(), values_["njet"], evtweight_, sr.histMap, ";Number of AK8 jets; Number of AK4 jets", 7, 0, 7, 8, 2, 10);
-        plot1D("h_lead_deepdisc_top", values_["deepttag"], evtweight_, sr.histMap, ";lead AK8 deepdisc top", 120, -0.1, 1.1);
         plot2D("h2d_tmod_deeptag", values_["deepttag"], values_["tmod"], evtweight_, sr.histMap, ";lead deepdisc top;t_{mod}", 60, -0.1, 1.1, 50, -10, 15);
         plot2D("h2d_dphijmet_deeptag", values_["deepttag"], values_["dphijmet"], evtweight_, sr.histMap, ";lead deepdisc top;#Delta#phi(jet,#slash{E}_{T})", 60, -0.1, 1.1, 40, 0, 4);
         plot2D("h2d_mlb_deeptag", values_["deepttag"], values_["mlb"], evtweight_, sr.histMap, ";lead deepdisc top;M_{lb}", 60, -0.1, 1.1, 50, -10, 15);

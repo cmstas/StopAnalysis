@@ -28,6 +28,10 @@ std::vector<SR> getStopSignalRegionsBinInMergedTag();
 std::vector<SR> getStopControlRegionsNoBTagsBinInMergedTag();
 std::vector<SR> getStopControlRegionsDileptonBinInMergedTag();
 
+std::vector<SR> getStopSignalRegionsBooleanTopTags();
+std::vector<SR> getStopControlRegionsNoBTagsBooleanTopTags();
+std::vector<SR> getStopControlRegionsDileptonBooleanTopTags();
+
 
 std::vector<SR> getStopCrosscheckRegionsEMu();
 std::vector<SR> getStopInclusiveRegionsTopological();

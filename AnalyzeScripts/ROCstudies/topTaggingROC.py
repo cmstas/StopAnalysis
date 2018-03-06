@@ -14,7 +14,7 @@ def makeROClist(hgood, hfake, *args, **kwargs):
     bindiv = hgood.GetNbinsX() / 2.2
     startbin = hgood.FindBin(1)
     stopbin = hgood.GetNbinsX()+1 # human define for aesthetic
-    cut_at_eff = 0.7             # human define for aesthetic
+    cut_at_eff = 1             # human define for aesthetic
     print "startbin is", startbin
     print "bindiv is", bindiv
 
@@ -107,7 +107,7 @@ if __name__ == "__main__":
     gstob.GetYaxis().SetTitle("S / #sqrt{S+B}")
     gstob.Draw()
 
-    c1.Print("stob_srNJet2_toptag.pdf")
+    c1.Print("stob_srNJetMET2_toptag.pdf")
 
     c1.Clear()
 
@@ -122,15 +122,15 @@ if __name__ == "__main__":
 
     groc.Draw()
 
-    c1.Print("roc_srNJet2_toptag.pdf")
+    c1.Print("roc_srNJetMET2_toptag.pdf")
 
     # c1.Clear()
 
     # hgood = f1.Get("testTopTagging/h_chi2_disc1")
     # hfake = f2.Get("testTopTagging/h_chi2fake_disc1")
 
-    hgood = f1.Get("srNJet2/h_chi2_disc")
-    hfake = f2.Get("srNJet2/h_chi2_disc")
+    hgood = f1.Get("srNJetMET2/h_chi2_disc")
+    hfake = f2.Get("srNJetMET2/h_chi2_disc")
 
     if not hgood: print "Cannot find hgood!"
     if not hfake: print "Cannot find hfake!"
@@ -150,15 +150,18 @@ if __name__ == "__main__":
     leg.AddEntry(chi2roc, "had chi2")
     leg.Draw()
 
-    c1.Print("roc_srNJet2_chi2.pdf")
+    c1.Print("roc_srNJetMET2_chi2.pdf")
 
-    hgood = f1.Get("srNJet2/h_tmod_finedisc")
-    hfake = f2.Get("srNJet2/h_tmod_finedisc")
+    hgood = f1.Get("srNJetMET2/h_tmod_finedisc")
+    hfake = f2.Get("srNJetMET2/h_tmod_finedisc")
 
     if not hgood: print "Cannot find hgood!"
     if not hfake: print "Cannot find hfake!"
 
-    lst_eff, lst_fkr, _ = makeROClist(hgood, hfake)
+    lst_eff, lst_fkr, lst_disc = makeROClist(hgood, hfake)
+    for i, disc in enumerate(lst_disc):
+        if (disc > 0.66 and disc < 0.67) or (disc > -0.01 and disc < 0.01):
+            print disc, lst_eff[i], lst_fkr[i]
 
     tmodroc = r.TGraph(lst_eff.size, lst_eff, lst_fkr)
     tmodroc.SetLineColor(r.kRed)
@@ -173,9 +176,9 @@ if __name__ == "__main__":
     leg.AddEntry(tmodroc, "tmod")
     leg.Draw()
 
-    c1.Print("roc_srNJet2_tmod.pdf")
+    c1.Print("roc_srNJetMET2_tmod.pdf")
 
-    fout = r.TFile("temp2.root", "update")
+    fout = r.TFile("temp3.root", "update")
     groc.Write("roc_ltc_dm600_ge4j")
     chi2roc.Write("roc_chi2_dm600_ge4j")
     tmodroc.Write("roc_tmod_dm600_ge4j")
