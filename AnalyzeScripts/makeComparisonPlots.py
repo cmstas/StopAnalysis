@@ -10,16 +10,20 @@ if __name__ == "__main__":
     os.system("mkdir -p plots")
 
     r.gROOT.SetBatch(1)
+    r.gStyle.SetOptStat(0)
 
     opts = {}
     opts["outputName"] = "plots/test.pdf"
     optstr = "--darkColorLines --lumi 2.89 --topYaxisTitle Data/Pred. --type Preliminary --dataName data2017 --outOfFrame "
 
-    f1 = r.TFile("../StopLooper/output/data2016/all_data_Run2016.root")
-    f2 = r.TFile("../StopLooper/output/mc2016/all_mc_Run2016.root")
+    f1 = r.TFile("../StopLooper/output/temp11/allBkg_25ns.root")
+    f2 = r.TFile("../StopLooper/output/temp11/SMS_T2tt.root")
 
-    Dirs = ["srbase", "cr2lbase", "cr0bbase"]
-    Hists = ["h_metbins", "h_met", "h_njets", "h_nbjets", "h_tmod", "h_mlepb"]
+    # Dirs = ["srbase", "cr2lbase", "cr0bbase"]
+    # Hists = ["h_metbins", "h_met", "h_njets", "h_nbjets", "h_tmod", "h_mlepb"]
+
+    Dirs = ["srbase"]
+    Hists = ["h_deepttag0p6_pt", "h_deepttag0p4_pt", "h_deepttag0p2_pt"]
 
     for dirstr in Dirs:
         for hstr in Hists:
@@ -32,14 +36,34 @@ if __name__ == "__main__":
             # scale = h1.Integral()/h2.Integral()
             # h2.Scale(scale)
 
-            bgs = [h2,]
-            opts["outputName"] = "plots/"+h1.GetName()+".pdf"
-            opts["xAxisOverride"] = h1.GetXaxis().GetTitle()
-            print opts["outputName"], opts["xAxisOverride"]
-            color = [r.kAzure-3,]
+            # bgs = [h2,]
+            # opts["outputName"] = "plots/"+h1.GetName()+".pdf"
+            # opts["xAxisOverride"] = h1.GetXaxis().GetTitle()
+            # print opts["outputName"], opts["xAxisOverride"]
+            # color = [r.kAzure-3,]
 
-            title = "title"
-            subttl = "subttl"
+            # title = "title"
+            # subttl = "subttl"
 
-            dataMCplot(h1, bgs=[h2,], titles=["data2016",], colors=color, opts=opts, opts_str=optstr, title=title, subtitle=subttl)
+            # dataMCplot(h1, bgs=[h2,], titles=["data2016",], colors=color, opts=opts, opts_str=optstr, title=title, subtitle=subttl)
+
+            h1.Scale(1./h1.Integral())
+            h2.Scale(1./h2.Integral())
+
+            c1 = r.TCanvas("c1", "c1", 800, 600)
+            h1.Draw()
+            c1.Print('plots/'+hstr+'.pdf')
+
+            hratio = h1.Clone('ratio'+hstr[1:])
+            hratio.Divide(h2)
+            for i in range(1, hratio.GetNbinsX()):
+                if (hratio.GetBinContent(i) < 0):
+                    hratio.SetBinContent(i, 0)
+                    hratio.SetBinError(i, 0)
+
+            hratio.GetYaxis().SetRangeUser(0, 7)
+            hratio.SetTitle('ratio'+hstr[1:])
+            hratio.Draw()
+            
+            # c1.Print('plots/'+hstr+'.pdf')
 
