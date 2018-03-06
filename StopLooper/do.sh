@@ -44,22 +44,22 @@ declare -a Samples=(TTJets)
 #     # eval "nohup nice -n -10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
 # done
 
-# 2016 data for comparison
-# INDIR=/nfs-7/userdata/stopRun2/analysis2016_SUS-16-051_35p9fbinv/v24/output
-INDIR=/nfs-7/userdata/stopRun2/analysis2016_SUS-16-051_35p9fbinv/v24/skim
-OUTDIR=output/temp14
+# 2016 data
+# INDIR=/nfs-7/userdata/stopRun2/analysis2016_SUS-16-051_35p9fbinv/v24/skim
+INDIR=/nfs-7/userdata/sicheng/stopbabies/skimmed_v25_10
+OUTDIR=output/temp16
 
 mkdir -p ${OUTDIR}
 mkdir -p ${LOGDIR}
 
-# declare -a Samples=(data_2016B data_2016C data_2016D data_2016E data_2016F data_2016G data_2016H)
-declare -a Samples=(all_2016)
+# declare -a Samples=(all_2016)
+declare -a Samples=(data_2016B data_2016C data_2016D data_2016E data_2016F data_2016G data_2016H)
 
-# for SAMPLE in ${Samples[@]}; do
-#     ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
-#     echo ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} '>&' ${LOGDIR}/log_${SAMPLE}.txt
-#     # eval "nohup nice -n -10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
-# done
+for SAMPLE in ${Samples[@]}; do
+    # ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
+    echo ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} '>&' ${LOGDIR}/log_${SAMPLE}.txt
+    eval "nohup nice -n -10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
+done
 
 # 2016 MC
 
@@ -74,7 +74,7 @@ declare -a Samples=(all_2016)
 
 # INDIR=/nfs-7/userdata/sicheng/stopbabies/merged_v25_9
 INDIR=/nfs-7/userdata/sicheng/stopbabies/skimmed_v25_9
-OUTDIR=output/temp_4bins
+# OUTDIR=output/temp15
 
 mkdir -p ${OUTDIR}
 mkdir -p ${LOGDIR}
@@ -95,7 +95,7 @@ done
 # 2016 signal
 INDIR=/nfs-7/userdata/sicheng/stopbabies/skimmed_v25_9
 # INDIR=/nfs-7/userdata/stopRun2/analysis2016_SUS-16-051_35p9fbinv/v22_usegenMET/skim
-OUTDIR=output/temp_4bins
+# OUTDIR=output/temp15
 
 mkdir -p ${OUTDIR}
 mkdir -p ${LOGDIR}
@@ -104,7 +104,9 @@ declare -a Samples=()
 Samples+=( SMS_T2tt_mStop_400to1200_madgraph_0 SMS_T2tt_mStop_400to1200_madgraph_1 SMS_T2tt_mStop_400to1200_madgraph_2 )
 Samples+=( SMS_T2tt_mStop_400to1200_madgraph_3 SMS_T2tt_mStop_400to1200_madgraph_4 SMS_T2tt_mStop_400to1200_madgraph_5 )
 Samples+=( SMS_T2tt_mStop_400to1200_madgraph_6 SMS_T2tt_mStop_400to1200_madgraph_7 )
-# declare -a Samples=(Signal_T2tt_m)
+Samples+=( SMS_T2bW_madgraph_0 SMS_T2bW_madgraph_1 SMS_T2bW_madgraph_2 )
+Samples+=( SMS_T2bW_madgraph_3 SMS_T2bW_madgraph_4 SMS_T2bW_madgraph_5 )
+Samples+=( SMS_T2bW_madgraph_6 SMS_T2bW_madgraph_7 )
 
 for SAMPLE in ${Samples[@]}; do
     echo ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} '>&' ${LOGDIR}/log_${SAMPLE}.txt
@@ -121,20 +123,22 @@ done
 echo -e 'All background jobs done!\a'
 
 # Local merge for the v25_9 babies
-pushd output/temp_4bins
+pushd ${OUTDIR}
 hadd -f ttbar_25ns.root    ttbar_*Lept*.root > /dev/null
 hadd -f singleT_25ns.root  t_tW_*.root  > /dev/null
 hadd -f Vjets_25ns.root    W1Jets*.root W2Jets*.root W3Jets*.root W4Jets*.root > /dev/null
 hadd -f rare_25ns.root     TTZ*.root WZ*.root  > /dev/null
 hadd -f allBkg_25ns.root   ttbar_25ns.root singleT_25ns.root Vjets_25ns.root rare_25ns.root > /dev/null
 hadd -f SMS_T2tt.root      SMS_T2tt_mStop_400to1200_madgraph_?.root > /dev/null
+hadd -f SMS_T2bW.root      SMS_T2bW_madgraph_?.root > /dev/null
+hadd -f allData_25ns.root  data_2016*.root > /dev/null
 popd > /dev/null
 
 # # Local merge for the moriond17 samples
 # pushd output/temp14
 # hadd -f ttbar_25ns.root    ttbar*Lept*.root > /dev/null
 # hadd -f singleT_25ns.root  t_t*_noHadDecays*.root > /dev/null
-# hadd -f Vjets_25ns.root    W?Jets*.root DYJets*.root > /dev/null
+# hadd -f Vjets_25ns.root    W?Jets*.root DYJets*m10To50*.root > /dev/null
 # hadd -f rare_25ns.root     ttZ*.root WZ*.root ttW*.root WW*.root ZZ*.root > /dev/null
 # hadd -f allBkg_25ns.root   ttbar_25ns.root singleT_25ns.root Vjets_25ns.root rare_25ns.root > /dev/null
 # popd > /dev/null
