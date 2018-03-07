@@ -407,6 +407,7 @@ evtWgtInfo::evtWgtInfo() {
   apply_diLepTrigger_sf = false;
   apply_cr2lTrigger_sf  = false;
   apply_bTag_sf         = false;
+  apply_bTagFS_sf       = false;
   apply_lep_sf          = false;
   apply_vetoLep_sf      = false;
   apply_tau_sf          = false;
@@ -706,16 +707,16 @@ void evtWgtInfo::calculateWeightsForEvent(bool nominalOnly) {
     getTopPtWeight( sf_topPt, sf_topPt_up, sf_topPt_dn );
 
   // MET resolution scale factors <-- would be easier to do it by just scaling the histogram afterwards <-- todo: not forget this
-  if ( sampletype == "ttbar" || sampletype == "ttW" || sampletype == "wjets" )
+  if ( sampletype == "ttbar" || sampletype == "singletop" || sampletype == "wjets" )
     getMetResWeight( sf_metRes, sf_metRes_up, sf_metRes_dn );
   // getMetResWeight_corridor( sf_metRes_corridor, sf_metRes_corridor_up, sf_metRes_corridor_dn );
 
   // MET ttbar scale factors
-  if (is_bkg_ && (sampletype == "ttbar" || sampletype == "ttW"))
+  if (is_bkg_ && (sampletype == "ttbar" || sampletype == "singletop"))
     getMetTTbarWeight( sf_metTTbar, sf_metTTbar_up, sf_metTTbar_dn );
 
   // ttbar system pT scale factor, apply_ttbarSysPt_sf=false: uncertainty only
-  if (is_bkg_ && (sampletype == "ttbar" || sampletype == "ttW"))
+  if (is_bkg_ && (sampletype == "ttbar" || sampletype == "singletop"))
     getTTbarSysPtSF( sf_ttbarSysPt, sf_ttbarSysPt_up, sf_ttbarSysPt_dn );
 
   // ISR Correction
@@ -1626,7 +1627,7 @@ void evtWgtInfo::getMetResWeight( double &weight_metRes, double &weight_metRes_u
   if ( is_signal_ ) return;
 
   // ttbar, tW, wjets
-  // if ( sampletype != "ttbar" && sampletype != "ttW" && sampletype != "wjets" ) return;
+  // if ( sampletype != "ttbar" && sampletype != "singletop" && sampletype != "wjets" ) return;
 
   // 2lep events only
   // if ( !babyAnalyzer.is2lep() ) return;
@@ -1919,7 +1920,7 @@ void evtWgtInfo::getMetResWeight_corridor( double &weight_metRes, double &weight
   if ( is_signal_ ) return;
 
   // ttbar, tW
-  if ( sampletype != "ttbar" && sampletype != "ttW" && sampletype != "wjets" ) return;
+  if ( sampletype != "ttbar" && sampletype != "singletop" && sampletype != "wjets" ) return;
 
   // 2lep events only
   //if ( !babyAnalyzer.is2lep() ) return;
@@ -1990,7 +1991,7 @@ void evtWgtInfo::getMetTTbarWeight( double &weight_metTTbar, double &weight_metT
   if ( is_signal_ ) return;
 
   // // ttbar, tW
-  // if ( sampletype != "ttbar" && sampletype != "ttW") return;
+  // if ( sampletype != "ttbar" && sampletype != "singletop") return;
 
   // 2lep events only
   if ( !babyAnalyzer.is2lep() ) return;
@@ -2500,10 +2501,12 @@ bool evtWgtInfo::doingSystematic( systID isyst ) {
 string evtWgtInfo::findSampleType( string samplestr ) {
   TString sample(samplestr);
 
-  if (sample.Contains("data")) return "data";
-  else if (sample.Contains("ttbar") || sample.Contains("TT_")) return "ttbar";
-  else if (sample.Contains("ttW") || sample.Contains("t_tW") || sample.Contains("t_tbarW")) return "ttW";
-  else if (sample.Contains("W") && sample.Contains("Jets")) return "wjets";
+  if (sample.BeginsWith("data")) return "data";
+  else if (sample.BeginsWith("ttbar") || sample.BeginsWith("TT_")) return "ttbar";
+  else if (sample.BeginsWith("t_") || sample.BeginsWith("ST_")) return "singletop";
+  else if (sample.BeginsWith("ttW") || sample.BeginsWith("TTW")) return "ttW";
+  else if (sample.BeginsWith("ttZ") || sample.BeginsWith("TTZ")) return "ttZ";
+  else if (sample.BeginsWith("W") && sample.Contains("Jets")) return "wjets";
 
   return samplestr;
 }
@@ -2540,6 +2543,10 @@ void evtWgtInfo::setDefaultSystematics( int syst_set ) {
       apply_ISR_sf         = true;  // only !=1.0 for signal
       apply_pu_sf          = true;
       apply_sample_sf      = true;  // only !=1.0 for some WJetsHT samps
+      if (is_fastsim_) {
+        apply_lepFS_sf     = true;
+        apply_bTagFS_sf    = true;
+      }
       break;
   }
 

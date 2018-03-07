@@ -59,13 +59,13 @@ const bool doNvtxReweight = false;
 // turn on to apply nTrueInt reweighting to MC
 const bool doNTrueIntReweight = true;
 // turn on top tagging studies, off for 2016 data/mc
-const bool doTopTagging = true;
+const bool doTopTagging = false;
 // turn on to apply json file to data
 const bool applyjson = true;
 // ignore scale1fb to run over test samples
 const bool ignoreScale1fb = false;
 // not running the standard regions to speed up
-const bool runYieldsOnly = false;
+const bool runYieldsOnly = true;
 // debug symbol, for printing exact event kinematics that passes
 const bool printPassedEvents = false;
 
@@ -163,8 +163,8 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
 
   // Full 2017 dataset json, 41.96/fb
   // const char* json_file = "../StopBabyMaker/json_files/Cert_294927-306462_13TeV_PromptReco_Collisions17_JSON_snt.txt";
-  const float kLumi = 40;
-  // const float kLumi = 35.867;         // 2016 lumi
+  // const float kLumi = 40;
+  const float kLumi = 35.867;         // 2016 lumi
 
   // Combined 2016 and 2017 json,
   // const char* json_file = "../StopCORE/inputs/json_files/Cert_271036-301141_13TeV_Combined1617_JSON_snt.txt";
@@ -225,7 +225,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
     // Get event weight histogram from baby
     TH3D* h_sig_counter = nullptr;
     TH2D* h_sig_counter_nEvents = nullptr;
-    if ( is_fastsim_ ) {
+    if (is_fastsim_) {
       h_sig_counter = (TH3D*) file.Get("h_counterSMS");
       h_sig_counter_nEvents = (TH2D*) file.Get("histNEvts");
     }
@@ -745,19 +745,6 @@ void StopLooper::fillHistosForSR(string suf) {
     // else if ( abs(lep1_pdgid()) == 13 )
     //   fillKineHists(suf+"_mu");
 
-    if (doTopTagging && suf == "") {
-      if (topcands_disc().size() > 0 && topcands_disc()[0] > 0.9) {
-        fillYieldHistos(sr, values_["met"], "_wtc"+suf);
-        // fillKineHists("_wtc"+suf);
-      }
-      for (auto disc : ak8pfjets_deepdisc_top()) {
-        if (disc > 0.9) {
-          fillYieldHistos(sr, values_["met"], "_wdt"+suf);
-          break;
-        }
-      }
-      // fillKineHists("_wtc"+suf);
-    }
   }
   // SRVec[0].PassesSelectionPrintFirstFail(values_);
 }

@@ -171,16 +171,17 @@ class evtWgtInfo {
   double sf_bTagEffHF_dn;
   double sf_bTagEffLF_up;
   double sf_bTagEffLF_dn;
-  double sf_bTag_FS_up;
-  double sf_bTag_FS_dn;
   double sf_bTag_tight;
   double sf_bTagEffHF_tight_up;
   double sf_bTagEffHF_tight_dn;
   double sf_bTagEffLF_tight_up;
   double sf_bTagEffLF_tight_dn;
+
+  bool   apply_bTagFS_sf;
+  double sf_bTag_FS_up;
+  double sf_bTag_FS_dn;
   double sf_bTag_tight_FS_up;
   double sf_bTag_tight_FS_dn;
-
 
   bool   apply_lep_sf;
   double sf_lep;
