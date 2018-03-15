@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <cmath>
-#include <algorithm> 
+#include <algorithm>
 
 // ROOT
 #include "TDirectory.h"
@@ -32,9 +32,9 @@ const int maxnprocess = 5;
 bool verbose = true;
 // do correlated syst for bkg errors
 const bool correlated = true;
-const bool fakedata = true;
-const bool nobgsyst = true;
-const bool nosigsyst = true;
+const bool fakedata = false;
+const bool nobgsyst = false;
+const bool nosigsyst = false;
 const bool dropsigcont = true;
 const bool dogenmet = false;
 
@@ -47,11 +47,29 @@ TFile *fznunu;
 TFile *fdata;
 TFile *fsig_genmet;
 
+// generic function to get yield from histograms
+double getYield(TFile* file, TString hname, int metbin, int endbin = 0) {
+  TH1D* hist = (TH1D*) file->Get(hname);
+  if (!hist) return 0;
+  if (metbin > hist->GetNbinsX()) {
+    cout << "[getYield] Request bin " << metbin << " exceed the maximum " << hist->GetNbinsX() << " for " << hname << " in file " << file->GetName() << " !!\n";
+    return 0;
+  }
+  if (endbin != 0)
+    return hist->Integral(metbin, endbin);
+
+  return hist->GetBinContent(metbin);
+}
+
 // generic function to get yield from histograms, and error in the card format 1 + relerr
 double getYieldAndError(double& error, TFile* file, TString hname, int metbin) {
   TH1D* hist = (TH1D*) file->Get(hname);
   if (!hist) {
     if (verbose) cout << "[getYieldAndError] Cannot find yield hist " << hname << "  in file " << file->GetName() << " !! returning 0!\n";
+    return 0;
+  }
+  if (metbin > hist->GetNbinsX()) {
+    cout << "[getYieldAndError] Request bin " << metbin << " exceed the maximum " << hist->GetNbinsX() << " for " << hname << " in file " << file->GetName() << " !!\n";
     return 0;
   }
   double yield = hist->GetBinContent(metbin);
@@ -159,17 +177,17 @@ int makeCardForOneBin(TString dir, int metbin, TString signame, int bin, TString
   TString hname_Z  = hname + "_"; // + "_Znunu_";
   TString hname_sig = hname + signame(4, 12);  // signame format: "T2tt_1200_900"
 
-  // some constants
+  // constants uncertainties
   double triggerrDn = 0.98;
-  if (bin == 1 || bin == 4 || bin == 8 || bin == 11)
-    triggerrDn = 0.95;
-  double triggerrUp  = 1.01; //also on any other simulation
-  double lumierr     = 1.062; //also on any other simulation
+  // if (bin == 1 || bin == 4 || bin == 8 || bin == 11)
+  //   triggerrDn = 0.95;
+  double triggerrUp  = 1.01;
+  double lumierr     = 1.025;
   double lepvetoerr  = 1.03;
 
   // these are the yields and statistical uncertainties
   double sig(0.), sigerr(1.);
-  double sig1(0.), sig2(1.), sig1err(1.), sig2err(1.);
+  double sig1(0.), sig2(1.);
   double osig(0.); // keep original without signal contamination correction
   double data(0.), dataerr(0);
   double bg2l(0.), bg2lerr(1.), bg1l(0.), bg1lerr(1.), bg1ltop(0.), bg1ltoperr(1.), bgznunu(0.), bgznunuerr(1.);
@@ -179,28 +197,41 @@ int makeCardForOneBin(TString dir, int metbin, TString signame, int bin, TString
   osig = sig; sig1 = sig;
 
   if (!dropsigcont) {
-    TString hname_cr2l_sig = TString(hname_sig).ReplaceAll("sr", "cr2l");
-    TString hname_cr0b_sig = TString(hname_sig).ReplaceAll("sr", "cr0b");
-    double sig_cr2l = getYieldAndError(sig1err, fsig, hname_cr2l_sig, metbin);
-    double sig_cr0b = getYieldAndError(sig1err, fsig, hname_cr0b_sig, metbin);
-    sig1 = sig - sig_cr2l - sig_cr0b;
+    auto getSigContainmination = [&](TFile* fsig, TFile* fbkg, TString crname) {
+      double sigcont(0.);
+      TString hnameCR_sig = TString(hname_sig).ReplaceAll("sr", crname);
+      int extr_start_bin = getYield(fbkg, "h_extrstart", 1);
+      if (extr_start_bin > 0 && extr_start_bin < metbin) {
+        // doing met extrapolation for this bin
+        sigcont = getYield(fsig, hnameCR_sig, extr_start_bin, -1);
+        sigcont *= getYield(fbkg, "h_alphaHist", metbin);
+      } else {
+        sigcont = getYield(fsig, hnameCR_sig, metbin);
+        sigcont *= getYield(fbkg, "h_alphaHist", metbin);
+      }
+      return sigcont;
+    };
+
+    double sigcont_cr2l = getSigContainmination(fsig, f2l, "cr2l");
+    double sigcont_cr0b = getSigContainmination(fsig, f1l, "cr0b");
+    sig1 = sig - sigcont_cr2l - sigcont_cr0b;
     sig1 = TMath::Max(0., sig1);
     sig = sig1;
 
-    // this is the yield deal with the genmet switched samples? I guess
+    // do the average of yield between the normal and genmet yields
     if (dogenmet && fsig_genmet) {
-      sig2 = getYieldAndError(sig2err, fsig_genmet, hname_sig, metbin);
-      double sig2_cr2l = getYieldAndError(sig1err, fsig_genmet, hname_cr2l_sig, metbin);
-      double sig2_cr0b = getYieldAndError(sig1err, fsig_genmet, hname_cr0b_sig, metbin);
-      sig2 = sig2 - sig2_cr2l - sig2_cr0b;
+      sig2 = getYield(fsig_genmet, hname_sig, metbin);
+      double sigcont_cr2l = getSigContainmination(fsig_genmet, f2l, "cr2l");
+      double sigcont_cr0b = getSigContainmination(fsig_genmet, f1l, "cr0b");
+      sig2 = sig2 - sigcont_cr2l - sigcont_cr0b;
       sig2 = TMath::Max(0., sig2);
       sig = (sig1 + sig2) / 2;
     }
   }
 
   data = getYieldAndError(dataerr, fdata, hname, metbin);
-  bg2l = getYieldAndError(bg2lerr, f2l, hname, metbin);  // <-- look up for the errors
-  bg1l = getYieldAndError(bg1lerr, f1l, hname, metbin);
+  bg2l = getYieldAndError(bg2lerr, f2l, hname + "_dataStats", metbin);  // <-- look up for the errors
+  bg1l = getYieldAndError(bg1lerr, f1l, hname + "_dataStats", metbin);
   bg1ltop = getYieldAndError(bg1ltoperr, f1ltop, hname, metbin);
   bgznunu = getYieldAndError(bgznunuerr, fznunu, hname, metbin);
 
@@ -238,8 +269,8 @@ int makeCardForOneBin(TString dir, int metbin, TString signame, int bin, TString
   numnuis += addOneUnc(fLogStream, "SigStat",     sigerr,     -1, 0, bin, "lnN"); // <-- revisit the Stats later
 
   if (!nosigsyst && sig > 0) {
-    // vector<string> systNamesCard = {"PUSyst", "BLFSyst",   "BHFSyst",   "JESSyst", "ISRSyst", "LEffSyst", "LEffFSSyst",}; // "BFSSyst", "MuRFSyst",
-    vector<string> systNames_sig = {"pileup", "bTagEffLF", "bTagEffHF", "jes",     "ISR",     "lepSF",    "lepFSSF",   }; // "BFSSyst", "MuRFSyst",
+    // vector<string> systNamesCard = {"PUSyst", "BLFSyst", "BHFSyst", "JESSyst", "ISRSyst", "LEffSyst", "LEffFSSyst", "BFSSyst", "MuRFSyst"};
+    vector<string> systNames_sig = {"pileup", "bTagEffLF", "bTagEffHF", "q2", "jes", "ISR", "lepSF", "lepFSSF", }; // "bTagFSEff"
     for (string syst : systNames_sig) {
       double systUp, systDn;
       getUncertainties(systUp, systDn, osig, fsig, hname_sig+"_"+syst.c_str(), metbin);
@@ -248,31 +279,39 @@ int makeCardForOneBin(TString dir, int metbin, TString signame, int bin, TString
     numnuis += addOneUnc(fLogStream, "lepVetoSyst", lepvetoerr, -1, 0, bin, "lnN");
   }
 
-  if (bg2l > 0)    numnuis += addOneUnc(fLogStream, "Bg2lStat",    bg2lerr,    -1, 1, bin, "lnN");
-  if (bg1l > 0)    numnuis += addOneUnc(fLogStream, "Bg1lStat",    bg1lerr,    -1, 2, bin, "lnN");
-  if (bg1ltop > 0) numnuis += addOneUnc(fLogStream, "Bg1lTopStat", bg1ltoperr, -1, 3, bin, "lnN");
+  // Statistical uncertainties
+  if (bg2l > 0) {
+    numnuis += addOneUnc(fLogStream, "Bg2lDataStat", bg2lerr, -1, 1, bin, "lnN");
+    getYieldAndError(bg2lerr, f2l, hname + "_MCStats", metbin);
+    numnuis += addOneUnc(fLogStream, "Bg2lMCStat",   bg2lerr, -1, 1, bin, "lnN");
+  }
+  if (bg1l > 0) {
+    numnuis += addOneUnc(fLogStream, "Bg1lDataStat", bg1lerr, -1, 2, bin, "lnN");
+    getYieldAndError(bg1lerr, f1l, hname + "_MCStats", metbin);
+    numnuis += addOneUnc(fLogStream, "Bg1lMCStat",   bg1lerr, -1, 2, bin, "lnN");
+  }
+  if (bg1ltop > 0) numnuis += addOneUnc(fLogStream, "Bg1lTopSyst", bg1ltoperr, -1, 3, bin, "lnN");
   if (bgznunu > 0) numnuis += addOneUnc(fLogStream, "BgZnunuStat", bgznunuerr, -1, 4, bin, "lnN");
 
   if (!nobgsyst) {
     // common systematic uncertainties
-    vector<string> systNames_corr = {"bTagEffHF", "bTagEffLF", "lepSF", "pdf", "q2", "jes",};
+    vector<string> systNames_corr = {"bTagEffHF", "bTagEffLF", "lepSF", "pdf", "q2", "jes", "ISR", "pileup", "alphas"};
     // individual systematic uncertainties for different backgrounds
-    vector<string> systNames_bg2l = {"ttbarSysPt", "alphas"};  // + MCStats
-    vector<string> systNames_bg1l = {"metRes"};                // + MCStats + Wb + Cont
-    vector<string> systNames_bgZnunu = {"topPtSF", "pileup"};
+    vector<string> systNames_bg2l = {"metRes", "ttbarSysPt"};  // + TauSF
+    vector<string> systNames_bg1l = {"metRes"};    // + Wbxsec (50%?) + Cont
+    vector<string> systNames_bgZnunu;
 
     double dnerr[] = {triggerrDn, -1, -1, triggerrDn, triggerrDn }; // obviously(?) need to swap CR2l sf
     double uperr[] = {triggerrUp, -1, -1, triggerrUp, triggerrUp }; // why 1l[2] has been left out?
     getUncertainties(uperr[1], dnerr[1], bg2l, f2l, hname_2l + "cr2lTriggerSF", metbin);
-    numnuis += addCorrelatedUnc(fLogStream, "TrigSyst2l", dnerr, uperr, -1, "lnN"); // err array are reset after addCorrelatedUnc()
+    numnuis += addCorrelatedUnc(fLogStream, "TrigSyst", dnerr, uperr, -1, "lnN"); // err array are reset after addCorrelatedUnc()
 
     dnerr[0] = lumierr; dnerr[3] = lumierr; dnerr[4] = lumierr;
     numnuis += addCorrelatedUnc(fLogStream, "LumiSyst", dnerr, uperr, -1, "lnN");
 
     if (correlated) {
       for (auto syst : systNames_corr) {
-        if (syst != "pdf")  // bg2l
-          getUncertainties(uperr[1], dnerr[1], bg2l, f2l, hname_2l + syst.c_str(), metbin);
+        getUncertainties(uperr[1], dnerr[1], bg2l, f2l, hname_2l + syst.c_str(), metbin); // doing pdf?
         if (syst != "lepSF")  // bg1l
           getUncertainties(uperr[2], dnerr[2], bg1l, f1l, hname_1l + syst.c_str(), metbin);
         // bgZnunu <-- uses both up and dn err for Znunu bkg until otherwise instructed
@@ -282,7 +321,7 @@ int makeCardForOneBin(TString dir, int metbin, TString signame, int bin, TString
     } else {
       for (auto syst : systNames_corr) {
         if (syst != "pdf") systNames_bg2l.push_back(syst);    // bg2l
-        if (syst != "lepSF") systNames_bg1l.push_back(syst);  // bg1l
+        if (syst != "lepSF" && syst != "ISR") systNames_bg1l.push_back(syst);  // bg1l
         systNames_bgZnunu.push_back(syst);                    // bgZnunu
       }
     }
@@ -313,13 +352,6 @@ int makeCardForOneBin(TString dir, int metbin, TString signame, int bin, TString
   *fLogStreamHeader << "jmax  " << 4  << "  number of backgrounds" << endl;
   *fLogStreamHeader << "kmax "  << numnuis << "  number of nuisance parameters" << endl;
 
-  // TString outputdir = "datacards/";
-  // if (correlated)          outputdir += "correlated";
-  // if (nosigsyst&&nobgsyst) outputdir += "_nounc";
-  // else if (nosigsyst)      outputdir += "_nosigsyst";
-  // else if (nobgsyst)       outputdir += "_nobgsyst";
-  // if (dropsigcont)         outputdir += "_dropsigcont";
-  // if (fakedata)            outputdir += "/fakedata/";
   system(Form("mkdir -p %s", outputdir.Data()));
 
   TString anName = (dir.Contains("srI"))? "compressed" : "std";
@@ -353,7 +385,7 @@ void makeCardsForPoint(TString sigpoint, TString outdir) {
       TH1D* hist = (TH1D*) fsig->Get(hname);
       if (!hist) { cout << "Cannot find yield hist " << hname << " in " << fsig->GetName() << endl; continue; }
       int n_metbins = hist->GetNbinsX();
-      for (int ibin = 1; ibin <= n_metbins; ++ibin) { 
+      for (int ibin = 1; ibin <= n_metbins; ++ibin) {
         // Make a separate card for each met bin.
         makeCardForOneBin(dir, ibin, sigpoint, ++nbintot, outdir);
       }
@@ -361,20 +393,23 @@ void makeCardsForPoint(TString sigpoint, TString outdir) {
   }
 }
 
+// -------------------------------------------------------------------------------------------------------------------
 // Make cards for a single mass point
-void newCardMaker(int single_point, string signal="T2tt_800_400", string input_dir="../StopLooper/output/temp12", string output_dir="datacards/temp12") {
+void newCardMaker(int dummy, string signal="T2tt_800_400", string input_dir="../StopLooper/output/temp14", string output_dir="datacards/temp14") {
   cout << "Making cards for single mass point: " << signal << endl;
   system(Form("mkdir -p %s", output_dir.c_str()));
 
   // set input files (global pointers)
-  fsig = new TFile(Form("%s/SMS_T2tt.root",input_dir.c_str()));
+  // fsig = new TFile(Form("%s/SMS_T2tt.root",input_dir.c_str()));
+  fsig = new TFile(Form("%s/Signal_%s.root",input_dir.c_str(), signal.substr(0,4).c_str()));
   f2l = new TFile(Form("%s/lostlepton.root",input_dir.c_str()));
   f1l = new TFile(Form("%s/1lepFromW.root",input_dir.c_str()));
   f1ltop = new TFile(Form("%s/1lepFromTop.root",input_dir.c_str()));
   fznunu = new TFile(Form("%s/ZToNuNu.root",input_dir.c_str()));
-  fsig_genmet = nullptr; // don't use switched genmet signal for now
+  // fsig_genmet = nullptr; // don't use switched genmet signal for now
+  fsig_genmet = new TFile(Form("%s/Signal_%s_gen.root",input_dir.c_str(), signal.substr(0,4).c_str()));
 
-  if (!fakedata) fdata = new TFile(Form("%s/allData.root",input_dir.c_str()));
+  if (!fakedata) fdata = new TFile(Form("%s/allData_25ns.root",input_dir.c_str()));
   else fdata = new TFile(Form("%s/allBkg_25ns.root",input_dir.c_str()));
 
   if ( f2l->IsZombie() || f1l->IsZombie() ||  f1ltop->IsZombie() || fznunu->IsZombie() || fsig->IsZombie() || fdata->IsZombie() ) {
@@ -386,7 +421,8 @@ void newCardMaker(int single_point, string signal="T2tt_800_400", string input_d
 }
 
 
-// Make cards for all scan
+// -------------------------------------------------------------------------------------------------------------------
+// Make cards for all signal mass points through scan
 int newCardMaker(string signal="T2tt", string input_dir="../StopLooper/output/temp13", string output_dir="datacards/scan_temp13") {
   cout << "Making cards for " << signal  << " scan!" << endl;
   system(Form("mkdir -p %s", output_dir.c_str()));
@@ -396,15 +432,16 @@ int newCardMaker(string signal="T2tt", string input_dir="../StopLooper/output/te
   bmark->Start("benchmark");
 
   // set input files (global pointers)
-  fsig = new TFile(Form("%s/SMS_%s.root",input_dir.c_str(), signal.c_str()));
+  // fsig = new TFile(Form("%s/SMS_%s.root",input_dir.c_str(), signal.c_str()));
+  fsig = new TFile(Form("%s/Signal_%s.root",input_dir.c_str(), signal.c_str()));
   f2l = new TFile(Form("%s/lostlepton.root",input_dir.c_str()));
   f1l = new TFile(Form("%s/1lepFromW.root",input_dir.c_str()));
   f1ltop = new TFile(Form("%s/1lepFromTop.root",input_dir.c_str()));
   fznunu = new TFile(Form("%s/ZToNuNu.root",input_dir.c_str()));
-  fsig_genmet = nullptr; // don't use switched genmet signal for now
-  // fsig_genmet = new TFile(Form("%s/Signal_%s_gen.root",input_dir.c_str(), signal.c_str()));
+  // fsig_genmet = nullptr; // don't use switched genmet signal for now
+  fsig_genmet = new TFile(Form("%s/Signal_%s_gen.root",input_dir.c_str(), signal.c_str()));
 
-  if (!fakedata) fdata = new TFile(Form("%s/allData.root",input_dir.c_str()));
+  if (!fakedata) fdata = new TFile(Form("%s/allData_25ns.root",input_dir.c_str()));
   else fdata = new TFile(Form("%s/allBkg_25ns.root",input_dir.c_str()));
 
   if ( f2l->IsZombie() || f1l->IsZombie() ||  f1ltop->IsZombie() || fznunu->IsZombie() || fsig->IsZombie() || fdata->IsZombie() ) {
@@ -412,41 +449,35 @@ int newCardMaker(string signal="T2tt", string input_dir="../StopLooper/output/te
     return -1;
   }
 
-  bool is_scan = true;
+  verbose = false;  // make sure no exccessive printing
   set<pair<int, int> > signal_points;
 
-  if (is_scan) {
-    verbose = false;
-    for (int im1 = 600; im1 <= 1250; im1 += 25) {
-      for (int im2 = 0; im2 <= 750; im2 += 25) {
-        if (im1 < 900 && im2 < 400) continue;
-        if (im1 - im2 < 400) continue;
-        TString hname_sig = Form("srbase/h_metbins_%d_%d", im1, ((im2 == 0)? 1 : im2));
-        TH1D* hpoint = (TH1D*) fsig->Get(hname_sig);
-        // if (!hpoint) { cout << "Cannot find yield hist " << hname_sig << " in " << fsig->GetName() << endl; continue; }
-        if (!hpoint) continue; 
-        if (im2 == 0) im2 = 1;
-        cout << "Making cards for point: " << Form("%s_%d_%d", signal.c_str(), im1, im2) << endl;
-        makeCardsForPoint(Form("%s_%d_%d", signal.c_str(), im1, im2), output_dir.c_str());
-        signal_points.insert( make_pair(im1,im2) );
-        if (im2 == 1) im2 = 0;
-      } // scanM2 loop
-    } // scanM1 loop
-  }
+  for (int im1 = 600; im1 <= 1250; im1 += 25) {
+    for (int im2 = 0; im2 <= 750; im2 += 25) {
+      if (im1 < 900 && im2 < 400) continue;
+      if (im1 - im2 < 400) continue;
+      TString hname_sig = Form("srbase/h_metbins_%d_%d", im1, ((im2 == 0)? 1 : im2));
+      TH1D* hpoint = (TH1D*) fsig->Get(hname_sig);
+      // if (!hpoint) { cout << "Cannot find yield hist " << hname_sig << " in " << fsig->GetName() << endl; continue; }
+      if (!hpoint) continue;
+      if (im2 == 0) im2 = 1;
+      cout << "Making cards for point: " << Form("%s_%d_%d", signal.c_str(), im1, im2) << endl;
+      makeCardsForPoint(Form("%s_%d_%d", signal.c_str(), im1, im2), output_dir.c_str());
+      signal_points.insert( make_pair(im1,im2) );
+      if (im2 == 1) im2 = 0;
+    } // scanM2 loop
+  } // scanM1 loop
 
-  if (is_scan) {
-    TString filename = Form("%s/points_%s.txt", output_dir.c_str(), signal.c_str());
-    ofstream ofile;
-    ofile.open(filename);
-    cout << "--------------------------------------------" << endl;
-         // << "- saw nonzero signal entries for the following points: " << endl;
-    for (set<pair<int,int> >::iterator it=signal_points.begin(); it!=signal_points.end(); ++it) {
-      // cout << signal << "_" << (*it).first << "_" << (*it).second << endl;
-      ofile << signal << "_" << (*it).first << "_" << (*it).second << endl;
-    }
-    cout << "Wrote point list to file  " << filename << endl;
-    ofile.close();
+  TString filename = Form("%s/points_%s.txt", output_dir.c_str(), signal.c_str());
+  ofstream ofile;
+  ofile.open(filename);
+  cout << "--------------------------------------------" << endl;
+  // << "- saw nonzero signal entries for the following points: " << endl;
+  for (set<pair<int,int> >::iterator it=signal_points.begin(); it!=signal_points.end(); ++it) {
+    ofile << signal << "_" << (*it).first << "_" << (*it).second << endl;
   }
+  cout << "Wrote point list to file  " << filename << endl;
+  ofile.close();
 
   bmark->Stop("benchmark");
   cout << endl;

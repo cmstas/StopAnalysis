@@ -1,9 +1,10 @@
 // -*- C++ -*-
 const bool useMetExtrapolation = true;
+const double extr_threshold = 3;  // minimum number of events in a bin to not need an MET extrapolation
 
 void dataDrivenFromCR(TFile* fdata, TFile* fmc, TFile* fout, TString ddtype, TString gentype) {
   // Additional hists to consider: dataStats, MCstats, impurity
-  
+
   TList* listOfDirs = fmc->GetListOfKeys();
   for (auto k : *listOfDirs) {
     TString srname = k->GetName();
@@ -39,19 +40,20 @@ void dataDrivenFromCR(TFile* fdata, TFile* fmc, TFile* fout, TString ddtype, TSt
     int lastbin = hist_data_CR->GetNbinsX();
     int extr_start_bin = lastbin; // the bin to start extrapolation, if == lastbin means no MET extrapolation is needed
 
-    const double extr_threshold = 5;  // minimum number of events in a bin to not need an MET extrapolation
     if (useMetExtrapolation) {
       double err = 0;
       double ylds = 0;
       for (; extr_start_bin > 0; --extr_start_bin) {
-        ylds = hist_data_CR->IntegralAndError(extr_start_bin, -1, err);
+        ylds = hist_MC_CR->IntegralAndError(extr_start_bin, -1, err);
         if (ylds > extr_threshold) break;
       }
-      if (extr_start_bin != lastbin)
+      if (extr_start_bin != lastbin){
         cout << "Doing MET extrapolation for  " << crname << "  from bin " << extr_start_bin << " to bin " << lastbin << " (last bin)!" << endl;
-      for (int ibin = extr_start_bin; ibin < lastbin; ++ibin) {
-        hist_data_CR->SetBinContent(ibin, ylds);
-        hist_data_CR->SetBinError(ibin, err);
+        ylds = hist_data_CR->IntegralAndError(extr_start_bin, -1, err);
+        for (int ibin = extr_start_bin; ibin < lastbin; ++ibin) {
+          hist_data_CR->SetBinContent(ibin, ylds);
+          hist_data_CR->SetBinError(ibin, err);
+        }
       }
     }
 
@@ -102,14 +104,23 @@ void dataDrivenFromCR(TFile* fdata, TFile* fmc, TFile* fout, TString ddtype, TSt
       hout->Multiply(hist_data_CR);
       hout->Write();
 
-      if (hname.EndsWith("h_metbins")) centralHist = hout;
+      if (hname.EndsWith("h_metbins")) {
+        centralHist = hout;
+        // Store the central alpha hist and extr_start_bin for signal contamination
+        alphaHist->Write("h_alphaHist");
+        if (useMetExtrapolation && extr_start_bin < lastbin) {
+          TH1D* h_extrstart = new TH1D("h_extrstart", "MET extrapolation start bin", 1, 0, 1);
+          h_extrstart->SetBinContent(1, extr_start_bin);
+          h_extrstart->Write();
+        }
+      }
     }
 
     // Create alphaHist for dataStats
     auto h_dataStats = (TH1D*) centralHist->Clone("h_metbins_dataStats");
     auto h_MCStats = (TH1D*) centralHist->Clone("h_metbins_MCStats");
     for (int ibin = 1; ibin <= extr_start_bin; ++ibin) {
-      // If not doing met extrapolation, extr_start_bin will equal to lastbin 
+      // If not doing met extrapolation, extr_start_bin will equal to lastbin
       double data_error_thisbin = (hist_data_CR->GetBinContent(ibin) < 0.01)? 0 : hist_data_CR->GetBinError(ibin) / hist_data_CR->GetBinContent(ibin);
       h_dataStats->SetBinError(ibin, data_error_thisbin * h_dataStats->GetBinContent(ibin));
 

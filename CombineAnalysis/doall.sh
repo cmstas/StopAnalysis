@@ -1,5 +1,5 @@
-indir=../StopLooper/output/3binsMp7p3Rp9
-outdir=scan_3binsMp7p3Rp9
+indir=../StopLooper/output/temp14
+outdir=scan_org35p9
 
 root -b -q fakeBkgEstimates.C"(\"$indir\")" || return $?
 
