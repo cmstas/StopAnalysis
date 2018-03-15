@@ -201,7 +201,7 @@ int makeCardForOneBin(TString dir, int metbin, TString signame, int bin, TString
       double sigcont(0.);
       TString hnameCR_sig = TString(hname_sig).ReplaceAll("sr", crname);
       int extr_start_bin = getYield(fbkg, "h_extrstart", 1);
-      if (extr_start_bin > 0 && extr_start_bin < metbin) {
+      if (extr_start_bin > 0 && extr_start_bin <= metbin) {
         // doing met extrapolation for this bin
         sigcont = getYield(fsig, hnameCR_sig, extr_start_bin, -1);
         sigcont *= getYield(fbkg, "h_alphaHist", metbin);

@@ -46,6 +46,7 @@ def getYieldEInTopoBins(f, srNames, suf = ''):
         if not hist:
             print "Can't find", sr+'/h_metbins'+suf, "!!!"
             hist = f.Get(sr+'/h_metbins')
+            if not hist: print "This should not happen!"
             yields.append([E(0,0)]*hist.GetNbinsX())
             continue
         topoylds = []
@@ -76,10 +77,10 @@ def quickStoBtable(y_org, ye_org, sy_org, sye_org, y_wtc, ye_wtc, sy_wtc, sye_wt
 
 if __name__ == '__main__':
 
-    f1 = r.TFile('../StopLooper/output/temp_org/allBkg_25ns.root')
-    f2 = r.TFile('../StopLooper/output/temp_org/SMS_T2tt.root')
-    f3 = r.TFile('../StopLooper/output/add2binsM/allBkg_25ns.root')
-    f4 = r.TFile('../StopLooper/output/add2binsM/SMS_T2tt.root')
+    f1 = r.TFile('../StopLooper/output/org_120ifb/allBkg_25ns.root')
+    f2 = r.TFile('../StopLooper/output/org_120ifb/SMS_T2tt.root')
+    f3 = r.TFile('../StopLooper/output/3binsMp4Rp9_120ifb/allBkg_25ns.root')
+    f4 = r.TFile('../StopLooper/output/3binsMp4Rp9_120ifb/SMS_T2tt.root')
 
     srNames = ['srA', 'srB', 'srC', 'srD', 'srE', 'srF', 'srG', 'srH', 'srI',]
 
@@ -99,7 +100,7 @@ if __name__ == '__main__':
 
     # tab.print_table()
 
-    srNames = ['srA', 'srB', 'srC', 'srD', 'srE', 'srF', 'srG', 'srH',]
+    srNames = ['srA', 'srB', 'srC', 'srD', 'srE', 'srF', 'srG', 'srH']
     wdtNames = ['srA_wdt', 'srB_wdt', 'srC_wdt', 'srD_wdt', 'srE_wdt', 'srF_wdt', 'srG_wdt', 'srH_wdt',]
     wrtNames = ['srA_wrt', 'srB_wrt', 'srC_wrt', 'srD_wrt', 'srE_wrt', 'srF_wrt', 'srG_wrt', 'srH_wrt',]
     ntcNames = ['srA_ndt', 'srB_ndt', 'srC_ntt', 'srD_ntt', 'srE_ntt', 'srF_ntt', 'srG_ntt', 'srH_ntt',]
@@ -109,7 +110,7 @@ if __name__ == '__main__':
     # wrtNames = ['cr0bA_wrt', 'cr0bB_wrt', 'cr0bC_wrt', 'cr0bD_wrt', 'cr0bE_wrt', 'cr0bF_wrt', 'cr0bG_wrt', 'cr0bH_wrt',]
     # ntcNames = ['cr0bA_ndt', 'cr0bB_ndt', 'cr0bC_ntt', 'cr0bD_ntt', 'cr0bE_ntt', 'cr0bF_ntt', 'cr0bG_ntt', 'cr0bH_ntt',]
 
-    scale = 120. / 40.
+    scale = 1
 
     bkgs = ['2lep', '1lepW', '1lepTop', 'Znunu']
     tab = Table()
@@ -134,7 +135,7 @@ if __name__ == '__main__':
     # tab.add_row(['Total bkg mtag'] + bylds_wdt)
     # beff = getPercentage(bylds_wdt, bylds_org)
     # tab.add_row(['mtag efficiency'] + beff)
-    tab.add_line()
+    # tab.add_line()
 
     # for sigpt in ['_1200_50', '_800_400']:
     #     # ylds, errs = getYieldAndErrsFromTopoSRs(f4, wdtNames, sigpt)
@@ -161,8 +162,6 @@ if __name__ == '__main__':
 
     # tab.print_table()
 
-
-
     # ssb_org = [get_StoSB(s,b).round(2) for s,b in zip(sylds_org, bylds_org)]
     # tab2.add_row(['SSB org'] + ssb_org)
     # ssb_wdt = [get_StoSB(s,b).round(2) for s,b in zip(sylds_wdt, bylds_wdt)]
@@ -171,54 +170,92 @@ if __name__ == '__main__':
     # tab2.print_table()
 
 
-    f5 = r.TFile('../StopLooper/output/temp_org/allBkg_25ns.root')
-    f6 = r.TFile('../StopLooper/output/temp_org/SMS_T2tt.root')
+    # f5 = r.TFile('../StopLooper/output/temp_org/allBkg_25ns.root')
+    # f6 = r.TFile('../StopLooper/output/temp_org/SMS_T2tt.root')
 
-    f7 = r.TFile('../StopLooper/output/rtagbinned/allBkg_25ns.root')
-    f8 = r.TFile('../StopLooper/output/rtagbinned/SMS_T2tt.root')
+    # f7 = r.TFile('../StopLooper/output/rtagbinned/allBkg_25ns.root')
+    # f8 = r.TFile('../StopLooper/output/rtagbinned/SMS_T2tt.root')
 
     # wdtNames = ['srA_wdt', 'srB_wdt',] 
-    # ntcNames = ['srA_ndt', 'srB_ndt',] 
+    # nttNames = ['srA_ntt', 'srB_ntt',] 
 
-    # wdtNames = ['srC_wdt', 'srD_wdt', 'srE_wdt', 'srF_wdt', 'srG_wdt', 'srH_wdt',]
-    # wrtNames = ['srC_wrt', 'srD_wrt', 'srE_wrt', 'srF_wrt', 'srG_wrt', 'srH_wrt',]
-    # ntcNames = ['srC_ntt', 'srD_ntt', 'srE_ntt', 'srF_ntt', 'srG_ntt', 'srH_ntt',]
-    # rdtNames = ['srC_wrdt', 'srD_wrdt', 'srE_wrdt', 'srF_wrdt', 'srG_wrdt', 'srH_wrdt',]
+    # wdtNames = ['srC_wdt', 'srD_wdt',] 
+    # wrtNames = ['srC_wrt', 'srD_wrt',] 
+    # nttNames = ['srC_ntt', 'srD_ntt',] 
 
-    # srNames = ['srC', 'srD', 'srE',]
-    srNames = ['srF', 'srG', 'srH',]
+    wdtNames = ['srE_wdt', 'srF_wdt', 'srG_wdt', 'srH_wdt',]
+    wrtNames = ['srE_wrt', 'srF_wrt', 'srG_wrt', 'srH_wrt',]
+    nttNames = ['srE_ntt', 'srF_ntt', 'srG_ntt', 'srH_ntt',]
 
-    tab3 = Table()
+    # wdtNames = ['srG_wdt', 'srH_wdt',]
+    # wrtNames = ['srG_wrt', 'srH_wrt',]
+    # nttNames = ['srG_ntt', 'srH_ntt',]
 
-    # bylds_wdt = getYieldEInTopoBins(f5, wdtNames)
-    # sylds_wdt = getYieldEInTopoBins(f6, wdtNames, '_1200_50')
-    # bylds_wrt = getYieldEInTopoBins(f5, wrtNames)
-    # sylds_wrt = getYieldEInTopoBins(f6, wrtNames, '_1200_50')
-    # bylds_rdt = getYieldEInTopoBins(f5, rdtNames)
-    # sylds_rdt = getYieldEInTopoBins(f6, rdtNames, '_1200_50')
+    # wdtNames = [sr.replace('sr','cr2l') for sr in wdtNames]
+    # wrtNames = [sr.replace('sr','cr2l') for sr in wrtNames]
+    # nttNames = [sr.replace('sr','cr2l') for sr in nttNames]
+
+    wdtNames = [sr.replace('sr','cr0b') for sr in wdtNames]
+    wrtNames = [sr.replace('sr','cr0b') for sr in wrtNames]
+    nttNames = [sr.replace('sr','cr0b') for sr in nttNames]
+
+    srNames = [sr.split('_')[0] for sr in wdtNames]
     
+    tab2 = Table()
+
     colnames = []
 
-    bylds = getYieldEInTopoBins(f5, srNames)
-    sylds = getYieldEInTopoBins(f6, srNames, '_1200_50')
+    # bylds = getYieldEInTopoBins(f5, srNames)
+    # sylds = getYieldEInTopoBins(f6, srNames, '_1200_50')
 
-    for sr, n in zip(srNames, map(len, sylds)):
+    bylds_org = getYieldEInTopoBins(f1, srNames)
+
+    bylds_wdt = getYieldEInTopoBins(f3, wdtNames)
+    bylds_wrt = getYieldEInTopoBins(f3, wrtNames)
+    bylds_ntt = getYieldEInTopoBins(f3, nttNames)
+
+    for sr, n in zip(wdtNames, map(len, bylds_wdt)):
         colnames += [sr.split('_')[0] + str(i) for i in range(1, n+1)] 
-    tab3.set_column_names(['srName'] + colnames)
+    tab2.set_column_names(['srName'] + colnames)
 
-    tab3.add_row(['tmod bkg'] + [y.round(2) for y in sum(bylds,[])])
-    tab3.add_row(['tmod sig'] + [y.round(2) for y in sum(sylds,[])])
-    tab3.add_row(['tmod SSB'] + [get_StoSB(s,b).round(2) for s,b in zip(sum(sylds,[]), sum(bylds,[]))])
-    tab3.add_line()
+    for bg in bkgs:
+        bylds = getYieldEInTopoBins(f3, wdtNames, '_'+bg)
+        tab2.add_row([bg+' mtag bin'] + [y.round(2) for y in sum(bylds,[])])
+    tab2.add_line()
 
-    bylds = getYieldEInTopoBins(f7, srNames)
-    sylds = getYieldEInTopoBins(f8, srNames, '_1200_50')
+    for bg in bkgs:
+        bylds = getYieldEInTopoBins(f3, wrtNames, '_'+bg)
+        tab2.add_row([bg+' rtag bin'] + [y.round(2) for y in sum(bylds,[])])
+    tab2.add_line()
 
-    tab3.add_row(['rtag bkg'] + [y.round(2) for y in sum(bylds,[])])
-    tab3.add_row(['rtag sig'] + [y.round(2) for y in sum(sylds,[])])
-    tab3.add_row(['rtag SSB'] + [get_StoSB(s,b).round(2) for s,b in zip(sum(sylds,[]), sum(bylds,[]))])
+    for bg in bkgs:
+        bylds = getYieldEInTopoBins(f3, nttNames, '_'+bg)
+        tab2.add_row([bg+' notag bin'] + [y.round(2) for y in sum(bylds,[])])
+    tab2.add_line()
 
-    tab3.print_table()
+    # tab2.add_row(['mertag bkg'] + [y.round(2) for y in sum(bylds_wdt,[])])
+    # tab2.add_row(['restag bkg'] + [y.round(2) for y in sum(bylds_wrt,[])])
+    # tab2.add_row(['no tag bkg'] + [y.round(2) for y in sum(bylds_ntt,[])])
+
+    tab2.add_row(['Total bkg'] + [y.round(2) for y in sum(bylds_org,[])])
+
+    tab2.print_table()
+
+    # tab3 = Table()
+
+    # tab3.add_row(['tmod bkg'] + [y.round(2) for y in sum(bylds,[])])
+    # tab3.add_row(['tmod sig'] + [y.round(2) for y in sum(sylds,[])])
+    # tab3.add_row(['tmod SSB'] + [get_StoSB(s,b).round(2) for s,b in zip(sum(sylds,[]), sum(bylds,[]))])
+    # tab3.add_line()
+
+    # bylds = getYieldEInTopoBins(f7, srNames)
+    # sylds = getYieldEInTopoBins(f8, srNames, '_1200_50')
+
+    # tab3.add_row(['rtag bkg'] + [y.round(2) for y in sum(bylds,[])])
+    # tab3.add_row(['rtag sig'] + [y.round(2) for y in sum(sylds,[])])
+    # tab3.add_row(['rtag SSB'] + [get_StoSB(s,b).round(2) for s,b in zip(sum(sylds,[]), sum(bylds,[]))])
+
+    # tab3.print_table()
 
     # tab3.add_row(['mertag bkg'] + [y.round(2) for y in sum(bylds_wdt,[])])
     # tab3.add_row(['mertag sig'] + [y.round(2) for y in sum(sylds_wdt,[])])

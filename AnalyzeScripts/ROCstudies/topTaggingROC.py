@@ -59,8 +59,8 @@ if __name__ == "__main__":
 
     f1 = r.TFile("../../StopLooper/output/temp11/SMS_T2tt.root")
     f2 = r.TFile("../../StopLooper/output/temp11/allBkg_25ns.root")
-    hgood = f1.Get("srNJet2/h_leadtopcand_finedisc")
-    hfake = f2.Get("srNJet2/h_leadtopcand_finedisc")
+    hgood = f1.Get("srbase/h_leadtopcand_finedisc")
+    hfake = f2.Get("srbase/h_leadtopcand_finedisc")
 
     # f1 = r.TFile("../../StopLooper/output/temp/TTJets_v25_4.root")
     # f2 = f1
@@ -107,7 +107,7 @@ if __name__ == "__main__":
     gstob.GetYaxis().SetTitle("S / #sqrt{S+B}")
     gstob.Draw()
 
-    c1.Print("stob_srNJetMET2_toptag.pdf")
+    c1.Print("stob_srbase_toptag.pdf")
 
     c1.Clear()
 
@@ -122,7 +122,7 @@ if __name__ == "__main__":
 
     groc.Draw()
 
-    c1.Print("roc_srNJetMET2_toptag.pdf")
+    c1.Print("roc_srbase_toptag.pdf")
 
     # c1.Clear()
 
@@ -160,7 +160,7 @@ if __name__ == "__main__":
 
     lst_eff, lst_fkr, lst_disc = makeROClist(hgood, hfake)
     for i, disc in enumerate(lst_disc):
-        if (disc > 0.66 and disc < 0.67) or (disc > -0.01 and disc < 0.01):
+        if (disc > 0.66 and disc < 0.67) or (disc > -0.001 and disc < 0.001):
             print disc, lst_eff[i], lst_fkr[i]
 
     tmodroc = r.TGraph(lst_eff.size, lst_eff, lst_fkr)
@@ -178,9 +178,9 @@ if __name__ == "__main__":
 
     c1.Print("roc_srNJetMET2_tmod.pdf")
 
-    fout = r.TFile("temp3.root", "update")
-    groc.Write("roc_ltc_dm600_ge4j")
-    chi2roc.Write("roc_chi2_dm600_ge4j")
-    tmodroc.Write("roc_tmod_dm600_ge4j")
+    fout = r.TFile("temp4.root", "update")
+    groc.Write("roc_ltc_dm600_ge4j_met400")
+    chi2roc.Write("roc_chi2_dm600_ge4j_met400")
+    tmodroc.Write("roc_tmod_dm600_ge4j_met400")
     fout.Close()
 

@@ -131,18 +131,19 @@ if __name__ == "__main__":
 
     c1 = r.TCanvas("c1", "c1", 800, 600)
 
-    # groc = getROCSigVBkg(f1, f2, "srbase", "h_deepttag", starval=[0.4, 0.6])
-    # groc.Draw()
-    # # c1.Print("roc_deepdisc_top.pdf")
+    groc = getROCSigVBkg(f1, f2, "srNJet1", "h_deepttag", starval=[0.4, 0.6])
+    groc.SetLineWidth(3)
+    groc.Draw()
+    # c1.Print("roc_deepdisc_top.pdf")
 
-    # grocb = getROCSigVBkg(f1, f2, "srbase", "h_binttag")
-    # grocb.SetLineColor(r.kRed)
-    # grocb.Draw("same")
+    grocb = getROCSigVBkg(f1, f2, "srbase", "h_binttag")
+    grocb.SetLineColor(r.kRed)
+    grocb.Draw("same")
 
-    # leg = r.TLegend(0.2, 0.7, 0.36, 0.8)
-    # leg.AddEntry(groc, "raw disc")
-    # leg.AddEntry(grocb, "binerized")
-    # leg.Draw()
+    leg = r.TLegend(0.2, 0.7, 0.36, 0.8)
+    leg.AddEntry(groc, "raw disc")
+    leg.AddEntry(grocb, "binerized")
+    leg.Draw()
 
     # c1.Print("roc_rawvsbin_top_base_dm600.pdf")
 
@@ -155,9 +156,9 @@ if __name__ == "__main__":
 
     c1.Clear()
 
-    grocw = getROCSigVBkg(f1, f2, "srbase", "h_deepWtag", starval=[0.4, 0.6, 0.8])
+    grocw = getROCSigVBkg(f1, f2, "srbase", "h_deepWtag", starval=[0.3,])
     grocw.Draw()
-    c1.Print("roc_deepdisc_W_base.pdf")
+    # c1.Print("roc_deepdisc_W_base.pdf")
 
     # S/sqrt(S+B) curves with errors
     c1.Clear()
@@ -165,7 +166,7 @@ if __name__ == "__main__":
     gstob = getStoNSigVBkg(f1, f2, "srbase", "h_deepWtag")
     gstob.Draw()
 
-    c1.Print("stob_deepdisc_W_base.pdf")
+    # c1.Print("stob_deepdisc_W_base.pdf")
 
     # Comined ROC curves with tmod, resolved tagger, chi2, etc
     c1.Clear()
@@ -173,13 +174,13 @@ if __name__ == "__main__":
     f1 = r.TFile("../../StopLooper/output/temp11/SMS_T2tt.root")
     f2 = r.TFile("../../StopLooper/output/temp11/allBkg_25ns.root")
 
-    leg = r.TLegend(0.14, 0.6, 0.36, 0.85)
+    leg = r.TLegend(0.14, 0.7, 0.46, 0.85)
 
     srlist = ['srNJetMET1', 'srNJetMET2']
     colors = [r.kBlack, r.kCyan]
     grs = []
     for i, sr in enumerate(srlist):
-        gr = getROCSigVBkg(f1, f2, sr)
+        gr = getROCSigVBkg(f1, f2, sr, starval=[0.4,])
         gr.SetLineColor(colors[i])
         gr.SetLineWidth(3)
         grs.append(gr)
@@ -194,28 +195,35 @@ if __name__ == "__main__":
     grs[0].Draw()
     grs[1].Draw("same")
 
-    leg.AddEntry(grs[0], "2to3j, merged")
-    leg.AddEntry(grs[1], "ge4j, merged")
+    # groc.Draw()
+    # leg.AddEntry(groc, "merged tag")
+    leg.AddEntry(grs[0], "2-3j, merged tag")
+    leg.AddEntry(grs[1], "#geq 4j, merged tag")
 
-    fxra = r.TFile("temp3.root")
-    gak4 = fxra.Get("roc_ltc_dm600_ge4j")
-    gak4.SetLineColor(r.kRed)
-    gak4.SetLineWidth(3)
-    gak4.Draw("same")
-    leg.AddEntry(gak4, "ge4j, resolved")
-    gchi2 = fxra.Get("roc_chi2_dm600_ge4j")
-    gchi2.SetLineColor(r.kBlue)
-    gchi2.SetLineWidth(3)
-    gchi2.Draw("same")
-    leg.AddEntry(gchi2, "ge4j, had #chi^{2}")
-    gtmod = fxra.Get("roc_tmod_dm600_ge4j")
-    gtmod.SetLineColor(r.kMagenta)
-    gtmod.SetLineWidth(3)
-    gtmod.Draw("same")
-    leg.AddEntry(gtmod, "ge4j, tmod")
+    # fxra = r.TFile("temp4.root")
+    # gak4 = fxra.Get("roc_ltc_dm600_ge4j")
+    # gak4.SetLineColor(r.kRed)
+    # gak4.SetLineWidth(3)
+    # gak4.Draw("same")
+    # leg.AddEntry(gak4, "#geq 4j, resolved tag")
+    # gchi2 = fxra.Get("roc_chi2_dm600_base")
+    # gchi2.SetLineColor(r.kBlue)
+    # gchi2.SetLineWidth(3)
+    # gchi2.Draw("same")
+    # leg.AddEntry(gchi2, "had #chi^{2}")
+    # gtmod = fxra.Get("roc_tmod_dm600_ge4j")
+    # gtmod.SetLineColor(r.kMagenta)
+    # gtmod.SetLineWidth(3)
+    # gtmod.Draw("same")
+    # leg.AddEntry(gtmod, "#geq 4j, tmod")
+    # gtmod2 = fxra.Get("roc_tmod_dm600_2to3j")
+    # gtmod2.SetLineColor(r.kAzure)
+    # gtmod2.SetLineWidth(3)
+    # gtmod2.Draw("same")
+    # leg.AddEntry(gtmod2, "2-3j, tmod")
 
     leg.Draw()
 
-    # c1.Print("rocs_incl_mvr_dm600.pdf")
+    c1.Print("rocs_incls_dm600.pdf")
 
     # c1.Clear()
