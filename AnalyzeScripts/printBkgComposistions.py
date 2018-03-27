@@ -77,10 +77,10 @@ def quickStoBtable(y_org, ye_org, sy_org, sye_org, y_wtc, ye_wtc, sy_wtc, sye_wt
 
 if __name__ == '__main__':
 
-    f1 = r.TFile('../StopLooper/output/org_120ifb/allBkg_25ns.root')
-    f2 = r.TFile('../StopLooper/output/org_120ifb/SMS_T2tt.root')
-    f3 = r.TFile('../StopLooper/output/3binsMp4Rp9_120ifb/allBkg_25ns.root')
-    f4 = r.TFile('../StopLooper/output/3binsMp4Rp9_120ifb/SMS_T2tt.root')
+    f1 = r.TFile('../StopLooper/output/temp14/allBkg_25ns.root')
+    f2 = r.TFile('../StopLooper/output/temp14/Signal_T2tt.root')
+    f3 = r.TFile('../StopLooper/output/newbin0/allBkg_25ns.root')
+    f4 = r.TFile('../StopLooper/output/newbin0/SMS_T2tt.root')
 
     srNames = ['srA', 'srB', 'srC', 'srD', 'srE', 'srF', 'srG', 'srH', 'srI',]
 
@@ -100,10 +100,10 @@ if __name__ == '__main__':
 
     # tab.print_table()
 
-    srNames = ['srA', 'srB', 'srC', 'srD', 'srE', 'srF', 'srG', 'srH']
-    wdtNames = ['srA_wdt', 'srB_wdt', 'srC_wdt', 'srD_wdt', 'srE_wdt', 'srF_wdt', 'srG_wdt', 'srH_wdt',]
-    wrtNames = ['srA_wrt', 'srB_wrt', 'srC_wrt', 'srD_wrt', 'srE_wrt', 'srF_wrt', 'srG_wrt', 'srH_wrt',]
-    ntcNames = ['srA_ndt', 'srB_ndt', 'srC_ntt', 'srD_ntt', 'srE_ntt', 'srF_ntt', 'srG_ntt', 'srH_ntt',]
+    srNames  = ['srA', 'srB', 'srC', 'srD', 'srE', 'srF', 'srG', 'srH']
+    ntcNames = ['srA1', 'srB1', 'srC1', 'srD1', 'srE1', 'srF1', 'srG1', 'srH1',]
+    wdtNames = ['srA2', 'srB2', 'srC2', 'srD2', 'srE2', 'srF2', 'srG2', 'srH2',]
+    wrtNames = ['srA3', 'srB3', 'srC3', 'srD3', 'srE3', 'srF3', 'srG3', 'srH3',]
 
     # srNames = ['cr0bA', 'cr0bB', 'cr0bC', 'cr0bD', 'cr0bE', 'cr0bF', 'cr0bG', 'cr0bH',]
     # wdtNames = ['cr0bA_wdt', 'cr0bB_wdt', 'cr0bC_wdt', 'cr0bD_wdt', 'cr0bE_wdt', 'cr0bF_wdt', 'cr0bG_wdt', 'cr0bH_wdt',]
@@ -160,7 +160,7 @@ if __name__ == '__main__':
 
     #     tab.add_line()
 
-    # tab.print_table()
+    tab.print_table()
 
     # ssb_org = [get_StoSB(s,b).round(2) for s,b in zip(sylds_org, bylds_org)]
     # tab2.add_row(['SSB org'] + ssb_org)
@@ -176,31 +176,31 @@ if __name__ == '__main__':
     # f7 = r.TFile('../StopLooper/output/rtagbinned/allBkg_25ns.root')
     # f8 = r.TFile('../StopLooper/output/rtagbinned/SMS_T2tt.root')
 
-    # wdtNames = ['srA_wdt', 'srB_wdt',] 
-    # nttNames = ['srA_ntt', 'srB_ntt',] 
+    nttNames = ['srA1', 'srB1',]
+    wdtNames = ['srA2', 'srB2',]
 
-    # wdtNames = ['srC_wdt', 'srD_wdt',] 
-    # wrtNames = ['srC_wrt', 'srD_wrt',] 
-    # nttNames = ['srC_ntt', 'srD_ntt',] 
+    # nttNames = ['srC1', 'srD1',]
+    # wdtNames = ['srC2', 'srD2',]
+    # wrtNames = ['srC3', 'srD3',]
 
-    wdtNames = ['srE_wdt', 'srF_wdt', 'srG_wdt', 'srH_wdt',]
-    wrtNames = ['srE_wrt', 'srF_wrt', 'srG_wrt', 'srH_wrt',]
-    nttNames = ['srE_ntt', 'srF_ntt', 'srG_ntt', 'srH_ntt',]
+    # nttNames = ['srE1', 'srF1', 'srG1', 'srH1',]
+    # wdtNames = ['srE2', 'srF2', 'srG2', 'srH2',]
+    # wrtNames = ['srE3', 'srF3', 'srG3', 'srH3',]
 
-    # wdtNames = ['srG_wdt', 'srH_wdt',]
-    # wrtNames = ['srG_wrt', 'srH_wrt',]
-    # nttNames = ['srG_ntt', 'srH_ntt',]
+    # nttNames = ['srG1', 'srH1',]
+    # wdtNames = ['srG2', 'srH2',]
+    # wrtNames = ['srG3', 'srH3',]
 
+    # nttNames = [sr.replace('sr','cr2l') for sr in nttNames]
     # wdtNames = [sr.replace('sr','cr2l') for sr in wdtNames]
     # wrtNames = [sr.replace('sr','cr2l') for sr in wrtNames]
-    # nttNames = [sr.replace('sr','cr2l') for sr in nttNames]
 
-    wdtNames = [sr.replace('sr','cr0b') for sr in wdtNames]
-    wrtNames = [sr.replace('sr','cr0b') for sr in wrtNames]
-    nttNames = [sr.replace('sr','cr0b') for sr in nttNames]
+    # nttNames = [sr.replace('sr','cr0b') for sr in nttNames]
+    # wdtNames = [sr.replace('sr','cr0b') for sr in wdtNames]
+    # wrtNames = [sr.replace('sr','cr0b') for sr in wrtNames]
 
     srNames = [sr.split('_')[0] for sr in wdtNames]
-    
+
     tab2 = Table()
 
     colnames = []
@@ -215,7 +215,7 @@ if __name__ == '__main__':
     bylds_ntt = getYieldEInTopoBins(f3, nttNames)
 
     for sr, n in zip(wdtNames, map(len, bylds_wdt)):
-        colnames += [sr.split('_')[0] + str(i) for i in range(1, n+1)] 
+        colnames += [sr.split('_')[0] + str(i) for i in range(1, n+1)]
     tab2.set_column_names(['srName'] + colnames)
 
     for bg in bkgs:
