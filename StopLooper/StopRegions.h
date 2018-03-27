@@ -12,6 +12,10 @@ std::vector<SR> getStopSignalRegionsTopological();
 std::vector<SR> getStopControlRegionsNoBTagsTopological();
 std::vector<SR> getStopControlRegionsDileptonTopological();
 
+std::vector<SR> getStopSignalRegionsNewMETBinning();
+std::vector<SR> getStopControlRegionsNoBTagsNewMETBinning();
+std::vector<SR> getStopControlRegionsDileptonNewMETBinning();
+
 std::vector<SR> getStopSignalRegionsAddResTagBin();
 std::vector<SR> getStopControlRegionsNoBTagsAddResTagBin();
 std::vector<SR> getStopControlRegionsDileptonAddResTagBin();

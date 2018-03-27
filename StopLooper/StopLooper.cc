@@ -59,13 +59,13 @@ const bool doNvtxReweight = false;
 // turn on to apply nTrueInt reweighting to MC
 const bool doNTrueIntReweight = true;
 // turn on top tagging studies, off for 2016 data/mc
-const bool doTopTagging = false;
+const bool doTopTagging = true;
 // turn on to apply json file to data
 const bool applyjson = true;
 // ignore scale1fb to run over test samples
 const bool ignoreScale1fb = false;
 // not running the standard regions to speed up
-const bool runYieldsOnly = true;
+const bool runYieldsOnly = false;
 // debug symbol, for printing exact event kinematics that passes
 const bool printPassedEvents = false;
 
@@ -79,9 +79,13 @@ std::ofstream ofile;
 
 void StopLooper::SetSignalRegions() {
 
-  SRVec = getStopSignalRegionsTopological();
-  CR0bVec = getStopControlRegionsNoBTagsTopological();
-  CR2lVec = getStopControlRegionsDileptonTopological();
+  // SRVec = getStopSignalRegionsTopological();
+  // CR0bVec = getStopControlRegionsNoBTagsTopological();
+  // CR2lVec = getStopControlRegionsDileptonTopological();
+
+  SRVec = getStopSignalRegionsNewMETBinning();
+  CR0bVec = getStopControlRegionsNoBTagsNewMETBinning();
+  CR2lVec = getStopControlRegionsDileptonNewMETBinning();
 
   // SRVec = getStopSignalRegionsAddTopTagBins();
   // CR0bVec = getStopControlRegionsNoBTagsAddTopTagBins();
@@ -154,21 +158,15 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
 
   outfile_ = new TFile(output_name.Data(), "RECREATE") ;
 
-  // // full 2016 dataset json, 35.87/fb:
+  // // Full 2016 dataset json, 35.87/fb:
   // const char* json_file = "../StopCORE/inputs/json_files/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON_snt.txt";
-  // // 2017 dataset json, 10.09/fb (10.07 until 300780)
-  // const char* json_file = "../StopCORE/inputs/json_files/Cert_294927-301141_13TeV_PromptReco_Collisions17_JSON_snt.txt";
-  // // 2017 dataset json, 8.32/fb
-  // const char* json_file = "../StopCORE/inputs/json_files/Cert_294927-300575_13TeV_PromptReco_Collisions17_JSON_snt.txt";
-
-  // Full 2017 dataset json, 41.96/fb
+  // // Full 2017 dataset json, 41.96/fb
   // const char* json_file = "../StopBabyMaker/json_files/Cert_294927-306462_13TeV_PromptReco_Collisions17_JSON_snt.txt";
-  // const float kLumi = 40;
+
+  // const float kLumi = 120;
   const float kLumi = 35.867;         // 2016 lumi
 
   // Combined 2016 and 2017 json,
-  // const char* json_file = "../StopCORE/inputs/json_files/Cert_271036-301141_13TeV_Combined1617_JSON_snt.txt";
-  // const char* json_file = "../StopCORE/inputs/json_files/Cert_271036-300575_13TeV_Combined1617_JSON_snt.txt";
   const char* json_file = "../StopCORE/inputs/json_files/Cert_271036-306462_13TeV_Combined1617_JSON_snt.txt";
 
   // Setup pileup re-weighting
@@ -243,6 +241,10 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
       evtWgt.setExtraFileWeight((3146940.0)/(5029568.0+3146940.0));
     else if (fname.Contains("t_tbarW_5f_powheg_pythia8_noHadDecays"))
       evtWgt.setExtraFileWeight((5029568.0)/(5029568.0+3146940.0));
+    else if (fname.Contains("ttZJets") || fname.Contains("TTZ"))
+      evtWgt.setExtraFileWeight(1.14);
+    else if (fname.Contains("WZ"))
+      evtWgt.setExtraFileWeight(1.21);
 
     dummy.cd();
     // Loop over Events in current file
@@ -312,11 +314,18 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
         // auto checkMassPt = [&](double mstop, double mlsp) { return (mass_stop() == mstop) && (mass_lsp() == mlsp); };
         // if (!checkMassPt(800, 400) && !checkMassPt(800, 600) && !checkMassPt(1000, 50) && !checkMassPt(1000, 200)) continue;
         plot2D("h_T2bW_masspts", mass_stop(), mass_lsp() , evtweight_, testVec[1].histMap, ";M(stop) [GeV]; M(lsp) [GeV]", 100, 300, 1300, 80, 0, 800);
-
+      } else if (dsname.Contains("T2bt")) {
+        float massdiff = mass_stop() - mass_lsp();
+        if (mass_lsp() < 300 && mass_stop() < 800) continue;
+        if (massdiff < 400) continue;
+        // if (massdiff < 900 || mass_stop() < 1000) continue;
+        // auto checkMassPt = [&](double mstop, double mlsp) { return (mass_stop() == mstop) && (mass_lsp() == mlsp); };
+        // if (!checkMassPt(800, 400) && !checkMassPt(800, 600) && !checkMassPt(1000, 50) && !checkMassPt(1000, 200)) continue;
+        plot2D("h_T2bt_masspts", mass_stop(), mass_lsp() , evtweight_, testVec[1].histMap, ";M(stop) [GeV]; M(lsp) [GeV]", 100, 300, 1300, 80, 0, 800);
       }
 
       // Only events nupt < 200 for WNJetsToLNu samples
-      if (dsname.Contains("JetsToLNu") && !dsname.Contains("NuPt-200") && nupt() > 200) continue;
+      if (dsname.BeginsWith("W") && dsname.Contains("JetsToLNu") && !dsname.Contains("NuPt-200") && nupt() > 200) continue;
 
       ++nPassedTotal;
 
@@ -348,9 +357,12 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
       // testTopTaggingEffficiency(testVec[0]);
 
       // nbtag for CSV valued btags -- for comparison between the 2016 analysis
-      int nbtagsCSV = 0;
-      for (float csv : ak4pfjets_CSV())
-        if (csv > 0.8484) nbtagsCSV++;
+      int nbtagCSV = 0;
+      int ntbtagCSV = 0;
+      for (float csv : ak4pfjets_CSV()) {
+        if (csv > 0.8484) nbtagCSV++;
+        if (csv > 0.9535) ntbtagCSV++;
+      }
 
       bool pass_deeptop_tag = false;
       float lead_restopdisc = -1.1;
@@ -506,14 +518,15 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
         }
         /// should do the same job as nanalysisbtags
         values_["nbtag"] = (values_["mlb"] > 175)? values_["ntbtag"] : values_["nbjet"];
+        // values_["nbtag"] = (values_["mlb"] > 175)? ntbtagCSV : nbtagCSV;
+        // values_["nbjet"] = nbtagCSV;
+        // values_["ntbtag"] = ntbtagCSV;
 
         // Filling histograms for SR
         fillHistosForSR(suffix);
 
         // testCutFlowHistos(testVec[1]);
 
-        // Temporary variable for CR0b before better solution to express this
-        values_["is0b"] = (values_["nbjet"] == 0 || (values_["nbjet"] >= 1 && values_["ntbtag"] == 0 && values_["mlb"] > 175.0));
         fillHistosForCR0b(suffix);
 
         values_["nlep_rl"] = (ngoodleps() == 1 && nvetoleps() >= 2 && lep2_p4().Pt() > 10)? 2 : ngoodleps();
@@ -681,7 +694,7 @@ void StopLooper::fillHistosForSR(string suf) {
       plot1D("h_mt_h"+s,     values_["mt"]      , evtweight_, sr.histMap, ";M_{T} [GeV]"             , 12, 150, 650);
       plot1D("h_mt2w"+s,     values_["mt2w"]    , evtweight_, sr.histMap, ";MT2W [GeV]"              , 18,  50, 500);
       plot1D("h_met"+s,      values_["met"]     , evtweight_, sr.histMap, ";#slash{E}_{T} [GeV]"      , 24,  50, 650);
-      plot1D("h_met_h"+s,    values_["met"]     , evtweight_, sr.histMap, ";#slash{E}_{T} [GeV]"      , 20, 250, 650);
+      plot1D("h_met_h"+s,    values_["met"]     , evtweight_, sr.histMap, ";#slash{E}_{T} [GeV]"      , 12, 250, 850);
       plot1D("h_metphi"+s,   values_["metphi"]  , evtweight_, sr.histMap, ";#phi(#slash{E}_{T})"      , 24,  50, 650);
       plot1D("h_lep1pt"+s,   values_["lep1pt"]  , evtweight_, sr.histMap, ";p_{T}(lepton) [GeV]"     , 30,  0, 300);
       plot1D("h_lep1eta"+s,  values_["lep1eta"] , evtweight_, sr.histMap, ";#eta(leppton)"           , 20, -5, 5);
@@ -699,29 +712,20 @@ void StopLooper::fillHistosForSR(string suf) {
         plot1D("h_deepWtag", values_["deepWtag"], evtweight_, sr.histMap, ";deepAK8 W tag", 120, -0.1, 1.1);
         plot1D("h_binWtag", values_["binWtag"], evtweight_, sr.histMap, ";deepAK8 binarized W disc", 120, -0.1, 1.1);
 
-        // Temporary test
-        // if (values_["deepAK8pt"] > 400) plot1D("h_deepttag_400", values_["deepttag"], evtweight_, sr.histMap, ";deepAK8 top tag", 120, -0.1, 1.1);
-        // if (values_["deepAK8pt"] > 500) plot1D("h_deepttag_500", values_["deepttag"], evtweight_, sr.histMap, ";deepAK8 top tag", 120, -0.1, 1.1);
-        // if (values_["deepAK8pt"] > 600) plot1D("h_deepttag_600", values_["deepttag"], evtweight_, sr.histMap, ";deepAK8 top tag", 120, -0.1, 1.1);
+        float chi2_disc = -log(hadronic_top_chi2()) / 8;
+        if (fabs(chi2_disc) >= 1.0) chi2_disc = std::copysign(0.99999, chi2_disc);
+        plot1D("h_chi2_disc"+s, chi2_disc, evtweight_, sr.histMap, ";hadronic #chi^2 discriminator", 110, -1.1, 1.1);
+        plot1D("h_chi2_finedisc"+s, chi2_disc, evtweight_, sr.histMap, ";hadronic #chi^2 discriminator", 550, -1.1, 1.1);
 
-        // if (values_["deepttag"] > 0.6) plot1D("h_deepttag0p6_pt"+s, values_["deepAK8pt"], evtweight_, sr.histMap, ";p_{T}(AK8) [GeV]", 75, 0, 1500);
-        // if (values_["deepttag"] > 0.4) plot1D("h_deepttag0p4_pt"+s, values_["deepAK8pt"], evtweight_, sr.histMap, ";p_{T}(AK8) [GeV]", 75, 0, 1500);
-        // if (values_["deepttag"] > 0.2) plot1D("h_deepttag0p2_pt"+s, values_["deepAK8pt"], evtweight_, sr.histMap, ";p_{T}(AK8) [GeV]", 75, 0, 1500);
+        float tmod_disc = values_["tmod"] / 15;
+        if (fabs(tmod_disc) >= 1.0) tmod_disc = std::copysign(0.99999, tmod_disc);
+        plot1D("h_tmod_disc"+s, tmod_disc, evtweight_, sr.histMap, ";t_{mod} discriminator", 110, -1.1, 1.1);
+        plot1D("h_tmod_finedisc"+s, tmod_disc, evtweight_, sr.histMap, ";t_{mod} discriminator", 550, -1.1, 1.1);
 
         if (values_["njet"] >= 4) {
           float lead_topcand_disc = (topcands_disc().size() > 0)? topcands_disc()[0] : -1.1;
           plot1D("h_leadtopcand_disc"+s, lead_topcand_disc, evtweight_, sr.histMap, ";top discriminator", 110, -1.1, 1.1);
           plot1D("h_leadtopcand_finedisc"+s, lead_topcand_disc, evtweight_, sr.histMap, ";top discriminator", 550, -1.1, 1.1);
-
-          float chi2_disc = -log(hadronic_top_chi2()) / 8;
-          if (fabs(chi2_disc) >= 1.0) chi2_disc = std::copysign(0.99999, chi2_disc);
-          plot1D("h_chi2_disc"+s, chi2_disc, evtweight_, sr.histMap, ";hadronic #chi^2 discriminator", 110, -1.1, 1.1);
-          plot1D("h_chi2_finedisc"+s, chi2_disc, evtweight_, sr.histMap, ";hadronic #chi^2 discriminator", 550, -1.1, 1.1);
-
-          float tmod_disc = values_["tmod"] / 15;
-          if (fabs(tmod_disc) >= 1.0) tmod_disc = std::copysign(0.99999, tmod_disc);
-          plot1D("h_tmod_disc"+s, tmod_disc, evtweight_, sr.histMap, ";t_{mod} discriminator", 110, -1.1, 1.1);
-          plot1D("h_tmod_finedisc"+s, tmod_disc, evtweight_, sr.histMap, ";t_{mod} discriminator", 550, -1.1, 1.1);
 
           plot2D("h2d_tmod_leadres", lead_topcand_disc, values_["tmod"], evtweight_, sr.histMap, ";lead topcand disc;t_{mod}", 55, -1.1, 1.1, 50, -10, 15);
           plot2D("h2d_tmod_chi2", chi2_disc, values_["tmod"], evtweight_, sr.histMap, ";lead topcand disc;t_{mod}", 55, -1.1, 1.1, 50, -10, 15);
@@ -737,7 +741,9 @@ void StopLooper::fillHistosForSR(string suf) {
     };
     // if (sr.GetName().find("base") != string::npos) // only plot for base regions
     if (suf == "") fillKineHists(suf);
-    // if (is_fastsim_) fillKineHists("_"+to_string((int)mass_stop())+"_"+to_string((int)mass_lsp()) + suf);
+    auto checkMassPt = [&](double mstop, double mlsp) { return (mass_stop() == mstop) && (mass_lsp() == mlsp); };
+    if (is_fastsim_ && (checkMassPt(1200, 50) || checkMassPt(800, 400)))
+      fillKineHists("_"+to_string((int)mass_stop())+"_"+to_string((int)mass_lsp()) + suf);
 
     // Re-using fillKineHists with different suffix for extra/checking categories
     // if ( abs(lep1_pdgid()) == 11 )
