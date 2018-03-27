@@ -41,7 +41,7 @@ def run_asymptotic(card):
         logname = card[:-4]+"_asym.log"
         masspt = 'PreFit_'+re.findall(r'datacard_([A-Za-z0-9_\./\\-]*).txt', card)[0]
         cmdstr = 'combine -M Asymptotic '+card+' -n '+masspt
-        os.system("timeout 25m "+ cmdstr +" >& "+ logname +" || echo 'Job failed or triggered timeout of 25m'") # --run expected --noFitAsimov
+        os.system("timeout 25m "+ cmdstr +" >& "+ logname +" || echo 'Job failed for '"+card+", see log at "+logname) # --run expected --noFitAsimov
         os.system("mv higgsCombine{0}.Asymptotic.mH120.root {1}/Limits_Asymptotic_{0}.root".format(masspt,limitdir)) # --run expected --noFitAsimov
         return logname
 
@@ -71,6 +71,9 @@ if __name__ == "__main__":
     for combined in pool.imap_unordered(combine_cards, sigs):
         cards.append(combined)
 
+    # cards = os.listdir(combineddir)
+    # cards = filter(lambda x : '_1.txt' in x and '.log' not in x, cards)
+    # cards = [combineddir+'/'+c for c in cards]
     # print cards
 
     os.system('mkdir -p '+limitdir)

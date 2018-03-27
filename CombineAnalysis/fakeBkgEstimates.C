@@ -31,6 +31,7 @@ void copyYieldHist(TFile* fin, TFile* fout, TString gentype) {
       }
       if (scale != 1) hout->Scale(scale);
       hout->Write();
+      if (hname.EndsWith("h_metbins")) hout->Clone("h_metbins_dataStats")->Write();
     }
     if (!outdir->Get("h_metbins")) {
       cout << "Didn't find yield hist for " << gentype << " in " << fin->GetName() << ":" << srname << "/. Faking a 0 one!" << endl;

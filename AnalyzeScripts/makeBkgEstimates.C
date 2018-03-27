@@ -43,7 +43,7 @@ void dataDrivenFromCR(TFile* fdata, TFile* fmc, TFile* fout, TString ddtype, TSt
     if (useMetExtrapolation) {
       double err = 0;
       double ylds = 0;
-      for (; extr_start_bin > 0; --extr_start_bin) {
+      for (; extr_start_bin > 1; --extr_start_bin) {
         ylds = hist_MC_CR->IntegralAndError(extr_start_bin, -1, err);
         if (ylds > extr_threshold) break;
       }

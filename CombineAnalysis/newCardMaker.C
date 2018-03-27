@@ -35,7 +35,7 @@ const bool correlated = true;
 const bool fakedata = false;
 const bool nobgsyst = false;
 const bool nosigsyst = false;
-const bool dropsigcont = true;
+const bool dropsigcont = false;
 const bool dogenmet = false;
 
 // global file pointers
@@ -96,18 +96,18 @@ int getUncertainties(double& errup, double& errdn, double origyield, TFile* file
   errdn = histDn->GetBinContent(metbin) / origyield;
 
   if (errdn > 0 && errup <= 0) {
-    cout << "switched for " << hname << "Up uncertainties " << errup << " to " << -1 << endl;
+    cout << "Switched " << file->GetName() << ":" << hname << "Up uncertainties " << errup << " to " << -1 << endl;
     errup = -1;
   }
   bool onereturn = false;
   if (std::isnan(errup)) { errup = -1; onereturn = true; }
   if (std::isnan(errdn)) { errdn = -1; onereturn = true; }
   if (onereturn) return -1;
-  if (errup<0&&errup!=-1) errup = 0.0001;
-  else if (errup>2) errup = 2;
-  if (errdn<0&&errdn!=-1) errdn = 0.0001;
+  if (errup <= 0 && errup != -1) errup = 0.001;
+  else if (errup > 2) errup = 2;
+  if (errdn <= 0 && errdn != -1) errdn = 0.001;
   else if (errdn>2) errdn = 2;
-  if (errup==1&&errdn==1) return 0;
+  if (errup == 1 && errdn == 1) return 0;
   return 1;
 }
 
@@ -160,7 +160,7 @@ int addOneUnc(std::ostringstream *fLogStream, string name, double d, double u, i
     d = -1;
   }
   for (int i = 0; i<process; ++i) *fLogStream << "- ";
-  if (d==0){ d = 0.001; }
+  if (d==0) { d = 0.001; }
   if (d<0)      *fLogStream << u << " ";//gmN
   else if (u<0) *fLogStream << d << " ";//only one uncertainty
   else         *fLogStream << d << "/" << u << " ";
@@ -270,7 +270,7 @@ int makeCardForOneBin(TString dir, int metbin, TString signame, int bin, TString
 
   if (!nosigsyst && sig > 0) {
     // vector<string> systNamesCard = {"PUSyst", "BLFSyst", "BHFSyst", "JESSyst", "ISRSyst", "LEffSyst", "LEffFSSyst", "BFSSyst", "MuRFSyst"};
-    vector<string> systNames_sig = {"pileup", "bTagEffLF", "bTagEffHF", "q2", "jes", "ISR", "lepSF", "lepFSSF", }; // "bTagFSEff"
+    vector<string> systNames_sig = {"pileup", "bTagEffLF", "bTagEffHF", "jes", "ISR", "lepSF", "lepFSSF", }; // "bTagFSEff" , "q2" <-- fix this
     for (string syst : systNames_sig) {
       double systUp, systDn;
       getUncertainties(systUp, systDn, osig, fsig, hname_sig+"_"+syst.c_str(), metbin);
@@ -347,7 +347,7 @@ int makeCardForOneBin(TString dir, int metbin, TString signame, int bin, TString
   *fLogStream << endl;
 
   // now correctly counted nuisances
-  *fLogStreamHeader << "# My significance experiment" << endl;
+  *fLogStreamHeader << "# Datacard for Stop-1l Analys at signal region " << dir << " and metbin " << metbin << endl;
   *fLogStreamHeader << "imax  " << 1  << "  number of channels" << endl; // single bin
   *fLogStreamHeader << "jmax  " << 4  << "  number of backgrounds" << endl;
   *fLogStreamHeader << "kmax "  << numnuis << "  number of nuisance parameters" << endl;
@@ -400,8 +400,8 @@ void newCardMaker(int dummy, string signal="T2tt_800_400", string input_dir="../
   system(Form("mkdir -p %s", output_dir.c_str()));
 
   // set input files (global pointers)
-  // fsig = new TFile(Form("%s/SMS_T2tt.root",input_dir.c_str()));
-  fsig = new TFile(Form("%s/Signal_%s.root",input_dir.c_str(), signal.substr(0,4).c_str()));
+  fsig = new TFile(Form("%s/SMS_%s.root",input_dir.c_str(), signal.substr(0,4).c_str()));
+  // fsig = new TFile(Form("%s/Signal_%s.root",input_dir.c_str(), signal.substr(0,4).c_str()));
   f2l = new TFile(Form("%s/lostlepton.root",input_dir.c_str()));
   f1l = new TFile(Form("%s/1lepFromW.root",input_dir.c_str()));
   f1ltop = new TFile(Form("%s/1lepFromTop.root",input_dir.c_str()));
@@ -432,14 +432,14 @@ int newCardMaker(string signal="T2tt", string input_dir="../StopLooper/output/te
   bmark->Start("benchmark");
 
   // set input files (global pointers)
-  // fsig = new TFile(Form("%s/SMS_%s.root",input_dir.c_str(), signal.c_str()));
-  fsig = new TFile(Form("%s/Signal_%s.root",input_dir.c_str(), signal.c_str()));
+  fsig = new TFile(Form("%s/SMS_%s.root",input_dir.c_str(), signal.c_str()));
+  // fsig = new TFile(Form("%s/Signal_%s.root",input_dir.c_str(), signal.c_str()));
   f2l = new TFile(Form("%s/lostlepton.root",input_dir.c_str()));
   f1l = new TFile(Form("%s/1lepFromW.root",input_dir.c_str()));
   f1ltop = new TFile(Form("%s/1lepFromTop.root",input_dir.c_str()));
   fznunu = new TFile(Form("%s/ZToNuNu.root",input_dir.c_str()));
-  // fsig_genmet = nullptr; // don't use switched genmet signal for now
-  fsig_genmet = new TFile(Form("%s/Signal_%s_gen.root",input_dir.c_str(), signal.c_str()));
+  fsig_genmet = nullptr; // don't use switched genmet signal for now
+  // fsig_genmet = new TFile(Form("%s/Signal_%s_gen.root",input_dir.c_str(), signal.c_str()));
 
   if (!fakedata) fdata = new TFile(Form("%s/allData_25ns.root",input_dir.c_str()));
   else fdata = new TFile(Form("%s/allBkg_25ns.root",input_dir.c_str()));

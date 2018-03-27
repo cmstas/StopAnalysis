@@ -2414,10 +2414,8 @@ void evtWgtInfo::getISRnJetsWeight( double &weight_ISR, double &weight_ISR_up, d
 
 
 inline void evtWgtInfo::getPileupWeight( double &weight_pu, double &weight_pu_up, double &weight_pu_dn ) {
-  if ( !is_bkg_ ) {
-    cout << "Cannot get pileup weight from " << ((is_data_)? "data" : "signal") << " samples!" << endl;
-    return;
-  }
+  if ( !is_bkg_ ) return;
+
   weight_pu    = babyAnalyzer.weight_PU();
   weight_pu_up = babyAnalyzer.weight_PUup();
   weight_pu_dn = babyAnalyzer.weight_PUdown();
