@@ -289,7 +289,7 @@ std::vector<SR> getStopInclusiveRegionsTopological() {
   SRvec.emplace_back(sr);
 
   sr = srbase;
-  sr.SetName("srNJetMlbTTag2");
+  sr.SetName("srNJetMlbTTagC2");
   sr.SetDetailName("geq4j_mlb0to175_deepttag");
   sr.SetVar("njet", 4, fInf);
   sr.SetVar("tmod", -fInf, fInf);
@@ -299,9 +299,25 @@ std::vector<SR> getStopInclusiveRegionsTopological() {
   sr.SetMETBins({250, 350, 450, 600, 1500});
   SRvec.emplace_back(sr);
 
-  sr.SetName("srNJetMlbTTag3");
+  sr.SetName("srNJetMlbTTagC3");
+  sr.SetDetailName("geq4j_mlb0to175_deepttag");
+  sr.SetVar("deepttag", -2, wpDeepTop);
+  sr.SetVar("resttag", wpResTop, 1);
+  sr.SetMETBins({250, 350, 500, 1500});
+  SRvec.emplace_back(sr);
+
+  sr.SetName("srNJetMlbTTagD2");
   sr.SetDetailName("geq4j_mlb175toInf_resttag");
+  sr.SetVar("njet", 4, fInf);
+  sr.SetVar("tmod", -fInf, fInf);
   sr.SetVar("mlb", 175, fInf);
+  sr.SetVar("deepttag", wpDeepTop, 1);
+  sr.SetVar("resttag", -2, 1);
+  sr.SetMETBins({250, 350, 450, 600, 1500});
+  SRvec.emplace_back(sr);
+
+  sr.SetName("srNJetMlbTTagD3");
+  sr.SetDetailName("geq4j_mlb175toInf_resttag");
   sr.SetVar("deepttag", -2, wpDeepTop);
   sr.SetVar("resttag", wpResTop, 1);
   sr.SetMETBins({250, 350, 500, 1500});
