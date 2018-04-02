@@ -1,6 +1,8 @@
 #include "StopRegions.h"
 
 const float fInf = std::numeric_limits<float>::max();
+const float wpResTop = 0.9;
+const float wpDeepTop = 0.4;
 
 
 std::vector<SR> getStopControlRegionsNoBTags(std::vector<SR>&& SRvec) {
@@ -208,8 +210,6 @@ std::vector<SR> getStopInclusiveRegionsTopological() {
   srbase.SetVar("nvlep", 1, 2);
   srbase.SetVar("passvetos", 1, 2);
   srbase.SetVar("njet", 2, fInf);
-  // srbase.SetVar("nbjet", 1, fInf);
-  // srbase.SetVar("ntbtag", 0, fInf);
   srbase.SetVar("nbtag", 1, fInf);
   srbase.SetVar("mlb", 0, fInf);
   srbase.SetVar("tmod", -fInf, fInf);
@@ -224,13 +224,87 @@ std::vector<SR> getStopInclusiveRegionsTopological() {
   // Top tag regions at baseline
 
   sr = srbase;
-  sr.SetName("srDeepTag");
-  sr.SetVar("deepttag", 0.4, 1);
+  sr.SetName("srNJetTModTTagA2");
+  sr.SetDetailName("2to3j_tmod10toInf_deepttag");
+  sr.SetVar("njet", 2, 4);
+  sr.SetVar("tmod", 10, fInf);
+  sr.SetVar("mlb", 0, fInf);
+  sr.SetVar("deepttag", wpDeepTop, 1);
+  // sr.SetMETBins({250, 350, 450, 600, 1500});
+  sr.SetMETBins({250, 600, 1500});
   SRvec.emplace_back(sr);
 
   sr = srbase;
-  sr.SetName("srResTag");
-  sr.SetVar("resttag", 0.9, 1);
+  sr.SetName("srNJetTModTTagC2");
+  sr.SetDetailName("geq4j_tmodlt0_deepttag");
+  sr.SetVar("njet", 4, fInf);
+  sr.SetVar("tmod", -fInf, 0);
+  sr.SetVar("mlb", 0, fInf);
+  sr.SetVar("deepttag", wpDeepTop, 1);
+  sr.SetVar("resttag", -2, 1);
+  sr.SetMETBins({250, 350, 450, 600, 1500});
+  SRvec.emplace_back(sr);
+
+  sr.SetName("srNJetTModTTagC3");
+  sr.SetDetailName("geq4j_tmodlt0_resttag");
+  sr.SetVar("deepttag", -2, wpDeepTop);
+  sr.SetVar("resttag", wpResTop, 1);
+  sr.SetMETBins({250, 350, 500, 1500});
+  SRvec.emplace_back(sr);
+
+  sr = srbase;
+  sr.SetName("srNJetTModTTagE2");
+  sr.SetDetailName("geq4j_tmod0to10_deepttag");
+  sr.SetVar("njet", 4, fInf);
+  sr.SetVar("tmod", 0, 10);
+  sr.SetVar("mlb", 0, fInf);
+  sr.SetVar("deepttag", wpDeepTop, 1);
+  sr.SetVar("resttag", -2, 1);
+  sr.SetMETBins({250, 350, 450, 1500});
+  SRvec.emplace_back(sr);
+
+  sr.SetName("srNJetTModTTagE3");
+  sr.SetDetailName("geq4j_tmod0to10_resttag");
+  sr.SetVar("deepttag", -2, wpDeepTop);
+  sr.SetVar("resttag", wpResTop, 1);
+  sr.SetMETBins({250, 350, 450, 1500});
+  SRvec.emplace_back(sr);
+
+  sr = srbase;
+  sr.SetName("srNJetTModTTagG2");
+  sr.SetDetailName("geq4j_tmod10toInf_deepttag");
+  sr.SetVar("njet", 4, fInf);
+  sr.SetVar("tmod", 10, fInf);
+  sr.SetVar("mlb", 0, fInf);
+  sr.SetVar("deepttag", wpDeepTop, 1);
+  sr.SetVar("resttag", -2, 1);
+  sr.SetMETBins({250, 450, 1500});
+  SRvec.emplace_back(sr);
+
+  sr.SetName("srNJetTModTTagG3");
+  sr.SetDetailName("geq4j_tmod10toInf_resttag");
+  sr.SetVar("deepttag", -2, wpDeepTop);
+  sr.SetVar("resttag", wpResTop, 1);
+  sr.SetMETBins({250, 350, 500, 1500});
+  SRvec.emplace_back(sr);
+
+  sr = srbase;
+  sr.SetName("srNJetMlbTTag2");
+  sr.SetDetailName("geq4j_mlb0to175_deepttag");
+  sr.SetVar("njet", 4, fInf);
+  sr.SetVar("tmod", -fInf, fInf);
+  sr.SetVar("mlb", 0, 175);
+  sr.SetVar("deepttag", wpDeepTop, 1);
+  sr.SetVar("resttag", -2, 1);
+  sr.SetMETBins({250, 350, 450, 600, 1500});
+  SRvec.emplace_back(sr);
+
+  sr.SetName("srNJetMlbTTag3");
+  sr.SetDetailName("geq4j_mlb175toInf_resttag");
+  sr.SetVar("mlb", 175, fInf);
+  sr.SetVar("deepttag", -2, wpDeepTop);
+  sr.SetVar("resttag", wpResTop, 1);
+  sr.SetMETBins({250, 350, 500, 1500});
   SRvec.emplace_back(sr);
 
   // Inclusive regions
@@ -328,6 +402,14 @@ std::vector<SR> getStopInclusiveRegionsTopological() {
   return SRvec;
 }
 
+std::vector<SR> getStopInclusiveControlRegionsNoBTags() {
+  return getStopControlRegionsNoBTags( getStopInclusiveRegionsTopological() );
+}
+
+std::vector<SR> getStopInclusiveControlRegionsDilepton() {
+  return getStopControlRegionsDilepton( getStopInclusiveRegionsTopological() );
+}
+
 std::vector<SR> getStopSignalRegionsAddResTagBin() {
 
   std::vector<SR> orgSRvec = getStopSignalRegionsTopological();
@@ -364,9 +446,6 @@ std::vector<SR> getStopControlRegionsDileptonAddResTagBin() {
 
 
 std::vector<SR> getStopSignalRegionsNewMETBinning() {
-
-  const float wpResTop = 0.9;
-  const float wpDeepTop = 0.4;
 
   SR srbase;
   srbase.SetAllowDummyVars(1);
@@ -701,9 +780,6 @@ std::vector<SR> getStopControlRegionsDileptonAddTopTagBins() {
 std::vector<SR> getStopSignalRegionsBinInResolvedTag() {
   // Replace the tmod bin with the top tagger bin
 
-  const float wpResTop = 0.9;
-  const float wpDeepTop = 0.6;
-
   std::vector<SR> orgSRvec = getStopSignalRegionsTopological();
   std::vector<SR> SRvec;
 
@@ -759,9 +835,6 @@ std::vector<SR> getStopControlRegionsDileptonBinInResolvedTag() {
 
 std::vector<SR> getStopSignalRegionsBinInMergedTag() {
   // Replace the tmod bin with the top tagger bin
-
-  // const float wpResTop = 0.9;
-  const float wpDeepTop = 0.9;
 
   std::vector<SR> orgSRvec = getStopSignalRegionsTopological();
   std::vector<SR> SRvec;

@@ -39,5 +39,7 @@ std::vector<SR> getStopControlRegionsDileptonBooleanTopTags();
 
 std::vector<SR> getStopCrosscheckRegionsEMu();
 std::vector<SR> getStopInclusiveRegionsTopological();
+std::vector<SR> getStopInclusiveControlRegionsNoBTags();
+std::vector<SR> getStopInclusiveControlRegionsDilepton();
 
 #endif // STOPREGIONS_H
