@@ -12,16 +12,16 @@ from metis.Utils import do_cmd
 if __name__ == "__main__":
 
     cms4_samples = {
-        "TTJets_amcnlo" : "/hadoop/cms/store/user/sicheng/ProjectMetis/TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISummer17MiniAOD-92X_upgrade2017_realistic_v10-v3_MINIAODSIM_CMS4_V00-00-07_test",
-        "ttbar_powheg" : "/hadoop/cms/store/user/sicheng/ProjectMetis/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8_RunIISummer17MiniAOD-92X_upgrade2017_realistic_v10_ext1-v1_MINIAODSIM_CMS4_V00-00-07_test2",
-        "SMS_T2tt_mStop-400to1200_madgraph" : "/hadoop/cms/store/user/sicheng/ProjectMetis/SMS-T2tt_mStop-400to1200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MINIAODSIM_CMS4_V00-00-02_test",
-        "SMS_T2bt_madgraph" : "/hadoop/cms/store/user/sicheng/ProjectMetis/SMS-T2bt_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MINIAODSIM_CMS4_V00-00-02_test",
-        "SMS_T2bW_madgraph" : "/hadoop/cms/store/user/sicheng/ProjectMetis/SMS-T2bW_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MINIAODSIM_CMS4_V00-00-02_test",
-        "W4JetsToLNu_madgraph" : "/hadoop/cms/store/user/sicheng/ProjectMetis/W4JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer17MiniAOD-92X_upgrade2017_realistic_v10-v1_MINIAODSIM_CMS4_V00-00-07_test2",
-        "W3JetsToLNu_madgraph" : "/hadoop/cms/store/user/sicheng/ProjectMetis/W3JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer17MiniAOD-92X_upgrade2017_realistic_v10-v1_MINIAODSIM_CMS4_V00-00-07_test2",
-        "W2JetsToLNu_madgraph" : "/hadoop/cms/store/user/sicheng/ProjectMetis/W2JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer17MiniAOD-92X_upgrade2017_realistic_v10-v1_MINIAODSIM_CMS4_V00-00-07_test2",
+        "TTJets_amcnlo_94X" : "/hadoop/cms/store/user/sicheng/ProjectMetis/TTJets_TuneCP5_13TeV-amcatnloFXFX-pythia8_RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v1_MINIAODSIM_CMS4_V00-00-12",
+        # "TTJets_amcnlo" : "/hadoop/cms/store/user/sicheng/ProjectMetis/TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISummer17MiniAOD-92X_upgrade2017_realistic_v10-v3_MINIAODSIM_CMS4_V00-00-07_test",
+        # "ttbar_powheg" : "/hadoop/cms/store/user/sicheng/ProjectMetis/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8_RunIISummer17MiniAOD-92X_upgrade2017_realistic_v10_ext1-v1_MINIAODSIM_CMS4_V00-00-07_test2",
+        # "SMS_T2tt_mStop-400to1200_madgraph" : "/hadoop/cms/store/user/sicheng/ProjectMetis/SMS-T2tt_mStop-400to1200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MINIAODSIM_CMS4_V00-00-02_test",
+        # "SMS_T2bt_madgraph" : "/hadoop/cms/store/user/sicheng/ProjectMetis/SMS-T2bt_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MINIAODSIM_CMS4_V00-00-02_test",
+        # "SMS_T2bW_madgraph" : "/hadoop/cms/store/user/sicheng/ProjectMetis/SMS-T2bW_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MINIAODSIM_CMS4_V00-00-02_test",
+        # "W4JetsToLNu_madgraph" : "/hadoop/cms/store/user/sicheng/ProjectMetis/W4JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer17MiniAOD-92X_upgrade2017_realistic_v10-v1_MINIAODSIM_CMS4_V00-00-07_test2",
+        # "W3JetsToLNu_madgraph" : "/hadoop/cms/store/user/sicheng/ProjectMetis/W3JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer17MiniAOD-92X_upgrade2017_realistic_v10-v1_MINIAODSIM_CMS4_V00-00-07_test2",
+        # "W2JetsToLNu_madgraph" : "/hadoop/cms/store/user/sicheng/ProjectMetis/W2JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer17MiniAOD-92X_upgrade2017_realistic_v10-v1_MINIAODSIM_CMS4_V00-00-07_test2",
     }
-
 
     # Make a directory sample, giving it the location and a dataset name for bookkeeping purposes
     # The globber must be customized (by default, it is *.root) in order to pick up the text files
@@ -31,10 +31,10 @@ if __name__ == "__main__":
     merge_tasks = []
 
     for dsname, samploc in cms4_samples.items():
-        cmsswver = "CMSSW_9_4_0"
+        cmsswver = "CMSSW_9_4_1"
         scramarch = "slc6_amd64_gcc630"
         tarfile = "input.tar.gz"
-        tag = "v26_2"
+        tag = "v27_1"
         maker_task = CondorTask(
             sample = DirectorySample(
                 dataset=dsname,
@@ -50,7 +50,8 @@ if __name__ == "__main__":
             outdir_name = "stopBaby_" + dsname,
             output_name = "stopbaby.root",
             arguments = "1" if "SMS" in dsname else "0", # isFastsim
-            condor_submit_params = {"sites": "UAF,T2_US_UCSD,UCSB"},
+            # condor_submit_params = {"sites": "UAF,T2_US_UCSD,UCSB"},
+            condor_submit_params = {"sites": "T2_US_UCSD,UCSB"},
             # no_load_from_backup = True,
         )
         merge_task = CondorTask(

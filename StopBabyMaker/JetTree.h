@@ -144,10 +144,6 @@ public:
     vecd ak8pfjets_tau1;
     vecd ak8pfjets_tau2;
     vecd ak8pfjets_tau3;
-    vecd ak8pfjets_top_mass;
-    vecd ak8pfjets_pruned_mass;
-    vecd ak8pfjets_softdrop_mass;
-    vecd ak8pfjets_pu_id;
     veci ak8pfjets_parton_flavor;
     vecd ak8pfjets_deepdisc_qcd;
     vecd ak8pfjets_deepdisc_top;

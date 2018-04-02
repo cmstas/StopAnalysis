@@ -652,8 +652,6 @@ void JetTree::FillAK8Jets(bool applynewcorr, FactorizedJetCorrector* corrector, 
     ak8pfjets_tau1.push_back(ak8jets_nJettinessTau1().at(idx));
     ak8pfjets_tau2.push_back(ak8jets_nJettinessTau2().at(idx));
     ak8pfjets_tau3.push_back(ak8jets_nJettinessTau3().at(idx));
-    ak8pfjets_pruned_mass.push_back(ak8jets_prunedMass().at(idx));
-    ak8pfjets_softdrop_mass.push_back(ak8jets_softdropMass().at(idx));
     ak8pfjets_parton_flavor.push_back(ak8jets_partonFlavour().at(idx));
 
     // Branches from deepAK8 object tagging
@@ -669,6 +667,8 @@ void JetTree::FillAK8Jets(bool applynewcorr, FactorizedJetCorrector* corrector, 
     // ak8pfjets_top_mass.push_back(ak8jets_topJetMass().at(idx));
     // ak8pfjets_trimmed_mass.push_back(ak8jets_trimmedMass().at(idx));
     // ak8pfjets_filtered_mass.push_back(ak8jets_filteredMass().at(idx));
+    // ak8pfjets_pruned_mass.push_back(ak8jets_prunedMass().at(idx));
+    // ak8pfjets_softdrop_mass.push_back(ak8jets_softdropMass().at(idx));
 
     // ak8pfjets_pu_id.push_back(ak8jets_pileupJetId().at(idx));
   }
@@ -810,10 +810,6 @@ void JetTree::Reset ()
     ak8pfjets_tau1.clear();
     ak8pfjets_tau2.clear();
     ak8pfjets_tau3.clear();
-    ak8pfjets_top_mass.clear();
-    ak8pfjets_pruned_mass.clear();
-    ak8pfjets_softdrop_mass.clear();
-    ak8pfjets_pu_id.clear();    
     ak8pfjets_parton_flavor.clear();
     ak8pfjets_deepdisc_qcd.clear();
     ak8pfjets_deepdisc_top.clear();
@@ -883,10 +879,6 @@ void JetTree::SetAK8Branches (TTree* tree)
     tree->Branch(Form("%sak8pfjets_tau1", prefix_.c_str()) , &ak8pfjets_tau1);
     tree->Branch(Form("%sak8pfjets_tau2", prefix_.c_str()) , &ak8pfjets_tau2);
     tree->Branch(Form("%sak8pfjets_tau3", prefix_.c_str()) , &ak8pfjets_tau3);
-    tree->Branch(Form("%sak8pfjets_top_mass", prefix_.c_str()) , &ak8pfjets_top_mass);
-    tree->Branch(Form("%sak8pfjets_pruned_mass", prefix_.c_str()) , &ak8pfjets_pruned_mass);
-    tree->Branch(Form("%sak8pfjets_softdrop_mass", prefix_.c_str()) , &ak8pfjets_softdrop_mass);
-    tree->Branch(Form("%sak8pfjets_pu_id", prefix_.c_str()) , &ak8pfjets_pu_id);    
     tree->Branch(Form("%sak8pfjets_parton_flavor", prefix_.c_str()) , &ak8pfjets_parton_flavor);
     tree->Branch(Form("%snGoodAK8PFJets", prefix_.c_str()) , &nGoodAK8PFJets);
 
