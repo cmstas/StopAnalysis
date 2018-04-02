@@ -3,7 +3,7 @@
 
 #include "TFile.h"
 #include "TChain.h"
-#include "../StopCORE/eventWeight.h"
+#include "eventWeight.h"
 #include "SR.h"
 
 class StopLooper {
@@ -35,6 +35,7 @@ class StopLooper {
   void fillHistosForCRemu(std::string suffix = "");
 
   // Testing
+  void fillTopTaggingHistos(std::string suffix = "");
   void testTopTaggingEffficiency(SR& sr);
   void testCutFlowHistos(SR& sr);
 
