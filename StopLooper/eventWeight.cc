@@ -399,9 +399,9 @@ evtWgtInfo::Util::Util( systID systematic ) {
 //////////////////////////////////////////////////////////////////////
 
 evtWgtInfo::evtWgtInfo() {
-  is_bkg_    = false;
-  is_data_   = false;
-  is_signal_ = false;
+  is_bkg_     = false;
+  is_data_    = false;
+  is_fastsim_ = false;
 
   // Initialize Switches for additional SFs
   apply_diLepTrigger_sf = false;
@@ -455,10 +455,9 @@ void evtWgtInfo::Setup(string samplestr, bool useBTagUtils, bool useLepSFUtils) 
   }
   else if ( sampletype.find("SMS") != string::npos || sampletype.find("Signal") != string::npos ||
             sampletype.find("sig_") != string::npos) {
-    is_signal_ = true;
     is_fastsim_ = true;
   }
-  is_bkg_ = !is_data_ && !is_signal_;
+  is_bkg_ = !is_data_ && !is_fastsim_;
 
   // The event counter hists setup is postponed to the file loop
 
@@ -467,7 +466,7 @@ void evtWgtInfo::Setup(string samplestr, bool useBTagUtils, bool useLepSFUtils) 
   useLepSFs_fromFiles  = useLepSFUtils;
 
   // Get Signal XSection File
-  if ( is_signal_ ) {
+  if ( is_fastsim_ ) {
     f_sig_xsec = new TFile("../StopCORE/inputs/signal_xsec/xsec_stop_13TeV.root","read");
     h_sig_xsec = (TH1D*) f_sig_xsec->Get("stop");
   }
@@ -509,24 +508,24 @@ void evtWgtInfo::Setup(string samplestr, bool useBTagUtils, bool useLepSFUtils) 
 
 void evtWgtInfo::Cleanup() {
 
-  if ( !is_data_ && useBTagSFs_fromFiles) {
-    delete bTagSFUtil;
-  }
-
-  if ( !is_data_ && useLepSFs_fromFiles) {
-    delete lepSFUtil;
-  }
-
-  if ( !is_data_ ) {
+  if ( is_data_ ) {
     f_cr2lTrigger_sf->Close();
     delete f_cr2lTrigger_sf;
-  }
 
-  if ( is_signal_ ) {
+    if (useBTagSFs_fromFiles) delete bTagSFUtil;
+    if (useLepSFs_fromFiles) delete lepSFUtil;
+  }
+  if ( is_fastsim_ ) {
     f_sig_xsec->Close();
     delete f_sig_xsec;
   }
+}
 
+//////////////////////////////////////////////////////////////////////
+
+void evtWgtInfo::resetEvent() {
+  event_ready = false;
+  add2ndLepToMet = false;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -534,7 +533,7 @@ void evtWgtInfo::Cleanup() {
 void evtWgtInfo::getCounterHistogramFromBaby( TFile *sourceFile ) {
 
   // Get counter histogram from source file
-  if ( is_signal_ ) {
+  if ( is_fastsim_ ) {
     h_sig_counter = (TH3D*) sourceFile->Get("h_counterSMS");
     h_sig_counter_nEvents = (TH2D*) sourceFile->Get("histNEvts");
   }
@@ -673,7 +672,7 @@ void evtWgtInfo::calculateWeightsForEvent(bool nominalOnly) {
   if ( is_data_ ) return;
 
   // Get SUSY masses if sample is signal scan
-  if ( is_signal_ ) getSusyMasses( mStop, mLSP );
+  if ( is_fastsim_ ) getSusyMasses( mStop, mLSP );
 
   // Get nEvents
   getNEvents( nEvents );
@@ -952,7 +951,7 @@ void evtWgtInfo::calculateWeightsForEvent(bool nominalOnly) {
 
 
 void evtWgtInfo::getSusyMasses( int &mStop, int &mLSP ) {
-  if ( is_signal_ ) {
+  if ( is_fastsim_ ) {
     mStop     = babyAnalyzer.mass_stop();
     mLSP      = babyAnalyzer.mass_lsp();
   } else {
@@ -962,7 +961,7 @@ void evtWgtInfo::getSusyMasses( int &mStop, int &mLSP ) {
 }
 
 void evtWgtInfo::getNEvents( int &nEvts ) {
-  if ( is_signal_ ) {
+  if ( is_fastsim_ ) {
     nEvts = (int) h_sig_counter_nEvents->GetBinContent(h_sig_counter->FindBin(mStop,mLSP));
   } else {
     nEvts = h_bkg_counter->GetBinContent(22);
@@ -975,7 +974,7 @@ void evtWgtInfo::getXSecWeight( double &xsec_val, double &weight_xsec_up, double
   xsec_val = 1.0;
   double xsec_err = 0.0;
 
-  if ( !is_signal_ ) {
+  if ( !is_fastsim_ ) {
     xsec_val = babyAnalyzer.xsec();
   } else {
     // getSusyMasses(mStop,mLSP);
@@ -991,7 +990,7 @@ void evtWgtInfo::getScaleToLumiWeight( double &wgt ) {
   wgt = 1.0;
   if ( is_data_ ) return;
 
-  if ( is_signal_ ) {
+  if ( is_fastsim_ ) {
     // getXSecWeight( xsec, sf_xsec_up, sf_xsec_dn );
     // getNEvents( nEvents );
     wgt = lumi*1000.0*xsec/(double)nEvents;
@@ -1161,7 +1160,7 @@ void evtWgtInfo::getBTagWeight( int WP, double &wgt_btagsf, double &wgt_btagsf_h
   // getNEvents( nEvents );
 
   // Signal Sample Normalization
-  if ( is_signal_ ) {
+  if ( is_fastsim_ ) {
     // getSusyMasses(mStop,mLSP);
 
     // Loose WP Signal Normalization
@@ -1291,7 +1290,7 @@ void evtWgtInfo::getBTagWeight_tightWP( double &wgt_btagsf_tight, double &wgt_bt
   // Normalization
   getNEvents( nEvents );
 
-  if ( is_signal_ ) {
+  if ( is_fastsim_ ) {
     getSusyMasses(mStop,mLSP);
 
     wgt_btagsf_tight       *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,37)) );
@@ -1377,7 +1376,7 @@ void evtWgtInfo::getLepSFWeight( double &weight_lepSF, double &weight_lepSF_Up, 
     // // Normalization
     // getNEvents( nEvents );
 
-    if ( is_signal_ ) {
+    if ( is_fastsim_ ) {
       // getSusyMasses(mStop,mLSP);
 
       weight_lepSF    *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,27)) );
@@ -1623,8 +1622,7 @@ void evtWgtInfo::getMetResWeight( double &weight_metRes, double &weight_metRes_u
   double sf_val = 1.0;
   double sf_err = 0.0;
 
-  if ( is_data_ ) return;
-  if ( is_signal_ ) return;
+  if (!is_bkg_) return;
 
   // ttbar, tW, wjets
   // if ( sampletype != "ttbar" && sampletype != "singletop" && sampletype != "wjets" ) return;
@@ -1667,24 +1665,16 @@ void evtWgtInfo::getMetResWeight( double &weight_metRes, double &weight_metRes_u
     if ( met>=250.0 && met<350.0 ) {
       sf_val = 0.99;
       sf_err = 0.01;
-    }
-
-    else if ( met>=350.0 && met<450.0 ) {
+    } else if ( met>=350.0 && met<450.0 ) {
       sf_val = 1.04;
       sf_err = 0.01;
-    }
-
-    else if ( met>=450.0 && met<600.0 ) {
+    } else if ( met>=450.0 && met<600.0 ) {
       sf_val = 1.11;
       sf_err = 0.01;
-    }
-
-    else if ( met>=600.0 ) {
+    } else if ( met>=600.0 ) {
       sf_val = 1.17;
       sf_err = 0.03;
-    }
-
-    else {  // shouldn't get here
+    } else {  // shouldn't get here
       sf_val = 1.00;
       sf_err = 0.00;
     }
@@ -1697,22 +1687,12 @@ void evtWgtInfo::getMetResWeight( double &weight_metRes, double &weight_metRes_u
     if ( met>=250.0 && met<450.0 ) {
       sf_val = 1.00;
       sf_err = 0.01;
-      //sf_val = 0.99;
-      //sf_err = 0.00;
-    }
-
-    if ( met>=450.0 && met<600.0 ) {
+    } else if ( met>=450.0 && met<600.0 ) {
       sf_val = 1.11;
       sf_err = 0.01;
-      //sf_val = 1.14;
-      //sf_err = 0.02;
-    }
-
-    if ( met>=600.0 ) {
+    } else if ( met>=600.0 ) {
       sf_val = 1.17;
       sf_err = 0.02;
-      //sf_val = 1.24;
-      //sf_err = 0.03;
     }
 
   } // end if region B
@@ -1724,36 +1704,18 @@ void evtWgtInfo::getMetResWeight( double &weight_metRes, double &weight_metRes_u
     if ( met>=250.0 && met<350.0 ) {
       sf_val = 0.99;
       sf_err = 0.01;
-      //sf_val = 0.98;
-      //sf_err = 0.01;
-    }
-
-    if ( met>=350.0 && met<450.0 ) {
+    } else if ( met>=350.0 && met<450.0 ) {
       sf_val = 1.05;
       sf_err = 0.01;
-      //sf_val = 1.06;
-      //sf_err = 0.02;
-    }
-
-    if ( met>=450.0 && met<550.0 ) {
+    } else if ( met>=450.0 && met<550.0 ) {
       sf_val = 1.07;
       sf_err = 0.04;
-      //sf_val = 1.12;
-      //sf_err = 0.05;
-    }
-
-    if ( met>=550.0 && met<650.0 ) {
+    } else if ( met>=550.0 && met<650.0 ) {
       sf_val = 1.10;
       sf_err = 0.04;
-      //sf_val = 1.21;
-      //sf_err = 0.05;
-    }
-
-    if ( met>=650.0 ) {
+    } else if ( met>=650.0 ) {
       sf_val = 1.14;
       sf_err = 0.05;
-      //sf_val = 1.18;
-      //sf_err = 0.05;
     }
 
   } // end if region C
@@ -1765,29 +1727,15 @@ void evtWgtInfo::getMetResWeight( double &weight_metRes, double &weight_metRes_u
     if ( met>=250.0 && met<350.0 ) {
       sf_val = 0.99;
       sf_err = 0.01;
-      //sf_val = 0.98;
-      //sf_err = 0.01;
-    }
-
-    if ( met>=350.0 && met<450.0 ) {
+    } else if ( met>=350.0 && met<450.0 ) {
       sf_val = 1.05;
       sf_err = 0.01;
-      //sf_val = 1.06;
-      //sf_err = 0.02;
-    }
-
-    if ( met>=450.0 && met<550.0 ) {
+    } else if ( met>=450.0 && met<550.0 ) {
       sf_val = 1.07;
       sf_err = 0.04;
-      //sf_val = 1.12;
-      //sf_err = 0.05;
-    }
-
-    if ( met>=550.0 ) {
+    } else if ( met>=550.0 ) {
       sf_val = 1.11;
       sf_err = 0.03;
-      //sf_val = 1.20;
-      //sf_err = 0.04;
     }
 
   } // end if region D
@@ -1799,22 +1747,12 @@ void evtWgtInfo::getMetResWeight( double &weight_metRes, double &weight_metRes_u
     if ( met>=250.0 && met<350.0 ) {
       sf_val = 0.98;
       sf_err = 0.01;
-      //sf_val = 0.97;
-      //sf_err = 0.01;
-    }
-
-    if ( met>=350.0 && met<550.0 ) {
+    } else if ( met>=350.0 && met<550.0 ) {
       sf_val = 1.06;
       sf_err = 0.01;
-      //sf_val = 1.08;
-      //sf_err = 0.02;
-    }
-
-    if ( met>=550.0 ) {
+    } else if ( met>=550.0 ) {
       sf_val = 1.10;
       sf_err = 0.03;
-      //sf_val = 1.13;
-      //sf_err = 0.03;
     }
 
   } // end if region E
@@ -1826,15 +1764,9 @@ void evtWgtInfo::getMetResWeight( double &weight_metRes, double &weight_metRes_u
     if ( met>=250.0 && met<450.0 ) {
       sf_val = 0.99;
       sf_err = 0.01;
-      //sf_val = 0.99;
-      //sf_err = 0.01;
-    }
-
-    if ( met>=450.0 ) {
+    } else if ( met>=450.0 ) {
       sf_val = 1.07;
       sf_err = 0.02;
-      //sf_val = 1.12;
-      //sf_err = 0.02;
     }
 
   } // end if region F
@@ -1846,29 +1778,15 @@ void evtWgtInfo::getMetResWeight( double &weight_metRes, double &weight_metRes_u
     if ( met>=250.0 && met<350.0 ) {
       sf_val = 0.98;
       sf_err = 0.01;
-      //sf_val = 0.97;
-      //sf_err = 0.01;
-    }
-
-    if ( met>=350.0 && met<450.0 ) {
+    } else if ( met>=350.0 && met<450.0 ) {
       sf_val = 1.06;
       sf_err = 0.01;
-      //sf_val = 1.08;
-      //sf_err = 0.02;
-    }
-
-    if ( met>=450.0 && met<600.0 ) {
+    } else if ( met>=450.0 && met<600.0 ) {
       sf_val = 1.07;
       sf_err = 0.02;
-      //sf_val = 1.12;
-      //sf_err = 0.03;
-    }
-
-    if ( met>=600.0 ) {
+    } else if ( met>=600.0 ) {
       sf_val = 1.08;
       sf_err = 0.04;
-      //sf_val = 1.11;
-      //sf_err = 0.04;
     }
 
   } // end if region G
@@ -1880,15 +1798,9 @@ void evtWgtInfo::getMetResWeight( double &weight_metRes, double &weight_metRes_u
     if ( met>=250.0 && met<450.0 ) {
       sf_val = 0.99;
       sf_err = 0.01;
-      //sf_val = 0.99;
-      //sf_err = 0.01;
-    }
-
-    if ( met>=450.0 ) {
+    } else if ( met>=450.0 ) {
       sf_val = 1.07;
       sf_err = 0.02;
-      //sf_val = 1.12;
-      //sf_err = 0.02;
     }
 
   } // end if region H
@@ -1917,7 +1829,7 @@ void evtWgtInfo::getMetResWeight_corridor( double &weight_metRes, double &weight
   double sf_err = 0.0;
 
   if ( is_data_ ) return;
-  if ( is_signal_ ) return;
+  if ( is_fastsim_ ) return;
 
   // ttbar, tW
   if ( sampletype != "ttbar" && sampletype != "singletop" && sampletype != "wjets" ) return;
@@ -1939,29 +1851,15 @@ void evtWgtInfo::getMetResWeight_corridor( double &weight_metRes, double &weight
   if ( met>=250.0 && met<350.0 ) {
     sf_val = 0.98;
     sf_err = 0.02;
-    //sf_val = 0.97; // 2016 SUS-16-051 pre-approval #s
-    //sf_err = 0.02;
-  }
-
-  if ( met>=350.0 && met<450.0 ) {
+  } else if ( met>=350.0 && met<450.0 ) {
     sf_val = 1.04;
     sf_err = 0.02;
-    //sf_val = 1.05;
-    //sf_err = 0.03;
-  }
-
-  if ( met>=450.0 && met<550.0 ) {
+  } else if ( met>=450.0 && met<550.0 ) {
     sf_val = 1.07;
     sf_err = 0.04;
-    //sf_val = 1.14;
-    //sf_err = 0.05;
-  }
-
-  if ( met>=550.0 ) {
+  } else if ( met>=550.0 ) {
     sf_val = 1.07;
     sf_err = 0.05;
-    //sf_val = 1.14;
-    //sf_err = 0.06;
   }
 
   // 50% uncertainty on difference between no sf and applying it
@@ -1988,7 +1886,7 @@ void evtWgtInfo::getMetTTbarWeight( double &weight_metTTbar, double &weight_metT
   double sf_err = 0.0;
 
   if ( is_data_ ) return;
-  if ( is_signal_ ) return;
+  if ( is_fastsim_ ) return;
 
   // // ttbar, tW
   // if ( sampletype != "ttbar" && sampletype != "singletop") return;
@@ -2017,8 +1915,7 @@ void evtWgtInfo::getMetTTbarWeight( double &weight_metTTbar, double &weight_metT
     if ( met>450.0 && met<600.0 ) {
       sf_val = 1.00;
       sf_err = 0.24;
-    }
-    if ( met>600.0 ) {
+    } else if ( met>=600.0 ) {
       sf_val = 0.99;
       sf_err = 0.39;
     }
@@ -2029,8 +1926,7 @@ void evtWgtInfo::getMetTTbarWeight( double &weight_metTTbar, double &weight_metT
     if ( met>350.0 && met<550.0 ) {
       sf_val = 1.04;
       sf_err = 0.10;
-    }
-    if ( met>550.0 ) {
+    } else if ( met>=550.0 ) {
       sf_val = 0.62;
       sf_err = 0.18;
     }
@@ -2041,8 +1937,7 @@ void evtWgtInfo::getMetTTbarWeight( double &weight_metTTbar, double &weight_metT
     if ( met>250.0 && met<450.0 ) {
       sf_val = 1.02;
       sf_err = 0.05;
-    }
-    if ( met>450.0 ) {
+    } else if ( met>=450.0 ) {
       sf_val = 0.62;
       sf_err = 0.10;
     }
@@ -2053,8 +1948,7 @@ void evtWgtInfo::getMetTTbarWeight( double &weight_metTTbar, double &weight_metT
     if ( met>250.0 && met<450.0 ) {
       sf_val = 1.02;
       sf_err = 0.05;
-    }
-    if ( met>450.0 ) {
+    } else if ( met>=450.0 ) {
       sf_val = 0.62;
       sf_err = 0.10;
     }
@@ -2294,8 +2188,8 @@ void evtWgtInfo::getPDFWeight( double &weight_pdf_up, double &weight_pdf_dn ) {
 
   if ( babyAnalyzer.genweights().size() < 110 ) return;
 
-  if ( is_signal_ && ( h_sig_counter->GetBinContent(mStop,mLSP,10)<=0 ||
-                       h_sig_counter->GetBinContent(mStop,mLSP,11)<=0 ) ) return;
+  if ( is_fastsim_ && ( h_sig_counter->GetBinContent(mStop,mLSP,10)<=0 ||
+                        h_sig_counter->GetBinContent(mStop,mLSP,11)<=0 ) ) return;
   else if ( h_bkg_counter->GetBinContent(10)<=0 ||
             h_bkg_counter->GetBinContent(11)<=0   ) return;
 
@@ -2303,7 +2197,7 @@ void evtWgtInfo::getPDFWeight( double &weight_pdf_up, double &weight_pdf_dn ) {
   weight_pdf_dn = babyAnalyzer.pdf_down_weight();
 
   // Normalization
-  if ( is_signal_ ) {
+  if ( is_fastsim_ ) {
     weight_pdf_up *= (nEvents/h_sig_counter->GetBinContent(mStop,mLSP,10));
     weight_pdf_dn *= (nEvents/h_sig_counter->GetBinContent(mStop,mLSP,11));
   } else {
@@ -2326,7 +2220,7 @@ void evtWgtInfo::getAlphasWeight( double &weight_alphas_up, double &weight_alpha
   weight_alphas_dn = babyAnalyzer.genweights().at(110)/babyAnalyzer.genweights().at(0);
 
   // Normalization
-  if ( is_signal_ ) {
+  if ( is_fastsim_ ) {
     weight_alphas_up *= (  h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,1)) / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,12))  );
     weight_alphas_dn *= (  h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,1)) / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,13))  );
   } else {
@@ -2351,7 +2245,7 @@ void evtWgtInfo::getQ2Weight( double &weight_q2_up, double &weight_q2_dn ) {
   weight_q2_dn = babyAnalyzer.genweights().at(8)/babyAnalyzer.genweights().at(0);
 
   // Normalization
-  if ( is_signal_ ) {
+  if ( is_fastsim_ ) {
     weight_q2_up *= ( h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,1)) / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,5)) );
     weight_q2_dn *= ( h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,1)) / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,9)) );
   } else {
@@ -2379,7 +2273,7 @@ void evtWgtInfo::getISRWeight( double &weight_ISR, double &weight_ISR_up, double
   weight_ISR_dn = babyAnalyzer.weight_ISRdown();
 
   // getNEvents(nEvents);
-  if ( is_signal_ ) {
+  if ( is_fastsim_ ) {
     weight_ISR    *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,19)) );
     weight_ISR_up *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,20)) );
     weight_ISR_dn *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,21)) );
@@ -2400,7 +2294,7 @@ void evtWgtInfo::getISRnJetsWeight( double &weight_ISR, double &weight_ISR_up, d
   // getNEvents(nEvents);
 
   // Q: What is this?? Doesn't his just revert the weight??
-  if ( is_signal_ ) {
+  if ( is_fastsim_ ) {
     weight_ISR    *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,24)) );
     weight_ISR_up *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,25)) );
     weight_ISR_dn *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,26)) );
@@ -2550,45 +2444,32 @@ void evtWgtInfo::setDefaultSystematics( int syst_set ) {
 
 }
 
-/*
-double evtWgtInfo::getSampleWeight( sampleInfo::ID sample ) {
+double evtWgtInfo::getSampleWeight( TString fname ) {
 
   double result = 1.0;
 
   if (!apply_sample_sf ) return result;
 
-  switch ( sample ) {
+  if (fname.Contains("ttbar_diLept_madgraph_pythia8_ext1"))
+    result = 23198554.0 / (23198554.0+5689986.0);
+  else if (fname.Contains("ttbar_diLept_madgraph_pythia8"))
+    result = 5689986.0 / (23198554.0+5689986.0);
+  else if (fname.Contains("t_tW_5f_powheg_pythia8_noHadDecays_ext1"))
+    result = (3145334.0)/(4473156.0+3145334.0);
+  else if (fname.Contains("t_tW_5f_powheg_pythia8_noHadDecays"))
+    result = (4473156.0)/(4473156.0+3145334.0);
+  else if (fname.Contains("t_tbarW_5f_powheg_pythia8_noHadDecays_ext1"))
+    result = (3146940.0)/(5029568.0+3146940.0);
+  else if (fname.Contains("t_tbarW_5f_powheg_pythia8_noHadDecays"))
+    result = (5029568.0)/(5029568.0+3146940.0);
+  else if (fname.Contains("ttZJets") || fname.Contains("TTZ"))
+    result = 1.14;
+  else if (fname.Contains("WZ"))
+    result = 1.21;
 
-    case(sampleInfo::k_ttbar_diLept_madgraph_pythia8):
-      result = (5689986.0)/(23198554.0+5689986.0);
-      break;
-
-    case(sampleInfo::k_ttbar_diLept_madgraph_pythia8_ext1):
-      result = (23198554.0)/(23198554.0+5689986.0);
-      break;
-
-    case(sampleInfo::k_t_tW_5f_powheg_pythia8_noHadDecays):
-      result = (4473156.0)/(4473156.0+3145334.0);
-      break;
-
-    case(sampleInfo::k_t_tW_5f_powheg_pythia8_noHadDecays_ext1):
-      result = (3145334.0)/(4473156.0+3145334.0);
-      break;
-
-    case(sampleInfo::k_t_tbarW_5f_powheg_pythia8_noHadDecays):
-      result = (5029568.0)/(5029568.0+3146940.0);
-      break;
-
-    case(sampleInfo::k_t_tbarW_5f_powheg_pythia8_noHadDecays_ext1):
-      result = (3146940.0)/(5029568.0+3146940.0);
-      break;
-
-    default:
-      break;
-  };
+  sf_extra_file *= result;
 
   return result;
 }
-*/
 
 //////////////////////////////////////////////////////////////////////

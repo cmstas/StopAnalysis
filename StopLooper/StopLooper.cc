@@ -219,22 +219,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
     }
     evtWgt.getCounterHistogramFromBaby(&file);
     // Extra file weight for extension dataset, should move these code to other places
-    if (fname.Contains("ttbar_diLept_madgraph_pythia8_ext1"))
-      evtWgt.setExtraFileWeight(23198554.0 / (23198554.0+5689986.0));
-    else if (fname.Contains("ttbar_diLept_madgraph_pythia8"))
-      evtWgt.setExtraFileWeight(5689986.0 / (23198554.0+5689986.0));
-    else if (fname.Contains("t_tW_5f_powheg_pythia8_noHadDecays_ext1"))
-      evtWgt.setExtraFileWeight((3145334.0)/(4473156.0+3145334.0));
-    else if (fname.Contains("t_tW_5f_powheg_pythia8_noHadDecays"))
-      evtWgt.setExtraFileWeight((4473156.0)/(4473156.0+3145334.0));
-    else if (fname.Contains("t_tbarW_5f_powheg_pythia8_noHadDecays_ext1"))
-      evtWgt.setExtraFileWeight((3146940.0)/(5029568.0+3146940.0));
-    else if (fname.Contains("t_tbarW_5f_powheg_pythia8_noHadDecays"))
-      evtWgt.setExtraFileWeight((5029568.0)/(5029568.0+3146940.0));
-    else if (fname.Contains("ttZJets") || fname.Contains("TTZ"))
-      evtWgt.setExtraFileWeight(1.14);
-    else if (fname.Contains("WZ"))
-      evtWgt.setExtraFileWeight(1.21);
+    evtWgt.getSampleWeight(fname);
 
     dummy.cd();
     // Loop over Events in current file
@@ -315,7 +300,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
 
       // Calculate event weight
       /// the weights would be calculated but only do if the event get selected
-      evtWgt.resetWeights();
+      evtWgt.resetEvent();
 
       // Simple weight with scale1fb only
       if (!is_data()) {

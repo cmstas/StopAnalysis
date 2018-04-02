@@ -1,10 +1,10 @@
 #ifndef EVENTWEIGHT_H
 #define EVENTWEIGHT_H
 
-// stopCORE
-#include "eventWeight_bTagSF.h"
-#include "eventWeight_lepSF.h"
-#include "stop_1l_babyAnalyzer.h"
+// StopCORE
+#include "../StopCORE/eventWeight_bTagSF.h"
+#include "../StopCORE/eventWeight_lepSF.h"
+#include "../StopCORE/stop_1l_babyAnalyzer.h"
 
 // ROOT
 #include "TFile.h"
@@ -16,21 +16,11 @@
 
 typedef ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > LorentzVector;
 
-// C
+// STL
 #include <string>
 #include <vector>
 
-//
-// Other namespace functions
-//
-// double GetEventWeight( ID whichSyst );
-// double GetEventWeight_corridor( ID whichSyst );
-// double GetEventWeight_SRbulk( ID whichSyst );
-// double GetEventWeight_CR2lbulk( ID whichSyst );
 
-//
-// CLASS
-//
 class evtWgtInfo {
 
  public:
@@ -270,7 +260,7 @@ class evtWgtInfo {
   evtWgtInfo();
   void Setup( std::string sample, bool useBTagUtils=false, bool useLepSFUtils=false);
   void Cleanup();
-  void resetWeights() { event_ready = false; add2ndLepToMet = false; }
+  void resetEvent();
   void getCounterHistogramFromBaby( TFile *sourceFile );
   void setExtraFileWeight(double sf_extra) { sf_extra_file = sf_extra; }
 
@@ -304,17 +294,16 @@ class evtWgtInfo {
   void getISRnJetsWeight( double &weight_ISR, double &weight_ISR_up, double &weight_ISR_dn );
   void getPileupWeight( double &weight_pu, double &weight_pu_up, double &weight_pu_dn );
 
-  double getSampleWeight( std::string sample );
+  double getSampleWeight( TString sample );
   void setDefaultSystematics( int syst_set=0 );
   bool doingSystematic( systID systid );
-  std::string findSampleType( string samplestr);  // <-- todo: finish this function
+  std::string findSampleType( std::string samplestr);  // <-- todo: finish this function
   std::string getLabel( systID systid );
   double getWeight( systID systid, bool cr2lregions=false );
 
  private:
   bool is_bkg_;
   bool is_data_;
-  bool is_signal_;
   bool is_fastsim_;
   bool event_ready;
 
