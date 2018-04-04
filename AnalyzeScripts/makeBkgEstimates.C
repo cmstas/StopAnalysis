@@ -1,6 +1,7 @@
 // -*- C++ -*-
 const bool useMetExtrapolation = true;
 const double extr_threshold = 3;  // minimum number of events in a bin to not need an MET extrapolation
+const bool doCRPurityError = true;
 
 void dataDrivenFromCR(TFile* fdata, TFile* fmc, TFile* fout, TString ddtype, TString gentype) {
   // Additional hists to consider: dataStats, MCstats, impurity
@@ -33,12 +34,21 @@ void dataDrivenFromCR(TFile* fdata, TFile* fmc, TFile* fout, TString ddtype, TSt
       continue;  // <-- actions to be added
     }
     if (!fdata->Get(hname_data_CR)) {
-      cout << "Couldn't find yield hist for " << hist_data_CR << " in " << fmc->GetName() << ". Use yield from MC!" << endl;
+      cout << "Couldn't find yield hist for " << hist_data_CR << " in " << fdata->GetName() << ". Please use yield from MC!" << endl;
       continue;  // <-- actions to be added
     }
 
     int lastbin = hist_data_CR->GetNbinsX();
     int extr_start_bin = lastbin; // the bin to start extrapolation, if == lastbin means no MET extrapolation is needed
+
+    auto combineYieldsInExtrBins = [&](TH1D* hist) {
+      double err = 0;
+      double ylds = hist->IntegralAndError(extr_start_bin, -1, err);
+      for (int ibin = extr_start_bin; ibin <= lastbin; ++ibin) {
+        hist->SetBinContent(ibin, ylds);
+        hist->SetBinError(ibin, err);
+      }
+    };
 
     if (useMetExtrapolation) {
       double err = 0;
@@ -47,13 +57,9 @@ void dataDrivenFromCR(TFile* fdata, TFile* fmc, TFile* fout, TString ddtype, TSt
         ylds = hist_MC_CR->IntegralAndError(extr_start_bin, -1, err);
         if (ylds > extr_threshold) break;
       }
-      if (extr_start_bin != lastbin){
+      if (extr_start_bin != lastbin) {
         cout << "Doing MET extrapolation for  " << crname << "  from bin " << extr_start_bin << " to bin " << lastbin << " (last bin)!" << endl;
-        ylds = hist_data_CR->IntegralAndError(extr_start_bin, -1, err);
-        for (int ibin = extr_start_bin; ibin < lastbin; ++ibin) {
-          hist_data_CR->SetBinContent(ibin, ylds);
-          hist_data_CR->SetBinError(ibin, err);
-        }
+        combineYieldsInExtrBins(hist_data_CR);
       }
     }
 
@@ -79,14 +85,8 @@ void dataDrivenFromCR(TFile* fdata, TFile* fmc, TFile* fout, TString ddtype, TSt
         hist_MC_SR = (TH1D*) fmc->Get(hname_MC_SR)->Clone(hnameSR);
       }
 
-      if (useMetExtrapolation && extr_start_bin != lastbin) {
-        double err = 0;
-        double ylds = hist_MC_CR->IntegralAndError(extr_start_bin, -1, err);
-        for (int ibin = extr_start_bin; ibin < lastbin; ++ibin) {
-          hist_MC_CR->SetBinContent(ibin, ylds);
-          hist_MC_CR->SetBinError(ibin, err);
-        }
-      }
+      if (useMetExtrapolation && extr_start_bin != lastbin)
+        combineYieldsInExtrBins(hist_MC_CR);
 
       auto alphaHist = (TH1D*) hist_MC_SR->Clone(hname+"_alpha");
       alphaHist->Divide(hist_MC_CR);
@@ -112,6 +112,20 @@ void dataDrivenFromCR(TFile* fdata, TFile* fmc, TFile* fout, TString ddtype, TSt
           TH1D* h_extrstart = new TH1D("h_extrstart", "MET extrapolation start bin", 1, 0, 1);
           h_extrstart->SetBinContent(1, extr_start_bin);
           h_extrstart->Write();
+        }
+        if (doCRPurityError) {
+          auto hist_MC_CR_pure = (TH1D*) fmc->Get(hname_MC_CR + gentype);
+          auto hout_purityUp = (TH1D*) hout->Clone(hname+"_CRpurityUp");
+          auto hout_purityDn = (TH1D*) hout->Clone(hname+"_CRpurityDn");
+          if (useMetExtrapolation && extr_start_bin < lastbin)
+            combineYieldsInExtrBins(hist_MC_CR_pure);
+          for (int ibin = 1; ibin <= lastbin; ++ibin) {
+            double crpurityerr = 0.5 * (hist_MC_CR->GetBinContent(ibin) - hist_MC_CR_pure->GetBinContent(ibin)) / hist_MC_CR->GetBinContent(ibin);
+            hout_purityUp->SetBinContent(ibin, hout->GetBinContent(ibin) / ( 1 - crpurityerr));
+            hout_purityDn->SetBinContent(ibin, hout->GetBinContent(ibin) / ( 1 + crpurityerr));
+          }
+          hout_purityUp->Write();
+          hout_purityDn->Write();
         }
       }
     }
