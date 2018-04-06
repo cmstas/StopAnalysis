@@ -37,6 +37,8 @@ class evtWgtInfo {
     k_bTagEffHFDown,
     k_bTagEffLFUp,
     k_bTagEffLFDown,
+    k_bTagFSEffUp,
+    k_bTagFSEffDown,
     k_lepSFUp,
     k_lepSFDown,
     k_lepFSSFUp,
@@ -53,8 +55,8 @@ class evtWgtInfo {
     k_nuPtSF_Down,
     k_WwidthSF_Up,
     k_WwidthSF_Down,
-    k_hfXsec_Up,
-    k_hfXsec_Down,
+    k_WbXsec_Up,
+    k_WbXsec_Down,
     k_pdfUp,
     k_pdfDown,
     k_alphasUp,
@@ -126,8 +128,6 @@ class evtWgtInfo {
   // Event weights for each systematic
   double sys_wgts[k_nSyst];
   double sys_wgts_corridor[k_nSyst];
-  double sys_wgts_SRbulk[k_nSyst];
-  double sys_wgts_CR2lbulk[k_nSyst];
 
   // Variables to form baseline event weight
   int mStop;
@@ -156,6 +156,7 @@ class evtWgtInfo {
   double sf_cr2lTrigger_dn;
 
   bool   apply_bTag_sf;
+  bool   use_tight_bTag;
   double sf_bTag;
   double sf_bTagEffHF_up;
   double sf_bTagEffHF_dn;
@@ -202,6 +203,7 @@ class evtWgtInfo {
   double sf_metRes;
   double sf_metRes_up;
   double sf_metRes_dn;
+  bool   apply_metRes_corridor_sf;
   double sf_metRes_corridor;
   double sf_metRes_corridor_up;
   double sf_metRes_corridor_dn;
@@ -236,8 +238,9 @@ class evtWgtInfo {
   double sf_Wwidth_up;
   double sf_Wwidth_dn;
 
-  double sf_hfXsec_up;
-  double sf_hfXsec_dn;
+  bool apply_WbXsec_sf;
+  double sf_WbXsec_up;
+  double sf_WbXsec_dn;
 
   double sf_pdf_up;
   double sf_pdf_dn;
@@ -265,7 +268,7 @@ class evtWgtInfo {
   void setExtraFileWeight(double sf_extra) { sf_extra_file = sf_extra; }
 
   void initializeWeights();
-  void calculateWeightsForEvent( bool nominalOnly=false );
+  void calculateWeightsForEvent( bool nominalOnly = false );
   void getSusyMasses( int &mStop, int &mLSP );
   void getNEvents( int &nEvts );
   void getXSecWeight( double &weight_xsec, double &weight_xsec_up, double &weight_xsec_dn );
@@ -274,7 +277,6 @@ class evtWgtInfo {
   void getDiLepTriggerWeight( double &wgt_trigger, double &wgt_trigger_up, double &wgt_trigger_dn );
   void getCR2lTriggerWeight( double &wgt_trigger, double &wgt_trigger_up, double &wgt_trigger_dn );
   void getBTagWeight( int WP, double &wgt_btagsf, double &wgt_btagsf_hf_up, double &wgt_btagsf_hf_dn, double &wgt_btagsf_lf_up, double &wgt_btagsf_lf_dn, double &wgt_btagsf_fs_up, double &wgt_btagsf_fs_dn );
-  void getBTagWeight_tightWP( double &wgt_btagsf_tight, double &wgt_btagsf_hf_tight_up, double &wgt_btagsf_hf_tight_dn, double &wgt_btagsf_lf_tight_up, double &wgt_btagsf_lf_tight_dn, double &wgt_btagsf_tight_fs_up, double &wgt_btagsf_tight_fs_dn );
   void getBTagWeight_fromFiles( int WP, double &wgt_btagsf, double &wgt_btagsf_hf_up, double &wgt_btagsf_hf_dn, double &wgt_btagsf_lf_up, double &wgt_btagsf_lf_dn, double &wgt_btagsf_tight_fs_up, double &wgt_btagsf_tight_fs_dn );
   void getLepSFWeight( double &weight_lepSF, double &weight_lepSF_Up, double &weight_lepSF_Dn, double &weight_lepFSSF, double &weight_lepFSSF_Up, double &weight_lepFSSF_Dn, double &weight_vetoLepSF, double &weight_vetoLepSF_Up, double &weight_vetoLepSF_Dn );
   void getTauSFWeight( double &weight_tau, double &weight_tau_up, double &weight_tau_dn );
@@ -286,7 +288,7 @@ class evtWgtInfo {
   void getTTbarSysPtSF( double &weight_ttbarSysPt, double &weight_ttbarSysPt_up, double &weight_ttbarSysPt_dn );
   void getNuPtSF( double &weight_nuPt_up, double &weight_nuPt_dn );
   void getWwidthSF( double &weight_Wwidth_up, double &weight_Wwidth_dn );
-  void getWJetsHFXSecSF( double &weight_hfXsec_up, double &weight_hfXsec_dn );
+  void getWbXSecSF( double &weight_WbXsec_up, double &weight_WbXsec_dn );
   void getPDFWeight( double &weight_pdf_up, double &weight_pdf_dn );
   void getAlphasWeight( double &weight_alphas_up, double &weight_alphas_dn );
   void getQ2Weight( double &weight_q2_up, double &weight_q2_dn );

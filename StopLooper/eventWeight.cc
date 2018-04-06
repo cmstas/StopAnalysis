@@ -101,6 +101,22 @@ evtWgtInfo::Util::Util( systID systematic ) {
       hasOwnBabies = false;
       break;
 
+    case( k_bTagFSEffUp ):
+      id          = systematic;
+      label       = "bTagFSEffUp";
+      title       = "bTag Fastsim Efficiency, Up";
+      tex         = "bTag~Fastsim~Efficicency,~Up";
+      hasOwnBabies = false;
+      break;
+
+    case( k_bTagFSEffDown ):
+      id          = systematic;
+      label       = "bTagFSEffDn";
+      title       = "bTag Fastsim Efficiency, Down";
+      tex         = "bTag~Fastsim~Efficicency,~Down";
+      hasOwnBabies = false;
+      break;
+
     case( k_lepSFUp ):
       id          = systematic;
       label       = "lepSFUp";
@@ -229,19 +245,19 @@ evtWgtInfo::Util::Util( systID systematic ) {
       hasOwnBabies = false;
       break;
 
-    case( k_hfXsec_Up ):
+    case( k_WbXsec_Up ):
       id          = systematic;
-      label       = "hfXsecUp";
-      title       = "W+HF x-section, Up";
-      tex         = "$W+HF$~x-section,~Up";
+      label       = "WbXsecUp";
+      title       = "W+b x-section, Up";
+      tex         = "$W+b$~x-section,~Up";
       hasOwnBabies = false;
       break;
 
-    case( k_hfXsec_Down ):
+    case( k_WbXsec_Down ):
       id          = systematic;
-      label       = "hfXsecDn";
-      title       = "W+HF x-section, Down";
-      tex         = "$W+HF$~x-section,~Down";
+      label       = "WbXsecDn";
+      title       = "W+b x-section, Down";
+      tex         = "$W+b$~x-section,~Down";
       hasOwnBabies = false;
       break;
 
@@ -385,16 +401,6 @@ evtWgtInfo::Util::Util( systID systematic ) {
   } // end systematic switch
 
 }
-
-//////////////////////////////////////////////////////////////////////
-
-// double GetEventWeight( ID whichSyst ) { return wgtInfo.sys_wgts[whichSyst]; }
-
-// double GetEventWeight_corridor( ID whichSyst ) { return wgtInfo.sys_wgts_corridor[whichSyst]; }
-
-// double GetEventWeight_SRbulk( ID whichSyst ) { return wgtInfo.sys_wgts_SRbulk[whichSyst]; }
-
-// double GetEventWeight_CR2lbulk( ID whichSyst ) { return wgtInfo.sys_wgts_CR2lbulk[whichSyst]; }
 
 //////////////////////////////////////////////////////////////////////
 
@@ -629,8 +635,8 @@ void evtWgtInfo::initializeWeights() {
   sf_Wwidth_up = 1.0;
   sf_Wwidth_dn = 1.0;
 
-  sf_hfXsec_up = 1.0;
-  sf_hfXsec_dn = 1.0;
+  sf_WbXsec_up = 1.0;
+  sf_WbXsec_dn = 1.0;
 
   sf_pdf_up = 1.0;
   sf_pdf_dn = 1.0;
@@ -656,8 +662,6 @@ void evtWgtInfo::initializeWeights() {
 
   for (int iSys=0; iSys<k_nSyst; iSys++) sys_wgts[iSys]=1.0;
   for (int iSys=0; iSys<k_nSyst; iSys++) sys_wgts_corridor[iSys]=1.0;
-  for (int iSys=0; iSys<k_nSyst; iSys++) sys_wgts_SRbulk[iSys]=1.0;
-  for (int iSys=0; iSys<k_nSyst; iSys++) sys_wgts_CR2lbulk[iSys]=1.0;
 
   return;
 }
@@ -684,38 +688,44 @@ void evtWgtInfo::calculateWeightsForEvent(bool nominalOnly) {
   getScaleToLumiWeight( sf_nominal );
 
   // get dilepton trigger sf
-  getDiLepTriggerWeight( sf_diLepTrigger, sf_diLepTrigger_up, sf_diLepTrigger_dn );
+  if (apply_diLepTrigger_sf)
+    getDiLepTriggerWeight( sf_diLepTrigger, sf_diLepTrigger_up, sf_diLepTrigger_dn );
 
   // get CR2l trigger sf <-- when to apply this sf?
-  getCR2lTriggerWeight( sf_cr2lTrigger, sf_cr2lTrigger_up, sf_cr2lTrigger_dn );
+  if (apply_cr2lTrigger_sf)
+    getCR2lTriggerWeight( sf_cr2lTrigger, sf_cr2lTrigger_up, sf_cr2lTrigger_dn );
 
-  // btag
-  getBTagWeight( 1, sf_bTag, sf_bTagEffHF_up, sf_bTagEffHF_dn, sf_bTagEffLF_up, sf_bTagEffLF_dn, sf_bTag_FS_up, sf_bTag_FS_dn );
-
-  // btag, tightWP
-  getBTagWeight( 2, sf_bTag_tight, sf_bTagEffHF_tight_up, sf_bTagEffHF_tight_dn, sf_bTagEffLF_tight_up, sf_bTagEffLF_tight_dn, sf_bTag_tight_FS_up, sf_bTag_tight_FS_dn );
+  // btag SF, medium=1 and tight=2
+  if (apply_bTag_sf) {
+    getBTagWeight( 1, sf_bTag, sf_bTagEffHF_up, sf_bTagEffHF_dn, sf_bTagEffLF_up, sf_bTagEffLF_dn, sf_bTag_FS_up, sf_bTag_FS_dn );
+    getBTagWeight( 2, sf_bTag_tight, sf_bTagEffHF_tight_up, sf_bTagEffHF_tight_dn, sf_bTagEffLF_tight_up, sf_bTagEffLF_tight_dn, sf_bTag_tight_FS_up, sf_bTag_tight_FS_dn );
+  }
 
   // lepSFs
-  getLepSFWeight( sf_lep, sf_lep_up, sf_lep_dn, sf_lepFS, sf_lepFS_up, sf_lepFS_dn, sf_vetoLep, sf_vetoLep_up, sf_vetoLep_dn );
+  if (apply_lep_sf || apply_vetoLep_sf || apply_lepFS_sf)
+    getLepSFWeight( sf_lep, sf_lep_up, sf_lep_dn, sf_lepFS, sf_lepFS_up, sf_lepFS_dn, sf_vetoLep, sf_vetoLep_up, sf_vetoLep_dn );
 
   // tau SF
-  getTauSFWeight( sf_tau, sf_tau_up, sf_tau_dn );
+  if (apply_tau_sf)
+    getTauSFWeight( sf_tau, sf_tau_up, sf_tau_dn );
 
   // top pT Reweighting
-  if ( sampletype == "ttbar" )
+  if (apply_topPt_sf && sampletype == "ttbar")
     getTopPtWeight( sf_topPt, sf_topPt_up, sf_topPt_dn );
 
   // MET resolution scale factors <-- would be easier to do it by just scaling the histogram afterwards <-- todo: not forget this
-  if ( sampletype == "ttbar" || sampletype == "singletop" || sampletype == "wjets" )
+  if (apply_metRes_sf && (sampletype == "ttbar" || sampletype == "singletop" || sampletype == "wjets"))
     getMetResWeight( sf_metRes, sf_metRes_up, sf_metRes_dn );
-  // getMetResWeight_corridor( sf_metRes_corridor, sf_metRes_corridor_up, sf_metRes_corridor_dn );
+
+  if (apply_metRes_corridor_sf)
+    getMetResWeight_corridor( sf_metRes_corridor, sf_metRes_corridor_up, sf_metRes_corridor_dn );
 
   // MET ttbar scale factors
-  if (is_bkg_ && (sampletype == "ttbar" || sampletype == "singletop"))
+  if (apply_metTTbar_sf && is_bkg_ && (sampletype == "ttbar" || sampletype == "singletop"))
     getMetTTbarWeight( sf_metTTbar, sf_metTTbar_up, sf_metTTbar_dn );
 
   // ttbar system pT scale factor, apply_ttbarSysPt_sf=false: uncertainty only
-  if (is_bkg_ && (sampletype == "ttbar" || sampletype == "singletop"))
+  if (apply_ttbarSysPt_sf && is_bkg_ && (sampletype == "ttbar" || sampletype == "singletop"))
     getTTbarSysPtSF( sf_ttbarSysPt, sf_ttbarSysPt_up, sf_ttbarSysPt_dn );
 
   // ISR Correction
@@ -730,9 +740,6 @@ void evtWgtInfo::calculateWeightsForEvent(bool nominalOnly) {
   // Lumi Variation
   getLumi( sf_lumi, sf_lumi_up, sf_lumi_dn );
 
-  // // Sample Scale Factor <-- what is this useful?
-  // sf_sample = getSampleWeight( sample_info->id );
-
   // Scale Factors for Uncertainties
   if ( !nominalOnly ) {
 
@@ -746,7 +753,7 @@ void evtWgtInfo::calculateWeightsForEvent(bool nominalOnly) {
 
       // W+HF xsec uncertainty
       if (sampletype == "wjets")
-        getWJetsHFXSecSF( sf_hfXsec_up, sf_hfXsec_dn );
+        getWbXSecSF( sf_WbXsec_up, sf_WbXsec_dn );
     }
 
     // Pre-check genweights size
@@ -762,6 +769,9 @@ void evtWgtInfo::calculateWeightsForEvent(bool nominalOnly) {
     }
   } // end if !nominalOnly
 
+  // Determine if tight btag SF should be used <-- temporary
+  use_tight_bTag = ( babyAnalyzer.Mlb_closestb() >= 175. && babyAnalyzer.ntightbtags() >= 1 );
+
   //
   // Systematic Weights
   //
@@ -770,25 +780,20 @@ void evtWgtInfo::calculateWeightsForEvent(bool nominalOnly) {
   // This is scale1fb*lumi = lumi*1000*xsec/nEvents
   evt_wgt *= sf_nominal;
 
-  //
-  // Switches, set in looper determine if
-  //   these additional SFs are != 1.0
-  //
-
-  // Apply diLepton Trigger scale factor
-  evt_wgt *= sf_diLepTrigger;
   // Apply CR2l Trigger scale factor
   evt_wgt *= sf_cr2lTrigger;
   // Apply bTag scale factor
-  evt_wgt *= sf_bTag;
+  evt_wgt *= (use_tight_bTag)? sf_bTag_tight : sf_bTag;
   // Apply lepton scale factor
-  evt_wgt *= sf_lep*sf_vetoLep*sf_lepFS;
+  evt_wgt *= sf_lep * sf_vetoLep * sf_lepFS;
   // Apply tau sf
   evt_wgt *= sf_tau;
   // Apply top pT sf
   evt_wgt *= sf_topPt;
   // Apply met resolution sf
   evt_wgt *= sf_metRes;
+  // Apply met ttbar sf
+  evt_wgt *= sf_metTTbar;
   // Apply ttbar system pT SF (will be 1 if not ttbar/tW 2l)
   evt_wgt *= sf_ttbarSysPt;
   // Apply ISR SF ( switched to ISRnjets )
@@ -803,7 +808,8 @@ void evtWgtInfo::calculateWeightsForEvent(bool nominalOnly) {
   //
   // Systematic Weights
   //
-  for (int iSys=0; iSys<k_nSyst; iSys++) {
+  for (int iSys = 0; iSys < k_nSyst; iSys++) {
+    if (!doingSystematic( systID(iSys) )) continue;
     double sys_wgt = evt_wgt;
 
     switch (iSys) {
@@ -819,13 +825,17 @@ void evtWgtInfo::calculateWeightsForEvent(bool nominalOnly) {
       case k_cr2lTriggerDown:
         sys_wgt *= (sf_cr2lTrigger_dn/sf_cr2lTrigger); break;
       case k_bTagEffHFUp:
-        sys_wgt *= (sf_bTagEffHF_up/sf_bTag); break;
+        sys_wgt *= (use_tight_bTag)? (sf_bTagEffHF_tight_up/sf_bTag_tight) : (sf_bTagEffHF_up/sf_bTag); break;
       case k_bTagEffHFDown:
-        sys_wgt *= (sf_bTagEffHF_dn/sf_bTag); break;
+        sys_wgt *= (use_tight_bTag)? (sf_bTagEffHF_tight_dn/sf_bTag_tight) : (sf_bTagEffHF_dn/sf_bTag); break;
       case k_bTagEffLFUp:
-        sys_wgt *= (sf_bTagEffLF_up/sf_bTag); break;
+        sys_wgt *= (use_tight_bTag)? (sf_bTagEffLF_tight_up/sf_bTag_tight) : (sf_bTagEffLF_up/sf_bTag); break;
       case k_bTagEffLFDown:
-        sys_wgt *= (sf_bTagEffLF_dn/sf_bTag); break;
+        sys_wgt *= (use_tight_bTag)? (sf_bTagEffLF_tight_dn/sf_bTag_tight) : (sf_bTagEffLF_dn/sf_bTag); break;
+      case k_bTagFSEffUp:  // bTag SF FastSim
+        sys_wgt *= (use_tight_bTag)? (sf_bTag_tight_FS_up/sf_bTag_tight) : (sf_bTag_FS_up/sf_bTag); break;
+      case k_bTagFSEffDown:
+        sys_wgt *= (use_tight_bTag)? (sf_bTag_tight_FS_dn/sf_bTag_tight) : (sf_bTag_FS_dn/sf_bTag); break;
       case k_lepSFUp:
         sys_wgt *= (sf_lep_up*sf_vetoLep_up)/(sf_lep*sf_vetoLep); break;
       case k_lepSFDown:
@@ -846,6 +856,10 @@ void evtWgtInfo::calculateWeightsForEvent(bool nominalOnly) {
         sys_wgt *= sf_metRes_up/sf_metRes; break;
       case k_metResDown:
         sys_wgt *= sf_metRes_dn/sf_metRes; break;
+      case k_metTTbarUp:
+        sys_wgt *= sf_metTTbar_up/sf_metTTbar; break;
+      case k_metTTbarDown:
+        sys_wgt *= sf_metTTbar_dn/sf_metTTbar; break;
       case k_ttbarSysPtUp:
         sys_wgt *= (sf_ttbarSysPt_up/sf_ttbarSysPt); break;
       case k_ttbarSysPtDown:
@@ -858,10 +872,10 @@ void evtWgtInfo::calculateWeightsForEvent(bool nominalOnly) {
         sys_wgt *= sf_Wwidth_up; break;
       case k_WwidthSF_Down:
         sys_wgt *= sf_Wwidth_dn; break;
-      case k_hfXsec_Up:  // W+HF XSec Up
-        sys_wgt *= sf_hfXsec_up; break;
-      case k_hfXsec_Down:
-        sys_wgt *= sf_hfXsec_dn; break;
+      case k_WbXsec_Up:  // W+HF XSec Up
+        sys_wgt *= sf_WbXsec_up; break;
+      case k_WbXsec_Down:
+        sys_wgt *= sf_WbXsec_dn; break;
       case k_pdfUp:
         sys_wgt *= sf_pdf_up; break;
       case k_pdfDown:
@@ -894,61 +908,30 @@ void evtWgtInfo::calculateWeightsForEvent(bool nominalOnly) {
 
     // Corridor regions use alternate MET resolution weights
     double wgt_corridor = sys_wgt;
-    if (      iSys==k_metResUp   ) wgt_corridor *= sf_metRes_corridor_up / sf_metRes_up;
-    else if ( iSys==k_metResDown ) wgt_corridor *= sf_metRes_corridor_dn / sf_metRes_dn;
-    else wgt_corridor *= sf_metRes_corridor / sf_metRes;
-
-    // Bulk SR uses MET TTbar weights
-    double wgt_SRbulk = sys_wgt;
-    if (      iSys==k_metTTbarUp   ) wgt_SRbulk *= sf_metTTbar;
-    else if ( iSys==k_metTTbarDown ) wgt_SRbulk *= sf_metTTbar_up;
-    else wgt_SRbulk *= sf_metTTbar;
-
-    // Bulk SR and CR2L both use tight btag SFs in high-Mlb regions
-    // Factor in JES when counting tight tags, but NOT when calculating Mlb!
-    double wgt_CR2lbulk = sys_wgt;
-    double ntighttags = babyAnalyzer.ntightbtags();
-    if (      iSys==k_JESUp   ) ntighttags = babyAnalyzer.jup_ntightbtags();
-    else if ( iSys==k_JESDown ) ntighttags = babyAnalyzer.jdown_ntightbtags();
-
-    if ( babyAnalyzer.Mlb_closestb() >= 175. && ntighttags >= 1 ) {
-      if ( iSys==k_bTagEffHFUp ) {
-        wgt_SRbulk   *= sf_bTagEffHF_tight_up / sf_bTagEffHF_up;
-        wgt_CR2lbulk *= sf_bTagEffHF_tight_up / sf_bTagEffHF_up;
-      }
-      else if ( iSys==k_bTagEffHFDown ) {
-        wgt_SRbulk   *= sf_bTagEffHF_tight_dn / sf_bTagEffHF_dn;
-        wgt_CR2lbulk *= sf_bTagEffHF_tight_dn / sf_bTagEffHF_dn;
-      }
-      else if ( iSys==k_bTagEffLFUp ) {
-        wgt_SRbulk   *= sf_bTagEffLF_tight_up / sf_bTagEffLF_up;
-        wgt_CR2lbulk *= sf_bTagEffLF_tight_up / sf_bTagEffLF_up;
-      }
-      else if ( iSys==k_bTagEffLFDown ) {
-        wgt_SRbulk   *= sf_bTagEffLF_tight_dn / sf_bTagEffLF_dn;
-        wgt_CR2lbulk *= sf_bTagEffLF_tight_dn / sf_bTagEffLF_dn;
-      }
-      else {
-        wgt_SRbulk   *= sf_bTag_tight / sf_bTag;
-        wgt_CR2lbulk *= sf_bTag_tight / sf_bTag;
-      }
+    if (apply_metRes_corridor_sf && apply_metRes_sf) {
+      if ( iSys==k_metResUp ) wgt_corridor *= sf_metRes_corridor_up / sf_metRes_up;
+      else if ( iSys==k_metResDown ) wgt_corridor *= sf_metRes_corridor_dn / sf_metRes_dn;
+      else wgt_corridor *= sf_metRes_corridor / sf_metRes;
     }
+
+    // To change the bTag scale factor if JES move it to that bin <-- this is a ugly temporary solution
+    // until a better workflow can be designed
+    if ( (iSys==k_JESUp && use_tight_bTag != (babyAnalyzer.jup_ntightbtags() >= 175 && babyAnalyzer.Mlb_closestb_jup() > 0)) ||
+         (iSys==k_JESDown && use_tight_bTag != (babyAnalyzer.jdown_ntightbtags() >= 175 && babyAnalyzer.Mlb_closestb_jdown() > 0)) )
+      sys_wgt *= (use_tight_bTag)? sf_bTag/sf_bTag_tight : sf_bTag_tight/sf_bTag;
 
     // Fill Array Element
     sys_wgts[iSys] = sys_wgt;
     sys_wgts_corridor[iSys] = wgt_corridor;
-    sys_wgts_SRbulk[iSys] = wgt_SRbulk;
-    sys_wgts_CR2lbulk[iSys] = wgt_CR2lbulk;
 
     // Break if only filling nominal
     if ( nominalOnly && iSys==k_nominal ) break;
-
   } // end loop over systematics
 
   event_ready = true;
-
 }
 
+//////////////////////////////////////////////////////////////////////
 
 void evtWgtInfo::getSusyMasses( int &mStop, int &mLSP ) {
   if ( is_fastsim_ ) {
@@ -1036,7 +1019,6 @@ void evtWgtInfo::getDiLepTriggerWeight( double &wgt_trigger, double &wgt_trigger
   wgt_trigger_dn = (sf_val - sf_err );
 
   return;
-
 }
 
 
@@ -1109,7 +1091,6 @@ void evtWgtInfo::getBTagWeight( int WP, double &wgt_btagsf, double &wgt_btagsf_h
   if ( useBTagSFs_fromFiles ) {
     getBTagWeight_fromFiles( WP, wgt_btagsf, wgt_btagsf_hf_up, wgt_btagsf_hf_dn, wgt_btagsf_lf_up, wgt_btagsf_lf_dn, wgt_btagsf_fs_up, wgt_btagsf_fs_dn );
   }
-
   // Else taking SFs from babies
   else {
     // Loose WP
@@ -1120,35 +1101,35 @@ void evtWgtInfo::getBTagWeight( int WP, double &wgt_btagsf, double &wgt_btagsf_h
       wgt_btagsf_lf_up = babyAnalyzer.weight_loosebtagsf_light_UP();
       wgt_btagsf_lf_dn = babyAnalyzer.weight_loosebtagsf_light_DN();
 
-      if ( is_fastsim_ ) {
+      if ( is_fastsim_ && apply_bTag_sf ) {
         wgt_btagsf_fs_up = babyAnalyzer.weight_loosebtagsf_fastsim_UP();
         wgt_btagsf_fs_dn = babyAnalyzer.weight_loosebtagsf_fastsim_DN();
       }
     } // end if Loose WP
 
     // Medium WP
-    if ( WP==1 ) {
+    else if ( WP==1 ) {
       wgt_btagsf       = babyAnalyzer.weight_btagsf();
       wgt_btagsf_hf_up = babyAnalyzer.weight_btagsf_heavy_UP();
       wgt_btagsf_hf_dn = babyAnalyzer.weight_btagsf_heavy_DN();
       wgt_btagsf_lf_up = babyAnalyzer.weight_btagsf_light_UP();
       wgt_btagsf_lf_dn = babyAnalyzer.weight_btagsf_light_DN();
 
-      if ( is_fastsim_ ) {
+      if ( is_fastsim_ && apply_bTag_sf ) {
         wgt_btagsf_fs_up = babyAnalyzer.weight_btagsf_fastsim_UP();
         wgt_btagsf_fs_dn = babyAnalyzer.weight_btagsf_fastsim_DN();
       }
     } // end if Medium WP
 
     // Tight WP
-    if ( WP==2 ) {
+    else if ( WP==2 ) {
       wgt_btagsf       = babyAnalyzer.weight_tightbtagsf();
       wgt_btagsf_hf_up = babyAnalyzer.weight_tightbtagsf_heavy_UP();
       wgt_btagsf_hf_dn = babyAnalyzer.weight_tightbtagsf_heavy_DN();
       wgt_btagsf_lf_up = babyAnalyzer.weight_tightbtagsf_light_UP();
       wgt_btagsf_lf_dn = babyAnalyzer.weight_tightbtagsf_light_DN();
 
-      if ( is_fastsim_ ) {
+      if ( is_fastsim_ && apply_bTag_sf ) {
         wgt_btagsf_fs_up = babyAnalyzer.weight_tightbtagsf_fastsim_UP();
         wgt_btagsf_fs_dn = babyAnalyzer.weight_tightbtagsf_fastsim_DN();
       }
@@ -1171,36 +1152,35 @@ void evtWgtInfo::getBTagWeight( int WP, double &wgt_btagsf, double &wgt_btagsf_h
       wgt_btagsf_lf_up *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,46)) );
       wgt_btagsf_lf_dn *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,48)) );
 
-      if ( is_fastsim_ ) {
+      if ( apply_bTagFS_sf ) {
         wgt_btagsf_fs_up *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,49)) );
         wgt_btagsf_fs_dn *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,50)) );
       }
     } // end if Loose WP
 
-
     // Medium WP Signal Normalization
-    if ( WP==1 ) {
+    else if ( WP==1 ) {
       wgt_btagsf       *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,14)) );
       wgt_btagsf_hf_up *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,15)) );
       wgt_btagsf_hf_dn *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,17)) );
       wgt_btagsf_lf_up *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,16)) );
       wgt_btagsf_lf_dn *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,18)) );
 
-      if ( is_fastsim_ ) {
+      if ( apply_bTagFS_sf ) {
         wgt_btagsf_fs_up *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,22)) );
         wgt_btagsf_fs_dn *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,23)) );
       }
     } // end if Medium WP
 
     // Tight WP Signal Normalization
-    if ( WP==2 ) {
+    else if ( WP==2 ) {
       wgt_btagsf       *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,37)) );
       wgt_btagsf_hf_up *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,38)) );
       wgt_btagsf_hf_dn *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,40)) );
       wgt_btagsf_lf_up *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,39)) );
       wgt_btagsf_lf_dn *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,41)) );
 
-      if ( is_fastsim_ ) {
+      if ( apply_bTagFS_sf ) {
         wgt_btagsf_fs_up *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,42)) );
         wgt_btagsf_fs_dn *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,43)) );
       }
@@ -1210,7 +1190,6 @@ void evtWgtInfo::getBTagWeight( int WP, double &wgt_btagsf, double &wgt_btagsf_h
 
   // Background Sample Normalization
   else {
-
     // Loose WP Bkg Normalization
     if ( WP==0 ) {
       wgt_btagsf       *= ( nEvents / h_bkg_counter->GetBinContent(44) );
@@ -1218,104 +1197,27 @@ void evtWgtInfo::getBTagWeight( int WP, double &wgt_btagsf, double &wgt_btagsf_h
       wgt_btagsf_hf_dn *= ( nEvents / h_bkg_counter->GetBinContent(47) );
       wgt_btagsf_lf_up *= ( nEvents / h_bkg_counter->GetBinContent(46) );
       wgt_btagsf_lf_dn *= ( nEvents / h_bkg_counter->GetBinContent(48) );
-
-      if ( is_fastsim_ ) {
-        wgt_btagsf_fs_up *= ( nEvents / h_bkg_counter->GetBinContent(49) );
-        wgt_btagsf_fs_dn *= ( nEvents / h_bkg_counter->GetBinContent(50) );
-      }
     } // end if Loose WP
 
     // Medium WP Bkg Normalization
-    if ( WP==1 ) {
+    else if ( WP==1 ) {
       wgt_btagsf       *= ( nEvents / h_bkg_counter->GetBinContent(14) );
       wgt_btagsf_hf_up *= ( nEvents / h_bkg_counter->GetBinContent(15) );
       wgt_btagsf_hf_dn *= ( nEvents / h_bkg_counter->GetBinContent(17) );
       wgt_btagsf_lf_up *= ( nEvents / h_bkg_counter->GetBinContent(16) );
       wgt_btagsf_lf_dn *= ( nEvents / h_bkg_counter->GetBinContent(18) );
-
-      if ( is_fastsim_ ) {
-        wgt_btagsf_fs_up *= ( nEvents / h_bkg_counter->GetBinContent(23) );
-        wgt_btagsf_fs_dn *= ( nEvents / h_bkg_counter->GetBinContent(24) );
-      }
     } // end if Medium WP
 
     // Tight WP Bkg Normalization
-    if ( WP==2 ) {
+    else if ( WP==2 ) {
       wgt_btagsf       *= ( nEvents / h_bkg_counter->GetBinContent(37) );
       wgt_btagsf_hf_up *= ( nEvents / h_bkg_counter->GetBinContent(38) );
       wgt_btagsf_hf_dn *= ( nEvents / h_bkg_counter->GetBinContent(40) );
       wgt_btagsf_lf_up *= ( nEvents / h_bkg_counter->GetBinContent(39) );
       wgt_btagsf_lf_dn *= ( nEvents / h_bkg_counter->GetBinContent(41) );
-
-      if ( is_fastsim_ ) {
-        wgt_btagsf_fs_up *= ( nEvents / h_bkg_counter->GetBinContent(42) );
-        wgt_btagsf_fs_dn *= ( nEvents / h_bkg_counter->GetBinContent(43) );
-      }
     } // end if Tight WP
 
   } // end if normalizing bkg
-
-}
-
-//////////////////////////////////////////////////////////////////////
-
-void evtWgtInfo::getBTagWeight_tightWP( double &wgt_btagsf_tight, double &wgt_btagsf_hf_tight_up, double &wgt_btagsf_hf_tight_dn, double &wgt_btagsf_lf_tight_up, double &wgt_btagsf_lf_tight_dn, double &wgt_btagsf_tight_fs_up, double &wgt_btagsf_tight_fs_dn ) {
-
-  wgt_btagsf_tight       = 1.0;
-  wgt_btagsf_hf_tight_up = 1.0;
-  wgt_btagsf_hf_tight_dn = 1.0;
-  wgt_btagsf_lf_tight_up = 1.0;
-  wgt_btagsf_lf_tight_dn = 1.0;
-  wgt_btagsf_tight_fs_up = 1.0;
-  wgt_btagsf_tight_fs_dn = 1.0;
-
-  if ( !apply_bTag_sf ) return;
-
-  if ( useBTagSFs_fromFiles ) {
-    getBTagWeight_fromFiles( 2, wgt_btagsf_tight, wgt_btagsf_hf_tight_up, wgt_btagsf_hf_tight_dn, wgt_btagsf_lf_tight_up, wgt_btagsf_lf_tight_dn, wgt_btagsf_tight_fs_up, wgt_btagsf_tight_fs_dn );
-  }
-  else {
-    wgt_btagsf_tight       = babyAnalyzer.weight_tightbtagsf();
-    wgt_btagsf_hf_tight_up = babyAnalyzer.weight_tightbtagsf_heavy_UP();
-    wgt_btagsf_hf_tight_dn = babyAnalyzer.weight_tightbtagsf_heavy_DN();
-    wgt_btagsf_lf_tight_up = babyAnalyzer.weight_tightbtagsf_light_UP();
-    wgt_btagsf_lf_tight_dn = babyAnalyzer.weight_tightbtagsf_light_DN();
-
-    if ( is_fastsim_ ) {
-      wgt_btagsf_tight_fs_up = babyAnalyzer.weight_tightbtagsf_fastsim_UP();
-      wgt_btagsf_tight_fs_dn = babyAnalyzer.weight_tightbtagsf_fastsim_DN();
-    }
-  }
-
-  // Normalization
-  getNEvents( nEvents );
-
-  if ( is_fastsim_ ) {
-    getSusyMasses(mStop,mLSP);
-
-    wgt_btagsf_tight       *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,37)) );
-    wgt_btagsf_hf_tight_up *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,38)) );
-    wgt_btagsf_hf_tight_dn *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,40)) );
-    wgt_btagsf_lf_tight_up *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,39)) );
-    wgt_btagsf_lf_tight_dn *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,41)) );
-
-    if ( is_fastsim_ ) {
-      wgt_btagsf_tight_fs_up *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,42)) );
-      wgt_btagsf_tight_fs_dn *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,43)) );
-    }
-  }
-  else {
-    wgt_btagsf_tight       *= ( nEvents / h_bkg_counter->GetBinContent(37) );
-    wgt_btagsf_hf_tight_up *= ( nEvents / h_bkg_counter->GetBinContent(38) );
-    wgt_btagsf_hf_tight_dn *= ( nEvents / h_bkg_counter->GetBinContent(40) );
-    wgt_btagsf_lf_tight_up *= ( nEvents / h_bkg_counter->GetBinContent(39) );
-    wgt_btagsf_lf_tight_dn *= ( nEvents / h_bkg_counter->GetBinContent(41) );
-
-    if ( is_fastsim_ ) {
-      wgt_btagsf_tight_fs_up *= ( nEvents / h_bkg_counter->GetBinContent(42) );
-      wgt_btagsf_tight_fs_dn *= ( nEvents / h_bkg_counter->GetBinContent(43) );
-    }
-  }
 
 }
 
@@ -1357,8 +1259,7 @@ void evtWgtInfo::getLepSFWeight( double &weight_lepSF, double &weight_lepSF_Up, 
 
   if ( useLepSFs_fromFiles ) {
     getLepSFWeight_fromFiles( weight_lepSF, weight_lepSF_Up, weight_lepSF_Dn, weight_lepFSSF, weight_lepFSSF_Up, weight_lepFSSF_Dn, weight_vetoLepSF, weight_vetoLepSF_Up, weight_vetoLepSF_Dn );
-  }
-  else {
+  } else {
     weight_lepSF = babyAnalyzer.weight_lepSF();
     weight_lepSF_Up = babyAnalyzer.weight_lepSF_up();
     weight_lepSF_Dn = babyAnalyzer.weight_lepSF_down();
@@ -1367,18 +1268,16 @@ void evtWgtInfo::getLepSFWeight( double &weight_lepSF, double &weight_lepSF_Up, 
     weight_vetoLepSF_Up = babyAnalyzer.weight_vetoLepSF_up();
     weight_vetoLepSF_Dn = babyAnalyzer.weight_vetoLepSF_down();
 
-    if ( is_fastsim_ ) {
+    if ( apply_lepFS_sf ) {
       weight_lepFSSF = babyAnalyzer.weight_lepSF_fastSim();
       weight_lepFSSF_Up = babyAnalyzer.weight_lepSF_fastSim_up();
       weight_lepFSSF_Dn = babyAnalyzer.weight_lepSF_fastSim_down();
     }
 
-    // // Normalization
     // getNEvents( nEvents );
+    // getSusyMasses(mStop,mLSP);
 
     if ( is_fastsim_ ) {
-      // getSusyMasses(mStop,mLSP);
-
       weight_lepSF    *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,27)) );
       weight_lepSF_Up *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,28)) );
       weight_lepSF_Dn *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,29)) );
@@ -1387,13 +1286,13 @@ void evtWgtInfo::getLepSFWeight( double &weight_lepSF, double &weight_lepSF_Up, 
       weight_vetoLepSF_Up *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,31)) );
       weight_vetoLepSF_Dn *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,32)) );
 
-      if ( is_fastsim_ ) {
+      if ( apply_lepFS_sf ) {
         weight_lepFSSF    *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,33)) );
         weight_lepFSSF_Up *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,34)) );
         weight_lepFSSF_Dn *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,35)) );
       }
-    }
-    else {
+
+    } else {
       weight_lepSF    *= ( nEvents / h_bkg_counter->GetBinContent(h_bkg_counter->FindBin(28)) );
       weight_lepSF_Up *= ( nEvents / h_bkg_counter->GetBinContent(h_bkg_counter->FindBin(29)) );
       weight_lepSF_Dn *= ( nEvents / h_bkg_counter->GetBinContent(h_bkg_counter->FindBin(30)) );
@@ -1401,12 +1300,6 @@ void evtWgtInfo::getLepSFWeight( double &weight_lepSF, double &weight_lepSF_Up, 
       weight_vetoLepSF    *= ( nEvents / h_bkg_counter->GetBinContent(h_bkg_counter->FindBin(31)) );
       weight_vetoLepSF_Up *= ( nEvents / h_bkg_counter->GetBinContent(h_bkg_counter->FindBin(32)) );
       weight_vetoLepSF_Dn *= ( nEvents / h_bkg_counter->GetBinContent(h_bkg_counter->FindBin(33)) );
-
-      if ( is_fastsim_ ) {
-        weight_lepFSSF    *= ( nEvents / h_bkg_counter->GetBinContent(h_bkg_counter->FindBin(34)) );
-        weight_lepFSSF_Up *= ( nEvents / h_bkg_counter->GetBinContent(h_bkg_counter->FindBin(35)) );
-        weight_lepFSSF_Dn *= ( nEvents / h_bkg_counter->GetBinContent(h_bkg_counter->FindBin(36)) );
-      }
     }
   }
 
@@ -2136,10 +2029,10 @@ void evtWgtInfo::getWwidthSF( double &weight_Wwidth_up, double &weight_Wwidth_dn
 
 //////////////////////////////////////////////////////////////////////
 
-void evtWgtInfo::getWJetsHFXSecSF( double &weight_hfXsec_up, double &weight_hfXsec_dn ) {
+void evtWgtInfo::getWbXSecSF( double &weight_WbXsec_up, double &weight_WbXsec_dn ) {
 
-  weight_hfXsec_up = 1.0;
-  weight_hfXsec_dn = 1.0;
+  weight_WbXsec_up = 1.0;
+  weight_WbXsec_dn = 1.0;
 
   double sf_val = 1.0;
   double sf_err = 0.0;
@@ -2147,38 +2040,21 @@ void evtWgtInfo::getWJetsHFXSecSF( double &weight_hfXsec_up, double &weight_hfXs
   if ( !babyAnalyzer.is1lepFromW() ) return;
 
   bool isWHF = false;
-  for (int iJet= 0; iJet<(int)babyAnalyzer.ak4pfjets_p4().size(); iJet++) {
-    if (abs(babyAnalyzer.ak4pfjets_hadron_flavor().at(iJet))==5) {
+  // Question: Is this the correct way to get events from W+b production?
+  // TODO: check how was pfjet->hadronFlavour() assigned
+  for (auto hadFlavor : babyAnalyzer.ak4pfjets_hadron_flavor()) {
+    if (abs(hadFlavor) == 5) {
       isWHF = true;
       break;
-    } // end if W+bets
+    } // end if W+bjets
   } // end loop over jets
 
   if ( !isWHF ) return;
 
-  if ( babyAnalyzer.ngoodjets()==2 &&
-       babyAnalyzer.topnessMod()>=6.4 ) {
+  sf_err = 0.50;
 
-    sf_err = 0.50;
-
-  } // end if nJets==2 modTop>6.4
-
-  if ( babyAnalyzer.ngoodjets()==3 &&
-       babyAnalyzer.MT2W()>=200.0     ) {
-
-    sf_err = 0.50;
-
-  } // end if nJets==3 && MT2W>200
-
-  if ( babyAnalyzer.ngoodjets()>=4 &&
-       babyAnalyzer.MT2W()>=200.0     ) {
-
-    sf_err = 0.50;
-
-  } // end if nJets>=4 && MT2W>200
-
-  weight_hfXsec_up = (sf_val + sf_err);
-  weight_hfXsec_dn = (sf_val - sf_err);
+  weight_WbXsec_up = (sf_val + sf_err);
+  weight_WbXsec_dn = (sf_val - sf_err);
 
 }
 
@@ -2359,9 +2235,10 @@ bool evtWgtInfo::doingSystematic( systID isyst ) {
     case k_nuPtSF_Down:
     case k_WwidthSF_Up:
     case k_WwidthSF_Down:
-    case k_hfXsec_Up:
-    case k_hfXsec_Down:
       return false;
+    case k_WbXsec_Up:
+    case k_WbXsec_Down:
+      return apply_WbXsec_sf;
     case k_pdfUp:
     case k_pdfDown:
     case k_alphasUp:
@@ -2371,7 +2248,7 @@ bool evtWgtInfo::doingSystematic( systID isyst ) {
       return true;  // <-- deduced from bkgEstimate_diLepton.C
     case k_lumiUp:
     case k_lumiDown:
-      return false;  // <-- todo: look this up
+      return false;  // <-- No need ot include this in the looper
     case k_ISRUp:
     case k_ISRDown:
       return apply_ISR_sf;
@@ -2427,7 +2304,6 @@ void evtWgtInfo::setDefaultSystematics( int syst_set ) {
       apply_lep_sf         = true;  // both lep1 and lep2 (if available) are multiplied together
       apply_vetoLep_sf     = true;  // this is actually the lost lepton sf, only !=1 if there is >=2 genLeptons and ==1 recoLeptons in the event
       apply_tau_sf         = true;
-      apply_lepFS_sf       = false;
       apply_topPt_sf       = false; // true=sf, false=uncertainty
       apply_metRes_sf      = true;
       apply_metTTbar_sf    = true;
@@ -2435,6 +2311,8 @@ void evtWgtInfo::setDefaultSystematics( int syst_set ) {
       apply_ISR_sf         = true;  // only !=1.0 for signal
       apply_pu_sf          = true;
       apply_sample_sf      = true;  // only !=1.0 for some WJetsHT samps
+      if (sampletype == "wjets")
+        apply_WbXsec_sf    = true;
       if (is_fastsim_) {
         apply_lepFS_sf     = true;
         apply_bTagFS_sf    = true;
