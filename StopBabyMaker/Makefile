@@ -23,12 +23,9 @@ GLIBS          = $(filter-out -lNew, $(NGLIBS))
 
 COREPATH       = $(HOME)/CORE
 TOOLSPATH      = $(COREPATH)/Tools
-DORKYPATH      = $(TOOLSPATH)/dorky
-
 
 CXXFLAGS       += -I$(COREPATH)
 CXXFLAGS       += -I$(TOOLSPATH)
-CXXFLAGS       += -I$(DORKYPATH)
 
 CORESOURCE     = $(COREPATH)/CMS3_CORE.so
 CORELIB        = ./CMS3_CORE.so

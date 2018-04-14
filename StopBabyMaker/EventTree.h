@@ -203,7 +203,12 @@ public:
     float pdf_up_weight;
     float pdf_down_weight;
     vecd  genweights;
+    int   ngenweights;
     vecs  genweightsID;
+    float weight_Q2_up;
+    float weight_Q2_down;
+    float weight_alphas_up;
+    float weight_alphas_down;
     float weight_btagsf;
     float weight_btagsf_heavy_UP;
     float weight_btagsf_light_UP;

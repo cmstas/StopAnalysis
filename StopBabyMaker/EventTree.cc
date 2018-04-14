@@ -314,8 +314,13 @@ void EventTree::Reset ()
     cms3tag  = "";
     pdf_up_weight = -9999.;
     pdf_down_weight = -9999.;
+    ngenweights = -9999;
     genweights.clear();
     genweightsID.clear();
+    weight_Q2_up = -9999.;
+    weight_Q2_down = -9999.;
+    weight_alphas_up = -9999.;
+    weight_alphas_down = -9999.;
 
     weight_btagsf = -9999;
     weight_btagsf_heavy_UP = -9999;
@@ -652,7 +657,12 @@ void EventTree::SetBranches (TTree* tree)
     tree->Branch("pdf_up_weight", &pdf_up_weight);
     tree->Branch("pdf_down_weight", &pdf_down_weight);
     tree->Branch("genweightsID", &genweightsID);
+    tree->Branch("ngenweights", &ngenweights);
     tree->Branch("genweights", &genweights);
+    tree->Branch("weight_Q2_up", &weight_Q2_up);
+    tree->Branch("weight_Q2_down", &weight_Q2_down);
+    tree->Branch("weight_alphas_up", &weight_alphas_up);
+    tree->Branch("weight_alphas_down", &weight_alphas_down);
     tree->Branch("weight_btagsf", &weight_btagsf);
     tree->Branch("weight_btagsf_heavy_UP", &weight_btagsf_heavy_UP);
     tree->Branch("weight_btagsf_light_UP", &weight_btagsf_light_UP);

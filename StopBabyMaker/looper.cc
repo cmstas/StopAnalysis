@@ -26,16 +26,19 @@
 #include "stop_variables/topness.h"
 #include "stop_variables/MT2_implementations.h"
 #include "JetCorrector.h"
-#include "Tools/datasetinfo/getDatasetInfo.h"
 //#include "btagsf/BTagCalibrationStandalone.h"
 
+// CORE
 #include "PhotonSelections.h"
-#include "MuonSelections.h"//93991
-#include "IsolationTools.h"//93991
+#include "MuonSelections.h"
+#include "IsolationTools.h"
 #include "MetSelections.h"
 
+// CORE/Tools
 #include "goodrun.h"
-#include "dorky.cc"
+#include "utils.h"
+#include "dorky/dorky.h"
+#include "datasetinfo/getDatasetInfo.h"
 
 
 typedef ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > LorentzVector;
@@ -1024,46 +1027,8 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
       //
       InitBabyNtuple();
 
-      //
-      // calculate sum of weights and save them in a hisogram.
-      //
-      float pdf_weight_up = 1;
-      float pdf_weight_down = 1;
-      float sum_of_weights= 0;
-      float average_of_weights= 0;
-
       counterhist->Fill(22,1.);
-      if(!evt_isRealData()){
-        //error on pdf replicas
-        if(genweights().size()>110){
-          for(int ipdf=9;ipdf<109;ipdf++){
-            average_of_weights += cms3.genweights().at(ipdf);
-          }// average of weights
-          average_of_weights =  average_of_weights/100;
 
-          for(int ipdf=9;ipdf<109;ipdf++){
-            sum_of_weights += (cms3.genweights().at(ipdf)- average_of_weights)*(cms3.genweights().at(ipdf)-average_of_weights);
-          }//std of weights.
-
-          pdf_weight_up = (average_of_weights+sqrt(sum_of_weights/99));
-          pdf_weight_down = (average_of_weights-sqrt(sum_of_weights/99));
-          StopEvt.pdf_up_weight = pdf_weight_up;
-          StopEvt.pdf_down_weight = pdf_weight_down;
-          counterhist->Fill(1,genweights()[0]);
-          counterhist->Fill(2,genweights()[1]);
-          counterhist->Fill(3,genweights()[2]);
-          counterhist->Fill(4,genweights()[3]);
-          counterhist->Fill(5,genweights()[4]);
-          counterhist->Fill(6,genweights()[5]);
-          counterhist->Fill(7,genweights()[6]);
-          counterhist->Fill(8,genweights()[7]);
-          counterhist->Fill(9,genweights()[8]);
-          counterhist->Fill(10,pdf_weight_up);
-          counterhist->Fill(11,pdf_weight_down);
-          counterhist->Fill(12,genweights()[109]); // α_s variation.
-          counterhist->Fill(13,genweights()[110]); // α_s variation.
-        }
-      }
       //////////////////////////////////////////
       // If data, check against good run list//
       /////////////////////////////////////////
@@ -1125,6 +1090,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
         float SMSaverage_of_weights= 0;
         //error on pdf replicas
         //fastsim has first genweights bin being ==1
+        StopEvt.ngenweights = genweights().size();
         if(genweights().size()>111){ //fix segfault
           for(int ipdf=10;ipdf<110;ipdf++){
             SMSaverage_of_weights += cms3.genweights().at(ipdf);
@@ -1135,23 +1101,74 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
           }//std of weights.
           SMSpdf_weight_up = (SMSaverage_of_weights+sqrt(SMSsum_of_weights/99.));
           SMSpdf_weight_down = (SMSaverage_of_weights-sqrt(SMSsum_of_weights/99.));
-          StopEvt.pdf_up_weight = SMSpdf_weight_up;//overwrite here, although it should not matter
-          StopEvt.pdf_down_weight = SMSpdf_weight_down;//overwrite here, although it should not matter
+
+          double genw1inv = 1. / genweights()[1];  // inverse of the central gen weight 1
+          StopEvt.pdf_up_weight      = SMSpdf_weight_up   * genw1inv;
+          StopEvt.pdf_down_weight    = SMSpdf_weight_down * genw1inv;
+          StopEvt.weight_Q2_up       = genweights()[5]    * genw1inv;
+          StopEvt.weight_Q2_down     = genweights()[9]    * genw1inv;
+          StopEvt.weight_alphas_up   = genweights()[110]  * genw1inv;
+          StopEvt.weight_alphas_down = genweights()[111]  * genw1inv;
+
           counterhistSig->Fill(mStop,mLSP,1,genweights()[1]);
-          counterhistSig->Fill(mStop,mLSP,2,genweights()[2]);
-          counterhistSig->Fill(mStop,mLSP,3,genweights()[3]);
-          counterhistSig->Fill(mStop,mLSP,4,genweights()[4]);
-          counterhistSig->Fill(mStop,mLSP,5,genweights()[5]);
-          counterhistSig->Fill(mStop,mLSP,6,genweights()[6]);
-          counterhistSig->Fill(mStop,mLSP,7,genweights()[7]);
-          counterhistSig->Fill(mStop,mLSP,8,genweights()[8]);
-          counterhistSig->Fill(mStop,mLSP,9,genweights()[9]);
-          counterhistSig->Fill(mStop,mLSP,10,SMSpdf_weight_up);
-          counterhistSig->Fill(mStop,mLSP,11,SMSpdf_weight_down);
-          counterhistSig->Fill(mStop,mLSP,12,genweights()[110]); // α_s variation.
-          counterhistSig->Fill(mStop,mLSP,13,genweights()[111]); // α_s variation.
+          counterhistSig->Fill(mStop,mLSP,2,genweights()[2]*genw1inv);
+          counterhistSig->Fill(mStop,mLSP,3,genweights()[3]*genw1inv);
+          counterhistSig->Fill(mStop,mLSP,4,genweights()[4]*genw1inv);
+          counterhistSig->Fill(mStop,mLSP,5,StopEvt.weight_Q2_up);
+          counterhistSig->Fill(mStop,mLSP,6,StopEvt.weight_Q2_down);
+          counterhistSig->Fill(mStop,mLSP,7,genweights()[7]*genw1inv);
+          counterhistSig->Fill(mStop,mLSP,8,genweights()[8]*genw1inv);
+          counterhistSig->Fill(mStop,mLSP,9,genweights()[9]*genw1inv);
+          counterhistSig->Fill(mStop,mLSP,10,StopEvt.pdf_up_weight);
+          counterhistSig->Fill(mStop,mLSP,11,StopEvt.pdf_down_weight);
+          counterhistSig->Fill(mStop,mLSP,12,StopEvt.weight_alphas_up);   // α_s variation.
+          counterhistSig->Fill(mStop,mLSP,13,StopEvt.weight_alphas_down); // α_s variation.
         }
       }// is signal
+      else if(!evt_isRealData()){
+        // calculate sum of weights and save them in a hisogram.
+        float pdf_weight_up = 1;
+        float pdf_weight_down = 1;
+        float sum_of_weights= 0;
+        float average_of_weights= 0;
+
+        //error on pdf replicas
+        StopEvt.ngenweights = genweights().size();
+        if(genweights().size()>110){
+          for(int ipdf=9;ipdf<109;ipdf++){
+            average_of_weights += cms3.genweights().at(ipdf);
+          }// average of weights
+          average_of_weights =  average_of_weights/100;
+
+          for(int ipdf=9;ipdf<109;ipdf++){
+            sum_of_weights += (cms3.genweights().at(ipdf)- average_of_weights)*(cms3.genweights().at(ipdf)-average_of_weights);
+          }//std of weights.
+          pdf_weight_up = (average_of_weights+sqrt(sum_of_weights/99));
+          pdf_weight_down = (average_of_weights-sqrt(sum_of_weights/99));
+
+          double genw0inv = 1. / genweights()[0];  // inverse of the central gen weight [0]
+          StopEvt.pdf_up_weight      = pdf_weight_up     * genw0inv;
+          StopEvt.pdf_down_weight    = pdf_weight_down   * genw0inv;
+          StopEvt.weight_Q2_up       = genweights()[4]   * genw0inv;
+          StopEvt.weight_Q2_down     = genweights()[8]   * genw0inv;
+          StopEvt.weight_alphas_up   = genweights()[109] * genw0inv;
+          StopEvt.weight_alphas_down = genweights()[110] * genw0inv;
+          counterhist->Fill(1,genweights()[0]);
+          counterhist->Fill(2,genweights()[1]*genw0inv);
+          counterhist->Fill(3,genweights()[2]*genw0inv);
+          counterhist->Fill(4,genweights()[3]*genw0inv);
+          counterhist->Fill(5,StopEvt.weight_Q2_up);
+          counterhist->Fill(6,genweights()[5]*genw0inv);
+          counterhist->Fill(7,genweights()[6]*genw0inv);
+          counterhist->Fill(8,genweights()[7]*genw0inv);
+          counterhist->Fill(9,StopEvt.weight_Q2_down);
+          counterhist->Fill(10,StopEvt.pdf_up_weight);
+          counterhist->Fill(11,StopEvt.pdf_down_weight);
+          counterhist->Fill(12,StopEvt.weight_alphas_up);   // α_s variation.
+          counterhist->Fill(13,StopEvt.weight_alphas_down); // α_s variation.
+        }
+      }
+
       //
       // Gen Information - now goes first
       //
@@ -1175,7 +1192,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
       bool istopevent = false;
       bool isWevent = false;
       bool isZevent = false;
-      vector<LorentzVector> genpnotISR; genpnotISR.clear();
+      // vector<LorentzVector> genpnotISR; genpnotISR.clear();
 
       if(thisFile.Contains("DYJets") || thisFile.Contains("ZJets") ||
          thisFile.Contains("ZZ") || thisFile.Contains("WZ") ||
@@ -1198,43 +1215,39 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
         for(unsigned int genx = 0; genx < genps_p4().size() ; genx++){
           if( genps_id().at(genx)==genps_id_simplemother().at(genx) && !genps_isLastCopy().at(genx) ) continue;
 
-          if( genps_isHardProcess().at(genx) ||
-              genps_fromHardProcessDecayed().at(genx) ||
-              genps_fromHardProcessFinalState().at(genx) ||
-              genps_isLastCopy().at(genx) ||
-              genps_status().at(genx)==1 ){
+          if( genps_isHardProcess().at(genx) || genps_fromHardProcessDecayed().at(genx) || genps_fromHardProcessFinalState().at(genx) ||
+              genps_isLastCopy().at(genx) || genps_status().at(genx)==1 ) {
 
-            if(abs(genps_id().at(genx)) == pdg_el  ||  abs(genps_id().at(genx)) == pdg_mu || abs(genps_id().at(genx)) == pdg_tau || abs(genps_id().at(genx)) == pdg_b || abs(genps_id().at(genx)) == pdg_c || abs(genps_id().at(genx)) == pdg_s || abs(genps_id().at(genx)) == pdg_d ||abs(genps_id().at(genx)) == pdg_u ){//if have lepton or quark --> those could be matched to a jet
-              int mother_idx = genps_idx_mother().at(genx);
-              int mother_id = -999;
-              if(mother_idx>=0) mother_id = abs(genps_id().at(mother_idx));
-              if(mother_id==pdg_t || mother_id==pdg_W || mother_id==1000006 || mother_id==2000006 || mother_id==pdg_chi_1plus1 || mother_id==pdg_chi_2plus1){
-                genpnotISR.push_back(genps_p4().at(genx));
-              }
-            }
+            int pdgid = abs(genps_id().at(genx));
+            int mother_id = abs(genps_id_mother().at(genx));
+            int mother_idx =  genps_idx_mother().at(genx);
 
-            if( abs(genps_id().at(genx)) == pdg_el  ||  abs(genps_id().at(genx)) == pdg_mu || abs(genps_id().at(genx)) == pdg_tau) gen_leps.FillCommon(genx);
-            if( abs(genps_id().at(genx)) == pdg_numu || abs(genps_id().at(genx)) == pdg_nue || abs(genps_id().at(genx)) == pdg_nutau ) gen_nus.FillCommon(genx);
-            if( abs(genps_id().at(genx)) == pdg_t || abs(genps_id().at(genx)) == pdg_b || abs(genps_id().at(genx)) == pdg_c || abs(genps_id().at(genx)) == pdg_s || abs(genps_id().at(genx)) == pdg_d ||abs(genps_id().at(genx)) == pdg_u   ) gen_qs.FillCommon(genx);
-            if( abs(genps_id().at(genx)) == pdg_W || abs(genps_id().at(genx)) == pdg_Z ||(abs(genps_id().at(genx)) == pdg_ph &&
-                                                                                          genps_p4().at(genx).Pt()>5.0)  || abs(genps_id().at(genx)) == pdg_h  ) gen_bosons.FillCommon(genx);
+            // if( pdgid == pdg_el || pdgid == pdg_mu || pdgid == pdg_tau || pdgid == pdg_b || pdgid == pdg_c || pdgid == pdg_s || pdgid == pdg_d || pdgid == pdg_u ) {
+            //   // if have lepton or quark --> those could be matched to a jet
+            //   if(mother_id==pdg_t || mother_id==pdg_W || mother_id==1000006 || mother_id==2000006 || mother_id==pdg_chi_1plus1 || mother_id==pdg_chi_2plus1){
+            //     genpnotISR.push_back(genps_p4().at(genx));
+            //   }
+            // }
+
+            if( pdgid == pdg_el  ||  pdgid == pdg_mu || pdgid == pdg_tau) gen_leps.FillCommon(genx);
+            if( pdgid == pdg_numu || pdgid == pdg_nue || pdgid == pdg_nutau ) gen_nus.FillCommon(genx);
+            if( pdgid == pdg_t || pdgid == pdg_b || pdgid == pdg_c || pdgid == pdg_s || pdgid == pdg_d ||pdgid == pdg_u   ) gen_qs.FillCommon(genx);
+            if( pdgid == pdg_W || pdgid == pdg_Z || (pdgid == pdg_ph && genps_p4().at(genx).Pt()>5.0)  || pdgid == pdg_h  ) gen_bosons.FillCommon(genx);
 
             //add all SUSY particles
-            if(abs(genps_id().at(genx))>=1000000&&abs(genps_id().at(genx))<=1000040) gen_susy.FillCommon(genx);
+            if(pdgid >= 1000000&&pdgid <= 1000040) gen_susy.FillCommon(genx);
 
-            if(abs(genps_id_mother().at(genx)) == pdg_W && abs(genps_id().at(genx)) == pdg_nue && genps_status().at(genx) == 1 && abs(genps_id_mother().at(genps_idx_mother().at(genx))) == pdg_t) n_nuelfromt++;
+            if( mother_id == pdg_W && pdgid == pdg_nue && genps_status().at(genx) == 1 && abs(genps_id_mother().at(mother_idx)) == pdg_t) n_nuelfromt++;
+            if( mother_id == pdg_W && pdgid == pdg_numu && genps_status().at(genx) == 1 && abs(genps_id_mother().at(mother_idx)) == pdg_t ) n_numufromt++;
+            if( mother_id == pdg_W && pdgid == pdg_nutau && genps_status().at(genx) == 1 && abs(genps_id_mother().at(mother_idx)) == pdg_t ) n_nutaufromt++;
 
-            if(abs(genps_id_mother().at(genx)) == pdg_W && abs(genps_id().at(genx)) == pdg_numu && genps_status().at(genx) == 1 && abs(genps_id_mother().at(genps_idx_mother().at(genx))) == pdg_t ) n_numufromt++;
+            if( pdgid == pdg_el  && genps_fromHardProcessFinalState().at(genx) && genps_isLastCopy().at(genx) ) nLepsHardProcess++;
+            if( pdgid == pdg_mu  && genps_fromHardProcessFinalState().at(genx) && genps_isLastCopy().at(genx) ) nLepsHardProcess++;
+            if( pdgid == pdg_tau && genps_fromHardProcessDecayed().at(genx) && genps_isLastCopy().at(genx) ) nLepsHardProcess++;
 
-            if(abs(genps_id_mother().at(genx)) == pdg_W && abs(genps_id().at(genx)) == pdg_nutau && genps_status().at(genx) == 1 && abs(genps_id_mother().at(genps_idx_mother().at(genx))) == pdg_t ) n_nutaufromt++;
-
-            if( abs(genps_id().at(genx))==pdg_el  && genps_fromHardProcessFinalState().at(genx) && genps_isLastCopy().at(genx) ) nLepsHardProcess++;
-            if( abs(genps_id().at(genx))==pdg_mu  && genps_fromHardProcessFinalState().at(genx) && genps_isLastCopy().at(genx) ) nLepsHardProcess++;
-            if( abs(genps_id().at(genx))==pdg_tau && genps_fromHardProcessDecayed().at(genx) && genps_isLastCopy().at(genx) ) nLepsHardProcess++;
-
-            if( abs(genps_id().at(genx))==pdg_nue   && genps_fromHardProcessFinalState().at(genx) && genps_isLastCopy().at(genx) ) nNusHardProcess++;
-            if( abs(genps_id().at(genx))==pdg_numu  && genps_fromHardProcessFinalState().at(genx) && genps_isLastCopy().at(genx) ) nNusHardProcess++;
-            if( abs(genps_id().at(genx))==pdg_nutau && genps_fromHardProcessFinalState().at(genx) && genps_isLastCopy().at(genx) ) nNusHardProcess++;
+            if( pdgid == pdg_nue   && genps_fromHardProcessFinalState().at(genx) && genps_isLastCopy().at(genx) ) nNusHardProcess++;
+            if( pdgid == pdg_numu  && genps_fromHardProcessFinalState().at(genx) && genps_isLastCopy().at(genx) ) nNusHardProcess++;
+            if( pdgid == pdg_nutau && genps_fromHardProcessFinalState().at(genx) && genps_isLastCopy().at(genx) ) nNusHardProcess++;
 
           }
         }
@@ -1905,19 +1918,19 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
       }
 
       if (!evt_isRealData()){
-        int NISRjets = 0;
-        int nonISRjets = 0;
-        for(unsigned int jix = 0; jix<jets.ak4pfjets_p4.size(); ++jix){
-          bool ismatched = false;
-          for(unsigned int gpix = 0; gpix<genpnotISR.size(); ++gpix){
-            if(dRbetweenVectors(jets.ak4pfjets_p4[jix],genpnotISR[gpix])<=0.3){
-              ismatched = true;
-              break;
-            }
-          }
-          if(!ismatched) ++NISRjets;
-          else ++nonISRjets;
-        }
+        int NISRjets = get_nisrMatch(jets.ak4pfjets_p4);
+        int nonISRjets = jets.ak4pfjets_p4.size() - NISRjets;
+        // for(unsigned int jix = 0; jix<jets.ak4pfjets_p4.size(); ++jix){
+        //   bool ismatched = false;
+        //   for(unsigned int gpix = 0; gpix<genpnotISR.size(); ++gpix){
+        //     if(dRbetweenVectors(jets.ak4pfjets_p4[jix],genpnotISR[gpix])<=0.3){
+        //       ismatched = true;
+        //       break;
+        //     }
+        //   }
+        //   if(!ismatched) ++NISRjets;
+        //   else ++nonISRjets;
+        // }
         //ICHEP 2016
         //if(NISRjets     ==0){ StopEvt.weight_ISRnjets = 1.0000; StopEvt.weight_ISRnjets_UP = 1.0000; StopEvt.weight_ISRnjets_DN = 1.0000; }
         //else if(NISRjets==1){ StopEvt.weight_ISRnjets = 0.8820; StopEvt.weight_ISRnjets_UP = 0.9410; StopEvt.weight_ISRnjets_DN = 0.8230; }
