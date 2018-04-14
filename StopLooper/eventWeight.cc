@@ -710,7 +710,7 @@ void evtWgtInfo::calculateWeightsForEvent(bool nominalOnly) {
     getTauSFWeight( sf_tau, sf_tau_up, sf_tau_dn );
 
   // top pT Reweighting
-  if (apply_topPt_sf && sampletype == "ttbar")
+  if (sampletype == "ttbar")
     getTopPtWeight( sf_topPt, sf_topPt_up, sf_topPt_dn );
 
   // MET resolution scale factors <-- would be easier to do it by just scaling the histogram afterwards <-- todo: not forget this
@@ -725,7 +725,7 @@ void evtWgtInfo::calculateWeightsForEvent(bool nominalOnly) {
     getMetTTbarWeight( sf_metTTbar, sf_metTTbar_up, sf_metTTbar_dn );
 
   // ttbar system pT scale factor, apply_ttbarSysPt_sf=false: uncertainty only
-  if (apply_ttbarSysPt_sf && is_bkg_ && (sampletype == "ttbar" || sampletype == "singletop"))
+  if (is_bkg_ && (sampletype == "ttbar" || sampletype == "singletop"))
     getTTbarSysPtSF( sf_ttbarSysPt, sf_ttbarSysPt_up, sf_ttbarSysPt_dn );
 
   // ISR Correction
@@ -746,7 +746,7 @@ void evtWgtInfo::calculateWeightsForEvent(bool nominalOnly) {
     // Scale factors for 1l from W background events only
     if (is_bkg_ && babyAnalyzer.is1lepFromW()) {
       // Nuetrino pT scale factor
-      getNuPtSF( sf_nuPt_up, sf_nuPt_dn );
+      // getNuPtSF( sf_nuPt_up, sf_nuPt_dn );
 
       // W width scale factor
       getWwidthSF( sf_Wwidth_up, sf_Wwidth_dn );
@@ -809,7 +809,7 @@ void evtWgtInfo::calculateWeightsForEvent(bool nominalOnly) {
   // Systematic Weights
   //
   for (int iSys = 0; iSys < k_nSyst; iSys++) {
-    if (!doingSystematic( systID(iSys) )) continue;
+    if (iSys > 2 && !doingSystematic( systID(iSys) )) continue;
     double sys_wgt = evt_wgt;
 
     switch (iSys) {
@@ -1909,42 +1909,16 @@ void evtWgtInfo::getTTbarSysPtSF( double &weight_ttbarSysPt, double &weight_ttba
   // Get system Pt
   double system_pt = system_LV.Pt();
 
-  // Get Scale Factor
-  if ( system_pt>=0.0 && system_pt<50.0 ) {
-    sf_val = 1.02; // 36.46fb
-    sf_err = 0.01;
-  }
-  else if ( system_pt>=50.0 && system_pt<100.0 ) {
-    sf_val = 0.99; // 36.46fb
-    sf_err = 0.01;
-  }
-  else if ( system_pt>=100.0 && system_pt<150.0 ) {
-    sf_val = 0.98; // 36.46fb
-    sf_err = 0.01;
-  }
-  else if ( system_pt>=150.0 && system_pt<200.0 ) {
-    sf_val = 0.95; // 36.46fb
-    sf_err = 0.01;
-  }
-  else if ( system_pt>=200.0 && system_pt<250.0 ) {
-    sf_val = 0.99; // 36.46
-    sf_err = 0.02;
-  }
-  else if ( system_pt>=250.0 && system_pt<350.0 ) {
-    sf_val = 1.01; // 36.46fb
-    sf_err = 0.02;
-  }
-  else if ( system_pt>=350.0 && system_pt<450.0 ) {
-    sf_val = 1.07; // 36.46fb
-    sf_err = 0.04;
-  }
-  else if ( system_pt>=450.0 ) {
-    sf_val = 1.09; // 36.46fb
-    sf_err = 0.05;
-  }
+  const vector<double> ptcats = {   0  , 50,  100,  150,  200,  250,  350,  450, };
+  const vector<double> sfvals = {1.02, 0.99, 0.98, 0.95, 0.99, 1.01, 1.07, 1.09, };
+  const vector<double> sferrs = {0.01, 0.01, 0.01, 0.01, 0.02, 0.02, 0.04, 0.05, };
+
+  int icat = std::upper_bound(ptcats.begin(), ptcats.end(), system_pt) - ptcats.begin() - 1;
 
   // true=sf, false=uncertainty only
   if (!apply_ttbarSysPt_sf) sf_val = 1.0;
+  else sf_val = sfvals[icat];
+  sf_err = sferrs[icat];
 
   weight_ttbarSysPt    = sf_val;
   weight_ttbarSysPt_up = (sf_val + sf_err );
@@ -2090,16 +2064,22 @@ void evtWgtInfo::getPDFWeight( double &weight_pdf_up, double &weight_pdf_dn ) {
 
 void evtWgtInfo::getAlphasWeight( double &weight_alphas_up, double &weight_alphas_dn ) {
 
-  if ( babyAnalyzer.genweights().size() < 110 ) return;
+  weight_alphas_up = 1.0;
+  weight_alphas_dn = 1.0;
 
-  weight_alphas_up = babyAnalyzer.genweights().at(109)/babyAnalyzer.genweights().at(0);
-  weight_alphas_dn = babyAnalyzer.genweights().at(110)/babyAnalyzer.genweights().at(0);
+  if ( babyAnalyzer.genweights().size() < 110 ) return;
 
   // Normalization
   if ( is_fastsim_ ) {
+    weight_alphas_up = babyAnalyzer.genweights().at(110)/babyAnalyzer.genweights().at(1);
+    weight_alphas_dn = babyAnalyzer.genweights().at(111)/babyAnalyzer.genweights().at(1);
+
     weight_alphas_up *= (  h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,1)) / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,12))  );
     weight_alphas_dn *= (  h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,1)) / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,13))  );
   } else {
+    weight_alphas_up = babyAnalyzer.genweights().at(109)/babyAnalyzer.genweights().at(0);
+    weight_alphas_dn = babyAnalyzer.genweights().at(110)/babyAnalyzer.genweights().at(0);
+
     weight_alphas_up *= ( h_bkg_counter->GetBinContent(1) / h_bkg_counter->GetBinContent(12) );
     weight_alphas_dn *= ( h_bkg_counter->GetBinContent(1) / h_bkg_counter->GetBinContent(13) );
   }
@@ -2117,14 +2097,17 @@ void evtWgtInfo::getQ2Weight( double &weight_q2_up, double &weight_q2_dn ) {
 
   if ( babyAnalyzer.genweights().size() < 110 ) return;
 
-  weight_q2_up = babyAnalyzer.genweights().at(4)/babyAnalyzer.genweights().at(0);
-  weight_q2_dn = babyAnalyzer.genweights().at(8)/babyAnalyzer.genweights().at(0);
-
   // Normalization
   if ( is_fastsim_ ) {
+    weight_q2_up = babyAnalyzer.genweights().at(5)/babyAnalyzer.genweights().at(1);
+    weight_q2_dn = babyAnalyzer.genweights().at(9)/babyAnalyzer.genweights().at(1);
+
     weight_q2_up *= ( h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,1)) / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,5)) );
     weight_q2_dn *= ( h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,1)) / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,9)) );
   } else {
+    weight_q2_up = babyAnalyzer.genweights().at(4)/babyAnalyzer.genweights().at(0);
+    weight_q2_dn = babyAnalyzer.genweights().at(8)/babyAnalyzer.genweights().at(0);
+
     weight_q2_up *= ( h_bkg_counter->GetBinContent(1) / h_bkg_counter->GetBinContent(5) );
     weight_q2_dn *= ( h_bkg_counter->GetBinContent(1) / h_bkg_counter->GetBinContent(9) );
   }
@@ -2169,7 +2152,6 @@ void evtWgtInfo::getISRnJetsWeight( double &weight_ISR, double &weight_ISR_up, d
 
   // getNEvents(nEvents);
 
-  // Q: What is this?? Doesn't his just revert the weight??
   if ( is_fastsim_ ) {
     weight_ISR    *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,24)) );
     weight_ISR_up *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,25)) );
@@ -2213,6 +2195,9 @@ bool evtWgtInfo::doingSystematic( systID isyst ) {
     case k_bTagEffLFUp:
     case k_bTagEffLFDown:
       return apply_bTag_sf;
+    case k_bTagFSEffUp:
+    case k_bTagFSEffDown:
+      return apply_bTagFS_sf;
     case k_lepSFUp:
     case k_lepSFDown:
       return apply_lep_sf;
@@ -2221,7 +2206,7 @@ bool evtWgtInfo::doingSystematic( systID isyst ) {
       return apply_lepFS_sf;
     case k_topPtSFUp:
     case k_topPtSFDown:
-      return true; // apply_topPt_sf =true: do sf, =false: uncertainty only
+      return is_bkg_; // apply_topPt_sf =true: do sf, =false: uncertainty only
     case k_metResUp:
     case k_metResDown:
       return apply_metRes_sf;
@@ -2230,7 +2215,7 @@ bool evtWgtInfo::doingSystematic( systID isyst ) {
       return apply_metTTbar_sf;
     case k_ttbarSysPtUp:
     case k_ttbarSysPtDown:
-      return true; // apply_ttbarSysPt_sf =true: do sf, =false: uncertainty only
+      return is_bkg_; // apply_ttbarSysPt_sf =true: do sf, =false: uncertainty only
     case k_nuPtSF_Up:
     case k_nuPtSF_Down:
     case k_WwidthSF_Up:
@@ -2306,7 +2291,7 @@ void evtWgtInfo::setDefaultSystematics( int syst_set ) {
       apply_tau_sf         = true;
       apply_topPt_sf       = false; // true=sf, false=uncertainty
       apply_metRes_sf      = true;
-      apply_metTTbar_sf    = true;
+      apply_metTTbar_sf    = false;
       apply_ttbarSysPt_sf  = false; // true=sf, false=uncertainty, only !=1.0 for madgraph tt2l, tW2l
       apply_ISR_sf         = true;  // only !=1.0 for signal
       apply_pu_sf          = true;
@@ -2316,6 +2301,8 @@ void evtWgtInfo::setDefaultSystematics( int syst_set ) {
       if (is_fastsim_) {
         apply_lepFS_sf     = true;
         apply_bTagFS_sf    = true;
+        apply_metRes_sf    = false;
+        apply_tau_sf       = false;
       }
       break;
   }
