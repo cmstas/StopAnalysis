@@ -31,56 +31,29 @@ CXXFLAGS       += -I$(TOOLSPATH)
 CXXFLAGS       += -I$(DORKYPATH)
 
 CORELIB        = $(COREPATH)/CMS3_CORE.so
-STOPVARLIB     = ../StopBabyMaker/StopVariables.so
 
 TOOLSLIB = ../CORE/Tools/btagsf/BTagCalibrationStandalone.o
 
-# stopCORE.so: sysInfo.o eventWeight_bTagSF.o eventWeight_lepSF.o selectionInfo.o categoryInfo.o genClassyInfo.o sampleInfo.o stop_1l_babyAnalyzer.o 
+# stopCORE.so: sysInfo.o eventWeight_bTagSF.o eventWeight_lepSF.o selectionInfo.o categoryInfo.o genClassyInfo.o sampleInfo.o stop_1l_babyAnalyzer.o
 # 	$(LD) $(LDFLAGS) $(SOFLAGS) -o stopCORE.so sysInfo.o eventWeight_bTagSF.o eventWeight_lepSF.o selectionInfo.o categoryInfo.o genClassyInfo.o sampleInfo.o stop_1l_babyAnalyzer.o $(GLIBS) -lGenVector -lEG $(CORELIB) $(STOPVARLIB) -Wl,-rpath,./
 
-stopCORE.so: eventWeight.o eventWeight_bTagSF.o eventWeight_lepSF.o stop_1l_babyAnalyzer.o sampleInfo.o
-	$(LD) $(LDFLAGS) $(SOFLAGS) -o stopCORE.so eventWeight.o eventWeight_bTagSF.o eventWeight_lepSF.o stop_1l_babyAnalyzer.o sampleInfo.o $(GLIBS) -lGenVector -lEG $(TOOLSLIB) $(STOPVARLIB) -Wl,-rpath,./
-
-
-# stopCORE.so: eventWeight.o eventWeight_bTagSF.o eventWeight_lepSF.o stop_1l_babyAnalyzer.o 
-# 	$(LD) $(LDFLAGS) $(SOFLAGS) -o stopCORE.so eventWeight.o eventWeight_bTagSF.o eventWeight_lepSF.o stop_1l_babyAnalyzer.o $(GLIBS) -lGenVector -lEG $(CORELIB) $(STOPVARLIB) -Wl,-rpath,./
-
+stopCORE.so: eventWeight_bTagSF.o eventWeight_lepSF.o stop_1l_babyAnalyzer.o sampleInfo.o
+	$(LD) $(LDFLAGS) $(SOFLAGS) -o stopCORE.so eventWeight_bTagSF.o eventWeight_lepSF.o stop_1l_babyAnalyzer.o sampleInfo.o $(GLIBS) -lGenVector -lEG $(TOOLSLIB) -Wl,-rpath,./
 
 sysInfo.o: sysInfo.h sysInfo.cc stop_1l_babyAnalyzer.h stop_1l_babyAnalyzer.cc eventWeight_lepSF.h eventWeight_lepSF.cc eventWeight_bTagSF.h eventWeight_bTagSF.cc
 	$(CXX) $(CXXFLAGS) -c sysInfo.cc
 
+%.o: 	%.cc %.h
+	$(QUIET) echo "Compiling $<"; \
+	$(CXX) $(CXXFLAGS) $< -c -o $@
 
-eventWeight.o: eventWeight.cc eventWeight.h
-	$(CXX) $(CXXFLAGS) -c eventWeight.cc
-
-
-eventWeight_bTagSF.o: eventWeight_bTagSF.cc eventWeight_bTagSF.h
-	$(CXX) $(CXXFLAGS) -c eventWeight_bTagSF.cc
-
-
-eventWeight_lepSF.o: eventWeight_lepSF.cc eventWeight_lepSF.h
-	$(CXX) $(CXXFLAGS) -c eventWeight_lepSF.cc
-
-
-selectionInfo.o: selectionInfo.cc selectionInfo.h stop_1l_babyAnalyzer.cc stop_1l_babyAnalyzer.h
-	$(CXX) $(CXXFLAGS) -c selectionInfo.cc
-
-
-categoryInfo.o: categoryInfo.cc categoryInfo.h stop_1l_babyAnalyzer.cc stop_1l_babyAnalyzer.h
-	$(CXX) $(CXXFLAGS) -c categoryInfo.cc
-
-
-genClassyInfo.o: genClassyInfo.cc genClassyInfo.h stop_1l_babyAnalyzer.cc stop_1l_babyAnalyzer.h
-	$(CXX) $(CXXFLAGS) -c genClassyInfo.cc
-
-
-sampleInfo.o: sampleInfo.h sampleInfo.cc
-	$(CXX) $(CXXFLAGS) -c sampleInfo.cc
-
-stop_1l_babyAnalyzer.o: stop_1l_babyAnalyzer.cc stop_1l_babyAnalyzer.h
-	$(CXX) $(CXXFLAGS) -c stop_1l_babyAnalyzer.cc
+# STOPVARSOURCE  = $(wildcard stop_variables/*.cc)
+# StopVariables.so: $(STOPVARSOURCE) $(STOPVARSOURCE:.cc=.h)
+# 	cd stop_variables && $(MAKE) -j4 && cd ..; \
+# 	mv stop_variables/StopVariables.so .
 
 .PHONY: clean
 clean:
 	rm -v -f \
-	*.o *.d *.so *.pcm *~; echo "Done"
+	*.o *.d *.so *.pcm *~ \
+	echo "Done"

@@ -21,8 +21,8 @@ endif
 #endif
 
 CC = g++
-CMSROOT = ../
-INCLUDE = $(shell root-config --cflags) -I$(CMSROOT) -I$(CMSROOT)/CORE
+SNTCORE = ../
+INCLUDE = $(shell root-config --cflags) -I$(SNTCORE)
 CFLAGS = -Wall -Wno-unused-function -g -O3 -fPIC $(INCLUDE) $(EXTRACFLAGS)
 ROOTLIBS = $(shell root-config --ldflags --cflags --libs) -lTMVA #-lEG -lGenVector
 DICTINCLUDE = $(ROOTSYS)/include/Math/QuantFuncMathCore.h $(ROOTSYS)/include/TLorentzVector.h $(ROOTSYS)/include/Math/Vector4D.h
