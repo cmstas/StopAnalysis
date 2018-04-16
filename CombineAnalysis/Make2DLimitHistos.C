@@ -66,7 +66,7 @@ void Make2DLimitHistos(TString signaltype="std_T2tt", TString indir="limits", bo
   }
   hxsec = (TH1D*)fxsec->Get("stop");
   
-  int mStopLow  = 600;
+  int mStopLow  = 150;
   int mStopHigh = 1250;
   int mStopStep = 25;
   int mLSPLow   = 0;

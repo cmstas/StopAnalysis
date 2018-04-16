@@ -59,8 +59,10 @@ const bool doTopTagging = false;
 const bool applyjson = true;
 // ignore scale1fb to run over test samples
 const bool ignoreScale1fb = false;
-// not running the standard regions to speed up
+// only produce yield histos
 const bool runYieldsOnly = false;
+// only running selected signal points to speed up
+const bool runFullSignalScan = true;
 // debug symbol, for printing exact event kinematics that passes
 const bool printPassedEvents = false;
 
@@ -70,8 +72,9 @@ bool printOnce1 = false;
 
 const float fInf = std::numeric_limits<float>::max();
 
-const vector<float> mStopBins = []() { vector<float> bins; for (int i = 150; i < 1350; i += 25) bins.push_back(i); return bins; } ();
-const vector<float> mLSPBins  = []() { vector<float> bins; for (int i =   0; i <  750; i += 25) bins.push_back(i); return bins; } ();
+const float kSMSMassStep = 25;
+const vector<float> mStopBins = []() { vector<float> bins; for (float i = 150; i < 1350; i += kSMSMassStep) bins.push_back(i); return bins; } ();
+const vector<float> mLSPBins  = []() { vector<float> bins; for (float i =   0; i <  750; i += kSMSMassStep) bins.push_back(i); return bins; } ();
 
 std::ofstream ofile;
 
@@ -272,30 +275,37 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
 
       // For testing on only subset of mass points
       TString dsname = dataset();
-      // auto checkMassPt = [&](double mstop, double mlsp) { return (mass_stop() == mstop) && (mass_lsp() == mlsp); };
-      if (dsname.Contains("T2tt")) {
-        float massdiff = mass_stop() - mass_lsp();
-        if (mass_lsp() < 400 && mass_stop() < 900) continue;
-        if (massdiff < 400) continue;
-        // if (massdiff < 600 || mass_stop() < 1100) continue;
-        plot2D("h_T2tt_masspts", mass_stop(), mass_lsp() , evtweight_, SRVec.at(0).histMap, ";M_{stop} [GeV]; M_{lsp} [GeV]", 100, 300, 1300, 80, 0, 800);
-      } else if (dsname.Contains("T2bW")) {
-        float massdiff = mass_stop() - mass_lsp();
-        if (mass_lsp() < 300 && mass_stop() < 800) continue;
-        if (massdiff < 400) continue;
-        // if (massdiff < 900 || mass_stop() < 1000) continue;
-        plot2D("h_T2bW_masspts", mass_stop(), mass_lsp() , evtweight_, SRVec.at(0).histMap, ";M_{stop} [GeV]; M_{lsp} [GeV]", 100, 300, 1300, 80, 0, 800);
-      } else if (dsname.Contains("T2bt")) {
-        float massdiff = mass_stop() - mass_lsp();
-        if (mass_lsp() < 300 && mass_stop() < 800) continue;
-        if (massdiff < 400) continue;
-        // if (massdiff < 900 || mass_stop() < 1000) continue;
-        // if (!checkMassPt(800, 400) && !checkMassPt(800, 600) && !checkMassPt(1000, 50) && !checkMassPt(1000, 200)) continue;
-        plot2D("h_T2bt_masspts", mass_stop(), mass_lsp() , evtweight_, SRVec.at(0).histMap, ";M_{stop} [GeV]; M_{lsp} [GeV]", 100, 300, 1300, 80, 0, 800);
+      if (!runFullSignalScan && is_fastsim_) {
+        // auto checkMassPt = [&](double mstop, double mlsp) { return (mass_stop() == mstop) && (mass_lsp() == mlsp); };
+        if (dsname.Contains("T2tt")) {
+          float massdiff = mass_stop() - mass_lsp();
+          if (mass_lsp() < 400 && mass_stop() < 900) continue;
+          if (massdiff < 400) continue;
+          // if (massdiff < 600 || mass_stop() < 1100) continue;
+          plot2D("h_T2tt_masspts", mass_stop(), mass_lsp() , evtweight_, SRVec.at(0).histMap, ";M_{stop} [GeV]; M_{lsp} [GeV]", 100, 300, 1300, 80, 0, 800);
+        } else if (dsname.Contains("T2bW")) {
+          float massdiff = mass_stop() - mass_lsp();
+          if (mass_lsp() < 300 && mass_stop() < 800) continue;
+          if (massdiff < 400) continue;
+          // if (massdiff < 900 || mass_stop() < 1000) continue;
+          plot2D("h_T2bW_masspts", mass_stop(), mass_lsp() , evtweight_, SRVec.at(0).histMap, ";M_{stop} [GeV]; M_{lsp} [GeV]", 100, 300, 1300, 80, 0, 800);
+        } else if (dsname.Contains("T2bt")) {
+          float massdiff = mass_stop() - mass_lsp();
+          if (mass_lsp() < 300 && mass_stop() < 800) continue;
+          if (massdiff < 400) continue;
+          // if (massdiff < 900 || mass_stop() < 1000) continue;
+          // if (!checkMassPt(800, 400) && !checkMassPt(800, 600) && !checkMassPt(1000, 50) && !checkMassPt(1000, 200)) continue;
+          plot2D("h_T2bt_masspts", mass_stop(), mass_lsp() , evtweight_, SRVec.at(0).histMap, ";M_{stop} [GeV]; M_{LSP} [GeV]", 100, 300, 1300, 64, 0, 800);
+        }
       }
 
       // Only events nupt < 200 for WNJetsToLNu samples
       if (dsname.BeginsWith("/W") && dsname.Contains("JetsToLNu") && !dsname.Contains("NuPt-200") && nupt() > 200) continue;
+
+      if (is_fastsim_) {
+        if (fmod(mass_stop(), kSMSMassStep) > 0.1 || fmod(mass_lsp(), kSMSMassStep) > 0.1) continue;  // skip points in between the binning
+        plot2D("h2d_signal_masspts", mass_stop(), mass_lsp() , evtweight_, SRVec.at(0).histMap, ";M_{stop} [GeV]; M_{lsp} [GeV]", 96, 100, 1300, 64, 0, 800);
+      }
 
       ++nPassedTotal;
 

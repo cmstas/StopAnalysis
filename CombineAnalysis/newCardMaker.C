@@ -294,8 +294,7 @@ int makeCardForOneBin(TString dir, int mstop, int mlsp, int metbin, int bin, TSt
     double genmetunc = 1. + fabs(sig1-sig) / (2.*sig); // <-- careful for sig == 0.
     if (fsig_genmet && (fabs(fabs(sig1-sig)-fabs(sig2-sig)) > 0.001)) cout << "This should not happen " << fabs(sig1-sig) << " " << fabs(sig2-sig) << endl;
     if (genmetunc != 1) {
-      *fLogStream << "SigGenMETunc" << bin << "   lnU " << genmetunc << " -  -  -  -" << endl;
-      ++numnuis;
+      numnuis += addOneUnc(fLogStream, "SigGenMETunc", genmetunc, -1, 0,  bin, "lnU");
     }
   }
 
@@ -485,16 +484,16 @@ int newCardMaker(string signal, string input_dir="../StopLooper/output/temp", st
   verbose = false;  // make sure no exccessive printing
   set<pair<int, int> > signal_points;
 
-  TH2D* hpoints = (TH2D*) fsig->Get(Form("srbase/h_%s_masspts", signal.c_str()));
+  TH2D* hpoints = (TH2D*) fsig->Get("srbase/h2d_signal_masspts");
   if (!hpoints) {
     cout << "Cannot find signal mass points hist in " << fsig->GetName() << endl;
     return -1;
   }
 
-  for (int im1 = 600; im1 <= 1250; im1 += 25) {
+  for (int im1 = 150; im1 <= 1250; im1 += 25) {
     for (int im2 = 0; im2 <= 750; im2 += 25) {
-      if (im1 < 900 && im2 < 400) continue;
-      if (im1 - im2 < 400) continue;
+      // if (im1 < 900 && im2 < 400) continue;
+      // if (im1 - im2 < 400) continue;
       if (im2 == 0) im2 = 1;
       if (hpoints->GetBinContent(hpoints->FindBin(im1, im2)) == 0) continue;
       cout << "Making cards for point: " << Form("%s_%d_%d", signal.c_str(), im1, im2) << endl;

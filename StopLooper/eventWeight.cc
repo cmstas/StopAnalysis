@@ -422,6 +422,7 @@ evtWgtInfo::evtWgtInfo() {
   apply_metRes_sf       = false;
   apply_metTTbar_sf     = false;
   apply_ttbarSysPt_sf   = false;
+  apply_WbXsec_sf       = false;
   apply_ISR_sf          = false;
   apply_pu_sf           = false;
   apply_sample_sf       = false;
@@ -752,7 +753,7 @@ void evtWgtInfo::calculateWeightsForEvent(bool nominalOnly) {
       getWwidthSF( sf_Wwidth_up, sf_Wwidth_dn );
 
       // W+HF xsec uncertainty
-      if (sampletype == "wjets")
+      if (apply_WbXsec_sf && sampletype == "wjets")
         getWbXSecSF( sf_WbXsec_up, sf_WbXsec_dn );
     }
 
@@ -2295,7 +2296,7 @@ void evtWgtInfo::setDefaultSystematics( int syst_set ) {
       apply_ttbarSysPt_sf  = false; // true=sf, false=uncertainty, only !=1.0 for madgraph tt2l, tW2l
       apply_ISR_sf         = true;  // only !=1.0 for signal
       apply_pu_sf          = true;
-      apply_sample_sf      = true;  // only !=1.0 for some WJetsHT samps
+      apply_sample_sf      = true;
       if (sampletype == "wjets")
         apply_WbXsec_sf    = true;
       if (is_fastsim_) {
@@ -2313,7 +2314,7 @@ double evtWgtInfo::getSampleWeight( TString fname ) {
 
   double result = 1.0;
 
-  if (!apply_sample_sf ) return result;
+  if (!apply_sample_sf) return result;
 
   if (fname.Contains("ttbar_diLept_madgraph_pythia8_ext1"))
     result = 23198554.0 / (23198554.0+5689986.0);
@@ -2332,7 +2333,7 @@ double evtWgtInfo::getSampleWeight( TString fname ) {
   else if (fname.Contains("WZ"))
     result = 1.21;
 
-  sf_extra_file *= result;
+  sf_extra_file = result;
 
   return result;
 }

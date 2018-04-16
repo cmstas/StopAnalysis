@@ -16,6 +16,8 @@ std::vector<SR> getStopControlRegionsNoBTags(std::vector<SR>&& SRvec) {
       cr.RemoveVar("ntbtag");
     }
     cr.SetVar("nbtag", 0, 1);
+    if (cr.GetLowerBound("tmod") < 10)
+      cr.SetVar("nbjet", 0, 1);
     cr.SetVar("mlb_0b", cr.GetLowerBound("mlb"), cr.GetUpperBound("mlb"));
     cr.RemoveVar("mlb");
     CRvec.emplace_back(cr);
