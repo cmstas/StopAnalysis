@@ -295,7 +295,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
       }
 
       // Only events nupt < 200 for WNJetsToLNu samples
-      if (dsname.BeginsWith("W") && dsname.Contains("JetsToLNu") && !dsname.Contains("NuPt-200") && nupt() > 200) continue;
+      if (dsname.BeginsWith("/W") && dsname.Contains("JetsToLNu") && !dsname.Contains("NuPt-200") && nupt() > 200) continue;
 
       ++nPassedTotal;
 
@@ -371,7 +371,6 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
           values_["met"] = pfmet();
           values_["mt2w"] = MT2W();
           values_["mlb"] = Mlb_closestb();
-          values_["mlb_0b"] = (lep1_p4() + ak4pfjets_leadbtag_p4()).M();
           values_["tmod"] = topnessMod();
           values_["njet"] = ngoodjets();
           values_["nbjet"] = ngoodbtags();
@@ -393,7 +392,6 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
           values_["met"] = pfmet_jup();
           values_["mt2w"] = MT2W_jup();
           values_["mlb"] = Mlb_closestb_jup();
-          values_["mlb_0b"] = (lep1_p4() + jup_ak4pfjets_leadbtag_p4()).M();
           values_["tmod"] = topnessMod_jup();
           values_["njet"] = jup_ngoodjets();
           values_["nbjet"] = jup_ngoodbtags();  // nbtag30();
@@ -415,7 +413,6 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
           values_["met"] = pfmet_jdown();
           values_["mt2w"] = MT2W_jdown();
           values_["mlb"] = Mlb_closestb_jdown();
-          values_["mlb_0b"] = (lep1_p4() + jdown_ak4pfjets_leadbtag_p4()).M();
           values_["tmod"] = topnessMod_jdown();
           values_["njet"] = jdown_ngoodjets();
           values_["nbjet"] = jdown_ngoodbtags();  // nbtag30();
@@ -475,6 +472,18 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
         }
         fillHistosForCR2l(suffix);
         fillHistosForCRemu(suffix);
+
+        // // Also do yield using genmet for fastsim samples
+        // if (is_fastsim_ && jestype_ == 0) {
+        //   values_["met"] = genmet();
+        //   values_["mt"] = mt_genmet_lep();
+        //   values_["tmod"] = topnessMod_genmet();
+        //   values_["dphijmet"] = mindphi_genmet_j1_j2();
+        //   values_["dphilmet"] = mindphi_genmet_lep1();
+
+        //   fillHistosForSR("_genmet");
+        // }
+
       }
 
       // if (event > 10) break;  // for debugging purpose

@@ -28,15 +28,20 @@ const int step = 25;
 // define maximum number of processes global as it is used by correlation testing functions outside main function
 const int maxnprocess = 5;
 
-// switches
-bool verbose = true;
-// do correlated syst for bkg errors
+// do correlated syst for bkg errors? default: true
 const bool correlated = true;
+// do subtract signal contamination from CR? default: true
+const bool dosigcont = true;
+// do average with yields using genmet for signal? default: true
+const bool dogenmet = true;
+// test without real data?
 const bool fakedata = false;
+// test without background systematics?
 const bool nobgsyst = false;
+// test without signal systematics?
 const bool nosigsyst = false;
-const bool dropsigcont = false;
-const bool dogenmet = false;
+
+bool verbose = true;  // automatic turned off if is signal scan
 
 // global file pointers
 TFile *fsig;
@@ -205,9 +210,10 @@ int makeCardForOneBin(TString dir, int mstop, int mlsp, int metbin, int bin, TSt
   TString hname_sig = dir + "/hSMS_metbins";
 
   // constants uncertainties
+  // TODO: numbers to be updated for new analysis
   double triggerrDn = 0.98;
-  // if (bin == 1 || bin == 4 || bin == 8 || bin == 11)
-  //   triggerrDn = 0.95;
+  if (bin == 1 || bin == 4 || bin == 8 || bin == 11)  // TODO: To use better scheme for these
+    triggerrDn = 0.95;
   double triggerrUp  = 1.01;
   double lumierr     = 1.025;
   double lepvetoerr  = 1.03;
@@ -223,18 +229,19 @@ int makeCardForOneBin(TString dir, int mstop, int mlsp, int metbin, int bin, TSt
   sig = getYieldAndError(sigerr, fsig, hname_sig, metbin, mstop, mlsp);
   osig = sig; sig1 = sig;
 
-  if (!dropsigcont) {
+  if (dosigcont) {
     auto getSigContainmination = [&](TFile* fsig, TFile* fbkg, TString crname) {
       double sigcont(0.);
       TString hnameCR_sig = TString(hname_sig).ReplaceAll("sr", crname);
+      TString hname_alpha = TString(hname).ReplaceAll("metbins", "alphaHist");
       int extr_start_bin = getYield(fbkg, "h_extrstart", 1);
       if (extr_start_bin > 0 && extr_start_bin <= metbin) {
         // doing met extrapolation for this bin
         sigcont = getYield(fsig, hnameCR_sig, extr_start_bin, mstop, mlsp, -1);
-        sigcont *= getYield(fbkg, "h_alphaHist", metbin);
+        sigcont *= getYield(fbkg, hname_alpha, metbin);
       } else {
         sigcont = getYield(fsig, hnameCR_sig, metbin, mstop, mlsp);
-        sigcont *= getYield(fbkg, "h_alphaHist", metbin);
+        sigcont *= getYield(fbkg, hname_alpha, metbin);
       }
       return sigcont;
     };
@@ -247,7 +254,7 @@ int makeCardForOneBin(TString dir, int mstop, int mlsp, int metbin, int bin, TSt
 
     // do the average of yield between the normal and genmet yields
     if (dogenmet && fsig_genmet) {
-      sig2 = getYield(fsig_genmet, hname_sig, metbin);
+      sig2 = getYield(fsig_genmet, hname_sig, metbin, mstop, mlsp);
       double sigcont_cr2l = getSigContainmination(fsig_genmet, f2l, "cr2l");
       double sigcont_cr0b = getSigContainmination(fsig_genmet, f1l, "cr0b");
       sig2 = sig2 - sigcont_cr2l - sigcont_cr0b;
@@ -262,7 +269,7 @@ int makeCardForOneBin(TString dir, int mstop, int mlsp, int metbin, int bin, TSt
   bg1ltop = getYieldAndError(bg1ltoperr, f1ltop, hname, metbin);
   bgznunu = getYieldAndError(bgznunuerr, fznunu, hname, metbin);
 
-  bg1ltoperr = 2;  // - no statistical uncertainty on 1ltop! <-- Why??
+  bg1ltoperr = 2;  // simply put 100% uncertainty on 1ltop, as is estimate from MC only
 
   // now the important part - get the datacard
   std::ostringstream* fLogStream = new std::ostringstream;
@@ -283,7 +290,7 @@ int makeCardForOneBin(TString dir, int mstop, int mlsp, int metbin, int bin, TSt
   *fLogStream << "------------" << endl;
 
   // next ALL control region statistical uncertainties
-  if (!dropsigcont) {
+  if (dosigcont) {
     double genmetunc = 1. + fabs(sig1-sig) / (2.*sig); // <-- careful for sig == 0.
     if (fsig_genmet && (fabs(fabs(sig1-sig)-fabs(sig2-sig)) > 0.001)) cout << "This should not happen " << fabs(sig1-sig) << " " << fabs(sig2-sig) << endl;
     if (genmetunc != 1) {
@@ -426,14 +433,14 @@ void newCardMaker(string signal = "T2tt", int mStop = 800, int mLSP = 400, strin
   system(Form("mkdir -p %s", output_dir.c_str()));
 
   // set input files (global pointers)
-  fsig = new TFile(Form("%s/SMS_%s.root",input_dir.c_str(), signal.substr(0,4).c_str()));
-  // fsig = new TFile(Form("%s/Signal_%s.root",input_dir.c_str(), signal.substr(0,4).c_str()));
+  // fsig = new TFile(Form("%s/SMS_%s.root",input_dir.c_str(), signal.substr(0,4).c_str()));
+  fsig = new TFile(Form("%s/Signal_%s.root",input_dir.c_str(), signal.substr(0,4).c_str()));
   f2l = new TFile(Form("%s/lostlepton.root",input_dir.c_str()));
   f1l = new TFile(Form("%s/1lepFromW.root",input_dir.c_str()));
   f1ltop = new TFile(Form("%s/1lepFromTop.root",input_dir.c_str()));
   fznunu = new TFile(Form("%s/ZToNuNu.root",input_dir.c_str()));
-  fsig_genmet = nullptr; // don't use switched genmet signal for now
-  // fsig_genmet = new TFile(Form("%s/Signal_%s_gen.root",input_dir.c_str(), signal.substr(0,4).c_str()));
+  // fsig_genmet = nullptr; // don't use switched genmet signal for now
+  fsig_genmet = new TFile(Form("%s/Signal_%s_gen.root",input_dir.c_str(), signal.substr(0,4).c_str()));
 
   if (!fakedata) fdata = new TFile(Form("%s/allData_25ns.root",input_dir.c_str()));
   else fdata = new TFile(Form("%s/allBkg_25ns.root",input_dir.c_str()));
@@ -458,14 +465,14 @@ int newCardMaker(string signal, string input_dir="../StopLooper/output/temp", st
   bmark->Start("benchmark");
 
   // set input files (global pointers)
-  fsig = new TFile(Form("%s/SMS_%s.root",input_dir.c_str(), signal.c_str()));
-  // fsig = new TFile(Form("%s/Signal_%s.root",input_dir.c_str(), signal.c_str()));
+  // fsig = new TFile(Form("%s/SMS_%s.root",input_dir.c_str(), signal.c_str()));
+  fsig = new TFile(Form("%s/Signal_%s.root",input_dir.c_str(), signal.c_str()));
   f2l = new TFile(Form("%s/lostlepton.root",input_dir.c_str()));
   f1l = new TFile(Form("%s/1lepFromW.root",input_dir.c_str()));
   f1ltop = new TFile(Form("%s/1lepFromTop.root",input_dir.c_str()));
   fznunu = new TFile(Form("%s/ZToNuNu.root",input_dir.c_str()));
-  fsig_genmet = nullptr; // don't use switched genmet signal for now
-  // fsig_genmet = new TFile(Form("%s/Signal_%s_gen.root",input_dir.c_str(), signal.c_str()));
+  // fsig_genmet = nullptr; // don't use switched genmet signal for now
+  fsig_genmet = new TFile(Form("%s/Signal_%s_gen.root",input_dir.c_str(), signal.c_str()));
 
   if (!fakedata) fdata = new TFile(Form("%s/allData_25ns.root",input_dir.c_str()));
   else fdata = new TFile(Form("%s/allBkg_25ns.root",input_dir.c_str()));
