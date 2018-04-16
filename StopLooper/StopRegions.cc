@@ -64,7 +64,7 @@ std::vector<SR> getStopSignalRegionsTopological() {
   srbase.SetVar("mlb", 0, fInf);
   srbase.SetVar("tmod", -fInf, fInf);
   srbase.SetVar("dphijmet", 0.8, 3.14159);
-  srbase.SetMETBins({0, 250, 350, 450, 550, 650, 800});
+  srbase.SetMETBins({0, 250, 350, 450, 550, 650, 800, 1500});
 
   SR sr;
   std::vector<SR> SRvec;
@@ -216,7 +216,7 @@ std::vector<SR> getStopInclusiveRegionsTopological() {
   srbase.SetVar("mlb", 0, fInf);
   srbase.SetVar("tmod", -fInf, fInf);
   srbase.SetVar("dphijmet", 0.0, 3.1416);
-  srbase.SetMETBins({0, 250, 350, 450, 550, 650, 800});
+  srbase.SetMETBins({0, 250, 350, 450, 550, 650, 800, 1500});
 
   SR sr;
   std::vector<SR> SRvec;
@@ -478,7 +478,7 @@ std::vector<SR> getStopSignalRegionsNewMETBinning() {
   srbase.SetVar("mlb", 0, fInf);
   srbase.SetVar("tmod", -fInf, fInf);
   srbase.SetVar("dphijmet", 0.8, 3.1416);
-  srbase.SetMETBins({0, 250, 350, 450, 550, 650, 800});
+  srbase.SetMETBins({0, 250, 350, 450, 550, 650, 800, 1500});
 
   SR sr;
   std::vector<SR> SRvec;

@@ -517,17 +517,11 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
       dir->cd();
       for (auto& h : sr.histMap) {
         if (h.first.find("HI") != string::npos || h.first.find("LOW") != string::npos) continue;
-        if (h.first.find("h_metbins") != string::npos) {
-          int nbin = h.second->GetNbinsX();
-          if (h.second->GetBinContent(nbin+1) > 0) {
-            // Move overflows to the last bin of histograms
-            double err = 0;
-            h.second->SetBinContent(nbin, h.second->IntegralAndError(nbin, -1, err));
-            h.second->SetBinError(nbin, err);
-            h.second->SetBinContent(nbin+1, 0);
-            h.second->SetBinError(nbin+1, 0);
-          }
-        }
+        // Move overflows of the yield hist to the last bin of histograms
+        if (h.first.find("h_metbins") != string::npos)
+          moveOverFlowToLastBin1D(h.second);
+        else if (h.first.find("hSMS_metbins") != string::npos)
+          moveXOverFlowToLastBin3D((TH3*) h.second);
         h.second->Write();
       }
     }

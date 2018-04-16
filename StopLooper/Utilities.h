@@ -62,12 +62,18 @@ void savePlotsDir(std::map<std::string, TH1*>& h_1d, TFile* outfile, const char*
 void savePlots2Dir(std::map<std::string, TH2D*>& h_2d, TFile* outfile, const char* outdir = "");
 void savePlots12(std::map<std::string, TH1D*>&, std::map<std::string, TH2D*>&, const char* );
 
+void moveOverFlowToLastBin1D(TH1* hist);
+void moveXOverFlowToLastBin3D(TH3* hist);
+
 // New functions
 template<typename... TArgs>
 void plot1d(std::string name, float xval, double weight, std::map<std::string, TH1*> &allhistos, TArgs... args);
 
 template<typename... TArgs>
 void plot2d(std::string name, float xval, float yval, double weight, std::map<std::string, TH1*> &allhistos, TArgs... args);
+
+template<typename... TArgs>
+void plot3d(std::string name, float xval, float yval, float zval, double weight, std::map<std::string, TH1*> &allhistos, TArgs... args);
 
 #endif
 

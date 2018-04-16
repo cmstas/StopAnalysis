@@ -2294,16 +2294,16 @@ void evtWgtInfo::setDefaultSystematics( int syst_set ) {
       apply_metRes_sf      = true;
       apply_metTTbar_sf    = false;
       apply_ttbarSysPt_sf  = false; // true=sf, false=uncertainty, only !=1.0 for madgraph tt2l, tW2l
+      apply_WbXsec_sf      = true;
       apply_ISR_sf         = true;  // only !=1.0 for signal
       apply_pu_sf          = true;
       apply_sample_sf      = true;
-      if (sampletype == "wjets")
-        apply_WbXsec_sf    = true;
       if (is_fastsim_) {
         apply_lepFS_sf     = true;
         apply_bTagFS_sf    = true;
         apply_metRes_sf    = false;
         apply_tau_sf       = false;
+        apply_WbXsec_sf    = false;
       }
       break;
   }
