@@ -730,11 +730,11 @@ void evtWgtInfo::calculateWeightsForEvent(bool nominalOnly) {
     getTTbarSysPtSF( sf_ttbarSysPt, sf_ttbarSysPt_up, sf_ttbarSysPt_dn );
 
   // ISR Correction
-  if (apply_ISR_sf && sampletype == "ttbar")
+  if (apply_ISR_sf)
     getISRnJetsWeight( sf_ISR, sf_ISR_up, sf_ISR_dn );
 
   // Pileup Reweighting
-  if (apply_pu_sf && is_bkg_) {
+  if (apply_pu_sf) {
     getPileupWeight( sf_pu, sf_pu_up, sf_pu_dn );
   }
 
@@ -1265,10 +1265,11 @@ void evtWgtInfo::getLepSFWeight( double &weight_lepSF, double &weight_lepSF_Up, 
     weight_lepSF_Up = babyAnalyzer.weight_lepSF_up();
     weight_lepSF_Dn = babyAnalyzer.weight_lepSF_down();
 
-    weight_vetoLepSF = babyAnalyzer.weight_vetoLepSF();
-    weight_vetoLepSF_Up = babyAnalyzer.weight_vetoLepSF_up();
-    weight_vetoLepSF_Dn = babyAnalyzer.weight_vetoLepSF_down();
-
+    if ( apply_vetoLep_sf ) {
+      weight_vetoLepSF = babyAnalyzer.weight_vetoLepSF();
+      weight_vetoLepSF_Up = babyAnalyzer.weight_vetoLepSF_up();
+      weight_vetoLepSF_Dn = babyAnalyzer.weight_vetoLepSF_down();
+    }
     if ( apply_lepFS_sf ) {
       weight_lepFSSF = babyAnalyzer.weight_lepSF_fastSim();
       weight_lepFSSF_Up = babyAnalyzer.weight_lepSF_fastSim_up();
@@ -1283,10 +1284,11 @@ void evtWgtInfo::getLepSFWeight( double &weight_lepSF, double &weight_lepSF_Up, 
       weight_lepSF_Up *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,28)) );
       weight_lepSF_Dn *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,29)) );
 
-      weight_vetoLepSF    *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,30)) );
-      weight_vetoLepSF_Up *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,31)) );
-      weight_vetoLepSF_Dn *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,32)) );
-
+      if ( apply_vetoLep_sf ) {
+        weight_vetoLepSF    *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,30)) );
+        weight_vetoLepSF_Up *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,31)) );
+        weight_vetoLepSF_Dn *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,32)) );
+      }
       if ( apply_lepFS_sf ) {
         weight_lepFSSF    *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,33)) );
         weight_lepFSSF_Up *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,34)) );
@@ -1298,9 +1300,11 @@ void evtWgtInfo::getLepSFWeight( double &weight_lepSF, double &weight_lepSF_Up, 
       weight_lepSF_Up *= ( nEvents / h_bkg_counter->GetBinContent(h_bkg_counter->FindBin(29)) );
       weight_lepSF_Dn *= ( nEvents / h_bkg_counter->GetBinContent(h_bkg_counter->FindBin(30)) );
 
-      weight_vetoLepSF    *= ( nEvents / h_bkg_counter->GetBinContent(h_bkg_counter->FindBin(31)) );
-      weight_vetoLepSF_Up *= ( nEvents / h_bkg_counter->GetBinContent(h_bkg_counter->FindBin(32)) );
-      weight_vetoLepSF_Dn *= ( nEvents / h_bkg_counter->GetBinContent(h_bkg_counter->FindBin(33)) );
+      if ( apply_vetoLep_sf ) {
+        weight_vetoLepSF    *= ( nEvents / h_bkg_counter->GetBinContent(h_bkg_counter->FindBin(31)) );
+        weight_vetoLepSF_Up *= ( nEvents / h_bkg_counter->GetBinContent(h_bkg_counter->FindBin(32)) );
+        weight_vetoLepSF_Dn *= ( nEvents / h_bkg_counter->GetBinContent(h_bkg_counter->FindBin(33)) );
+      }
     }
   }
 
@@ -2145,7 +2149,7 @@ void evtWgtInfo::getISRWeight( double &weight_ISR, double &weight_ISR_up, double
 
 void evtWgtInfo::getISRnJetsWeight( double &weight_ISR, double &weight_ISR_up, double &weight_ISR_dn ) {
 
-  if ( sampletype != "ttbar" ) return;
+  // if ( sampletype != "ttbar" ) return;
 
   weight_ISR    = babyAnalyzer.weight_ISRnjets();
   weight_ISR_up = babyAnalyzer.weight_ISRnjets_UP();
@@ -2167,8 +2171,6 @@ void evtWgtInfo::getISRnJetsWeight( double &weight_ISR, double &weight_ISR_up, d
 
 
 inline void evtWgtInfo::getPileupWeight( double &weight_pu, double &weight_pu_up, double &weight_pu_dn ) {
-  if ( !is_bkg_ ) return;
-
   weight_pu    = babyAnalyzer.weight_PU();
   weight_pu_up = babyAnalyzer.weight_PUup();
   weight_pu_dn = babyAnalyzer.weight_PUdown();
@@ -2304,6 +2306,8 @@ void evtWgtInfo::setDefaultSystematics( int syst_set ) {
         apply_metRes_sf    = false;
         apply_tau_sf       = false;
         apply_WbXsec_sf    = false;
+        apply_vetoLep_sf   = false;  // <-- why??
+        apply_pu_sf        = false;  // <-- why?
       }
       break;
   }

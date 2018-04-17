@@ -62,7 +62,7 @@ const bool ignoreScale1fb = false;
 // only produce yield histos
 const bool runYieldsOnly = false;
 // only running selected signal points to speed up
-const bool runFullSignalScan = true;
+const bool runFullSignalScan = false;
 // debug symbol, for printing exact event kinematics that passes
 const bool printPassedEvents = false;
 
@@ -269,6 +269,9 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
         if ( !filt_jetWithBadMuon() ) continue;
         if ( !filt_pfovercalomet() ) continue;
       }
+      else if (is_fastsim_) {
+        if ( !filt_fastsimjets() ) continue;
+      }
 
       // Require at least 1 good vertex
       if (nvtxs() < 1) continue;
@@ -277,6 +280,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
       TString dsname = dataset();
       if (!runFullSignalScan && is_fastsim_) {
         // auto checkMassPt = [&](double mstop, double mlsp) { return (mass_stop() == mstop) && (mass_lsp() == mlsp); };
+        // if (!checkMassPt(800,400)) continue;
         if (dsname.Contains("T2tt")) {
           float massdiff = mass_stop() - mass_lsp();
           if (mass_lsp() < 400 && mass_stop() < 900) continue;
