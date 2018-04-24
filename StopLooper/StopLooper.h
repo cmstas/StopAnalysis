@@ -3,8 +3,9 @@
 
 #include "TFile.h"
 #include "TChain.h"
-#include "eventWeight.h"
 #include "SR.h"
+#include "eventWeight.h"
+#include "../StopCORE/TopTagger/ResolvedTopMVA.h"
 
 class StopLooper {
  public:
@@ -45,6 +46,7 @@ class StopLooper {
   void newFillHistosForCR(std::string suffix = "");
 
   evtWgtInfo evtWgt;
+  ResolvedTopMVA* resTopMVA;
 
  private:
   // Global variable

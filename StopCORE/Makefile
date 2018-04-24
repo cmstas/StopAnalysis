@@ -37,11 +37,14 @@ TOOLSLIB = ../CORE/Tools/btagsf/BTagCalibrationStandalone.o
 # stopCORE.so: sysInfo.o eventWeight_bTagSF.o eventWeight_lepSF.o selectionInfo.o categoryInfo.o genClassyInfo.o sampleInfo.o stop_1l_babyAnalyzer.o
 # 	$(LD) $(LDFLAGS) $(SOFLAGS) -o stopCORE.so sysInfo.o eventWeight_bTagSF.o eventWeight_lepSF.o selectionInfo.o categoryInfo.o genClassyInfo.o sampleInfo.o stop_1l_babyAnalyzer.o $(GLIBS) -lGenVector -lEG $(CORELIB) $(STOPVARLIB) -Wl,-rpath,./
 
-stopCORE.so: eventWeight_bTagSF.o eventWeight_lepSF.o stop_1l_babyAnalyzer.o sampleInfo.o
-	$(LD) $(LDFLAGS) $(SOFLAGS) -o stopCORE.so eventWeight_bTagSF.o eventWeight_lepSF.o stop_1l_babyAnalyzer.o sampleInfo.o $(GLIBS) -lGenVector -lEG $(TOOLSLIB) -Wl,-rpath,./
+stopCORE.so: stop_1l_babyAnalyzer.o eventWeight_bTagSF.o eventWeight_lepSF.o sampleInfo.o ResolvedTopMVA.o
+	$(LD) $(LDFLAGS) $(SOFLAGS) -o stopCORE.so stop_1l_babyAnalyzer.o ResolvedTopMVA.o eventWeight_bTagSF.o eventWeight_lepSF.o sampleInfo.o $(GLIBS) -lGenVector -lEG $(TOOLSLIB) -Wl,-rpath,./
 
 sysInfo.o: sysInfo.h sysInfo.cc stop_1l_babyAnalyzer.h stop_1l_babyAnalyzer.cc eventWeight_lepSF.h eventWeight_lepSF.cc eventWeight_bTagSF.h eventWeight_bTagSF.cc
 	$(CXX) $(CXXFLAGS) -c sysInfo.cc
+
+ResolvedTopMVA.o: TopTagger/ResolvedTopMVA.h TopTagger/ResolvedTopMVA.cc TopTagger/TMVAReader.h
+	$(CXX) $(CXXFLAGS) -c TopTagger/ResolvedTopMVA.cc
 
 %.o: 	%.cc %.h
 	$(QUIET) echo "Compiling $<"; \

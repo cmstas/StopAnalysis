@@ -216,7 +216,7 @@ std::vector<SR> getStopInclusiveRegionsTopological() {
   srbase.SetVar("mlb", 0, fInf);
   srbase.SetVar("tmod", -fInf, fInf);
   srbase.SetVar("dphijmet", 0.0, 3.1416);
-  srbase.SetMETBins({0, 250, 350, 450, 550, 650, 800, 1500});
+  srbase.SetMETBins({250, 350, 450, 550, 650, 800, 1500});
 
   SR sr;
   std::vector<SR> SRvec;
@@ -224,6 +224,19 @@ std::vector<SR> getStopInclusiveRegionsTopological() {
   SRvec.emplace_back(srbase);
 
   // Top tag regions at baseline
+
+  sr = srbase;
+  sr.SetName("srbase2");
+  sr.SetVar("deepttag", wpDeepTop, 1);
+  sr.SetMETBins({250, 350, 500, 700, 1500});
+  SRvec.emplace_back(sr);
+
+  sr = srbase;
+  sr.SetName("srbase3");
+  sr.SetVar("deepttag", -1, wpDeepTop);
+  sr.SetVar("resttag", wpResTop, 1);
+  sr.SetMETBins({250, 350, 500, 700, 1500});
+  SRvec.emplace_back(sr);
 
   sr = srbase;
   sr.SetName("srNJetTModTTagA2");
