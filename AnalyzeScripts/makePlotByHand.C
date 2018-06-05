@@ -21,7 +21,7 @@ TH1D* fillSRYieldsPlot(vector<TFile*> samples, vector<string> dirs, string suffi
     if (h_metbins) {
       n_metbins = h_metbins->GetNbinsX();
     } else {
-      cout << "Couldn't get number of met bins" << std::endl;
+      cout << "Couldn't get number of met bins in dir " << dir << std::endl;
       return srhist;
     }
 
@@ -75,7 +75,7 @@ THStack* fillSRYieldsStackHist(vector<TFile*> samples, vector<string> dirs, vect
       if (h_metbins) {
         n_metbins = h_metbins->GetNbinsX();
       } else {
-        cout << "Couldn't get number of met bins" << std::endl;
+        cout << "Couldn't get number of met bins in dir " << dir << std::endl;
         return srhstack;
       }
 
@@ -117,11 +117,11 @@ THStack* fillSRYieldsStackHist(vector<TFile*> samples, vector<string> dirs, vect
 
 void makeSigYieldsComparisonHist() {
 
-  const int type = 3;
-  const int n_srbins = 20;
+  const int type = 4;
+  const int n_srbins = 67;
 
   TFile* forg = new TFile("../StopLooper/output/samples2016/allBkg_25ns.root");
-  TFile* fbkg = new TFile("../StopLooper/output/newbin0_35p9ifb/allBkg_25ns.root");
+  TFile* fbkg = new TFile("../StopLooper/output/newbin1_120ifb/allBkg_25ns.root");
 
   TFile* fsig0 = new TFile("../StopLooper/output/temp14/Signal_T2tt.root");
   TFile* fsig2 = new TFile("../StopLooper/output/newbin0_35p9ifb/SMS_T2tt.root");
@@ -133,19 +133,21 @@ void makeSigYieldsComparisonHist() {
   vector<string> dirs3 = {"srC3", "srD3", "srE3", "srF3", "srG3", "srH3",  };
   vector<string> genclasses = {"_1lepTop", "_1lepW", "_Znunu", "_2lep", };
 
-  dirs2 = dirs3;
+  vector<string> dirsAll = dirs1;
+  dirsAll.insert(dirsAll.end(), dirs2.begin(), dirs2.end());
+  dirsAll.insert(dirsAll.end(), dirs3.begin(), dirs3.end());
 
   vector<Color_t> colors = {kRed-7, kSpring-5, kOrange-2, kAzure+7, kCyan-7, kMagenta-7, kTeal+6, kGray+2};
-  THStack* hSR_stk = fillSRYieldsStackHist({fbkg}, dirs2, colors, genclasses, n_srbins, 120/35.9);
-  TH1D* hSR_org = fillSRYieldsPlot({forg}, dirs0, "", n_srbins);
+  THStack* hSR_stk = fillSRYieldsStackHist({fbkg}, dirsAll, colors, genclasses, n_srbins);
+  TH1D* hSR_org = fillSRYieldsPlot({fbkg}, dirsAll, "", n_srbins);
   hSR_org->SetName("h_SRyields_org");
-  hSR_org->Scale(120/35.9);
+  // hSR_org->Scale(120/35.9);
   hSR_org->SetTitle("");
 
   // Only works for having only 1 signal for now. Should be using individual
-  TH1D* hSR_mMT = fillSRYieldsPlot({fbkg}, dirs2, "", n_srbins);
+  TH1D* hSR_mMT = fillSRYieldsPlot({fbkg}, dirsAll, "", n_srbins);
   hSR_mMT->SetName("h_SRyields_mMT");
-  hSR_mMT->Scale(120/35.9);
+  // hSR_mMT->Scale(120/35.9);
   TH1D* hRatio = (TH1D*) hSR_mMT->Clone("h_ratio");
   hRatio->Divide(hSR_mMT, hSR_org, 1, 1, "B");
   hSR_mMT->Scale(120/35.9);
@@ -157,7 +159,7 @@ void makeSigYieldsComparisonHist() {
   TH1D* hRatio_sig = (TH1D*) hSR_sig2->Clone("h_ratio_sig");
   hRatio_sig->Divide(hSR_sig2, hSR_sig0, 1, 1, "B");
 
-  TCanvas* c0 = new TCanvas("c0", "c0", 1080, 800);
+  TCanvas* c0 = new TCanvas("c0", "c0", 1800, 800);
   gStyle->SetOptStat("");
   gStyle->SetPadGridX(0);
   gStyle->SetPadGridY(0);
@@ -165,7 +167,8 @@ void makeSigYieldsComparisonHist() {
   gStyle->SetPadTickY(1);
   gStyle->SetFrameBorderMode(0);
   // c0->SetCanvasSize(600, 700);
-  TPad* mainPad = new TPad("1", "1", 0.0, 0.20, 1.0, 1.0);
+  // TPad* mainPad = new TPad("1", "1", 0.0, 0.20, 1.0, 1.0);
+  TPad* mainPad = new TPad("1", "1", 0.0, 0.05, 1.0, 1.0);
   TPad* ratioPad = new TPad("2", "2", 0.0, 0.0, 1.0, 0.23);
   mainPad->SetTopMargin(0.08);
   mainPad->SetLeftMargin(0.10);
@@ -176,7 +179,7 @@ void makeSigYieldsComparisonHist() {
   ratioPad->SetTopMargin(0.05);
   ratioPad->SetLeftMargin(0.10);
   ratioPad->SetRightMargin(0.05);
-  ratioPad->Draw();
+  // ratioPad->Draw();
 
   mainPad->cd();
 
@@ -186,7 +189,7 @@ void makeSigYieldsComparisonHist() {
   hSR_org->SetLineColorAlpha(kOrange+1, 0.3);
   hSR_org->SetFillColorAlpha(kOrange+1, 0.7);
 
-  hSR_org->GetXaxis()->SetLabelSize(0.052);
+  hSR_org->GetXaxis()->SetLabelSize(0.048);
   if (type == 2) {
     hSR_org->GetXaxis()->SetBinLabel( 1, "A:[250,350]"      );
     hSR_org->GetXaxis()->SetBinLabel( 2, "A:[350,450]"      );
@@ -236,14 +239,85 @@ void makeSigYieldsComparisonHist() {
     hSR_org->GetXaxis()->SetBinLabel(18, "G:[600, +#infty]" );
     hSR_org->GetXaxis()->SetBinLabel(19, "H:[250,450]"      );
     hSR_org->GetXaxis()->SetBinLabel(20, "H:[450, +#infty]" );
+  } else if (type == 4) {
+
+    hSR_org->GetXaxis()->SetBinLabel(1 , "A1:[250,350]"      );
+    hSR_org->GetXaxis()->SetBinLabel(2 , "A1:[350,450]"      );
+    hSR_org->GetXaxis()->SetBinLabel(3 , "A1:[450,600]"      );
+    hSR_org->GetXaxis()->SetBinLabel(4 , "A1:[600,750]"      );
+    hSR_org->GetXaxis()->SetBinLabel(5 , "A1:[750, +#infty]" );
+    hSR_org->GetXaxis()->SetBinLabel(6 , "B1:[250,450]"      );
+    hSR_org->GetXaxis()->SetBinLabel(7 , "B1:[450,700]"      );
+    hSR_org->GetXaxis()->SetBinLabel(8 , "B1:[700, +#infty]" );
+    hSR_org->GetXaxis()->SetBinLabel(9 , "C1:[250,350]"      );
+    hSR_org->GetXaxis()->SetBinLabel(10, "C1:[350,450]"      );
+    hSR_org->GetXaxis()->SetBinLabel(11, "C1:[450,550]"      );
+    hSR_org->GetXaxis()->SetBinLabel(12, "C1:[550,650]"      );
+    hSR_org->GetXaxis()->SetBinLabel(13, "C1:[650,800]"      );
+    hSR_org->GetXaxis()->SetBinLabel(14, "C1:[800, +#infty]" );
+    hSR_org->GetXaxis()->SetBinLabel(15, "D1:[250,350]"      );
+    hSR_org->GetXaxis()->SetBinLabel(16, "D1:[350,450]"      );
+    hSR_org->GetXaxis()->SetBinLabel(17, "D1:[450,600]"      );
+    hSR_org->GetXaxis()->SetBinLabel(18, "D1:[600, +#infty]" );
+    hSR_org->GetXaxis()->SetBinLabel(19, "E1:[250,350]"      );
+    hSR_org->GetXaxis()->SetBinLabel(20, "E1:[350,450]"      );
+    hSR_org->GetXaxis()->SetBinLabel(21, "E1:[450,600]"      );
+    hSR_org->GetXaxis()->SetBinLabel(22, "E1:[600, +#infty]" );
+    hSR_org->GetXaxis()->SetBinLabel(23, "F1:[250,350]"      );
+    hSR_org->GetXaxis()->SetBinLabel(24, "F1:[350,450]"      );
+    hSR_org->GetXaxis()->SetBinLabel(25, "F1:[450, +#infty]" );
+    hSR_org->GetXaxis()->SetBinLabel(26, "G1:[250,350]"      );
+    hSR_org->GetXaxis()->SetBinLabel(27, "G1:[350,450]"      );
+    hSR_org->GetXaxis()->SetBinLabel(28, "G1:[450,550]"      );
+    hSR_org->GetXaxis()->SetBinLabel(29, "G1:[550,750]"      );
+    hSR_org->GetXaxis()->SetBinLabel(30, "G1:[750, +#infty]" );
+    hSR_org->GetXaxis()->SetBinLabel(31, "H1:[250,500]"      );
+    hSR_org->GetXaxis()->SetBinLabel(32, "H1:[500, +#infty]" );
+    hSR_org->GetXaxis()->SetBinLabel(33, "A2:[250,600]"      );
+    hSR_org->GetXaxis()->SetBinLabel(34, "A2:[600, +#infty]" );
+    hSR_org->GetXaxis()->SetBinLabel(35, "B2:[250, +#infty]" );
+    hSR_org->GetXaxis()->SetBinLabel(36, "C2:[250,350]"      );
+    hSR_org->GetXaxis()->SetBinLabel(37, "C2:[350,450]"      );
+    hSR_org->GetXaxis()->SetBinLabel(38, "C2:[450,600]"      );
+    hSR_org->GetXaxis()->SetBinLabel(39, "C2:[600, +#infty]" );
+    hSR_org->GetXaxis()->SetBinLabel(40, "D2:[250,350]"      );
+    hSR_org->GetXaxis()->SetBinLabel(41, "D2:[350,550]"      );
+    hSR_org->GetXaxis()->SetBinLabel(42, "D2:[550, +#infty]" );
+    hSR_org->GetXaxis()->SetBinLabel(43, "E2:[250,350]"      );
+    hSR_org->GetXaxis()->SetBinLabel(44, "E2:[350,450]"      );
+    hSR_org->GetXaxis()->SetBinLabel(45, "E2:[450, +#infty]" );
+    hSR_org->GetXaxis()->SetBinLabel(46, "F2:[250,450]"      );
+    hSR_org->GetXaxis()->SetBinLabel(47, "F2:[450, +#infty]" );
+    hSR_org->GetXaxis()->SetBinLabel(48, "G2:[250,450]"      );
+    hSR_org->GetXaxis()->SetBinLabel(49, "G2:[450, +#infty]" );
+    hSR_org->GetXaxis()->SetBinLabel(50, "H2:[250,450]"      );
+    hSR_org->GetXaxis()->SetBinLabel(51, "H2:[450, +#infty]" );
+    hSR_org->GetXaxis()->SetBinLabel(52, "C3:[250,350]"      );
+    hSR_org->GetXaxis()->SetBinLabel(53, "C3:[350,500]"      );
+    hSR_org->GetXaxis()->SetBinLabel(54, "C3:[500, +#infty]" );
+    hSR_org->GetXaxis()->SetBinLabel(55, "D3:[250,350]"      );
+    hSR_org->GetXaxis()->SetBinLabel(56, "D3:[350,450]"      );
+    hSR_org->GetXaxis()->SetBinLabel(57, "D3:[450, +#infty]" );
+    hSR_org->GetXaxis()->SetBinLabel(58, "E3:[250,350]"      );
+    hSR_org->GetXaxis()->SetBinLabel(59, "E3:[350,450]"      );
+    hSR_org->GetXaxis()->SetBinLabel(60, "E3:[450, +#infty]" );
+    hSR_org->GetXaxis()->SetBinLabel(61, "F3:[250,450]"      );
+    hSR_org->GetXaxis()->SetBinLabel(62, "F3:[450, +#infty]" );
+    hSR_org->GetXaxis()->SetBinLabel(63, "G3:[250,350]"      );
+    hSR_org->GetXaxis()->SetBinLabel(64, "G3:[350,500]"      );
+    hSR_org->GetXaxis()->SetBinLabel(65, "G3:[500, +#infty]" );
+    hSR_org->GetXaxis()->SetBinLabel(66, "H3:[250,450]"      );
+    hSR_org->GetXaxis()->SetBinLabel(67, "H3:[450, +#infty]" );
+
   }
-   
+
+
   hSR_org->GetXaxis()->LabelsOption("v");
 
   hSR_org->GetYaxis()->SetTitle("N Events");
   hSR_org->GetYaxis()->SetTitleOffset(0.6);
   hSR_org->GetYaxis()->SetTitleSize(0.06);
-  hSR_org->GetYaxis()->SetRangeUser(0.06, 4000);
+  hSR_org->GetYaxis()->SetRangeUser(0.1, 4000);
   hSR_org->Draw("hist");
   // hSR_mMT->SetFillColor(kAzure+7);
   // hSR_mMT->Draw("axissame");
@@ -265,10 +339,10 @@ void makeSigYieldsComparisonHist() {
     hSR_sig0->SetBinError(i, 0);
     hSR_sig2->SetBinError(i, 0);
   }
-  hSR_sig0->Draw("same");
-  hSR_sig2->Draw("same");
+  // hSR_sig0->Draw("same");
+  // hSR_sig2->Draw("same");
 
-  TLegend* leg = new TLegend(0.42, 0.76, 0.68, 0.89);
+  TLegend* leg = new TLegend(0.42, 0.74, 0.68, 0.89);
   leg->SetFillColor(0);
   leg->SetFillStyle(0);
   leg->SetBorderSize(0);
@@ -276,10 +350,12 @@ void makeSigYieldsComparisonHist() {
   leg->SetNColumns(2);
   leg->AddEntry(hSR_stk->GetHists()->At(0), "1lepTop");
   leg->AddEntry(hSR_stk->GetHists()->At(1), "1lepW");
-  leg->AddEntry(hSR_stk->GetHists()->At(2), "Z#nu#nu");
+  leg->AddEntry(hSR_stk->GetHists()->At(2), "Z#rightarrow#nu#nu");
   leg->AddEntry(hSR_stk->GetHists()->At(3), "lostlep");
 
   leg->Draw("same");
+
+  c0->SaveAs(Form("sigYieldsCompareHist_%s.pdf", "test"));
 
   TLegend* leg2 = new TLegend(0.68, 0.69, 0.84, 0.89);
   leg2->SetFillColor(0);
@@ -288,8 +364,8 @@ void makeSigYieldsComparisonHist() {
   leg2->SetTextSize(0.042);
   leg2->AddEntry(hSR_org, "Total background");
   if (type == 2) {
-  leg2->AddEntry(hSR_sig0, "T2tt(1200,50) org");
-  leg2->AddEntry(hSR_sig2, "T2tt(1200,50) mtag");
+    leg2->AddEntry(hSR_sig0, "T2tt(1200,50) org");
+    leg2->AddEntry(hSR_sig2, "T2tt(1200,50) mtag");
   } else if (type == 3) {
     leg2->AddEntry(hSR_sig0, "T2tt(800,400) org");
     leg2->AddEntry(hSR_sig2, "T2tt(800,400) rtag");
@@ -323,7 +399,7 @@ void makeSigYieldsComparisonHist() {
   hRatio_sig->SetLineWidth(2);
   hRatio_sig->Draw("same");
 
-  c0->SaveAs(Form("sigYieldsCompareHist_%s.pdf", "test"));
+  // c0->SaveAs(Form("sigYieldsCompareHist_%s.pdf", "test"));
 
   bool printHistContent = false;
   if (printHistContent) {
@@ -336,6 +412,107 @@ void makeSigYieldsComparisonHist() {
 
   delete hSR_org;
   delete hSR_mMT;
+  delete hSR_stk;
+  delete c0;
+  delete leg;
+  delete h_axis_ratio;
+}
+
+void makeExamplePlot() {
+
+  const int type = 2;
+  const int n_srbins = 67;
+
+  // TFile* fbkg = new TFile("../StopLooper/output/tempIncl_merged/allBkg_25ns.root");
+  // TFile* fsig = new TFile("../StopLooper/output/tempIncl_merged/SMS_T2tt.root");
+
+  TFile* fbkg = new TFile("../StopLooper/output/tempIncl_merged/allBkg_25ns.root");
+  TFile* fsig = new TFile("../StopLooper/output/tempIncl_merged/SMS_T2tt.root");
+
+  vector<string> dirsAll = {"srbase", };
+
+  vector<Color_t> colors = {kRed-7, kSpring-5, kOrange-2, kAzure+7, kCyan-7, kMagenta-7, kTeal+6, kGray+2};
+
+  THStack* hSR_stk;
+  auto h2l = (TH1D*) fbkg->Get("srbaseMET/h_met_h_2lep");
+  auto h1lW = (TH1D*) fbkg->Get("srbaseMET/h_met_h_1lepW");
+  auto h1ltop = (TH1D*) fbkg->Get("srbaseMET/h_met_h_1lepTop");
+  auto hZnunu = (TH1D*) fbkg->Get("srbaseMET/h_met_h_Znunu");
+  hSR_stk->Add(hZnunu);
+  hSR_stk->Add(h1ltop);
+  hSR_stk->Add(h1lW);
+  hSR_stk->Add(h2l);
+
+  TH1D* hSR_org = fbkg->Get("srbaseMET/h_met_h");
+
+  hSR_org->SetName("h_SRyields_org");
+  // hSR_org->Scale(120/35.9);
+  hSR_org->SetTitle("");
+
+  // Only works for having only 1 signal for now. Should be using individual
+
+  TH1D* hSR_sig = fbkg->Get("srbaseMET/h_met_h_1200_50");
+
+  TCanvas* c0 = new TCanvas("c0", "c0", 800, 400);
+  gStyle->SetOptStat("");
+  gStyle->SetPadGridX(0);
+  gStyle->SetPadGridY(0);
+  gStyle->SetPadTickX(1);
+  gStyle->SetPadTickY(1);
+  gStyle->SetFrameBorderMode(0);
+  // c0->SetCanvasSize(600, 700);
+  // TPad* mainPad = new TPad("1", "1", 0.0, 0.20, 1.0, 1.0);
+  TPad* mainPad = new TPad("1", "1", 0.0, 0.05, 1.0, 1.0);
+  TPad* ratioPad = new TPad("2", "2", 0.0, 0.0, 1.0, 0.23);
+  mainPad->SetTopMargin(0.08);
+  mainPad->SetLeftMargin(0.10);
+  mainPad->SetRightMargin(0.05);
+  mainPad->SetBottomMargin(0.22);
+  mainPad->SetLogy();
+  mainPad->Draw();
+  ratioPad->SetTopMargin(0.05);
+  ratioPad->SetLeftMargin(0.10);
+  ratioPad->SetRightMargin(0.05);
+  // ratioPad->Draw();
+
+  mainPad->cd();
+
+
+  hSR_org->GetXaxis()->LabelsOption("v");
+
+  hSR_org->GetYaxis()->SetTitle("N Events");
+  hSR_org->GetYaxis()->SetTitleOffset(0.6);
+  hSR_org->GetYaxis()->SetTitleSize(0.06);
+  hSR_org->GetYaxis()->SetRangeUser(0.1, 4000);
+  hSR_org->Draw("hist");
+  hSR_stk->Draw("histsame");
+  hSR_stk->Draw("axissame");
+
+  hSR_sig->SetLineStyle(2);
+  hSR_sig->SetLineWidth(3);
+  hSR_sig->SetLineColor(kGray+2);
+
+  // hSR_sig0->Draw("same");
+  // hSR_sig2->Draw("same");
+
+  TLegend* leg = new TLegend(0.42, 0.74, 0.68, 0.89);
+  leg->SetFillColor(0);
+  leg->SetFillStyle(0);
+  leg->SetBorderSize(0);
+  leg->SetTextSize(0.042);
+  leg->SetNColumns(2);
+  leg->AddEntry(hSR_stk->GetHists()->At(0), "Z#rightarrow#nu#nu");
+  leg->AddEntry(hSR_stk->GetHists()->At(1), "1lepTop");
+  leg->AddEntry(hSR_stk->GetHists()->At(2), "1lepW");
+  leg->AddEntry(hSR_stk->GetHists()->At(3), "lostlep");
+  leg->AddEntry(hSR_sig, "T2tt(1200,50)");
+
+  leg->Draw("same");
+
+  c0->SaveAs(Form("srmet_%s.pdf", "test"));
+
+
+  delete hSR_org;
   delete hSR_stk;
   delete c0;
   delete leg;

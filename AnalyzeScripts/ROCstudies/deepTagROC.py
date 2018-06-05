@@ -92,6 +92,15 @@ def getNSigPoints(f1):
             count += 1
     return count
 
+def getNSigPointsNew(f1):
+    count = float(0)
+    hmpt = f1.Get("srbase/h2d_signal_masspts")
+    for ibx in hmpt.GetNbinsX():
+        for iby in hmpt.GetNbinsY():
+            if hmpt.GetBinContent(ibx, iby) > 0:
+                count += 1
+    return count
+
 def getStoNSigVBkg(f1, f2, sr, hname="h_deepttag"):
     hgood = f1.Get(sr+'/'+hname)
     hfake = f2.Get(sr+'/'+hname)
@@ -171,13 +180,18 @@ if __name__ == "__main__":
     # Comined ROC curves with tmod, resolved tagger, chi2, etc
     c1.Clear()
 
-    f1 = r.TFile("../../StopLooper/output/temp11/SMS_T2tt.root")
-    f2 = r.TFile("../../StopLooper/output/temp11/allBkg_25ns.root")
+    # f1 = r.TFile("../../StopLooper/output/temp11/SMS_T2tt.root")
+    # f2 = r.TFile("../../StopLooper/output/temp11/allBkg_25ns.root")
 
-    leg = r.TLegend(0.14, 0.7, 0.46, 0.85)
+    f1 = r.TFile("../../StopLooper/output/oldbin_120ifb/SMS_T2tt.root")
+    f2 = r.TFile("../../StopLooper/output/oldbin_120ifb/allBkg_25ns.root")
 
-    srlist = ['srNJetMET1', 'srNJetMET2']
-    colors = [r.kBlack, r.kCyan]
+    leg = r.TLegend(0.14, 0.64, 0.6, 0.85)
+    leg.SetTextSize(0.042)
+
+    # srlist = ['srNJet1', 'srNJet2']
+    srlist = ['srA','srC','srE']
+    colors = [r.kBlack, r.kCyan, r.kGreen]
     grs = []
     for i, sr in enumerate(srlist):
         gr = getROCSigVBkg(f1, f2, sr, starval=[0.4,])
@@ -192,38 +206,51 @@ if __name__ == "__main__":
         #     gr.Draw("same")
         # leg.AddEntry(gr, sr)
 
+    grs[0].GetXaxis().SetTitle("T2tt Signal Efficiency")
+    grs[0].GetYaxis().SetTitle("SM Background Efficiency")
+    grs[0].GetXaxis().SetTitleSize(0.045)
+    grs[0].GetYaxis().SetTitleSize(0.045)
+    grs[0].GetXaxis().SetTitleOffset(0.9)
+    grs[0].GetYaxis().SetTitleOffset(0.9)
+    grs[0].GetXaxis().SetRangeUser(0.0, 0.65)
+    grs[0].GetYaxis().SetRangeUser(0.01, 0.4)
+    grs[0].SetLineColor(r.kAzure+1)
     grs[0].Draw()
     grs[1].Draw("same")
 
     # groc.Draw()
     # leg.AddEntry(groc, "merged tag")
-    leg.AddEntry(grs[0], "2-3j, merged tag")
-    leg.AddEntry(grs[1], "#geq 4j, merged tag")
+    # leg.AddEntry(grs[0], "2-3j, merged tag, #DeltaM>600")
+    # leg.AddEntry(grs[1], "#geq 4j, merged tag, #DeltaM>600")
 
-    # fxra = r.TFile("temp4.root")
-    # gak4 = fxra.Get("roc_ltc_dm600_ge4j")
-    # gak4.SetLineColor(r.kRed)
+    leg.AddEntry(grs[0], "srA")
+    leg.AddEntry(grs[1], "srC")
+    leg.AddEntry(grs[2], "srE")
+
+    # fxra = r.TFile("restagROCs_dm200to400.root")
+    # gak4 = fxra.Get("roc_ltc_dm200to400_ge4j")
+    # gak4.SetLineColor(r.kRed-7)
     # gak4.SetLineWidth(3)
     # gak4.Draw("same")
-    # leg.AddEntry(gak4, "#geq 4j, resolved tag")
-    # gchi2 = fxra.Get("roc_chi2_dm600_base")
-    # gchi2.SetLineColor(r.kBlue)
+    # leg.AddEntry(gak4, "#geq 4j, resolved tag, #DeltaM<400")
+    # gchi2 = fxra.Get("roc_chi2_dm200to400_ge4j")
+    # gchi2.SetLineColor(r.kGray+1)
     # gchi2.SetLineWidth(3)
     # gchi2.Draw("same")
-    # leg.AddEntry(gchi2, "had #chi^{2}")
-    # gtmod = fxra.Get("roc_tmod_dm600_ge4j")
-    # gtmod.SetLineColor(r.kMagenta)
-    # gtmod.SetLineWidth(3)
-    # gtmod.Draw("same")
-    # leg.AddEntry(gtmod, "#geq 4j, tmod")
-    # gtmod2 = fxra.Get("roc_tmod_dm600_2to3j")
-    # gtmod2.SetLineColor(r.kAzure)
-    # gtmod2.SetLineWidth(3)
-    # gtmod2.Draw("same")
-    # leg.AddEntry(gtmod2, "2-3j, tmod")
+    # leg.AddEntry(gchi2, "#geq 4j, had #chi^{2}, #DeltaM<400")
+    # # gtmod = fxra.Get("roc_tmod_dm600_ge4j")
+    # # gtmod.SetLineColor(r.kMagenta)
+    # # gtmod.SetLineWidth(3)
+    # # gtmod.Draw("same")
+    # # leg.AddEntry(gtmod, "#geq 4j, tmod")
+    # # gtmod2 = fxra.Get("roc_tmod_dm600_2to3j")
+    # # gtmod2.SetLineColor(r.kAzure)
+    # # gtmod2.SetLineWidth(3)
+    # # gtmod2.Draw("same")
+    # # leg.AddEntry(gtmod2, "2-3j, tmod")
 
     leg.Draw()
 
-    c1.Print("rocs_incls_dm600.pdf")
+    c1.Print("rocs_topoSRs.pdf")
 
     # c1.Clear()

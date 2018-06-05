@@ -51,16 +51,28 @@ def StoBErr(s, b, se, be):
     v /= 4*(s+b)**3
     return sqrt(v)
 
+def getNSigPointsNew(f1):
+    count = float(0)
+    hmpt = f1.Get("srbase/h2d_signal_masspts")
+    if not hmpt:
+        print "Cannot find masspt hist, returning 1."
+        return 1;
+    for ibx in range(1, hmpt.GetNbinsX()+1):
+        for iby in range(1, hmpt.GetNbinsY()+1):
+            if hmpt.GetBinContent(ibx, iby) > 0:
+                count += 1
+    return count
+
 if __name__ == "__main__":
 
     os.system("mkdir -p plots")
 
     r.gROOT.SetBatch(1)
 
-    f1 = r.TFile("../../StopLooper/output/temp11/SMS_T2tt.root")
+    f1 = r.TFile("../../StopLooper/output/temp12/SMS_T2tt.root")
     f2 = r.TFile("../../StopLooper/output/temp11/allBkg_25ns.root")
-    hgood = f1.Get("srbase/h_leadtopcand_finedisc")
-    hfake = f2.Get("srbase/h_leadtopcand_finedisc")
+    hgood = f1.Get("srNJet2/h_leadtopcand_finedisc")
+    hfake = f2.Get("srNJet2/h_leadtopcand_finedisc")
 
     # f1 = r.TFile("../../StopLooper/output/temp/TTJets_v25_4.root")
     # f2 = f1
@@ -83,7 +95,7 @@ if __name__ == "__main__":
             p98_fkrate = np.array([lst_fkrate[i]], dtype=float)
 
     lst_sigyld, lst_bkgyld, lst_disc = makeROClist(hgood, hfake, raw_yields=True)
-    # lst_sigyld /= 52.
+    lst_sigyld /= getNSigPointsNew(f1)
     print lst_sigyld[-1], lst_bkgyld[-1]
     lst_sigyld *= 34.03 / lst_sigyld[-1]
     lst_bkgyld *= 825.9 / lst_bkgyld[-1]
@@ -107,7 +119,7 @@ if __name__ == "__main__":
     gstob.GetYaxis().SetTitle("S / #sqrt{S+B}")
     gstob.Draw()
 
-    c1.Print("stob_srbase_toptag.pdf")
+    # c1.Print("stob_srbase_toptag.pdf")
 
     c1.Clear()
 
@@ -122,15 +134,15 @@ if __name__ == "__main__":
 
     groc.Draw()
 
-    c1.Print("roc_srbase_toptag.pdf")
+    c1.Print("roc_srNJet2_toptag.pdf")
 
     # c1.Clear()
 
     # hgood = f1.Get("testTopTagging/h_chi2_disc1")
     # hfake = f2.Get("testTopTagging/h_chi2fake_disc1")
 
-    hgood = f1.Get("srNJetMET2/h_chi2_disc")
-    hfake = f2.Get("srNJetMET2/h_chi2_disc")
+    hgood = f1.Get("srNJet2/h_chi2_disc")
+    hfake = f2.Get("srNJet2/h_chi2_disc")
 
     if not hgood: print "Cannot find hgood!"
     if not hfake: print "Cannot find hfake!"
@@ -150,10 +162,10 @@ if __name__ == "__main__":
     leg.AddEntry(chi2roc, "had chi2")
     leg.Draw()
 
-    c1.Print("roc_srNJetMET2_chi2.pdf")
+    c1.Print("roc_srNJet2_chi2.pdf")
 
-    hgood = f1.Get("srNJetMET2/h_tmod_finedisc")
-    hfake = f2.Get("srNJetMET2/h_tmod_finedisc")
+    hgood = f1.Get("srNJet2/h_tmod_finedisc")
+    hfake = f2.Get("srNJet2/h_tmod_finedisc")
 
     if not hgood: print "Cannot find hgood!"
     if not hfake: print "Cannot find hfake!"
@@ -176,11 +188,10 @@ if __name__ == "__main__":
     leg.AddEntry(tmodroc, "tmod")
     leg.Draw()
 
-    c1.Print("roc_srNJetMET2_tmod.pdf")
+    c1.Print("roc_srNJet2_tmod.pdf")
 
-    fout = r.TFile("temp4.root", "update")
-    groc.Write("roc_ltc_dm600_ge4j_met400")
-    chi2roc.Write("roc_chi2_dm600_ge4j_met400")
-    tmodroc.Write("roc_tmod_dm600_ge4j_met400")
-    fout.Close()
-
+    # fout = r.TFile("restagROCs_dm200to400.root", "update")
+    # groc.Write("roc_ltc_dm200to400_ge4j")
+    # chi2roc.Write("roc_chi2_dm200to400_ge4j")
+    # tmodroc.Write("roc_tmod_dm200to400_ge4j")
+    # fout.Close()
