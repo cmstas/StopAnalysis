@@ -21,7 +21,7 @@ cd ..
 [[ `ls input/` ]] && echo "[setup] Cleaning input/" && rm -r input/*
 echo "[setup] Making input tarfile... This assumes that the babymaker has been compiled and tested."
 pushd $BABYMAKER_DIR > /dev/null
-cp -r *.so LinkDef_rdict.pcm btagsf jecfiles json_files lepsf TopTagger puWeights_2016data_36p6fbinv.root xsec_stop_13TeV.root scale1fbs.txt runBabyMaker sample_2017.dat $BATCH_DIR/input
+cp -rL *.so LinkDef_rdict.pcm btagsf jecfiles json_files lepsf TopTagger puWeights_2016data_36p6fbinv.root xsec_stop_13TeV.root scale1fbs.txt runBabyMaker sample_2017.dat $BATCH_DIR/input
 popd > /dev/null
 tar -czf input.tar.gz input
 

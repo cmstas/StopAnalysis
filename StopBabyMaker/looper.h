@@ -73,6 +73,7 @@ class babyMaker {
   float skim_ph_eta;
 
   bool applyJECfromFile;
+  bool applyAK8JECfromFile;
   int  JES_type;
 
   bool applyBtagSFs;

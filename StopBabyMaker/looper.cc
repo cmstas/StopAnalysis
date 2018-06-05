@@ -837,7 +837,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
   //
   // Set scale1fb file
   //
-  DatasetInfoFromFile df("scale1fbs.txt");
+  DatasetInfoFromFile df;
 
   //
   // JEC files
@@ -857,96 +857,57 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
   ak8jetcorr_filenames_pfL1FastJetL2L3.clear();
   std::string ak8jetcorr_uncertainty_filename;
 
-  // files for RunIISpring15 MC
+  // JEC file version
+  string jecVer = "Fall17_17Nov2017C_V6";
+
   if (isDataFromFileName) {
+    if      (filestr.find("2016B") != std::string::npos ||
+             filestr.find("2016C") != std::string::npos ||
+             filestr.find("2016D") != std::string::npos) jecVer = "Summer16_07Aug2017BCD_V10";
+    else if (filestr.find("2016E") != std::string::npos ||
+             filestr.find("2016F") != std::string::npos) jecVer = "Summer16_07Aug2017EF_V10";
+    else if (filestr.find("2016G") != std::string::npos ||
+             filestr.find("2016H") != std::string::npos) jecVer = "Summer16_07Aug2017GH_V10";
 
-    if(filestr.find("2016B") != std::string::npos ||
-       filestr.find("2016C") != std::string::npos ||
-       filestr.find("2016D") != std::string::npos    ){
-      jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Summer16_23Sep2016BCDV3_DATA/Summer16_23Sep2016BCDV3_DATA_L1FastJet_AK4PFchs.txt");
-      jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Summer16_23Sep2016BCDV3_DATA/Summer16_23Sep2016BCDV3_DATA_L2Relative_AK4PFchs.txt");
-      jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Summer16_23Sep2016BCDV3_DATA/Summer16_23Sep2016BCDV3_DATA_L3Absolute_AK4PFchs.txt");
-      jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Summer16_23Sep2016BCDV3_DATA/Summer16_23Sep2016BCDV3_DATA_L2L3Residual_AK4PFchs.txt");
-      jetcorr_uncertainty_filename = "jecfiles/Summer16_23Sep2016BCDV3_DATA/Summer16_23Sep2016BCDV3_DATA_Uncertainty_AK4PFchs.txt";
+    else if (filestr.find("2017B") != std::string::npos) jecVer = "Fall17_17Nov2017B_V6";
+    else if (filestr.find("2017C") != std::string::npos) jecVer = "Fall17_17Nov2017C_V6";
+    else if (filestr.find("2017D") != std::string::npos) jecVer = "Fall17_17Nov2017D_V6";
+    else if (filestr.find("2017E") != std::string::npos) jecVer = "Fall17_17Nov2017E_V6";
+    else if (filestr.find("2017F") != std::string::npos) jecVer = "Fall17_17Nov2017F_V6";
+    else {
+      cout << "[babyMaker::looper] Cannot read from filestr the data era, may not be applying the correct JEC!\n";
     }
-
-    if(filestr.find("2016E") != std::string::npos ||
-       filestr.find("2016F") != std::string::npos    ){
-      jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Summer16_23Sep2016EFV3_DATA/Summer16_23Sep2016EFV3_DATA_L1FastJet_AK4PFchs.txt");
-      jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Summer16_23Sep2016EFV3_DATA/Summer16_23Sep2016EFV3_DATA_L2Relative_AK4PFchs.txt");
-      jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Summer16_23Sep2016EFV3_DATA/Summer16_23Sep2016EFV3_DATA_L3Absolute_AK4PFchs.txt");
-      jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Summer16_23Sep2016EFV3_DATA/Summer16_23Sep2016EFV3_DATA_L2L3Residual_AK4PFchs.txt");
-      jetcorr_uncertainty_filename = "jecfiles/Summer16_23Sep2016EFV3_DATA/Summer16_23Sep2016EFV3_DATA_Uncertainty_AK4PFchs.txt";
-    }
-
-    if(filestr.find("2016G") != std::string::npos){
-      jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Summer16_23Sep2016GV3_DATA/Summer16_23Sep2016GV3_DATA_L1FastJet_AK4PFchs.txt");
-      jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Summer16_23Sep2016GV3_DATA/Summer16_23Sep2016GV3_DATA_L2Relative_AK4PFchs.txt");
-      jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Summer16_23Sep2016GV3_DATA/Summer16_23Sep2016GV3_DATA_L3Absolute_AK4PFchs.txt");
-      jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Summer16_23Sep2016GV3_DATA/Summer16_23Sep2016GV3_DATA_L2L3Residual_AK4PFchs.txt");
-      jetcorr_uncertainty_filename = "jecfiles/Summer16_23Sep2016GV3_DATA/Summer16_23Sep2016GV3_DATA_Uncertainty_AK4PFchs.txt";
-    }
-
-    if(filestr.find("2016H") != std::string::npos){
-      jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Summer16_23Sep2016HV3_DATA/Summer16_23Sep2016HV3_DATA_L1FastJet_AK4PFchs.txt");
-      jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Summer16_23Sep2016HV3_DATA/Summer16_23Sep2016HV3_DATA_L2Relative_AK4PFchs.txt");
-      jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Summer16_23Sep2016HV3_DATA/Summer16_23Sep2016HV3_DATA_L3Absolute_AK4PFchs.txt");
-      jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Summer16_23Sep2016HV3_DATA/Summer16_23Sep2016HV3_DATA_L2L3Residual_AK4PFchs.txt");
-      jetcorr_uncertainty_filename = "jecfiles/Summer16_23Sep2016HV3_DATA/Summer16_23Sep2016HV3_DATA_Uncertainty_AK4PFchs.txt";
-    }
-    if(filestr.find("2017") != std::string::npos){//this is currently a dummy if someone sets a wrong flag in runBabyMaker
-      jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Summer16_23Sep2016HV4_DATA/Summer16_23Sep2016HV4_DATA_L1FastJet_AK4PFchs.txt");
-      jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Summer16_23Sep2016HV4_DATA/Summer16_23Sep2016HV4_DATA_L2Relative_AK4PFchs.txt");
-      jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Summer16_23Sep2016HV4_DATA/Summer16_23Sep2016HV4_DATA_L3Absolute_AK4PFchs.txt");
-      jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Summer16_23Sep2016HV4_DATA/Summer16_23Sep2016HV4_DATA_L2L3Residual_AK4PFchs.txt");
-      jetcorr_uncertainty_filename = "jecfiles/Summer16_23Sep2016HV4_DATA/Summer16_23Sep2016HV3_DATA_Uncertainty_AK4PFchs.txt";
-
-      ak8jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Summer16_23Sep2016HV4_DATA/Summer16_23Sep2016HV4_DATA_L1FastJet_AK8PFchs.txt");
-      ak8jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Summer16_23Sep2016HV4_DATA/Summer16_23Sep2016HV4_DATA_L2Relative_AK8PFchs.txt");
-      ak8jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Summer16_23Sep2016HV4_DATA/Summer16_23Sep2016HV4_DATA_L3Absolute_AK8PFchs.txt");
-      ak8jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Summer16_23Sep2016HV4_DATA/Summer16_23Sep2016HV4_DATA_L2L3Residual_AK8PFchs.txt");
-      ak8jetcorr_uncertainty_filename = "jecfiles/Summer16_23Sep2016HV4_DATA/Summer16_23Sep2016HV3_DATA_Uncertainty_AK8PFchs.txt";
-    }
-
-    // Run independent from ICHEP
-    //jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Spring16_25nsV6_DATA_L1FastJet_AK4PFchs.txt");
-    //jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Spring16_25nsV6_DATA_L2Relative_AK4PFchs.txt");
-    //jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Spring16_25nsV6_DATA_L3Absolute_AK4PFchs.txt");
-    //jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Spring16_25nsV6_DATA_L2L3Residual_AK4PFchs.txt");
-    //jetcorr_uncertainty_filename = "jecfiles/Spring16_25nsV6_DATA_Uncertainty_AK4PFchs.txt";
+    jecVer += "_DATA";
   }
-
-  else if(isSignalFromFileName){
-    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Spring16/Spring16_FastSimV1_MC_L1FastJet_AK4PFchs.txt");
-    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Spring16/Spring16_FastSimV1_MC_L2Relative_AK4PFchs.txt");
-    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Spring16/Spring16_FastSimV1_MC_L3Absolute_AK4PFchs.txt");
-    jetcorr_uncertainty_filename = "jecfiles/Spring16/Spring16_FastSimV1_MC_Uncertainty_AK4PFchs.txt";
-
-    ak8jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Spring16/Spring16_FastSimV1_MC_L1FastJet_AK8PFchs.txt");
-    ak8jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Spring16/Spring16_FastSimV1_MC_L2Relative_AK8PFchs.txt");
-    ak8jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Spring16/Spring16_FastSimV1_MC_L3Absolute_AK8PFchs.txt");
-    ak8jetcorr_uncertainty_filename = "jecfiles/Spring16/Spring16_FastSimV1_MC_Uncertainty_AK8PFchs.txt";
+  // 2016 Fastsim samples
+  else if (isSignalFromFileName){
+    jecVer = "Spring16_FastSimV1_MC";
   }
-
   // ICHEP16 samples
   else if(filestr.find("Spring16") != std::string::npos){
-    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Spring16/Spring16_25nsV6_MC_L1FastJet_AK4PFchs.txt");
-    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Spring16/Spring16_25nsV6_MC_L2Relative_AK4PFchs.txt");
-    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Spring16/Spring16_25nsV6_MC_L3Absolute_AK4PFchs.txt");
-    jetcorr_uncertainty_filename = "jecfiles/Spring16_25nsV6_MC_Uncertainty_AK4PFchs.txt";
+    jecVer = "Spring16_25nsV6_MC";
+  }
+  // Moriond17 samples
+  else if (filestr.find("Summer16") != std::string::npos) {
+    jecVer = "Summer16_23Sep2016V3_MC";
+  }
+  // 2017 94X MiniAODv2
+  else if (filestr.find("Fall17") != std::string::npos) {
+    jecVer = "Fall17_17Nov2017_V6_MC";
   }
 
-  // Moriond17 samples
-  else{
-    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Summer16_23Sep2016V3_MC/Summer16_23Sep2016V3_MC_L1FastJet_AK4PFchs.txt");
-    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Summer16_23Sep2016V3_MC/Summer16_23Sep2016V3_MC_L2Relative_AK4PFchs.txt");
-    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Summer16_23Sep2016V3_MC/Summer16_23Sep2016V3_MC_L3Absolute_AK4PFchs.txt");
-    jetcorr_uncertainty_filename = "jecfiles/Summer16_23Sep2016V3_MC/Summer16_23Sep2016V3_MC_Uncertainty_AK4PFchs.txt";
+  jetcorr_filenames_pfL1FastJetL2L3.push_back("jecfiles/"+jecVer+"/"+jecVer+"_L1FastJet_AK4PFchs.txt");
+  jetcorr_filenames_pfL1FastJetL2L3.push_back("jecfiles/"+jecVer+"/"+jecVer+"_L2Relative_AK4PFchs.txt");
+  jetcorr_filenames_pfL1FastJetL2L3.push_back("jecfiles/"+jecVer+"/"+jecVer+"_L3Absolute_AK4PFchs.txt");
+  jetcorr_filenames_pfL1FastJetL2L3.push_back("jecfiles/"+jecVer+"/"+jecVer+"_L2L3Residual_AK4PFchs.txt");
+  jetcorr_uncertainty_filename = "jecfiles/"+jecVer+"/"+jecVer+"_Uncertainty_AK4PFchs.txt";
 
-    ak8jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Summer16_23Sep2016V4_MC/Summer16_23Sep2016V4_MC_L1FastJet_AK8PFchs.txt");
-    ak8jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Summer16_23Sep2016V4_MC/Summer16_23Sep2016V4_MC_L2Relative_AK8PFchs.txt");
-    ak8jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Summer16_23Sep2016V4_MC/Summer16_23Sep2016V4_MC_L3Absolute_AK8PFchs.txt");
-    ak8jetcorr_uncertainty_filename = "jecfiles/Summer16_23Sep2016V4_MC/Summer16_23Sep2016V4_MC_Uncertainty_AK8PFchs.txt";
+  if (applyAK8JECfromFile) {
+    ak8jetcorr_filenames_pfL1FastJetL2L3.push_back("jecfiles/"+jecVer+"/"+jecVer+"_L1FastJet_AK8PFPuppi.txt");
+    ak8jetcorr_filenames_pfL1FastJetL2L3.push_back("jecfiles/"+jecVer+"/"+jecVer+"_L2Relative_AK8PFPuppi.txt");
+    ak8jetcorr_filenames_pfL1FastJetL2L3.push_back("jecfiles/"+jecVer+"/"+jecVer+"_L3Absolute_AK8PFPuppi.txt");
+    ak8jetcorr_filenames_pfL1FastJetL2L3.push_back("jecfiles/"+jecVer+"/"+jecVer+"_L2L3Residual_AK8PFPuppi.txt");
+    ak8jetcorr_uncertainty_filename = "jecfiles/"+jecVer+"/"+jecVer+"_Uncertainty_AK8PFPuppi.txt";
   }
 
   if(applyJECfromFile != 0) {
@@ -1867,7 +1828,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
         jets.SetJetSelection("ak8", skim_jet_ak8_pt, skim_jet_ak8_eta, true); //save only jets passing jid
         //jets.FillCommon(idx_alloverlapjets, jet_corrector_pfL1FastJetL2L3,btagprob_data,btagprob_mc,btagprob_heavy_UP, btagprob_heavy_DN, btagprob_light_UP,btagprob_light_DN,btagprob_FS_UP,btagprob_FS_DN,jet_overlep1_idx, jet_overlep2_idx,applyJECfromFile,jetcorr_uncertainty,JES_type, applyBtagSFs, isFastsim);
         jets.FillCommon(idx_alloverlapjets, jet_corrector_pfL1FastJetL2L3,btagprob_data,btagprob_mc,btagprob_heavy_UP, btagprob_heavy_DN, btagprob_light_UP,btagprob_light_DN,btagprob_FS_UP,btagprob_FS_DN,loosebtagprob_data,loosebtagprob_mc,loosebtagprob_heavy_UP, loosebtagprob_heavy_DN, loosebtagprob_light_UP,loosebtagprob_light_DN,loosebtagprob_FS_UP,loosebtagprob_FS_DN,tightbtagprob_data,tightbtagprob_mc,tightbtagprob_heavy_UP, tightbtagprob_heavy_DN, tightbtagprob_light_UP,tightbtagprob_light_DN,tightbtagprob_FS_UP,tightbtagprob_FS_DN,jet_overlep1_idx, jet_overlep2_idx,applyJECfromFile,jetcorr_uncertainty,JES_type, applyBtagSFs, isFastsim);
-        jets.FillAK8Jets(applyJECfromFile, ak8jet_corrector_pfL1FastJetL2L3, ak8jetcorr_uncertainty, JES_type);
+        jets.FillAK8Jets(applyAK8JECfromFile, ak8jet_corrector_pfL1FastJetL2L3, ak8jetcorr_uncertainty, JES_type);
 
         if(applyJECfromFile) {//if no JEC file is defined - code cannot do up/down variations
           //JEC up
@@ -1881,7 +1842,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
           jets_jup.SetJetSelection("ak8", skim_jet_ak8_pt, skim_jet_ak8_eta, true); //save only jets passing jid
           //jets_jup.FillCommon(idx_alloverlapjets_jup, jet_corrector_pfL1FastJetL2L3,btagprob_data_jup,btagprob_mc_jup,btagprob_heavy_UP_jup, btagprob_heavy_DN_jup, btagprob_light_UP_jup,btagprob_light_DN_jup,btagprob_FS_UP_jup,btagprob_FS_DN_jup,jet_overlep1_idx, jet_overlep2_idx,true,jetcorr_uncertainty_sys,1, false, isFastsim);
           jets_jup.FillCommon(idx_alloverlapjets_jup, jet_corrector_pfL1FastJetL2L3, btagprob_data_jup, btagprob_mc_jup, btagprob_heavy_UP_jup, btagprob_heavy_DN_jup, btagprob_light_UP_jup,btagprob_light_DN_jup,btagprob_FS_UP_jup,btagprob_FS_DN_jup,loosebtagprob_data_jup,loosebtagprob_mc_jup,loosebtagprob_heavy_UP_jup, loosebtagprob_heavy_DN_jup, loosebtagprob_light_UP_jup,loosebtagprob_light_DN_jup,loosebtagprob_FS_UP_jup,loosebtagprob_FS_DN_jup,tightbtagprob_data_jup,tightbtagprob_mc_jup,tightbtagprob_heavy_UP_jup, tightbtagprob_heavy_DN_jup, tightbtagprob_light_UP_jup,tightbtagprob_light_DN_jup,tightbtagprob_FS_UP_jup,tightbtagprob_FS_DN_jup,jet_overlep1_idx, jet_overlep2_idx, true, jetcorr_uncertainty_sys, 1, false, isFastsim);
-          jets_jup.FillAK8Jets(true, ak8jet_corrector_pfL1FastJetL2L3, ak8jetcorr_uncertainty_sys, 1);
+          jets_jup.FillAK8Jets(applyAK8JECfromFile, ak8jet_corrector_pfL1FastJetL2L3, ak8jetcorr_uncertainty_sys, 1);
 
           //JEC down
           jet_overlep1_idx = -9999;
@@ -1894,7 +1855,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
           jets_jdown.SetJetSelection("ak8", skim_jet_ak8_pt, skim_jet_ak8_eta, true); //save only jets passing jid
           //jets_jdown.FillCommon(idx_alloverlapjets_jdown, jet_corrector_pfL1FastJetL2L3,btagprob_data_jdown,btagprob_mc_jdown,btagprob_heavy_UP_jdown, btagprob_heavy_DN_jdown, btagprob_light_UP_jdown,btagprob_light_DN_jdown,btagprob_FS_UP_jdown,btagprob_FS_DN_jdown,jet_overlep1_idx, jet_overlep2_idx,true,jetcorr_uncertainty_sys,-1, false, isFastsim);
           jets_jdown.FillCommon(idx_alloverlapjets_jdown, jet_corrector_pfL1FastJetL2L3,btagprob_data_jdown,btagprob_mc_jdown,btagprob_heavy_UP_jdown, btagprob_heavy_DN_jdown, btagprob_light_UP_jdown,btagprob_light_DN_jdown,btagprob_FS_UP_jdown,btagprob_FS_DN_jdown,loosebtagprob_data_jdown,loosebtagprob_mc_jdown,loosebtagprob_heavy_UP_jdown, loosebtagprob_heavy_DN_jdown, loosebtagprob_light_UP_jdown,loosebtagprob_light_DN_jdown,loosebtagprob_FS_UP_jdown,loosebtagprob_FS_DN_jdown,tightbtagprob_data_jdown,tightbtagprob_mc_jdown,tightbtagprob_heavy_UP_jdown, tightbtagprob_heavy_DN_jdown, tightbtagprob_light_UP_jdown,tightbtagprob_light_DN_jdown,tightbtagprob_FS_UP_jdown, tightbtagprob_FS_DN_jdown, jet_overlep1_idx, jet_overlep2_idx, true, jetcorr_uncertainty_sys, -1, false, isFastsim);
-          jets_jdown.FillAK8Jets(true, ak8jet_corrector_pfL1FastJetL2L3, ak8jetcorr_uncertainty_sys, -1);
+          jets_jdown.FillAK8Jets(applyAK8JECfromFile, ak8jet_corrector_pfL1FastJetL2L3, ak8jetcorr_uncertainty_sys, -1);
         }
 
         bool isbadmuonjet = false;

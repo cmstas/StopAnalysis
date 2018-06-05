@@ -2,7 +2,7 @@
 
 [[ -f Makefile ]] && { make -j 12 || return $?; }
 
-# runBabyMaker takes six arguments: ./runBabyMaker sample_name nevents file_number outpath samplelist isFastSim
+# runBabyMaker takes six arguments: ./runBabyMaker <sample_name> [nevents] [file_number] <outpath> <samplelist> [isFastSim]
 #  Need to provide at least sample_name; nevents=-1 (-1=all events), file_number=-1 (-1=merged_ntuple_*.root), output=/nfs-7/userdata/stopRun2/, samplelist=sample_2017.dat, isFastSim=false by default
 # ./runBabyMaker data_single_muon_Run2017B_MINIAOD_PromptReco-v1 10000 1 
 # ./runBabyMaker TTJets_V07_test 3000 1 ./ sample_2017.dat 0
@@ -24,4 +24,6 @@
 # ./runBabyMaker stopbaby 3000 1 ./ /hadoop/cms/store/user/sicheng/ProjectMetis/TTJets_DiLept_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1_MINIAODSIM_CMS4_V00-00-02_toptag/merged_ntuple_60.root 0
 # ./runBabyMaker stopbaby 3000 3 ./ /hadoop/cms/store/user/sicheng/ProjectMetis/SMS-T2tt_mStop-400to1200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MINIAODSIM_CMS4_V00-00-02_toptag/merged_ntuple_64.root 1
 # ./runBabyMaker stopbaby 3000 3 ./ /hadoop/cms/store/user/sicheng/ProjectMetis/TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext2-v1_MINIAODSIM_CMS4_V00-00-02_toptag/merged_ntuple_3.root 1
-./runBabyMaker stopbaby 3000 5 ./ /hadoop/cms/store/user/sicheng/ProjectMetis/SingleMuon_Run2016B-03Feb2017_ver2-v2_MINIAOD_CMS4_V00-00-02_toptag/merged_ntuple_248.root 0
+# ./runBabyMaker stopbaby 3000 5 ./ /hadoop/cms/store/user/sicheng/ProjectMetis/SingleMuon_Run2016B-03Feb2017_ver2-v2_MINIAOD_CMS4_V00-00-02_toptag/merged_ntuple_248.root 0
+# ./runBabyMaker stopbaby 3000 1 ./ /hadoop/cms/store/group/snt/run2_mc2017/TTJets_TuneCP5_13TeV-amcatnloFXFX-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_CMS4_V09-04-13/merged_ntuple_1.root 0
+./runBabyMaker stopbaby 3000 1 ./ /hadoop/cms/store/group/snt/run2_data2018_prompt/MET_Run2018A-PromptReco-v1_MINIAOD_CMS4_V10-01-00/merged_ntuple_97.root 0
