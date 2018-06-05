@@ -226,6 +226,18 @@ std::vector<SR> getStopInclusiveRegionsTopological() {
   // Top tag regions at baseline
 
   sr = srbase;
+  sr.SetName("srbaseMT");
+  srbase.SetVar("mt", 0, fInf);
+  sr.SetMETBins({250, 1500});
+  SRvec.emplace_back(sr);
+
+  sr = srbase;
+  sr.SetName("srbaseMET");
+  srbase.SetVar("met", 100, fInf);
+  sr.SetMETBins({100, 1500});
+  SRvec.emplace_back(sr);
+
+  sr = srbase;
   sr.SetName("srbase2");
   sr.SetVar("deepttag", wpDeepTop, 1);
   sr.SetMETBins({250, 350, 500, 700, 1500});
@@ -476,7 +488,7 @@ std::vector<SR> getStopControlRegionsDileptonAddResTagBin() {
 }
 
 
-std::vector<SR> getStopSignalRegionsNewMETBinning() {
+std::vector<SR> getStopSignalRegionsNewMETBinning1() {
 
   SR srbase;
   srbase.SetAllowDummyVars(1);
@@ -716,6 +728,267 @@ std::vector<SR> getStopSignalRegionsNewMETBinning() {
   return SRvec;
 }
 
+std::vector<SR> getStopControlRegionsNoBTagsNewMETBinning1() {
+  return getStopControlRegionsNoBTags( getStopSignalRegionsNewMETBinning() );
+}
+
+std::vector<SR> getStopControlRegionsDileptonNewMETBinning1() {
+  return getStopControlRegionsDilepton( getStopSignalRegionsNewMETBinning() );
+}
+
+std::vector<SR> getStopSignalRegionsNewMETBinning() {
+
+  SR srbase;
+  srbase.SetAllowDummyVars(1);
+  srbase.SetName("srbase");
+  srbase.SetVar("mt", 150, fInf);
+  srbase.SetVar("met", 250, fInf);
+  srbase.SetVar("nlep", 1, 2);
+  srbase.SetVar("nvlep", 1, 2);
+  srbase.SetVar("passvetos", 1, 2);
+  srbase.SetVar("njet", 2, fInf);
+  srbase.SetVar("nbtag", 1, fInf);
+  srbase.SetVar("mlb", 0, fInf);
+  srbase.SetVar("tmod", -fInf, fInf);
+  srbase.SetVar("dphijmet", 0.8, 3.1416);
+  srbase.SetMETBins({0, 250, 350, 450, 550, 650, 800, 1500});
+
+  SR sr;
+  std::vector<SR> SRvec;
+
+  SRvec.emplace_back(srbase);
+
+  sr = srbase;
+
+  // SR 2-3j
+
+  sr.SetName("srA0");
+  sr.SetDetailName("2to3j_tmod10toInf_mlb0to175_nottag");
+  sr.SetVar("njet", 2, 4);
+  sr.SetVar("tmod", 10, fInf);
+  sr.SetVar("mlb", 0, 175);
+  // sr.SetMETBins({250, 350, 450, 600, 750, 1500});
+  sr.SetMETBins({600, 750, 1500});
+  SRvec.emplace_back(sr);
+
+  sr.SetName("srA1");
+  sr.SetDetailName("2to3j_tmod10toInf_mlb0to175_nottag");
+  sr.SetVar("njet", 2, 4);
+  sr.SetVar("tmod", 10, fInf);
+  sr.SetVar("mlb", 0, 175);
+  sr.SetVar("deepttag", -1, wpDeepTop);
+  // sr.SetMETBins({250, 350, 450, 600, 750, 1500});
+  // sr.SetMETBins({350, 450, 600, 750, 1500});
+  sr.SetMETBins({350, 450, 600});
+  SRvec.emplace_back(sr);
+
+  sr.SetName("srA2");
+  sr.SetDetailName("2to3j_tmod10toInf_mlb0to175_deepttag");
+  sr.SetVar("deepttag", wpDeepTop, 1);
+  // sr.SetMETBins({250, 600, 1500});
+  sr.SetMETBins({250, 600});
+  SRvec.emplace_back(sr);
+
+
+  sr.SetName("srB0");
+  sr.SetDetailName("2to3j_tmod10toInf_mlb175toInf_nottag");
+  sr.SetVar("njet", 2, 4);
+  sr.SetVar("tmod", 10, fInf);
+  sr.SetVar("mlb", 175, fInf);
+  sr.SetVar("deepttag", -1, 1);
+  sr.SetMETBins({250, 450, 700, 1500});
+  SRvec.emplace_back(sr);
+
+  // sr.SetName("srB1");
+  // sr.SetDetailName("2to3j_tmod10toInf_mlb175toInf_nottag");
+  // sr.SetVar("njet", 2, 4);
+  // sr.SetVar("tmod", 10, fInf);
+  // sr.SetVar("mlb", 175, fInf);
+  // sr.SetVar("deepttag", -1, wpDeepTop);
+  // sr.SetMETBins({250, 450, 700, 1500});
+  // SRvec.emplace_back(sr);
+
+  // sr.SetName("srB2");
+  // sr.SetDetailName("2to3j_tmod10toInf_mlb175toInf_deepttag");
+  // sr.SetVar("deepttag", wpDeepTop, 1);
+  // sr.SetMETBins({250, 1500});
+  // SRvec.emplace_back(sr);
+
+
+  // SR geq4j
+
+  sr.SetName("srC0");
+  sr.SetDetailName("geq4j_tmodlt0_mlb0to175_met550");
+  sr.SetVar("njet", 4, fInf);
+  sr.SetVar("tmod", -fInf, 0);
+  sr.SetVar("mlb", 0, 175);
+  sr.SetVar("deepttag", -2, 1);
+  sr.SetVar("resttag", -2, 1);
+  // sr.SetMETBins({250, 350, 450, 550, 650, 1500});
+  // sr.SetMETBins({250, 350, 450, 550, 650, 800, 1500});
+  // sr.SetMETBins({450, 550, 650, 800, 1500});
+  sr.SetMETBins({350, 450, 550, 650, 800, 1500});
+  SRvec.emplace_back(sr);
+
+  // sr.SetName("srC1");
+  // sr.SetDetailName("geq4j_tmodlt0_mlb0to175_nottag");
+  // sr.SetVar("njet", 4, fInf);
+  // sr.SetVar("tmod", -fInf, 0);
+  // sr.SetVar("mlb", 0, 175);
+  // sr.SetVar("deepttag", -2, wpDeepTop);
+  // sr.SetVar("resttag", -2, wpResTop);
+  // // sr.SetMETBins({250, 350, 450, 550, 650, 800, 1500});
+  // // sr.SetMETBins({250, 350, 450});
+  // sr.SetMETBins({350, 450});
+  // SRvec.emplace_back(sr);
+
+  // sr.SetName("srC2");
+  // sr.SetDetailName("geq4j_tmodlt0_mlb0to175_deepttag");
+  // sr.SetVar("deepttag", wpDeepTop, 1);
+  // sr.SetVar("resttag", -2, 1);
+  // // sr.SetMETBins({250, 350, 450, 600, 1500});
+  // sr.SetMETBins({350, 450});
+  // SRvec.emplace_back(sr);
+
+  // sr.SetName("srC3");
+  // sr.SetDetailName("geq4j_tmodlt0_mlb0to175_resttag");
+  // sr.SetVar("deepttag", -2, wpDeepTop);
+  // sr.SetVar("resttag", wpResTop, 1);
+  // // sr.SetMETBins({250, 350, 500, 1500});
+  // // sr.SetMETBins({250, 350, 450});
+  // sr.SetMETBins({350, 450});
+  // SRvec.emplace_back(sr);
+
+
+  sr.SetName("srD0");
+  sr.SetDetailName("geq4j_tmodlt0_mlb175toInf");
+  sr.SetVar("njet", 4, fInf);
+  sr.SetVar("tmod", -fInf, 0);
+  sr.SetVar("mlb", 175, fInf);
+  sr.SetVar("deepttag", -2, 1);
+  sr.SetVar("resttag", -2, 1);
+  sr.SetMETBins({250, 350, 450, 600, 1500});
+  SRvec.emplace_back(sr);
+
+
+  sr.SetName("srE0");
+  sr.SetDetailName("geq4j_tmod0to10_mlb0to175");
+  sr.SetVar("njet", 4, fInf);
+  sr.SetVar("tmod", 0, 10);
+  sr.SetVar("mlb", 0, 175);
+  sr.SetVar("deepttag", -2, 1);
+  sr.SetVar("resttag", -2, 1);
+  // sr.SetMETBins({250, 350, 450, 600, 1500});
+  sr.SetMETBins({450, 600, 1500});
+  SRvec.emplace_back(sr);
+
+  sr.SetName("srE1");
+  sr.SetDetailName("geq4j_tmod0to10_mlb0to175_nottag");
+  sr.SetVar("njet", 4, fInf);
+  sr.SetVar("tmod", 0, 10);
+  sr.SetVar("mlb", 0, 175);
+  sr.SetVar("deepttag", -2, wpDeepTop);
+  sr.SetVar("resttag", -2, wpResTop);
+  // sr.SetMETBins({250, 350, 450, 600, 1500});
+  sr.SetMETBins({250, 350, 450});
+  SRvec.emplace_back(sr);
+
+  sr.SetName("srE2");
+  sr.SetDetailName("geq4j_tmod0to10_mlb0to175_deepttag");
+  sr.SetVar("deepttag", wpDeepTop, 1);
+  sr.SetVar("resttag", -2, 1);
+  // sr.SetMETBins({250, 350, 450, 1500});
+  sr.SetMETBins({250, 350, 450});
+  SRvec.emplace_back(sr);
+
+  sr.SetName("srE3");
+  sr.SetDetailName("geq4j_tmod0to10_mlb0to175_resttag");
+  sr.SetVar("deepttag", -2, wpDeepTop);
+  sr.SetVar("resttag", wpResTop, 1);
+  // sr.SetMETBins({250, 350, 450, 1500});
+  sr.SetMETBins({250, 350, 450});
+  SRvec.emplace_back(sr);
+
+
+  sr.SetName("srF0");
+  sr.SetDetailName("geq4j_tmod0to10_mlb175toInf");
+  sr.SetVar("njet", 4, fInf);
+  sr.SetVar("tmod", 0, 10);
+  sr.SetVar("mlb", 175, fInf);
+  sr.SetVar("deepttag", -2, 1);
+  sr.SetVar("resttag", -2, 1);
+  sr.SetMETBins({250, 350, 450, 1500});
+  SRvec.emplace_back(sr);
+
+
+  sr.SetName("srG0");
+  sr.SetDetailName("geq4j_tmod10toInf_mlb0to175");
+  sr.SetVar("njet", 4, fInf);
+  sr.SetVar("tmod", 10, fInf);
+  sr.SetVar("mlb", 0, 175);
+  sr.SetVar("deepttag", -2, 1);
+  sr.SetVar("resttag", -2, 1);
+  sr.SetMETBins({450, 550, 750, 1500});
+  SRvec.emplace_back(sr);
+
+  sr.SetName("srG1");
+  sr.SetDetailName("geq4j_tmod10toInf_mlb0to175_nottag");
+  sr.SetVar("njet", 4, fInf);
+  sr.SetVar("tmod", 10, fInf);
+  sr.SetVar("mlb", 0, 175);
+  sr.SetVar("deepttag", -2, wpDeepTop);
+  sr.SetVar("resttag", -2, wpResTop);
+  // sr.SetMETBins({250, 350, 450, 550, 750, 1500});
+  sr.SetMETBins({250, 350, 450});
+  SRvec.emplace_back(sr);
+
+  sr.SetName("srG2");
+  sr.SetDetailName("geq4j_tmod10toInf_mlb0to175_deepttag");
+  sr.SetVar("deepttag", wpDeepTop, 1);
+  sr.SetVar("resttag", -2, 1);
+  // sr.SetMETBins({250, 450, 1500});
+  sr.SetMETBins({250, 350, 450});
+  SRvec.emplace_back(sr);
+
+  sr.SetName("srG3");
+  sr.SetDetailName("geq4j_tmod10toInf_mlb0to175_resttag");
+  sr.SetVar("deepttag", -2, wpDeepTop);
+  sr.SetVar("resttag", wpResTop, 1);
+  // sr.SetMETBins({250, 350, 500, 1500});
+  sr.SetMETBins({250, 350, 450});
+  SRvec.emplace_back(sr);
+
+
+  sr.SetName("srH0");
+  sr.SetDetailName("geq4j_tmod10toInf_mlb175toInf");
+  sr.SetVar("njet", 4, fInf);
+  sr.SetVar("tmod", 10, fInf);
+  sr.SetVar("mlb", 175, fInf);
+  sr.SetVar("deepttag", -2, 1);
+  sr.SetVar("resttag", -2, 1);
+  sr.SetMETBins({250, 500, 1500});
+  SRvec.emplace_back(sr);
+
+
+  // Compressed regions
+  sr = srbase;
+  sr.SetName("srI");
+  sr.SetDetailName("geq5j_lpt0to150_j1notb");
+  sr.RemoveVar("nbtag");
+  sr.SetVar("mt", 150, fInf);
+  sr.SetVar("njet", 5, fInf);
+  sr.SetVar("nbjet", 1, fInf);
+  sr.SetVar("lep1pt", 0, 150);
+  sr.SetVar("dphilmet", 0, 2.0);
+  sr.SetVar("dphijmet", 0.5, 3.1416);
+  sr.SetVar("j1passbtag", 0, 1);  // Require j1 not b-tagged
+  // sr.SetMETBins({250, 350, 450, 550, 1500});
+  sr.SetMETBins({250, 350, 450, 550, 700, 1500});
+  SRvec.emplace_back(sr);
+
+  return SRvec;
+}
+
 std::vector<SR> getStopControlRegionsNoBTagsNewMETBinning() {
   return getStopControlRegionsNoBTags( getStopSignalRegionsNewMETBinning() );
 }
@@ -741,7 +1014,7 @@ std::vector<SR> getStopSignalRegionsAddTopTagBins() {
       std::string srname = sr.GetName();
       sr.SetAllowDummyVars(1);
 
-      sr.SetName(srname+"_ntt");
+      sr.SetName(srname+"1");
       sr.SetVar("deepttag", -2, wpDeepTop);
       // sr.SetVar("deepWtag", -2, wpDeepW);
       SRvec.emplace_back(sr);
@@ -751,7 +1024,7 @@ std::vector<SR> getStopSignalRegionsAddTopTagBins() {
       // sr.SetVar("deepWtag", wpDeepW, 1);
       // SRvec.emplace_back(sr);
 
-      sr.SetName(srname+"_wdt");
+      sr.SetName(srname+"2");
       sr.SetVar("deepttag", wpDeepTop, 1);
       // sr.SetVar("deepWtag", -2, 1);
       SRvec.emplace_back(sr);
@@ -759,20 +1032,20 @@ std::vector<SR> getStopSignalRegionsAddTopTagBins() {
     else if (sr.GetLowerBound("njet") == 4) {
       std::string srname = sr.GetName();
 
-      sr.SetName(srname+"_ntt");
+      sr.SetName(srname+"1");
       sr.SetVar("deepttag", -2, wpDeepTop);
       // sr.SetVar("deepWtag", -2, wpDeepW);
       sr.SetVar("resttag", -2, wpResTop);
       SRvec.emplace_back(sr);
 
-      sr.SetName(srname+"_wdt");
+      sr.SetName(srname+"2");
       sr.SetVar("deepttag", wpDeepTop, 1);
       // sr.SetVar("deepWtag", -2, 1);
       sr.SetVar("resttag", -2, 1);
       // sr.SetVar("resttag", -2, wpResTop);
       SRvec.emplace_back(sr);
 
-      sr.SetName(srname+"_wrt");
+      sr.SetName(srname+"3");
       // sr.SetVar("deepttag", -2, 1);
       sr.SetVar("deepttag", -2, wpDeepTop);
       // sr.SetVar("deepWtag", -2, 1);

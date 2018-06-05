@@ -26,6 +26,7 @@
 
 // Stop baby class
 #include "../StopCORE/stop_1l_babyAnalyzer.h"
+#include "../StopCORE/TopTagger/ResolvedTopMVA.h"
 
 #include "SR.h"
 #include "StopRegions.h"
@@ -38,8 +39,6 @@ using namespace stop_1l;
 class SR;
 
 const bool verbose = false;
-// turn on to apply weights to central value
-const bool applyWeights = false;
 // turn on to apply btag sf - take from files defined in eventWeight_btagSF.cc
 const bool applyBtagSFfromFiles = false; // default false
 // turn on to apply lepton sf to central value - reread from files
@@ -50,18 +49,14 @@ const bool doSystVariations = true;
 const bool doGenClassification = true;
 // turn on to apply Nvtx reweighting to MC / data2016
 const bool doNvtxReweight = false;
-// turn on to apply nTrueInt reweighting to MC
-const bool doNTrueIntReweight = true;
 // turn on top tagging studies, off for 2016 data/mc
 const bool doTopTagging = true;
 // turn on to apply json file to data
-const bool applyjson = true;
-// ignore scale1fb to run over test samples
-const bool ignoreScale1fb = false;
+const bool applyGoodRunList = true;
 // re-run resolved top MVA locally
-const bool runResTopMVA = true;
+const bool runResTopMVA = false;
 // only produce yield histos
-const bool runYieldsOnly = false;
+const bool runYieldsOnly = true;
 // only running selected signal points to speed up
 const bool runFullSignalScan = false;
 // debug symbol, for printing exact event kinematics that passes
@@ -150,6 +145,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
 
   TString output_name = Form("%s/%s.root",output_dir.c_str(),samplestr.c_str());
   cout << "[StopLooper::looper] creating output file: " << output_name << endl;  outfile_ = new TFile(output_name.Data(),"RECREATE") ;
+  cout << "Complied with C++ standard: " << __cplusplus << endl;
 
   if (printPassedEvents) ofile.open("passEventList.txt");
 
@@ -182,7 +178,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
     }
   }
 
-  if (applyjson) {
+  if (applyGoodRunList) {
     cout << "Loading json file: " << json_file << endl;
     set_goodrun_file(json_file);
   }
@@ -243,7 +239,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
       ++nEventsTotal;
 
       if ( is_data() ) {
-        if ( applyjson && !goodrun(run(), ls()) ) continue;
+        if ( applyGoodRunList && !goodrun(run(), ls()) ) continue;
         duplicate_removal::DorkyEventIdentifier id(run(), evt(), ls());
         if ( is_duplicate(id) ) {
           ++nDuplicates;
@@ -284,23 +280,24 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
       TString dsname = dataset();
       if (!runFullSignalScan && is_fastsim_) {
         // auto checkMassPt = [&](double mstop, double mlsp) { return (mass_stop() == mstop) && (mass_lsp() == mlsp); };
-        // if (!checkMassPt(800,400)) continue;
+        // if (!checkMassPt(800,400)  && !checkMassPt(1200,50)  && !checkMassPt(400,100) &&
+        //     !checkMassPt(1100,300) && !checkMassPt(1100,500) && !checkMassPt(900,600)) continue;
         if (dsname.Contains("T2tt")) {
           float massdiff = mass_stop() - mass_lsp();
-          if (mass_lsp() < 400 && mass_stop() < 900) continue;
-          if (massdiff < 200 || massdiff > 400) continue;
+          if (mass_lsp() < 400 && mass_stop() < 1000) continue;
+          if (massdiff < 300) continue;
           // if (massdiff < 600 || mass_stop() < 1100) continue;
           plot2D("h2d_T2tt_masspts", mass_stop(), mass_lsp() , evtweight_, SRVec.at(0).histMap, ";M_{stop} [GeV]; M_{lsp} [GeV]", 100, 300, 1300, 80, 0, 800);
         } else if (dsname.Contains("T2bW")) {
           float massdiff = mass_stop() - mass_lsp();
           if (mass_lsp() < 300 && mass_stop() < 800) continue;
-          if (massdiff < 400) continue;
+          if (massdiff < 300) continue;
           // if (massdiff < 900 || mass_stop() < 1000) continue;
           plot2D("h2d_T2bW_masspts", mass_stop(), mass_lsp() , evtweight_, SRVec.at(0).histMap, ";M_{stop} [GeV]; M_{lsp} [GeV]", 100, 300, 1300, 80, 0, 800);
         } else if (dsname.Contains("T2bt")) {
           float massdiff = mass_stop() - mass_lsp();
           if (mass_lsp() < 300 && mass_stop() < 800) continue;
-          if (massdiff < 400) continue;
+          if (massdiff < 300) continue;
           // if (massdiff < 900 || mass_stop() < 1000) continue;
           // if (!checkMassPt(800, 400) && !checkMassPt(800, 600) && !checkMassPt(1000, 50) && !checkMassPt(1000, 200)) continue;
           plot2D("h2d_T2bt_masspts", mass_stop(), mass_lsp() , evtweight_, SRVec.at(0).histMap, ";M_{stop} [GeV]; M_{LSP} [GeV]", 100, 300, 1300, 64, 0, 800);
@@ -462,10 +459,8 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
         // testCutFlowHistos(testVec[1]);
         fillTopTaggingHistos(suffix);
 
-
         values_["nlep_rl"] = (ngoodleps() == 1 && nvetoleps() >= 2 && lep2_p4().Pt() > 10)? 2 : ngoodleps();
         values_["mll"] = (lep1_p4() + lep2_p4()).M();
-        // values_["mlb_rl"] = Mlb_closestb();
 
         if (jestype_ == 0) {
           values_["mt_rl"] = mt_met_lep_rl();
@@ -646,7 +641,7 @@ void StopLooper::fillHistosForSR(string suf) {
       plot1D("h_mt_h"+s,     values_["mt"]      , evtweight_, sr.histMap, ";M_{T} [GeV]"             , 12, 150, 650);
       plot1D("h_mt2w"+s,     values_["mt2w"]    , evtweight_, sr.histMap, ";MT2W [GeV]"              , 18,  50, 500);
       plot1D("h_met"+s,      values_["met"]     , evtweight_, sr.histMap, ";#slash{E}_{T} [GeV]"     , 24,  50, 650);
-      plot1D("h_met_h"+s,    values_["met"]     , evtweight_, sr.histMap, ";#slash{E}_{T} [GeV]"     , 12, 250, 850);
+      plot1D("h_met_h"+s,    values_["met"]     , evtweight_, sr.histMap, ";#slash{E}_{T} [GeV]"     , 30, 100, 850);
       plot1D("h_metphi"+s,   values_["metphi"]  , evtweight_, sr.histMap, ";#phi(#slash{E}_{T})"     , 34, -3.4, 3.4);
       plot1D("h_lep1pt"+s,   values_["lep1pt"]  , evtweight_, sr.histMap, ";p_{T}(lepton) [GeV]"     , 30,  0, 300);
       plot1D("h_lep1eta"+s,  values_["lep1eta"] , evtweight_, sr.histMap, ";#eta(leppton)"           , 20, -5, 5);
