@@ -18,7 +18,9 @@ LinkDef_out.*
 *.root
 
 # Ignore batch generated files
-batch_metis/tasks/
-batch_metis/input*
 batch_metis/ProjectMetis
+batch_metis/*/
 batch_metis/*.cmd
+batch_metis/*.tar.gz
+batch_metis/*.log
+batch_metis/*.json

@@ -12,7 +12,11 @@ from metis.Utils import do_cmd
 if __name__ == "__main__":
 
     cms4_samples = {
-        "TTJets_amcnlo_94X" : "/hadoop/cms/store/user/sicheng/ProjectMetis/TTJets_TuneCP5_13TeV-amcatnloFXFX-pythia8_RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v1_MINIAODSIM_CMS4_V00-00-12",
+        # "TTJets_amcnlo_94X" : "/hadoop/cms/store/user/sicheng/ProjectMetis/TTJets_TuneCP5_13TeV-amcatnloFXFX-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_CMS4_V09-04-13",
+        "tt1l_madgraph" : "/hadoop/cms/store/user/sicheng/ProjectMetis/TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_CMS4_V09-04-13",
+        # "ttbar_singleLeptFromT_amcnlo_94X" : "/hadoop/cms/store/user/sicheng/ProjectMetis/TTJets_SingleLeptFromT_TuneCP5_13TeV-madgraphMLM-pythia8_RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v1_MINIAODSIM_CMS4_V09-04-13",
+
+        # "TTJets_amcnlo_94X" : "/hadoop/cms/store/user/sicheng/ProjectMetis/TTJets_TuneCP5_13TeV-amcatnloFXFX-pythia8_RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v1_MINIAODSIM_CMS4_V00-00-12",
         # "TTJets_amcnlo" : "/hadoop/cms/store/user/sicheng/ProjectMetis/TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISummer17MiniAOD-92X_upgrade2017_realistic_v10-v3_MINIAODSIM_CMS4_V00-00-07_test",
         # "ttbar_powheg" : "/hadoop/cms/store/user/sicheng/ProjectMetis/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8_RunIISummer17MiniAOD-92X_upgrade2017_realistic_v10_ext1-v1_MINIAODSIM_CMS4_V00-00-07_test2",
         # "SMS_T2tt_mStop-400to1200_madgraph" : "/hadoop/cms/store/user/sicheng/ProjectMetis/SMS-T2tt_mStop-400to1200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1_MINIAODSIM_CMS4_V00-00-02_test",
@@ -34,7 +38,7 @@ if __name__ == "__main__":
         cmsswver = "CMSSW_9_4_1"
         scramarch = "slc6_amd64_gcc630"
         tarfile = "input.tar.gz"
-        tag = "v27_1"
+        tag = "v27_2"
         maker_task = CondorTask(
             sample = DirectorySample(
                 dataset=dsname,
@@ -51,11 +55,12 @@ if __name__ == "__main__":
             output_name = "stopbaby.root",
             arguments = "1" if "SMS" in dsname else "0", # isFastsim
             # condor_submit_params = {"sites": "UAF,T2_US_UCSD,UCSB"},
-            condor_submit_params = {"sites": "T2_US_UCSD,UCSB"},
+            # condor_submit_params = {"sites": "T2_US_UCSD,UCSB"},
+            condor_submit_params = {"use_xrootd": True},
             # no_load_from_backup = True,
         )
         merge_task = CondorTask(
-            sample = DirectorySample( 
+            sample = DirectorySample(
                 dataset="merge_"+dsname,
                 location=maker_task.get_outputdir(),
             ),
@@ -64,7 +69,7 @@ if __name__ == "__main__":
             tarfile = "merge_scripts.tar.gz",
             files_per_output = 100000,
             output_dir = maker_task.get_outputdir() + "/merged",
-            output_name = "merged_" + dsname + ".root",
+            output_name = dsname + ".root",
             condor_submit_params = {"sites":"UAF"},
             output_is_tree = True,
             # check_expectedevents = True,
@@ -75,11 +80,11 @@ if __name__ == "__main__":
         )
         maker_tasks.append(maker_task)
         merge_tasks.append(merge_task)
-        
+
 
     for i in range(100):
         total_summary = {}
-        
+
         for maker_task, merge_task in zip(maker_tasks,merge_tasks):
             maker_task.process()
 
@@ -102,4 +107,3 @@ if __name__ == "__main__":
     # If it's complete, make a dummy sample out of the output directory
     # in order to pick up the files. Then cat out the contents and sum
     # them up. This should be 3*2*10 = 100
-

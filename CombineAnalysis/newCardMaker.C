@@ -494,8 +494,8 @@ int newCardMaker(string signal, string input_dir="../StopLooper/output/temp", st
     for (int im2 = 0; im2 <= 750; im2 += 25) {
       // if (im1 < 900 && im2 < 400) continue;
       // if (im1 - im2 < 400) continue;
-      if (im2 == 0) im2 = 1;
       if (hpoints->GetBinContent(hpoints->FindBin(im1, im2)) == 0) continue;
+      if (im2 == 0) im2 = 1;
       cout << "Making cards for point: " << Form("%s_%d_%d", signal.c_str(), im1, im2) << endl;
       makeCardsForPoint(signal.c_str(), im1, im2, output_dir.c_str());
       signal_points.insert( make_pair(im1,im2) );

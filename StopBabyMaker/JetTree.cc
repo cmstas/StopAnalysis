@@ -594,7 +594,7 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx, Factorize
     nGoodGenJets = nGoodJets;
 
     nGoodJets = 0;
-    if (doResolveTopMVA && ngoodbtags > 0) {
+    if (doResolveTopMVA) {
       resTopMVA->setJetVecPtrs(&ak4pfjets_p4, &ak4pfjets_CSV, &ak4pfjets_cvsl, &ak4pfjets_ptD, &ak4pfjets_axis1, &ak4pfjets_mult);
       std::vector<TopCand> resMVATopCands = resTopMVA->getTopCandidates(-1);
       for (auto tcand : resMVATopCands) {
