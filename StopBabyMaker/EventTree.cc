@@ -81,17 +81,18 @@ void EventTree::FillCommon (const std::string &root_file_name)
     if(!signal){
       if(nvtxs>0) filt_met = true;
       else filt_met = false;
-      filt_met = filt_met*filt_globalTightHalo2016()*filt_ecalTP()*filt_eeBadSc()*filt_hbheNoise()*filt_hbheNoiseIso();
+      // filt_met = filt_met*filt_globalTightHalo2016()*filt_ecalTP()*filt_eeBadSc()*filt_hbheNoise()*filt_hbheNoiseIso();
+      filt_met = filt_met && filt_globalTightHalo2016() && filt_ecalTP() && filt_eeBadSc() && filt_hbheNoise() && filt_hbheNoiseIso();
 
-   //   if(is_data) filt_badMuonFilter = badMuonFilterV2(); //still some problems with MC
-     // if(is_data) filt_badChargedCandidateFilter = badChargedCandidateFilterV2();
-       filt_badMuonFilter = badMuonFilterV2(); //still some problems with MC
-       filt_badChargedCandidateFilter = badChargedCandidateFilterV2();
+      // filt_badMuonFilter = badMuonFilterV2(); //still some problems with MC
+      // filt_badChargedCandidateFilter = badChargedCandidateFilterV2();
+      filt_badMuonFilter = filt_BadPFMuonFilter();
+      filt_badChargedCandidateFilter = filt_BadChargedCandidateFilter();
       filt_cscbeamhalo = filt_cscBeamHalo();
       filt_cscbeamhalo2015 = filt_cscBeamHalo2015();
       filt_globaltighthalo2016 = filt_globalTightHalo2016();
       filt_globalsupertighthalo2016 = filt_globalSuperTightHalo2016();
-      filt_eebadsc = filt_eeBadSc();
+      filt_eebadsc = (is_data)? filt_eeBadSc() : 1;
       filt_goodvtx = filt_goodVertices(); //not working but same as our 1goodvertex requirement
       filt_ecallaser = filt_ecalLaser();
       filt_ecaltp = filt_ecalTP();
@@ -103,9 +104,7 @@ void EventTree::FillCommon (const std::string &root_file_name)
       filt_trkPOG_tms = filt_trkPOG_toomanystripclus53X();
       filt_hbhenoise = filt_hbheNoise(); // hbheNoiseFilter_25ns();
       filt_hbheisonoise = filt_hbheNoiseIso();//hbheIsoNoiseFilter();
-      // if(is_data) filt_badmuons = filt_badMuons();
-      // if(is_data) filt_duplicatemuons = filt_duplicateMuons();
-      // if(is_data) filt_nobadmuons = filt_noBadMuons();
+      filt_ecalbadcalib = filt_ecalBadCalibFilter();  // new in 94X
    }
     
     if (!is_data)
@@ -429,7 +428,8 @@ void EventTree::Reset ()
 
     EA_fixgridfastjet_all_rho = -9999.;
 
-   /* HLT_MET170             = -9999.;
+    /*
+    HLT_MET170             = -9999.;
     HLT_SingleMu           = -9999.; 
     HLT_SingleEl           = -9999.;
     HLT_MET120Btag         = -9999.;      
@@ -483,51 +483,37 @@ void EventTree::Reset ()
     HLT_SingleMu_eff =  -9999;
     HLT_SingleEl_eff =  -9999;
 
-    filt_cscbeamhalo = false;
-    filt_ecallaser = false;
-    filt_ecaltp = false;
-    filt_eebadsc = false;
-    filt_goodvtx = false;
-    filt_badevents =false;
-    filt_hbhenoise = false;
-    filt_hbheisonoise = false;
-    filt_hcallaser = false;
-    filt_trkfail = false;
-    filt_trkPOG = false;
-    filt_trkPOG_tmc = false;
-    filt_trkPOG_tms = false;
-    filt_eff = -9999.;*/
+    filt_eff = -9999.;
+    */
 
-     filt_cscbeamhalo = false;
-     filt_cscbeamhalo2015 = false;
-     filt_globaltighthalo2016 = false;
-     filt_globalsupertighthalo2016 = false;
-     filt_ecallaser = false;
-     filt_ecaltp = false;
-     filt_eebadsc = false;
-     filt_goodvtx = false;
-     filt_badevents = false;
-     filt_hbhenoise = false;
-     filt_hbheisonoise = false;
-     filt_hcallaser = false;
-     filt_met = false;
-     filt_trkfail = false;
-     filt_trkPOG = false;
-     filt_trkPOG_logerr_tmc = false;
-     filt_trkPOG_tmc = false;
-     filt_trkPOG_tms = false;
-     filt_badChargedCandidateFilter = false;
-     filt_badMuonFilter = false;
-    filt_fastsimjets       = false;
-    filt_fastsimjets_jup   = false;
-    filt_fastsimjets_jdown = false;
-    filt_jetWithBadMuon        = false;
-    filt_jetWithBadMuon_jup    = false;
-    filt_jetWithBadMuon_jdown  = false;
-    filt_pfovercalomet         = false;
-    filt_badmuons              = false;
-    filt_duplicatemuons        = false;
-    filt_nobadmuons            = false;
+    filt_cscbeamhalo               = true;
+    filt_cscbeamhalo2015           = true;
+    filt_globaltighthalo2016       = true;
+    filt_globalsupertighthalo2016  = true;
+    filt_ecallaser                 = true;
+    filt_ecaltp                    = true;
+    filt_ecalbadcalib              = true;
+    filt_eebadsc                   = true;
+    filt_goodvtx                   = true;
+    filt_badevents                 = true;
+    filt_hbhenoise                 = true;
+    filt_hbheisonoise              = true;
+    filt_hcallaser                 = true;
+    filt_met                       = true;
+    filt_trkfail                   = true;
+    filt_trkPOG                    = true;
+    filt_trkPOG_logerr_tmc         = true;
+    filt_trkPOG_tmc                = true;
+    filt_trkPOG_tms                = true;
+    filt_badChargedCandidateFilter = true;
+    filt_badMuonFilter             = true;
+    filt_fastsimjets               = true;
+    filt_fastsimjets_jup           = true;
+    filt_fastsimjets_jdown         = true;
+    filt_jetWithBadMuon            = true;
+    filt_jetWithBadMuon_jup        = true;
+    filt_jetWithBadMuon_jdown      = true;
+    filt_pfovercalomet             = true;
     
     nPhotons             = -9999;
     ph_selectedidx       = -9999;
@@ -809,7 +795,6 @@ void EventTree::SetMETFilterBranches (TTree* tree)
     tree->Branch("filt_trkPOG_tmc", &filt_trkPOG_tmc);
     tree->Branch("filt_trkPOG_tms", &filt_trkPOG_tms);
     tree->Branch("firstGoodVtxIdx", &firstGoodVtxIdx);
-//    tree->Branch("filt_badChargedCandidateFilter", &filt_badChargedCandidateFilter);
     tree->Branch("filt_badChargedCandidateFilter", &filt_badChargedCandidateFilter);
     tree->Branch("filt_badMuonFilter", &filt_badMuonFilter);
     tree->Branch("filt_met", &filt_met);
@@ -820,9 +805,6 @@ void EventTree::SetMETFilterBranches (TTree* tree)
     tree->Branch("filt_jetWithBadMuon_jup", &filt_jetWithBadMuon_jup);
     tree->Branch("filt_jetWithBadMuon_jdown", &filt_jetWithBadMuon_jdown);
     tree->Branch("filt_pfovercalomet", &filt_pfovercalomet);
-    tree->Branch("filt_badmuons", &filt_badmuons);
-    tree->Branch("filt_duplicatemuons", &filt_duplicatemuons);
-    tree->Branch("filt_nobadmuons", &filt_nobadmuons);
 
 }
 
