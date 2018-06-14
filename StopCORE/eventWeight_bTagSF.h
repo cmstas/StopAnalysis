@@ -5,7 +5,7 @@
 // #ifndef __CINT__
 #include "../CORE/Tools/btagsf/BTagCalibrationStandalone.h"
 // #include "btagsf/BTagCalibrationStandalone.h"
-// #include "CondFormats/BTauObjects/interface/BTagCalibration.h"
+nnn// #include "CondFormats/BTauObjects/interface/BTagCalibration.h"
 // #endif /* __CINT __ */
 
 // ROOT
@@ -14,7 +14,7 @@
 
 // C++
 #include <string>
-#include <vector>
+nn#include <vector>
 
 //
 // CLASS
@@ -32,34 +32,13 @@ class eventWeight_bTagSF{
   float BTAG_TGT;
     
   BTagCalibration* calib;
-  BTagCalibrationReader* reader_heavy;
-  BTagCalibrationReader* reader_heavy_UP;
-  BTagCalibrationReader* reader_heavy_DN;
-  BTagCalibrationReader* reader_light;
-  BTagCalibrationReader* reader_light_UP;
-  BTagCalibrationReader* reader_light_DN;
-  BTagCalibrationReader* reader_loose_heavy;
-  BTagCalibrationReader* reader_loose_heavy_UP;
-  BTagCalibrationReader* reader_loose_heavy_DN;
-  BTagCalibrationReader* reader_loose_light;
-  BTagCalibrationReader* reader_loose_light_UP;
-  BTagCalibrationReader* reader_loose_light_DN;
-  BTagCalibrationReader* reader_tight_heavy;
-  BTagCalibrationReader* reader_tight_heavy_UP;
-  BTagCalibrationReader* reader_tight_heavy_DN;
-  BTagCalibrationReader* reader_tight_light;
-  BTagCalibrationReader* reader_tight_light_UP;
-  BTagCalibrationReader* reader_tight_light_DN;
+  BTagCalibrationReader* reader_medium;
+  BTagCalibrationReader* reader_loose;
+  BTagCalibrationReader* reader_tight;
   BTagCalibration* calib_fastsim;
-  BTagCalibrationReader* reader_fastsim;
-  BTagCalibrationReader* reader_fastsim_UP;
-  BTagCalibrationReader* reader_fastsim_DN;
-  BTagCalibrationReader* reader_tight_fastsim;
-  BTagCalibrationReader* reader_tight_fastsim_UP;
-  BTagCalibrationReader* reader_tight_fastsim_DN;
-  BTagCalibrationReader* reader_loose_fastsim;
-  BTagCalibrationReader* reader_loose_fastsim_UP;
-  BTagCalibrationReader* reader_loose_fastsim_DN;
+  BTagCalibrationReader* reader_medium_FS;
+  BTagCalibrationReader* reader_loose_FS;
+  BTagCalibrationReader* reader_tight_FS;
   TFile *feff;
   TH2D* h_btag_eff_b;
   TH2D* h_btag_eff_c;

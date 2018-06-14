@@ -5,6 +5,16 @@
 
 using namespace tas;
  
+// // DeepCSV working points 80X
+// static const float BTAG_MED = 0.6324;
+// static const float BTAG_LSE = 0.2219;
+// static const float BTAG_TGT = 0.9432;
+
+// DeepCSV working points 94X
+static const float BTAG_MED = 0.4941;
+static const float BTAG_LSE = 0.1522;
+static const float BTAG_TGT = 0.8001;
+
 JetTree::JetTree() : doResolveTopMVA(false) {}
 
 JetTree::JetTree(const std::string &prefix) : prefix_(prefix), doResolveTopMVA(false) {}
@@ -21,35 +31,34 @@ void JetTree::InitTopMVA(ResolvedTopMVA* resTopMVAptr) {
 void JetTree::InitBtagSFTool(bool isFastsim_) {
     isFastsim = isFastsim_;
     //calib = calib_;
-    calib         = new BTagCalibration("DeepCSV", "btagsf/DeepCSV_Moriond17_B_H.csv"); // DeepCSV version of SFs
-    calib_fastsim = new BTagCalibration("deepcsv", "btagsf/fastsim_deepcsv_ttbar_26_1_2017.csv"); // DeepCSV fastsim version of SFs
-    reader_heavy      = new BTagCalibrationReader(calib, BTagEntry::OP_MEDIUM, "comb", "central"); // central
-    reader_heavy_UP   = new BTagCalibrationReader(calib, BTagEntry::OP_MEDIUM, "comb", "up");  // sys up
-    reader_heavy_DN   = new BTagCalibrationReader(calib, BTagEntry::OP_MEDIUM, "comb", "down");  // sys down
-    reader_light      = new BTagCalibrationReader(calib, BTagEntry::OP_MEDIUM, "incl", "central");  // central
-    reader_light_UP   = new BTagCalibrationReader(calib, BTagEntry::OP_MEDIUM, "incl", "up");  // sys up
-    reader_light_DN   = new BTagCalibrationReader(calib, BTagEntry::OP_MEDIUM, "incl", "down");  // sys down
-    reader_fastsim    = new BTagCalibrationReader(calib_fastsim, BTagEntry::OP_MEDIUM, "fastsim", "central"); // central
-    reader_fastsim_UP = new BTagCalibrationReader(calib_fastsim, BTagEntry::OP_MEDIUM, "fastsim", "up");  // sys up
-    reader_fastsim_DN = new BTagCalibrationReader(calib_fastsim, BTagEntry::OP_MEDIUM, "fastsim", "down");  // sys down
-    reader_loose_heavy      = new BTagCalibrationReader(calib, BTagEntry::OP_LOOSE, "comb", "central"); // central
-    reader_loose_heavy_UP   = new BTagCalibrationReader(calib, BTagEntry::OP_LOOSE, "comb", "up");  // sys up
-    reader_loose_heavy_DN   = new BTagCalibrationReader(calib, BTagEntry::OP_LOOSE, "comb", "down");  // sys down
-    reader_loose_light      = new BTagCalibrationReader(calib, BTagEntry::OP_LOOSE, "incl", "central");  // central
-    reader_loose_light_UP   = new BTagCalibrationReader(calib, BTagEntry::OP_LOOSE, "incl", "up");  // sys up
-    reader_loose_light_DN   = new BTagCalibrationReader(calib, BTagEntry::OP_LOOSE, "incl", "down");  // sys down
-    reader_loose_fastsim    = new BTagCalibrationReader(calib_fastsim, BTagEntry::OP_LOOSE, "fastsim", "central"); // central
-    reader_loose_fastsim_UP = new BTagCalibrationReader(calib_fastsim, BTagEntry::OP_LOOSE, "fastsim", "up");  // sys up
-    reader_loose_fastsim_DN = new BTagCalibrationReader(calib_fastsim, BTagEntry::OP_LOOSE, "fastsim", "down");  // sys down
-    reader_tight_heavy      = new BTagCalibrationReader(calib, BTagEntry::OP_TIGHT, "comb", "central"); // central
-    reader_tight_heavy_UP   = new BTagCalibrationReader(calib, BTagEntry::OP_TIGHT, "comb", "up");  // sys up
-    reader_tight_heavy_DN   = new BTagCalibrationReader(calib, BTagEntry::OP_TIGHT, "comb", "down");  // sys down
-    reader_tight_light      = new BTagCalibrationReader(calib, BTagEntry::OP_TIGHT, "incl", "central");  // central
-    reader_tight_light_UP   = new BTagCalibrationReader(calib, BTagEntry::OP_TIGHT, "incl", "up");  // sys up
-    reader_tight_light_DN   = new BTagCalibrationReader(calib, BTagEntry::OP_TIGHT, "incl", "down");  // sys down
-    reader_tight_fastsim    = new BTagCalibrationReader(calib_fastsim, BTagEntry::OP_TIGHT, "fastsim", "central"); // central
-    reader_tight_fastsim_UP = new BTagCalibrationReader(calib_fastsim, BTagEntry::OP_TIGHT, "fastsim", "up");  // sys up
-    reader_tight_fastsim_DN = new BTagCalibrationReader(calib_fastsim, BTagEntry::OP_TIGHT, "fastsim", "down");  // sys down
+    calib = new BTagCalibration("DeepCSV", "btagsf/run2_25ns/DeepCSV_94XSF_V2_B_F.csv"); // DeepCSV version of SFs
+    reader_medium = new BTagCalibrationReader(BTagEntry::OP_MEDIUM, "central", {"up", "down"});
+    reader_medium->load(*calib, BTagEntry::FLAV_B, "comb");
+    reader_medium->load(*calib, BTagEntry::FLAV_C, "comb");
+    reader_medium->load(*calib, BTagEntry::FLAV_UDSG, "incl");
+    reader_tight = new BTagCalibrationReader(BTagEntry::OP_TIGHT, "central", {"up", "down"});
+    reader_tight->load(*calib, BTagEntry::FLAV_B, "comb");
+    reader_tight->load(*calib, BTagEntry::FLAV_C, "comb");
+    reader_tight->load(*calib, BTagEntry::FLAV_UDSG, "incl");
+    reader_loose = new BTagCalibrationReader(BTagEntry::OP_LOOSE, "central", {"up", "down"});
+    reader_loose->load(*calib, BTagEntry::FLAV_B, "comb");
+    reader_loose->load(*calib, BTagEntry::FLAV_C, "comb");
+    reader_loose->load(*calib, BTagEntry::FLAV_UDSG, "incl");
+
+    calib_fastsim = new BTagCalibration("deepcsv", "btagsf/run2_fastsim/fastsim_deepcsv_ttbar_26_1_2017.csv"); // DeepCSV fastsim version of SFs
+    reader_medium_FS = new BTagCalibrationReader(BTagEntry::OP_MEDIUM, "central", {"up", "down"});
+    reader_medium_FS->load(*calib_fastsim, BTagEntry::FLAV_B, "fastsim");
+    reader_medium_FS->load(*calib_fastsim, BTagEntry::FLAV_C, "fastsim");
+    reader_medium_FS->load(*calib_fastsim, BTagEntry::FLAV_UDSG, "fastsim");
+    reader_tight_FS = new BTagCalibrationReader(BTagEntry::OP_TIGHT, "central", {"up", "down"});
+    reader_tight_FS->load(*calib_fastsim, BTagEntry::FLAV_B, "fastsim");
+    reader_tight_FS->load(*calib_fastsim, BTagEntry::FLAV_C, "fastsim");
+    reader_tight_FS->load(*calib_fastsim, BTagEntry::FLAV_UDSG, "fastsim");
+    reader_loose_FS = new BTagCalibrationReader(BTagEntry::OP_LOOSE, "central", {"up", "down"});
+    reader_loose_FS->load(*calib_fastsim, BTagEntry::FLAV_B, "fastsim");
+    reader_loose_FS->load(*calib_fastsim, BTagEntry::FLAV_C, "fastsim");
+    reader_loose_FS->load(*calib_fastsim, BTagEntry::FLAV_UDSG, "fastsim");
+
     TH2D* h_btag_eff_b_temp = NULL;
     TH2D* h_btag_eff_c_temp = NULL;
     TH2D* h_btag_eff_udsg_temp = NULL;
@@ -60,11 +69,11 @@ void JetTree::InitBtagSFTool(bool isFastsim_) {
     TH2D* h_loose_btag_eff_c_temp = NULL;
     TH2D* h_loose_btag_eff_udsg_temp = NULL;
     if(isFastsim){
-      // Created using https://github.com/cmstas/bTagEfficiencyTools. Todo: change to deepCSV later
-      feff =  new TFile("btagsf/btageff__SMS-T1bbbb-T1qqqq_25ns_Moriond17.root");
+      // Created using https://github.com/cmstas/bTagEfficiencyTools. TODO: change to deepCSV version
+      feff =  new TFile("btagsf/run2_fastsim/btageff__SMS-T1bbbb-T1qqqq_25ns_Moriond17.root");
     } else {
-      // Todo: create efficiency in the phase space of the stop analysis
-      feff =  new TFile("btagsf/btageff__ttbar_powheg_pythia8_25ns_Moriond17_deepCSV.root");
+      // TODO: create efficiency in the phase space of the stop analysis
+      feff =  new TFile("btagsf/run2_25ns/btageff__ttbar_amc_94X_deepCSV.root");
     }
     if (!feff) throw std::invalid_argument("JetTree.cc: btagsf file does not exist!");
     h_btag_eff_b_temp = (TH2D*) feff->Get("h2_BTaggingEff_csv_med_Eff_b");
@@ -104,15 +113,15 @@ float JetTree::getBtagEffFromFile(float pt, float eta, int mcFlavour, int WP, bo
       std::cout << "babyMaker::getBtagEffFromFile: ERROR: wrong WP" << std::endl;
       return 1.;
     }
-    if(WP==1 && (!h_btag_eff_b || !h_btag_eff_c || !h_btag_eff_udsg)) {
+    if(WP==BTagEntry::OP_MEDIUM && (!h_btag_eff_b || !h_btag_eff_c || !h_btag_eff_udsg)) {
       std::cout << "babyMaker::getBtagEffFromFile: ERROR: missing input hists for medium WP" << std::endl;
       return 1.;
     }
-    if(WP==0 && (!h_loose_btag_eff_b || !h_loose_btag_eff_c || !h_loose_btag_eff_udsg)) {
+    if(WP==BTagEntry::OP_LOOSE && (!h_loose_btag_eff_b || !h_loose_btag_eff_c || !h_loose_btag_eff_udsg)) {
       std::cout << "babyMaker::getBtagEffFromFile: ERROR: missing input hists for loose WP" << std::endl;
       return 1.;
     }
-    if(WP==2 && (!h_tight_btag_eff_b || !h_tight_btag_eff_c || !h_tight_btag_eff_udsg)) {
+    if(WP==BTagEntry::OP_TIGHT && (!h_tight_btag_eff_b || !h_tight_btag_eff_c || !h_tight_btag_eff_udsg)) {
       std::cout << "babyMaker::getBtagEffFromFile: ERROR: missing input hists for tight WP" << std::endl;
       return 1.;
     }
@@ -124,7 +133,7 @@ float JetTree::getBtagEffFromFile(float pt, float eta, int mcFlavour, int WP, bo
     // only use pt bins up to 400 GeV for charm and udsg
     float pt_cutoff = std::max(20.,std::min(399.,double(pt)));
     TH2D* h(0);
-    if(WP==1){
+    if(WP==BTagEntry::OP_MEDIUM){
       if (abs(mcFlavour) == 5) {
 	h = h_btag_eff_b;
 	pt_cutoff = std::max(20.,std::min(599.,double(pt)));
@@ -136,7 +145,7 @@ float JetTree::getBtagEffFromFile(float pt, float eta, int mcFlavour, int WP, bo
 	h = h_btag_eff_udsg;
       }
     }
-    if(WP==0){
+    if(WP==BTagEntry::OP_LOOSE){
       if (abs(mcFlavour) == 5) {
 	h = h_loose_btag_eff_b;
 	pt_cutoff = std::max(20.,std::min(599.,double(pt)));
@@ -148,7 +157,7 @@ float JetTree::getBtagEffFromFile(float pt, float eta, int mcFlavour, int WP, bo
 	h = h_loose_btag_eff_udsg;
       }
     }
-    if(WP==2){
+    if(WP==BTagEntry::OP_TIGHT){
       if (abs(mcFlavour) == 5) {
 	h = h_tight_btag_eff_b;
 	pt_cutoff = std::max(20.,std::min(599.,double(pt)));
@@ -176,9 +185,6 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx, Factorize
     int nbtags_med = 0;
     int nbtags_tight = 0;
     int nbtags_loose = 0;
-    static const float BTAG_MED = 0.6324;  // DeepCSV working points
-    static const float BTAG_LSE = 0.2219;
-    static const float BTAG_TGT = 0.9432;
     float dPhiM = 0.;
     float btagdisc = 0.;   
     unsigned int leadbtag_idx = 0;
@@ -364,8 +370,6 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx, Factorize
 	BTagEntry::JetFlavor flavor = BTagEntry::FLAV_UDSG;
 	if (abs(pfjets_hadronFlavour().at(jindex)) == 5) flavor = BTagEntry::FLAV_B;
 	else if (abs(pfjets_hadronFlavour().at(jindex)) == 4) flavor = BTagEntry::FLAV_C;
-	float pt_cutoff = std::max(30.,std::min(669.,double(p4sCorrJets[jindex].pt())));
-	float eta_cutoff = std::min(2.39,fabs(double(p4sCorrJets[jindex].eta())));
 	float weight_cent(1.), weight_UP(1.), weight_DN(1.), weight_FS_UP(1.), weight_FS_DN(1.);
 	float weight_loose_cent(1.), weight_loose_UP(1.), weight_loose_DN(1.), weight_loose_FS_UP(1.), weight_loose_FS_DN(1.);
 	float weight_tight_cent(1.), weight_tight_UP(1.), weight_tight_DN(1.), weight_tight_FS_UP(1.), weight_tight_FS_DN(1.);
@@ -377,45 +381,35 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx, Factorize
           if (eff == 0 || efftight == 0)
             cerr << "JetTree.cc: Error: 0 btag eff from file found! :" << eff << " " << effloose << " " << efftight << ", pt = " << p4sCorrJets[jindex].pt() << endl;
 	  // cout<<"read uncertainty from btagsf reader:"<<endl;
-	  if (flavor == BTagEntry::FLAV_UDSG) {
-	    weight_cent = reader_light   ->eval(flavor, eta_cutoff, pt_cutoff);
-	    weight_UP   = reader_light_UP->eval(flavor, eta_cutoff, pt_cutoff);
-	    weight_DN   = reader_light_DN->eval(flavor, eta_cutoff, pt_cutoff);
-	    weight_loose_cent = reader_loose_light   ->eval(flavor, eta_cutoff, pt_cutoff);
-	    weight_loose_UP   = reader_loose_light_UP->eval(flavor, eta_cutoff, pt_cutoff);
-	    weight_loose_DN   = reader_loose_light_DN->eval(flavor, eta_cutoff, pt_cutoff);
-	    weight_tight_cent = reader_tight_light   ->eval(flavor, eta_cutoff, pt_cutoff);
-	    weight_tight_UP   = reader_tight_light_UP->eval(flavor, eta_cutoff, pt_cutoff);
-	    weight_tight_DN   = reader_tight_light_DN->eval(flavor, eta_cutoff, pt_cutoff);
-	  } else {
-	    weight_cent = reader_heavy   ->eval(flavor, eta_cutoff, pt_cutoff);
-	    weight_UP   = reader_heavy_UP->eval(flavor, eta_cutoff, pt_cutoff);
-	    weight_DN   = reader_heavy_DN->eval(flavor, eta_cutoff, pt_cutoff);
-	    weight_loose_cent = reader_loose_heavy   ->eval(flavor, eta_cutoff, pt_cutoff);
-	    weight_loose_UP   = reader_loose_heavy_UP->eval(flavor, eta_cutoff, pt_cutoff);
-	    weight_loose_DN   = reader_loose_heavy_DN->eval(flavor, eta_cutoff, pt_cutoff);
-	    weight_tight_cent = reader_tight_heavy   ->eval(flavor, eta_cutoff, pt_cutoff);
-	    weight_tight_UP   = reader_tight_heavy_UP->eval(flavor, eta_cutoff, pt_cutoff);
-	    weight_tight_DN   = reader_tight_heavy_DN->eval(flavor, eta_cutoff, pt_cutoff);
-	  }
+          weight_cent       = reader_medium ->eval_auto_bounds("central", flavor, p4sCorrJets[jindex].eta(), p4sCorrJets[jindex].pt());
+          weight_UP         = reader_medium ->eval_auto_bounds("up",      flavor, p4sCorrJets[jindex].eta(), p4sCorrJets[jindex].pt());
+          weight_DN         = reader_medium ->eval_auto_bounds("down",    flavor, p4sCorrJets[jindex].eta(), p4sCorrJets[jindex].pt());
+          weight_loose_cent = reader_loose  ->eval_auto_bounds("central", flavor, p4sCorrJets[jindex].eta(), p4sCorrJets[jindex].pt());
+          weight_loose_UP   = reader_loose  ->eval_auto_bounds("up",      flavor, p4sCorrJets[jindex].eta(), p4sCorrJets[jindex].pt());
+          weight_loose_DN   = reader_loose  ->eval_auto_bounds("down",    flavor, p4sCorrJets[jindex].eta(), p4sCorrJets[jindex].pt());
+          weight_tight_cent = reader_tight  ->eval_auto_bounds("central", flavor, p4sCorrJets[jindex].eta(), p4sCorrJets[jindex].pt());
+          weight_tight_UP   = reader_tight  ->eval_auto_bounds("up",      flavor, p4sCorrJets[jindex].eta(), p4sCorrJets[jindex].pt());
+          weight_tight_DN   = reader_tight  ->eval_auto_bounds("down",    flavor, p4sCorrJets[jindex].eta(), p4sCorrJets[jindex].pt());
+
 	  if (isFastsim) {
-	    weight_FS_UP = reader_fastsim_UP->eval(flavor, eta_cutoff, pt_cutoff) * weight_cent;
-	    weight_FS_DN = reader_fastsim_DN->eval(flavor, eta_cutoff, pt_cutoff) * weight_cent;
-	    weight_cent *= reader_fastsim   ->eval(flavor, eta_cutoff, pt_cutoff);
-	    weight_UP   *= reader_fastsim   ->eval(flavor, eta_cutoff, pt_cutoff);//this is still just btagSF
-	    weight_DN   *= reader_fastsim   ->eval(flavor, eta_cutoff, pt_cutoff);//this is still just btagSF
-	    weight_loose_FS_UP = reader_loose_fastsim_UP->eval(flavor, eta_cutoff, pt_cutoff) * weight_loose_cent;
-	    weight_loose_FS_DN = reader_loose_fastsim_DN->eval(flavor, eta_cutoff, pt_cutoff) * weight_loose_cent;
-	    weight_loose_cent *= reader_loose_fastsim   ->eval(flavor, eta_cutoff, pt_cutoff);
-	    weight_loose_UP   *= reader_loose_fastsim   ->eval(flavor, eta_cutoff, pt_cutoff);//this is still just btagSF
-	    weight_loose_DN   *= reader_loose_fastsim   ->eval(flavor, eta_cutoff, pt_cutoff);//this is still just btagSF
-	    weight_tight_FS_UP = reader_tight_fastsim_UP->eval(flavor, eta_cutoff, pt_cutoff) * weight_tight_cent;
-	    weight_tight_FS_DN = reader_tight_fastsim_DN->eval(flavor, eta_cutoff, pt_cutoff) * weight_tight_cent;
-	    weight_tight_cent *= reader_tight_fastsim   ->eval(flavor, eta_cutoff, pt_cutoff);
-	    weight_tight_UP   *= reader_tight_fastsim   ->eval(flavor, eta_cutoff, pt_cutoff);//this is still just btagSF
-	    weight_tight_DN   *= reader_tight_fastsim   ->eval(flavor, eta_cutoff, pt_cutoff);//this is still just btagSF
+            weight_FS_UP       = reader_medium_FS ->eval_auto_bounds("up",      flavor, p4sCorrJets[jindex].eta(), p4sCorrJets[jindex].pt()) * weight_cent;
+            weight_FS_DN       = reader_medium_FS ->eval_auto_bounds("down",    flavor, p4sCorrJets[jindex].eta(), p4sCorrJets[jindex].pt()) * weight_cent;
+            weight_cent       *= reader_medium_FS ->eval_auto_bounds("central", flavor, p4sCorrJets[jindex].eta(), p4sCorrJets[jindex].pt());
+            weight_UP         *= reader_medium_FS ->eval_auto_bounds("central", flavor, p4sCorrJets[jindex].eta(), p4sCorrJets[jindex].pt());//this is still just btagSF
+            weight_DN         *= reader_medium_FS ->eval_auto_bounds("central", flavor, p4sCorrJets[jindex].eta(), p4sCorrJets[jindex].pt());//this is still just btagSF
+            weight_loose_FS_UP = reader_loose_FS  ->eval_auto_bounds("up",      flavor, p4sCorrJets[jindex].eta(), p4sCorrJets[jindex].pt()) * weight_loose_cent;
+            weight_loose_FS_DN = reader_loose_FS  ->eval_auto_bounds("down",    flavor, p4sCorrJets[jindex].eta(), p4sCorrJets[jindex].pt()) * weight_loose_cent;
+            weight_loose_cent *= reader_loose_FS  ->eval_auto_bounds("central", flavor, p4sCorrJets[jindex].eta(), p4sCorrJets[jindex].pt());
+            weight_loose_UP   *= reader_loose_FS  ->eval_auto_bounds("central", flavor, p4sCorrJets[jindex].eta(), p4sCorrJets[jindex].pt());//this is still just btagSF
+            weight_loose_DN   *= reader_loose_FS  ->eval_auto_bounds("central", flavor, p4sCorrJets[jindex].eta(), p4sCorrJets[jindex].pt());//this is still just btagSF
+            weight_tight_FS_UP = reader_tight_FS  ->eval_auto_bounds("up",      flavor, p4sCorrJets[jindex].eta(), p4sCorrJets[jindex].pt()) * weight_tight_cent;
+            weight_tight_FS_DN = reader_tight_FS  ->eval_auto_bounds("down",    flavor, p4sCorrJets[jindex].eta(), p4sCorrJets[jindex].pt()) * weight_tight_cent;
+            weight_tight_cent *= reader_tight_FS  ->eval_auto_bounds("central", flavor, p4sCorrJets[jindex].eta(), p4sCorrJets[jindex].pt());
+            weight_tight_UP   *= reader_tight_FS  ->eval_auto_bounds("central", flavor, p4sCorrJets[jindex].eta(), p4sCorrJets[jindex].pt());//this is still just btagSF
+            weight_tight_DN   *= reader_tight_FS  ->eval_auto_bounds("central", flavor, p4sCorrJets[jindex].eta(), p4sCorrJets[jindex].pt());//this is still just btagSF
 	  }
 	}
+
 	//medium btag
 	if (value_deepCSV > BTAG_MED) {
              ak4pfjets_passMEDbtag.push_back(true);
@@ -699,34 +693,13 @@ void JetTree::deleteBtagSFTool()
 {
    
     delete calib;
-    delete reader_heavy;
-    delete reader_heavy_UP;
-    delete reader_heavy_DN;
-    delete reader_light;
-    delete reader_light_UP;
-    delete reader_light_DN;
     delete calib_fastsim;
-    delete reader_fastsim;
-    delete reader_fastsim_UP;
-    delete reader_fastsim_DN;
-    delete reader_loose_heavy;
-    delete reader_loose_heavy_UP;
-    delete reader_loose_heavy_DN;
-    delete reader_loose_light;
-    delete reader_loose_light_UP;
-    delete reader_loose_light_DN;
-    delete reader_loose_fastsim;
-    delete reader_loose_fastsim_UP;
-    delete reader_loose_fastsim_DN;
-    delete reader_tight_heavy;
-    delete reader_tight_heavy_UP;
-    delete reader_tight_heavy_DN;
-    delete reader_tight_light;
-    delete reader_tight_light_UP;
-    delete reader_tight_light_DN;
-    delete reader_tight_fastsim;
-    delete reader_tight_fastsim_UP;
-    delete reader_tight_fastsim_DN;
+    delete reader_medium;
+    delete reader_tight;
+    delete reader_loose;
+    delete reader_medium_FS;
+    delete reader_tight_FS;
+    delete reader_loose_FS;
     
     delete feff;
     return;
