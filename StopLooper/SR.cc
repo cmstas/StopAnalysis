@@ -95,7 +95,7 @@ bool SR::PassesSelection(map<string, float> values) {
   return true;
 }
 
-bool SR::PassesSelection(map<string, funcf> funcs) {
+bool SR::PassesSelection(map<string, func_t> funcs) {
   if ((kAllowDummyVars_ == 0 && GetNumberOfVariables() != funcs.size()) ||
       (kAllowDummyVars_ == 1 && GetNumberOfVariables()  > funcs.size())) {
     cout << "Number of variables to cut on != number of variables in signal region. Passed " << funcs.size() << ", expected " << GetNumberOfVariables() << endl;

@@ -58,11 +58,12 @@ class StopLooper {
   float evtweight_;
   int jestype_;
   std::map<std::string,float> values_;
-  std::map<std::string,funcf> funcs_;
+  std::map<std::string,func_t> funcs_;
 
   // For nvtx reweighting
   float nvtxscale_[100];
 
+  friend class SR;
 };
 
 #endif

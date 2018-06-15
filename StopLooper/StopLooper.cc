@@ -163,7 +163,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
   // const float kLumi = 35.867;         // 2016 lumi
 
   // Combined 2016 (35.87/fb), 2017 (41.96/fb) and 2018 (12.3/fb) json,
-  const char* json_file = "../StopCORE/inputs/json_files/Cert_271036-317080_13TeV_Combined161718_JSON_snt.txt";
+  const char* json_file = "../StopCORE/inputs/json_files/Cert_271036-317391_13TeV_Combined161718_JSON_snt.txt";
 
   if (samplestr.find("data_2016") == 0 || samplestr == "data_single_lepton_met") is2016data = true;
   if (samplestr.find("data_2018") == 0) is2018data = true;
@@ -341,7 +341,6 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
         }
       }
 
-      if (pfmet() > 100) continue;
       if (doNvtxReweight && (is2016data || is2018data)) {
         if (nvtxs() < 85) evtweight_ = nvtxscale_[nvtxs()];  // only scale for data
       }
@@ -363,8 +362,8 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
       // Fill the variables
 
       /// Common variables for all JES type
-      funcs_["nlep"] = (funcf)ngoodleps;
-      funcs_["nvlep"] = (funcf)nvetoleps;
+      funcs_["nlep"] = (func_t)ngoodleps;
+      funcs_["nvlep"] = (func_t)nvetoleps;
       funcs_["lep1pt"] = []() { return lep1_p4().pt(); };
       funcs_["passvetos"] = []() -> float { return PassTrackVeto() && PassTauVeto(); };
 
@@ -380,7 +379,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
       };
 
       /// Values only for hist filling or testing
-      funcs_["chi2"] = (funcf)hadronic_top_chi2;
+      funcs_["chi2"] = (func_t)hadronic_top_chi2;
       funcs_["lep1pt"] = []() { return lep1_p4().pt(); };
       funcs_["lep1eta"] = []() { return lep1_p4().eta(); };
       funcs_["lep2pt"] = []() { return lep2_p4().pt(); };
@@ -393,67 +392,67 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
 
         /// JES type dependent variables
         if (jestype_ == 0) {
-          funcs_["mt"] = (funcf)mt_met_lep;
-          funcs_["met"] = (funcf)pfmet;
-          funcs_["mt2w"] = (funcf)MT2W;
-          funcs_["mlb"] = (funcf)Mlb_closestb;
-          funcs_["tmod"] = (funcf)topnessMod;
-          funcs_["njet"] = (funcf)ngoodjets;
-          funcs_["nbjet"] = (funcf)ngoodbtags;
-          funcs_["nbtag"]  = (funcf)nanalysisbtags;
-          funcs_["dphijmet"] = (funcf)mindphi_met_j1_j2;
-          funcs_["dphilmet"] = (funcf)lep1_dphiMET;
+          funcs_["mt"] = (func_t)mt_met_lep;
+          funcs_["met"] = (func_t)pfmet;
+          funcs_["mt2w"] = (func_t)MT2W;
+          funcs_["mlb"] = (func_t)Mlb_closestb;
+          funcs_["tmod"] = (func_t)topnessMod;
+          funcs_["njet"] = (func_t)ngoodjets;
+          funcs_["nbjet"] = (func_t)ngoodbtags;
+          funcs_["nbtag"]  = (func_t)nanalysisbtags;
+          funcs_["dphijmet"] = (func_t)mindphi_met_j1_j2;
+          funcs_["dphilmet"] = (func_t)lep1_dphiMET;
           funcs_["j1passbtag"] = []() -> float { return (ngoodjets() > 0)? ak4pfjets_passMEDbtag().at(0) : 0; };
           funcs_["jet1pt"] = []() { return (ngoodjets() > 0)? ak4pfjets_p4().at(0).pt() : 0; };
           funcs_["jet2pt"] = []() { return (ngoodjets() > 1)? ak4pfjets_p4().at(1).pt() : 0; };
 
-          funcs_["ht"] = (funcf)ak4_HT;
-          funcs_["metphi"] = (funcf)pfmet_phi;
-          funcs_["ntbtag"] = (funcf)ntightbtags;
+          funcs_["ht"] = (func_t)ak4_HT;
+          funcs_["metphi"] = (func_t)pfmet_phi;
+          funcs_["ntbtag"] = (func_t)ntightbtags;
           funcs_["leadbpt"] = []() { return ak4pfjets_leadbtag_p4().pt(); };
           funcs_["mlb_0b"] = []() { return (ak4pfjets_leadbtag_p4() + lep1_p4()).M(); };
 
           // suffix = "_nominal";
         } else if (jestype_ == 1) {
-          funcs_["mt"] = (funcf)mt_met_lep_jup;
-          funcs_["met"] = (funcf)pfmet_jup;
-          funcs_["mt2w"] = (funcf)MT2W_jup;
-          funcs_["mlb"] = (funcf)Mlb_closestb_jup;
-          funcs_["tmod"] = (funcf)topnessMod_jup;
-          funcs_["njet"] = (funcf)jup_ngoodjets;
-          funcs_["nbjet"] = (funcf)jup_ngoodbtags;
-          funcs_["nbtag"]  = (funcf)jup_nanalysisbtags;
-          funcs_["dphijmet"] = (funcf)mindphi_met_j1_j2_jup;
+          funcs_["mt"] = (func_t)mt_met_lep_jup;
+          funcs_["met"] = (func_t)pfmet_jup;
+          funcs_["mt2w"] = (func_t)MT2W_jup;
+          funcs_["mlb"] = (func_t)Mlb_closestb_jup;
+          funcs_["tmod"] = (func_t)topnessMod_jup;
+          funcs_["njet"] = (func_t)jup_ngoodjets;
+          funcs_["nbjet"] = (func_t)jup_ngoodbtags;
+          funcs_["nbtag"]  = (func_t)jup_nanalysisbtags;
+          funcs_["dphijmet"] = (func_t)mindphi_met_j1_j2_jup;
           funcs_["dphilmet"] = []() { return fabs(lep1_p4().phi() - pfmet_phi_jup()); };
           funcs_["j1passbtag"] = []() -> float { return (jup_ngoodjets() > 0)? jup_ak4pfjets_passMEDbtag().at(0) : 0; };
           funcs_["jet1pt"] = []() { return (jup_ngoodjets() > 0)? jup_ak4pfjets_p4().at(0).pt() : 0; };
           funcs_["jet2pt"] = []() { return (jup_ngoodjets() > 1)? jup_ak4pfjets_p4().at(1).pt() : 0; };
 
-          funcs_["ht"] = (funcf)jup_ak4_HT;
-          funcs_["metphi"] = (funcf)pfmet_phi_jup;
-          funcs_["ntbtag"] = (funcf)jup_ntightbtags;
+          funcs_["ht"] = (func_t)jup_ak4_HT;
+          funcs_["metphi"] = (func_t)pfmet_phi_jup;
+          funcs_["ntbtag"] = (func_t)jup_ntightbtags;
           funcs_["leadbpt"] = []() { return jup_ak4pfjets_leadbtag_p4().pt(); };
           funcs_["mlb_0b"] = []() { return (jup_ak4pfjets_leadbtag_p4() + lep1_p4()).M(); };
 
           suffix = "_jesUp";
         } else if (jestype_ == 2) {
-          funcs_["mt"] = (funcf)mt_met_lep_jdown;
-          funcs_["met"] = (funcf)pfmet_jdown;
-          funcs_["mt2w"] = (funcf)MT2W_jdown;
-          funcs_["mlb"] = (funcf)Mlb_closestb_jdown;
-          funcs_["tmod"] = (funcf)topnessMod_jdown;
-          funcs_["njet"] = (funcf)jdown_ngoodjets;
-          funcs_["nbjet"] = (funcf)jdown_ngoodbtags;
-          funcs_["nbtag"]  = (funcf)jdown_nanalysisbtags;
-          funcs_["dphijmet"] = (funcf)mindphi_met_j1_j2_jdown;
+          funcs_["mt"] = (func_t)mt_met_lep_jdown;
+          funcs_["met"] = (func_t)pfmet_jdown;
+          funcs_["mt2w"] = (func_t)MT2W_jdown;
+          funcs_["mlb"] = (func_t)Mlb_closestb_jdown;
+          funcs_["tmod"] = (func_t)topnessMod_jdown;
+          funcs_["njet"] = (func_t)jdown_ngoodjets;
+          funcs_["nbjet"] = (func_t)jdown_ngoodbtags;
+          funcs_["nbtag"]  = (func_t)jdown_nanalysisbtags;
+          funcs_["dphijmet"] = (func_t)mindphi_met_j1_j2_jdown;
           funcs_["dphilmet"] = []() { return fabs(lep1_p4().phi() - pfmet_phi_jdown()); };
           funcs_["j1passbtag"] = []() -> float { return (jdown_ngoodjets() > 0)? jdown_ak4pfjets_passMEDbtag().at(0) : 0; };
           funcs_["jet1pt"] = []() { return (jdown_ngoodjets() > 0)? jdown_ak4pfjets_p4().at(0).pt() : 0; };
           funcs_["jet2pt"] = []() { return (jdown_ngoodjets() > 1)? jdown_ak4pfjets_p4().at(1).pt() : 0; };
 
-          funcs_["ht"] = (funcf)jdown_ak4_HT;
-          funcs_["metphi"] = (funcf)pfmet_phi_jdown;
-          funcs_["ntbtag"] = (funcf)jdown_ntightbtags;
+          funcs_["ht"] = (func_t)jdown_ak4_HT;
+          funcs_["metphi"] = (func_t)pfmet_phi_jdown;
+          funcs_["ntbtag"] = (func_t)jdown_ntightbtags;
           funcs_["leadbpt"] = []() { return jdown_ak4pfjets_leadbtag_p4().pt(); };
           funcs_["mlb_0b"] = []() { return (jdown_ak4pfjets_leadbtag_p4() + lep1_p4()).M(); };
 
@@ -480,26 +479,26 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
         funcs_["mll"] = []() { return (lep1_p4() + lep2_p4()).M(); };
 
         if (jestype_ == 0) {
-          funcs_["mt_rl"] = (funcf)mt_met_lep_rl;
-          funcs_["mt2w_rl"] = (funcf)MT2W_rl;
-          funcs_["met_rl"] = (funcf)pfmet_rl;
-          funcs_["dphijmet_rl"]= (funcf)mindphi_met_j1_j2_rl;
-          funcs_["dphilmet_rl"] = (funcf)lep1_dphiMET_rl;
-          funcs_["tmod_rl"] = (funcf)topnessMod_rl;
+          funcs_["mt_rl"] = (func_t)mt_met_lep_rl;
+          funcs_["mt2w_rl"] = (func_t)MT2W_rl;
+          funcs_["met_rl"] = (func_t)pfmet_rl;
+          funcs_["dphijmet_rl"]= (func_t)mindphi_met_j1_j2_rl;
+          funcs_["dphilmet_rl"] = (func_t)lep1_dphiMET_rl;
+          funcs_["tmod_rl"] = (func_t)topnessMod_rl;
         } else if (jestype_ == 1) {
-          funcs_["mt_rl"] = (funcf)mt_met_lep_rl_jup;
-          funcs_["mt2w_rl"] = (funcf)MT2W_rl_jup;
-          funcs_["met_rl"] = (funcf)pfmet_rl_jup;
-          funcs_["dphijmet_rl"]= (funcf)mindphi_met_j1_j2_rl_jup;
-          funcs_["dphilmet_rl"] = (funcf)lep1_dphiMET_rl_jup;
-          funcs_["tmod_rl"] = (funcf)topnessMod_rl_jup;
+          funcs_["mt_rl"] = (func_t)mt_met_lep_rl_jup;
+          funcs_["mt2w_rl"] = (func_t)MT2W_rl_jup;
+          funcs_["met_rl"] = (func_t)pfmet_rl_jup;
+          funcs_["dphijmet_rl"]= (func_t)mindphi_met_j1_j2_rl_jup;
+          funcs_["dphilmet_rl"] = (func_t)lep1_dphiMET_rl_jup;
+          funcs_["tmod_rl"] = (func_t)topnessMod_rl_jup;
         } else if (jestype_ == 2) {
-          funcs_["mt_rl"] = (funcf)mt_met_lep_rl_jdown;
-          funcs_["mt2w_rl"] = (funcf)MT2W_rl_jdown;
-          funcs_["met_rl"] = (funcf)pfmet_rl_jdown;
-          funcs_["dphijmet_rl"]= (funcf)mindphi_met_j1_j2_rl_jdown;
-          funcs_["dphilmet_rl"] = (funcf)lep1_dphiMET_rl_jdown;
-          funcs_["tmod_rl"] = (funcf)topnessMod_rl_jdown;
+          funcs_["mt_rl"] = (func_t)mt_met_lep_rl_jdown;
+          funcs_["mt2w_rl"] = (func_t)MT2W_rl_jdown;
+          funcs_["met_rl"] = (func_t)pfmet_rl_jdown;
+          funcs_["dphijmet_rl"]= (func_t)mindphi_met_j1_j2_rl_jdown;
+          funcs_["dphilmet_rl"] = (func_t)lep1_dphiMET_rl_jdown;
+          funcs_["tmod_rl"] = (func_t)topnessMod_rl_jdown;
         }
         fillHistosForCR2l(suffix);
         fillHistosForCRemu(suffix);
