@@ -1,6 +1,7 @@
-#ifndef PLOTUTILITIES_H
-#define PLOTUTILITIES_H
+#ifndef STOPLOOPER_UTILITIES_H
+#define STOPLOOPER_UTILITIES_H
 
+#include "TMath.h"
 #include "TH1.h" 
 #include "TH2.h" 
 #include "TH3.h" 
@@ -8,72 +9,92 @@
 #include "TCanvas.h" 
 #include "TFile.h"
 
-#include "RooRealVar.h"
-#include "RooDataSet.h"
-
 #include <map>
 #include <string>
 
-TH1D cumulate (const TH1D &in, bool increasing);
-TGraph eff_rej (const TH1D &signal, TH1D &background, bool normalize, bool increasing);
-void saveHist(const char* filename, const char* pat="*");
-void deleteHistos();
-TCanvas *ComparePlots(TFile *f, const char *hist1, const char *hist2, const char *label1, const char *label2, 
-		      unsigned int rebin, bool norm, bool log, unsigned int opt);
-TGraph GetROC(TFile *f, const char *hist1, const char *hist2, bool increasing);
-TGraph GetEff(TFile *f, const char *hist1, bool increasing);
+// Histogram manipulation
+inline void moveOverFlowToLastBin1D(TH1* hist) {
+  int nbin = hist->GetNbinsX();
+  if (hist->GetBinContent(nbin+1) > 0) {
+    double err = 0;
+    hist->SetBinContent(nbin, hist->IntegralAndError(nbin, -1, err));
+    hist->SetBinError(nbin, err);
+    hist->SetBinContent(nbin+1, 0);
+    hist->SetBinError(nbin+1, 0);
+  }
+}
 
-void plotRooDataSet(std::string name, RooRealVar* x_, RooRealVar* w_, double weight, std::map<std::string, RooDataSet*> &allRooDatasets, std::string title);
-void plot1D(std::string name, float xval, double weight, std::map<std::string, TH1*> &allhistos, 
-	    std::string title, int numbinsx, float xmin, float xmax);
-void plot1D(std::string name, float xval, double weight, std::map<std::string, TH1*> &allhistos, 
-	    std::string title, int numbinsx, const float * xbins);
-TH1D* getHist1D(std::string title, std::map<std::string, TH1*> &allhistos, 
-                int numbinsx, float xmin, float xmax);
-void insertHist1D(TH1D* hist, std::map<std::string, TH1*> &allhistos);
-void plot2D(std::string name, float xval, float yval, double weight, std::map<std::string, TH1*> &allhistos, 
-	    std::string title, int numbinsx, float xmin, float xmax, int numbinsy, float ymin, float ymax);
-void plot2D(std::string name, float xval, float yval, double weight, std::map<std::string, TH1*> &allhistos, 
-	    std::string title, int numbinsx, const float * xbins, int numbinsy, const float * ybins);
-TH2D* getHist2D(std::string title, std::map<std::string, TH1*> &allhistos, 
-	    int numbinsx, float xmin, float xmax, int numbinsy, float ymin, float ymax);
-void insertHist2D(TH2D* hist, std::map<std::string, TH1*> &allhistos);
-// Old plot2D, with TH2D map
-void plot2D(std::string name, float xval, float yval, double weight, std::map<std::string, TH2D*> &allhistos, 
-	    std::string title, int numbinsx, float xmin, float xmax, int numbinsy, float ymin, float ymax);
-void plot2D(std::string name, float xval, float yval, double weight, std::map<std::string, TH2D*> &allhistos, 
-	    std::string title, int numbinsx, const float * xbins, int numbinsy, const float * ybins);
-void plot3D(std::string name, float xval, float yval, float zval, double weight, std::map<std::string, TH1*> &allhistos, 
-	    std::string title, int numbinsx, float xmin, float xmax, int numbinsy, float ymin, float ymax,
-	    int numbinsz, float zmin, float zmax);
-void plot3D(std::string name, float xval, float yval, float zval, double weight, std::map<std::string, TH1*> &allhistos, 
-	    std::string title, int numbinsx, const float * xbins, int numbinsy, const float * ybins,
-	    int numbinsz, const float * zbins);
+inline void moveXOverFlowToLastBin3D(TH3* hist) {
+  int nbinx = hist->GetNbinsX();
+  for (int ibiny = 0; ibiny < hist->GetNbinsY(); ++ibiny) {
+    for (int ibinz = 0; ibinz < hist->GetNbinsZ(); ++ibinz) {
+      if (hist->GetBinContent(nbinx+1, ibiny, ibinz) <= 0) continue;
+      double err = 0;
+      double yield = hist->IntegralAndError(nbinx, -1, ibiny, ibiny, ibinz, ibinz, err);
+      hist->SetBinContent(nbinx, ibiny, ibinz, yield);
+      hist->SetBinError(nbinx, ibiny, ibinz, err);
+      hist->SetBinContent(nbinx+1, ibiny, ibinz, 0);
+      hist->SetBinError(nbinx+1, ibiny, ibinz, 0);
+    }
+  }
+}
 
-void plot1DUnderOverFlow(std::string title, double xval, double weight, std::map<std::string, TH1*> &allhistos, 
-	    int numbinsx, double xmin, double xmax);
-void plot2DUnderOverFlow(std::string name, double xval, double yval, double weight, std::map<std::string, TH1*> &allhistos, 
-	    std::string title, int numbinsx, double xmin, double xmax, int numbinsy, double ymin, double ymax);
+// Templated function
+template<class LorentzVectorType>
+bool isCloseObject(LorentzVectorType p1, LorentzVectorType p2, float conesize)
+{
+  const float PI = TMath::Pi();
+  float deltaEta = fabs(p1.eta() - p2.eta());
+  if (deltaEta > conesize) return false;
+  float deltaPhi = fabs(p1.eta() - p2.eta());
+  if (deltaPhi > PI) deltaPhi = 2*PI - deltaPhi;
+  if (deltaPhi > conesize) return false;
+  float deltaR2 = deltaEta*deltaEta + deltaPhi*deltaPhi;
+  if (deltaR2 > conesize*conesize) return false;
 
-void savePlots(std::map<std::string, TH1*>&, const char* );
-void savePlots2(std::map<std::string, TH2D*>&, const char* );
-void saveRooDataSetsDir(std::map<std::string, RooDataSet*>& datasets, TFile* outfile, const char* outdir = "");
-void savePlotsDir(std::map<std::string, TH1*>& h_1d, TFile* outfile, const char* outdir = "");
-void savePlots2Dir(std::map<std::string, TH2D*>& h_2d, TFile* outfile, const char* outdir = "");
-void savePlots12(std::map<std::string, TH1D*>&, std::map<std::string, TH2D*>&, const char* );
-
-void moveOverFlowToLastBin1D(TH1* hist);
-void moveXOverFlowToLastBin3D(TH3* hist);
-
-// New functions
-template<typename... TArgs>
-void plot1d(std::string name, float xval, double weight, std::map<std::string, TH1*> &allhistos, TArgs... args);
+  return true;
+}
 
 template<typename... TArgs>
-void plot2d(std::string name, float xval, float yval, double weight, std::map<std::string, TH1*> &allhistos, TArgs... args);
+void plot1d(std::string name, float xval, double weight, std::map<std::string, TH1*> &allhistos, TArgs... args)
+{
+  auto iter = allhistos.find(name);
+  if (iter == allhistos.end()) {
+    TH1D* currentHisto= new TH1D(name.c_str(), args...);
+    currentHisto->Sumw2();
+    currentHisto->Fill(xval, weight);
+    allhistos.insert( std::pair<std::string, TH1*>(name, currentHisto) );
+  } else {
+    iter->second->Fill(xval, weight);
+  }
+}
 
 template<typename... TArgs>
-void plot3d(std::string name, float xval, float yval, float zval, double weight, std::map<std::string, TH1*> &allhistos, TArgs... args);
+void plot2d(std::string name, float xval, float yval, double weight, std::map<std::string, TH1*> &allhistos, TArgs... args)
+{
+  auto iter = allhistos.find(name);
+  if (iter == allhistos.end()) {
+    TH2D* currentHisto= new TH2D(name.c_str(), args...);
+    currentHisto->Sumw2();
+    currentHisto->Fill(xval, yval, weight);
+    allhistos.insert( std::pair<std::string, TH1*>(name, currentHisto) );
+  } else {
+    ((TH2D*) iter->second)->Fill(xval, yval, weight);
+  }
+}
 
-#endif
+template<typename... TArgs>
+void plot3d(std::string name, float xval, float yval, float zval, double weight, std::map<std::string, TH1*> &allhistos, TArgs... args)
+{
+  auto iter = allhistos.find(name);
+  if (iter == allhistos.end()) {
+    TH3D* currentHisto= new TH3D(name.c_str(), args...);
+    currentHisto->Sumw2();
+    currentHisto->Fill(xval, yval, zval, weight);
+    allhistos.insert( std::pair<std::string, TH1*>(name, currentHisto) );
+  } else {
+    ((TH3D*) iter->second)->Fill(xval, yval, zval, weight);
+  }
+}
 
+#endif  // STOPLOOPER_UTILITIES_H
