@@ -27,13 +27,17 @@ int main(int argc, char** argv)
     string inputdir = sample.baby_i_o.first;
     for (auto fname : sample.inputBabies) {
       string filepath = inputdir + fname;
+      if (input_dir.find("/output") != string::npos)
+        filepath.replace(filepath.find("skim"), 4, "output");
       chain->Add(filepath.c_str());
     }
   };
 
-  if (sample == "all_2016") {
-    sampleInfo::vect_id sampleList = sampleInfo::getSampleList_SR();
-    // sampleInfo::vect_id sampleList = sampleInfo::vect_id{sampleInfo::ID::k_ttbar_singleLeptFromT_madgraph_pythia8_ext1};
+  if (sample.find("sample") != string::npos) {
+    sampleInfo::vect_id sampleList;
+    if (sample == "all_2016_samples") sampleList = sampleInfo::getSampleList_SR();
+    else if (sample == "2016data_sample") sampleList = sampleInfo::vect_id{sampleInfo::ID::k_single_lepton_met};
+    else if (sample == "2016ttbar_sample") sampleList = sampleInfo::vect_id{sampleInfo::ID::k_ttbar_singleLeptFromT_madgraph_pythia8_ext1};
     for (auto sampleid : sampleList) {
       sampleInfo::sampleUtil sample(sampleid);
       string samplestr = sample.label;

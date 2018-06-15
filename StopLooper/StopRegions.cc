@@ -215,7 +215,7 @@ std::vector<SR> getStopInclusiveRegionsTopological() {
   srbase.SetVar("nbtag", 1, fInf);
   srbase.SetVar("mlb", 0, fInf);
   srbase.SetVar("tmod", -fInf, fInf);
-  srbase.SetVar("dphijmet", 0.0, 3.1416);
+  srbase.SetVar("dphijmet", 0.8, 3.1416);
   srbase.SetMETBins({250, 350, 450, 550, 650, 800, 1500});
 
   SR sr;
@@ -223,32 +223,59 @@ std::vector<SR> getStopInclusiveRegionsTopological() {
 
   SRvec.emplace_back(srbase);
 
-  // Top tag regions at baseline
-
-  sr = srbase;
-  sr.SetName("srbaseMT");
-  srbase.SetVar("mt", 0, fInf);
-  sr.SetMETBins({250, 1500});
-  SRvec.emplace_back(sr);
-
-  sr = srbase;
-  sr.SetName("srbaseMET");
-  srbase.SetVar("met", 100, fInf);
+  // Test regions
+  sr.SetAllowDummyVars(1);
+  sr.SetName("srtest0");         // test for zpeak lumi
+  sr.SetVar("mt", 0, fInf);
+  sr.SetVar("met", 100, fInf);
+  sr.SetVar("nlep", 1, 2);
+  sr.SetVar("nvlep", 1, 2);
+  sr.SetVar("passvetos", 1, 2);
+  sr.SetVar("njet", 2, fInf);
+  sr.SetVar("nbtag", 1, fInf);
+  sr.SetVar("mlb", 0, fInf);
+  sr.SetVar("tmod", -fInf, fInf);
+  sr.SetVar("dphijmet", 0.8, 3.1416);
   sr.SetMETBins({100, 1500});
   SRvec.emplace_back(sr);
 
-  sr = srbase;
-  sr.SetName("srbase2");
-  sr.SetVar("deepttag", wpDeepTop, 1);
-  sr.SetMETBins({250, 350, 500, 700, 1500});
+  sr.SetName("srtestMT");
+  sr.SetVar("met", 250, fInf);
   SRvec.emplace_back(sr);
 
-  sr = srbase;
-  sr.SetName("srbase3");
-  sr.SetVar("deepttag", -1, wpDeepTop);
-  sr.SetVar("resttag", wpResTop, 1);
-  sr.SetMETBins({250, 350, 500, 700, 1500});
+  sr.SetName("srtestMET");
+  sr.SetVar("met", 100, fInf);
+  sr.SetVar("mt", 150, fInf);
   SRvec.emplace_back(sr);
+
+  sr.SetName("srtest2");
+  sr.SetVar("met", 250, fInf);
+  sr.SetVar("dphijmet", 0.0, 3.1416);
+  SRvec.emplace_back(sr);
+
+  sr.SetName("srtest3");         // test
+  sr.SetVar("met", 150, fInf);
+  sr.SetVar("nbtag", 0, fInf);
+  SRvec.emplace_back(sr);
+
+  sr.SetName("srtest4");
+  sr.SetDetailName("geq4j_inclusive");
+  sr.SetVar("njet", 4, fInf);
+  SRvec.emplace_back(sr);
+
+  // // Top tag regions at baseline
+  // sr = srbase;
+  // sr.SetName("srbase2");
+  // sr.SetVar("deepttag", wpDeepTop, 1);
+  // sr.SetMETBins({250, 350, 500, 700, 1500});
+  // SRvec.emplace_back(sr);
+
+  // sr = srbase;
+  // sr.SetName("srbase3");
+  // sr.SetVar("deepttag", -1, wpDeepTop);
+  // sr.SetVar("resttag", wpResTop, 1);
+  // sr.SetMETBins({250, 350, 500, 700, 1500});
+  // SRvec.emplace_back(sr);
 
   sr = srbase;
   sr.SetName("srNJetTModTTagA2");
@@ -969,6 +996,7 @@ std::vector<SR> getStopSignalRegionsNewMETBinning() {
   sr.SetMETBins({250, 500, 1500});
   SRvec.emplace_back(sr);
 
+  // SRvec.clear();  // TEMPORARY!!
 
   // Compressed regions
   sr = srbase;
@@ -985,6 +1013,54 @@ std::vector<SR> getStopSignalRegionsNewMETBinning() {
   // sr.SetMETBins({250, 350, 450, 550, 1500});
   sr.SetMETBins({250, 350, 450, 550, 700, 1500});
   SRvec.emplace_back(sr);
+
+  // sr = srbase;
+  // sr.SetName("srI2");
+  // sr.SetDetailName("geq2j_lpt0to150_j1notb");
+  // sr.RemoveVar("nbtag");
+  // sr.SetVar("mt", 100, fInf);
+  // sr.SetVar("njet", 4, fInf);
+  // sr.SetVar("nbjet", 1, fInf);
+  // sr.SetVar("lep1pt", 0, 100);
+  // sr.SetVar("j1pt", 200, fInf);
+  // // sr.SetVar("j2pt", 20, 150);
+  // // sr.SetVar("dphilmet", 0, 2.0);
+  // sr.SetVar("dphijmet", 2, 3.1416);
+  // sr.SetVar("j1passbtag", 0, 1);  // Require j1 not b-tagged
+  // sr.SetMETBins({250, 350, 450, 550, 700, 1500});
+  // SRvec.emplace_back(sr);
+
+  // sr = srbase;
+  // sr.SetName("srI3");
+  // sr.SetDetailName("geq2j_lpt0to150_j1notb");
+  // sr.RemoveVar("nbtag");
+  // sr.SetVar("mt", 100, fInf);
+  // sr.SetVar("njet", 4, fInf);
+  // sr.SetVar("nbjet", 1, fInf);
+  // sr.SetVar("lep1pt", 0, 100);
+  // sr.SetVar("j1pt", 400, fInf);
+  // // sr.SetVar("j2pt", 20, 150);
+  // // sr.SetVar("dphilmet", 0, 2.0);
+  // sr.SetVar("dphijmet", 2, 3.1416);
+  // sr.SetVar("j1passbtag", 0, 1);  // Require j1 not b-tagged
+  // sr.SetMETBins({250, 350, 450, 550, 700, 1500});
+  // SRvec.emplace_back(sr);
+
+  // sr = srbase;
+  // sr.SetName("srI4");
+  // sr.SetDetailName("geq2j_lpt0to150_j1notb");
+  // sr.RemoveVar("nbtag");
+  // sr.SetVar("mt", 100, fInf);
+  // sr.SetVar("njet", 4, fInf);
+  // sr.SetVar("nbjet", 1, fInf);
+  // sr.SetVar("lep1pt", 0, 100);
+  // sr.SetVar("j1pt", 600, fInf);
+  // // sr.SetVar("j2pt", 20, 150);
+  // // sr.SetVar("dphilmet", 0, 2.0);
+  // sr.SetVar("dphijmet", 2, 3.1416);
+  // sr.SetVar("j1passbtag", 0, 1);  // Require j1 not b-tagged
+  // sr.SetMETBins({250, 350, 450, 550, 700, 1500});
+  // SRvec.emplace_back(sr);
 
   return SRvec;
 }
