@@ -11,6 +11,7 @@
 
 // class: SR [Stop Region]
 // some more descriptions here...
+using funcf = float (*)();
 
 class SR {
 
@@ -39,6 +40,7 @@ public:
   float* GetMETBinsPtr();
 
   bool PassesSelection(std::map<std::string, float> values);
+  bool PassesSelection(std::map<std::string, funcf> funcs);
   bool VarExists(std::string var_name) const;
   void RemoveVar(std::string var_name);
   void Clear();
