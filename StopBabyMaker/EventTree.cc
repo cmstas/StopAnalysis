@@ -514,6 +514,9 @@ void EventTree::Reset ()
     filt_jetWithBadMuon_jup        = true;
     filt_jetWithBadMuon_jdown      = true;
     filt_pfovercalomet             = true;
+    filt_nobadmuons                = true;
+    filt_badmuons                  = false;
+    filt_duplicatemuons            = false;
     
     nPhotons             = -9999;
     ph_selectedidx       = -9999;
@@ -783,6 +786,7 @@ void EventTree::SetMETFilterBranches (TTree* tree)
     tree->Branch("filt_globalsupertighthalo2016", &filt_globalsupertighthalo2016);
     tree->Branch("filt_ecallaser", &filt_ecallaser);
     tree->Branch("filt_ecaltp", &filt_ecaltp);
+    tree->Branch("filt_ecalbadcalib", &filt_ecalbadcalib);
     tree->Branch("filt_eebadsc", &filt_eebadsc);
     tree->Branch("filt_goodvtx", &filt_goodvtx);
     tree->Branch("filt_badevents", &filt_badevents);
@@ -805,7 +809,9 @@ void EventTree::SetMETFilterBranches (TTree* tree)
     tree->Branch("filt_jetWithBadMuon_jup", &filt_jetWithBadMuon_jup);
     tree->Branch("filt_jetWithBadMuon_jdown", &filt_jetWithBadMuon_jdown);
     tree->Branch("filt_pfovercalomet", &filt_pfovercalomet);
-
+    tree->Branch("filt_badmuons", &filt_badmuons);
+    tree->Branch("filt_duplicatemuons", &filt_duplicatemuons);
+    tree->Branch("filt_nobadmuons", &filt_nobadmuons);
 }
 
 void EventTree::SetPhotonBranches (TTree* tree)

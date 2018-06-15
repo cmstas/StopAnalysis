@@ -1,6 +1,6 @@
 # StopBabyMaker
 
-This code makes stop babies from CMS4 ntuples, produced by the [NtupleMaker](https://github.com/cmstas/Ntuple).
+This code makes stop babies from CMS4 ntuples, produced by the [NtupleMaker](https://github.com/cmstas/NtupleMaker).
 
 ## Setup
 
@@ -31,15 +31,10 @@ The main exectuable is `runBabyMaker`. To run it, you need to provide at least t
 - **isFastsim**: This should be a boolean of 1 or 0 telling if the sample is a fastSim sample or not. The default value is 0 (not fastSim).
 
 
-### Another (old) way to run the babymaker
-
-`./runBabyMaker sample_name nevents file_number outpath sampleList isFastsim`
-
+#### Another (old) way to run the babymaker
+    The following arguments can also be changed to the following provided a samples.dat list is present.
 - **sample\_name**: This is the compact name for the sample you want to run on. These sample names are defined in the various sample\*.dat files.
-- **nevents**: This is how many events you want to run over. A value of -1 means all events in the ntuple. If you don't provide a value, -1 is used automatically.
-- **file\_number**: This number specifies which file you want to run over (i.e. merged\_ntuple\_X.root). The default value is -1, which means all files.
 - **sampleList**: This parameter tells the babyMaker which .dat file contains the sample\_name you want to run on. The default value is sample_2017.dat.
-- **isFastsim**: Put a 1 if your desired sample is a fastSim sample. The default value is 0 (not fastSim).
 
 ## Submitting batch jobs to the grid
 

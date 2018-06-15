@@ -150,42 +150,42 @@ void eventWeight_bTagSF::getBTagWeight( int WP, std::vector< double > jet_pt, st
       flavor = BTagEntry::FLAV_B;
       pt_eff = std::max(20.0,std::min(599.0, jet_pt[iJet])); // max pt of 600.0 GeV for b
 
-      if( WP==BTagEntry::LOOSE  ) h_eff = h_loose_btag_eff_b;
-      if( WP==BTagEntry::MEDIUM ) h_eff = h_btag_eff_b;
-      if( WP==BTagEntry::TIGHT  ) h_eff = h_tight_btag_eff_b;
+      if( WP==BTagEntry::OP_LOOSE  ) h_eff = h_loose_btag_eff_b;
+      if( WP==BTagEntry::OP_MEDIUM ) h_eff = h_btag_eff_b;
+      if( WP==BTagEntry::OP_TIGHT  ) h_eff = h_tight_btag_eff_b;
     }
     // Charm
     else if( abs(jet_flavour[iJet])==4 ){
       flavor = BTagEntry::FLAV_C;
 
-      if( WP==BTagEntry::LOOSE  ) h_eff = h_loose_btag_eff_c;
-      if( WP==BTagEntry::MEDIUM ) h_eff = h_btag_eff_c;
-      if( WP==BTagEntry::TIGHT  ) h_eff = h_tight_btag_eff_c;
+      if( WP==BTagEntry::OP_LOOSE  ) h_eff = h_loose_btag_eff_c;
+      if( WP==BTagEntry::OP_MEDIUM ) h_eff = h_btag_eff_c;
+      if( WP==BTagEntry::OP_TIGHT  ) h_eff = h_tight_btag_eff_c;
     }
     // UDSG
     else{
       flavor = BTagEntry::FLAV_UDSG;
 
-      if( WP==BTagEntry::LOOSE  ) h_eff = h_loose_btag_eff_udsg;
-      if( WP==BTagEntry::MEDIUM ) h_eff = h_btag_eff_udsg;
-      if( WP==BTagEntry::TIGHT  ) h_eff = h_tight_btag_eff_udsg;
+      if( WP==BTagEntry::OP_LOOSE  ) h_eff = h_loose_btag_eff_udsg;
+      if( WP==BTagEntry::OP_MEDIUM ) h_eff = h_btag_eff_udsg;
+      if( WP==BTagEntry::OP_TIGHT  ) h_eff = h_tight_btag_eff_udsg;
     }
 
     binx = h_eff->GetXaxis()->FindBin(pt_eff);
     biny = h_eff->GetYaxis()->FindBin(eta_eff);
     btagprob_eff = h_eff->GetBinContent(binx,biny);
 
-    if( WP==BTagEntry::LOOSE ){
+    if( WP==BTagEntry::OP_LOOSE ){
       weight_cent = reader_loose->eval_auto_bounds("central", flavor, jet_eta[iJet], jet_pt[iJet]);
       weight_UP   = reader_loose->eval_auto_bounds("up",      flavor, jet_eta[iJet], jet_pt[iJet]);
       weight_DN   = reader_loose->eval_auto_bounds("down",    flavor, jet_eta[iJet], jet_pt[iJet]);
     }
-    else if( WP==BTagEntry::MEDIUM ){
+    else if( WP==BTagEntry::OP_MEDIUM ){
       weight_cent = reader_medium->eval_auto_bounds("central", flavor, jet_eta[iJet], jet_pt[iJet]);
       weight_UP   = reader_medium->eval_auto_bounds("up",      flavor, jet_eta[iJet], jet_pt[iJet]);
       weight_DN   = reader_medium->eval_auto_bounds("down",    flavor, jet_eta[iJet], jet_pt[iJet]);
     }
-    else if( WP==BTagEntry::TIGHT ){
+    else if( WP==BTagEntry::OP_TIGHT ){
       weight_cent = reader_tight->eval_auto_bounds("central", flavor, jet_eta[iJet], jet_pt[iJet]);
       weight_UP   = reader_tight->eval_auto_bounds("up",      flavor, jet_eta[iJet], jet_pt[iJet]);
       weight_DN   = reader_tight->eval_auto_bounds("down",    flavor, jet_eta[iJet], jet_pt[iJet]);
@@ -194,14 +194,14 @@ void eventWeight_bTagSF::getBTagWeight( int WP, std::vector< double > jet_pt, st
     // extra SF for fastsim
     if(sampleIsFastsim) {
 
-      if( WP==BTagEntry::LOOSE ){
+      if( WP==BTagEntry::OP_LOOSE ){
         weight_FS_UP = reader_loose_FS->eval_auto_bounds("up",      flavor, jet_eta[iJet], jet_pt[iJet]) * weight_cent;
         weight_FS_DN = reader_loose_FS->eval_auto_bounds("down",    flavor, jet_eta[iJet], jet_pt[iJet]) * weight_cent;
         weight_cent *= reader_loose_FS->eval_auto_bounds("central", flavor, jet_eta[iJet], jet_pt[iJet]);
         weight_UP   *= reader_loose_FS->eval_auto_bounds("central", flavor, jet_eta[iJet], jet_pt[iJet]);//this is still just btagSF
         weight_DN   *= reader_loose_FS->eval_auto_bounds("central", flavor, jet_eta[iJet], jet_pt[iJet]);//this is still just btagSF
       }
-      else if( WP==BTagEntry::MEDIUM ){
+      else if( WP==BTagEntry::OP_MEDIUM ){
         weight_FS_UP = reader_medium_FS->eval_auto_bounds("up",      flavor, jet_eta[iJet], jet_pt[iJet]) * weight_cent;
         weight_FS_DN = reader_medium_FS->eval_auto_bounds("down",    flavor, jet_eta[iJet], jet_pt[iJet]) * weight_cent;
         weight_cent *= reader_medium_FS->eval_auto_bounds("central", flavor, jet_eta[iJet], jet_pt[iJet]);
@@ -209,7 +209,7 @@ void eventWeight_bTagSF::getBTagWeight( int WP, std::vector< double > jet_pt, st
         weight_DN   *= reader_medium_FS->eval_auto_bounds("central", flavor, jet_eta[iJet], jet_pt[iJet]);//this is still just btagSF
 
       }
-      else if( WP==BTagEntry::TIGHT ){
+      else if( WP==BTagEntry::OP_TIGHT ){
         weight_FS_UP = reader_tight_FS->eval_auto_bounds("up",      flavor, jet_eta[iJet], jet_pt[iJet]) * weight_cent;
         weight_FS_DN = reader_tight_FS->eval_auto_bounds("down",    flavor, jet_eta[iJet], jet_pt[iJet]) * weight_cent;
         weight_cent *= reader_tight_FS->eval_auto_bounds("central", flavor, jet_eta[iJet], jet_pt[iJet]);
