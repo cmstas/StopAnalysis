@@ -227,7 +227,7 @@ std::vector<SR> getStopInclusiveRegionsTopological() {
   sr.SetAllowDummyVars(1);
   sr.SetName("srtest0");         // test for zpeak lumi
   sr.SetVar("mt", 0, fInf);
-  sr.SetVar("met", 50, fInf);
+  sr.SetVar("met", 100, fInf);
   sr.SetVar("nlep", 1, 2);
   sr.SetVar("nvlep", 1, 2);
   sr.SetVar("passvetos", 1, 2);
@@ -244,17 +244,11 @@ std::vector<SR> getStopInclusiveRegionsTopological() {
   SRvec.emplace_back(sr);
 
   sr.SetName("srtestMET");
-  sr.SetVar("met", 50, fInf);
+  sr.SetVar("met", 100, fInf);
   sr.SetVar("mt", 150, fInf);
-  SRvec.emplace_back(sr);
-
-  sr.SetName("srtest1");
-  sr.SetVar("met", 150, fInf);
-  sr.SetVar("mt", 0, fInf);
   SRvec.emplace_back(sr);
 
   sr.SetName("srtest2");
-  sr.SetVar("mt", 150, fInf);
   sr.SetVar("met", 250, fInf);
   sr.SetVar("dphijmet", 0.0, 3.1416);
   SRvec.emplace_back(sr);
