@@ -830,9 +830,11 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
   //
   // Set JSON file
   //
-  bool applyjson = false;
-  const char* json_file = "json_files/Cert_294927-306462_13TeV_PromptReco_Collisions17_JSON.txt";
-  set_goodrun_file_json(json_file);
+  const bool applyjson = false;
+  if (applyjson) {
+    const char* json_file = "json_files/Cert_294927-306462_13TeV_PromptReco_Collisions17_JSON.txt";
+    set_goodrun_file_json(json_file);
+  }
 
   //
   // Set scale1fb file

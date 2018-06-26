@@ -2,6 +2,7 @@
 #include "CMS3.h"
 #include "JetSelections.h"
 #include "btagsf/BTagCalibrationStandalone.h"
+#include "Math/VectorUtil.h"
 
 using namespace tas;
  
@@ -598,6 +599,31 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx, Factorize
         topcands_Wp4.push_back( tcand.wcand );
       }
     }
+
+    // Fill info for soft b-tags
+    for (size_t i=0; i<svs_p4().size(); i++) {
+
+      if (svs_p4().at(i).Pt() >= 20.0) continue;
+      if (svs_nTrks().at(i) < 3) continue;
+      if (svs_distXYval().at(i) >= 3.0) continue;
+      if (svs_dist3Dsig().at(i) <= 4.0) continue;
+      if (cos(svs_anglePV().at(i)) <= 0.98) continue;
+
+      bool failDR = false;
+      for (size_t j=0; j<ak4pfjets_p4.size(); j++) {
+        if (ROOT::Math::VectorUtil::DeltaR( svs_p4().at(i), ak4pfjets_p4[j] ) <= 0.4) {
+          failDR = true;
+          break;
+        }
+      } // end loop over ak4 jets
+
+      if (failDR) continue;
+
+      softtags_p4.push_back( svs_p4().at(i) );
+
+    } // end loop over SVs
+
+    nsoftbtags = softtags_p4.size();
 }
         
 // fill info for ak8pfjets
@@ -668,6 +694,10 @@ void JetTree::FillAK8Jets(bool applynewcorr, FactorizedJetCorrector* corrector, 
   }
 
   nGoodAK8PFJets = nGoodJets;
+  for (auto disc : ak8pfjets_deepdisc_top) {
+    if (disc > lead_ak8deepdisc_top) lead_ak8deepdisc_top = disc;
+  }
+
 }
 
 void JetTree::SetJetSelection (std::string cone_size, float pt_cut,float eta, bool id)
@@ -791,7 +821,10 @@ void JetTree::Reset ()
     ak8pfjets_deepdisc_zbb.clear();
     ak8pfjets_deepdisc_hbb.clear();
     ak8pfjets_deepdisc_h4q.clear();
+    lead_ak8deepdisc_top = -1;
  
+    softtags_p4.clear();
+
     ak4genjets_p4.clear();
  
     ak4pfjets_MEDbjet_pt.clear();
@@ -813,6 +846,7 @@ void JetTree::Reset ()
     nloosebtags    = -9999;
     ntightbtags    = -9999;
     nanalysisbtags = -9999;
+    nsoftbtags    = -9999;
 }
  
 void JetTree::SetAK4Branches (TTree* tree)
@@ -844,6 +878,9 @@ void JetTree::SetAK4Branches (TTree* tree)
     tree->Branch(Form("%sak4pfjets_leadMEDbjet_p4", prefix_.c_str()) , &ak4pfjets_leadMEDbjet_p4);
     tree->Branch(Form("%sak4pfjets_leadbtag_p4", prefix_.c_str()) , &ak4pfjets_leadbtag_p4);
     tree->Branch(Form("%sak4genjets_p4", prefix_.c_str()) , &ak4genjets_p4); 
+
+    tree->Branch(Form("%ssofttags_p4", prefix_.c_str()) , &softtags_p4);
+    tree->Branch(Form("%snsoftbtags", prefix_.c_str()) , &nsoftbtags);
 }
 
 void JetTree::SetAK8Branches (TTree* tree)
@@ -862,6 +899,7 @@ void JetTree::SetAK8Branches (TTree* tree)
     tree->Branch(Form("%sak8pfjets_deepdisc_zbb", prefix_.c_str()) , &ak8pfjets_deepdisc_zbb);
     tree->Branch(Form("%sak8pfjets_deepdisc_hbb", prefix_.c_str()) , &ak8pfjets_deepdisc_hbb);
     tree->Branch(Form("%sak8pfjets_deepdisc_h4q", prefix_.c_str()) , &ak8pfjets_deepdisc_h4q);
+    tree->Branch(Form("%slead_ak8deepdisc_top", prefix_.c_str()) , &lead_ak8deepdisc_top);
 }
 
 void JetTree::SetAK4Branches_Overleps (TTree* tree)

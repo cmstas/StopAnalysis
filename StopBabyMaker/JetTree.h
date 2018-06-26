@@ -152,10 +152,15 @@ public:
     vecd ak8pfjets_deepdisc_zbb;
     vecd ak8pfjets_deepdisc_hbb;
     vecd ak8pfjets_deepdisc_h4q;
+    float lead_ak8deepdisc_top;
      
     // genjets    
     vecLorentzVector ak4genjets_p4;    
  
+    // soft btag
+    vecLorentzVector softtags_p4;
+    int nsoftbtags;
+
     // top tagger
     bool doResolveTopMVA;
     ResolvedTopMVA* resTopMVA;
