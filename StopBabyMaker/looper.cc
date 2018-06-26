@@ -282,8 +282,8 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
   TObjArray *listOfFiles = chain->GetListOfFiles();
   TIter fileIter(listOfFiles);
   TFile *currentFile = 0;
-  bool applyJECunc = false;
-  if (applyJECfromFile && (JES_type != 0)) applyJECunc = true;
+  bool applyJECunc = applyJECfromFile;
+  // if (applyJECfromFile && (JES_type != 0)) applyJECunc = true;
 
   //
   // JEC files
@@ -904,36 +904,41 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
   jetcorr_filenames_pfL1FastJetL2L3.push_back("jecfiles/"+jecVer+"/"+jecVer+"_L2L3Residual_AK4PFchs.txt");
   jetcorr_uncertainty_filename = "jecfiles/"+jecVer+"/"+jecVer+"_Uncertainty_AK4PFchs.txt";
 
+  if (applyJECfromFile) {
+    cout << "applying JEC from the following files:" << endl;
+    for (auto filename : jetcorr_filenames_pfL1FastJetL2L3)
+      cout << "   " << filename << endl;
+
+    jet_corrector_pfL1FastJetL2L3 = makeJetCorrector(jetcorr_filenames_pfL1FastJetL2L3);
+    jetcorr_uncertainty_sys = new JetCorrectionUncertainty(jetcorr_uncertainty_filename);
+  } else {
+    cout << "JECs taken from miniAOD directly" << endl;
+  }
+
+  // Prepare for future possible de-coupling applyJECunc from applyJECfromFile
+  if (!isDataFromFileName && applyJECunc) {
+    cout << "applying JEC uncertainties with weight " << applyJECunc << " from file: " << endl
+         << "   " << jetcorr_uncertainty_filename << endl
+         << "   " << ak8jetcorr_uncertainty_filename << endl;
+    jetcorr_uncertainty = new JetCorrectionUncertainty(jetcorr_uncertainty_filename);
+    ak8jetcorr_uncertainty = new JetCorrectionUncertainty(ak8jetcorr_uncertainty_filename);
+  }
+
   if (applyAK8JECfromFile) {
     ak8jetcorr_filenames_pfL1FastJetL2L3.push_back("jecfiles/"+jecVer+"/"+jecVer+"_L1FastJet_AK8PFPuppi.txt");
     ak8jetcorr_filenames_pfL1FastJetL2L3.push_back("jecfiles/"+jecVer+"/"+jecVer+"_L2Relative_AK8PFPuppi.txt");
     ak8jetcorr_filenames_pfL1FastJetL2L3.push_back("jecfiles/"+jecVer+"/"+jecVer+"_L3Absolute_AK8PFPuppi.txt");
     ak8jetcorr_filenames_pfL1FastJetL2L3.push_back("jecfiles/"+jecVer+"/"+jecVer+"_L2L3Residual_AK8PFPuppi.txt");
     ak8jetcorr_uncertainty_filename = "jecfiles/"+jecVer+"/"+jecVer+"_Uncertainty_AK8PFPuppi.txt";
-  }
 
-  if(applyJECfromFile != 0) {
     cout << "applying JEC from the following files:" << endl;
-    for (auto filename : jetcorr_filenames_pfL1FastJetL2L3)
-      cout << "   " << filename << endl;
     for (auto filename : ak8jetcorr_filenames_pfL1FastJetL2L3)
       cout << "   " << filename << endl;
 
-    jet_corrector_pfL1FastJetL2L3 = makeJetCorrector(jetcorr_filenames_pfL1FastJetL2L3);
     ak8jet_corrector_pfL1FastJetL2L3 = makeJetCorrector(ak8jetcorr_filenames_pfL1FastJetL2L3);
-
-    if (!isDataFromFileName && applyJECunc != 0) {
-      cout << "applying JEC uncertainties with weight " << applyJECunc << " from file: " << endl
-           << "   " << jetcorr_uncertainty_filename << endl
-           << "   " << ak8jetcorr_uncertainty_filename << endl;
-      jetcorr_uncertainty = new JetCorrectionUncertainty(jetcorr_uncertainty_filename);
-      ak8jetcorr_uncertainty = new JetCorrectionUncertainty(ak8jetcorr_uncertainty_filename);
-    }
-    jetcorr_uncertainty_sys = new JetCorrectionUncertainty(jetcorr_uncertainty_filename);
     ak8jetcorr_uncertainty_sys = new JetCorrectionUncertainty(ak8jetcorr_uncertainty_filename);
   }
-  else
-    cout << "JECs taken from miniAOD directly" << endl;
+
   //
   // Get bad events from txt files
   //
