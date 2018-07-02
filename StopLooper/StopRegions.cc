@@ -227,13 +227,13 @@ std::vector<SR> getStopInclusiveRegionsTopological() {
   sr.SetAllowDummyVars(1);
   sr.SetName("srtest0");         // test for zpeak lumi
   sr.SetVar("mt", 0, fInf);
-  sr.SetVar("met", 100, fInf);
+  sr.SetVar("met", 50, fInf);
   sr.SetVar("nlep", 1, 2);
   sr.SetVar("nvlep", 1, 2);
   sr.SetVar("passvetos", 1, 2);
   sr.SetVar("njet", 2, fInf);
   sr.SetVar("nbtag", 1, fInf);
-  sr.SetVar("mlb", 0, fInf);
+  sr.SetVar("mlb", -fInf, fInf);
   sr.SetVar("tmod", -fInf, fInf);
   sr.SetVar("dphijmet", 0.8, 3.1416);
   sr.SetMETBins({100, 1500});
@@ -244,7 +244,7 @@ std::vector<SR> getStopInclusiveRegionsTopological() {
   SRvec.emplace_back(sr);
 
   sr.SetName("srtestMET");
-  sr.SetVar("met", 100, fInf);
+  sr.SetVar("met", 50, fInf);
   sr.SetVar("mt", 150, fInf);
   SRvec.emplace_back(sr);
 
@@ -253,15 +253,30 @@ std::vector<SR> getStopInclusiveRegionsTopological() {
   sr.SetVar("dphijmet", 0.0, 3.1416);
   SRvec.emplace_back(sr);
 
-  sr.SetName("srtest3");         // test
-  sr.SetVar("met", 150, fInf);
+  sr.SetName("srtest3");
+  sr.SetVar("mt", 0, fInf);
   sr.SetVar("nbtag", 0, fInf);
   SRvec.emplace_back(sr);
 
   sr.SetName("srtest4");
   sr.SetDetailName("geq4j_inclusive");
+  sr.SetVar("mt", 150, fInf);
+  sr.SetVar("dphijmet", 0.0, 3.1416);
   sr.SetVar("njet", 4, fInf);
   SRvec.emplace_back(sr);
+
+  // SRvec.clear();
+
+  sr.SetName("srtest5");         // test
+  sr.SetVar("met", 150, fInf);
+  sr.SetVar("dphijmet", 0, 0.5);
+  sr.SetVar("nlep", 0, fInf);
+  sr.SetVar("nvlep", 0, fInf);
+  sr.SetVar("njet", 2, fInf);
+  sr.SetVar("nbtag", 0, fInf);
+  SRvec.emplace_back(sr);
+
+  // return SRvec;
 
   // // Top tag regions at baseline
   // sr = srbase;
@@ -467,6 +482,21 @@ std::vector<SR> getStopInclusiveRegionsTopological() {
   sr.SetVar("njet", 4, fInf);
   sr.SetVar("tmod", 10, fInf);
   sr.SetMETBins({150, 250, 350, 450, 600, 1500});
+  SRvec.emplace_back(sr);
+
+  // Compressed regions
+  sr = srbase;
+  sr.SetName("srI");
+  sr.SetDetailName("geq5j_lpt0to150_j1notb");
+  sr.RemoveVar("nbtag");
+  sr.SetVar("mt", 150, fInf);
+  sr.SetVar("njet", 5, fInf);
+  sr.SetVar("nbjet", 1, fInf);
+  sr.SetVar("lep1pt", 0, 150);
+  sr.SetVar("dphilmet", 0, 2.0);
+  sr.SetVar("dphijmet", 0.5, 3.1416);
+  sr.SetVar("j1passbtag", 0, 1);  // Require j1 not b-tagged
+  sr.SetMETBins({250, 1500});
   SRvec.emplace_back(sr);
 
   return SRvec;

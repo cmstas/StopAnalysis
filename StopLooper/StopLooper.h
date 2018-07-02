@@ -37,6 +37,7 @@ class StopLooper {
 
   // Testing
   void fillTopTaggingHistos(std::string suffix = "");
+  void fillEfficiencyHistos(SR& sr, std::string type = "", std::string suffix = "");
   void testTopTaggingEffficiency(SR& sr);
   void testCutFlowHistos(SR& sr);
 

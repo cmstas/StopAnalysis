@@ -41,12 +41,12 @@ inline void moveXOverFlowToLastBin3D(TH3* hist) {
 
 // Templated function
 template<class LorentzVectorType>
-bool isCloseObject(LorentzVectorType p1, LorentzVectorType p2, float conesize)
+bool isCloseObject(const LorentzVectorType p1, const LorentzVectorType p2, const float conesize)
 {
   const float PI = TMath::Pi();
   float deltaEta = fabs(p1.eta() - p2.eta());
   if (deltaEta > conesize) return false;
-  float deltaPhi = fabs(p1.eta() - p2.eta());
+  float deltaPhi = fabs(p1.phi() - p2.phi());
   if (deltaPhi > PI) deltaPhi = 2*PI - deltaPhi;
   if (deltaPhi > conesize) return false;
   float deltaR2 = deltaEta*deltaEta + deltaPhi*deltaPhi;

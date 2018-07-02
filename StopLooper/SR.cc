@@ -119,7 +119,7 @@ bool SR::PassesSelectionPrintFirstFail(map<string, float> values) {
         return false;
       }
       if (( abs(cut_upper + 1.0) > ep ) && (value >= cut_upper)) {
-        if (debug_print_count_SR_cc++ < k_debug_print_limit_SR_cc)
+        if (k_suppress_vals.find(it->first) == string::npos && debug_print_count_SR_cc++ < k_debug_print_limit_SR_cc)
           cout << __LINE__ <<": var " << it->first << ": value= " << value << ", cut_upper= " << cut_upper << ": sr: " << srname_ << endl;
         return false;
       }

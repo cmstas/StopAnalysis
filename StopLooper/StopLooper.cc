@@ -165,8 +165,8 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
   const float kLumi = 120;
   // const float kLumi = 35.867;         // 2016 lumi
 
-  // Combined 2016 (35.87/fb), 2017 (41.96/fb) and 2018 (12.3/fb) json,
-  const char* json_file = "../StopCORE/inputs/json_files/Cert_271036-317080_13TeV_Combined161718_JSON_snt.txt";
+  // Combined 2016 (35.87/fb), 2017 (41.96/fb) and 2018 (14.38/fb) json,
+  const char* json_file = "../StopCORE/inputs/json_files/Cert_271036-317391_13TeV_Combined161718_JSON_snt.txt";
 
   if (samplestr.find("data_2016") == 0 || samplestr == "data_single_lepton_met") is2016data = true;
   if (samplestr.find("data_2018") == 0) is2018data = true;
@@ -180,7 +180,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
     TH1F* h_nvtxscale = (TH1F*) f_purw.Get("h_nvtxscale_"+scaletype);
     if (!h_nvtxscale) throw invalid_argument("???");
     if (verbose) cout << "Doing nvtx reweighting! Scaling " << scaletype << ". The scale factors are:" << endl;
-    for (int i = 1; i < 85; ++i) {
+    for (int i = 1; i < 100; ++i) {
       nvtxscale_[i] = h_nvtxscale->GetBinContent(i);
       if (verbose) cout << i << "  " << nvtxscale_[i] << endl;
     }
@@ -253,8 +253,11 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
         }
       }
 
+      fillEfficiencyHistos(testVec[0], "filters");
+
       // Apply met filters
       if (is2016data) {
+        // The newer version of the header file uses boolean type for all of the following, which breaks for 2016 data
         if ( !filt_met() ) continue;
         if ( !filt_goodvtx() ) continue;
         if ( firstGoodVtxIdx() == -1 ) continue;
@@ -267,15 +270,15 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
         if ( !filt_nobadmuons() ) continue;
       } else {
         if ( !filt_goodvtx() ) continue;
-        if ( !is_fastsim_ && !filt_globaltighthalo2016()) continue; // problematic for 2017 promptReco
-        // if ( !is_fastsim_ && !filt_globalsupertighthalo2016()) continue;
+        // if ( !is_fastsim_ && !filt_globaltighthalo2016()) continue; // problematic for 2017 & 2018 promptReco
+        if ( !is_fastsim_ && !filt_globalsupertighthalo2016()) continue;
         if ( !filt_hbhenoise() ) continue;
         if ( !filt_hbheisonoise() )   continue;
         if ( !filt_ecaltp() ) continue;
         if ( !filt_badMuonFilter() ) continue;
         if ( !filt_badChargedCandidateFilter() ) continue;
         if ( is_data() && !filt_eebadsc() ) continue;
-        // if ( !filt_ecalbadcalib() ) continue;
+        if ( !filt_ecalbadcalib() ) continue;
       }
 
       // stop defined filters
@@ -344,13 +347,15 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
         }
       }
 
-      if (pfmet() > 100) continue;
-      if (doNvtxReweight && (is2016data || is2018data)) {
-        if (nvtxs() < 85) evtweight_ = nvtxscale_[nvtxs()];  // only scale for data
-      }
+      fillEfficiencyHistos(testVec[0], "triggers");
 
       // Plot nvtxs on the base selection of stopbaby for reweighting purpose
-      plot1d("h_nvtxs", nvtxs(), evtweight_, testVec[0].histMap, ";Number of vertices", 100, 1, 101);
+      plot1d("h_nvtxs", nvtxs(), 1, testVec[0].histMap, ";Number of vertices", 100, 1, 101);
+
+      if (doNvtxReweight && (is2016data || is2018data)) {
+        if (nvtxs() < 100) evtweight_ = nvtxscale_[nvtxs()];  // only scale for data
+        plot1d("h_nvtxs_rwtd", nvtxs(), evtweight_, testVec[0].histMap, ";Number of vertices", 100, 1, 101);
+      }
 
       // Temporary test for top tagging efficiency
       testTopTaggingEffficiency(testVec[1]);
@@ -593,7 +598,7 @@ void StopLooper::fillYieldHistos(SR& sr, float met, string suf, bool is_cr2l) {
   evtweight_ = evtWgt.getWeight(evtWgtInfo::systID(jestype_), is_cr2l);
 
   if (doNvtxReweight && (is2016data || is2018data)) {
-    if (nvtxs() < 85) evtweight_ *= nvtxscale_[nvtxs()];  // only scale for data
+    if (nvtxs() < 100) evtweight_ *= nvtxscale_[nvtxs()];  // only scale for data
   }
 
   auto fillhists = [&](string s) {
@@ -662,10 +667,8 @@ void StopLooper::fillHistosForSR(string suf) {
     auto fillKineHists = [&](string s) {
       // Simple plot function plot1d to add extra plots anywhere in the code, is great for quick checks
       plot1d("h_mt"+s,       values_["mt"]      , evtweight_, sr.histMap, ";M_{T} [GeV]"             , 12,  0, 600);
-      plot1d("h_mt_h"+s,     values_["mt"]      , evtweight_, sr.histMap, ";M_{T} [GeV]"             , 12, 150, 650);
       plot1d("h_mt2w"+s,     values_["mt2w"]    , evtweight_, sr.histMap, ";MT2W [GeV]"              , 18,  50, 500);
       plot1d("h_met"+s,      values_["met"]     , evtweight_, sr.histMap, ";#slash{E}_{T} [GeV]"     , 24,  50, 650);
-      plot1d("h_met_h"+s,    values_["met"]     , evtweight_, sr.histMap, ";#slash{E}_{T} [GeV]"     , 30, 100, 850);
       plot1d("h_metphi"+s,   values_["metphi"]  , evtweight_, sr.histMap, ";#phi(#slash{E}_{T})"     , 34, -3.4, 3.4);
       plot1d("h_lep1pt"+s,   values_["lep1pt"]  , evtweight_, sr.histMap, ";p_{T}(lepton) [GeV]"     , 50,  0, 500);
       plot1d("h_lep1eta"+s,  values_["lep1eta"] , evtweight_, sr.histMap, ";#eta(leppton)"           , 60, -3, 3);
@@ -677,8 +680,14 @@ void StopLooper::fillHistosForSR(string suf) {
       plot1d("h_tmod"+s,     values_["tmod"]    , evtweight_, sr.histMap, ";Modified topness"        , 25, -10, 15);
       plot1d("h_nvtxs"+s,        nvtxs()        , evtweight_, sr.histMap, ";Number of vertices"      , 70,  1, 71);
 
+      plot1d("h_mt_h"+s,     values_["mt"]      , evtweight_, sr.histMap, ";M_{T} [GeV]"             , 12, 150, 650);
+      plot1d("h_met_h"+s,    values_["met"]     , evtweight_, sr.histMap, ";#slash{E}_{T} [GeV]"     , 30, 100, 850);
+      plot1d("h_nbtags"+s,   values_["nbjet"]   , evtweight_, sr.histMap, ";Number of b-tagged jets" ,  5,  0, 5);
+
       plot1d("h_jet1pt"+s,  ak4pfjets_p4().at(0).pt(), evtweight_, sr.histMap, ";p_{T}(jet1) [GeV]"  , 70,  0, 700);
       plot1d("h_jet1eta"+s, ak4pfjets_p4().at(0).eta(), evtweight_, sr.histMap, ";#eta(jet1) [GeV]"   , 60,  -3,  3);
+      plot1d("h_jet2pt"+s,  ak4pfjets_p4().at(1).pt(), evtweight_, sr.histMap, ";p_{T}(jet2) [GeV]"  , 70,  0, 700);
+      plot1d("h_jet2eta"+s, ak4pfjets_p4().at(1).eta(), evtweight_, sr.histMap, ";#eta(jet2) [GeV]"   , 60,  -3,  3);
     };
     // if (sr.GetName().find("base") != string::npos) // only plot for base regions
     if (suf == "") fillKineHists(suf);
@@ -740,8 +749,9 @@ void StopLooper::fillHistosForCR2l(string suf) {
               ( HLT_MET()) || ( HLT_MET110_MHT110()) || ( HLT_MET120_MHT120()) )) return;
   }
 
-  // // For getting into full trigger efficiency in 2017 data
-  // if ( (abs(lep1_pdgid()) == 11 && values_["lep1pt"] < 40) || (abs(lep1_pdgid()) == 13 && values_["lep1pt"] < 30) ) return;
+  // // For getting into full trigger efficiency in 2017 & 2018 data
+  // if (not( (HLT_SingleEl() && abs(lep1_pdgid()) == 11 && values_["lep1pt"] < 45) ||
+  //          (HLT_SingleMu() && abs(lep1_pdgid()) == 13 && values_["lep1pt"] < 40) || (HLT_MET_MHT() && pfmet() > 250) )) return;
 
   for (auto& cr : CR2lVec) {
     if (!cr.PassesSelection(values_)) continue;
@@ -752,14 +762,10 @@ void StopLooper::fillHistosForCR2l(string suf) {
     auto fillKineHists = [&] (string s) {
       plot1d("h_finemet"+s,  values_["met"]         , evtweight_, cr.histMap, ";#slash{E}_{T} [GeV]"           , 80,  0, 800);
       plot1d("h_met"+s,      values_["met"]         , evtweight_, cr.histMap, ";#slash{E}_{T} [GeV]"           , 24,  50, 650);
-      plot1d("h_met_u"+s,    values_["met"]         , evtweight_, cr.histMap, ";#slash{E}_{T} [GeV]"           , 20, 250, 650);
       plot1d("h_metphi"+s,   values_["metphi"]      , evtweight_, cr.histMap, ";#phi(#slash{E}_{T})"           , 40,  -4, 4);
       plot1d("h_mt"+s,       values_["mt"]          , evtweight_, cr.histMap, ";M_{T} [GeV]"                   , 12,  0, 600);
-      plot1d("h_mt_u"+s,     values_["mt"]          , evtweight_, cr.histMap, ";M_{T} [GeV]"                   , 12, 150, 650);
       plot1d("h_rlmet"+s,    values_["met_rl"]      , evtweight_, cr.histMap, ";#slash{E}_{T} (with removed lepton) [GeV]" , 24,  50, 650);
       plot1d("h_rlmt"+s,     values_["mt_rl"]       , evtweight_, cr.histMap, ";M_{T} (with removed lepton) [GeV]" , 12,  0, 600);
-      plot1d("h_rlmet_u"+s,  values_["met_rl"]      , evtweight_, cr.histMap, ";#slash{E}_{T} (with removed lepton) [GeV]" , 20, 250, 650);
-      plot1d("h_rlmt_u"+s,   values_["mt_rl"]       , evtweight_, cr.histMap, ";M_{T} (with removed lepton) [GeV]" , 12, 150, 600);
       plot1d("h_mt2w"+s,     values_["mt2w_rl"]     , evtweight_, cr.histMap, ";MT2W"                          , 18,  50, 500);
       plot1d("h_tmod"+s,     values_["tmod_rl"]     , evtweight_, cr.histMap, ";Modified topness"              , 20, -10, 15);
       plot1d("h_njets"+s,    values_["njet"]        , evtweight_, cr.histMap, ";Number of jets"                ,  8,  2, 10);
@@ -771,8 +777,17 @@ void StopLooper::fillHistosForCR2l(string suf) {
       plot1d("h_dphijmet"+s, values_["dphijmet_rl"] , evtweight_, cr.histMap, ";#Delta#phi(jet,#slash{E}_{T})" , 33,  0, 3.3);
       plot1d("h_nvtxs"+s,          nvtxs()          , evtweight_, cr.histMap, ";Number of vertices"            , 70,  1, 71);
 
+      plot1d("h_met_h"+s,    values_["met"]         , evtweight_, cr.histMap, ";#slash{E}_{T} [GeV]"           , 20, 250, 650);
+      plot1d("h_mt_h"+s,     values_["mt"]          , evtweight_, cr.histMap, ";M_{T} [GeV]"                   , 12, 150, 650);
+      plot1d("h_rlmet_h"+s,  values_["met_rl"]      , evtweight_, cr.histMap, ";#slash{E}_{T} (with removed lepton) [GeV]" , 20, 250, 650);
+      plot1d("h_rlmt_h"+s,   values_["mt_rl"]       , evtweight_, cr.histMap, ";M_{T} (with removed lepton) [GeV]" , 12, 150, 600);
+      plot1d("h_nbtags"+s,   values_["nbjet"]       , evtweight_, cr.histMap, ";Number of b-tagged jets"       ,  5,  0, 5);
+
       plot1d("h_jet1pt"+s,  ak4pfjets_p4().at(0).pt(),  evtweight_, cr.histMap, ";p_{T}(jet1) [GeV]"  , 70,  0, 700);
       plot1d("h_jet1eta"+s, ak4pfjets_p4().at(0).eta(), evtweight_, cr.histMap, ";#eta(jet1) [GeV]"   , 60,  -3,  3);
+      plot1d("h_jet2pt"+s,  ak4pfjets_p4().at(1).pt(),  evtweight_, cr.histMap, ";p_{T}(jet2) [GeV]"  , 70,  0, 700);
+      plot1d("h_jet2eta"+s, ak4pfjets_p4().at(1).eta(), evtweight_, cr.histMap, ";#eta(jet2) [GeV]"   , 60,  -3,  3);
+      plot1d("h_dphijmet_notrl"+s, values_["dphijmet"], evtweight_, cr.histMap, ";#Delta#phi(jet,#slash{E}_{T})" , 33,  0, 3.3);
 
       // Luminosity test at Z peak
       if (lep1_pdgid() == -lep2_pdgid()) {
@@ -812,8 +827,9 @@ void StopLooper::fillHistosForCR0b(string suf) {
     if (not ( (abs(lep1_pdgid()) == 11 && HLT_SingleEl()) || (abs(lep1_pdgid()) == 13 && HLT_SingleMu()) ||(HLT_MET() || HLT_MET110_MHT110() || HLT_MET120_MHT120()) )) return;
   }
 
-  // // For getting into full trigger efficiency in 2017 data
-  // if ( (abs(lep1_pdgid()) == 11 && values_["lep1pt"] < 40) || (abs(lep1_pdgid()) == 13 && values_["lep1pt"] < 30) ) return;
+  // // For getting into full trigger efficiency in 2017 & 2018 data
+  // if (not( (HLT_SingleEl() && abs(lep1_pdgid()) == 11 && values_["lep1pt"] < 45) ||
+  //          (HLT_SingleMu() && abs(lep1_pdgid()) == 13 && values_["lep1pt"] < 40) || (HLT_MET_MHT() && pfmet() > 250) )) return;
 
   for (auto& cr : CR0bVec) {
     if (!cr.PassesSelection(values_)) continue;
@@ -831,23 +847,28 @@ void StopLooper::fillHistosForCR0b(string suf) {
 
     auto fillKineHists = [&] (string s) {
       plot1d("h_mt"+s,       values_["mt"]      , evtweight_, cr.histMap, ";M_{T} [GeV]"          , 12,  0, 600);
-      plot1d("h_mt_u"+s,     values_["mt"]      , evtweight_, cr.histMap, ";M_{T} [GeV]"          , 12, 150, 650);
       plot1d("h_mt2w"+s,     values_["mt2w"]    , evtweight_, cr.histMap, ";MT2W [GeV]"           , 18,  50, 500);
       plot1d("h_met"+s,      values_["met"]     , evtweight_, cr.histMap, ";#slash{E}_{T} [GeV]"  , 24,  50, 650);
-      plot1d("h_met_u"+s,    values_["met"]     , evtweight_, cr.histMap, ";#slash{E}_{T} [GeV]"  , 20, 250, 650);
       plot1d("h_metphi"+s,   values_["metphi"]  , evtweight_, cr.histMap, ";#phi(#slash{E}_{T})"  , 34, -3.4, 3.4);
       plot1d("h_lep1pt"+s,   values_["lep1pt"]  , evtweight_, cr.histMap, ";p_{T}(lepton) [GeV]"  , 50,  0, 500);
       plot1d("h_lep1eta"+s,  values_["lep1eta"] , evtweight_, cr.histMap, ";#eta(leppton)"        , 60, -3, 3);
       plot1d("h_nleps"+s,    values_["nlep"]    , evtweight_, cr.histMap, ";Number of leptons"    ,  5,  0, 5);
       plot1d("h_njets"+s,    values_["njet"]    , evtweight_, cr.histMap, ";Number of jets"       ,  8,  2, 10);
-      plot1d("h_nbjets"+s,   values_["nbjet"]   , evtweight_, cr.histMap, ";Number of b-tagged jets" ,  6,  0, 6);
+      plot1d("h_nbjets"+s,   values_["nbjet"]   , evtweight_, cr.histMap, ";Number of b-tagged jets" ,  5,  0, 5);
       plot1d("h_mlepb"+s,    values_["mlb_0b"]  , evtweight_, cr.histMap, ";M_{#it{l}b} [GeV]"  , 24,  0, 600);
       plot1d("h_dphijmet"+s, values_["dphijmet"], evtweight_, cr.histMap, ";#Delta#phi(jet,#slash{E}_{T})" , 33,  0, 3.3);
       plot1d("h_tmod"+s,     values_["tmod"]    , evtweight_, cr.histMap, ";Modified topness"     , 25, -10, 15);
       plot1d("h_nvtxs"+s,        nvtxs()        , evtweight_, cr.histMap, ";Number of vertices"   , 70,  1, 71);
 
+      plot1d("h_met_h"+s,    values_["met"]     , evtweight_, cr.histMap, ";#slash{E}_{T} [GeV]"  , 20, 250, 650);
+      plot1d("h_mt_h"+s,     values_["mt"]      , evtweight_, cr.histMap, ";M_{T} [GeV]"          , 12, 150, 650);
+
       plot1d("h_jet1pt"+s,  ak4pfjets_p4().at(0).pt(),  evtweight_, cr.histMap, ";p_{T}(jet1) [GeV]"  , 70,  0, 700);
       plot1d("h_jet1eta"+s, ak4pfjets_p4().at(0).eta(), evtweight_, cr.histMap, ";#eta(jet1) [GeV]"   , 60,  -3,  3);
+      plot1d("h_jet2pt"+s,  ak4pfjets_p4().at(1).pt(),  evtweight_, cr.histMap, ";p_{T}(jet2) [GeV]"  , 70,  0, 700);
+      plot1d("h_jet2eta"+s, ak4pfjets_p4().at(1).eta(), evtweight_, cr.histMap, ";#eta(jet2) [GeV]"   , 60,  -3,  3);
+      // Temporary test for low dphijmet excess
+      plot1d("h_dphij1j2"+s, fabs(ak4pfjets_p4().at(0).phi()-ak4pfjets_p4().at(1).phi()), evtweight_, cr.histMap, ";#Delta#phi(j1,j2)" , 33,  0, 3.3);
     };
     fillKineHists(suf);
     if ( abs(lep1_pdgid()) == 11 ) {
@@ -894,8 +915,8 @@ void StopLooper::fillHistosForCR0b(string suf) {
 
 void StopLooper::fillHistosForCRemu(string suf) {
 
-  // Trigger requirements
-  if ( !HLT_MET_MHT() ) return;
+  // Trigger requirements and go to the plateau region
+  if ( !HLT_MET_MHT() || pfmet() < 250 ) return;
   if ( !(lep1_pdgid() * lep2_pdgid() == -143) ) return;
 
   // Basic cuts that are not supposed to change frequently
@@ -935,6 +956,11 @@ void StopLooper::fillHistosForCRemu(string suf) {
         plot1d("h_mlepb"+s,    values_["mlb_0b"]  , evtweight_, cr.histMap, ";M_{#it{l}b} [GeV]" , 24,  0, 600);
         plot1d("h_dphijmet"+s, values_["dphijmet"], evtweight_, cr.histMap, ";#Delta#phi(jet,#slash{E}_{T})" , 33,  0, 3.3);
 
+        plot1d("h_jet1pt"+s,  ak4pfjets_p4().at(0).pt(),  evtweight_, cr.histMap, ";p_{T}(jet1) [GeV]"  , 70,  0, 700);
+        plot1d("h_jet1eta"+s, ak4pfjets_p4().at(0).eta(), evtweight_, cr.histMap, ";#eta(jet1) [GeV]"   , 60,  -3,  3);
+        plot1d("h_jet2pt"+s,  ak4pfjets_p4().at(1).pt(),  evtweight_, cr.histMap, ";p_{T}(jet2) [GeV]"  , 70,  0, 700);
+        plot1d("h_jet2eta"+s, ak4pfjets_p4().at(1).eta(), evtweight_, cr.histMap, ";#eta(jet2) [GeV]"   , 60,  -3,  3);
+
         const float leppt_bins[] = {0, 30, 40, 50, 75, 100, 125, 200};
         plot1d("h_lep1ptbins"+s, values_["lep1pt"], evtweight_, cr.histMap, ";p_{T}(lepton) [GeV]", 7, leppt_bins);
         plot1d("h_lep2ptbins"+s, values_["lep2pt"], evtweight_, cr.histMap, ";p_{T}(lep2) [GeV]"  , 7, leppt_bins);
@@ -942,6 +968,73 @@ void StopLooper::fillHistosForCRemu(string suf) {
       fillhists(suf);
       if (HLT_MuE())
         fillhists(suf+"_passHLT");
+    }
+  }
+}
+
+void StopLooper::fillEfficiencyHistos(SR& sr, string type, string suffix) {
+
+  // Temporary globalTightHalo filter study
+  if (is_data() && (type == "" || type == "filters")) {
+    plot1d("hden_met_filt_globaltight"+suffix, pfmet(), 1, sr.histMap, ";#slash{E}_{T} [GeV]", 160, 50, 850);
+    plot1d("hden_metphi_filt_globaltight"+suffix, pfmet_phi(), 1, sr.histMap, ";#phi(#slash{E}_{T})", 128, -3.2, 3.2);
+    plot1d("hden_met_filt_supertight"+suffix, pfmet(), 1, sr.histMap, ";#slash{E}_{T} [GeV]", 160, 50, 850);
+    plot1d("hden_metphi_filt_supertight"+suffix, pfmet_phi(), 1, sr.histMap, ";#phi(#slash{E}_{T})", 128, -3.2, 3.2);
+
+    if (filt_globalsupertighthalo2016()) {
+      plot1d("hnum_met_filt_supertight"+suffix, pfmet(), filt_globalsupertighthalo2016(), sr.histMap, ";#slash{E}_{T} [GeV]", 160, 50, 850);
+      plot1d("hnum_metphi_filt_supertight"+suffix, pfmet_phi(), filt_globalsupertighthalo2016(), sr.histMap, ";#phi(#slash{E}_{T})", 128, -3.2, 3.2);
+    }
+    if (filt_globaltighthalo2016()) {
+      plot1d("hnum_met_filt_globaltight"+suffix, pfmet(), 1, sr.histMap, ";#slash{E}_{T} [GeV]", 160, 50, 850);
+      plot1d("hnum_metphi_filt_globaltight"+suffix, pfmet_phi(), 1, sr.histMap, ";#phi(#slash{E}_{T})", 128, -3.2, 3.2);
+    }
+  }
+
+  if (is_data() && (type == "" || type == "triggers")) {
+    // Study the efficiency of the MET trigger
+    if (HLT_SingleMu() && abs(lep1_pdgid()) == 13 && nvetoleps() == 1 && lep1_p4().pt() > 40) {
+      plot1d("hden_met_hltmet"+suffix, pfmet(), 1, sr.histMap, ";#slash{E}_{T} [GeV]"  , 60,  50, 650);
+      plot1d("hden_met_hltmetmht120"+suffix, pfmet(), 1, sr.histMap, ";#slash{E}_{T} [GeV]"  , 60,  50, 650);
+      plot1d("hden_ht_hltht1050"+suffix, ak4_HT(), 1, sr.histMap, ";H_{T} [GeV]", 30, 800, 1400);
+      if (HLT_MET_MHT())
+        plot1d("hnum_met_hltmet"+suffix, pfmet(), 1, sr.histMap, ";#slash{E}_{T} [GeV]"  , 60,  50, 650);
+      if (HLT_MET120_MHT120())
+        plot1d("hnum_met_hltmetmht120"+suffix, pfmet(), 1, sr.histMap, ";#slash{E}_{T} [GeV]"  , 60,  50, 650);
+      if (HLT_PFHT_unprescaled())
+        plot1d("hnum_ht_hltht1050"+suffix, ak4_HT(), 1, sr.histMap, ";H_{T} [GeV]", 30, 800, 1400);
+    } else if (HLT_SingleEl() && abs(lep1_pdgid()) == 11 && nvetoleps() == 1 && lep1_p4().pt() > 45) {
+      plot1d("hden_met_hltmet_eden"+suffix, pfmet(), 1, sr.histMap, ";#slash{E}_{T} [GeV]"  , 60,  50, 650);
+      if (HLT_MET_MHT())
+        plot1d("hnum_met_hltmet_eden"+suffix, pfmet(), 1, sr.histMap, ";#slash{E}_{T} [GeV]"  , 60,  50, 650);
+    }
+
+    // Study the efficiency of the single lepton triggers
+    if (HLT_MET_MHT() && pfmet() > 250) {
+      if (abs(lep1_pdgid()) == 13) {
+        plot1d("hden_lep1pt_hltmu"+suffix, lep1_p4().pt(), 1, sr.histMap, ";p_{T}(lep1) [GeV]", 50,  0, 500);
+        if (HLT_SingleMu())
+          plot1d("hnum_lep1pt_hltmu"+suffix, lep1_p4().pt(), 1, sr.histMap, ";p_{T}(#mu) [GeV]", 50,  0, 500);
+      }
+      else if (abs(lep1_pdgid()) == 11) {
+        plot1d("hden_lep1pt_hltel"+suffix, lep1_p4().pt(), 1, sr.histMap, ";p_{T}(lep1) [GeV]", 50,  0, 500);
+        if (HLT_SingleEl())
+          plot1d("hnum_lep1pt_hltel"+suffix, lep1_p4().pt(), 1, sr.histMap, ";p_{T}(e) [GeV]", 50,  0, 500);
+      }
+    }
+
+    // Study the OR of the 3 triggers, uses jetht dataset
+    if (HLT_PFHT_unprescaled())
+      plot1d("h_ht"+suffix, ak4_HT(), 1, sr.histMap, ";p_{T}(lep1) [GeV];#slash{E}_{T} [GeV]", 30, 800, 1400);
+
+    if (HLT_PFHT_unprescaled() || HLT_PFHT_prescaled()) {
+    // if (HLT_PFHT_unprescaled() && ak4_HT() > 1200) {
+    // if (true) {
+      const float TEbins_met[] = {175, 200, 225, 250, 275, 300, 400, 600};
+      const float TEbins_lep[] = {15, 17.5, 20, 22.5, 25, 30, 40, 60};
+      plot2d("hden2d_met_lep1pt_hlt3"+suffix, lep1_p4().pt(), pfmet(), 1, sr.histMap, ";p_{T}(lep1) [GeV];#slash{E}_{T} [GeV]", 7, TEbins_lep, 7, TEbins_met);
+      if (HLT_MET_MHT() || HLT_SingleMu() || HLT_SingleEl())
+        plot2d("hnum2d_met_lep1pt_hlt3"+suffix, lep1_p4().pt(), pfmet(), 1, sr.histMap, ";p_{T}(lep1) [GeV];#slash{E}_{T} [GeV]", 7, TEbins_lep, 7, TEbins_met);
     }
   }
 }

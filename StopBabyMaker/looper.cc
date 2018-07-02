@@ -1337,7 +1337,10 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
         StopEvt.pfmet_phi_jup = newmet_jup.second;
         StopEvt.pfmet_jdown = newmet_jdown.first;
         StopEvt.pfmet_phi_jdown = newmet_jdown.second;
-        if(TMath::IsNaN(StopEvt.pfmet)||(!TMath::Finite(StopEvt.pfmet))||StopEvt.pfmet>14000.) continue;
+        if(TMath::IsNaN(StopEvt.pfmet)||(!TMath::Finite(StopEvt.pfmet))||StopEvt.pfmet>14000.) {
+          cout << "Invalid MET value after correction, skipping event!" << endl;
+          continue;
+        }
       }
       else{
         StopEvt.pfmet = evt_pfmet();
@@ -1345,7 +1348,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
         if(evt_isRealData() && thisFile.Contains("03Feb2017") && !thisFile.Contains("CMS4")){
           StopEvt.pfmet = evt_muegclean_pfmet();
           StopEvt.pfmet_phi = evt_muegclean_pfmetPhi();
-          StopEvt.pfmet_original = evt_pfmetPhi();
+          StopEvt.pfmet_original = evt_pfmet();
           StopEvt.pfmet_original_phi = evt_pfmetPhi();
         }
       }
