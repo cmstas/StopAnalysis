@@ -84,6 +84,15 @@ public:
     vecd ak4pfjets_CSV;
     vecd ak4pfjets_deepCSV;
     vecd ak4pfjets_mva;
+
+    vecd ak4pfjets_cvsl;
+    vecd ak4pfjets_csvbtag;
+    vecd ak4pfjets_deepCSVb;
+    vecd ak4pfjets_deepCSVbb;
+    vecd ak4pfjets_deepCSVc;
+    vecd ak4pfjets_deepCSVcc;
+    vecd ak4pfjets_deepCSVl;
+
     vecd ak4pfjets_puid;
     veci ak4pfjets_parton_flavor;
     veci ak4pfjets_hadron_flavor;
@@ -96,18 +105,26 @@ public:
     vecd ak4pfjets_MEDbjet_pt;
     LorentzVector ak4pfjets_leadbtag_p4;
 
-    vecd ak4pfjets_cvsl;
     vecd ak4pfjets_ptD;
     vecd ak4pfjets_axis1;
+    vecd ak4pfjets_axis2;
     veci ak4pfjets_mult;
 
     vecd ak4pfjets_chf;       
     vecd ak4pfjets_nhf;
     vecd ak4pfjets_cef;
     vecd ak4pfjets_nef;
+    vecd ak4pfjets_muf;
+    vecd ak4pfjets_elf;
+    vecd ak4pfjets_phf;
+    vecd ak4pfjets_hhf;
+    vecd ak4pfjets_hef;
+
     veci ak4pfjets_cm;
     veci ak4pfjets_nm;
-    vecd ak4pfjets_muf;
+    veci ak4pfjets_em;
+    veci ak4pfjets_mm;
+    veci ak4pfjets_pm;
 
     veci ak4pfjets_mc3dr;
     veci ak4pfjets_mc3id;

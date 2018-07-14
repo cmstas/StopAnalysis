@@ -326,11 +326,23 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx, Factorize
         ak4pfjets_phi.push_back(p4sCorrJets.at(jindex).phi());
         ak4pfjets_mass.push_back(p4sCorrJets.at(jindex).mass());
 
-        float value_deepCSV = getbtagvalue(deepCSV_prefix+"JetTags:probb",jindex) + getbtagvalue(deepCSV_prefix+"JetTags:probbb",jindex);
         dphi_ak4pfjet_met.push_back(getdphi(p4sCorrJets.at(jindex).phi(), evt_pfmetPhi()));//this can be false - due to correction to pfmet, but it gets corrected later
-        ak4pfjets_CSV.push_back(pfjets_pfCombinedInclusiveSecondaryVertexV2BJetTag().at(jindex));
+
+        // various b-tagging values
+        ak4pfjets_deepCSVb.push_back(getbtagvalue("pfDeepCSVJetTags:probb", jindex));
+        ak4pfjets_deepCSVbb.push_back(getbtagvalue("pfDeepCSVJetTags:probbb", jindex));
+        ak4pfjets_deepCSVc.push_back(getbtagvalue("pfDeepCSVJetTags:probc", jindex));
+        ak4pfjets_deepCSVl.push_back(getbtagvalue("pfDeepCSVJetTags:probudsg", jindex));
+        // ak4pfjets_deepCSVcc.push_back(getbtagvalue("pfDeepCSVJetTags:probcc", jindex));
+
+        float value_deepCSV = ak4pfjets_deepCSVb.back() + ak4pfjets_deepCSVbb.back(); // save for later
         ak4pfjets_deepCSV.push_back(value_deepCSV);
+        ak4pfjets_CSV.push_back(pfjets_pfCombinedInclusiveSecondaryVertexV2BJetTag().at(jindex));
         ak4pfjets_mva.push_back(getbtagvalue("pfCombinedMVAV2BJetTags", jindex));
+        ak4pfjets_cvsl.push_back(getbtagvalue("pfCombinedCvsLJetTags", jindex));
+        ak4pfjets_csvbtag.push_back(getbtagvalue("pfCombinedSecondaryVertexV2BJetTags", jindex));
+
+        // jet ids
         ak4pfjets_puid.push_back(loosePileupJetId(jindex));
         ak4pfjets_parton_flavor.push_back(pfjets_partonFlavour().at(jindex));
 	ak4pfjets_hadron_flavor.push_back(pfjets_hadronFlavour().at(jindex));
@@ -339,19 +351,28 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx, Factorize
         //ak4pfjets_medium_pfid.push_back(isMediumPFJetV2(jindex));
         ak4pfjets_tight_pfid.push_back(isTightPFJetV2(jindex));
 
-        if (doResolveTopMVA) {
-          ak4pfjets_cvsl.push_back(getbtagvalue("pfCombinedCvsLJetTags", jindex));
-          ak4pfjets_ptD.push_back(pfjets_ptDistribution().at(jindex));
-          ak4pfjets_axis1.push_back(pfjets_axis1().at(jindex));
-          ak4pfjets_mult.push_back(pfjets_totalMultiplicity().at(jindex));
-        }
-        ak4pfjets_chf.push_back(pfjets_chargedHadronE().at(jindex)/ (pfjets_undoJEC().at(jindex)*p4sCorrJets[jindex].energy()) );
-        ak4pfjets_nhf.push_back(pfjets_neutralHadronE().at(jindex)/ (pfjets_undoJEC().at(jindex)*p4sCorrJets[jindex].energy()) );
-        ak4pfjets_cef.push_back(pfjets_chargedEmE().at(jindex)/ (pfjets_undoJEC().at(jindex)*p4sCorrJets[jindex].energy()) );
-        ak4pfjets_nef.push_back(pfjets_neutralEmE().at(jindex)/ (pfjets_undoJEC().at(jindex)*p4sCorrJets[jindex].energy()) );
-	ak4pfjets_muf.push_back(pfjets_muonE().at(jindex)/ (pfjets_undoJEC().at(jindex)*p4sCorrJets[jindex].energy()) );
+        // QG likelihood variables
+        ak4pfjets_ptD.push_back(pfjets_ptDistribution().at(jindex));
+        ak4pfjets_axis1.push_back(pfjets_axis1().at(jindex));
+        ak4pfjets_axis2.push_back(pfjets_axis2().at(jindex));
+        ak4pfjets_mult.push_back(pfjets_totalMultiplicity().at(jindex));
+
+        double jetenergy_inv = 1. / (pfjets_undoJEC().at(jindex) * pfjets_p4()[jindex].energy());
+        ak4pfjets_chf.push_back(pfjets_chargedHadronE().at(jindex) * jetenergy_inv);
+        ak4pfjets_nhf.push_back(pfjets_neutralHadronE().at(jindex) * jetenergy_inv);
+        ak4pfjets_cef.push_back(pfjets_chargedEmE().at(jindex)     * jetenergy_inv);
+        ak4pfjets_nef.push_back(pfjets_neutralEmE().at(jindex)     * jetenergy_inv);
+	ak4pfjets_muf.push_back(pfjets_muonE().at(jindex)          * jetenergy_inv);
+        ak4pfjets_elf.push_back(pfjets_electronE().at(jindex)      * jetenergy_inv);
+        ak4pfjets_phf.push_back(pfjets_photonE().at(jindex)        * jetenergy_inv);
+        ak4pfjets_hhf.push_back(pfjets_hfHadronE().at(jindex)      * jetenergy_inv);
+        ak4pfjets_hef.push_back(pfjets_hfEmE().at(jindex)          * jetenergy_inv);
+
         ak4pfjets_cm.push_back(pfjets_chargedMultiplicity().at(jindex));
-        ak4pfjets_nm.push_back(cms3.pfjets_neutralMultiplicity().at(jindex));
+        ak4pfjets_nm.push_back(pfjets_neutralMultiplicity().at(jindex));
+        ak4pfjets_em.push_back(pfjets_electronMultiplicity().at(jindex));
+        ak4pfjets_mm.push_back(pfjets_muonMultiplicity().at(jindex));
+        ak4pfjets_pm.push_back(pfjets_photonMultiplicity().at(jindex));
 	
 	if (!evt_isRealData() && pfjets_mc3dr().size()>0) {
           ak4pfjets_mc3dr.push_back(pfjets_mc3dr().at(jindex));
@@ -756,9 +777,17 @@ void JetTree::Reset ()
     ak4pfjets_medium_pfid.clear();
     ak4pfjets_tight_pfid.clear();
 
+    ak4pfjets_csvbtag.clear();
+    ak4pfjets_deepCSVb.clear();
+    ak4pfjets_deepCSVbb.clear();
+    ak4pfjets_deepCSVc.clear();
+    ak4pfjets_deepCSVcc.clear();
+    ak4pfjets_deepCSVl.clear();
+
     ak4pfjets_cvsl.clear();
     ak4pfjets_ptD.clear();
     ak4pfjets_axis1.clear();
+    ak4pfjets_axis2.clear();
     ak4pfjets_mult.clear();
 
     topcands_ak4idx.clear();
@@ -773,6 +802,15 @@ void JetTree::Reset ()
     ak4pfjets_muf.clear();
     ak4pfjets_cm.clear();
     ak4pfjets_nm.clear();
+
+    ak4pfjets_muf.clear();
+    ak4pfjets_elf.clear();
+    ak4pfjets_phf.clear();
+    ak4pfjets_hhf.clear();
+    ak4pfjets_hef.clear();
+    ak4pfjets_em.clear();
+    ak4pfjets_mm.clear();
+    ak4pfjets_pm.clear();
 
     ak4pfjets_mc3dr.clear();
     ak4pfjets_mc3id.clear();
@@ -953,7 +991,23 @@ void JetTree::SetAK4Branches_TopTag(TTree* tree)
     tree->Branch(Form("%sak4pfjets_cvsl", prefix_.c_str()) , &ak4pfjets_cvsl);
     tree->Branch(Form("%sak4pfjets_ptD", prefix_.c_str()) , &ak4pfjets_ptD);
     tree->Branch(Form("%sak4pfjets_axis1", prefix_.c_str()) , &ak4pfjets_axis1);
+    tree->Branch(Form("%sak4pfjets_axis2", prefix_.c_str()) , &ak4pfjets_axis2);
     tree->Branch(Form("%sak4pfjets_mult", prefix_.c_str()) , &ak4pfjets_mult);
+
+    tree->Branch(Form("%sak4pfjets_csvbtag", prefix_.c_str()) , &ak4pfjets_csvbtag);
+    tree->Branch(Form("%sak4pfjets_deepCSVb", prefix_.c_str()) , &ak4pfjets_deepCSVb);
+    tree->Branch(Form("%sak4pfjets_deepCSVbb", prefix_.c_str()) , &ak4pfjets_deepCSVbb);
+    tree->Branch(Form("%sak4pfjets_deepCSVc", prefix_.c_str()) , &ak4pfjets_deepCSVc);
+    tree->Branch(Form("%sak4pfjets_deepCSVcc", prefix_.c_str()) , &ak4pfjets_deepCSVcc);
+    tree->Branch(Form("%sak4pfjets_deepCSVl", prefix_.c_str()) , &ak4pfjets_deepCSVl);
+    tree->Branch(Form("%sak4pfjets_muf", prefix_.c_str()) , &ak4pfjets_muf);
+    tree->Branch(Form("%sak4pfjets_elf", prefix_.c_str()) , &ak4pfjets_elf);
+    tree->Branch(Form("%sak4pfjets_phf", prefix_.c_str()) , &ak4pfjets_phf);
+    tree->Branch(Form("%sak4pfjets_hhf", prefix_.c_str()) , &ak4pfjets_hhf);
+    tree->Branch(Form("%sak4pfjets_hef", prefix_.c_str()) , &ak4pfjets_hef);
+    tree->Branch(Form("%sak4pfjets_em", prefix_.c_str()) , &ak4pfjets_em);
+    tree->Branch(Form("%sak4pfjets_mm", prefix_.c_str()) , &ak4pfjets_mm);
+    tree->Branch(Form("%sak4pfjets_pm", prefix_.c_str()) , &ak4pfjets_pm);
 
     tree->Branch(Form("%stopcands_ak4idx", prefix_.c_str()) , &topcands_ak4idx);
     tree->Branch(Form("%stopcands_disc", prefix_.c_str()) , &topcands_disc);
