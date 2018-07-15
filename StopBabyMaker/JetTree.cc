@@ -3,6 +3,11 @@
 #include "JetSelections.h"
 #include "btagsf/BTagCalibrationStandalone.h"
 #include "Math/VectorUtil.h"
+#include "TLorentzVector.h"
+
+#include "TopTagger/TopTagger/include/TopTagger.h"
+#include "TopTagger/TopTagger/include/TopTaggerResults.h"
+#include "TopTagger/TopTagger/include/TopTaggerUtilities.h"
 
 using namespace tas;
  
@@ -27,6 +32,9 @@ JetTree::~JetTree () {
 void JetTree::InitTopMVA(ResolvedTopMVA* resTopMVAptr) {
   doResolveTopMVA = true;
   resTopMVA = resTopMVAptr;
+
+  tftagger = new TopTagger;
+  tftagger->setCfgFile("TopTagger.cfg");
 }
 
 void JetTree::InitBtagSFTool(bool isFastsim_) {
@@ -268,6 +276,13 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx, Factorize
     }
     sortedJets_pt =  sort_pt(p4sCorrJets,JET_PT);
 
+    vector<TLorentzVector> ak4jets_TLV;
+    // Temporary solutions: create dummy AK8 inputs
+    ttUtility::ConstAK8Inputs<float> AK8Inputs(
+        vector<TLorentzVector>{}, vector<float>{}, vector<float>{}, vector<float>{}, vector<float>{},
+        vector<vector<TLorentzVector>>{}, vector<vector<float>>{}, vector<vector<float>>{},
+        vector<vector<float>>{}, vector<vector<float>>{}, vector<vector<float>>{});
+
     for (size_t idx = 0; idx < pfjets_p4().size(); ++idx)
     {
         jindex = sortedJets_pt.at(idx).first;
@@ -325,6 +340,8 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx, Factorize
         ak4pfjets_eta.push_back(p4sCorrJets.at(jindex).eta());
         ak4pfjets_phi.push_back(p4sCorrJets.at(jindex).phi());
         ak4pfjets_mass.push_back(p4sCorrJets.at(jindex).mass());
+
+        ak4jets_TLV.emplace_back(ak4pfjets_p4.back().Px(), ak4pfjets_p4.back().Py(), ak4pfjets_p4.back().Pz(), ak4pfjets_p4.back().E());
 
         dphi_ak4pfjet_met.push_back(getdphi(p4sCorrJets.at(jindex).phi(), evt_pfmetPhi()));//this can be false - due to correction to pfmet, but it gets corrected later
 
@@ -621,6 +638,55 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx, Factorize
       }
     }
 
+    ttUtility::ConstAK4Inputs<float> AK4Inputs(ak4jets_TLV, ak4pfjets_csvbtag);
+    AK4Inputs.addSupplamentalVector("qgPtD",                                ak4pfjets_ptD);
+    AK4Inputs.addSupplamentalVector("qgAxis1",                              ak4pfjets_axis1);
+    AK4Inputs.addSupplamentalVector("qgAxis2",                              ak4pfjets_axis2);
+    AK4Inputs.addSupplamentalVector("qgMult", vector<float>(ak4pfjets_mult.begin(), ak4pfjets_mult.end())); // because everything has to be vector<float>
+    AK4Inputs.addSupplamentalVector("recoJetschargedHadronEnergyFraction",  ak4pfjets_chf);
+    AK4Inputs.addSupplamentalVector("recoJetschargedEmEnergyFraction",      ak4pfjets_cef);
+    AK4Inputs.addSupplamentalVector("recoJetsneutralEmEnergyFraction",      ak4pfjets_nef);
+    AK4Inputs.addSupplamentalVector("recoJetsmuonEnergyFraction",           ak4pfjets_muf);
+    AK4Inputs.addSupplamentalVector("recoJetsHFHadronEnergyFraction",       ak4pfjets_hhf);
+    AK4Inputs.addSupplamentalVector("recoJetsHFEMEnergyFraction",           ak4pfjets_hef);
+    AK4Inputs.addSupplamentalVector("recoJetsneutralEnergyFraction",        ak4pfjets_nhf);
+    AK4Inputs.addSupplamentalVector("PhotonEnergyFraction",                 ak4pfjets_phf);
+    AK4Inputs.addSupplamentalVector("ElectronEnergyFraction",               ak4pfjets_elf);
+    AK4Inputs.addSupplamentalVector("ChargedHadronMultiplicity",            ak4pfjets_cm);
+    AK4Inputs.addSupplamentalVector("NeutralHadronMultiplicity",            ak4pfjets_nm);
+    AK4Inputs.addSupplamentalVector("PhotonMultiplicity",                   ak4pfjets_pm);
+    AK4Inputs.addSupplamentalVector("ElectronMultiplicity",                 ak4pfjets_em);
+    AK4Inputs.addSupplamentalVector("MuonMultiplicity",                     ak4pfjets_mm);
+    AK4Inputs.addSupplamentalVector("DeepCSVb",                             ak4pfjets_deepCSVb);
+    AK4Inputs.addSupplamentalVector("DeepCSVc",                             ak4pfjets_deepCSVc);
+    AK4Inputs.addSupplamentalVector("DeepCSVl",                             ak4pfjets_deepCSVl);
+    AK4Inputs.addSupplamentalVector("DeepCSVbb",                            ak4pfjets_deepCSVbb);
+    AK4Inputs.addSupplamentalVector("DeepCSVcc", vector<float>(ak4jets_TLV.size(), 0)); // Temporary dealing with deepCSVcc not present in 94X
+
+    std::vector<Constituent> constituents = ttUtility::packageConstituents(AK4Inputs, AK8Inputs);
+
+    tftagger->runTagger(constituents);
+
+    //retrieve the top tagger results object
+    const TopTaggerResults& ttr = tftagger->getResults();
+
+    //get reconstructed top
+    const std::vector<TopObject*>& tftops = ttr.getTops();
+
+    for (const TopObject* top : tftops) {
+      tftops_p4.emplace_back(top->p().Px(), top->p().Py(), top->p().Pz(), top->p().E());
+      if (top->getNConstituents() != 3) cout << "[JetTree] Getting TF top that has " << top->getNConstituents() << " constituents!!\n";
+      vector<float> subjet_pt, subjet_eta, subjet_phi;
+      for (const Constituent* subjet : top->getConstituents()) {
+        subjet_pt.push_back(subjet->p().Pt());
+        subjet_eta.push_back(subjet->p().Eta());
+        subjet_phi.push_back(subjet->p().Phi());
+      }
+      tftops_subjet_pt.push_back(subjet_pt);
+      tftops_subjet_eta.push_back(subjet_eta);
+      tftops_subjet_phi.push_back(subjet_phi);
+    }
+
     // Fill info for soft b-tags
     for (size_t i=0; i<svs_p4().size(); i++) {
 
@@ -794,6 +860,11 @@ void JetTree::Reset ()
     topcands_disc.clear();
     topcands_p4.clear();
     topcands_Wp4.clear();
+
+    tftops_p4.clear();
+    tftops_subjet_pt.clear();
+    tftops_subjet_eta.clear();
+    tftops_subjet_phi.clear();
 
     ak4pfjets_chf.clear();
     ak4pfjets_nhf.clear();
@@ -1013,6 +1084,11 @@ void JetTree::SetAK4Branches_TopTag(TTree* tree)
     tree->Branch(Form("%stopcands_disc", prefix_.c_str()) , &topcands_disc);
     tree->Branch(Form("%stopcands_p4", prefix_.c_str()) , &topcands_p4);
     tree->Branch(Form("%stopcands_Wp4", prefix_.c_str()) , &topcands_Wp4);
+
+    tree->Branch(Form("%stftops_p4", prefix_.c_str()) ,  &tftops_p4);
+    tree->Branch(Form("%stftops_subjet_pt", prefix_.c_str()) ,  &tftops_subjet_pt);
+    tree->Branch(Form("%stftops_subjet_eta", prefix_.c_str()) ,  &tftops_subjet_eta);
+    tree->Branch(Form("%stftops_subjet_phi", prefix_.c_str()) ,  &tftops_subjet_phi);
 }
 
 void JetTree::SetAK4Branches_Other(TTree* tree)

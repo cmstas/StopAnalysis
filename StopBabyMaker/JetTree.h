@@ -9,6 +9,7 @@
 #include "btagsf/BTagCalibrationStandalone.h"
 #include "TH2.h" 
 #include "TopTagger/ResolvedTopMVA.h"
+#include "TopTagger/TopTagger/include/TopTagger.h"
 // forward declarations
 class TTree;
  
@@ -120,11 +121,11 @@ public:
     vecd ak4pfjets_hhf;
     vecd ak4pfjets_hef;
 
-    veci ak4pfjets_cm;
-    veci ak4pfjets_nm;
-    veci ak4pfjets_em;
-    veci ak4pfjets_mm;
-    veci ak4pfjets_pm;
+    vecd ak4pfjets_cm;
+    vecd ak4pfjets_nm;
+    vecd ak4pfjets_em;
+    vecd ak4pfjets_mm;
+    vecd ak4pfjets_pm;
 
     veci ak4pfjets_mc3dr;
     veci ak4pfjets_mc3id;
@@ -178,13 +179,20 @@ public:
     vecLorentzVector softtags_p4;
     int nsoftbtags;
 
-    // top tagger
+    // resolved top tagger -- BDT version
     bool doResolveTopMVA;
     ResolvedTopMVA* resTopMVA;
     vecii topcands_ak4idx;
     vecd topcands_disc;
     vecLorentzVector topcands_p4;
     vecLorentzVector topcands_Wp4;
+
+    // resolved top tagger -- tensorflow veriosn
+    TopTagger* tftagger;
+    vecLorentzVector tftops_p4;
+    vector<vecd> tftops_subjet_pt;
+    vector<vecd> tftops_subjet_eta;
+    vector<vecd> tftops_subjet_phi;
 
 private:
     float m_ak4_pt_cut;

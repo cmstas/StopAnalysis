@@ -26,6 +26,7 @@ TOOLSPATH      = $(COREPATH)/Tools
 
 CXXFLAGS       += -I$(COREPATH)
 CXXFLAGS       += -I$(TOOLSPATH)
+CXXFLAGS       += -I./
 
 CORESOURCE     = $(COREPATH)/CMS3_CORE.so
 CORELIB        = ./CMS3_CORE.so
@@ -33,12 +34,24 @@ CORELIB        = ./CMS3_CORE.so
 STOPVARSOURCE  = $(wildcard stop_variables/*.cc)
 STOPVARLIB     = StopVariables.so
 
+ODIR           = obj
+
+TENSORFLOW_DIR = /cvmfs/cms.cern.ch/slc6_amd64_gcc700/external/tensorflow-c/1.1.0-mmelna
+TENSORFLOWLIBS = -ltensorflow
+
+ifdef TENSORFLOW_DIR
+	CXXFLAGS += -I$(TENSORFLOW_DIR)/include
+
+	CXXFLAGS += -DDOTENSORFLOW
+	LIBS     += -L$(TENSORFLOW_DIR)/lib $(TENSORFLOWLIBS)
+endif
+
 #
 # Make rules
 #
 
-runBabyMaker: runBabyMaker.o looper.o EventTree.o LeptonTree.o JetTree.o ResolvedTopMVA.o IsoTracksTree.o TauTree.o GenParticleTree.o PhotonTree.o StopSelections.o LinkDef_out.so $(CORELIB) $(STOPVARLIB) 
-	$(LD) $(LDFLAGS) -o runBabyMaker runBabyMaker.o looper.o EventTree.o ResolvedTopMVA.o JetTree.o LeptonTree.o PhotonTree.o IsoTracksTree.o TauTree.o GenParticleTree.o StopSelections.o $(GLIBS) -lGenVector -lEG -lTMVA $(CORELIB) $(STOPVARLIB) LinkDef_out.so -Wl,-rpath,./
+runBabyMaker: runBabyMaker.o looper.o EventTree.o LeptonTree.o JetTree.o ResolvedTopMVA.o IsoTracksTree.o TauTree.o GenParticleTree.o PhotonTree.o StopSelections.o LinkDef_out.so $(CORELIB) $(STOPVARLIB) libTopTagger.so $(ODIR)/rootdict.o
+	$(LD) $(LDFLAGS) -o runBabyMaker runBabyMaker.o looper.o EventTree.o ResolvedTopMVA.o JetTree.o LeptonTree.o PhotonTree.o IsoTracksTree.o TauTree.o GenParticleTree.o StopSelections.o libTopTagger.so $(ODIR)/rootdict.o -LTopTagger/TopTagger/test -lTopTagger $(LIBS) $(GLIBS) -lGenVector -lEG -lTMVA $(CORELIB) $(STOPVARLIB) LinkDef_out.so -Wl,-rpath,./
 
 $(CORELIB): $(CORESOURCE)
 	cp $(CORESOURCE) .
@@ -83,6 +96,10 @@ StopSelections.o: StopSelections.cc StopSelections.h
 LinkDef_out.so: LinkDef.h
 	@rootcling -v -f LinkDef.cc -c -p Math/Vector4D.h LinkDef.h
 	$(CXX) $(CXXFLAGS) $(SOFLAGS) LinkDef.cc -o $@
+
+libTopTagger.so:
+	cp TopTagger/TopTagger/test/libTopTagger.so .
+
 
 .PHONY: clean
 clean:
