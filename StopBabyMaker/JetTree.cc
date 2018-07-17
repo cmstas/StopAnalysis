@@ -34,7 +34,7 @@ void JetTree::InitTopMVA(ResolvedTopMVA* resTopMVAptr) {
   resTopMVA = resTopMVAptr;
 
   tftagger = new TopTagger;
-  tftagger->setCfgFile("TopTagger.cfg");
+  tftagger->setCfgFile("TopTagger/TopTagger.cfg");
 }
 
 void JetTree::InitBtagSFTool(bool isFastsim_) {
@@ -277,11 +277,6 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx, Factorize
     sortedJets_pt =  sort_pt(p4sCorrJets,JET_PT);
 
     vector<TLorentzVector> ak4jets_TLV;
-    // Temporary solutions: create dummy AK8 inputs
-    ttUtility::ConstAK8Inputs<float> AK8Inputs(
-        vector<TLorentzVector>{}, vector<float>{}, vector<float>{}, vector<float>{}, vector<float>{},
-        vector<vector<TLorentzVector>>{}, vector<vector<float>>{}, vector<vector<float>>{},
-        vector<vector<float>>{}, vector<vector<float>>{}, vector<vector<float>>{});
 
     for (size_t idx = 0; idx < pfjets_p4().size(); ++idx)
     {
@@ -642,7 +637,8 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx, Factorize
     AK4Inputs.addSupplamentalVector("qgPtD",                                ak4pfjets_ptD);
     AK4Inputs.addSupplamentalVector("qgAxis1",                              ak4pfjets_axis1);
     AK4Inputs.addSupplamentalVector("qgAxis2",                              ak4pfjets_axis2);
-    AK4Inputs.addSupplamentalVector("qgMult", vector<float>(ak4pfjets_mult.begin(), ak4pfjets_mult.end())); // because everything has to be vector<float>
+    auto ak4jets_mult = vector<float>(ak4pfjets_mult.begin(), ak4pfjets_mult.end()); // because everything has to be vector<float>
+    AK4Inputs.addSupplamentalVector("qgMult",                               ak4jets_mult);
     AK4Inputs.addSupplamentalVector("recoJetschargedHadronEnergyFraction",  ak4pfjets_chf);
     AK4Inputs.addSupplamentalVector("recoJetschargedEmEnergyFraction",      ak4pfjets_cef);
     AK4Inputs.addSupplamentalVector("recoJetsneutralEmEnergyFraction",      ak4pfjets_nef);
@@ -661,9 +657,10 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx, Factorize
     AK4Inputs.addSupplamentalVector("DeepCSVc",                             ak4pfjets_deepCSVc);
     AK4Inputs.addSupplamentalVector("DeepCSVl",                             ak4pfjets_deepCSVl);
     AK4Inputs.addSupplamentalVector("DeepCSVbb",                            ak4pfjets_deepCSVbb);
-    AK4Inputs.addSupplamentalVector("DeepCSVcc", vector<float>(ak4jets_TLV.size(), 0)); // Temporary dealing with deepCSVcc not present in 94X
+    auto ak4jets_deepCSVcc = vector<float>(ak4jets_TLV.size(), 0); // Temporary dealing with deepCSVcc not present in 94X
+    AK4Inputs.addSupplamentalVector("DeepCSVcc",                            ak4jets_deepCSVcc);
 
-    std::vector<Constituent> constituents = ttUtility::packageConstituents(AK4Inputs, AK8Inputs);
+    std::vector<Constituent> constituents = ttUtility::packageConstituents(AK4Inputs);
 
     tftagger->runTagger(constituents);
 

@@ -163,8 +163,8 @@ std::vector<TopCand> ResolvedTopMVA::getTopCandidates(const double WP, const siz
     }
   }
 
-  // auto cands = removeOverlap(allCands, WP);
-  return allCands;
+  auto cands = removeOverlap(allCands, WP);
+  return cands;
 }
 
 std::vector<TopCand> ResolvedTopMVA::removeOverlap(std::vector<TopCand>& cands, double threshold) {
