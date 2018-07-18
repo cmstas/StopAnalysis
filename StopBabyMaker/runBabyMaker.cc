@@ -89,7 +89,7 @@ int main(int argc, char **argv){
   // Skim Parameters
   //
   mylooper->skim_nvtx            = 1;
-  mylooper->skim_met             = 50;
+  mylooper->skim_met             = 150;
 
   mylooper->skim_nGoodLep        = 1;
   mylooper->skim_goodLep_el_pt   = 20.0;
@@ -114,7 +114,7 @@ int main(int argc, char **argv){
   mylooper->skim_nBJets          = 0;
 
   //temporarily set to false in order to take JECs from miniAOD directly for 2017 early data
-  mylooper->applyJECfromFile   = false; //THIS FLAG DECIDES NOW TOO IF JESUP/DOWN VALUES ARE CALCULATED
+  mylooper->applyJECfromFile    = false; //THIS FLAG DECIDES NOW TOO IF JESUP/DOWN VALUES ARE CALCULATED
   mylooper->applyAK8JECfromFile = false;
   mylooper->JES_type            = 0;  //0 central, 1 up, -1 down; // not needed anymore
 

@@ -282,8 +282,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
   TObjArray *listOfFiles = chain->GetListOfFiles();
   TIter fileIter(listOfFiles);
   TFile *currentFile = 0;
-  bool applyJECunc = applyJECfromFile;
-  // if (applyJECfromFile && (JES_type != 0)) applyJECunc = true;
+  bool applyJECunc = (applyJECfromFile && (JES_type != 0));
 
   //
   // JEC files
@@ -839,7 +838,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
   //
   // Set scale1fb file
   //
-  DatasetInfoFromFile df;
+  DatasetInfoFromFile df("scale1fbs.txt");
 
   //
   // JEC files
@@ -1101,7 +1100,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
         float average_of_weights= 0;
 
         //error on pdf replicas
-        StopEvt.ngenweights = genweights().size();
+        // StopEvt.ngenweights = genweights().size();
         if(genweights().size()>110){
           for(int ipdf=9;ipdf<109;ipdf++){
             average_of_weights += cms3.genweights().at(ipdf);
@@ -2786,6 +2785,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
 
       if(!(StopEvt.pfmet >= skim_met) && !(StopEvt.pfmet_rl >= skim_met) && !(StopEvt.pfmet_rl_jup >= skim_met) && !(StopEvt.pfmet_rl_jdown >= skim_met) && !(StopEvt.pfmet_jup >= skim_met) && !(StopEvt.pfmet_jdown >= skim_met) ) continue;
       //if(!(StopEvt.pfmet >= skim_met) && !(StopEvt.pfmet_rl >= skim_met) && !(StopEvt.pfmet_rl_jup >= skim_met) && !(StopEvt.pfmet_rl_jdown >= skim_met) && !(StopEvt.pfmet_jup >= skim_met) && !(StopEvt.pfmet_jdown >= skim_met) && !(StopEvt.pfmet_egclean >= skim_met) && !(StopEvt.pfmet_muegclean >= skim_met) && !(StopEvt.pfmet_muegcleanfix >= skim_met) && !(StopEvt.pfmet_uncorrcalomet >= skim_met) ) continue;
+      if (StopEvt.pfmet < skim_met && StopEvt.pfmet_rl < skim_met) continue; // Temporary!!
       nEvents_pass_skim_met++;
       /////////////////////////////////////////////////////////
 

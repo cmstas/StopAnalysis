@@ -190,6 +190,7 @@ public:
     // resolved top tagger -- tensorflow veriosn
     TopTagger* tftagger;
     vecLorentzVector tftops_p4;
+    vecd tftops_disc;
     vector<vecd> tftops_subjet_pt;
     vector<vecd> tftops_subjet_eta;
     vector<vecd> tftops_subjet_phi;

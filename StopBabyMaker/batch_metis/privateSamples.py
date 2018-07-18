@@ -12,8 +12,11 @@ from metis.Utils import do_cmd
 if __name__ == "__main__":
 
     cms4_samples = {
+        "TTJets_amcnlo" : "/hadoop/cms/store/user/sicheng/ProjectMetis/TTJets_TuneCP5_13TeV-amcatnloFXFX-pythia8_RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v1_MINIAODSIM_CMS4_V09-04-14",
+        # "tt1l_madgraph" : "/hadoop/cms/store/user/sicheng/ProjectMetis/TTJets_SingleLeptFromT_TuneCP5_13TeV-madgraphMLM-pythia8_RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v1_MINIAODSIM_CMS4_V09-04-14",
+
         # "TTJets_amcnlo_94X" : "/hadoop/cms/store/user/sicheng/ProjectMetis/TTJets_TuneCP5_13TeV-amcatnloFXFX-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_CMS4_V09-04-13",
-        "tt1l_madgraph" : "/hadoop/cms/store/user/sicheng/ProjectMetis/TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_CMS4_V09-04-13",
+        # "tt1l_madgraph" : "/hadoop/cms/store/user/sicheng/ProjectMetis/TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_CMS4_V09-04-13",
         # "ttbar_singleLeptFromT_amcnlo_94X" : "/hadoop/cms/store/user/sicheng/ProjectMetis/TTJets_SingleLeptFromT_TuneCP5_13TeV-madgraphMLM-pythia8_RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v1_MINIAODSIM_CMS4_V09-04-13",
 
         # "TTJets_amcnlo_94X" : "/hadoop/cms/store/user/sicheng/ProjectMetis/TTJets_TuneCP5_13TeV-amcatnloFXFX-pythia8_RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v1_MINIAODSIM_CMS4_V00-00-12",
@@ -35,17 +38,17 @@ if __name__ == "__main__":
     merge_tasks = []
 
     for dsname, samploc in cms4_samples.items():
-        cmsswver = "CMSSW_9_4_1"
-        scramarch = "slc6_amd64_gcc630"
+        cmsswver = "CMSSW_10_1_0"
+        scramarch = "slc6_amd64_gcc700"
         tarfile = "input.tar.gz"
-        tag = "v27_2"
+        tag = "v28_3"
         maker_task = CondorTask(
             sample = DirectorySample(
                 dataset=dsname,
                 location=samploc,
             ),
             # open_dataset = True,
-            files_per_output = 1,
+            files_per_output = 2,
             tag = tag,
             cmssw_version = cmsswver,
             scram_arch = scramarch,
@@ -55,8 +58,8 @@ if __name__ == "__main__":
             output_name = "stopbaby.root",
             arguments = "1" if "SMS" in dsname else "0", # isFastsim
             # condor_submit_params = {"sites": "UAF,T2_US_UCSD,UCSB"},
-            # condor_submit_params = {"sites": "T2_US_UCSD,UCSB"},
-            condor_submit_params = {"use_xrootd": True},
+            condor_submit_params = {"sites": "T2_US_UCSD,UCSB"},
+            # condor_submit_params = {"use_xrootd": True},
             # no_load_from_backup = True,
         )
         merge_task = CondorTask(

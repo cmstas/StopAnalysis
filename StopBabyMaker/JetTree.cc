@@ -672,6 +672,7 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx, Factorize
 
     for (const TopObject* top : tftops) {
       tftops_p4.emplace_back(top->p().Px(), top->p().Py(), top->p().Pz(), top->p().E());
+      tftops_disc.push_back(top->getDiscriminator());
       if (top->getNConstituents() != 3) cout << "[JetTree] Getting TF top that has " << top->getNConstituents() << " constituents!!\n";
       vector<float> subjet_pt, subjet_eta, subjet_phi;
       for (const Constituent* subjet : top->getConstituents()) {
@@ -840,6 +841,7 @@ void JetTree::Reset ()
     ak4pfjets_medium_pfid.clear();
     ak4pfjets_tight_pfid.clear();
 
+    ak4pfjets_cvsl.clear();
     ak4pfjets_csvbtag.clear();
     ak4pfjets_deepCSVb.clear();
     ak4pfjets_deepCSVbb.clear();
@@ -847,7 +849,6 @@ void JetTree::Reset ()
     ak4pfjets_deepCSVcc.clear();
     ak4pfjets_deepCSVl.clear();
 
-    ak4pfjets_cvsl.clear();
     ak4pfjets_ptD.clear();
     ak4pfjets_axis1.clear();
     ak4pfjets_axis2.clear();
@@ -859,6 +860,7 @@ void JetTree::Reset ()
     topcands_Wp4.clear();
 
     tftops_p4.clear();
+    tftops_disc.clear();
     tftops_subjet_pt.clear();
     tftops_subjet_eta.clear();
     tftops_subjet_phi.clear();
@@ -868,14 +870,13 @@ void JetTree::Reset ()
     ak4pfjets_cef.clear();
     ak4pfjets_nef.clear();
     ak4pfjets_muf.clear();
-    ak4pfjets_cm.clear();
-    ak4pfjets_nm.clear();
-
-    ak4pfjets_muf.clear();
     ak4pfjets_elf.clear();
     ak4pfjets_phf.clear();
     ak4pfjets_hhf.clear();
     ak4pfjets_hef.clear();
+
+    ak4pfjets_cm.clear();
+    ak4pfjets_nm.clear();
     ak4pfjets_em.clear();
     ak4pfjets_mm.clear();
     ak4pfjets_pm.clear();
@@ -1050,8 +1051,17 @@ void JetTree::SetAK4Branches_EF(TTree* tree)
     tree->Branch(Form("%sak4pfjets_cef", prefix_.c_str()) , &ak4pfjets_cef);
     tree->Branch(Form("%sak4pfjets_nef", prefix_.c_str()) , &ak4pfjets_nef);
     tree->Branch(Form("%sak4pfjets_muf", prefix_.c_str()) , &ak4pfjets_muf);
+    tree->Branch(Form("%sak4pfjets_muf", prefix_.c_str()) , &ak4pfjets_muf);
+    tree->Branch(Form("%sak4pfjets_elf", prefix_.c_str()) , &ak4pfjets_elf);
+    tree->Branch(Form("%sak4pfjets_phf", prefix_.c_str()) , &ak4pfjets_phf);
+    tree->Branch(Form("%sak4pfjets_hhf", prefix_.c_str()) , &ak4pfjets_hhf);
+    tree->Branch(Form("%sak4pfjets_hef", prefix_.c_str()) , &ak4pfjets_hef);
+
     tree->Branch(Form("%sak4pfjets_cm", prefix_.c_str()) , &ak4pfjets_cm);
     tree->Branch(Form("%sak4pfjets_nm", prefix_.c_str()) , &ak4pfjets_nm);
+    tree->Branch(Form("%sak4pfjets_em", prefix_.c_str()) , &ak4pfjets_em);
+    tree->Branch(Form("%sak4pfjets_mm", prefix_.c_str()) , &ak4pfjets_mm);
+    tree->Branch(Form("%sak4pfjets_pm", prefix_.c_str()) , &ak4pfjets_pm);
 }
 
 void JetTree::SetAK4Branches_TopTag(TTree* tree)
@@ -1068,24 +1078,17 @@ void JetTree::SetAK4Branches_TopTag(TTree* tree)
     tree->Branch(Form("%sak4pfjets_deepCSVc", prefix_.c_str()) , &ak4pfjets_deepCSVc);
     tree->Branch(Form("%sak4pfjets_deepCSVcc", prefix_.c_str()) , &ak4pfjets_deepCSVcc);
     tree->Branch(Form("%sak4pfjets_deepCSVl", prefix_.c_str()) , &ak4pfjets_deepCSVl);
-    tree->Branch(Form("%sak4pfjets_muf", prefix_.c_str()) , &ak4pfjets_muf);
-    tree->Branch(Form("%sak4pfjets_elf", prefix_.c_str()) , &ak4pfjets_elf);
-    tree->Branch(Form("%sak4pfjets_phf", prefix_.c_str()) , &ak4pfjets_phf);
-    tree->Branch(Form("%sak4pfjets_hhf", prefix_.c_str()) , &ak4pfjets_hhf);
-    tree->Branch(Form("%sak4pfjets_hef", prefix_.c_str()) , &ak4pfjets_hef);
-    tree->Branch(Form("%sak4pfjets_em", prefix_.c_str()) , &ak4pfjets_em);
-    tree->Branch(Form("%sak4pfjets_mm", prefix_.c_str()) , &ak4pfjets_mm);
-    tree->Branch(Form("%sak4pfjets_pm", prefix_.c_str()) , &ak4pfjets_pm);
 
     tree->Branch(Form("%stopcands_ak4idx", prefix_.c_str()) , &topcands_ak4idx);
     tree->Branch(Form("%stopcands_disc", prefix_.c_str()) , &topcands_disc);
     tree->Branch(Form("%stopcands_p4", prefix_.c_str()) , &topcands_p4);
     tree->Branch(Form("%stopcands_Wp4", prefix_.c_str()) , &topcands_Wp4);
 
-    tree->Branch(Form("%stftops_p4", prefix_.c_str()) ,  &tftops_p4);
-    tree->Branch(Form("%stftops_subjet_pt", prefix_.c_str()) ,  &tftops_subjet_pt);
-    tree->Branch(Form("%stftops_subjet_eta", prefix_.c_str()) ,  &tftops_subjet_eta);
-    tree->Branch(Form("%stftops_subjet_phi", prefix_.c_str()) ,  &tftops_subjet_phi);
+    tree->Branch(Form("%stftops_p4", prefix_.c_str()) , &tftops_p4);
+    tree->Branch(Form("%stftops_disc", prefix_.c_str()) , &tftops_disc);
+    tree->Branch(Form("%stftops_subjet_pt", prefix_.c_str()) , &tftops_subjet_pt);
+    tree->Branch(Form("%stftops_subjet_eta", prefix_.c_str()) , &tftops_subjet_eta);
+    tree->Branch(Form("%stftops_subjet_phi", prefix_.c_str()) , &tftops_subjet_phi);
 }
 
 void JetTree::SetAK4Branches_Other(TTree* tree)
