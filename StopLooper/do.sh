@@ -14,19 +14,31 @@ LOGDIR=logs
 # 2018 Data
 
 # INDIR=/nfs-7/userdata/sicheng/stopbabies/merged_v27_3
-INDIR=/nfs-7/userdata/sicheng/stopbabies/skimmed_v27_4
-OUTDIR=output/temp2018data4
+# INDIR=/nfs-7/userdata/sicheng/stopbabies/skimmed_v27_5
+INDIR=/nfs-7/userdata/sicheng/stopbabies/merged_v27_5/shuffle
+# INDIR=/nfs-7/userdata/sicheng/stopbabies/merged_v27_6
+# INDIR=/nfs-7/userdata/sicheng/stopbabies/merged_v27_6/shuffle2
+OUTDIR=output/temp2018data2
+LOGDIR=$OUTDIR/logs
 
 mkdir -p ${OUTDIR}
 mkdir -p ${LOGDIR}
 
-declare -a Samples=(data_2018A data_2018B)
+# declare -a Samples=()
+# declare -a Samples=(data_2018A data_2018B)
+# declare -a Samples=(data_2018B)
+# declare -a Samples=(data_2018Av1_met data_2018Bv1_met)
+# declare -a Samples=(data_2018Av1_singlemu data_2018Bv1_singlemu)
+# Samples+=( data_2018Av1_egamma data_2018Bv1_egamma )
+# declare -a Samples=(data_2018A_met data_2018B_met data_2018A_singlemu data_2018A_egamma data_2018B_singlemu data_2018B_egamma data_2018A_jetht data_2018B_jetht)
+# declare -a Samples=(data_2018_jetht data_2018_singlemu data_2018_met data_2018_egamma)
+declare -a Samples=(data_2018_met)
 
-for SAMPLE in ${Samples[@]}; do
-    # ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
-    echo ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} '>&' ${LOGDIR}/log_${SAMPLE}.txt
-    eval "nohup nice -n -10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
-done
+# for SAMPLE in ${Samples[@]}; do
+#     # ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
+#     echo ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} '>&' ${LOGDIR}/log_${SAMPLE}.txt
+#     eval "nohup nice -n -10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
+# done
 
 # 2017 Data
 
@@ -34,16 +46,37 @@ done
 # INDIR=/nfs-7/userdata/haweber/tupler_babies/merged/Stop_1l/v2017/output/
 # INDIR=/nfs-7/userdata/sicheng/stopbabies/merged_v25_7
 # INDIR=/nfs-7/userdata/sicheng/stopbabies/skimmed_v25_7
-OUTDIR=output/temp2017data4
+INDIR=/nfs-7/userdata/sicheng/stopbabies/merged_v27_5/shuffle
+# INDIR=/nfs-7/userdata/sicheng/stopbabies/merged_v27_6
+OUTDIR=output/temp2017data2
+LOGDIR=$OUTDIR/logs
 
 mkdir -p ${OUTDIR}
 mkdir -p ${LOGDIR}
 
 # declare -a Samples=(data_2017B data_2017C data_2017D data_2017E data_2017F)
-declare -a Samples=(data_2017B data_2017C data_2017D data_2017E data_2017F)
+declare -a Samples=(data_2017_met)
+# declare -a Samples=(data_2017B_met data_2017C_met data_2017D_met data_2017E_met data_2017F_met)
+# declare -a Samples=(data_2017B_singlemu data_2017C_singlemu data_2017D_singlemu data_2017E_singlemu data_2017F_singlemu)
+# Samples+=(data_2017B_singleel data_2017C_singleel data_2017D_singleel data_2017E_singleel data_2017F_singleel)
 
+# for SAMPLE in ${Samples[@]}; do
+#     # ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
+#     echo ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} '>&' ${LOGDIR}/log_${SAMPLE}.txt
+#     eval "nohup nice -n -10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
+# done
+
+# 2018 MC
+# INDIR=/home/users/sicheng/temp/TopTagger/StopAnalysis/StopBabyMaker
+INDIR=/nfs-7/userdata/sicheng/stopbabies/merged_v28_3
+OUTDIR=output/tempNewTagger2
+LOGDIR=$OUTDIR/logs
+
+mkdir -p ${OUTDIR}
+mkdir -p ${LOGDIR}
+
+declare -a Samples=(TTJets_amcnlo_0 TTJets_amcnlo_1 TTJets_amcnlo_2)
 for SAMPLE in ${Samples[@]}; do
-    # ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
     echo ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} '>&' ${LOGDIR}/log_${SAMPLE}.txt
     eval "nohup nice -n -10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
 done
@@ -53,6 +86,7 @@ done
 # INDIR=/nfs-7/userdata/sicheng/stopbabies/merged_v25_4
 INDIR=/hadoop/cms/store/user/sicheng/ProjectMetis/stopBaby_ttbar_semileptonic_madgraph_v27_2/skimmed
 OUTDIR=output/tempIncl
+LOGDIR=logs
 
 mkdir -p ${OUTDIR}
 mkdir -p ${LOGDIR}
@@ -72,20 +106,20 @@ declare -a Samples=(ttbar_semileptonic)
 INDIR=/nfs-7/userdata/stopRun2/analysis2016_SUS-16-051_35p9fbinv/v24/output
 # OUTDIR=output/samples2016
 # INDIR=/nfs-7/userdata/sicheng/stopbabies/skimmed_v25_10
-OUTDIR=output/temp2016data4
+OUTDIR=output/temp2016data2
 
 mkdir -p ${OUTDIR}
 mkdir -p ${LOGDIR}
 
-declare -a Samples=(2016data_sample)
+# declare -a Samples=(2016data_sample)
 # declare -a Samples=(data_2016B data_2016C data_2016D data_2016E data_2016F data_2016G data_2016H)
-# declare -a Samples=(data_2016B)
+declare -a Samples=(data_met)
 
-for SAMPLE in ${Samples[@]}; do
-    # ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
-    echo ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} '>&' ${LOGDIR}/log_${SAMPLE}.txt
-    eval "nohup nice -n -10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
-done
+# for SAMPLE in ${Samples[@]}; do
+#     # ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
+#     echo ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} '>&' ${LOGDIR}/log_${SAMPLE}.txt
+#     eval "nohup nice -n -10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
+# done
 
 # 2016 MC
 
@@ -157,16 +191,16 @@ done
 
 echo -e 'All looper jobs done!\a'
 
-pushd output/temp2018data4/
-hadd -f data_2018_all.root  data_2018?.root > /dev/null
-popd > /dev/null
-pushd output/temp2017data4/
-hadd -f data_2017_all.root  data_2017?.root > /dev/null
-popd > /dev/null
-pushd output/temp2016data4/
-# hadd -f data_2016_all.root  data_2016?.root > /dev/null
-cp data_single_lepton_met.root data_2016_all.root 
-popd > /dev/null
+# pushd output/temp2018data1/
+# hadd -f data_2018_all.root  data_2018?.root > /dev/null
+# popd > /dev/null
+# pushd output/temp2017data1/
+# hadd -f data_2017_all.root  data_2017?.root > /dev/null
+# popd > /dev/null
+# pushd output/temp2016data9/
+# # hadd -f data_2016_all.root  data_2016?.root > /dev/null
+# cp data_single_lepton_met.root data_2016_all.root 
+# popd > /dev/null
 
 # # Local merge for the v25_9 babies
 # pushd ${OUTDIR}
