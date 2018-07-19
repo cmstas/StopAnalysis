@@ -22,6 +22,8 @@ void stop_1l_babyAnalyzer::Init(TTree *tree) {
   if (ak4pfjets_leadbtag_p4_branch) ak4pfjets_leadbtag_p4_branch->SetAddress(&ak4pfjets_leadbtag_p4_);
   ak4genjets_p4_branch = tree->GetBranch("ak4genjets_p4");
   if (ak4genjets_p4_branch) ak4genjets_p4_branch->SetAddress(&ak4genjets_p4_);
+  softtags_p4_branch = tree->GetBranch("softtags_p4");
+  if (softtags_p4_branch) softtags_p4_branch->SetAddress(&softtags_p4_);
   jup_ak4pfjets_p4_branch = tree->GetBranch("jup_ak4pfjets_p4");
   if (jup_ak4pfjets_p4_branch) jup_ak4pfjets_p4_branch->SetAddress(&jup_ak4pfjets_p4_);
   jup_ak4pfjets_leadMEDbjet_p4_branch = tree->GetBranch("jup_ak4pfjets_leadMEDbjet_p4");
@@ -30,6 +32,8 @@ void stop_1l_babyAnalyzer::Init(TTree *tree) {
   if (jup_ak4pfjets_leadbtag_p4_branch) jup_ak4pfjets_leadbtag_p4_branch->SetAddress(&jup_ak4pfjets_leadbtag_p4_);
   jup_ak4genjets_p4_branch = tree->GetBranch("jup_ak4genjets_p4");
   if (jup_ak4genjets_p4_branch) jup_ak4genjets_p4_branch->SetAddress(&jup_ak4genjets_p4_);
+  jup_softtags_p4_branch = tree->GetBranch("jup_softtags_p4");
+  if (jup_softtags_p4_branch) jup_softtags_p4_branch->SetAddress(&jup_softtags_p4_);
   jdown_ak4pfjets_p4_branch = tree->GetBranch("jdown_ak4pfjets_p4");
   if (jdown_ak4pfjets_p4_branch) jdown_ak4pfjets_p4_branch->SetAddress(&jdown_ak4pfjets_p4_);
   jdown_ak4pfjets_leadMEDbjet_p4_branch = tree->GetBranch("jdown_ak4pfjets_leadMEDbjet_p4");
@@ -38,6 +42,8 @@ void stop_1l_babyAnalyzer::Init(TTree *tree) {
   if (jdown_ak4pfjets_leadbtag_p4_branch) jdown_ak4pfjets_leadbtag_p4_branch->SetAddress(&jdown_ak4pfjets_leadbtag_p4_);
   jdown_ak4genjets_p4_branch = tree->GetBranch("jdown_ak4genjets_p4");
   if (jdown_ak4genjets_p4_branch) jdown_ak4genjets_p4_branch->SetAddress(&jdown_ak4genjets_p4_);
+  jdown_softtags_p4_branch = tree->GetBranch("jdown_softtags_p4");
+  if (jdown_softtags_p4_branch) jdown_softtags_p4_branch->SetAddress(&jdown_softtags_p4_);
   genleps_p4_branch = tree->GetBranch("genleps_p4");
   if (genleps_p4_branch) genleps_p4_branch->SetAddress(&genleps_p4_);
   genleps_motherp4_branch = tree->GetBranch("genleps_motherp4");
@@ -78,14 +84,20 @@ void stop_1l_babyAnalyzer::Init(TTree *tree) {
   if (topcands_p4_branch) topcands_p4_branch->SetAddress(&topcands_p4_);
   topcands_Wp4_branch = tree->GetBranch("topcands_Wp4");
   if (topcands_Wp4_branch) topcands_Wp4_branch->SetAddress(&topcands_Wp4_);
+  tftops_p4_branch = tree->GetBranch("tftops_p4");
+  if (tftops_p4_branch) tftops_p4_branch->SetAddress(&tftops_p4_);
   jup_topcands_p4_branch = tree->GetBranch("jup_topcands_p4");
   if (jup_topcands_p4_branch) jup_topcands_p4_branch->SetAddress(&jup_topcands_p4_);
   jup_topcands_Wp4_branch = tree->GetBranch("jup_topcands_Wp4");
   if (jup_topcands_Wp4_branch) jup_topcands_Wp4_branch->SetAddress(&jup_topcands_Wp4_);
+  jup_tftops_p4_branch = tree->GetBranch("jup_tftops_p4");
+  if (jup_tftops_p4_branch) jup_tftops_p4_branch->SetAddress(&jup_tftops_p4_);
   jdown_topcands_p4_branch = tree->GetBranch("jdown_topcands_p4");
   if (jdown_topcands_p4_branch) jdown_topcands_p4_branch->SetAddress(&jdown_topcands_p4_);
   jdown_topcands_Wp4_branch = tree->GetBranch("jdown_topcands_Wp4");
   if (jdown_topcands_Wp4_branch) jdown_topcands_Wp4_branch->SetAddress(&jdown_topcands_Wp4_);
+  jdown_tftops_p4_branch = tree->GetBranch("jdown_tftops_p4");
+  if (jdown_tftops_p4_branch) jdown_tftops_p4_branch->SetAddress(&jdown_tftops_p4_);
   tau_leadtrack_p4_branch = tree->GetBranch("tau_leadtrack_p4");
   if (tau_leadtrack_p4_branch) tau_leadtrack_p4_branch->SetAddress(&tau_leadtrack_p4_);
   tau_leadneutral_p4_branch = tree->GetBranch("tau_leadneutral_p4");
@@ -569,6 +581,8 @@ void stop_1l_babyAnalyzer::Init(TTree *tree) {
   if (ak4pfjets_loose_puid_branch) ak4pfjets_loose_puid_branch->SetAddress(&ak4pfjets_loose_puid_);
   ak4pfjets_loose_pfid_branch = tree->GetBranch("ak4pfjets_loose_pfid");
   if (ak4pfjets_loose_pfid_branch) ak4pfjets_loose_pfid_branch->SetAddress(&ak4pfjets_loose_pfid_);
+  nsoftbtags_branch = tree->GetBranch("nsoftbtags");
+  if (nsoftbtags_branch) nsoftbtags_branch->SetAddress(&nsoftbtags_);
   jup_nskimjets_branch = tree->GetBranch("jup_nskimjets");
   if (jup_nskimjets_branch) jup_nskimjets_branch->SetAddress(&jup_nskimjets_);
   jup_nskimbtagmed_branch = tree->GetBranch("jup_nskimbtagmed");
@@ -609,6 +623,8 @@ void stop_1l_babyAnalyzer::Init(TTree *tree) {
   if (jup_ak4pfjets_loose_puid_branch) jup_ak4pfjets_loose_puid_branch->SetAddress(&jup_ak4pfjets_loose_puid_);
   jup_ak4pfjets_loose_pfid_branch = tree->GetBranch("jup_ak4pfjets_loose_pfid");
   if (jup_ak4pfjets_loose_pfid_branch) jup_ak4pfjets_loose_pfid_branch->SetAddress(&jup_ak4pfjets_loose_pfid_);
+  jup_nsoftbtags_branch = tree->GetBranch("jup_nsoftbtags");
+  if (jup_nsoftbtags_branch) jup_nsoftbtags_branch->SetAddress(&jup_nsoftbtags_);
   jdown_nskimjets_branch = tree->GetBranch("jdown_nskimjets");
   if (jdown_nskimjets_branch) jdown_nskimjets_branch->SetAddress(&jdown_nskimjets_);
   jdown_nskimbtagmed_branch = tree->GetBranch("jdown_nskimbtagmed");
@@ -649,6 +665,8 @@ void stop_1l_babyAnalyzer::Init(TTree *tree) {
   if (jdown_ak4pfjets_loose_puid_branch) jdown_ak4pfjets_loose_puid_branch->SetAddress(&jdown_ak4pfjets_loose_puid_);
   jdown_ak4pfjets_loose_pfid_branch = tree->GetBranch("jdown_ak4pfjets_loose_pfid");
   if (jdown_ak4pfjets_loose_pfid_branch) jdown_ak4pfjets_loose_pfid_branch->SetAddress(&jdown_ak4pfjets_loose_pfid_);
+  jdown_nsoftbtags_branch = tree->GetBranch("jdown_nsoftbtags");
+  if (jdown_nsoftbtags_branch) jdown_nsoftbtags_branch->SetAddress(&jdown_nsoftbtags_);
   genleps_isfromt_branch = tree->GetBranch("genleps_isfromt");
   if (genleps_isfromt_branch) genleps_isfromt_branch->SetAddress(&genleps_isfromt_);
   genleps_id_branch = tree->GetBranch("genleps_id");
@@ -833,6 +851,8 @@ void stop_1l_babyAnalyzer::Init(TTree *tree) {
   if (ak8pfjets_deepdisc_hbb_branch) ak8pfjets_deepdisc_hbb_branch->SetAddress(&ak8pfjets_deepdisc_hbb_);
   ak8pfjets_deepdisc_h4q_branch = tree->GetBranch("ak8pfjets_deepdisc_h4q");
   if (ak8pfjets_deepdisc_h4q_branch) ak8pfjets_deepdisc_h4q_branch->SetAddress(&ak8pfjets_deepdisc_h4q_);
+  lead_ak8deepdisc_top_branch = tree->GetBranch("lead_ak8deepdisc_top");
+  if (lead_ak8deepdisc_top_branch) lead_ak8deepdisc_top_branch->SetAddress(&lead_ak8deepdisc_top_);
   jup_ak8pfjets_tau1_branch = tree->GetBranch("jup_ak8pfjets_tau1");
   if (jup_ak8pfjets_tau1_branch) jup_ak8pfjets_tau1_branch->SetAddress(&jup_ak8pfjets_tau1_);
   jup_ak8pfjets_tau2_branch = tree->GetBranch("jup_ak8pfjets_tau2");
@@ -857,6 +877,8 @@ void stop_1l_babyAnalyzer::Init(TTree *tree) {
   if (jup_ak8pfjets_deepdisc_hbb_branch) jup_ak8pfjets_deepdisc_hbb_branch->SetAddress(&jup_ak8pfjets_deepdisc_hbb_);
   jup_ak8pfjets_deepdisc_h4q_branch = tree->GetBranch("jup_ak8pfjets_deepdisc_h4q");
   if (jup_ak8pfjets_deepdisc_h4q_branch) jup_ak8pfjets_deepdisc_h4q_branch->SetAddress(&jup_ak8pfjets_deepdisc_h4q_);
+  jup_lead_ak8deepdisc_top_branch = tree->GetBranch("jup_lead_ak8deepdisc_top");
+  if (jup_lead_ak8deepdisc_top_branch) jup_lead_ak8deepdisc_top_branch->SetAddress(&jup_lead_ak8deepdisc_top_);
   jdown_ak8pfjets_tau1_branch = tree->GetBranch("jdown_ak8pfjets_tau1");
   if (jdown_ak8pfjets_tau1_branch) jdown_ak8pfjets_tau1_branch->SetAddress(&jdown_ak8pfjets_tau1_);
   jdown_ak8pfjets_tau2_branch = tree->GetBranch("jdown_ak8pfjets_tau2");
@@ -881,42 +903,110 @@ void stop_1l_babyAnalyzer::Init(TTree *tree) {
   if (jdown_ak8pfjets_deepdisc_hbb_branch) jdown_ak8pfjets_deepdisc_hbb_branch->SetAddress(&jdown_ak8pfjets_deepdisc_hbb_);
   jdown_ak8pfjets_deepdisc_h4q_branch = tree->GetBranch("jdown_ak8pfjets_deepdisc_h4q");
   if (jdown_ak8pfjets_deepdisc_h4q_branch) jdown_ak8pfjets_deepdisc_h4q_branch->SetAddress(&jdown_ak8pfjets_deepdisc_h4q_);
+  jdown_lead_ak8deepdisc_top_branch = tree->GetBranch("jdown_lead_ak8deepdisc_top");
+  if (jdown_lead_ak8deepdisc_top_branch) jdown_lead_ak8deepdisc_top_branch->SetAddress(&jdown_lead_ak8deepdisc_top_);
   ak4pfjets_cvsl_branch = tree->GetBranch("ak4pfjets_cvsl");
   if (ak4pfjets_cvsl_branch) ak4pfjets_cvsl_branch->SetAddress(&ak4pfjets_cvsl_);
   ak4pfjets_ptD_branch = tree->GetBranch("ak4pfjets_ptD");
   if (ak4pfjets_ptD_branch) ak4pfjets_ptD_branch->SetAddress(&ak4pfjets_ptD_);
   ak4pfjets_axis1_branch = tree->GetBranch("ak4pfjets_axis1");
   if (ak4pfjets_axis1_branch) ak4pfjets_axis1_branch->SetAddress(&ak4pfjets_axis1_);
+  ak4pfjets_axis2_branch = tree->GetBranch("ak4pfjets_axis2");
+  if (ak4pfjets_axis2_branch) ak4pfjets_axis2_branch->SetAddress(&ak4pfjets_axis2_);
   ak4pfjets_mult_branch = tree->GetBranch("ak4pfjets_mult");
   if (ak4pfjets_mult_branch) ak4pfjets_mult_branch->SetAddress(&ak4pfjets_mult_);
+  ak4pfjets_csvbtag_branch = tree->GetBranch("ak4pfjets_csvbtag");
+  if (ak4pfjets_csvbtag_branch) ak4pfjets_csvbtag_branch->SetAddress(&ak4pfjets_csvbtag_);
+  ak4pfjets_deepCSVb_branch = tree->GetBranch("ak4pfjets_deepCSVb");
+  if (ak4pfjets_deepCSVb_branch) ak4pfjets_deepCSVb_branch->SetAddress(&ak4pfjets_deepCSVb_);
+  ak4pfjets_deepCSVbb_branch = tree->GetBranch("ak4pfjets_deepCSVbb");
+  if (ak4pfjets_deepCSVbb_branch) ak4pfjets_deepCSVbb_branch->SetAddress(&ak4pfjets_deepCSVbb_);
+  ak4pfjets_deepCSVc_branch = tree->GetBranch("ak4pfjets_deepCSVc");
+  if (ak4pfjets_deepCSVc_branch) ak4pfjets_deepCSVc_branch->SetAddress(&ak4pfjets_deepCSVc_);
+  ak4pfjets_deepCSVcc_branch = tree->GetBranch("ak4pfjets_deepCSVcc");
+  if (ak4pfjets_deepCSVcc_branch) ak4pfjets_deepCSVcc_branch->SetAddress(&ak4pfjets_deepCSVcc_);
+  ak4pfjets_deepCSVl_branch = tree->GetBranch("ak4pfjets_deepCSVl");
+  if (ak4pfjets_deepCSVl_branch) ak4pfjets_deepCSVl_branch->SetAddress(&ak4pfjets_deepCSVl_);
   topcands_ak4idx_branch = tree->GetBranch("topcands_ak4idx");
   if (topcands_ak4idx_branch) topcands_ak4idx_branch->SetAddress(&topcands_ak4idx_);
   topcands_disc_branch = tree->GetBranch("topcands_disc");
   if (topcands_disc_branch) topcands_disc_branch->SetAddress(&topcands_disc_);
+  tftops_disc_branch = tree->GetBranch("tftops_disc");
+  if (tftops_disc_branch) tftops_disc_branch->SetAddress(&tftops_disc_);
+  tftops_subjet_pt_branch = tree->GetBranch("tftops_subjet_pt");
+  if (tftops_subjet_pt_branch) tftops_subjet_pt_branch->SetAddress(&tftops_subjet_pt_);
+  tftops_subjet_eta_branch = tree->GetBranch("tftops_subjet_eta");
+  if (tftops_subjet_eta_branch) tftops_subjet_eta_branch->SetAddress(&tftops_subjet_eta_);
+  tftops_subjet_phi_branch = tree->GetBranch("tftops_subjet_phi");
+  if (tftops_subjet_phi_branch) tftops_subjet_phi_branch->SetAddress(&tftops_subjet_phi_);
   jup_ak4pfjets_cvsl_branch = tree->GetBranch("jup_ak4pfjets_cvsl");
   if (jup_ak4pfjets_cvsl_branch) jup_ak4pfjets_cvsl_branch->SetAddress(&jup_ak4pfjets_cvsl_);
   jup_ak4pfjets_ptD_branch = tree->GetBranch("jup_ak4pfjets_ptD");
   if (jup_ak4pfjets_ptD_branch) jup_ak4pfjets_ptD_branch->SetAddress(&jup_ak4pfjets_ptD_);
   jup_ak4pfjets_axis1_branch = tree->GetBranch("jup_ak4pfjets_axis1");
   if (jup_ak4pfjets_axis1_branch) jup_ak4pfjets_axis1_branch->SetAddress(&jup_ak4pfjets_axis1_);
+  jup_ak4pfjets_axis2_branch = tree->GetBranch("jup_ak4pfjets_axis2");
+  if (jup_ak4pfjets_axis2_branch) jup_ak4pfjets_axis2_branch->SetAddress(&jup_ak4pfjets_axis2_);
   jup_ak4pfjets_mult_branch = tree->GetBranch("jup_ak4pfjets_mult");
   if (jup_ak4pfjets_mult_branch) jup_ak4pfjets_mult_branch->SetAddress(&jup_ak4pfjets_mult_);
+  jup_ak4pfjets_csvbtag_branch = tree->GetBranch("jup_ak4pfjets_csvbtag");
+  if (jup_ak4pfjets_csvbtag_branch) jup_ak4pfjets_csvbtag_branch->SetAddress(&jup_ak4pfjets_csvbtag_);
+  jup_ak4pfjets_deepCSVb_branch = tree->GetBranch("jup_ak4pfjets_deepCSVb");
+  if (jup_ak4pfjets_deepCSVb_branch) jup_ak4pfjets_deepCSVb_branch->SetAddress(&jup_ak4pfjets_deepCSVb_);
+  jup_ak4pfjets_deepCSVbb_branch = tree->GetBranch("jup_ak4pfjets_deepCSVbb");
+  if (jup_ak4pfjets_deepCSVbb_branch) jup_ak4pfjets_deepCSVbb_branch->SetAddress(&jup_ak4pfjets_deepCSVbb_);
+  jup_ak4pfjets_deepCSVc_branch = tree->GetBranch("jup_ak4pfjets_deepCSVc");
+  if (jup_ak4pfjets_deepCSVc_branch) jup_ak4pfjets_deepCSVc_branch->SetAddress(&jup_ak4pfjets_deepCSVc_);
+  jup_ak4pfjets_deepCSVcc_branch = tree->GetBranch("jup_ak4pfjets_deepCSVcc");
+  if (jup_ak4pfjets_deepCSVcc_branch) jup_ak4pfjets_deepCSVcc_branch->SetAddress(&jup_ak4pfjets_deepCSVcc_);
+  jup_ak4pfjets_deepCSVl_branch = tree->GetBranch("jup_ak4pfjets_deepCSVl");
+  if (jup_ak4pfjets_deepCSVl_branch) jup_ak4pfjets_deepCSVl_branch->SetAddress(&jup_ak4pfjets_deepCSVl_);
   jup_topcands_ak4idx_branch = tree->GetBranch("jup_topcands_ak4idx");
   if (jup_topcands_ak4idx_branch) jup_topcands_ak4idx_branch->SetAddress(&jup_topcands_ak4idx_);
   jup_topcands_disc_branch = tree->GetBranch("jup_topcands_disc");
   if (jup_topcands_disc_branch) jup_topcands_disc_branch->SetAddress(&jup_topcands_disc_);
+  jup_tftops_disc_branch = tree->GetBranch("jup_tftops_disc");
+  if (jup_tftops_disc_branch) jup_tftops_disc_branch->SetAddress(&jup_tftops_disc_);
+  jup_tftops_subjet_pt_branch = tree->GetBranch("jup_tftops_subjet_pt");
+  if (jup_tftops_subjet_pt_branch) jup_tftops_subjet_pt_branch->SetAddress(&jup_tftops_subjet_pt_);
+  jup_tftops_subjet_eta_branch = tree->GetBranch("jup_tftops_subjet_eta");
+  if (jup_tftops_subjet_eta_branch) jup_tftops_subjet_eta_branch->SetAddress(&jup_tftops_subjet_eta_);
+  jup_tftops_subjet_phi_branch = tree->GetBranch("jup_tftops_subjet_phi");
+  if (jup_tftops_subjet_phi_branch) jup_tftops_subjet_phi_branch->SetAddress(&jup_tftops_subjet_phi_);
   jdown_ak4pfjets_cvsl_branch = tree->GetBranch("jdown_ak4pfjets_cvsl");
   if (jdown_ak4pfjets_cvsl_branch) jdown_ak4pfjets_cvsl_branch->SetAddress(&jdown_ak4pfjets_cvsl_);
   jdown_ak4pfjets_ptD_branch = tree->GetBranch("jdown_ak4pfjets_ptD");
   if (jdown_ak4pfjets_ptD_branch) jdown_ak4pfjets_ptD_branch->SetAddress(&jdown_ak4pfjets_ptD_);
   jdown_ak4pfjets_axis1_branch = tree->GetBranch("jdown_ak4pfjets_axis1");
   if (jdown_ak4pfjets_axis1_branch) jdown_ak4pfjets_axis1_branch->SetAddress(&jdown_ak4pfjets_axis1_);
+  jdown_ak4pfjets_axis2_branch = tree->GetBranch("jdown_ak4pfjets_axis2");
+  if (jdown_ak4pfjets_axis2_branch) jdown_ak4pfjets_axis2_branch->SetAddress(&jdown_ak4pfjets_axis2_);
   jdown_ak4pfjets_mult_branch = tree->GetBranch("jdown_ak4pfjets_mult");
   if (jdown_ak4pfjets_mult_branch) jdown_ak4pfjets_mult_branch->SetAddress(&jdown_ak4pfjets_mult_);
+  jdown_ak4pfjets_csvbtag_branch = tree->GetBranch("jdown_ak4pfjets_csvbtag");
+  if (jdown_ak4pfjets_csvbtag_branch) jdown_ak4pfjets_csvbtag_branch->SetAddress(&jdown_ak4pfjets_csvbtag_);
+  jdown_ak4pfjets_deepCSVb_branch = tree->GetBranch("jdown_ak4pfjets_deepCSVb");
+  if (jdown_ak4pfjets_deepCSVb_branch) jdown_ak4pfjets_deepCSVb_branch->SetAddress(&jdown_ak4pfjets_deepCSVb_);
+  jdown_ak4pfjets_deepCSVbb_branch = tree->GetBranch("jdown_ak4pfjets_deepCSVbb");
+  if (jdown_ak4pfjets_deepCSVbb_branch) jdown_ak4pfjets_deepCSVbb_branch->SetAddress(&jdown_ak4pfjets_deepCSVbb_);
+  jdown_ak4pfjets_deepCSVc_branch = tree->GetBranch("jdown_ak4pfjets_deepCSVc");
+  if (jdown_ak4pfjets_deepCSVc_branch) jdown_ak4pfjets_deepCSVc_branch->SetAddress(&jdown_ak4pfjets_deepCSVc_);
+  jdown_ak4pfjets_deepCSVcc_branch = tree->GetBranch("jdown_ak4pfjets_deepCSVcc");
+  if (jdown_ak4pfjets_deepCSVcc_branch) jdown_ak4pfjets_deepCSVcc_branch->SetAddress(&jdown_ak4pfjets_deepCSVcc_);
+  jdown_ak4pfjets_deepCSVl_branch = tree->GetBranch("jdown_ak4pfjets_deepCSVl");
+  if (jdown_ak4pfjets_deepCSVl_branch) jdown_ak4pfjets_deepCSVl_branch->SetAddress(&jdown_ak4pfjets_deepCSVl_);
   jdown_topcands_ak4idx_branch = tree->GetBranch("jdown_topcands_ak4idx");
   if (jdown_topcands_ak4idx_branch) jdown_topcands_ak4idx_branch->SetAddress(&jdown_topcands_ak4idx_);
   jdown_topcands_disc_branch = tree->GetBranch("jdown_topcands_disc");
   if (jdown_topcands_disc_branch) jdown_topcands_disc_branch->SetAddress(&jdown_topcands_disc_);
+  jdown_tftops_disc_branch = tree->GetBranch("jdown_tftops_disc");
+  if (jdown_tftops_disc_branch) jdown_tftops_disc_branch->SetAddress(&jdown_tftops_disc_);
+  jdown_tftops_subjet_pt_branch = tree->GetBranch("jdown_tftops_subjet_pt");
+  if (jdown_tftops_subjet_pt_branch) jdown_tftops_subjet_pt_branch->SetAddress(&jdown_tftops_subjet_pt_);
+  jdown_tftops_subjet_eta_branch = tree->GetBranch("jdown_tftops_subjet_eta");
+  if (jdown_tftops_subjet_eta_branch) jdown_tftops_subjet_eta_branch->SetAddress(&jdown_tftops_subjet_eta_);
+  jdown_tftops_subjet_phi_branch = tree->GetBranch("jdown_tftops_subjet_phi");
+  if (jdown_tftops_subjet_phi_branch) jdown_tftops_subjet_phi_branch->SetAddress(&jdown_tftops_subjet_phi_);
   tau_IDnames_branch = tree->GetBranch("tau_IDnames");
   if (tau_IDnames_branch) tau_IDnames_branch->SetAddress(&tau_IDnames_);
   tau_isocand_p4_branch = tree->GetBranch("tau_isocand_p4");
@@ -1266,6 +1356,8 @@ void stop_1l_babyAnalyzer::GetEntry(unsigned int idx) {
   ak4pfjets_leadMEDbjet_p4_isLoaded = false;
   ak4pfjets_leadbtag_p4_isLoaded = false;
   ak4genjets_p4_isLoaded = false;
+  softtags_p4_isLoaded = false;
+  nsoftbtags_isLoaded = false;
   jup_nskimjets_isLoaded = false;
   jup_nskimbtagmed_isLoaded = false;
   jup_nskimbtagloose_isLoaded = false;
@@ -1290,6 +1382,8 @@ void stop_1l_babyAnalyzer::GetEntry(unsigned int idx) {
   jup_ak4pfjets_leadMEDbjet_p4_isLoaded = false;
   jup_ak4pfjets_leadbtag_p4_isLoaded = false;
   jup_ak4genjets_p4_isLoaded = false;
+  jup_softtags_p4_isLoaded = false;
+  jup_nsoftbtags_isLoaded = false;
   jdown_nskimjets_isLoaded = false;
   jdown_nskimbtagmed_isLoaded = false;
   jdown_nskimbtagloose_isLoaded = false;
@@ -1314,6 +1408,8 @@ void stop_1l_babyAnalyzer::GetEntry(unsigned int idx) {
   jdown_ak4pfjets_leadMEDbjet_p4_isLoaded = false;
   jdown_ak4pfjets_leadbtag_p4_isLoaded = false;
   jdown_ak4genjets_p4_isLoaded = false;
+  jdown_softtags_p4_isLoaded = false;
+  jdown_nsoftbtags_isLoaded = false;
   genleps_isfromt_isLoaded = false;
   genleps_p4_isLoaded = false;
   genleps_id_isLoaded = false;
@@ -1422,6 +1518,7 @@ void stop_1l_babyAnalyzer::GetEntry(unsigned int idx) {
   ak8pfjets_deepdisc_zbb_isLoaded = false;
   ak8pfjets_deepdisc_hbb_isLoaded = false;
   ak8pfjets_deepdisc_h4q_isLoaded = false;
+  lead_ak8deepdisc_top_isLoaded = false;
   jup_ak8pfjets_p4_isLoaded = false;
   jup_ak8pfjets_tau1_isLoaded = false;
   jup_ak8pfjets_tau2_isLoaded = false;
@@ -1435,6 +1532,7 @@ void stop_1l_babyAnalyzer::GetEntry(unsigned int idx) {
   jup_ak8pfjets_deepdisc_zbb_isLoaded = false;
   jup_ak8pfjets_deepdisc_hbb_isLoaded = false;
   jup_ak8pfjets_deepdisc_h4q_isLoaded = false;
+  jup_lead_ak8deepdisc_top_isLoaded = false;
   jdown_ak8pfjets_p4_isLoaded = false;
   jdown_ak8pfjets_tau1_isLoaded = false;
   jdown_ak8pfjets_tau2_isLoaded = false;
@@ -1448,30 +1546,67 @@ void stop_1l_babyAnalyzer::GetEntry(unsigned int idx) {
   jdown_ak8pfjets_deepdisc_zbb_isLoaded = false;
   jdown_ak8pfjets_deepdisc_hbb_isLoaded = false;
   jdown_ak8pfjets_deepdisc_h4q_isLoaded = false;
+  jdown_lead_ak8deepdisc_top_isLoaded = false;
   ak4pfjets_cvsl_isLoaded = false;
   ak4pfjets_ptD_isLoaded = false;
   ak4pfjets_axis1_isLoaded = false;
+  ak4pfjets_axis2_isLoaded = false;
   ak4pfjets_mult_isLoaded = false;
+  ak4pfjets_csvbtag_isLoaded = false;
+  ak4pfjets_deepCSVb_isLoaded = false;
+  ak4pfjets_deepCSVbb_isLoaded = false;
+  ak4pfjets_deepCSVc_isLoaded = false;
+  ak4pfjets_deepCSVcc_isLoaded = false;
+  ak4pfjets_deepCSVl_isLoaded = false;
   topcands_ak4idx_isLoaded = false;
   topcands_disc_isLoaded = false;
   topcands_p4_isLoaded = false;
   topcands_Wp4_isLoaded = false;
+  tftops_p4_isLoaded = false;
+  tftops_disc_isLoaded = false;
+  tftops_subjet_pt_isLoaded = false;
+  tftops_subjet_eta_isLoaded = false;
+  tftops_subjet_phi_isLoaded = false;
   jup_ak4pfjets_cvsl_isLoaded = false;
   jup_ak4pfjets_ptD_isLoaded = false;
   jup_ak4pfjets_axis1_isLoaded = false;
+  jup_ak4pfjets_axis2_isLoaded = false;
   jup_ak4pfjets_mult_isLoaded = false;
+  jup_ak4pfjets_csvbtag_isLoaded = false;
+  jup_ak4pfjets_deepCSVb_isLoaded = false;
+  jup_ak4pfjets_deepCSVbb_isLoaded = false;
+  jup_ak4pfjets_deepCSVc_isLoaded = false;
+  jup_ak4pfjets_deepCSVcc_isLoaded = false;
+  jup_ak4pfjets_deepCSVl_isLoaded = false;
   jup_topcands_ak4idx_isLoaded = false;
   jup_topcands_disc_isLoaded = false;
   jup_topcands_p4_isLoaded = false;
   jup_topcands_Wp4_isLoaded = false;
+  jup_tftops_p4_isLoaded = false;
+  jup_tftops_disc_isLoaded = false;
+  jup_tftops_subjet_pt_isLoaded = false;
+  jup_tftops_subjet_eta_isLoaded = false;
+  jup_tftops_subjet_phi_isLoaded = false;
   jdown_ak4pfjets_cvsl_isLoaded = false;
   jdown_ak4pfjets_ptD_isLoaded = false;
   jdown_ak4pfjets_axis1_isLoaded = false;
+  jdown_ak4pfjets_axis2_isLoaded = false;
   jdown_ak4pfjets_mult_isLoaded = false;
+  jdown_ak4pfjets_csvbtag_isLoaded = false;
+  jdown_ak4pfjets_deepCSVb_isLoaded = false;
+  jdown_ak4pfjets_deepCSVbb_isLoaded = false;
+  jdown_ak4pfjets_deepCSVc_isLoaded = false;
+  jdown_ak4pfjets_deepCSVcc_isLoaded = false;
+  jdown_ak4pfjets_deepCSVl_isLoaded = false;
   jdown_topcands_ak4idx_isLoaded = false;
   jdown_topcands_disc_isLoaded = false;
   jdown_topcands_p4_isLoaded = false;
   jdown_topcands_Wp4_isLoaded = false;
+  jdown_tftops_p4_isLoaded = false;
+  jdown_tftops_disc_isLoaded = false;
+  jdown_tftops_subjet_pt_isLoaded = false;
+  jdown_tftops_subjet_eta_isLoaded = false;
+  jdown_tftops_subjet_phi_isLoaded = false;
   tau_IDnames_isLoaded = false;
   tau_leadtrack_p4_isLoaded = false;
   tau_leadneutral_p4_isLoaded = false;
@@ -1774,6 +1909,8 @@ void stop_1l_babyAnalyzer::LoadAllBranches() {
   if (ak4pfjets_leadMEDbjet_p4_branch != 0) ak4pfjets_leadMEDbjet_p4();
   if (ak4pfjets_leadbtag_p4_branch != 0) ak4pfjets_leadbtag_p4();
   if (ak4genjets_p4_branch != 0) ak4genjets_p4();
+  if (softtags_p4_branch != 0) softtags_p4();
+  if (nsoftbtags_branch != 0) nsoftbtags();
   if (jup_nskimjets_branch != 0) jup_nskimjets();
   if (jup_nskimbtagmed_branch != 0) jup_nskimbtagmed();
   if (jup_nskimbtagloose_branch != 0) jup_nskimbtagloose();
@@ -1798,6 +1935,8 @@ void stop_1l_babyAnalyzer::LoadAllBranches() {
   if (jup_ak4pfjets_leadMEDbjet_p4_branch != 0) jup_ak4pfjets_leadMEDbjet_p4();
   if (jup_ak4pfjets_leadbtag_p4_branch != 0) jup_ak4pfjets_leadbtag_p4();
   if (jup_ak4genjets_p4_branch != 0) jup_ak4genjets_p4();
+  if (jup_softtags_p4_branch != 0) jup_softtags_p4();
+  if (jup_nsoftbtags_branch != 0) jup_nsoftbtags();
   if (jdown_nskimjets_branch != 0) jdown_nskimjets();
   if (jdown_nskimbtagmed_branch != 0) jdown_nskimbtagmed();
   if (jdown_nskimbtagloose_branch != 0) jdown_nskimbtagloose();
@@ -1822,6 +1961,8 @@ void stop_1l_babyAnalyzer::LoadAllBranches() {
   if (jdown_ak4pfjets_leadMEDbjet_p4_branch != 0) jdown_ak4pfjets_leadMEDbjet_p4();
   if (jdown_ak4pfjets_leadbtag_p4_branch != 0) jdown_ak4pfjets_leadbtag_p4();
   if (jdown_ak4genjets_p4_branch != 0) jdown_ak4genjets_p4();
+  if (jdown_softtags_p4_branch != 0) jdown_softtags_p4();
+  if (jdown_nsoftbtags_branch != 0) jdown_nsoftbtags();
   if (genleps_isfromt_branch != 0) genleps_isfromt();
   if (genleps_p4_branch != 0) genleps_p4();
   if (genleps_id_branch != 0) genleps_id();
@@ -1930,6 +2071,7 @@ void stop_1l_babyAnalyzer::LoadAllBranches() {
   if (ak8pfjets_deepdisc_zbb_branch != 0) ak8pfjets_deepdisc_zbb();
   if (ak8pfjets_deepdisc_hbb_branch != 0) ak8pfjets_deepdisc_hbb();
   if (ak8pfjets_deepdisc_h4q_branch != 0) ak8pfjets_deepdisc_h4q();
+  if (lead_ak8deepdisc_top_branch != 0) lead_ak8deepdisc_top();
   if (jup_ak8pfjets_p4_branch != 0) jup_ak8pfjets_p4();
   if (jup_ak8pfjets_tau1_branch != 0) jup_ak8pfjets_tau1();
   if (jup_ak8pfjets_tau2_branch != 0) jup_ak8pfjets_tau2();
@@ -1943,6 +2085,7 @@ void stop_1l_babyAnalyzer::LoadAllBranches() {
   if (jup_ak8pfjets_deepdisc_zbb_branch != 0) jup_ak8pfjets_deepdisc_zbb();
   if (jup_ak8pfjets_deepdisc_hbb_branch != 0) jup_ak8pfjets_deepdisc_hbb();
   if (jup_ak8pfjets_deepdisc_h4q_branch != 0) jup_ak8pfjets_deepdisc_h4q();
+  if (jup_lead_ak8deepdisc_top_branch != 0) jup_lead_ak8deepdisc_top();
   if (jdown_ak8pfjets_p4_branch != 0) jdown_ak8pfjets_p4();
   if (jdown_ak8pfjets_tau1_branch != 0) jdown_ak8pfjets_tau1();
   if (jdown_ak8pfjets_tau2_branch != 0) jdown_ak8pfjets_tau2();
@@ -1956,30 +2099,67 @@ void stop_1l_babyAnalyzer::LoadAllBranches() {
   if (jdown_ak8pfjets_deepdisc_zbb_branch != 0) jdown_ak8pfjets_deepdisc_zbb();
   if (jdown_ak8pfjets_deepdisc_hbb_branch != 0) jdown_ak8pfjets_deepdisc_hbb();
   if (jdown_ak8pfjets_deepdisc_h4q_branch != 0) jdown_ak8pfjets_deepdisc_h4q();
+  if (jdown_lead_ak8deepdisc_top_branch != 0) jdown_lead_ak8deepdisc_top();
   if (ak4pfjets_cvsl_branch != 0) ak4pfjets_cvsl();
   if (ak4pfjets_ptD_branch != 0) ak4pfjets_ptD();
   if (ak4pfjets_axis1_branch != 0) ak4pfjets_axis1();
+  if (ak4pfjets_axis2_branch != 0) ak4pfjets_axis2();
   if (ak4pfjets_mult_branch != 0) ak4pfjets_mult();
+  if (ak4pfjets_csvbtag_branch != 0) ak4pfjets_csvbtag();
+  if (ak4pfjets_deepCSVb_branch != 0) ak4pfjets_deepCSVb();
+  if (ak4pfjets_deepCSVbb_branch != 0) ak4pfjets_deepCSVbb();
+  if (ak4pfjets_deepCSVc_branch != 0) ak4pfjets_deepCSVc();
+  if (ak4pfjets_deepCSVcc_branch != 0) ak4pfjets_deepCSVcc();
+  if (ak4pfjets_deepCSVl_branch != 0) ak4pfjets_deepCSVl();
   if (topcands_ak4idx_branch != 0) topcands_ak4idx();
   if (topcands_disc_branch != 0) topcands_disc();
   if (topcands_p4_branch != 0) topcands_p4();
   if (topcands_Wp4_branch != 0) topcands_Wp4();
+  if (tftops_p4_branch != 0) tftops_p4();
+  if (tftops_disc_branch != 0) tftops_disc();
+  if (tftops_subjet_pt_branch != 0) tftops_subjet_pt();
+  if (tftops_subjet_eta_branch != 0) tftops_subjet_eta();
+  if (tftops_subjet_phi_branch != 0) tftops_subjet_phi();
   if (jup_ak4pfjets_cvsl_branch != 0) jup_ak4pfjets_cvsl();
   if (jup_ak4pfjets_ptD_branch != 0) jup_ak4pfjets_ptD();
   if (jup_ak4pfjets_axis1_branch != 0) jup_ak4pfjets_axis1();
+  if (jup_ak4pfjets_axis2_branch != 0) jup_ak4pfjets_axis2();
   if (jup_ak4pfjets_mult_branch != 0) jup_ak4pfjets_mult();
+  if (jup_ak4pfjets_csvbtag_branch != 0) jup_ak4pfjets_csvbtag();
+  if (jup_ak4pfjets_deepCSVb_branch != 0) jup_ak4pfjets_deepCSVb();
+  if (jup_ak4pfjets_deepCSVbb_branch != 0) jup_ak4pfjets_deepCSVbb();
+  if (jup_ak4pfjets_deepCSVc_branch != 0) jup_ak4pfjets_deepCSVc();
+  if (jup_ak4pfjets_deepCSVcc_branch != 0) jup_ak4pfjets_deepCSVcc();
+  if (jup_ak4pfjets_deepCSVl_branch != 0) jup_ak4pfjets_deepCSVl();
   if (jup_topcands_ak4idx_branch != 0) jup_topcands_ak4idx();
   if (jup_topcands_disc_branch != 0) jup_topcands_disc();
   if (jup_topcands_p4_branch != 0) jup_topcands_p4();
   if (jup_topcands_Wp4_branch != 0) jup_topcands_Wp4();
+  if (jup_tftops_p4_branch != 0) jup_tftops_p4();
+  if (jup_tftops_disc_branch != 0) jup_tftops_disc();
+  if (jup_tftops_subjet_pt_branch != 0) jup_tftops_subjet_pt();
+  if (jup_tftops_subjet_eta_branch != 0) jup_tftops_subjet_eta();
+  if (jup_tftops_subjet_phi_branch != 0) jup_tftops_subjet_phi();
   if (jdown_ak4pfjets_cvsl_branch != 0) jdown_ak4pfjets_cvsl();
   if (jdown_ak4pfjets_ptD_branch != 0) jdown_ak4pfjets_ptD();
   if (jdown_ak4pfjets_axis1_branch != 0) jdown_ak4pfjets_axis1();
+  if (jdown_ak4pfjets_axis2_branch != 0) jdown_ak4pfjets_axis2();
   if (jdown_ak4pfjets_mult_branch != 0) jdown_ak4pfjets_mult();
+  if (jdown_ak4pfjets_csvbtag_branch != 0) jdown_ak4pfjets_csvbtag();
+  if (jdown_ak4pfjets_deepCSVb_branch != 0) jdown_ak4pfjets_deepCSVb();
+  if (jdown_ak4pfjets_deepCSVbb_branch != 0) jdown_ak4pfjets_deepCSVbb();
+  if (jdown_ak4pfjets_deepCSVc_branch != 0) jdown_ak4pfjets_deepCSVc();
+  if (jdown_ak4pfjets_deepCSVcc_branch != 0) jdown_ak4pfjets_deepCSVcc();
+  if (jdown_ak4pfjets_deepCSVl_branch != 0) jdown_ak4pfjets_deepCSVl();
   if (jdown_topcands_ak4idx_branch != 0) jdown_topcands_ak4idx();
   if (jdown_topcands_disc_branch != 0) jdown_topcands_disc();
   if (jdown_topcands_p4_branch != 0) jdown_topcands_p4();
   if (jdown_topcands_Wp4_branch != 0) jdown_topcands_Wp4();
+  if (jdown_tftops_p4_branch != 0) jdown_tftops_p4();
+  if (jdown_tftops_disc_branch != 0) jdown_tftops_disc();
+  if (jdown_tftops_subjet_pt_branch != 0) jdown_tftops_subjet_pt();
+  if (jdown_tftops_subjet_eta_branch != 0) jdown_tftops_subjet_eta();
+  if (jdown_tftops_subjet_phi_branch != 0) jdown_tftops_subjet_phi();
   if (tau_IDnames_branch != 0) tau_IDnames();
   if (tau_leadtrack_p4_branch != 0) tau_leadtrack_p4();
   if (tau_leadneutral_p4_branch != 0) tau_leadneutral_p4();
@@ -5232,6 +5412,32 @@ const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l
   return *ak4genjets_p4_;
 }
 
+const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l_babyAnalyzer::softtags_p4() {
+  if (not softtags_p4_isLoaded) {
+    if (softtags_p4_branch != 0) {
+      softtags_p4_branch->GetEntry(index);
+    } else {
+      printf("branch softtags_p4_branch does not exist!\n");
+      exit(1);
+    }
+    softtags_p4_isLoaded = true;
+  }
+  return *softtags_p4_;
+}
+
+const int &stop_1l_babyAnalyzer::nsoftbtags() {
+  if (not nsoftbtags_isLoaded) {
+    if (nsoftbtags_branch != 0) {
+      nsoftbtags_branch->GetEntry(index);
+    } else {
+      printf("branch nsoftbtags_branch does not exist!\n");
+      exit(1);
+    }
+    nsoftbtags_isLoaded = true;
+  }
+  return nsoftbtags_;
+}
+
 const int &stop_1l_babyAnalyzer::jup_nskimjets() {
   if (not jup_nskimjets_isLoaded) {
     if (jup_nskimjets_branch != 0) {
@@ -5544,6 +5750,32 @@ const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l
   return *jup_ak4genjets_p4_;
 }
 
+const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l_babyAnalyzer::jup_softtags_p4() {
+  if (not jup_softtags_p4_isLoaded) {
+    if (jup_softtags_p4_branch != 0) {
+      jup_softtags_p4_branch->GetEntry(index);
+    } else {
+      printf("branch jup_softtags_p4_branch does not exist!\n");
+      exit(1);
+    }
+    jup_softtags_p4_isLoaded = true;
+  }
+  return *jup_softtags_p4_;
+}
+
+const int &stop_1l_babyAnalyzer::jup_nsoftbtags() {
+  if (not jup_nsoftbtags_isLoaded) {
+    if (jup_nsoftbtags_branch != 0) {
+      jup_nsoftbtags_branch->GetEntry(index);
+    } else {
+      printf("branch jup_nsoftbtags_branch does not exist!\n");
+      exit(1);
+    }
+    jup_nsoftbtags_isLoaded = true;
+  }
+  return jup_nsoftbtags_;
+}
+
 const int &stop_1l_babyAnalyzer::jdown_nskimjets() {
   if (not jdown_nskimjets_isLoaded) {
     if (jdown_nskimjets_branch != 0) {
@@ -5854,6 +6086,32 @@ const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l
     jdown_ak4genjets_p4_isLoaded = true;
   }
   return *jdown_ak4genjets_p4_;
+}
+
+const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l_babyAnalyzer::jdown_softtags_p4() {
+  if (not jdown_softtags_p4_isLoaded) {
+    if (jdown_softtags_p4_branch != 0) {
+      jdown_softtags_p4_branch->GetEntry(index);
+    } else {
+      printf("branch jdown_softtags_p4_branch does not exist!\n");
+      exit(1);
+    }
+    jdown_softtags_p4_isLoaded = true;
+  }
+  return *jdown_softtags_p4_;
+}
+
+const int &stop_1l_babyAnalyzer::jdown_nsoftbtags() {
+  if (not jdown_nsoftbtags_isLoaded) {
+    if (jdown_nsoftbtags_branch != 0) {
+      jdown_nsoftbtags_branch->GetEntry(index);
+    } else {
+      printf("branch jdown_nsoftbtags_branch does not exist!\n");
+      exit(1);
+    }
+    jdown_nsoftbtags_isLoaded = true;
+  }
+  return jdown_nsoftbtags_;
 }
 
 const vector<bool> &stop_1l_babyAnalyzer::genleps_isfromt() {
@@ -7260,6 +7518,19 @@ const vector<float> &stop_1l_babyAnalyzer::ak8pfjets_deepdisc_h4q() {
   return *ak8pfjets_deepdisc_h4q_;
 }
 
+const float &stop_1l_babyAnalyzer::lead_ak8deepdisc_top() {
+  if (not lead_ak8deepdisc_top_isLoaded) {
+    if (lead_ak8deepdisc_top_branch != 0) {
+      lead_ak8deepdisc_top_branch->GetEntry(index);
+    } else {
+      printf("branch lead_ak8deepdisc_top_branch does not exist!\n");
+      exit(1);
+    }
+    lead_ak8deepdisc_top_isLoaded = true;
+  }
+  return lead_ak8deepdisc_top_;
+}
+
 const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l_babyAnalyzer::jup_ak8pfjets_p4() {
   if (not jup_ak8pfjets_p4_isLoaded) {
     if (jup_ak8pfjets_p4_branch != 0) {
@@ -7427,6 +7698,19 @@ const vector<float> &stop_1l_babyAnalyzer::jup_ak8pfjets_deepdisc_h4q() {
     jup_ak8pfjets_deepdisc_h4q_isLoaded = true;
   }
   return *jup_ak8pfjets_deepdisc_h4q_;
+}
+
+const float &stop_1l_babyAnalyzer::jup_lead_ak8deepdisc_top() {
+  if (not jup_lead_ak8deepdisc_top_isLoaded) {
+    if (jup_lead_ak8deepdisc_top_branch != 0) {
+      jup_lead_ak8deepdisc_top_branch->GetEntry(index);
+    } else {
+      printf("branch jup_lead_ak8deepdisc_top_branch does not exist!\n");
+      exit(1);
+    }
+    jup_lead_ak8deepdisc_top_isLoaded = true;
+  }
+  return jup_lead_ak8deepdisc_top_;
 }
 
 const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l_babyAnalyzer::jdown_ak8pfjets_p4() {
@@ -7598,6 +7882,19 @@ const vector<float> &stop_1l_babyAnalyzer::jdown_ak8pfjets_deepdisc_h4q() {
   return *jdown_ak8pfjets_deepdisc_h4q_;
 }
 
+const float &stop_1l_babyAnalyzer::jdown_lead_ak8deepdisc_top() {
+  if (not jdown_lead_ak8deepdisc_top_isLoaded) {
+    if (jdown_lead_ak8deepdisc_top_branch != 0) {
+      jdown_lead_ak8deepdisc_top_branch->GetEntry(index);
+    } else {
+      printf("branch jdown_lead_ak8deepdisc_top_branch does not exist!\n");
+      exit(1);
+    }
+    jdown_lead_ak8deepdisc_top_isLoaded = true;
+  }
+  return jdown_lead_ak8deepdisc_top_;
+}
+
 const vector<float> &stop_1l_babyAnalyzer::ak4pfjets_cvsl() {
   if (not ak4pfjets_cvsl_isLoaded) {
     if (ak4pfjets_cvsl_branch != 0) {
@@ -7637,6 +7934,19 @@ const vector<float> &stop_1l_babyAnalyzer::ak4pfjets_axis1() {
   return *ak4pfjets_axis1_;
 }
 
+const vector<float> &stop_1l_babyAnalyzer::ak4pfjets_axis2() {
+  if (not ak4pfjets_axis2_isLoaded) {
+    if (ak4pfjets_axis2_branch != 0) {
+      ak4pfjets_axis2_branch->GetEntry(index);
+    } else {
+      printf("branch ak4pfjets_axis2_branch does not exist!\n");
+      exit(1);
+    }
+    ak4pfjets_axis2_isLoaded = true;
+  }
+  return *ak4pfjets_axis2_;
+}
+
 const vector<int> &stop_1l_babyAnalyzer::ak4pfjets_mult() {
   if (not ak4pfjets_mult_isLoaded) {
     if (ak4pfjets_mult_branch != 0) {
@@ -7648,6 +7958,84 @@ const vector<int> &stop_1l_babyAnalyzer::ak4pfjets_mult() {
     ak4pfjets_mult_isLoaded = true;
   }
   return *ak4pfjets_mult_;
+}
+
+const vector<float> &stop_1l_babyAnalyzer::ak4pfjets_csvbtag() {
+  if (not ak4pfjets_csvbtag_isLoaded) {
+    if (ak4pfjets_csvbtag_branch != 0) {
+      ak4pfjets_csvbtag_branch->GetEntry(index);
+    } else {
+      printf("branch ak4pfjets_csvbtag_branch does not exist!\n");
+      exit(1);
+    }
+    ak4pfjets_csvbtag_isLoaded = true;
+  }
+  return *ak4pfjets_csvbtag_;
+}
+
+const vector<float> &stop_1l_babyAnalyzer::ak4pfjets_deepCSVb() {
+  if (not ak4pfjets_deepCSVb_isLoaded) {
+    if (ak4pfjets_deepCSVb_branch != 0) {
+      ak4pfjets_deepCSVb_branch->GetEntry(index);
+    } else {
+      printf("branch ak4pfjets_deepCSVb_branch does not exist!\n");
+      exit(1);
+    }
+    ak4pfjets_deepCSVb_isLoaded = true;
+  }
+  return *ak4pfjets_deepCSVb_;
+}
+
+const vector<float> &stop_1l_babyAnalyzer::ak4pfjets_deepCSVbb() {
+  if (not ak4pfjets_deepCSVbb_isLoaded) {
+    if (ak4pfjets_deepCSVbb_branch != 0) {
+      ak4pfjets_deepCSVbb_branch->GetEntry(index);
+    } else {
+      printf("branch ak4pfjets_deepCSVbb_branch does not exist!\n");
+      exit(1);
+    }
+    ak4pfjets_deepCSVbb_isLoaded = true;
+  }
+  return *ak4pfjets_deepCSVbb_;
+}
+
+const vector<float> &stop_1l_babyAnalyzer::ak4pfjets_deepCSVc() {
+  if (not ak4pfjets_deepCSVc_isLoaded) {
+    if (ak4pfjets_deepCSVc_branch != 0) {
+      ak4pfjets_deepCSVc_branch->GetEntry(index);
+    } else {
+      printf("branch ak4pfjets_deepCSVc_branch does not exist!\n");
+      exit(1);
+    }
+    ak4pfjets_deepCSVc_isLoaded = true;
+  }
+  return *ak4pfjets_deepCSVc_;
+}
+
+const vector<float> &stop_1l_babyAnalyzer::ak4pfjets_deepCSVcc() {
+  if (not ak4pfjets_deepCSVcc_isLoaded) {
+    if (ak4pfjets_deepCSVcc_branch != 0) {
+      ak4pfjets_deepCSVcc_branch->GetEntry(index);
+    } else {
+      printf("branch ak4pfjets_deepCSVcc_branch does not exist!\n");
+      exit(1);
+    }
+    ak4pfjets_deepCSVcc_isLoaded = true;
+  }
+  return *ak4pfjets_deepCSVcc_;
+}
+
+const vector<float> &stop_1l_babyAnalyzer::ak4pfjets_deepCSVl() {
+  if (not ak4pfjets_deepCSVl_isLoaded) {
+    if (ak4pfjets_deepCSVl_branch != 0) {
+      ak4pfjets_deepCSVl_branch->GetEntry(index);
+    } else {
+      printf("branch ak4pfjets_deepCSVl_branch does not exist!\n");
+      exit(1);
+    }
+    ak4pfjets_deepCSVl_isLoaded = true;
+  }
+  return *ak4pfjets_deepCSVl_;
 }
 
 const vector<vector<int> > &stop_1l_babyAnalyzer::topcands_ak4idx() {
@@ -7702,6 +8090,71 @@ const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l
   return *topcands_Wp4_;
 }
 
+const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l_babyAnalyzer::tftops_p4() {
+  if (not tftops_p4_isLoaded) {
+    if (tftops_p4_branch != 0) {
+      tftops_p4_branch->GetEntry(index);
+    } else {
+      printf("branch tftops_p4_branch does not exist!\n");
+      exit(1);
+    }
+    tftops_p4_isLoaded = true;
+  }
+  return *tftops_p4_;
+}
+
+const vector<float> &stop_1l_babyAnalyzer::tftops_disc() {
+  if (not tftops_disc_isLoaded) {
+    if (tftops_disc_branch != 0) {
+      tftops_disc_branch->GetEntry(index);
+    } else {
+      printf("branch tftops_disc_branch does not exist!\n");
+      exit(1);
+    }
+    tftops_disc_isLoaded = true;
+  }
+  return *tftops_disc_;
+}
+
+const vector<vector<float> > &stop_1l_babyAnalyzer::tftops_subjet_pt() {
+  if (not tftops_subjet_pt_isLoaded) {
+    if (tftops_subjet_pt_branch != 0) {
+      tftops_subjet_pt_branch->GetEntry(index);
+    } else {
+      printf("branch tftops_subjet_pt_branch does not exist!\n");
+      exit(1);
+    }
+    tftops_subjet_pt_isLoaded = true;
+  }
+  return *tftops_subjet_pt_;
+}
+
+const vector<vector<float> > &stop_1l_babyAnalyzer::tftops_subjet_eta() {
+  if (not tftops_subjet_eta_isLoaded) {
+    if (tftops_subjet_eta_branch != 0) {
+      tftops_subjet_eta_branch->GetEntry(index);
+    } else {
+      printf("branch tftops_subjet_eta_branch does not exist!\n");
+      exit(1);
+    }
+    tftops_subjet_eta_isLoaded = true;
+  }
+  return *tftops_subjet_eta_;
+}
+
+const vector<vector<float> > &stop_1l_babyAnalyzer::tftops_subjet_phi() {
+  if (not tftops_subjet_phi_isLoaded) {
+    if (tftops_subjet_phi_branch != 0) {
+      tftops_subjet_phi_branch->GetEntry(index);
+    } else {
+      printf("branch tftops_subjet_phi_branch does not exist!\n");
+      exit(1);
+    }
+    tftops_subjet_phi_isLoaded = true;
+  }
+  return *tftops_subjet_phi_;
+}
+
 const vector<float> &stop_1l_babyAnalyzer::jup_ak4pfjets_cvsl() {
   if (not jup_ak4pfjets_cvsl_isLoaded) {
     if (jup_ak4pfjets_cvsl_branch != 0) {
@@ -7741,6 +8194,19 @@ const vector<float> &stop_1l_babyAnalyzer::jup_ak4pfjets_axis1() {
   return *jup_ak4pfjets_axis1_;
 }
 
+const vector<float> &stop_1l_babyAnalyzer::jup_ak4pfjets_axis2() {
+  if (not jup_ak4pfjets_axis2_isLoaded) {
+    if (jup_ak4pfjets_axis2_branch != 0) {
+      jup_ak4pfjets_axis2_branch->GetEntry(index);
+    } else {
+      printf("branch jup_ak4pfjets_axis2_branch does not exist!\n");
+      exit(1);
+    }
+    jup_ak4pfjets_axis2_isLoaded = true;
+  }
+  return *jup_ak4pfjets_axis2_;
+}
+
 const vector<int> &stop_1l_babyAnalyzer::jup_ak4pfjets_mult() {
   if (not jup_ak4pfjets_mult_isLoaded) {
     if (jup_ak4pfjets_mult_branch != 0) {
@@ -7752,6 +8218,84 @@ const vector<int> &stop_1l_babyAnalyzer::jup_ak4pfjets_mult() {
     jup_ak4pfjets_mult_isLoaded = true;
   }
   return *jup_ak4pfjets_mult_;
+}
+
+const vector<float> &stop_1l_babyAnalyzer::jup_ak4pfjets_csvbtag() {
+  if (not jup_ak4pfjets_csvbtag_isLoaded) {
+    if (jup_ak4pfjets_csvbtag_branch != 0) {
+      jup_ak4pfjets_csvbtag_branch->GetEntry(index);
+    } else {
+      printf("branch jup_ak4pfjets_csvbtag_branch does not exist!\n");
+      exit(1);
+    }
+    jup_ak4pfjets_csvbtag_isLoaded = true;
+  }
+  return *jup_ak4pfjets_csvbtag_;
+}
+
+const vector<float> &stop_1l_babyAnalyzer::jup_ak4pfjets_deepCSVb() {
+  if (not jup_ak4pfjets_deepCSVb_isLoaded) {
+    if (jup_ak4pfjets_deepCSVb_branch != 0) {
+      jup_ak4pfjets_deepCSVb_branch->GetEntry(index);
+    } else {
+      printf("branch jup_ak4pfjets_deepCSVb_branch does not exist!\n");
+      exit(1);
+    }
+    jup_ak4pfjets_deepCSVb_isLoaded = true;
+  }
+  return *jup_ak4pfjets_deepCSVb_;
+}
+
+const vector<float> &stop_1l_babyAnalyzer::jup_ak4pfjets_deepCSVbb() {
+  if (not jup_ak4pfjets_deepCSVbb_isLoaded) {
+    if (jup_ak4pfjets_deepCSVbb_branch != 0) {
+      jup_ak4pfjets_deepCSVbb_branch->GetEntry(index);
+    } else {
+      printf("branch jup_ak4pfjets_deepCSVbb_branch does not exist!\n");
+      exit(1);
+    }
+    jup_ak4pfjets_deepCSVbb_isLoaded = true;
+  }
+  return *jup_ak4pfjets_deepCSVbb_;
+}
+
+const vector<float> &stop_1l_babyAnalyzer::jup_ak4pfjets_deepCSVc() {
+  if (not jup_ak4pfjets_deepCSVc_isLoaded) {
+    if (jup_ak4pfjets_deepCSVc_branch != 0) {
+      jup_ak4pfjets_deepCSVc_branch->GetEntry(index);
+    } else {
+      printf("branch jup_ak4pfjets_deepCSVc_branch does not exist!\n");
+      exit(1);
+    }
+    jup_ak4pfjets_deepCSVc_isLoaded = true;
+  }
+  return *jup_ak4pfjets_deepCSVc_;
+}
+
+const vector<float> &stop_1l_babyAnalyzer::jup_ak4pfjets_deepCSVcc() {
+  if (not jup_ak4pfjets_deepCSVcc_isLoaded) {
+    if (jup_ak4pfjets_deepCSVcc_branch != 0) {
+      jup_ak4pfjets_deepCSVcc_branch->GetEntry(index);
+    } else {
+      printf("branch jup_ak4pfjets_deepCSVcc_branch does not exist!\n");
+      exit(1);
+    }
+    jup_ak4pfjets_deepCSVcc_isLoaded = true;
+  }
+  return *jup_ak4pfjets_deepCSVcc_;
+}
+
+const vector<float> &stop_1l_babyAnalyzer::jup_ak4pfjets_deepCSVl() {
+  if (not jup_ak4pfjets_deepCSVl_isLoaded) {
+    if (jup_ak4pfjets_deepCSVl_branch != 0) {
+      jup_ak4pfjets_deepCSVl_branch->GetEntry(index);
+    } else {
+      printf("branch jup_ak4pfjets_deepCSVl_branch does not exist!\n");
+      exit(1);
+    }
+    jup_ak4pfjets_deepCSVl_isLoaded = true;
+  }
+  return *jup_ak4pfjets_deepCSVl_;
 }
 
 const vector<vector<int> > &stop_1l_babyAnalyzer::jup_topcands_ak4idx() {
@@ -7806,6 +8350,71 @@ const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l
   return *jup_topcands_Wp4_;
 }
 
+const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l_babyAnalyzer::jup_tftops_p4() {
+  if (not jup_tftops_p4_isLoaded) {
+    if (jup_tftops_p4_branch != 0) {
+      jup_tftops_p4_branch->GetEntry(index);
+    } else {
+      printf("branch jup_tftops_p4_branch does not exist!\n");
+      exit(1);
+    }
+    jup_tftops_p4_isLoaded = true;
+  }
+  return *jup_tftops_p4_;
+}
+
+const vector<float> &stop_1l_babyAnalyzer::jup_tftops_disc() {
+  if (not jup_tftops_disc_isLoaded) {
+    if (jup_tftops_disc_branch != 0) {
+      jup_tftops_disc_branch->GetEntry(index);
+    } else {
+      printf("branch jup_tftops_disc_branch does not exist!\n");
+      exit(1);
+    }
+    jup_tftops_disc_isLoaded = true;
+  }
+  return *jup_tftops_disc_;
+}
+
+const vector<vector<float> > &stop_1l_babyAnalyzer::jup_tftops_subjet_pt() {
+  if (not jup_tftops_subjet_pt_isLoaded) {
+    if (jup_tftops_subjet_pt_branch != 0) {
+      jup_tftops_subjet_pt_branch->GetEntry(index);
+    } else {
+      printf("branch jup_tftops_subjet_pt_branch does not exist!\n");
+      exit(1);
+    }
+    jup_tftops_subjet_pt_isLoaded = true;
+  }
+  return *jup_tftops_subjet_pt_;
+}
+
+const vector<vector<float> > &stop_1l_babyAnalyzer::jup_tftops_subjet_eta() {
+  if (not jup_tftops_subjet_eta_isLoaded) {
+    if (jup_tftops_subjet_eta_branch != 0) {
+      jup_tftops_subjet_eta_branch->GetEntry(index);
+    } else {
+      printf("branch jup_tftops_subjet_eta_branch does not exist!\n");
+      exit(1);
+    }
+    jup_tftops_subjet_eta_isLoaded = true;
+  }
+  return *jup_tftops_subjet_eta_;
+}
+
+const vector<vector<float> > &stop_1l_babyAnalyzer::jup_tftops_subjet_phi() {
+  if (not jup_tftops_subjet_phi_isLoaded) {
+    if (jup_tftops_subjet_phi_branch != 0) {
+      jup_tftops_subjet_phi_branch->GetEntry(index);
+    } else {
+      printf("branch jup_tftops_subjet_phi_branch does not exist!\n");
+      exit(1);
+    }
+    jup_tftops_subjet_phi_isLoaded = true;
+  }
+  return *jup_tftops_subjet_phi_;
+}
+
 const vector<float> &stop_1l_babyAnalyzer::jdown_ak4pfjets_cvsl() {
   if (not jdown_ak4pfjets_cvsl_isLoaded) {
     if (jdown_ak4pfjets_cvsl_branch != 0) {
@@ -7845,6 +8454,19 @@ const vector<float> &stop_1l_babyAnalyzer::jdown_ak4pfjets_axis1() {
   return *jdown_ak4pfjets_axis1_;
 }
 
+const vector<float> &stop_1l_babyAnalyzer::jdown_ak4pfjets_axis2() {
+  if (not jdown_ak4pfjets_axis2_isLoaded) {
+    if (jdown_ak4pfjets_axis2_branch != 0) {
+      jdown_ak4pfjets_axis2_branch->GetEntry(index);
+    } else {
+      printf("branch jdown_ak4pfjets_axis2_branch does not exist!\n");
+      exit(1);
+    }
+    jdown_ak4pfjets_axis2_isLoaded = true;
+  }
+  return *jdown_ak4pfjets_axis2_;
+}
+
 const vector<int> &stop_1l_babyAnalyzer::jdown_ak4pfjets_mult() {
   if (not jdown_ak4pfjets_mult_isLoaded) {
     if (jdown_ak4pfjets_mult_branch != 0) {
@@ -7856,6 +8478,84 @@ const vector<int> &stop_1l_babyAnalyzer::jdown_ak4pfjets_mult() {
     jdown_ak4pfjets_mult_isLoaded = true;
   }
   return *jdown_ak4pfjets_mult_;
+}
+
+const vector<float> &stop_1l_babyAnalyzer::jdown_ak4pfjets_csvbtag() {
+  if (not jdown_ak4pfjets_csvbtag_isLoaded) {
+    if (jdown_ak4pfjets_csvbtag_branch != 0) {
+      jdown_ak4pfjets_csvbtag_branch->GetEntry(index);
+    } else {
+      printf("branch jdown_ak4pfjets_csvbtag_branch does not exist!\n");
+      exit(1);
+    }
+    jdown_ak4pfjets_csvbtag_isLoaded = true;
+  }
+  return *jdown_ak4pfjets_csvbtag_;
+}
+
+const vector<float> &stop_1l_babyAnalyzer::jdown_ak4pfjets_deepCSVb() {
+  if (not jdown_ak4pfjets_deepCSVb_isLoaded) {
+    if (jdown_ak4pfjets_deepCSVb_branch != 0) {
+      jdown_ak4pfjets_deepCSVb_branch->GetEntry(index);
+    } else {
+      printf("branch jdown_ak4pfjets_deepCSVb_branch does not exist!\n");
+      exit(1);
+    }
+    jdown_ak4pfjets_deepCSVb_isLoaded = true;
+  }
+  return *jdown_ak4pfjets_deepCSVb_;
+}
+
+const vector<float> &stop_1l_babyAnalyzer::jdown_ak4pfjets_deepCSVbb() {
+  if (not jdown_ak4pfjets_deepCSVbb_isLoaded) {
+    if (jdown_ak4pfjets_deepCSVbb_branch != 0) {
+      jdown_ak4pfjets_deepCSVbb_branch->GetEntry(index);
+    } else {
+      printf("branch jdown_ak4pfjets_deepCSVbb_branch does not exist!\n");
+      exit(1);
+    }
+    jdown_ak4pfjets_deepCSVbb_isLoaded = true;
+  }
+  return *jdown_ak4pfjets_deepCSVbb_;
+}
+
+const vector<float> &stop_1l_babyAnalyzer::jdown_ak4pfjets_deepCSVc() {
+  if (not jdown_ak4pfjets_deepCSVc_isLoaded) {
+    if (jdown_ak4pfjets_deepCSVc_branch != 0) {
+      jdown_ak4pfjets_deepCSVc_branch->GetEntry(index);
+    } else {
+      printf("branch jdown_ak4pfjets_deepCSVc_branch does not exist!\n");
+      exit(1);
+    }
+    jdown_ak4pfjets_deepCSVc_isLoaded = true;
+  }
+  return *jdown_ak4pfjets_deepCSVc_;
+}
+
+const vector<float> &stop_1l_babyAnalyzer::jdown_ak4pfjets_deepCSVcc() {
+  if (not jdown_ak4pfjets_deepCSVcc_isLoaded) {
+    if (jdown_ak4pfjets_deepCSVcc_branch != 0) {
+      jdown_ak4pfjets_deepCSVcc_branch->GetEntry(index);
+    } else {
+      printf("branch jdown_ak4pfjets_deepCSVcc_branch does not exist!\n");
+      exit(1);
+    }
+    jdown_ak4pfjets_deepCSVcc_isLoaded = true;
+  }
+  return *jdown_ak4pfjets_deepCSVcc_;
+}
+
+const vector<float> &stop_1l_babyAnalyzer::jdown_ak4pfjets_deepCSVl() {
+  if (not jdown_ak4pfjets_deepCSVl_isLoaded) {
+    if (jdown_ak4pfjets_deepCSVl_branch != 0) {
+      jdown_ak4pfjets_deepCSVl_branch->GetEntry(index);
+    } else {
+      printf("branch jdown_ak4pfjets_deepCSVl_branch does not exist!\n");
+      exit(1);
+    }
+    jdown_ak4pfjets_deepCSVl_isLoaded = true;
+  }
+  return *jdown_ak4pfjets_deepCSVl_;
 }
 
 const vector<vector<int> > &stop_1l_babyAnalyzer::jdown_topcands_ak4idx() {
@@ -7908,6 +8608,71 @@ const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l
     jdown_topcands_Wp4_isLoaded = true;
   }
   return *jdown_topcands_Wp4_;
+}
+
+const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l_babyAnalyzer::jdown_tftops_p4() {
+  if (not jdown_tftops_p4_isLoaded) {
+    if (jdown_tftops_p4_branch != 0) {
+      jdown_tftops_p4_branch->GetEntry(index);
+    } else {
+      printf("branch jdown_tftops_p4_branch does not exist!\n");
+      exit(1);
+    }
+    jdown_tftops_p4_isLoaded = true;
+  }
+  return *jdown_tftops_p4_;
+}
+
+const vector<float> &stop_1l_babyAnalyzer::jdown_tftops_disc() {
+  if (not jdown_tftops_disc_isLoaded) {
+    if (jdown_tftops_disc_branch != 0) {
+      jdown_tftops_disc_branch->GetEntry(index);
+    } else {
+      printf("branch jdown_tftops_disc_branch does not exist!\n");
+      exit(1);
+    }
+    jdown_tftops_disc_isLoaded = true;
+  }
+  return *jdown_tftops_disc_;
+}
+
+const vector<vector<float> > &stop_1l_babyAnalyzer::jdown_tftops_subjet_pt() {
+  if (not jdown_tftops_subjet_pt_isLoaded) {
+    if (jdown_tftops_subjet_pt_branch != 0) {
+      jdown_tftops_subjet_pt_branch->GetEntry(index);
+    } else {
+      printf("branch jdown_tftops_subjet_pt_branch does not exist!\n");
+      exit(1);
+    }
+    jdown_tftops_subjet_pt_isLoaded = true;
+  }
+  return *jdown_tftops_subjet_pt_;
+}
+
+const vector<vector<float> > &stop_1l_babyAnalyzer::jdown_tftops_subjet_eta() {
+  if (not jdown_tftops_subjet_eta_isLoaded) {
+    if (jdown_tftops_subjet_eta_branch != 0) {
+      jdown_tftops_subjet_eta_branch->GetEntry(index);
+    } else {
+      printf("branch jdown_tftops_subjet_eta_branch does not exist!\n");
+      exit(1);
+    }
+    jdown_tftops_subjet_eta_isLoaded = true;
+  }
+  return *jdown_tftops_subjet_eta_;
+}
+
+const vector<vector<float> > &stop_1l_babyAnalyzer::jdown_tftops_subjet_phi() {
+  if (not jdown_tftops_subjet_phi_isLoaded) {
+    if (jdown_tftops_subjet_phi_branch != 0) {
+      jdown_tftops_subjet_phi_branch->GetEntry(index);
+    } else {
+      printf("branch jdown_tftops_subjet_phi_branch does not exist!\n");
+      exit(1);
+    }
+    jdown_tftops_subjet_phi_isLoaded = true;
+  }
+  return *jdown_tftops_subjet_phi_;
 }
 
 const vector<TString> &stop_1l_babyAnalyzer::tau_IDnames() {
@@ -8855,6 +9620,8 @@ const vector<bool> &ak4pfjets_loose_pfid() { return babyAnalyzer.ak4pfjets_loose
 const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &ak4pfjets_leadMEDbjet_p4() { return babyAnalyzer.ak4pfjets_leadMEDbjet_p4(); }
 const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &ak4pfjets_leadbtag_p4() { return babyAnalyzer.ak4pfjets_leadbtag_p4(); }
 const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &ak4genjets_p4() { return babyAnalyzer.ak4genjets_p4(); }
+const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &softtags_p4() { return babyAnalyzer.softtags_p4(); }
+const int &nsoftbtags() { return babyAnalyzer.nsoftbtags(); }
 const int &jup_nskimjets() { return babyAnalyzer.jup_nskimjets(); }
 const int &jup_nskimbtagmed() { return babyAnalyzer.jup_nskimbtagmed(); }
 const int &jup_nskimbtagloose() { return babyAnalyzer.jup_nskimbtagloose(); }
@@ -8879,6 +9646,8 @@ const vector<bool> &jup_ak4pfjets_loose_pfid() { return babyAnalyzer.jup_ak4pfje
 const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &jup_ak4pfjets_leadMEDbjet_p4() { return babyAnalyzer.jup_ak4pfjets_leadMEDbjet_p4(); }
 const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &jup_ak4pfjets_leadbtag_p4() { return babyAnalyzer.jup_ak4pfjets_leadbtag_p4(); }
 const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &jup_ak4genjets_p4() { return babyAnalyzer.jup_ak4genjets_p4(); }
+const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &jup_softtags_p4() { return babyAnalyzer.jup_softtags_p4(); }
+const int &jup_nsoftbtags() { return babyAnalyzer.jup_nsoftbtags(); }
 const int &jdown_nskimjets() { return babyAnalyzer.jdown_nskimjets(); }
 const int &jdown_nskimbtagmed() { return babyAnalyzer.jdown_nskimbtagmed(); }
 const int &jdown_nskimbtagloose() { return babyAnalyzer.jdown_nskimbtagloose(); }
@@ -8903,6 +9672,8 @@ const vector<bool> &jdown_ak4pfjets_loose_pfid() { return babyAnalyzer.jdown_ak4
 const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &jdown_ak4pfjets_leadMEDbjet_p4() { return babyAnalyzer.jdown_ak4pfjets_leadMEDbjet_p4(); }
 const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &jdown_ak4pfjets_leadbtag_p4() { return babyAnalyzer.jdown_ak4pfjets_leadbtag_p4(); }
 const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &jdown_ak4genjets_p4() { return babyAnalyzer.jdown_ak4genjets_p4(); }
+const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &jdown_softtags_p4() { return babyAnalyzer.jdown_softtags_p4(); }
+const int &jdown_nsoftbtags() { return babyAnalyzer.jdown_nsoftbtags(); }
 const vector<bool> &genleps_isfromt() { return babyAnalyzer.genleps_isfromt(); }
 const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &genleps_p4() { return babyAnalyzer.genleps_p4(); }
 const vector<int> &genleps_id() { return babyAnalyzer.genleps_id(); }
@@ -9011,6 +9782,7 @@ const vector<float> &ak8pfjets_deepdisc_z() { return babyAnalyzer.ak8pfjets_deep
 const vector<float> &ak8pfjets_deepdisc_zbb() { return babyAnalyzer.ak8pfjets_deepdisc_zbb(); }
 const vector<float> &ak8pfjets_deepdisc_hbb() { return babyAnalyzer.ak8pfjets_deepdisc_hbb(); }
 const vector<float> &ak8pfjets_deepdisc_h4q() { return babyAnalyzer.ak8pfjets_deepdisc_h4q(); }
+const float &lead_ak8deepdisc_top() { return babyAnalyzer.lead_ak8deepdisc_top(); }
 const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &jup_ak8pfjets_p4() { return babyAnalyzer.jup_ak8pfjets_p4(); }
 const vector<float> &jup_ak8pfjets_tau1() { return babyAnalyzer.jup_ak8pfjets_tau1(); }
 const vector<float> &jup_ak8pfjets_tau2() { return babyAnalyzer.jup_ak8pfjets_tau2(); }
@@ -9024,6 +9796,7 @@ const vector<float> &jup_ak8pfjets_deepdisc_z() { return babyAnalyzer.jup_ak8pfj
 const vector<float> &jup_ak8pfjets_deepdisc_zbb() { return babyAnalyzer.jup_ak8pfjets_deepdisc_zbb(); }
 const vector<float> &jup_ak8pfjets_deepdisc_hbb() { return babyAnalyzer.jup_ak8pfjets_deepdisc_hbb(); }
 const vector<float> &jup_ak8pfjets_deepdisc_h4q() { return babyAnalyzer.jup_ak8pfjets_deepdisc_h4q(); }
+const float &jup_lead_ak8deepdisc_top() { return babyAnalyzer.jup_lead_ak8deepdisc_top(); }
 const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &jdown_ak8pfjets_p4() { return babyAnalyzer.jdown_ak8pfjets_p4(); }
 const vector<float> &jdown_ak8pfjets_tau1() { return babyAnalyzer.jdown_ak8pfjets_tau1(); }
 const vector<float> &jdown_ak8pfjets_tau2() { return babyAnalyzer.jdown_ak8pfjets_tau2(); }
@@ -9037,30 +9810,67 @@ const vector<float> &jdown_ak8pfjets_deepdisc_z() { return babyAnalyzer.jdown_ak
 const vector<float> &jdown_ak8pfjets_deepdisc_zbb() { return babyAnalyzer.jdown_ak8pfjets_deepdisc_zbb(); }
 const vector<float> &jdown_ak8pfjets_deepdisc_hbb() { return babyAnalyzer.jdown_ak8pfjets_deepdisc_hbb(); }
 const vector<float> &jdown_ak8pfjets_deepdisc_h4q() { return babyAnalyzer.jdown_ak8pfjets_deepdisc_h4q(); }
+const float &jdown_lead_ak8deepdisc_top() { return babyAnalyzer.jdown_lead_ak8deepdisc_top(); }
 const vector<float> &ak4pfjets_cvsl() { return babyAnalyzer.ak4pfjets_cvsl(); }
 const vector<float> &ak4pfjets_ptD() { return babyAnalyzer.ak4pfjets_ptD(); }
 const vector<float> &ak4pfjets_axis1() { return babyAnalyzer.ak4pfjets_axis1(); }
+const vector<float> &ak4pfjets_axis2() { return babyAnalyzer.ak4pfjets_axis2(); }
 const vector<int> &ak4pfjets_mult() { return babyAnalyzer.ak4pfjets_mult(); }
+const vector<float> &ak4pfjets_csvbtag() { return babyAnalyzer.ak4pfjets_csvbtag(); }
+const vector<float> &ak4pfjets_deepCSVb() { return babyAnalyzer.ak4pfjets_deepCSVb(); }
+const vector<float> &ak4pfjets_deepCSVbb() { return babyAnalyzer.ak4pfjets_deepCSVbb(); }
+const vector<float> &ak4pfjets_deepCSVc() { return babyAnalyzer.ak4pfjets_deepCSVc(); }
+const vector<float> &ak4pfjets_deepCSVcc() { return babyAnalyzer.ak4pfjets_deepCSVcc(); }
+const vector<float> &ak4pfjets_deepCSVl() { return babyAnalyzer.ak4pfjets_deepCSVl(); }
 const vector<vector<int> > &topcands_ak4idx() { return babyAnalyzer.topcands_ak4idx(); }
 const vector<float> &topcands_disc() { return babyAnalyzer.topcands_disc(); }
 const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &topcands_p4() { return babyAnalyzer.topcands_p4(); }
 const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &topcands_Wp4() { return babyAnalyzer.topcands_Wp4(); }
+const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &tftops_p4() { return babyAnalyzer.tftops_p4(); }
+const vector<float> &tftops_disc() { return babyAnalyzer.tftops_disc(); }
+const vector<vector<float> > &tftops_subjet_pt() { return babyAnalyzer.tftops_subjet_pt(); }
+const vector<vector<float> > &tftops_subjet_eta() { return babyAnalyzer.tftops_subjet_eta(); }
+const vector<vector<float> > &tftops_subjet_phi() { return babyAnalyzer.tftops_subjet_phi(); }
 const vector<float> &jup_ak4pfjets_cvsl() { return babyAnalyzer.jup_ak4pfjets_cvsl(); }
 const vector<float> &jup_ak4pfjets_ptD() { return babyAnalyzer.jup_ak4pfjets_ptD(); }
 const vector<float> &jup_ak4pfjets_axis1() { return babyAnalyzer.jup_ak4pfjets_axis1(); }
+const vector<float> &jup_ak4pfjets_axis2() { return babyAnalyzer.jup_ak4pfjets_axis2(); }
 const vector<int> &jup_ak4pfjets_mult() { return babyAnalyzer.jup_ak4pfjets_mult(); }
+const vector<float> &jup_ak4pfjets_csvbtag() { return babyAnalyzer.jup_ak4pfjets_csvbtag(); }
+const vector<float> &jup_ak4pfjets_deepCSVb() { return babyAnalyzer.jup_ak4pfjets_deepCSVb(); }
+const vector<float> &jup_ak4pfjets_deepCSVbb() { return babyAnalyzer.jup_ak4pfjets_deepCSVbb(); }
+const vector<float> &jup_ak4pfjets_deepCSVc() { return babyAnalyzer.jup_ak4pfjets_deepCSVc(); }
+const vector<float> &jup_ak4pfjets_deepCSVcc() { return babyAnalyzer.jup_ak4pfjets_deepCSVcc(); }
+const vector<float> &jup_ak4pfjets_deepCSVl() { return babyAnalyzer.jup_ak4pfjets_deepCSVl(); }
 const vector<vector<int> > &jup_topcands_ak4idx() { return babyAnalyzer.jup_topcands_ak4idx(); }
 const vector<float> &jup_topcands_disc() { return babyAnalyzer.jup_topcands_disc(); }
 const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &jup_topcands_p4() { return babyAnalyzer.jup_topcands_p4(); }
 const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &jup_topcands_Wp4() { return babyAnalyzer.jup_topcands_Wp4(); }
+const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &jup_tftops_p4() { return babyAnalyzer.jup_tftops_p4(); }
+const vector<float> &jup_tftops_disc() { return babyAnalyzer.jup_tftops_disc(); }
+const vector<vector<float> > &jup_tftops_subjet_pt() { return babyAnalyzer.jup_tftops_subjet_pt(); }
+const vector<vector<float> > &jup_tftops_subjet_eta() { return babyAnalyzer.jup_tftops_subjet_eta(); }
+const vector<vector<float> > &jup_tftops_subjet_phi() { return babyAnalyzer.jup_tftops_subjet_phi(); }
 const vector<float> &jdown_ak4pfjets_cvsl() { return babyAnalyzer.jdown_ak4pfjets_cvsl(); }
 const vector<float> &jdown_ak4pfjets_ptD() { return babyAnalyzer.jdown_ak4pfjets_ptD(); }
 const vector<float> &jdown_ak4pfjets_axis1() { return babyAnalyzer.jdown_ak4pfjets_axis1(); }
+const vector<float> &jdown_ak4pfjets_axis2() { return babyAnalyzer.jdown_ak4pfjets_axis2(); }
 const vector<int> &jdown_ak4pfjets_mult() { return babyAnalyzer.jdown_ak4pfjets_mult(); }
+const vector<float> &jdown_ak4pfjets_csvbtag() { return babyAnalyzer.jdown_ak4pfjets_csvbtag(); }
+const vector<float> &jdown_ak4pfjets_deepCSVb() { return babyAnalyzer.jdown_ak4pfjets_deepCSVb(); }
+const vector<float> &jdown_ak4pfjets_deepCSVbb() { return babyAnalyzer.jdown_ak4pfjets_deepCSVbb(); }
+const vector<float> &jdown_ak4pfjets_deepCSVc() { return babyAnalyzer.jdown_ak4pfjets_deepCSVc(); }
+const vector<float> &jdown_ak4pfjets_deepCSVcc() { return babyAnalyzer.jdown_ak4pfjets_deepCSVcc(); }
+const vector<float> &jdown_ak4pfjets_deepCSVl() { return babyAnalyzer.jdown_ak4pfjets_deepCSVl(); }
 const vector<vector<int> > &jdown_topcands_ak4idx() { return babyAnalyzer.jdown_topcands_ak4idx(); }
 const vector<float> &jdown_topcands_disc() { return babyAnalyzer.jdown_topcands_disc(); }
 const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &jdown_topcands_p4() { return babyAnalyzer.jdown_topcands_p4(); }
 const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &jdown_topcands_Wp4() { return babyAnalyzer.jdown_topcands_Wp4(); }
+const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &jdown_tftops_p4() { return babyAnalyzer.jdown_tftops_p4(); }
+const vector<float> &jdown_tftops_disc() { return babyAnalyzer.jdown_tftops_disc(); }
+const vector<vector<float> > &jdown_tftops_subjet_pt() { return babyAnalyzer.jdown_tftops_subjet_pt(); }
+const vector<vector<float> > &jdown_tftops_subjet_eta() { return babyAnalyzer.jdown_tftops_subjet_eta(); }
+const vector<vector<float> > &jdown_tftops_subjet_phi() { return babyAnalyzer.jdown_tftops_subjet_phi(); }
 const vector<TString> &tau_IDnames() { return babyAnalyzer.tau_IDnames(); }
 const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &tau_leadtrack_p4() { return babyAnalyzer.tau_leadtrack_p4(); }
 const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &tau_leadneutral_p4() { return babyAnalyzer.tau_leadneutral_p4(); }
