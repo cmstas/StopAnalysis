@@ -41,7 +41,7 @@ if __name__ == "__main__":
         cmsswver = "CMSSW_10_1_0"
         scramarch = "slc6_amd64_gcc700"
         tarfile = "input.tar.gz"
-        tag = "v28_3"
+        tag = "v28_5"
         maker_task = CondorTask(
             sample = DirectorySample(
                 dataset=dsname,
@@ -58,8 +58,8 @@ if __name__ == "__main__":
             output_name = "stopbaby.root",
             arguments = "1" if "SMS" in dsname else "0", # isFastsim
             # condor_submit_params = {"sites": "UAF,T2_US_UCSD,UCSB"},
-            condor_submit_params = {"sites": "T2_US_UCSD,UCSB"},
-            # condor_submit_params = {"use_xrootd": True},
+            # condor_submit_params = {"sites": "T2_US_UCSD,UCSB"},
+            condor_submit_params = {"use_xrootd": True},
             # no_load_from_backup = True,
         )
         merge_task = CondorTask(

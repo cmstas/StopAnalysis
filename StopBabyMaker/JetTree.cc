@@ -282,7 +282,8 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx, Factorize
     {
         jindex = sortedJets_pt.at(idx).first;
         //deal with the overlaps
-        if(jindex == overlep1_idx){
+        const bool fillOverleps = false;
+        if(fillOverleps && jindex == overlep1_idx){
 		ak4pfjet_overlep1_p4  = p4sCorrJets.at(jindex);
                 ak4pfjet_overlep1_CSV = pfjets_pfCombinedInclusiveSecondaryVertexV2BJetTag().at(jindex);
                 ak4pfjet_overlep1_deepCSV = getbtagvalue(deepCSV_prefix+"JetTags:probb",jindex) + getbtagvalue(deepCSV_prefix+"JetTags:probbb",jindex);
@@ -295,7 +296,7 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx, Factorize
                 ak4pfjet_overlep1_cm  = pfjets_chargedMultiplicity().at(jindex);
                 ak4pfjet_overlep1_nm  = cms3.pfjets_neutralMultiplicity().at(jindex);
 	}
-        if(jindex == overlep2_idx){
+        else if(fillOverleps && jindex == overlep2_idx){
                 ak4pfjet_overlep2_p4  = p4sCorrJets.at(jindex);
                 ak4pfjet_overlep2_CSV = pfjets_pfCombinedInclusiveSecondaryVertexV2BJetTag().at(jindex);
                 ak4pfjet_overlep2_deepCSV = getbtagvalue(deepCSV_prefix+"JetTags:probb",jindex) + getbtagvalue(deepCSV_prefix+"JetTags:probbb",jindex);
@@ -345,14 +346,12 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx, Factorize
         ak4pfjets_deepCSVbb.push_back(getbtagvalue("pfDeepCSVJetTags:probbb", jindex));
         ak4pfjets_deepCSVc.push_back(getbtagvalue("pfDeepCSVJetTags:probc", jindex));
         ak4pfjets_deepCSVl.push_back(getbtagvalue("pfDeepCSVJetTags:probudsg", jindex));
-        // ak4pfjets_deepCSVcc.push_back(getbtagvalue("pfDeepCSVJetTags:probcc", jindex));
 
         float value_deepCSV = ak4pfjets_deepCSVb.back() + ak4pfjets_deepCSVbb.back(); // save for later
         ak4pfjets_deepCSV.push_back(value_deepCSV);
         ak4pfjets_CSV.push_back(pfjets_pfCombinedInclusiveSecondaryVertexV2BJetTag().at(jindex));
         ak4pfjets_mva.push_back(getbtagvalue("pfCombinedMVAV2BJetTags", jindex));
         ak4pfjets_cvsl.push_back(getbtagvalue("pfCombinedCvsLJetTags", jindex));
-        ak4pfjets_csvbtag.push_back(getbtagvalue("pfCombinedSecondaryVertexV2BJetTags", jindex));
 
         // jet ids
         ak4pfjets_puid.push_back(loosePileupJetId(jindex));
@@ -633,7 +632,7 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx, Factorize
       }
     }
 
-    ttUtility::ConstAK4Inputs<float> AK4Inputs(ak4jets_TLV, ak4pfjets_csvbtag);
+    ttUtility::ConstAK4Inputs<float> AK4Inputs(ak4jets_TLV, ak4pfjets_CSV);
     AK4Inputs.addSupplamentalVector("qgPtD",                                ak4pfjets_ptD);
     AK4Inputs.addSupplamentalVector("qgAxis1",                              ak4pfjets_axis1);
     AK4Inputs.addSupplamentalVector("qgAxis2",                              ak4pfjets_axis2);
@@ -657,8 +656,8 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx, Factorize
     AK4Inputs.addSupplamentalVector("DeepCSVc",                             ak4pfjets_deepCSVc);
     AK4Inputs.addSupplamentalVector("DeepCSVl",                             ak4pfjets_deepCSVl);
     AK4Inputs.addSupplamentalVector("DeepCSVbb",                            ak4pfjets_deepCSVbb);
-    auto ak4jets_deepCSVcc = vector<float>(ak4jets_TLV.size(), 0); // Temporary dealing with deepCSVcc not present in 94X
-    AK4Inputs.addSupplamentalVector("DeepCSVcc",                            ak4jets_deepCSVcc);
+    auto dummy_deepCSVcc = vector<float>(ak4jets_TLV.size(), 0); // Temporary dealing with deepCSVcc not present in 94X
+    AK4Inputs.addSupplamentalVector("DeepCSVcc",                            dummy_deepCSVcc);
 
     std::vector<Constituent> constituents = ttUtility::packageConstituents(AK4Inputs);
 
@@ -842,11 +841,9 @@ void JetTree::Reset ()
     ak4pfjets_tight_pfid.clear();
 
     ak4pfjets_cvsl.clear();
-    ak4pfjets_csvbtag.clear();
     ak4pfjets_deepCSVb.clear();
     ak4pfjets_deepCSVbb.clear();
     ak4pfjets_deepCSVc.clear();
-    ak4pfjets_deepCSVcc.clear();
     ak4pfjets_deepCSVl.clear();
 
     ak4pfjets_ptD.clear();
@@ -1072,11 +1069,9 @@ void JetTree::SetAK4Branches_TopTag(TTree* tree)
     tree->Branch(Form("%sak4pfjets_axis2", prefix_.c_str()) , &ak4pfjets_axis2);
     tree->Branch(Form("%sak4pfjets_mult", prefix_.c_str()) , &ak4pfjets_mult);
 
-    tree->Branch(Form("%sak4pfjets_csvbtag", prefix_.c_str()) , &ak4pfjets_csvbtag);
     tree->Branch(Form("%sak4pfjets_deepCSVb", prefix_.c_str()) , &ak4pfjets_deepCSVb);
     tree->Branch(Form("%sak4pfjets_deepCSVbb", prefix_.c_str()) , &ak4pfjets_deepCSVbb);
     tree->Branch(Form("%sak4pfjets_deepCSVc", prefix_.c_str()) , &ak4pfjets_deepCSVc);
-    tree->Branch(Form("%sak4pfjets_deepCSVcc", prefix_.c_str()) , &ak4pfjets_deepCSVcc);
     tree->Branch(Form("%sak4pfjets_deepCSVl", prefix_.c_str()) , &ak4pfjets_deepCSVl);
 
     tree->Branch(Form("%stopcands_ak4idx", prefix_.c_str()) , &topcands_ak4idx);

@@ -87,11 +87,9 @@ public:
     vecd ak4pfjets_mva;
 
     vecd ak4pfjets_cvsl;
-    vecd ak4pfjets_csvbtag;
     vecd ak4pfjets_deepCSVb;
     vecd ak4pfjets_deepCSVbb;
     vecd ak4pfjets_deepCSVc;
-    vecd ak4pfjets_deepCSVcc;
     vecd ak4pfjets_deepCSVl;
 
     vecd ak4pfjets_puid;
