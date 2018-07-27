@@ -35,7 +35,7 @@ const bool dosigcont = true;
 // do average with yields using genmet for signal? default: true
 const bool dogenmet = true;
 // test without real data?
-const bool fakedata = false;
+const bool fakedata = true;
 // test without background systematics?
 const bool nobgsyst = false;
 // test without signal systematics?
@@ -127,7 +127,7 @@ int getUncertainties(double& errup, double& errdn, double origyield, TFile* file
   }
 
   if (errdn > 0 && errup <= 0) {
-    cout << "Switched " << file->GetName() << ":" << hname << (m1? Form("Up for (%d_%d)", m1, m2) : "Up") << " from " << errup << " to " << -1 << endl;
+    cout << "Switched " << file->GetName() << ":" << hname << (m1? Form("Up for (%d_%d)", m1, m2) : "Up") << " metbin " << metbin <<  " from " << errup << " to " << -1 << endl;
     errup = -1;
   }
   bool onereturn = false;
@@ -432,14 +432,14 @@ void newCardMaker(string signal = "T2tt", int mStop = 800, int mLSP = 400, strin
   system(Form("mkdir -p %s", output_dir.c_str()));
 
   // set input files (global pointers)
-  // fsig = new TFile(Form("%s/SMS_%s.root",input_dir.c_str(), signal.substr(0,4).c_str()));
-  fsig = new TFile(Form("%s/Signal_%s.root",input_dir.c_str(), signal.substr(0,4).c_str()));
+  fsig = new TFile(Form("%s/SMS_%s.root",input_dir.c_str(), signal.substr(0,4).c_str()));
+  // fsig = new TFile(Form("%s/Signal_%s.root",input_dir.c_str(), signal.substr(0,4).c_str()));
   f2l = new TFile(Form("%s/lostlepton.root",input_dir.c_str()));
   f1l = new TFile(Form("%s/1lepFromW.root",input_dir.c_str()));
   f1ltop = new TFile(Form("%s/1lepFromTop.root",input_dir.c_str()));
   fznunu = new TFile(Form("%s/ZToNuNu.root",input_dir.c_str()));
-  // fsig_genmet = nullptr; // don't use switched genmet signal for now
-  fsig_genmet = new TFile(Form("%s/Signal_%s_gen.root",input_dir.c_str(), signal.substr(0,4).c_str()));
+  fsig_genmet = nullptr; // don't use switched genmet signal for now
+  // fsig_genmet = new TFile(Form("%s/Signal_%s_gen.root",input_dir.c_str(), signal.substr(0,4).c_str()));
 
   if (!fakedata) fdata = new TFile(Form("%s/allData_25ns.root",input_dir.c_str()));
   else fdata = new TFile(Form("%s/allBkg_25ns.root",input_dir.c_str()));
@@ -464,14 +464,14 @@ int newCardMaker(string signal, string input_dir="../StopLooper/output/temp", st
   bmark->Start("benchmark");
 
   // set input files (global pointers)
-  // fsig = new TFile(Form("%s/SMS_%s.root",input_dir.c_str(), signal.c_str()));
-  fsig = new TFile(Form("%s/Signal_%s.root",input_dir.c_str(), signal.c_str()));
+  fsig = new TFile(Form("%s/SMS_%s.root",input_dir.c_str(), signal.c_str()));
+  // fsig = new TFile(Form("%s/Signal_%s.root",input_dir.c_str(), signal.c_str()));
   f2l = new TFile(Form("%s/lostlepton.root",input_dir.c_str()));
   f1l = new TFile(Form("%s/1lepFromW.root",input_dir.c_str()));
   f1ltop = new TFile(Form("%s/1lepFromTop.root",input_dir.c_str()));
   fznunu = new TFile(Form("%s/ZToNuNu.root",input_dir.c_str()));
-  // fsig_genmet = nullptr; // don't use switched genmet signal for now
-  fsig_genmet = new TFile(Form("%s/Signal_%s_gen.root",input_dir.c_str(), signal.c_str()));
+  fsig_genmet = nullptr; // don't use switched genmet signal for now
+  // fsig_genmet = new TFile(Form("%s/Signal_%s_gen.root",input_dir.c_str(), signal.c_str()));
 
   if (!fakedata) fdata = new TFile(Form("%s/allData_25ns.root",input_dir.c_str()));
   else fdata = new TFile(Form("%s/allBkg_25ns.root",input_dir.c_str()));
