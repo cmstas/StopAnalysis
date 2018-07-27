@@ -22,28 +22,28 @@ int numberOfGoodVertices() {
 bool PassElectronVetoSelections(unsigned int elIdx,float pt, float eta){
   if(els_p4().at(elIdx).pt() < pt) return false;
   if(fabs(els_p4().at(elIdx).eta()) > eta) return false;
-  if(!electronID(elIdx, STOP_veto_v3)) return false;  //pass veto, mini-isolation applied at 0.2
+  if(!electronID(elIdx, STOP_veto_v4)) return false;  //pass veto, mini-isolation applied at 0.2
   return true;
 }
 
 bool PassMuonVetoSelections(unsigned int muIdx,float pt, float eta){
   if(mus_p4().at(muIdx).pt() < pt) return false;
   if(fabs(mus_p4().at(muIdx).eta()) > eta) return false;
-  if(!muonID(muIdx, STOP_loose_v3)) return false;  //pass loose, mini-isolation applied at 0.2
+  if(!muonID(muIdx, STOP_loose_v4)) return false;  //pass loose, mini-isolation applied at 0.2
   return true;
 }
 
 bool PassElectronPreSelections(unsigned int elIdx,float pt, float eta){
   if(els_p4().at(elIdx).pt() < pt) return false;
   if(fabs(els_p4().at(elIdx).eta()) > eta) return false;
-  if(!electronID(elIdx, STOP_medium_v3)) return false;  //mini-isolation applied at 0.1
+  if(!electronID(elIdx, STOP_medium_v4)) return false;  //mini-isolation applied at 0.1
   return true;
 }
 
 bool PassMuonPreSelections(unsigned int muIdx,float pt, float eta){
   if(mus_p4().at(muIdx).pt() < pt) return false;
   if(fabs(mus_p4().at(muIdx).eta()) > eta) return false;
-  if(!muonID(muIdx, STOP_medium_v3)) return false;
+  if(!muonID(muIdx, STOP_medium_v4)) return false;
 //  if(!muonID(muIdx, STOP_tight_v2)) return false;  //mini-isolation applied at 0.1
   return true;
 }
