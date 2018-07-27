@@ -18,41 +18,55 @@ if __name__ == "__main__":
         # "stopbaby" : "/SMS-T8bbstausnu_XCha0p5_XStau0p5_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16MiniAODv2-PUSummer16Fast_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM",
         # "stopbaby" : "/SMS-T8bbstausnu_XCha0p5_XStau0p75_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16MiniAODv2-PUSummer16Fast_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM",
 
-        # 2017 ReReco (94X) -- incorrect deepAK8 tagger for CMS4-V09-04-12
-        "data_2017B_met" : "/MET/Run2017B-31Mar2018-v1/MINIAOD",
-        "data_2017C_met" : "/MET/Run2017C-31Mar2018-v1/MINIAOD",
-        "data_2017E_met" : "/MET/Run2017E-31Mar2018-v1/MINIAOD",
-        "data_2017D_met" : "/MET/Run2017D-31Mar2018-v1/MINIAOD",
-        "data_2017F_met" : "/MET/Run2017F-31Mar2018-v1/MINIAOD",
+        # # 2017 ReReco (94X) -- incorrect deepAK8 tagger for CMS4-V09-04-12
+        # "data_2017B_met" : "/MET/Run2017B-31Mar2018-v1/MINIAOD",
+        # "data_2017C_met" : "/MET/Run2017C-31Mar2018-v1/MINIAOD",
+        # "data_2017E_met" : "/MET/Run2017E-31Mar2018-v1/MINIAOD",
+        # "data_2017D_met" : "/MET/Run2017D-31Mar2018-v1/MINIAOD",
+        # "data_2017F_met" : "/MET/Run2017F-31Mar2018-v1/MINIAOD",
 
-        "data_2017B_singleel" : "/SingleElectron/Run2017B-31Mar2018-v1/MINIAOD",
-        "data_2017C_singleel" : "/SingleElectron/Run2017C-31Mar2018-v1/MINIAOD",
-        "data_2017D_singleel" : "/SingleElectron/Run2017D-31Mar2018-v1/MINIAOD",
-        "data_2017E_singleel" : "/SingleElectron/Run2017E-31Mar2018-v1/MINIAOD",
-        "data_2017F_singleel" : "/SingleElectron/Run2017F-31Mar2018-v1/MINIAOD",
+        # "data_2017B_singleel" : "/SingleElectron/Run2017B-31Mar2018-v1/MINIAOD",
+        # "data_2017C_singleel" : "/SingleElectron/Run2017C-31Mar2018-v1/MINIAOD",
+        # "data_2017D_singleel" : "/SingleElectron/Run2017D-31Mar2018-v1/MINIAOD",
+        # "data_2017E_singleel" : "/SingleElectron/Run2017E-31Mar2018-v1/MINIAOD",
+        # "data_2017F_singleel" : "/SingleElectron/Run2017F-31Mar2018-v1/MINIAOD",
 
-        "data_2017B_singlemu" : "/SingleMuon/Run2017B-31Mar2018-v1/MINIAOD",
-        "data_2017C_singlemu" : "/SingleMuon/Run2017C-31Mar2018-v1/MINIAOD",
-        "data_2017D_singlemu" : "/SingleMuon/Run2017D-31Mar2018-v1/MINIAOD",
-        "data_2017E_singlemu" : "/SingleMuon/Run2017E-31Mar2018-v1/MINIAOD",
-        "data_2017F_singlemu" : "/SingleMuon/Run2017F-31Mar2018-v1/MINIAOD",
+        # "data_2017B_singlemu" : "/SingleMuon/Run2017B-31Mar2018-v1/MINIAOD",
+        # "data_2017C_singlemu" : "/SingleMuon/Run2017C-31Mar2018-v1/MINIAOD",
+        # "data_2017D_singlemu" : "/SingleMuon/Run2017D-31Mar2018-v1/MINIAOD",
+        # "data_2017E_singlemu" : "/SingleMuon/Run2017E-31Mar2018-v1/MINIAOD",
+        # "data_2017F_singlemu" : "/SingleMuon/Run2017F-31Mar2018-v1/MINIAOD",
+
+        # "data_2017B_jetht" : "/JetHT/Run2017B-31Mar2018-v1/MINIAOD",
+        # "data_2017C_jetht" : "/JetHT/Run2017C-31Mar2018-v1/MINIAOD",
+        # "data_2017D_jetht" : "/JetHT/Run2017D-31Mar2018-v1/MINIAOD",
+        # "data_2017E_jetht" : "/JetHT/Run2017E-31Mar2018-v1/MINIAOD",
+        # "data_2017F_jetht" : "/JetHT/Run2017F-31Mar2018-v1/MINIAOD",
 
         # 2018 PromptReco
-        "data_2018Av1_singlemu" : "/SingleMuon/Run2018A-PromptReco-v1/MINIAOD",
-        "data_2018Av2_singlemu" : "/SingleMuon/Run2018A-PromptReco-v2/MINIAOD",
-        "data_2018Av3_singlemu" : "/SingleMuon/Run2018A-PromptReco-v3/MINIAOD",
+        # "data_2018Av1_singlemu" : "/SingleMuon/Run2018A-PromptReco-v1/MINIAOD",
+        # "data_2018Av2_singlemu" : "/SingleMuon/Run2018A-PromptReco-v2/MINIAOD",
+        # "data_2018Av3_singlemu" : "/SingleMuon/Run2018A-PromptReco-v3/MINIAOD",
         "data_2018Bv1_singlemu" : "/SingleMuon/Run2018B-PromptReco-v1/MINIAOD",
+        "data_2018Bv2_singlemu" : "/SingleMuon/Run2018B-PromptReco-v2/MINIAOD",
 
-        "data_2018Av1_egamma" : "/EGamma/Run2018A-PromptReco-v1/MINIAOD",
-        "data_2018Av2_egamma" : "/EGamma/Run2018A-PromptReco-v2/MINIAOD",
-        "data_2018Av3_egamma" : "/EGamma/Run2018A-PromptReco-v3/MINIAOD",
+        # "data_2018Av1_egamma" : "/EGamma/Run2018A-PromptReco-v1/MINIAOD",
+        # "data_2018Av2_egamma" : "/EGamma/Run2018A-PromptReco-v2/MINIAOD",
+        # "data_2018Av3_egamma" : "/EGamma/Run2018A-PromptReco-v3/MINIAOD",
         "data_2018Bv1_egamma" : "/EGamma/Run2018B-PromptReco-v1/MINIAOD",
+        "data_2018Bv2_egamma" : "/EGamma/Run2018B-PromptReco-v2/MINIAOD",
 
-        "data_2018Av1_met" : "/MET/Run2018A-PromptReco-v1/MINIAOD",
-        "data_2018Av2_met" : "/MET/Run2018A-PromptReco-v2/MINIAOD",
-        "data_2018Av3_met" : "/MET/Run2018A-PromptReco-v3/MINIAOD",
+        # "data_2018Av1_met" : "/MET/Run2018A-PromptReco-v1/MINIAOD",
+        # "data_2018Av2_met" : "/MET/Run2018A-PromptReco-v2/MINIAOD",
+        # "data_2018Av3_met" : "/MET/Run2018A-PromptReco-v3/MINIAOD",
         "data_2018Bv1_met" : "/MET/Run2018B-PromptReco-v1/MINIAOD",
+        "data_2018Bv2_met" : "/MET/Run2018B-PromptReco-v2/MINIAOD",
 
+        "data_2018Av1_jetht" : "/JetHT/Run2018A-PromptReco-v1/MINIAOD",
+        "data_2018Av2_jetht" : "/JetHT/Run2018A-PromptReco-v2/MINIAOD",
+        "data_2018Av3_jetht" : "/JetHT/Run2018A-PromptReco-v3/MINIAOD",
+        "data_2018Bv1_jetht" : "/JetHT/Run2018B-PromptReco-v1/MINIAOD",
+        # "data_2018Bv2_jetht" : "/JetHT/Run2018B-PromptReco-v2/MINIAOD",
 
         # # SingleMuon samples
         # "data_2017Bv1_singlemu" : "/SingleMuon/Run2017B-PromptReco-v1/MINIAOD",
@@ -126,8 +140,9 @@ if __name__ == "__main__":
     for babyname, dsname in snt_samples.items():
         cmsswver = "CMSSW_10_1_0"
         scramarch = "slc6_amd64_gcc700"
-        tarfile = "input.tar.gz"
-        tag = "v27_4"
+        # tarfile = "input.tar.gz"
+        tarfile = "tarfiles/input_v27_5.tar.gz"
+        tag = "v27_5"
         maker_task = CondorTask(
             sample = SNTSample(dataset=dsname),
             files_per_output = 20 if "data" in babyname else 1,

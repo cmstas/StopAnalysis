@@ -9,8 +9,9 @@ using namespace std;
 
 void compare_CRemu_efficiency_plots() {
 
-  auto ifile_new = new TFile("../StopLooper/output/temp4/data_met.root");
-  auto ifile_old = new TFile("../StopLooper/output/temp3/data_met.root");
+  auto ifile_new = new TFile("../StopLooper/output/temp2018data2/data_2018_met.root");
+  auto ifile_old = new TFile("../StopLooper/output/temp2017data2/data_2017_met.root");
+  auto ifile_anc = new TFile("../StopLooper/output/temp2016data2/data_2016_met.root");
 
   // auto ifile_new = new TFile("../StopLooper/output/temp6/data_muon_eg.root");
   // auto ifile_old = new TFile("../StopLooper/output/temp3/data_muon_eg.root");
@@ -36,13 +37,13 @@ void compare_CRemu_efficiency_plots() {
   prelim.SetTextFont(52);
   prelim.SetTextSize(0.0456);
 
-  TLatex data(0.17, 0.76, "Data 2017");
+  TLatex data(0.17, 0.76, "Data 2018");
   data.SetNDC();
   data.SetTextAlign(13);
   data.SetTextFont(52);
   data.SetTextSize(0.0456);
 
-  TLatex lumi(0.85, 0.82, "41.96 fb^{-1} (13 TeV)");
+  TLatex lumi(0.85, 0.82, "16.6 fb^{-1} (13 TeV)");
   lumi.SetNDC();
   lumi.SetTextAlign(31);
   lumi.SetTextFont(42);
@@ -61,7 +62,11 @@ void compare_CRemu_efficiency_plots() {
 
       heff_new->GetYaxis()->SetRangeUser(0, 1.1);
       heff_new->GetYaxis()->SetTitle("HLT_MuE eff");
-      heff_new->SetTitle("HLT_MuE efficiency in " + dirstr);
+      heff_new->GetXaxis()->SetTitleSize(0.06);
+      heff_new->GetXaxis()->SetTitleOffset(0.5);
+      // heff_new->SetTitle("HLT_MuE efficiency in " + dirstr);
+      heff_new->SetTitle("HLT_MuE efficiency in EMu CR");
+      heff_new->SetLineWidth(2);
       heff_new->Draw("");
       heff_new->Write(dirstr+"/"+hstr+"_eff_new");
 
@@ -76,10 +81,34 @@ void compare_CRemu_efficiency_plots() {
 
       heff_old->GetYaxis()->SetRangeUser(0, 1.1);
       heff_old->GetYaxis()->SetTitle("HLT_MuE eff");
-      heff_old->SetTitle("HLT_MuE efficiency in " + dirstr);
+      heff_old->GetXaxis()->SetTitleSize(0.06);
+      heff_old->GetXaxis()->SetTitleOffset(0.5);
+      // heff_old->SetTitle("HLT_MuE efficiency in " + dirstr);
+      heff_old->SetTitle("HLT_MuE efficiency in EMu CR");
+      heff_old->SetLineWidth(2);
       heff_old->SetLineColor(kRed);
       heff_old->Draw("same");
       heff_old->Write(dirstr+"/"+hstr+"_eff_old");
+
+      // eff anc
+      hden = (TH1F*) ifile_anc->Get(dirstr+"/"+hstr);
+      if (!hden) { cout << "Can't find " << dirstr+"/"+hstr << endl; continue; }
+      hnum = (TH1F*) ifile_anc->Get(dirstr+"/"+hstr+hltsuf);
+      if (!hnum) { cout << "Can't find " << dirstr+"/"+hstr+hltsuf << endl; continue; }
+
+      auto heff_anc = (TH1F*) hnum->Clone(hstr+"_eff");
+      heff_anc->Divide(hnum, hden, 1, 1, "B");
+
+      heff_anc->GetYaxis()->SetRangeUser(0, 1.1);
+      heff_anc->GetYaxis()->SetTitle("HLT_MuE eff");
+      heff_anc->GetXaxis()->SetTitleSize(0.06);
+      heff_anc->GetXaxis()->SetTitleOffset(0.5);
+      // heff_anc->SetTitle("HLT_MuE efficiency in " + dirstr);
+      heff_anc->SetTitle("HLT_MuE efficiency in EMu CR");
+      heff_anc->SetLineWidth(2);
+      heff_anc->SetLineColor(kTeal);
+      heff_anc->Draw("same");
+      heff_anc->Write(dirstr+"/"+hstr+"_eff_anc");
 
       TF1 line1("line1", "1", heff_new->GetXaxis()->GetXmin(), heff_new->GetXaxis()->GetXmax());
       line1.SetLineColor(13);
@@ -88,8 +117,9 @@ void compare_CRemu_efficiency_plots() {
 
       gPad->Update();
       TLegend leg(0.7, 0.3, 0.88, 0.43);
-      leg.AddEntry(heff_old, "data 2016");
-      leg.AddEntry(heff_new, "data 2017");
+      leg.AddEntry(heff_new, "data 2018");
+      leg.AddEntry(heff_old, "data 2017");
+      leg.AddEntry(heff_anc, "data 2016");
       leg.Draw();
 
 
