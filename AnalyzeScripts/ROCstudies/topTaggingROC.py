@@ -10,11 +10,12 @@ from math import sqrt
 def makeROClist(hgood, hfake, *args, **kwargs):
 
     raw_yields = kwargs.get("raw_yields", False)
+    hrange = kwargs.get("hrange", 1.2) # Range of the disc histogram, 2.2 for BDT tagger, 1.2 for TF tagger
 
-    bindiv = hgood.GetNbinsX() / 2.2
+    bindiv = hgood.GetNbinsX() / hrange
     startbin = hgood.FindBin(1)
     stopbin = hgood.GetNbinsX()+1 # human define for aesthetic
-    cut_at_eff = 1             # human define for aesthetic
+    cut_at_eff = 0.6             # human define for aesthetic
     print "startbin is", startbin
     print "bindiv is", bindiv
 
@@ -69,15 +70,17 @@ if __name__ == "__main__":
 
     r.gROOT.SetBatch(1)
 
-    f1 = r.TFile("../../StopLooper/output/temp12/SMS_T2tt.root")
-    f2 = r.TFile("../../StopLooper/output/temp11/allBkg_25ns.root")
-    hgood = f1.Get("srNJet2/h_leadtopcand_finedisc")
-    hfake = f2.Get("srNJet2/h_leadtopcand_finedisc")
+    # f1 = r.TFile("../../StopLooper/output/temp12/SMS_T2tt.root")
+    # f2 = r.TFile("../../StopLooper/output/temp11/allBkg_25ns.root")
+    # hgood = f1.Get("srNJet2/h_leadtopcand_finedisc")
+    # hfake = f2.Get("srNJet2/h_leadtopcand_finedisc")
 
-    # f1 = r.TFile("../../StopLooper/output/temp/TTJets_v25_4.root")
-    # f2 = f1
-    # hgood = f1.Get("testTopTagging/h_lead_topcand_finedisc")
-    # hfake = f1.Get("testTopTagging/h_lead_fakecand_finedisc")
+    # f1 = r.TFile("../../StopLooper/output/tempNewTagger2/TTJets_amcnlo.root")
+    f1 = r.TFile("../../StopLooper/output/tempNewTagger5/stopbaby.root")
+    f2 = f1
+
+    hgood = f1.Get("testTopTagging/h_lead_topcand_finedisc")
+    hfake = f1.Get("testTopTagging/h_lead_fakecand_finedisc")
 
     if not hgood: print "Cannot find hgood!"
     if not hfake: print "Cannot find hfake!"
@@ -119,13 +122,14 @@ if __name__ == "__main__":
     gstob.GetYaxis().SetTitle("S / #sqrt{S+B}")
     gstob.Draw()
 
-    # c1.Print("stob_srbase_toptag.pdf")
+    c1.Print("stob_test_tftop.pdf")
 
     c1.Clear()
 
     groc.SetTitle("Graph for fake rate vs tagging efficiency")
-    groc.GetXaxis().SetTitle("tagging eff.")
-    groc.GetYaxis().SetTitle("fake rate")
+    groc.GetXaxis().SetTitle("tt1l evt tagging eff.")
+    groc.GetYaxis().SetTitle("tt2l evt fake rate")
+    groc.SetLineColor(r.kGreen+2)
     groc.SetLineWidth(2)
 
     # groc.SetTitle("Graph for background vs signal efficiency")
@@ -134,15 +138,43 @@ if __name__ == "__main__":
 
     groc.Draw()
 
-    c1.Print("roc_srNJet2_toptag.pdf")
+    c1.Print("roc_test_tftop.pdf")
 
     # c1.Clear()
 
-    # hgood = f1.Get("testTopTagging/h_chi2_disc1")
-    # hfake = f2.Get("testTopTagging/h_chi2fake_disc1")
+    hgood = f1.Get("testTopTagging/h_lead_tftop_finedisc")
+    hfake = f1.Get("testTopTagging/h_lead_faketftop_finedisc")
 
-    hgood = f1.Get("srNJet2/h_chi2_disc")
-    hfake = f2.Get("srNJet2/h_chi2_disc")
+    if not hgood: print "Cannot find hgood!"
+    if not hfake: print "Cannot find hfake!"
+
+    lst_eff, lst_fkr, lst_disc = makeROClist(hgood, hfake)
+
+    print lst_disc
+    for i, disc in enumerate(lst_disc):
+        if disc == 0.998 or disc == 0.995 or disc == 0.99 or disc == 0.98:
+            print "TF: ", disc, lst_tageff[i], lst_fkrate[i]
+
+    tfroc = r.TGraph(lst_eff.size, lst_eff, lst_fkr)
+    tfroc.SetLineColor(r.kOrange+7)
+    tfroc.SetLineWidth(2)
+    tfroc.SetTitle("Graph for fake rate vs tagging efficiency")
+    tfroc.GetXaxis().SetTitle("tag eff.")
+    tfroc.GetYaxis().SetTitle("fake rate")
+    tfroc.Draw("same")
+
+    leg = r.TLegend(0.16, 0.68, 0.42, 0.86)
+    leg.AddEntry(groc, "BDT top tagger")
+    leg.AddEntry(tfroc, "TF top tagger")
+    leg.Draw()
+
+    c1.Print("roc_test_BDTvsTF.pdf")
+
+    hgood = f1.Get("testTopTagging/h_chi2_disc1")
+    hfake = f2.Get("testTopTagging/h_chi2fake_disc1")
+
+    # hgood = f1.Get("srNJet2/h_chi2_disc")
+    # hfake = f2.Get("srNJet2/h_chi2_disc")
 
     if not hgood: print "Cannot find hgood!"
     if not hfake: print "Cannot find hfake!"
@@ -150,19 +182,19 @@ if __name__ == "__main__":
     lst_eff, lst_fkr, _ = makeROClist(hgood, hfake)
 
     chi2roc = r.TGraph(lst_eff.size, lst_eff, lst_fkr)
-    chi2roc.SetLineColor(r.kBlue)
+    chi2roc.SetLineColor(r.kCyan-3)
     chi2roc.SetLineWidth(2)
     chi2roc.SetTitle("Graph for fake rate vs tagging efficiency")
     chi2roc.GetXaxis().SetTitle("tag eff.")
     chi2roc.GetYaxis().SetTitle("fake rate")
     chi2roc.Draw("same")
 
-    leg = r.TLegend(0.2, 0.7, 0.36, 0.8)
-    leg.AddEntry(groc, "top tagger")
-    leg.AddEntry(chi2roc, "had chi2")
+    # leg = r.TLegend(0.2, 0.7, 0.36, 0.8)
+    # leg.AddEntry(groc, "top tagger")
+    leg.AddEntry(chi2roc, "had #chi^{2}")
     leg.Draw()
 
-    c1.Print("roc_srNJet2_chi2.pdf")
+    c1.Print("roc_test_AddChi2.pdf")
 
     hgood = f1.Get("srNJet2/h_tmod_finedisc")
     hfake = f2.Get("srNJet2/h_tmod_finedisc")
@@ -188,7 +220,7 @@ if __name__ == "__main__":
     leg.AddEntry(tmodroc, "tmod")
     leg.Draw()
 
-    c1.Print("roc_srNJet2_tmod.pdf")
+    # c1.Print("roc_srNJet2_tmod.pdf")
 
     # fout = r.TFile("restagROCs_dm200to400.root", "update")
     # groc.Write("roc_ltc_dm200to400_ge4j")
