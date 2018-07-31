@@ -5,9 +5,8 @@
 #include "Math/VectorUtil.h"
 #include "TLorentzVector.h"
 
-#include "TopTagger/TopTagger/include/TopTagger.h"
-#include "TopTagger/TopTagger/include/TopTaggerResults.h"
-#include "TopTagger/TopTagger/include/TopTaggerUtilities.h"
+#include "TFTopTagger/include/TopTaggerResults.h"
+#include "TFTopTagger/include/TopTaggerUtilities.h"
 
 using namespace tas;
  
@@ -34,7 +33,7 @@ void JetTree::InitTopMVA(ResolvedTopMVA* resTopMVAptr) {
   resTopMVA = resTopMVAptr;
 
   tftagger = new TopTagger;
-  tftagger->setCfgFile("TopTagger/TopTagger.cfg");
+  tftagger->setCfgFile("TFTopTagger/TopTagger.cfg");
 }
 
 void JetTree::InitBtagSFTool(bool isFastsim_) {

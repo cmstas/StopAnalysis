@@ -21,12 +21,13 @@ NGLIBS         = $(ROOTGLIBS)
 NGLIBS        += -lMinuit
 GLIBS          = $(filter-out -lNew, $(NGLIBS))
 
-COREPATH       = $(HOME)/CORE
+COREPATH       = ../CORE
 TOOLSPATH      = $(COREPATH)/Tools
 
 CXXFLAGS       += -I$(COREPATH)
 CXXFLAGS       += -I$(TOOLSPATH)
 CXXFLAGS       += -I./
+CXXFLAGS       += -I./TFTopTagger
 
 CORESOURCE     = $(COREPATH)/CMS3_CORE.so
 CORELIB        = ./CMS3_CORE.so
@@ -49,7 +50,10 @@ endif
 #
 
 runBabyMaker: runBabyMaker.o looper.o EventTree.o LeptonTree.o JetTree.o ResolvedTopMVA.o IsoTracksTree.o TauTree.o GenParticleTree.o PhotonTree.o StopSelections.o LinkDef_out.so $(CORELIB) $(STOPVARLIB) libTopTagger.so
-	$(LD) $(LDFLAGS) -o runBabyMaker runBabyMaker.o looper.o EventTree.o ResolvedTopMVA.o JetTree.o LeptonTree.o PhotonTree.o IsoTracksTree.o TauTree.o GenParticleTree.o StopSelections.o libTopTagger.so -LTopTagger/TopTagger/test -lTopTagger $(LIBS) $(GLIBS) -lGenVector -lEG -lTMVA $(CORELIB) $(STOPVARLIB) LinkDef_out.so -Wl,-rpath,./
+	$(LD) $(LDFLAGS) -o runBabyMaker runBabyMaker.o looper.o EventTree.o ResolvedTopMVA.o JetTree.o LeptonTree.o PhotonTree.o IsoTracksTree.o TauTree.o GenParticleTree.o StopSelections.o libTopTagger.so $(LIBS) $(GLIBS) -lGenVector -lEG -lTMVA $(CORELIB) $(STOPVARLIB) LinkDef_out.so -Wl,-rpath,./
+
+$(CORESOURCE):
+	cd $(COREPATH) && $(MAKE) -j && cd ..
 
 $(CORELIB): $(CORESOURCE)
 	cp $(CORESOURCE) .
@@ -76,8 +80,8 @@ PhotonTree.o: PhotonTree.cc PhotonTree.h StopSelections.h
 JetTree.o: JetTree.cc JetTree.h StopSelections.h
 	$(CXX) $(CXXFLAGS) -c JetTree.cc
 
-ResolvedTopMVA.o: TopTagger/ResolvedTopMVA.h TopTagger/ResolvedTopMVA.cc TopTagger/TMVAReader.h
-	$(CXX) $(CXXFLAGS) -c TopTagger/ResolvedTopMVA.cc
+ResolvedTopMVA.o: ResTopTagger/ResolvedTopMVA.h ResTopTagger/ResolvedTopMVA.cc ResTopTagger/TMVAReader.h
+	$(CXX) $(CXXFLAGS) -c ResTopTagger/ResolvedTopMVA.cc
 
 TauTree.o: TauTree.cc TauTree.h
 	$(CXX) $(CXXFLAGS) -c TauTree.cc
@@ -96,8 +100,7 @@ LinkDef_out.so: LinkDef.h
 	$(CXX) $(CXXFLAGS) $(SOFLAGS) LinkDef.cc -o $@
 
 libTopTagger.so:
-	cp TopTagger/TopTagger/test/libTopTagger.so .
-
+	cp TFTopTagger/libTopTagger.so .
 
 .PHONY: clean
 clean:

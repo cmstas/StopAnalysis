@@ -8,8 +8,8 @@
 #include "StopSelections.h"
 #include "btagsf/BTagCalibrationStandalone.h"
 #include "TH2.h" 
-#include "TopTagger/ResolvedTopMVA.h"
-#include "TopTagger/TopTagger/include/TopTagger.h"
+#include "ResTopTagger/ResolvedTopMVA.h"
+#include "TFTopTagger/include/TopTagger.h"
 // forward declarations
 class TTree;
  

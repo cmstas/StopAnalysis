@@ -156,7 +156,7 @@ void babyMaker::MakeBabyNtuple(const char* output_name){
     jets_jdown.SetAK4Branches_TopTag(BabyTree);
 
     // Setup MVA Reader TopTagging for 
-    ResolvedTopMVA* resTopMVAptr =  new ResolvedTopMVA("TopTagger/resTop_xGBoost_v0.weights.xml", "BDT");
+    ResolvedTopMVA* resTopMVAptr =  new ResolvedTopMVA("ResTopTagger/resTop_xGBoost_v0.weights.xml", "BDT");
     jets.InitTopMVA(resTopMVAptr);
     jets_jup.InitTopMVA(resTopMVAptr);
     jets_jdown.InitTopMVA(resTopMVAptr);
