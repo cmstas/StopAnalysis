@@ -3,7 +3,9 @@ SnT Stop-1l Analysis
 The analysis try to look for / exclude the hypothetical top squark (stop) predicted by the supersymmetry.
 
 ## Setup
-Need a copy or a soft link to the snt CORE library under the main `StopAnalysis` directory.
+``` bash
+git clone --recurse-submodules git@github.com:cmstas/StopAnalysis.git && cd StopAnalysis
+```
 
 ## Analysis work flow in steps
 

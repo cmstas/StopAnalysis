@@ -1,20 +1,21 @@
 # StopBabyMaker
 
-This code makes stop babies from CMS4 ntuples, produced by the [NtupleMaker](https://github.com/cmstas/NtupleMaker).
+This code makes baby ntuples from the CMS4 ntuples, produced by the [NtupleMaker](https://github.com/cmstas/NtupleMaker).
+The output will facilitate the StopLooper top produce anaylsis result.
 
 ## Setup
 
-Require that [CORE](https://github.com/cmstas/CORE) to be checked out exactly under the `StopAnalysis` folder. 
-Soft links are created for efficiencies/correction files that are pointing to those in CORE.
-Make sure your local copy is up to date. Compile CORE, then compile the babymaker.
-
-```
-cd ../CORE && make -j 12 && cd -
+Make sure the submodule CORE under the parent folder is initiated. Then simply do
+``` bash
 make -j 12
 ```
 
-(If you already have some compiled code, you may wish to run `make
-clean` first).
+Soft links are created for efficiencies/correction files that are pointing to those in CORE.
+If CORE is updated later, you will need manually re-compile CORE for the babymaker.
+```
+cd ../CORE && make clean && make -j 12 && cd -
+make -j 12
+```
 
 ## Running the babymaker
 
@@ -31,7 +32,7 @@ The main exectuable is `runBabyMaker`. To run it, you need to provide at least t
 - **isFastsim**: This should be a boolean of 1 or 0 telling if the sample is a fastSim sample or not. The default value is 0 (not fastSim).
 
 
-#### Another (old) way to run the babymaker
+#### Another (old) way to run the babymaker <-- obsolete
     The following arguments can also be changed to the following provided a samples.dat list is present.
 - **sample\_name**: This is the compact name for the sample you want to run on. These sample names are defined in the various sample\*.dat files.
 - **sampleList**: This parameter tells the babyMaker which .dat file contains the sample\_name you want to run on. The default value is sample_2017.dat.
