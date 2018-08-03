@@ -11,14 +11,17 @@
 using namespace tas;
  
 // // DeepCSV working points 80X
+// static const float BTAG_TGT = 0.9432;
 // static const float BTAG_MED = 0.6324;
 // static const float BTAG_LSE = 0.2219;
-// static const float BTAG_TGT = 0.9432;
 
 // DeepCSV working points 94X
+// -- BtagSF file: DeepCSV_94XSF_V3_B_F.csv
+// -- Data: 17Nov2017 ReReco for B-F
+// -- Monte Carlo: RunIIFall17
+static const float BTAG_TGT = 0.8001;
 static const float BTAG_MED = 0.4941;
 static const float BTAG_LSE = 0.1522;
-static const float BTAG_TGT = 0.8001;
 
 JetTree::JetTree() : doResolveTopMVA(false) {}
 
@@ -38,8 +41,8 @@ void JetTree::InitTopMVA(ResolvedTopMVA* resTopMVAptr) {
 
 void JetTree::InitBtagSFTool(bool isFastsim_) {
     isFastsim = isFastsim_;
-    //calib = calib_;
-    calib = new BTagCalibration("DeepCSV", "btagsf/run2_25ns/DeepCSV_94XSF_V2_B_F.csv"); // DeepCSV version of SFs
+    // DeepCSV version of SFs
+    calib = new BTagCalibration("DeepCSV", "btagsf/run2_25ns/DeepCSV_94XSF_V3_B_F.csv");
     reader_medium = new BTagCalibrationReader(BTagEntry::OP_MEDIUM, "central", {"up", "down"});
     reader_medium->load(*calib, BTagEntry::FLAV_B, "comb");
     reader_medium->load(*calib, BTagEntry::FLAV_C, "comb");
@@ -53,7 +56,8 @@ void JetTree::InitBtagSFTool(bool isFastsim_) {
     reader_loose->load(*calib, BTagEntry::FLAV_C, "comb");
     reader_loose->load(*calib, BTagEntry::FLAV_UDSG, "incl");
 
-    calib_fastsim = new BTagCalibration("deepcsv", "btagsf/run2_fastsim/fastsim_deepcsv_ttbar_26_1_2017.csv"); // DeepCSV fastsim version of SFs
+    // DeepCSV fastsim version of SFs
+    calib_fastsim = new BTagCalibration("deepcsv", "btagsf/run2_fastsim/fastsim_deepcsv_ttbar_26_1_2017.csv"); // TODO: update to 94X version
     reader_medium_FS = new BTagCalibrationReader(BTagEntry::OP_MEDIUM, "central", {"up", "down"});
     reader_medium_FS->load(*calib_fastsim, BTagEntry::FLAV_B, "fastsim");
     reader_medium_FS->load(*calib_fastsim, BTagEntry::FLAV_C, "fastsim");
