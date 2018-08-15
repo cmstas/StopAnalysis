@@ -202,6 +202,7 @@ std::vector<SR> getStopCrosscheckRegionsEMu() {
 }
 
 std::vector<SR> getStopInclusiveRegionsTopological() {
+  std::vector<SR> SRvec;
 
   SR srbase;
   srbase.SetAllowDummyVars(1);
@@ -217,13 +218,20 @@ std::vector<SR> getStopInclusiveRegionsTopological() {
   srbase.SetVar("tmod", -fInf, fInf);
   srbase.SetVar("dphijmet", 0.8, 3.1416);
   srbase.SetMETBins({250, 350, 450, 550, 650, 800, 1500});
-
-  SR sr;
-  std::vector<SR> SRvec;
-
   SRvec.emplace_back(srbase);
 
+  SR sr;
+
+  sr = srbase;
+  sr.SetName("srsbmet");  // MET sideband
+  sr.SetVar("met", 150, 250);
+  sr.SetMETBins({150, 200, 250});
+  SRvec.emplace_back(sr);
+
+  return SRvec;
+
   // Test regions
+  sr.Clear();
   sr.SetAllowDummyVars(1);
   sr.SetName("srtest0");         // test for zpeak lumi
   sr.SetVar("mt", 0, fInf);
@@ -407,6 +415,8 @@ std::vector<SR> getStopInclusiveRegionsTopological() {
   sr.SetVar("met", 450, fInf);
   SRvec.emplace_back(sr);
 
+  SRvec.clear();
+
   sr = srbase;
   sr.SetName("srNJet2");
   sr.SetDetailName("ge4j");
@@ -419,6 +429,8 @@ std::vector<SR> getStopInclusiveRegionsTopological() {
   sr.SetDetailName("ge4j_met400");
   sr.SetVar("met", 450, fInf);
   SRvec.emplace_back(sr);
+
+  return SRvec;
 
   sr = srbase;
   sr.SetName("srNJetTMod1");
@@ -928,16 +940,16 @@ std::vector<SR> getStopSignalRegionsNewMETBinning() {
   SRvec.emplace_back(sr);
 
 
-  sr.SetName("srE0");
-  sr.SetDetailName("geq4j_tmod0to10_mlb0to175");
-  sr.SetVar("njet", 4, fInf);
-  sr.SetVar("tmod", 0, 10);
-  sr.SetVar("mlb", 0, 175);
-  sr.SetVar("deepttag", -2, 1);
-  sr.SetVar("resttag", -2, 1);
-  // sr.SetMETBins({250, 350, 450, 600, 1500});
-  sr.SetMETBins({450, 600, 1500});
-  SRvec.emplace_back(sr);
+  // sr.SetName("srE0");
+  // sr.SetDetailName("geq4j_tmod0to10_mlb0to175");
+  // sr.SetVar("njet", 4, fInf);
+  // sr.SetVar("tmod", 0, 10);
+  // sr.SetVar("mlb", 0, 175);
+  // sr.SetVar("deepttag", -2, 1);
+  // sr.SetVar("resttag", -2, 1);
+  // // sr.SetMETBins({250, 350, 450, 600, 1500});
+  // sr.SetMETBins({450, 600, 1500});
+  // SRvec.emplace_back(sr);
 
   sr.SetName("srE1");
   sr.SetDetailName("geq4j_tmod0to10_mlb0to175_nottag");
@@ -978,15 +990,15 @@ std::vector<SR> getStopSignalRegionsNewMETBinning() {
   SRvec.emplace_back(sr);
 
 
-  sr.SetName("srG0");
-  sr.SetDetailName("geq4j_tmod10toInf_mlb0to175");
-  sr.SetVar("njet", 4, fInf);
-  sr.SetVar("tmod", 10, fInf);
-  sr.SetVar("mlb", 0, 175);
-  sr.SetVar("deepttag", -2, 1);
-  sr.SetVar("resttag", -2, 1);
-  sr.SetMETBins({450, 550, 750, 1500});
-  SRvec.emplace_back(sr);
+  // sr.SetName("srG0");
+  // sr.SetDetailName("geq4j_tmod10toInf_mlb0to175");
+  // sr.SetVar("njet", 4, fInf);
+  // sr.SetVar("tmod", 10, fInf);
+  // sr.SetVar("mlb", 0, 175);
+  // sr.SetVar("deepttag", -2, 1);
+  // sr.SetVar("resttag", -2, 1);
+  // sr.SetMETBins({450, 550, 750, 1500});
+  // SRvec.emplace_back(sr);
 
   sr.SetName("srG1");
   sr.SetDetailName("geq4j_tmod10toInf_mlb0to175_nottag");

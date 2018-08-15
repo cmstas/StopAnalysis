@@ -17,7 +17,7 @@ void SR::SetDetailName(string detail_name) {
 }
 
 void SR::SetVar(string var_name, float lower_bound, float upper_bound) {
-  bins_[var_name] = pair<float,float>(lower_bound, upper_bound);
+  cuts_[var_name] = pair<float,float>(lower_bound, upper_bound);
 }
 
 void SR::SetMETBins(std::vector<float> met_bins) {
@@ -41,24 +41,24 @@ unsigned int SR::GetYield() const {
 }
 
 float SR::GetLowerBound(string var_name) const {
-  if (!bins_.count(var_name))
+  if (!cuts_.count(var_name))
     throw invalid_argument("Variable " + var_name + " not defined in SR " + srname_ + " ! Cannot get lower bound!");
-  return (bins_.at(var_name)).first;
+  return (cuts_.at(var_name)).first;
 }
 
 float SR::GetUpperBound(string var_name) const {
-  if (!bins_.count(var_name))
+  if (!cuts_.count(var_name))
     throw invalid_argument("Variable " + var_name + " not defined in SR " + srname_ + " ! Cannot get upper bound!");
-  return (bins_.at(var_name)).second;
+  return (cuts_.at(var_name)).second;
 }
 
 unsigned int SR::GetNumberOfVariables() const {
-  return (bins_.size());
+  return cuts_.size();
 }
 
 vector<string> SR::GetListOfVariables() const {
   vector<string> vars;
-  for (auto it = bins_.begin(); it != bins_.end(); ++it) {
+  for (auto it = cuts_.begin(); it != cuts_.end(); ++it) {
     vars.push_back(it->first);
   }
   return vars;
@@ -79,7 +79,7 @@ bool SR::PassesSelection(map<string, float> values) {
     cout << "Number of variables to cut on != number of variables in signal region. Passed " << values.size() << ", expected " << GetNumberOfVariables() << endl;
     throw invalid_argument(srname_ + ": Number of variables to cut on != number of variables in signal region");
   }
-  for (auto it = bins_.begin(); it != bins_.end(); it++) {
+  for (auto it = cuts_.begin(); it != cuts_.end(); it++) {
     if (values.find(it->first) != values.end()) { //check that we actually have bounds set for this variable
       float value = values[it->first];
       float cut_lower = (it->second).first;
@@ -105,7 +105,7 @@ bool SR::PassesSelectionPrintFirstFail(map<string, float> values) {
     cout << "Number of variables to cut on != number of variables in signal region. Passed " << values.size() << ", expected " << GetNumberOfVariables() << endl;
     throw invalid_argument(srname_ + ": Number of variables to cut on != number of variables in signal region");
   }
-  for (auto it = bins_.begin(); it != bins_.end(); it++) {
+  for (auto it = cuts_.begin(); it != cuts_.end(); it++) {
     if (values.find(it->first) != values.end()) { //check that we actually have bounds set for this variable
       float value = values[it->first];
       float cut_lower = (it->second).first;
@@ -132,18 +132,21 @@ bool SR::PassesSelectionPrintFirstFail(map<string, float> values) {
 }
 
 bool SR::VarExists(std::string var_name) const {
-  return bins_.count(var_name);
+  return cuts_.count(var_name);
 }
 
 void SR::RemoveVar(string var_name) {
-  if (bins_.find(var_name) != bins_.end()) bins_.erase(var_name);
+  if (cuts_.find(var_name) != cuts_.end()) cuts_.erase(var_name);
   else cerr << "WARNING: Variable " << var_name << " is not present in " << srname_ << ". Cannot remove!" << endl;
 }
 
 void SR::Clear() {
+  yield_ = 0;
   srname_ = "";
-  bins_.clear();
+  detailname_ = "";
+  cuts_.clear();
   defaultplots_.clear();
+  metbins_.clear();
   kAllowDummyVars_ = false;
 }
 

@@ -54,7 +54,7 @@ private:
   unsigned int yield_;
   std::string srname_;
   std::string detailname_;
-  std::map<std::string,std::pair<float,float>> bins_;
+  std::map<std::string,std::pair<float,float>> cuts_;
   std::vector<std::string> defaultplots_;
   std::vector<float> metbins_;
   int kAllowDummyVars_;

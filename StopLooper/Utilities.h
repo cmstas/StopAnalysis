@@ -2,11 +2,11 @@
 #define STOPLOOPER_UTILITIES_H
 
 #include "TMath.h"
-#include "TH1.h" 
-#include "TH2.h" 
-#include "TH3.h" 
+#include "TH1.h"
+#include "TH2.h"
+#include "TH3.h"
 #include "TGraph.h"
-#include "TCanvas.h" 
+#include "TCanvas.h"
 #include "TFile.h"
 
 #include <map>
@@ -39,6 +39,35 @@ inline void moveXOverFlowToLastBin3D(TH3* hist) {
   }
 }
 
+// Old functions with float for ranges to be consistent with xval for floating point errors
+void plot1D(string name, float xval, double weight, std::map<string, TH1*> &allhistos, string title, int numbinsx, float xmin, float xmax)
+{
+  if (title=="") title=name;
+  std::map<string, TH1*>::iterator iter= allhistos.find(name);
+  if (iter == allhistos.end()) { //no histo for this yet, so make a new one
+    TH1D* currentHisto= new TH1D(name.c_str(), title.c_str(), numbinsx, xmin, xmax);
+    currentHisto->Sumw2();
+    currentHisto->Fill(xval, weight);
+    allhistos.insert(std::pair<string, TH1*>(name, currentHisto) );
+  } else {
+    iter->second->Fill(xval, weight);
+  }
+}
+
+void plot1D(string name, float xval, double weight, std::map<string, TH1*> &allhistos, string title, int numbinsx, const float* xbins)
+{
+  if (title=="") title=name;
+  std::map<string, TH1*>::iterator iter= allhistos.find(name);
+  if (iter == allhistos.end()) { //no histo for this yet, so make a new one
+    TH1D* currentHisto= new TH1D(name.c_str(), title.c_str(), numbinsx, xbins);
+    currentHisto->Sumw2();
+    currentHisto->Fill(xval, weight);
+    allhistos.insert(std::pair<string, TH1*>(name, currentHisto) );
+  } else {
+    iter->second->Fill(xval, weight);
+  }
+}
+
 // Templated function
 template<class LorentzVectorType>
 bool isCloseObject(const LorentzVectorType p1, const LorentzVectorType p2, const float conesize)
@@ -56,7 +85,7 @@ bool isCloseObject(const LorentzVectorType p1, const LorentzVectorType p2, const
 }
 
 template<typename... TArgs>
-void plot1d(std::string name, float xval, double weight, std::map<std::string, TH1*> &allhistos, TArgs... args)
+void plot1d(std::string name, double xval, double weight, std::map<std::string, TH1*> &allhistos, TArgs... args)
 {
   auto iter = allhistos.find(name);
   if (iter == allhistos.end()) {
@@ -70,7 +99,7 @@ void plot1d(std::string name, float xval, double weight, std::map<std::string, T
 }
 
 template<typename... TArgs>
-void plot2d(std::string name, float xval, float yval, double weight, std::map<std::string, TH1*> &allhistos, TArgs... args)
+void plot2d(std::string name, double xval, double yval, double weight, std::map<std::string, TH1*> &allhistos, TArgs... args)
 {
   auto iter = allhistos.find(name);
   if (iter == allhistos.end()) {
@@ -84,7 +113,7 @@ void plot2d(std::string name, float xval, float yval, double weight, std::map<st
 }
 
 template<typename... TArgs>
-void plot3d(std::string name, float xval, float yval, float zval, double weight, std::map<std::string, TH1*> &allhistos, TArgs... args)
+void plot3d(std::string name, double xval, double yval, double zval, double weight, std::map<std::string, TH1*> &allhistos, TArgs... args)
 {
   auto iter = allhistos.find(name);
   if (iter == allhistos.end()) {

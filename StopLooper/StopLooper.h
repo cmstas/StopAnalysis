@@ -56,7 +56,7 @@ class StopLooper {
   // Event specific variables
   bool is_fastsim_;
   bool is_bkg_;
-  float evtweight_;
+  double evtweight_;
   int jestype_;
   std::map<std::string,float> values_;
 
