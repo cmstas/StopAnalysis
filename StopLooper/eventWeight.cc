@@ -439,10 +439,9 @@ evtWgtInfo::evtWgtInfo() {
   h_recoEff_tau         = nullptr;
 
   // Utilty Var Constants
-  // lumi = 35.867;         // 2016 lumi
-  // lumi = 41.96;         // 2017 lumi  <-- todo: need clever way of doing this / more easily configurable
-  lumi = 120;             // projected 2018 lumi
-  lumi_err = lumi*0.026; // 2.6% uncertainty for Moriond17
+  year = 0;
+  lumi = 150;            // projected 3 years lumi
+  lumi_err = lumi*0.05;  // TODO: Update the 2018 lumi uncertainty
 
   // Initialize event weights and related variables
   initializeWeights();
@@ -452,9 +451,25 @@ evtWgtInfo::evtWgtInfo() {
 
 //////////////////////////////////////////////////////////////////////
 
-void evtWgtInfo::Setup(string samplestr, bool useBTagUtils, bool useLepSFUtils) {
+void evtWgtInfo::Setup(string samplestr, int inyear, bool useBTagUtils, bool useLepSFUtils) {
 
   sampletype = findSampleType(samplestr);
+
+  year = inyear;
+
+  if (year == 2016) {
+    lumi = 35.867;         // 2016 lumi
+    lumi_err = lumi*0.026; // 2.6% uncertainty for Moriond17
+  } else if (year == 2017) {
+    lumi = 41.96;          // 2017 lumi
+    lumi_err = lumi*0.026; // TODO: Update the 2017 lumi uncertainty
+  } else if (year == 2018) {
+    lumi = 70;             // projected 2018 lumi
+    lumi_err = lumi*0.05;  // TODO: Update the 2018 lumi uncertainty
+  } else {
+    lumi = 150;            // projected 3 years lumi
+    lumi_err = lumi*0.05;  // TODO: Update the 2018 lumi uncertainty
+  }
 
   // Get sample info from enum
   if ( sampletype == "data" ) {
@@ -2286,6 +2301,7 @@ double evtWgtInfo::getWeight( systID isyst, bool is_cr2l ) {
 
 void evtWgtInfo::setDefaultSystematics( int syst_set ) {
   switch (syst_set) {
+    // Set of systematics used for Moriond17 analysis
     case 0:
       apply_cr2lTrigger_sf = true;  // only !=1 if pfmet!=pfmet_rl ie no weight for ==1lepton events in SR and CR0b
       apply_bTag_sf        = true;  // event weight, product of all jet wgts
@@ -2310,11 +2326,32 @@ void evtWgtInfo::setDefaultSystematics( int syst_set ) {
         apply_pu_sf        = false;  // <-- why?
       }
       break;
+
+    // Set of systematics prepared for legacy analysis using 94X samples
+    case 1:
+      apply_cr2lTrigger_sf = false;  // not available yet
+      apply_bTag_sf        = true;
+      apply_lep_sf         = false;  // available but not updated yet
+      apply_vetoLep_sf     = false;  // same as above
+      apply_tau_sf         = false;  // same as above
+      apply_topPt_sf       = false;
+      apply_metRes_sf      = false;  // not developed for 94X yet
+      apply_metTTbar_sf    = false;
+      apply_ttbarSysPt_sf  = false;
+      apply_WbXsec_sf      = false;  // not dev
+      apply_ISR_sf         = false;  // not available yet
+      apply_pu_sf          = false;  // not available yet
+      apply_sample_sf      = false;  // no multiple sample available yet
+      if (is_fastsim_) {
+        apply_lepFS_sf     = false;  // no fast sim yet
+        apply_bTagFS_sf    = false;
+      }
+      break;
   }
 
 }
 
-double evtWgtInfo::getSampleWeight( TString fname ) {
+double evtWgtInfo::getSampleWeightSummer16v2( TString fname ) {
 
   double result = 1.0;
 

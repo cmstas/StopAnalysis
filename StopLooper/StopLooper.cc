@@ -64,8 +64,9 @@ const bool runFullSignalScan = false;
 const bool printPassedEvents = false;
 
 // set bool def here for member function usage
-bool is2016data = false;
-bool is2018data = false;
+int year = 2017;
+int datayear = -1;
+string samplever = "Fall17v2";
 
 const float fInf = std::numeric_limits<float>::max();
 
@@ -161,24 +162,29 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
   // // Full 2017 dataset json, 41.96/fb
   // const char* json_file = "../StopBabyMaker/json_files/Cert_294927-306462_13TeV_PromptReco_Collisions17_JSON_snt.txt";
 
-  // const float kLumi = 120;
-  // const float kLumi = 35.867;         // 2016 lumi
-  const float kLumi = 41.96;          // 2017 lumi
+  float kLumi = 150;
+  if (year == 2016) kLumi = 35.867;
+  else if (year == 2017) kLumi = 41.96;
+  else if (year == 2018) kLumi = 70;
 
   // Combined 2016 (35.87/fb), 2017 (41.96/fb) and 2018 (19.26/fb) json,
   // const char* json_file = "../StopCORE/inputs/json_files/Cert_271036-317696_13TeV_Combined161718_JSON_snt.txt";
   const char* json_file = "../StopCORE/inputs/json_files/Cert_271036-317591_13TeV_Combined161718_JSON_snt.txt"; // 16.59/fb
   // const char* json_file = "../StopCORE/inputs/json_files/Cert_271036-317391_13TeV_Combined161718_JSON_snt.txt"; // 14.38/fb
 
-  if (samplestr.find("data_2016") == 0 || samplestr == "data_single_lepton_met") is2016data = true;
-  if (samplestr.find("data_2018") == 0) is2018data = true;
+  // Determine datayear from the sample name
+  if (samplestr == "data_single_lepton_met") datayear = 16;
+  else if (samplestr.find("data_2016") == 0) datayear = 2016;
+  else if (samplestr.find("data_2017") == 0) datayear = 2017;
+  else if (samplestr.find("data_2018") == 0) datayear = 2018;
+  else datayear = -1;
 
   // Setup pileup re-weighting
   if (doNvtxReweight) {
     TFile f_purw("/home/users/sicheng/working/StopAnalysis/AnalyzeScripts/pu_reweighting_hists/nvtx_reweighting_alldata.root");
     TString scaletype = "18to17";
-    if (is2018data) scaletype = "18to17";
-    else if (is2016data) scaletype = "16to17";
+    if (datayear == 2018) scaletype = "18to17";
+    else if (datayear == 2016) scaletype = "16to17";
     TH1F* h_nvtxscale = (TH1F*) f_purw.Get("h_nvtxscale_"+scaletype);
     if (!h_nvtxscale) throw invalid_argument("No nvtx reweighting hist found for " + scaletype);
     if (verbose) cout << "Doing nvtx reweighting! Scaling " << scaletype << ". The scale factors are:" << endl;
@@ -198,10 +204,12 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
   // GenerateAllSRptrSets();
 
   // Setup the event weight calculator
-
-  evtWgt.Setup(samplestr, applyBtagSFfromFiles, applyLeptonSFfromFiles);
-  evtWgt.setDefaultSystematics(0);
-  evtWgt.lumi = kLumi;
+  evtWgt.Setup(samplestr, year, applyBtagSFfromFiles, applyLeptonSFfromFiles);
+  if (year == 2016)
+    evtWgt.setDefaultSystematics(0);  // systematic set for Moriond17 analysis
+  else if (year >= 2017)
+    evtWgt.setDefaultSystematics(1);  // systematic set for 94X
+  // evtWgt.lumi = kLumi;
 
   int nDuplicates = 0;
   int nEvents = chain->GetEntries();
@@ -222,7 +230,18 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
     tree->SetCacheSize(128*1024*1024);
     babyAnalyzer.Init(tree);
 
-    is_fastsim_ = fname.Contains("SMS") || fname.Contains("Signal");
+    // Use the first event to get dsname
+    tree->LoadTree(0);
+    babyAnalyzer.GetEntry(0);
+
+    TString dsname = dataset();
+    cout << "[StopLooper::looper] running on sample: " << dsname << endl;
+
+    if (dsname.Contains("RunIIFall17MiniAODv2")) samplever = "Fall17v2";
+    else if (dsname.Contains("RunIISummer16MiniAODv2")) samplever = "Summer16v2";
+    else samplever = "Undetermined";
+
+    is_fastsim_ = dsname.Contains("SMS") || fname.Contains("SMS") || fname.Contains("Signal");
 
     // Get event weight histogram from baby
     TH3D* h_sig_counter = nullptr;
@@ -233,7 +252,8 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
     }
     evtWgt.getCounterHistogramFromBaby(&file);
     // Extra file weight for extension dataset, should move these code to other places
-    evtWgt.getSampleWeight(fname);
+    if (year == 2016)
+      evtWgt.getSampleWeightSummer16v2(fname);
 
     dummy.cd();
     // Loop over Events in current file
@@ -258,7 +278,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
       // fillEfficiencyHistos(testVec[0], "filters");
 
       // Apply met filters
-      if (is2016data) {
+      if (datayear == 2016 || datayear == 16) {
         // The newer version of the header file uses boolean type for all of the following, which breaks for 2016 data
         if ( !filt_met() ) continue;
         if ( !filt_goodvtx() ) continue;
@@ -267,10 +287,10 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
         if ( !filt_badChargedCandidateFilter() ) continue;
         if ( !filt_jetWithBadMuon() ) continue;
         if ( !filt_pfovercalomet() ) continue;
-        if ( filt_duplicatemuons() ) continue;
+        if ( filt_duplicatemuons() ) continue; // Temporary, breaks for old 16 babies
         if ( filt_badmuons() ) continue;
         // if ( !filt_nobadmuons() ) continue;  // breaks for v25_*
-      } else {
+      } else if (datayear == 2017) {
         if ( !filt_goodvtx() ) continue;
         // if ( !is_fastsim_ && !filt_globaltighthalo2016()) continue; // problematic for 2017 & 2018 promptReco
         if ( !is_fastsim_ && !filt_globalsupertighthalo2016()) continue;
@@ -296,7 +316,6 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
       if (nvtxs() < 1) continue;
 
       // For testing on only subset of mass points
-      TString dsname = dataset();
       if (!runFullSignalScan && is_fastsim_) {
         // auto checkMassPt = [&](double mstop, double mlsp) { return (mass_stop() == mstop) && (mass_lsp() == mlsp); };
         // if (!checkMassPt(800,400)  && !checkMassPt(1200,50)  && !checkMassPt(400,100) &&
@@ -323,8 +342,8 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
         }
       }
 
-      // Only events nupt < 200 for WNJetsToLNu samples
-      if (dsname.BeginsWith("/W") && dsname.Contains("JetsToLNu") && !dsname.Contains("NuPt-200") && nupt() > 200) continue;
+      // Only events nupt < 200 for WNJetsToLNu samples -- 80X only since NuPt-200 sample not available in 94X
+      if (dsname.BeginsWith("/W") && dsname.Contains("JetsToLNu") && dsname.Contains("80X") && !dsname.Contains("NuPt-200") && nupt() > 200) continue;
 
       if (is_fastsim_) {
         if (fmod(mass_stop(), kSMSMassStep) > 2 || fmod(mass_lsp(), kSMSMassStep) > 2) continue;  // skip points in between the binning
@@ -354,22 +373,25 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
       // Plot nvtxs on the base selection of stopbaby for reweighting purpose
       plot1d("h_nvtxs", nvtxs(), 1, testVec[0].histMap, ";Number of vertices", 100, 1, 101);
 
-      if (doNvtxReweight && (is2016data || is2018data)) {
+      if (doNvtxReweight && (datayear == 2016 || datayear == 2018)) {
         if (nvtxs() < 100) evtweight_ = nvtxscale_[nvtxs()];  // only scale for data
         plot1d("h_nvtxs_rwtd", nvtxs(), evtweight_, testVec[0].histMap, ";Number of vertices", 100, 1, 101);
       }
 
-      // Temporary test for top tagging efficiency
-      testTopTaggingEffficiency(testVec[1]);
+      // // Temporary test for top tagging efficiency
+      // testTopTaggingEffficiency(testVec[1]);
 
       // nbtag for CSV valued btags -- for comparison between the 2016 analysis
       int nbtagCSV = 0;
       int ntbtagCSV = 0;
       for (float csv : ak4pfjets_CSV()) {
-        // if (csv > 0.8484) nbtagCSV++;  // 80X Moriond17
-        // if (csv > 0.9535) ntbtagCSV++; // 80X Moriond17
-        if (csv > 0.8838) nbtagCSV++;  // 94X
-        if (csv > 0.9693) ntbtagCSV++; // 94X
+        if (year == 2016) {
+          if (csv > 0.8484) nbtagCSV++;  // 80X Moriond17
+          if (csv > 0.9535) ntbtagCSV++; // 80X Moriond17
+        } else if (year == 2017) {
+          if (csv > 0.8838) nbtagCSV++;  // 94X
+          if (csv > 0.9693) ntbtagCSV++; // 94X
+        }
       }
 
       float lead_restopdisc = -1.1;
@@ -481,9 +503,6 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
 
         fillHistosForCR0b(suffix);
 
-        // testCutFlowHistos(testVec[2]);
-        fillTopTaggingHistos(suffix);
-
         values_["nlep_rl"] = (ngoodleps() == 1 && nvetoleps() >= 2 && lep2_p4().Pt() > 10)? 2 : ngoodleps();
         values_["mll"] = (lep1_p4() + lep2_p4()).M();
 
@@ -511,6 +530,9 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
         }
         fillHistosForCR2l(suffix);
         fillHistosForCRemu(suffix);
+
+        // testCutFlowHistos(testVec[2]);
+        fillTopTaggingHistos(suffix);
 
         // // Also do yield using genmet for fastsim samples
         // if (is_fastsim_ && jestype_ == 0) {
@@ -601,7 +623,7 @@ void StopLooper::fillYieldHistos(SR& sr, float met, string suf, bool is_cr2l) {
 
   evtweight_ = evtWgt.getWeight(evtWgtInfo::systID(jestype_), is_cr2l);
 
-  if (doNvtxReweight && (is2016data || is2018data)) {
+  if (doNvtxReweight && (datayear == 2016 || datayear == 2018)) {
     if (nvtxs() < 100) evtweight_ *= nvtxscale_[nvtxs()];  // only scale for data
   }
 
@@ -654,9 +676,10 @@ void StopLooper::fillYieldHistos(SR& sr, float met, string suf, bool is_cr2l) {
 void StopLooper::fillHistosForSR(string suf) {
 
   // Trigger requirements
-  if (is_data() && !is2016data) { // 2017 Triggers
+  // if (is_data() && datayear >= 2017) { // 2017 Triggers
+  if (year >= 2017) { // TODO: confirm if trigger should be applied to 94X MC
     if (not ( (abs(lep1_pdgid()) == 11 && HLT_SingleEl()) || (abs(lep1_pdgid()) == 13 && HLT_SingleMu()) || HLT_MET_MHT() )) return;
-  } else if (is2016data) { // 2016 MET Triggers
+  } else if (datayear == 2016) { // 2016 MET Triggers
     if (not ( (abs(lep1_pdgid()) == 11 && HLT_SingleEl()) || (abs(lep1_pdgid()) == 13 && HLT_SingleMu()) ||(HLT_MET() || HLT_MET110_MHT110() || HLT_MET120_MHT120()) )) return;
   }
 
@@ -704,11 +727,11 @@ void StopLooper::fillHistosForSR(string suf) {
     if (is_fastsim_ && suf == "" && (checkMassPt(1200, 50) || checkMassPt(800, 400)))
       fillKineHists("_"+to_string((int)mass_stop())+"_"+to_string((int)mass_lsp()) + suf);
 
-    // Re-using fillKineHists with different suffix for extra/checking categories
-    if ( abs(lep1_pdgid()) == 11 )
-      fillKineHists(suf+"_e");
-    else if ( abs(lep1_pdgid()) == 13 )
-      fillKineHists(suf+"_mu");
+    // // Re-using fillKineHists with different suffix for extra/checking categories
+    // if ( abs(lep1_pdgid()) == 11 )
+    //   fillKineHists(suf+"_e");
+    // else if ( abs(lep1_pdgid()) == 13 )
+    //   fillKineHists(suf+"_mu");
 
     // if ( HLT_SingleMu() ) fillKineHists(suf+"_hltmu");
     // if ( HLT_SingleEl() ) fillKineHists(suf+"_hltel");
@@ -750,9 +773,10 @@ void StopLooper::fillHistosForSR(string suf) {
 void StopLooper::fillHistosForCR2l(string suf) {
 
   // Trigger requirements
-  if (is_data() && !is2016data) { // 2017 Triggers
+  // if (is_data() && datayear >= 2017) { // 2017 Triggers
+  if (year >= 2017) { // to confirm if trigger should be applied to 94X MC
     if (not ( (abs(lep1_pdgid()) == 11 && HLT_SingleEl()) || (abs(lep1_pdgid()) == 13 && HLT_SingleMu()) || HLT_MET_MHT() )) return;
-  } else if (is2016data) { // 2016 CR2l Triggers
+  } else if (datayear == 2016) { // 2016 CR2l Triggers
     // if (not ( (abs(lep1_pdgid()) == 11 && HLT_SingleEl()) || (abs(lep1_pdgid()) == 13 && HLT_SingleMu()) || (HLT_MET() || HLT_MET110_MHT110() || HLT_MET120_MHT120()) )) return;
     if (not ( ( HLT_SingleEl() && (abs(lep1_pdgid())==11 || abs(lep2_pdgid())==11) ) || ( HLT_SingleMu() && (abs(lep1_pdgid())==13 || abs(lep2_pdgid())==13) ) ||
               ( HLT_MET()) || ( HLT_MET110_MHT110()) || ( HLT_MET120_MHT120()) )) return;
@@ -773,8 +797,8 @@ void StopLooper::fillHistosForCR2l(string suf) {
       plot1d("h_met"+s,      values_["met"]         , evtweight_, cr.histMap, ";#slash{E}_{T} [GeV]"           , 20, 250, 650);
       plot1d("h_metphi"+s,   values_["metphi"]      , evtweight_, cr.histMap, ";#phi(#slash{E}_{T})"           , 40,  -4, 4);
       plot1d("h_mt"+s,       values_["mt"]          , evtweight_, cr.histMap, ";M_{T} [GeV]"                   , 12,  150, 600);
-      plot1d("h_rlmet"+s,    values_["met_rl"]      , evtweight_, cr.histMap, ";#slash{E}_{T} (with removed lepton) [GeV]" , 24,  50, 650);
-      plot1d("h_rlmt"+s,     values_["mt_rl"]       , evtweight_, cr.histMap, ";M_{T} (with removed lepton) [GeV]" , 12,  150, 600);
+      plot1d("h_rlmet"+s,    values_["met_rl"]      , evtweight_, cr.histMap, ";#slash{E}_{T} (with removed lepton) [GeV]" , 20, 250, 650);
+      plot1d("h_rlmt"+s,     values_["mt_rl"]       , evtweight_, cr.histMap, ";M_{T} (with removed lepton) [GeV]" , 10,  150, 600);
       plot1d("h_tmod"+s,     values_["tmod_rl"]     , evtweight_, cr.histMap, ";Modified topness"              , 20, -10, 15);
       plot1d("h_njets"+s,    values_["njet"]        , evtweight_, cr.histMap, ";Number of jets"                ,  8,  2, 10);
       plot1d("h_nbjets"+s,   values_["nbjet"]       , evtweight_, cr.histMap, ";Number of b-tagged jets"       ,  4,  1, 5);
@@ -789,7 +813,7 @@ void StopLooper::fillHistosForCR2l(string suf) {
       if (true) {
         plot1d("h_met_h"+s,      values_["met"]      , evtweight_, cr.histMap, ";#slash{E}_{T} [GeV]"           , 24,  50, 650);
         plot1d("h_mt_h"+s,       values_["mt"]       , evtweight_, cr.histMap, ";M_{T} [GeV]"                   , 24,   0, 600);
-        plot1d("h_rlmet_h"+s,    values_["met_rl"]   , evtweight_, cr.histMap, ";#slash{E}_{T} (with removed lepton) [GeV]" , 50, 250, 650);
+        plot1d("h_rlmet_h"+s,    values_["met_rl"]   , evtweight_, cr.histMap, ";#slash{E}_{T} (with removed lepton) [GeV]" , 24, 50, 650);
         plot1d("h_rlmt_h"+s,     values_["mt_rl"]    , evtweight_, cr.histMap, ";M_{T} (with removed lepton) [GeV]" , 12, 0, 600);
         plot1d("h_nbtags"+s,     values_["nbjet"]    , evtweight_, cr.histMap, ";Number of b-tagged jets"       ,  5,  0, 5);
         plot1d("h_dphijmet_h"+s, values_["dphijmet"] , evtweight_, cr.histMap, ";#Delta#phi(jet,#slash{E}_{T})"  , 33, 0.0, 3.3);
@@ -816,16 +840,16 @@ void StopLooper::fillHistosForCR2l(string suf) {
     };
     fillKineHists(suf);
 
-    if ( HLT_SingleMu() ) fillKineHists(suf+"_hltmu");
-    if ( HLT_SingleEl() ) fillKineHists(suf+"_hltel");
-    if ( HLT_MET_MHT() )  fillKineHists(suf+"_hltmet");
+    // if ( HLT_SingleMu() ) fillKineHists(suf+"_hltmu");
+    // if ( HLT_SingleEl() ) fillKineHists(suf+"_hltel");
+    // if ( HLT_MET_MHT() )  fillKineHists(suf+"_hltmet");
 
-    if ( abs(lep1_pdgid()*lep2_pdgid()) == 121 )
-      fillKineHists(suf+"_ee");
-    else if ( abs(lep1_pdgid()*lep2_pdgid()) == 143 )
-      fillKineHists(suf+"_emu");
-    else if ( abs(lep1_pdgid()*lep2_pdgid()) == 169 )
-      fillKineHists(suf+"_mumu");
+    // if ( abs(lep1_pdgid()*lep2_pdgid()) == 121 )
+    //   fillKineHists(suf+"_ee");
+    // else if ( abs(lep1_pdgid()*lep2_pdgid()) == 143 )
+    //   fillKineHists(suf+"_emu");
+    // else if ( abs(lep1_pdgid()*lep2_pdgid()) == 169 )
+    //   fillKineHists(suf+"_mumu");
 
   }
 }
@@ -833,11 +857,14 @@ void StopLooper::fillHistosForCR2l(string suf) {
 void StopLooper::fillHistosForCR0b(string suf) {
 
   // Trigger requirements
-  if (is_data() && !is2016data) { // 2017 Triggers
+  // if (is_data() && datayear >= 2017) { // 2017 Triggers
+  if (year >= 2017) { // to confirm if trigger should be applied to 94X MC
     if (not ( (abs(lep1_pdgid()) == 11 && HLT_SingleEl()) || (abs(lep1_pdgid()) == 13 && HLT_SingleMu()) || HLT_MET_MHT() )) return;
-  } else if (is2016data) { // 2016 MET Triggers
+  } else if (datayear == 2016) { // 2016 MET Triggers
     if (not ( (abs(lep1_pdgid()) == 11 && HLT_SingleEl()) || (abs(lep1_pdgid()) == 13 && HLT_SingleMu()) ||(HLT_MET() || HLT_MET110_MHT110() || HLT_MET120_MHT120()) )) return;
   }
+
+  if (year == 2017 && values_["njet"] < 4) return;  // TODO: remove this line when we have samples of W2jets
 
   for (auto& cr : CR0bVec) {
     if (!cr.PassesSelection(values_)) continue;
@@ -883,12 +910,13 @@ void StopLooper::fillHistosForCR0b(string suf) {
       plot1d("h_dphij1j2"+s, fabs(ak4pfjets_p4().at(0).phi()-ak4pfjets_p4().at(1).phi()), evtweight_, cr.histMap, ";#Delta#phi(j1,j2)" , 33,  0, 3.3);
     };
     fillKineHists(suf);
-    if ( abs(lep1_pdgid()) == 11 ) {
-      fillKineHists(suf+"_e");
-    }
-    else if ( abs(lep1_pdgid()) == 13 ) {
-      fillKineHists(suf+"_mu");
-    }
+
+    // if ( abs(lep1_pdgid()) == 11 ) {
+    //   fillKineHists(suf+"_e");
+    // } else if ( abs(lep1_pdgid()) == 13 ) {
+    //   fillKineHists(suf+"_mu");
+    // }
+
     // if (HLT_SingleMu() || HLT_SingleEl())
     //   fillKineHists(suf+"_hltsl");
     // if (HLT_MET_MHT())
@@ -951,16 +979,16 @@ void StopLooper::fillHistosForCRemu(string suf) {
     if ( cr.PassesSelection(values_) ) {
 
       auto fillhists = [&] (string s) {
-        plot1d("h_mt"+s,       values_["mt"]      , evtweight_, cr.histMap, ";M_{T} [GeV]"          , 12,  0, 600);
-        plot1d("h_mt_h"+s,     values_["mt"]      , evtweight_, cr.histMap, ";M_{T} [GeV]"          , 12, 150, 650);
+        plot1d("h_mt"+s,       values_["mt"]      , evtweight_, cr.histMap, ";M_{T} [GeV]"          , 10, 150, 650);
+        plot1d("h_mt_h"+s,     values_["mt"]      , evtweight_, cr.histMap, ";M_{T} [GeV]"          , 12,  0, 600);
         plot1d("h_mt2w"+s,     values_["mt2w"]    , evtweight_, cr.histMap, ";MT2W [GeV]"           , 18,  50, 500);
-        plot1d("h_met"+s,      values_["met"]     , evtweight_, cr.histMap, ";#slash{E}_{T} [GeV]"   , 24,  50, 650);
-        plot1d("h_met_h"+s,    values_["met"]     , evtweight_, cr.histMap, ";#slash{E}_{T} [GeV]"   , 20, 250, 650);
-        plot1d("h_metphi"+s,   values_["metphi"]  , evtweight_, cr.histMap, ";#phi(#slash{E}_{T})"   , 34, -3.4, 3.4);
+        plot1d("h_met"+s,      values_["met"]     , evtweight_, cr.histMap, ";#slash{E}_{T} [GeV]"  , 20, 250, 650);
+        plot1d("h_met_h"+s,    values_["met"]     , evtweight_, cr.histMap, ";#slash{E}_{T} [GeV]"  , 24,  50, 650);
+        plot1d("h_metphi"+s,   values_["metphi"]  , evtweight_, cr.histMap, ";#phi(#slash{E}_{T})"  , 32, -3.2, 3.2);
         plot1d("h_lep1pt"+s,   values_["lep1pt"]  , evtweight_, cr.histMap, ";p_{T}(lepton) [GeV]"  , 24,  0, 600);
         plot1d("h_lep2pt"+s,   values_["lep2pt"]  , evtweight_, cr.histMap, ";p_{T}(lep2) [GeV]"    , 30,  0, 300);
         plot1d("h_lep1eta"+s,  values_["lep1eta"] , evtweight_, cr.histMap, ";#eta(lepton)"         , 30, -3, 3);
-        plot1d("h_lep2eta"+s,  values_["lep2eta"] , evtweight_, cr.histMap, ";#eta (lep2)"          , 20, -3, 3);
+        plot1d("h_lep2eta"+s,  values_["lep2eta"] , evtweight_, cr.histMap, ";#eta(lep2)"           , 20, -3, 3);
         plot1d("h_nleps"+s,    values_["nlep"]    , evtweight_, cr.histMap, ";Number of leptons"    ,  5,  0, 5);
         plot1d("h_njets"+s,    values_["njet"]    , evtweight_, cr.histMap, ";Number of jets"       ,  8,  2, 10);
         plot1d("h_nbjets"+s,   values_["nbjet"]   , evtweight_, cr.histMap, ";nbtags"               , 6,   0, 6);
@@ -986,8 +1014,8 @@ void StopLooper::fillHistosForCRemu(string suf) {
 
 void StopLooper::fillEfficiencyHistos(SR& sr, string type, string suffix) {
 
-  // Temporary for the early 2018 PromptReco data trying to reduce the effect from HCAL issue
-  if (mindphi_met_j1_j2() < 0.5) return;  // TODO: remove this line
+  // // Temporary for the early 2018 PromptReco data trying to reduce the effect from HCAL issue
+  // if (mindphi_met_j1_j2() < 0.5) return;
 
   // Temporary globalTightHalo filter study
   if (is_data() && (type == "" || type == "filters")) {
@@ -1106,6 +1134,7 @@ void StopLooper::fillTopTaggingHistos(string suffix) {
   values_["Wak8pt"] = (iak8_W < 0)? 0 : ak8pfjets_p4().at(iak8_W).pt();
   values_["passdeepttag"] = pass_deeptop_tag;
   // values_["passresttag"] = lead_restopdisc > 0.9;
+  // values_["ntftops"] = 0;
   values_["ntftops"] = tftops_p4().size();
 
   auto fillTopTagHists = [&](SR& sr, string s) {
@@ -1116,6 +1145,7 @@ void StopLooper::fillTopTaggingHistos(string suffix) {
     plot1d("h_deepWtag", values_["deepWtag"], evtweight_, sr.histMap, ";deepAK8 W tag", 120, -0.1f, 1.1f);
     plot1d("h_binWtag", values_["binWtag"], evtweight_, sr.histMap, ";deepAK8 binarized W disc", 120, -0.1f, 1.1f);
     plot1d("h_ntftops", values_["ntftops"], evtweight_, sr.histMap, ";ntops from TF tagger", 4, 0, 4);
+    plot1d("h_tfttag", lead_tftop_disc, evtweight_, sr.histMap, ";TF resolved top tag", 120, -0.1f, 1.1f);
 
     float chi2_disc = -log(hadronic_top_chi2()) / 8;
     if (fabs(chi2_disc) >= 1.0) chi2_disc = std::copysign(0.99999, chi2_disc);
@@ -1160,6 +1190,7 @@ void StopLooper::fillTopTaggingHistos(string suffix) {
     if (is_fastsim_ && (checkMassPt(1200, 50) || checkMassPt(800, 400)))
       fillTopTagHists(sr, "_"+to_string((int)mass_stop())+"_"+to_string((int)mass_lsp()) + suffix);
   }
+  if (year == 2017 && values_["njet"] < 4) return;  // TODO: remove this line when we have samples of W2jets
   for (auto& sr : CR0bVec) {
     if (!sr.PassesSelection(values_)) continue;
     // Plot kinematics histograms
@@ -1185,11 +1216,12 @@ void StopLooper::testTopTaggingEffficiency(SR& sr) {
   int ntopcands = topcands_disc().size();
   float lead_disc = (ntopcands > 0)? topcands_disc().at(0) : -1.1; // lead_bdt_disc
 
-  int ntftops = tftops_p4().size();
+  int ntftops = 0;
   float lead_tftop_disc = -0.09;
-  for (auto disc : tftops_disc()) {
-    if (disc > lead_tftop_disc) lead_tftop_disc = disc;
-  }
+  // ntftops = tftops_p4().size();
+  // for (auto disc : tftops_disc()) {
+  //   if (disc > lead_tftop_disc) lead_tftop_disc = disc;
+  // }
 
   // Hadronic chi2 for comparison
   // Define a disc variable that look similar to resolve top discriminator

@@ -135,6 +135,7 @@ class evtWgtInfo {
   int mChargino;
 
   int jes_type;
+  int year;
 
   int    nEvents;
   double xsec;
@@ -261,7 +262,7 @@ class evtWgtInfo {
   double sf_extra_file;  // special weight that only initialized at constructor
 
   evtWgtInfo();
-  void Setup( std::string sample, bool useBTagUtils=false, bool useLepSFUtils=false);
+  void Setup(std::string sample, int year = 0, bool useBTagUtils=false, bool useLepSFUtils=false);
   void Cleanup();
   void resetEvent();
   void getCounterHistogramFromBaby( TFile *sourceFile );
@@ -296,7 +297,9 @@ class evtWgtInfo {
   void getISRnJetsWeight( double &weight_ISR, double &weight_ISR_up, double &weight_ISR_dn );
   void getPileupWeight( double &weight_pu, double &weight_pu_up, double &weight_pu_dn );
 
-  double getSampleWeight( TString sample );
+  double getSampleWeightSummer16v2( TString sample );
+  double getSampleWeightSummer16v3( TString sample );
+  double getSampleWeightFall17v2( TString sample );
   void setDefaultSystematics( int syst_set=0 );
   bool doingSystematic( systID systid );
   std::string findSampleType( std::string samplestr);  // <-- todo: finish this function
