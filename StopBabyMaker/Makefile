@@ -49,8 +49,8 @@ endif
 # Make rules
 #
 
-runBabyMaker: runBabyMaker.o looper.o EventTree.o LeptonTree.o JetTree.o ResolvedTopMVA.o IsoTracksTree.o TauTree.o GenParticleTree.o PhotonTree.o StopSelections.o LinkDef_out.so $(CORELIB) $(STOPVARLIB) libTopTagger.so
-	$(LD) $(LDFLAGS) -o runBabyMaker runBabyMaker.o looper.o EventTree.o ResolvedTopMVA.o JetTree.o LeptonTree.o PhotonTree.o IsoTracksTree.o TauTree.o GenParticleTree.o StopSelections.o libTopTagger.so $(LIBS) $(GLIBS) -lGenVector -lEG -lTMVA $(CORELIB) $(STOPVARLIB) LinkDef_out.so -Wl,-rpath,./
+runBabyMaker: runBabyMaker.o looper.o EventTree.o LeptonTree.o JetTree.o ResolvedTopMVA.o IsoTracksTree.o TauTree.o GenParticleTree.o PhotonTree.o StopSelections.o LinkDef_out.so $(CORELIB) $(STOPVARLIB) libTopTagger.so eventWeight_lepSF.o
+	$(LD) $(LDFLAGS) -o runBabyMaker runBabyMaker.o looper.o EventTree.o ResolvedTopMVA.o JetTree.o LeptonTree.o eventWeight_lepSF.o PhotonTree.o IsoTracksTree.o TauTree.o GenParticleTree.o StopSelections.o libTopTagger.so $(LIBS) $(GLIBS) -lGenVector -lEG -lTMVA $(CORELIB) $(STOPVARLIB) LinkDef_out.so -Wl,-rpath,./
 
 $(CORESOURCE):
 	cd $(COREPATH) && $(MAKE) -j && cd ..
@@ -73,6 +73,10 @@ EventTree.o: EventTree.cc EventTree.h StopSelections.h
 
 LeptonTree.o: LeptonTree.cc LeptonTree.h StopSelections.h
 	$(CXX) $(CXXFLAGS) -c LeptonTree.cc
+
+eventWeight_lepSF.o: ../StopCORE/eventWeight_lepSF.cc ../StopCORE/eventWeight_lepSF.h
+	cd ../StopCORE/ && $(MAKE) -j4 && cd -; \
+	cp ../StopCORE/eventWeight_lepSF.o  .
 
 PhotonTree.o: PhotonTree.cc PhotonTree.h StopSelections.h
 	$(CXX) $(CXXFLAGS) -c PhotonTree.cc

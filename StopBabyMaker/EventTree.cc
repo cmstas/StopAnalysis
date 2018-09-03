@@ -1,6 +1,7 @@
 #include "EventTree.h"
 #include "TString.h"
 #include "CMS3.h"
+#include "Config.h"
 #include "VertexSelections.h"
 #include "StopSelections.h"
 #include "MetSelections.h"
@@ -84,10 +85,13 @@ void EventTree::FillCommon (const std::string &root_file_name)
       // filt_met = filt_met*filt_globalTightHalo2016()*filt_ecalTP()*filt_eeBadSc()*filt_hbheNoise()*filt_hbheNoiseIso();
       filt_met = filt_met && filt_globalTightHalo2016() && filt_ecalTP() && filt_eeBadSc() && filt_hbheNoise() && filt_hbheNoiseIso();
 
-      // filt_badMuonFilter = badMuonFilterV2(); //still some problems with MC
-      // filt_badChargedCandidateFilter = badChargedCandidateFilterV2();
-      filt_badMuonFilter = filt_BadPFMuonFilter();
-      filt_badChargedCandidateFilter = filt_BadChargedCandidateFilter();
+      if (gconf.cmssw_ver == 80) {
+        filt_badMuonFilter = badMuonFilterV2(); //still some problems with MC
+        filt_badChargedCandidateFilter = badChargedCandidateFilterV2();
+      } else if (gconf.cmssw_ver == 94) {
+        filt_badMuonFilter = filt_BadPFMuonFilter();
+        filt_badChargedCandidateFilter = filt_BadChargedCandidateFilter();
+      }
       filt_cscbeamhalo = filt_cscBeamHalo();
       filt_cscbeamhalo2015 = filt_cscBeamHalo2015();
       filt_globaltighthalo2016 = filt_globalTightHalo2016();
@@ -104,8 +108,9 @@ void EventTree::FillCommon (const std::string &root_file_name)
       filt_trkPOG_tms = filt_trkPOG_toomanystripclus53X();
       filt_hbhenoise = filt_hbheNoise(); // hbheNoiseFilter_25ns();
       filt_hbheisonoise = filt_hbheNoiseIso();//hbheIsoNoiseFilter();
-      filt_ecalbadcalib = filt_ecalBadCalibFilter();  // new in 94X
-   }
+      if (gconf.cmssw_ver == 94)
+        filt_ecalbadcalib = filt_ecalBadCalibFilter();  // new in 94X
+    }
     
     if (!is_data)
     {

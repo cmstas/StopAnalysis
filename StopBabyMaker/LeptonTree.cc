@@ -3,6 +3,7 @@
 #include <cmath>
 #include "Math/GenVector/PtEtaPhiE4D.h"
 #include "CMS3.h"
+#include "Config.h"
 #include "ElectronSelections.h"
 #include "MuonSelections.h"
 #include "MCSelections.h"
@@ -26,9 +27,9 @@ void LeptonTree::FillCommon (int id, int idx)
 {
     if (idx < 0) return;
     int vtxidx = firstGoodVertex();
-   // is_fromw = not evt_isRealData() ? leptonIsFromW(idx, id, true) : -999999;
+    // is_fromw = not evt_isRealData() ? leptonIsFromW(idx, id, true) : -999999;
 
-//general stuff
+    // general stuff
     p4		= abs(id)==11 ? els_p4().at(idx) : mus_p4().at(idx);
     pdgid	= id;
     pt 		= abs(id)==11 ? els_p4().at(idx).pt() : abs(id)==13 ? mus_p4().at(idx).pt() : -9999.;
@@ -37,7 +38,7 @@ void LeptonTree::FillCommon (int id, int idx)
     mass        = abs(id)==11 ? els_p4().at(idx).mass() : abs(id)==13 ? mus_p4().at(idx).mass() : -9999.;
     charge      = abs(id)==11 ? els_charge().at(idx) : abs(id)==13 ? mus_charge().at(idx) : -9999;
 
-//mc stuff
+    // mc stuff
     if (!evt_isRealData()) {
           mcp4      = abs(id)==11 ? els_mc_p4().at(idx) : mus_mc_p4().at(idx);
           mc_motherid = abs(id)==11 ? els_mc_motherid().at(idx) : abs(id)==13 ? mus_mc_motherid().at(idx) : -9999;
@@ -49,9 +50,9 @@ void LeptonTree::FillCommon (int id, int idx)
           else if(isFromLight(id, idx))     production_type = fromLight;
           else if(isFromLightFake(id, idx)) production_type = fromLightFake;
           else production_type = none;
-   }
+    }
     
-//electrons
+    // electrons
     if (abs(id) == 11)
     {
 	if (vtxidx >= 0) {
@@ -61,14 +62,30 @@ void LeptonTree::FillCommon (int id, int idx)
             dzerr = els_z0Err().at(idx);
     	}
 
-        passLooseID = electronID(idx, STOP_loose_v3);
-        passMediumID = electronID(idx, STOP_medium_v3);
-        passTightID = electronID(idx, STOP_tight_v3);
-        passVeto     = electronID(idx, STOP_veto_v3);
+        passLooseID  = electronID(idx, STOP_loose_v4);
+        passMediumID = electronID(idx, STOP_medium_v4);
+        passTightID  = electronID(idx, STOP_tight_v4);
+        passVeto     = electronID(idx, STOP_veto_v4);
 
-        is_lepid_loose_noiso  = isLooseElectronPOGspring15noIso_v1(idx);
-        is_lepid_medium_noiso = isMediumElectronPOGspring15noIso_v1(idx);
-        is_lepid_tight_noiso  = isTightElectronPOGspring15noIso_v1(idx);
+        if (gconf.year == 2016 && gconf.cmssw_ver == 80) {
+            is_lepid_loose_noiso  = isLooseElectronPOGspring15noIso_v1(idx);
+            is_lepid_medium_noiso = isMediumElectronPOGspring15noIso_v1(idx);
+            is_lepid_tight_noiso  = isTightElectronPOGspring15noIso_v1(idx);
+        } else if (gconf.year == 2016 && gconf.cmssw_ver == 94) {
+            is_lepid_loose_noiso  = isLooseElectronPOGspring15noIso_v1(idx); // to be updated
+            is_lepid_medium_noiso = isMediumElectronPOGspring15noIso_v1(idx);
+            is_lepid_tight_noiso  = isTightElectronPOGspring15noIso_v1(idx);
+        } else if (gconf.year == 2017) {
+            is_lepid_loose_noiso  = isLooseElectronPOGfall17noIso_v2(idx);
+            is_lepid_medium_noiso = isMediumElectronPOGfall17noIso_v2(idx);
+            is_lepid_tight_noiso  = isTightElectronPOGfall17noIso_v2(idx);
+        } else if (gconf.year == 2018) {
+            is_lepid_loose_noiso  = isLooseElectronPOGfall17noIso_v2(idx); // to be updated
+            is_lepid_medium_noiso = isMediumElectronPOGfall17noIso_v2(idx);
+            is_lepid_tight_noiso  = isTightElectronPOGfall17noIso_v2(idx);
+        } else {
+            cout << "LeptonTree.cc: gconf.year " << gconf.year << " is not in the listed!\n";
+        }
 
         //id variables
         eoverpin        = els_eOverPIn().at(idx); 
@@ -92,35 +109,36 @@ void LeptonTree::FillCommon (int id, int idx)
 	relIso03DB = eleRelIso03(idx, STOP);
         relIso03EA = eleRelIso03EA(idx);
 
-       //elMiniRelIso(unsigned int idx, bool useVetoCones, float ptthresh, bool useDBcor)
-       //miniRelIsoDB = elMiniRelIso(idx, true, 0., true, false);
-       //miniRelIsoEA = elMiniRelIso(idx, true, 0., false, true);
-       //MiniIso      = elMiniRelIso(idx, true, 0., true, false);//copy of miniRelIsoDB - change to precomputed for 74X
-       miniRelIsoDB = elMiniRelIsoCMS3_DB(idx);
-       miniRelIsoEA = elMiniRelIsoCMS3_EA(idx,1);
-       MiniIso      = elMiniRelIsoCMS3_EA(idx,1);
-       relIso       = eleRelIso03EA(idx);
-
+        miniRelIsoDB = elMiniRelIsoCMS3_DB(idx);
+        miniRelIsoEA = elMiniRelIsoCMS3_EA(idx,gconf.ea_version);
+        MiniIso      = miniRelIsoEA;
+        relIso       = eleRelIso03EA(idx);
     } // end electron block
 
-//and now muons....
-    if (abs(id) == 13)
+    // muons
+    else if (abs(id) == 13)
     {
         //int trkidx = mus_trkidx().at(idx);
        // if (trkidx >= 0 && vtxidx >= 0) {
-	    d0 = mus_dxyPV().at(idx);
-            dz = mus_dzPV().at(idx);
-            d0err = mus_d0Err().at(idx);
-            dzerr = mus_z0Err().at(idx);
+        d0 = mus_dxyPV().at(idx);
+        dz = mus_dzPV().at(idx);
+        d0err = mus_d0Err().at(idx);
+        dzerr = mus_z0Err().at(idx);
        // }
-        passLooseID = muonID(idx, STOP_loose_v3);
-        passMediumID = muonID(idx, STOP_medium_v3);
-        passTightID =  muonID(idx, STOP_tight_v2);
-	passVeto = muonID(idx, STOP_loose_v3);
+        passLooseID = muonID(idx, STOP_loose_v4);
+        passMediumID = muonID(idx, STOP_medium_v4);
+        passTightID =  muonID(idx, STOP_tight_v4);
+        passVeto = muonID(idx, STOP_loose_v4);
 
-        is_lepid_loose_noiso  = isLooseMuonPOG(idx);
-        is_lepid_medium_noiso = isMediumMuonPOG(idx);
-        is_lepid_tight_noiso  = isTightMuonPOG(idx);
+        if (gconf.cmssw_ver >= 94) {
+            is_lepid_loose_noiso  = passesMuonPOG(muID::CutBasedIdLoose, idx);
+            is_lepid_medium_noiso = passesMuonPOG(muID::CutBasedIdMedium, idx);
+            is_lepid_tight_noiso  = passesMuonPOG(muID::CutBasedIdTight, idx);
+        } else {
+            is_lepid_loose_noiso  = isLooseMuonPOG(idx);
+            is_lepid_medium_noiso = isMediumMuonPOG(idx);
+            is_lepid_tight_noiso  = isTightMuonPOG(idx);
+        }
 
         //iso variables
         chiso     = mus_isoR04_pf_ChargedHadronPt().at(idx);
@@ -133,61 +151,11 @@ void LeptonTree::FillCommon (int id, int idx)
     	relIso03EA = muRelIso03EA(idx);
     	relIso04DB = muRelIso04DB(idx);
 
-	//muMiniRelIso(unsigned int idx, bool useVetoCones=true, float ptthresh = 0.5, bool useDBcor=false);
-	//miniRelIsoDB = muMiniRelIso(idx, true, 0.5, true, false);
-	//miniRelIsoEA = muMiniRelIso(idx, true, 0.5, false, true);
-	//MiniIso      = muMiniRelIso(idx, true, 0.5, true, false);//copy of miniRelIsoDB - change to precomputed for 74X
 	miniRelIsoDB = muMiniRelIsoCMS3_DB(idx);
-	miniRelIsoEA = muMiniRelIsoCMS3_EA(idx,1);
-
-	MiniIso      = muMiniRelIsoCMS3_EA(idx,1);
+	miniRelIsoEA = muMiniRelIsoCMS3_EA(idx,gconf.ea_version);
+	MiniIso      = miniRelIsoEA;
         relIso       = muRelIso03EA(idx);
     } // end muon block
-
-/*/obsolete branches
-    charge      = abs(id)==11 ? els_charge().at(idx) : abs(id)==13 ? mus_charge().at(idx) : -9999;
-    type        = abs(id)==11 ? els_type().at(idx) : abs(id)==13 ? mus_type().at(idx) : -9999;  
-    if (!evt_isRealData()) {
-          mcid      = abs(id)==11 ? els_mc_id().at(idx) : abs(id)==13 ? mus_mc_id().at(idx) : -9999 ;
-          mcidx       = abs(id)==11 ? els_mcidx().at(idx) : abs(id)==13 ? mus_mcidx().at(idx) : -9999;
-          mc3dr       = abs(id)==11 ? els_mc3dr().at(idx) : abs(id)==13 ? mus_mc3dr().at(idx) : -9999 ;
-          mc3id       = abs(id)==11 ? els_mc3_id().at(idx) : abs(id)==13 ? mus_mc3_id().at(idx) : -9999 ;
-          mc3idx      = abs(id)==11 ? els_mc3idx().at(idx) : abs(id)==13 ? mus_mc3idx().at(idx) : -9999 ;                             
-          mc3motherid = abs(id)==11 ? els_mc3_motherid().at(idx) : abs(id)==13 ? mus_mc3_motherid().at(idx) : -9999 ;
-          mc3motheridx= abs(id)==11 ? els_mc3_motheridx().at(idx) : abs(id)==13 ? mus_mc3_motheridx().at(idx) : -9999 ;
-
-   }
-        ip3d    = els_ip3d().at(idx);
-        ip3derr = els_ip3derr().at(idx);
-
-//electrons
-    if (abs(id) == 11)
-    {
-        is_el           = true; 
-       //ID
-        is_eleid_loose  = isLooseElectronPOGspring15noIso_v1(idx);
-        is_eleid_medium = isMediumElectronPOGspring15noIso_v1(idx);
-        is_eleid_tight  = isTightElectronPOGspring15noIso_v1(idx);
-        
-        //Phys14 IDs
-        is_phys14_loose_noIso  = isLooseElectronPOGphys14noIso_v2(idx);
-        is_phys14_medium_noIso = isMediumElectronPOGphys14noIso_v2(idx);
-        is_phys14_tight_noIso  = isTightElectronPOGphys14noIso_v2(idx);
- }
-    if (abs(id) == 13)
-    {
-        is_mu = true;
- ip3d    = mus_ip3d().at(idx);
-        ip3derr = mus_ip3derr().at(idx);
-
-        is_pfmu    = ((mus_type().at(idx) & (1<<5)) != 0);
-        if (vtxidx >= 0) {
-            is_muoid_loose  = isLooseMuonPOG(idx); //muonID(idx, STOP_loose_v1); 
-            is_muoid_medium = isMediumMuonPOG(idx); //muonID(idx, STOP_medium_v1);
-            is_muoid_tight  = isTightMuonPOG(idx); //muonID(idx, STOP_tight_v1);
-        }
-
-*/
 
 }
 
@@ -247,37 +215,6 @@ void LeptonTree::Reset()
     is_lepid_loose_noiso  = false;
     is_lepid_medium_noiso = false;
     is_lepid_tight_noiso  = false;
-
-/* obsolete 
-    is_mu           = false;
-    is_el           = false;
-    //is_fromw        = -9999;
-    charge          = -9999;
-    type            = -9999;  
-                                                                                                                                     
-    mcid            = -9999;
-    mcstatus        = -9999;
-       mc3dr        = -9999;
-    mc3id        = -9999;
-    mc3idx       = -9999;
-    mc3motherid  = -9999;
-    mc3motheridx = -9999;
-
-    is_eleid_loose  = false;
-    is_eleid_medium = false;
-    is_eleid_tight  = false;
-
-    is_phys14_loose_noIso  = false;
-    is_phys14_medium_noIso = false;
-    is_phys14_tight_noIso  = false;
-
-    is_muoid_loose  = false;
-    is_muoid_medium = false;
-    is_muoid_tight  = false;
-    ip3d            = -9999.;
-    ip3derr         = -9999.;
-    is_pfmu         = false;
-*/
 
     dphiMET= -9999.;
     dphiMET_jup= -9999.;
@@ -361,30 +298,3 @@ void LeptonTree::SetBranches_SynchTools (TTree* tree)
    tree->Branch(Form("%sphi"      , prefix_.c_str()) , &phi);
    tree->Branch(Form("%smass"      , prefix_.c_str()) , &mass);
 }
-
-/*obsolete
-    //status 3 means nothing now
-    tree->Branch(Form("%smc3dr"            , prefix_.c_str()) , &mc3dr);    
-    tree->Branch(Form("%smc3id"            , prefix_.c_str()) , &mc3id);     
-    tree->Branch(Form("%smc3idx"            , prefix_.c_str()) , &mc3idx);     
-    tree->Branch(Form("%smc3motherid"            , prefix_.c_str()) , &mc3motherid); 
-    tree->Branch(Form("%smc3motheridx"            , prefix_.c_str()) , &mc3motheridx); 
- 
-   //these have been changed to lepid_...although having them with no iso could be useful
-    tree->Branch(Form("%sis_eleid_loose" , prefix_.c_str()) , &is_eleid_loose);
-    tree->Branch(Form("%sis_eleid_medium" , prefix_.c_str()) , &is_eleid_medium ); 
-    tree->Branch(Form("%sis_eleid_tight"  , prefix_.c_str()) , &is_eleid_tight  ); 
-    tree->Branch(Form("%sis_phys14_loose_noIso", prefix_.c_str()) , &is_phys14_loose_noIso);
-    tree->Branch(Form("%sis_phys14_medium_noIso", prefix_.c_str()) , &is_phys14_medium_noIso);
-    tree->Branch(Form("%sis_phys14_tight_noIso", prefix_.c_str()) , &is_phys14_tight_noIso);
-
-    tree->Branch(Form("%sis_muoid_loose"  , prefix_.c_str()) , &is_muoid_loose  ); 
-    tree->Branch(Form("%sis_muoid_medium"  , prefix_.c_str()) , &is_muoid_medium  );
-    tree->Branch(Form("%sis_muoid_tight"  , prefix_.c_str()) , &is_muoid_tight  ); 
-    tree->Branch(Form("%sip3d"  		 , prefix_.c_str()) , &ip3d);
-    tree->Branch(Form("%sip3derr"	 , prefix_.c_str()) , &ip3derr);
-    tree->Branch(Form("%sis_pfmu"	 , prefix_.c_str()) , &is_pfmu);
-
-    tree->Branch(Form("%stype"            , prefix_.c_str()) , &type            ); 
-}
-*/

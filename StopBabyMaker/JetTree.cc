@@ -1,5 +1,6 @@
 #include "JetTree.h"
 #include "CMS3.h"
+#include "Config.h"
 #include "JetSelections.h"
 #include "btagsf/BTagCalibrationStandalone.h"
 #include "Math/VectorUtil.h"
@@ -10,19 +11,6 @@
 
 using namespace tas;
  
-// // DeepCSV working points 80X
-// static const float BTAG_TGT = 0.9432;
-// static const float BTAG_MED = 0.6324;
-// static const float BTAG_LSE = 0.2219;
-
-// DeepCSV working points 94X
-// -- BtagSF file: DeepCSV_94XSF_V3_B_F.csv
-// -- Data: 17Nov2017 ReReco for B-F
-// -- Monte Carlo: RunIIFall17
-static const float BTAG_TGT = 0.8001;
-static const float BTAG_MED = 0.4941;
-static const float BTAG_LSE = 0.1522;
-
 JetTree::JetTree() : doResolveTopMVA(false) {}
 
 JetTree::JetTree(const std::string &prefix) : prefix_(prefix), doResolveTopMVA(false) {}
@@ -42,7 +30,7 @@ void JetTree::InitTopMVA(ResolvedTopMVA* resTopMVAptr) {
 void JetTree::InitBtagSFTool(bool isFastsim_) {
     isFastsim = isFastsim_;
     // DeepCSV version of SFs
-    calib = new BTagCalibration("DeepCSV", "btagsf/run2_25ns/DeepCSV_94XSF_V3_B_F.csv");
+    calib = new BTagCalibration("DeepCSV", "btagsf/run2_25ns/"+gconf.fn_btagSF_DeepCSV);
     reader_medium = new BTagCalibrationReader(BTagEntry::OP_MEDIUM, "central", {"up", "down"});
     reader_medium->load(*calib, BTagEntry::FLAV_B, "comb");
     reader_medium->load(*calib, BTagEntry::FLAV_C, "comb");
@@ -57,7 +45,7 @@ void JetTree::InitBtagSFTool(bool isFastsim_) {
     reader_loose->load(*calib, BTagEntry::FLAV_UDSG, "incl");
 
     // DeepCSV fastsim version of SFs
-    calib_fastsim = new BTagCalibration("deepcsv", "btagsf/run2_fastsim/fastsim_deepcsv_ttbar_26_1_2017.csv"); // TODO: update to 94X version
+    calib_fastsim = new BTagCalibration("deepcsv", "btagsf/run2_fastsim/"+gconf.fn_btagSF_FS_DeepCSV);
     reader_medium_FS = new BTagCalibrationReader(BTagEntry::OP_MEDIUM, "central", {"up", "down"});
     reader_medium_FS->load(*calib_fastsim, BTagEntry::FLAV_B, "fastsim");
     reader_medium_FS->load(*calib_fastsim, BTagEntry::FLAV_C, "fastsim");
@@ -85,7 +73,10 @@ void JetTree::InitBtagSFTool(bool isFastsim_) {
       feff =  new TFile("btagsf/run2_fastsim/btageff__SMS-T1bbbb-T1qqqq_25ns_Moriond17.root");
     } else {
       // TODO: create efficiency in the phase space of the stop analysis
-      feff =  new TFile("btagsf/run2_25ns/btageff__ttbar_amc_94X_deepCSV.root");
+      if (gconf.cmssw_ver == 94)
+        feff =  new TFile("btagsf/run2_25ns/btageff__ttbar_amc_94X_deepCSV.root");
+      else if (gconf.cmssw_ver == 80)
+        feff =  new TFile("btagsf/run2_25ns/btageff__ttbar_powheg_pythia8_25ns_Moriond17_deepCSV.root");
     }
     if (!feff) throw std::invalid_argument("JetTree.cc: btagsf file does not exist!");
     h_btag_eff_b_temp = (TH2D*) feff->Get("h2_BTaggingEff_csv_med_Eff_b");
@@ -345,10 +336,10 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx, Factorize
         dphi_ak4pfjet_met.push_back(getdphi(p4sCorrJets.at(jindex).phi(), evt_pfmetPhi()));//this can be false - due to correction to pfmet, but it gets corrected later
 
         // various b-tagging values
-        ak4pfjets_deepCSVb.push_back(getbtagvalue("pfDeepCSVJetTags:probb", jindex));
-        ak4pfjets_deepCSVbb.push_back(getbtagvalue("pfDeepCSVJetTags:probbb", jindex));
-        ak4pfjets_deepCSVc.push_back(getbtagvalue("pfDeepCSVJetTags:probc", jindex));
-        ak4pfjets_deepCSVl.push_back(getbtagvalue("pfDeepCSVJetTags:probudsg", jindex));
+        ak4pfjets_deepCSVb.push_back(getbtagvalue(deepCSV_prefix+"JetTags:probb", jindex));
+        ak4pfjets_deepCSVbb.push_back(getbtagvalue(deepCSV_prefix+"JetTags:probbb", jindex));
+        ak4pfjets_deepCSVc.push_back(getbtagvalue(deepCSV_prefix+"JetTags:probc", jindex));
+        ak4pfjets_deepCSVl.push_back(getbtagvalue(deepCSV_prefix+"JetTags:probudsg", jindex));
 
         float value_deepCSV = ak4pfjets_deepCSVb.back() + ak4pfjets_deepCSVbb.back(); // save for later
         ak4pfjets_deepCSV.push_back(value_deepCSV);
@@ -447,7 +438,7 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx, Factorize
 	}
 
 	//medium btag
-	if (value_deepCSV > BTAG_MED) {
+	if (value_deepCSV > gconf.WP_DEEPCSV_MEDIUM) {
              ak4pfjets_passMEDbtag.push_back(true);
              nskimbtagmed++;
              if (is_jetpt30) nbtags_med++;
@@ -506,7 +497,7 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx, Factorize
 	  leadbtag_idx = jindex;
 	}
 	//loose btag
-	if (value_deepCSV > BTAG_LSE) {
+	if (value_deepCSV > gconf.WP_DEEPCSV_LOOSE) {
               nskimbtagloose++;
               if (is_jetpt30) nbtags_loose++;
               if (!evt_isRealData()&&applyBtagSFs) {
@@ -550,7 +541,7 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx, Factorize
            }
         }//finish loose
 	//tight btag
-	if (value_deepCSV > BTAG_TGT) {
+	if (value_deepCSV > gconf.WP_DEEPCSV_TIGHT) {
              nskimbtagtight++;
              if (is_jetpt30) nbtags_tight++;
               if (!evt_isRealData()&&applyBtagSFs) {
