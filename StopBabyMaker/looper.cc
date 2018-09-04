@@ -316,6 +316,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
 
   // Setup lepton SF histos
   eventWeight_lepSF lepsf;
+  lepsf.~eventWeight_lepSF();
   const double matched_dr = 0.1;  // match DR between genlep and recolep
   if( (applyLeptonSFs || applyVetoLeptonSFs) && !isDataFromFileName){
     TString lepsf_filepath;
@@ -989,7 +990,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
 
         StopEvt.pfmet = newmet.first;
         StopEvt.pfmet_phi = newmet.second;
-        if(evt_isRealData() && thisFile.Contains("03Feb2017") && !thisFile.Contains("CMS4")){
+        if(evt_isRealData() && thisFile.Contains("03Feb2017")){
           StopEvt.pfmet = evt_muegclean_pfmet();
           StopEvt.pfmet_phi = evt_muegclean_pfmetPhi();
           StopEvt.pfmet_original = newmet.first;
@@ -1007,14 +1008,14 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
       else{
         StopEvt.pfmet = evt_pfmet();
         StopEvt.pfmet_phi = evt_pfmetPhi();
-        if(evt_isRealData() && thisFile.Contains("03Feb2017") && !thisFile.Contains("CMS4")){
+        if(evt_isRealData() && thisFile.Contains("03Feb2017")){
           StopEvt.pfmet = evt_muegclean_pfmet();
           StopEvt.pfmet_phi = evt_muegclean_pfmetPhi();
           StopEvt.pfmet_original = evt_pfmet();
           StopEvt.pfmet_original_phi = evt_pfmetPhi();
         }
       }
-      if(evt_isRealData() && thisFile.Contains("03Feb2017") && !thisFile.Contains("CMS4")){
+      if(evt_isRealData() && thisFile.Contains("03Feb2017")){
         StopEvt.pfmet_egclean = evt_egclean_pfmet();
         StopEvt.pfmet_egclean_phi = evt_egclean_pfmetPhi();
         StopEvt.pfmet_muegclean = evt_muegclean_pfmet();
@@ -1157,7 +1158,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
       double lepSF_FS_Up = 1.0;
       double lepSF_FS_Dn = 1.0;
 
-      if (applyLeptonSFs) {
+      if (applyLeptonSFs && !StopEvt.is_data && nVetoLeptons > 0) {
         std::vector<float> recoLep_pt, recoLep_eta, genLostLep_pt, genLostLep_eta;
         std::vector<int> recoLep_pdgid, genLostLep_pdgid;
         std::vector<bool> recoLep_isSel;

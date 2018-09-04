@@ -626,56 +626,59 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx, Factorize
       }
     }
 
-    ttUtility::ConstAK4Inputs<float> AK4Inputs(ak4jets_TLV, ak4pfjets_CSV);
-    AK4Inputs.addSupplamentalVector("qgPtD",                                ak4pfjets_ptD);
-    AK4Inputs.addSupplamentalVector("qgAxis1",                              ak4pfjets_axis1);
-    AK4Inputs.addSupplamentalVector("qgAxis2",                              ak4pfjets_axis2);
-    auto ak4jets_mult = vector<float>(ak4pfjets_mult.begin(), ak4pfjets_mult.end()); // because everything has to be vector<float>
-    AK4Inputs.addSupplamentalVector("qgMult",                               ak4jets_mult);
-    AK4Inputs.addSupplamentalVector("recoJetschargedHadronEnergyFraction",  ak4pfjets_chf);
-    AK4Inputs.addSupplamentalVector("recoJetschargedEmEnergyFraction",      ak4pfjets_cef);
-    AK4Inputs.addSupplamentalVector("recoJetsneutralEmEnergyFraction",      ak4pfjets_nef);
-    AK4Inputs.addSupplamentalVector("recoJetsmuonEnergyFraction",           ak4pfjets_muf);
-    AK4Inputs.addSupplamentalVector("recoJetsHFHadronEnergyFraction",       ak4pfjets_hhf);
-    AK4Inputs.addSupplamentalVector("recoJetsHFEMEnergyFraction",           ak4pfjets_hef);
-    AK4Inputs.addSupplamentalVector("recoJetsneutralEnergyFraction",        ak4pfjets_nhf);
-    AK4Inputs.addSupplamentalVector("PhotonEnergyFraction",                 ak4pfjets_phf);
-    AK4Inputs.addSupplamentalVector("ElectronEnergyFraction",               ak4pfjets_elf);
-    AK4Inputs.addSupplamentalVector("ChargedHadronMultiplicity",            ak4pfjets_cm);
-    AK4Inputs.addSupplamentalVector("NeutralHadronMultiplicity",            ak4pfjets_nm);
-    AK4Inputs.addSupplamentalVector("PhotonMultiplicity",                   ak4pfjets_pm);
-    AK4Inputs.addSupplamentalVector("ElectronMultiplicity",                 ak4pfjets_em);
-    AK4Inputs.addSupplamentalVector("MuonMultiplicity",                     ak4pfjets_mm);
-    AK4Inputs.addSupplamentalVector("DeepCSVb",                             ak4pfjets_deepCSVb);
-    AK4Inputs.addSupplamentalVector("DeepCSVc",                             ak4pfjets_deepCSVc);
-    AK4Inputs.addSupplamentalVector("DeepCSVl",                             ak4pfjets_deepCSVl);
-    AK4Inputs.addSupplamentalVector("DeepCSVbb",                            ak4pfjets_deepCSVbb);
-    auto dummy_deepCSVcc = vector<float>(ak4jets_TLV.size(), 0); // Temporary dealing with deepCSVcc not present in 94X
-    AK4Inputs.addSupplamentalVector("DeepCSVcc",                            dummy_deepCSVcc);
+    const bool doResolveTopDNN = doResolveTopMVA;
+    if (doResolveTopDNN) {
+      ttUtility::ConstAK4Inputs<float> AK4Inputs(ak4jets_TLV, ak4pfjets_CSV);
+      AK4Inputs.addSupplamentalVector("qgPtD",                                ak4pfjets_ptD);
+      AK4Inputs.addSupplamentalVector("qgAxis1",                              ak4pfjets_axis1);
+      AK4Inputs.addSupplamentalVector("qgAxis2",                              ak4pfjets_axis2);
+      auto ak4jets_mult = vector<float>(ak4pfjets_mult.begin(), ak4pfjets_mult.end()); // because everything has to be vector<float>
+      AK4Inputs.addSupplamentalVector("qgMult",                               ak4jets_mult);
+      AK4Inputs.addSupplamentalVector("recoJetschargedHadronEnergyFraction",  ak4pfjets_chf);
+      AK4Inputs.addSupplamentalVector("recoJetschargedEmEnergyFraction",      ak4pfjets_cef);
+      AK4Inputs.addSupplamentalVector("recoJetsneutralEmEnergyFraction",      ak4pfjets_nef);
+      AK4Inputs.addSupplamentalVector("recoJetsmuonEnergyFraction",           ak4pfjets_muf);
+      AK4Inputs.addSupplamentalVector("recoJetsHFHadronEnergyFraction",       ak4pfjets_hhf);
+      AK4Inputs.addSupplamentalVector("recoJetsHFEMEnergyFraction",           ak4pfjets_hef);
+      AK4Inputs.addSupplamentalVector("recoJetsneutralEnergyFraction",        ak4pfjets_nhf);
+      AK4Inputs.addSupplamentalVector("PhotonEnergyFraction",                 ak4pfjets_phf);
+      AK4Inputs.addSupplamentalVector("ElectronEnergyFraction",               ak4pfjets_elf);
+      AK4Inputs.addSupplamentalVector("ChargedHadronMultiplicity",            ak4pfjets_cm);
+      AK4Inputs.addSupplamentalVector("NeutralHadronMultiplicity",            ak4pfjets_nm);
+      AK4Inputs.addSupplamentalVector("PhotonMultiplicity",                   ak4pfjets_pm);
+      AK4Inputs.addSupplamentalVector("ElectronMultiplicity",                 ak4pfjets_em);
+      AK4Inputs.addSupplamentalVector("MuonMultiplicity",                     ak4pfjets_mm);
+      AK4Inputs.addSupplamentalVector("DeepCSVb",                             ak4pfjets_deepCSVb);
+      AK4Inputs.addSupplamentalVector("DeepCSVc",                             ak4pfjets_deepCSVc);
+      AK4Inputs.addSupplamentalVector("DeepCSVl",                             ak4pfjets_deepCSVl);
+      AK4Inputs.addSupplamentalVector("DeepCSVbb",                            ak4pfjets_deepCSVbb);
+      auto dummy_deepCSVcc = vector<float>(ak4jets_TLV.size(), 0); // Temporary dealing with deepCSVcc not present in 94X
+      AK4Inputs.addSupplamentalVector("DeepCSVcc",                            dummy_deepCSVcc);
 
-    std::vector<Constituent> constituents = ttUtility::packageConstituents(AK4Inputs);
+      std::vector<Constituent> constituents = ttUtility::packageConstituents(AK4Inputs);
 
-    tftagger->runTagger(constituents);
+      tftagger->runTagger(constituents);
 
-    //retrieve the top tagger results object
-    const TopTaggerResults& ttr = tftagger->getResults();
+      //retrieve the top tagger results object
+      const TopTaggerResults& ttr = tftagger->getResults();
 
-    //get reconstructed top
-    const std::vector<TopObject*>& tftops = ttr.getTops();
+      //get reconstructed top
+      const std::vector<TopObject*>& tftops = ttr.getTops();
 
-    for (const TopObject* top : tftops) {
-      tftops_p4.emplace_back(top->p().Px(), top->p().Py(), top->p().Pz(), top->p().E());
-      tftops_disc.push_back(top->getDiscriminator());
-      if (top->getNConstituents() != 3) cout << "[JetTree] Getting TF top that has " << top->getNConstituents() << " constituents!!\n";
-      vector<float> subjet_pt, subjet_eta, subjet_phi;
-      for (const Constituent* subjet : top->getConstituents()) {
-        subjet_pt.push_back(subjet->p().Pt());
-        subjet_eta.push_back(subjet->p().Eta());
-        subjet_phi.push_back(subjet->p().Phi());
+      for (const TopObject* top : tftops) {
+        tftops_p4.emplace_back(top->p().Px(), top->p().Py(), top->p().Pz(), top->p().E());
+        tftops_disc.push_back(top->getDiscriminator());
+        if (top->getNConstituents() != 3) cout << "[JetTree] Getting TF top that has " << top->getNConstituents() << " constituents!!\n";
+        vector<float> subjet_pt, subjet_eta, subjet_phi;
+        for (const Constituent* subjet : top->getConstituents()) {
+          subjet_pt.push_back(subjet->p().Pt());
+          subjet_eta.push_back(subjet->p().Eta());
+          subjet_phi.push_back(subjet->p().Phi());
+        }
+        tftops_subjet_pt.push_back(subjet_pt);
+        tftops_subjet_eta.push_back(subjet_eta);
+        tftops_subjet_phi.push_back(subjet_phi);
       }
-      tftops_subjet_pt.push_back(subjet_pt);
-      tftops_subjet_eta.push_back(subjet_eta);
-      tftops_subjet_phi.push_back(subjet_phi);
     }
 
     // Fill info for soft b-tags
