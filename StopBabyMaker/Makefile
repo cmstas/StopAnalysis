@@ -112,4 +112,5 @@ clean:
 	runBabyMaker \
 	LinkDef.cc \
 	LinkDef_rdict.pcm \
+	../StopCORE/*.o \
 	*.o *.d *.so
