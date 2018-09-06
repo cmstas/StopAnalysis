@@ -27,8 +27,8 @@ void eventWeight_lepSF::setup( bool isFastsim, int inyear = 2017, TString filelo
   xmax_h_mu_SF = 1.0;
   ymin_h_mu_SF = 1.0;
   ymax_h_mu_SF = 1.0;
-  xmin_h_mu_SF_tracking = 1.0;
-  xmax_h_mu_SF_tracking = 1.0;
+  // xmin_h_mu_SF_tracking = 1.0;
+  // xmax_h_mu_SF_tracking = 1.0;
   xmin_h_mu_SF_veto = 1.0;
   xmax_h_mu_SF_veto = 1.0;
   ymin_h_mu_SF_veto = 1.0;
@@ -139,7 +139,7 @@ void eventWeight_lepSF::setup( bool isFastsim, int inyear = 2017, TString filelo
     f_mu_SF_id       = new TFile(filepath+"/TnP_NUM_MediumID_DENOM_generalTracks_VAR_map_pt_eta.root", "read");
     f_mu_SF_iso      = new TFile(filepath+"/TnP_NUM_MiniIsoTight_DENOM_MediumID_VAR_map_pt_eta.root", "read"); // double unc
     f_mu_SF_ip       = new TFile(filepath+"/TnP_NUM_TightIP2D_DENOM_MediumID_VAR_map_pt_eta.root", "read"); // double unc
-    f_mu_SF_tracking = new TFile(filepath+"/Tracking_EfficienciesAndSF_BCDEFGH.root", "read");
+    // f_mu_SF_tracking = new TFile(filepath+"/Tracking_EfficienciesAndSF_BCDEFGH.root", "read");
 
     f_mu_SF_veto_id  = new TFile(filepath+"/TnP_NUM_LooseID_DENOM_generalTracks_VAR_map_pt_eta.root", "read");
     f_mu_SF_veto_iso = new TFile(filepath+"/TnP_NUM_MiniIsoTight_DENOM_LooseID_VAR_map_pt_eta.root", "read");
@@ -159,7 +159,7 @@ void eventWeight_lepSF::setup( bool isFastsim, int inyear = 2017, TString filelo
     f_mu_SF_id       = new TFile(filepath+"/TnP_NUM_MediumID_DENOM_generalTracks_VAR_map_pt_eta.root", "read");
     f_mu_SF_iso      = new TFile(filepath+"/TnP_NUM_MiniIsoTight_DENOM_MediumID_VAR_map_pt_eta.root", "read"); // double unc
     f_mu_SF_ip       = new TFile(filepath+"/TnP_NUM_TightIP2D_DENOM_MediumID_VAR_map_pt_eta.root", "read"); // double unc
-    f_mu_SF_tracking = new TFile(filepath+"/Tracking_EfficienciesAndSF_BCDEFGH.root", "read");
+    // f_mu_SF_tracking = new TFile(filepath+"/Tracking_EfficienciesAndSF_BCDEFGH.root", "read");
 
     f_mu_SF_veto_id  = new TFile(filepath+"/TnP_NUM_LooseID_DENOM_generalTracks_VAR_map_pt_eta.root", "read");
     f_mu_SF_veto_iso = new TFile(filepath+"/TnP_NUM_MiniIsoTight_DENOM_LooseID_VAR_map_pt_eta.root", "read");
@@ -184,8 +184,8 @@ void eventWeight_lepSF::setup( bool isFastsim, int inyear = 2017, TString filelo
   TH2F *h_mu_SF_id_temp  = (TH2F*)f_mu_SF_id->Get("SF");
   TH2F *h_mu_SF_iso_temp = (TH2F*)f_mu_SF_iso->Get("SF");
   TH2F *h_mu_SF_ip_temp  = (TH2F*)f_mu_SF_ip->Get("SF");
-  // TGraphAsymmErrors *h_mu_SF_tracking_temp  = (TGraphAsymmErrors*)f_mu_SF_tracking->Get("ratio_eta");
-  TGraphAsymmErrors *h_mu_SF_tracking_temp  = (TGraphAsymmErrors*)f_mu_SF_tracking->Get("ratio_eff_aeta_dr030e030_corr");
+  // Muon Tracking is no longer recommended
+  // TGraphAsymmErrors *h_mu_SF_tracking_temp  = (TGraphAsymmErrors*)f_mu_SF_tracking->Get("ratio_eff_aeta_dr030e030_corr");
 
   // Grab veto mu histos
   TH2F *h_mu_SF_veto_id_temp  = (TH2F*)f_mu_SF_veto_id->Get("SF");
@@ -265,21 +265,21 @@ void eventWeight_lepSF::setup( bool isFastsim, int inyear = 2017, TString filelo
   ymin_h_mu_SF = h_mu_SF->GetYaxis()->GetBinLowEdge(1)+ferr;
   ymax_h_mu_SF = h_mu_SF->GetYaxis()->GetBinLowEdge(h_mu_SF->GetNbinsY()+1)-ferr;
 
-  // Get final fullsim, selected muon, tracking sfs, convert TGraphErrors
-  int nX = h_mu_SF_tracking_temp->GetN();
-  Double_t *x_val = h_mu_SF_tracking_temp->GetX();
-  Double_t *y_val = h_mu_SF_tracking_temp->GetY();
-  Double_t *y_err_up = h_mu_SF_tracking_temp->GetEYhigh();
-  Double_t *y_err_low = h_mu_SF_tracking_temp->GetEYhigh();
-  h_mu_SF_tracking = new TH1D("h_mu_SF_tracking","h_mu_SF_tracking",nX-1,x_val);
-  for (int i=0; i<nX; i++) {
-    h_mu_SF_tracking->SetBinContent(i+1,y_val[i]);
-    h_mu_SF_tracking->SetBinError(i+1,std::max(y_err_up[i],y_err_low[i]));
-  }
-  xmin_h_mu_SF_tracking = h_mu_SF_tracking->GetXaxis()->GetBinLowEdge(1)+ferr;
-  xmax_h_mu_SF_tracking = h_mu_SF_tracking->GetXaxis()->GetBinLowEdge(h_mu_SF_tracking->GetNbinsX()+1)-ferr;
-  // ymin_h_mu_SF_tracking = h_mu_SF_tracking->GetYaxis()->GetBinLowEdge(1)+ferr;
-  // ymax_h_mu_SF_tracking = h_mu_SF_tracking->GetYaxis()->GetBinLowEdge(h_mu_SF_tracking->GetNbinsY()+1)-ferr;
+  // Muon tracking is no longer recommended (effectively ~1)
+  // int nX = h_mu_SF_tracking_temp->GetN();
+  // Double_t *x_val = h_mu_SF_tracking_temp->GetX();
+  // Double_t *y_val = h_mu_SF_tracking_temp->GetY();
+  // Double_t *y_err_up = h_mu_SF_tracking_temp->GetEYhigh();
+  // Double_t *y_err_low = h_mu_SF_tracking_temp->GetEYhigh();
+  // h_mu_SF_tracking = new TH1D("h_mu_SF_tracking","h_mu_SF_tracking",nX-1,x_val);
+  // for (int i=0; i<nX; i++) {
+  //   h_mu_SF_tracking->SetBinContent(i+1,y_val[i]);
+  //   h_mu_SF_tracking->SetBinError(i+1,std::max(y_err_up[i],y_err_low[i]));
+  // }
+  // xmin_h_mu_SF_tracking = h_mu_SF_tracking->GetXaxis()->GetBinLowEdge(1)+ferr;
+  // xmax_h_mu_SF_tracking = h_mu_SF_tracking->GetXaxis()->GetBinLowEdge(h_mu_SF_tracking->GetNbinsX()+1)-ferr;
+  // // ymin_h_mu_SF_tracking = h_mu_SF_tracking->GetYaxis()->GetBinLowEdge(1)+ferr;
+  // // ymax_h_mu_SF_tracking = h_mu_SF_tracking->GetYaxis()->GetBinLowEdge(h_mu_SF_tracking->GetNbinsY()+1)-ferr;
 
   // Get final fullsim, veto mu, sfs
   TH2F *h_mu_SF_veto_id  = (TH2F*)h_mu_SF_veto_id_temp->Clone("h_mu_SF_veto_id");
@@ -389,7 +389,7 @@ eventWeight_lepSF::~eventWeight_lepSF() {
   delete f_mu_SF_id;
   delete f_mu_SF_iso;
   delete f_mu_SF_ip;
-  delete f_mu_SF_tracking;
+  // delete f_mu_SF_tracking;
   delete f_mu_SF_veto_id;
   delete f_mu_SF_veto_iso;
   delete f_mu_SF_veto_ip;
@@ -524,10 +524,11 @@ void eventWeight_lepSF::getLepWeight(vector<float> recoLep_pt, vector<float> rec
         }
       }
 
-      int binX = h_mu_SF_tracking->GetXaxis()->FindBin( std::max( std::min(xmax_h_mu_SF_tracking, recoLep_eta[iLep]), xmin_h_mu_SF_tracking ) );
-      weight_lepSF *= h_mu_SF_tracking->GetBinContent( binX );
-      weight_lepSF_Up *= ( h_mu_SF_tracking->GetBinContent(binX) + h_mu_SF_tracking->GetBinError(binX) );
-      weight_lepSF_Dn *= ( h_mu_SF_tracking->GetBinContent(binX) - h_mu_SF_tracking->GetBinError(binX) );
+      // Muon tracking is no longer recommended for both 2016 and 2017 data
+      // int binX = h_mu_SF_tracking->GetXaxis()->FindBin( std::max( std::min(xmax_h_mu_SF_tracking, recoLep_eta[iLep]), xmin_h_mu_SF_tracking ) );
+      // weight_lepSF *= h_mu_SF_tracking->GetBinContent( binX );
+      // weight_lepSF_Up *= ( h_mu_SF_tracking->GetBinContent(binX) + h_mu_SF_tracking->GetBinError(binX) );
+      // weight_lepSF_Dn *= ( h_mu_SF_tracking->GetBinContent(binX) - h_mu_SF_tracking->GetBinError(binX) );
     } // end if 2nd lep is mu
 
   } // end loop over reco leptons

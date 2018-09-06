@@ -53,7 +53,7 @@ runBabyMaker: runBabyMaker.o looper.o EventTree.o LeptonTree.o JetTree.o Resolve
 	$(LD) $(LDFLAGS) -o runBabyMaker runBabyMaker.o looper.o EventTree.o ResolvedTopMVA.o JetTree.o LeptonTree.o eventWeight_lepSF.o PhotonTree.o IsoTracksTree.o TauTree.o GenParticleTree.o StopSelections.o libTopTagger.so $(LIBS) $(GLIBS) -lGenVector -lEG -lTMVA $(CORELIB) $(STOPVARLIB) LinkDef_out.so -Wl,-rpath,./
 
 $(CORESOURCE):
-	cd $(COREPATH) && $(MAKE) -j && cd ..
+	cd $(COREPATH) && $(MAKE) -j16 && cd ..
 
 $(CORELIB): $(CORESOURCE)
 	cp $(CORESOURCE) .
@@ -112,5 +112,6 @@ clean:
 	runBabyMaker \
 	LinkDef.cc \
 	LinkDef_rdict.pcm \
+	../CORE/*.so \
 	../StopCORE/*.o \
 	*.o *.d *.so

@@ -70,7 +70,7 @@ class eventWeight_lepSF{
 
   // Final scale factor histograms for tracking
   TH2F *h_el_SF_tracking = nullptr;
-  TH1D *h_mu_SF_tracking = nullptr;
+  // TH1D *h_mu_SF_tracking = nullptr;
 
   // Final scale factor histograms for fastim/fullsim for selected leptons
   TH2F *h_el_FS = nullptr;
@@ -100,8 +100,8 @@ class eventWeight_lepSF{
   float xmax_h_mu_SF;
   float ymin_h_mu_SF;
   float ymax_h_mu_SF;
-  float xmin_h_mu_SF_tracking;
-  float xmax_h_mu_SF_tracking;
+  // float xmin_h_mu_SF_tracking;
+  // float xmax_h_mu_SF_tracking;
   float xmin_h_mu_SF_veto;
   float xmax_h_mu_SF_veto;
   float ymin_h_mu_SF_veto;

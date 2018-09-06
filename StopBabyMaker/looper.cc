@@ -316,7 +316,6 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
 
   // Setup lepton SF histos
   eventWeight_lepSF lepsf;
-  lepsf.~eventWeight_lepSF();
   const double matched_dr = 0.1;  // match DR between genlep and recolep
   if( (applyLeptonSFs || applyVetoLeptonSFs) && !isDataFromFileName){
     TString lepsf_filepath;
