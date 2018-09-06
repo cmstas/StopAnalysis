@@ -50,7 +50,7 @@ const bool doSystVariations = false;
 const bool doGenClassification = true;
 // turn on to apply Nvtx reweighting to MC / data2016
 const bool doNvtxReweight = false;
-// turn on top tagging studies, off for 2016 data/mc
+// turn on top tagging studies, off for baby ver < 25
 const bool doTopTagging = true;
 // turn on to apply json file to data
 const bool applyGoodRunList = true;
@@ -64,9 +64,10 @@ const bool runFullSignalScan = false;
 const bool printPassedEvents = false;
 
 // set bool def here for member function usage
-int year = 2017;
+int year = 2016;
 int datayear = -1;
-string samplever = "Fall17v2";
+// string samplever = "Fall17v2";
+string samplever = "Summer16v2";
 
 const float fInf = std::numeric_limits<float>::max();
 
@@ -204,11 +205,11 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
   // GenerateAllSRptrSets();
 
   // Setup the event weight calculator
-  evtWgt.Setup(samplestr, year, applyBtagSFfromFiles, applyLeptonSFfromFiles);
   if (year == 2016)
     evtWgt.setDefaultSystematics(0);  // systematic set for Moriond17 analysis
   else if (year >= 2017)
     evtWgt.setDefaultSystematics(1);  // systematic set for 94X
+  evtWgt.Setup(samplestr, year, applyBtagSFfromFiles, applyLeptonSFfromFiles);
   // evtWgt.lumi = kLumi;
 
   int nDuplicates = 0;
@@ -378,8 +379,8 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
         plot1d("h_nvtxs_rwtd", nvtxs(), evtweight_, testVec[0].histMap, ";Number of vertices", 100, 1, 101);
       }
 
-      // // Temporary test for top tagging efficiency
-      // testTopTaggingEffficiency(testVec[1]);
+      // Temporary test for top tagging efficiency
+      testTopTaggingEffficiency(testVec[1]);
 
       // nbtag for CSV valued btags -- for comparison between the 2016 analysis
       int nbtagCSV = 0;
@@ -1218,10 +1219,10 @@ void StopLooper::testTopTaggingEffficiency(SR& sr) {
 
   int ntftops = 0;
   float lead_tftop_disc = -0.09;
-  // ntftops = tftops_p4().size();
-  // for (auto disc : tftops_disc()) {
-  //   if (disc > lead_tftop_disc) lead_tftop_disc = disc;
-  // }
+  ntftops = tftops_p4().size();
+  for (auto disc : tftops_disc()) {
+    if (disc > lead_tftop_disc) lead_tftop_disc = disc;
+  }
 
   // Hadronic chi2 for comparison
   // Define a disc variable that look similar to resolve top discriminator

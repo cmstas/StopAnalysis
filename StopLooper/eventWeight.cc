@@ -494,7 +494,7 @@ void evtWgtInfo::Setup(string samplestr, int inyear, bool useBTagUtils, bool use
   }
 
   // Get SR trigger histos
-  if ( !is_data_ ) {
+  if ( !is_data_ && apply_cr2lTrigger_sf) {
     f_cr2lTrigger_sf = new TFile("../StopCORE/inputs/trigger/TriggerEff_2016.root","read");
     h_cr2lTrigger_sf_el = (TEfficiency*) f_cr2lTrigger_sf->Get("Efficiency_ge2l_metrl_el");
     h_cr2lTrigger_sf_mu = (TEfficiency*) f_cr2lTrigger_sf->Get("Efficiency_ge2l_metrl_mu");
@@ -507,11 +507,12 @@ void evtWgtInfo::Setup(string samplestr, int inyear, bool useBTagUtils, bool use
 
   // Initialize Lepton Scale Factors
   if ( !is_data_ && useLepSFs_fromFiles ) {
-    lepSFUtil  = new eventWeight_lepSF( is_fastsim_ );
+    lepSFUtil  = new eventWeight_lepSF();
+    lepSFUtil->setup(is_fastsim_, year, "../StopCORE/inputs/lepsf");
   }
 
   // Get pileup wgt histo
-  if ( !is_data_ ) {
+  if ( !is_data_ && apply_pu_sf) {
     f_pu = new TFile("../StopCORE/inputs/pileup/pileup_wgts.root", "read");
     h_pu_wgt = (TH1D*) f_pu->Get("h_pileup_wgt");
     h_pu_wgt_up = (TH1D*) f_pu->Get("h_pileup_wgt_up");
@@ -519,8 +520,9 @@ void evtWgtInfo::Setup(string samplestr, int inyear, bool useBTagUtils, bool use
   }
 
   // Get lep reco histo
-  if ( !is_data_ ) {
-    f_lepEff = new TFile("../StopCORE/inputs/lepsf/lepeff__moriond17__ttbar_powheg_pythia8_25ns__20170223.root", "read");
+  if ( !is_data_ && apply_tau_sf) {
+    TString lepeff_file = "Moriond17/lepeff__moriond17__ttbar_powheg_pythia8_25ns.root";
+    f_lepEff = new TFile("../StopCORE/inputs/lepsf/"+lepeff_file, "read");
     h_recoEff_tau = (TH2D*) f_lepEff->Get("h2_lepEff_vetoSel_Eff_tau");
   }
 
@@ -1357,25 +1359,21 @@ void evtWgtInfo::getLepSFWeight_fromFiles( double &weight_lepSF, double &weight_
 
   if ( is_data_ ) return;
 
-  std::vector< double > recoLep_pt, recoLep_eta, genLostLep_pt, genLostLep_eta;
+  std::vector< float > recoLep_pt, recoLep_eta, genLostLep_pt, genLostLep_eta;
   std::vector< int > recoLep_pdgid, genLostLep_pdgid;
   std::vector< bool > recoLep_isSel;
 
-  double matched_dr = 0.1;
+  const double matched_dr = 0.1;
 
   if ( babyAnalyzer.nvetoleps()>=1 ) {
     recoLep_pt.push_back( babyAnalyzer.lep1_p4().Pt() );
     recoLep_eta.push_back( babyAnalyzer.lep1_p4().Eta() );
     recoLep_pdgid.push_back( babyAnalyzer.lep1_pdgid() );
-    if ( ( (abs(babyAnalyzer.lep1_pdgid())==13 &&
-            babyAnalyzer.lep1_passMediumID()      ) ||
-           (abs(babyAnalyzer.lep1_pdgid())==11 &&
-            babyAnalyzer.lep1_passMediumID()      )    ) &&
-         ( babyAnalyzer.lep1_p4().Pt()>20.0            ) &&
-         ( fabs(babyAnalyzer.lep1_p4().Eta())<2.4      )    ) {
+    if ( ( (abs(babyAnalyzer.lep1_pdgid())==13 && babyAnalyzer.lep1_passMediumID()) ||
+           (abs(babyAnalyzer.lep1_pdgid())==11 && babyAnalyzer.lep1_passMediumID()) ) &&
+         babyAnalyzer.lep1_p4().Pt()>20.0 && fabs(babyAnalyzer.lep1_p4().Eta())<2.4 ) {
       recoLep_isSel.push_back( true );
-    }
-    else {
+    } else {
       recoLep_isSel.push_back( false );
     }
 
@@ -1383,15 +1381,11 @@ void evtWgtInfo::getLepSFWeight_fromFiles( double &weight_lepSF, double &weight_
       recoLep_pt.push_back( babyAnalyzer.lep2_p4().Pt() );
       recoLep_eta.push_back( babyAnalyzer.lep2_p4().Eta() );
       recoLep_pdgid.push_back( babyAnalyzer.lep2_pdgid() );
-      if ( ( (abs(babyAnalyzer.lep2_pdgid())==13 &&
-              babyAnalyzer.lep2_passMediumID()      ) ||
-             (abs(babyAnalyzer.lep2_pdgid())==11 &&
-              babyAnalyzer.lep2_passMediumID()      )    ) &&
-           ( babyAnalyzer.lep2_p4().Pt()>20.0            ) &&
-           ( fabs(babyAnalyzer.lep2_p4().Eta())<2.4      )    ) {
+      if ( ( (abs(babyAnalyzer.lep2_pdgid())==13 && babyAnalyzer.lep2_passMediumID()) ||
+             (abs(babyAnalyzer.lep2_pdgid())==11 && babyAnalyzer.lep2_passMediumID()) ) &&
+           babyAnalyzer.lep2_p4().Pt()>20.0 && fabs(babyAnalyzer.lep2_p4().Eta())<2.4 ) {
         recoLep_isSel.push_back( true );
-      }
-      else {
+      } else {
         recoLep_isSel.push_back( false );
       }
 

@@ -9,7 +9,7 @@
 
 class StopLooper {
  public:
-  StopLooper() : evtweight_(1.) , jestype_(0) {}
+  StopLooper() : evtweight_(1.), jestype_(0) {}
   ~StopLooper() {}
 
   void SetSignalRegions();
