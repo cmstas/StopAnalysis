@@ -25,7 +25,7 @@
 #include "../CORE/Tools/badEventFilter.h"
 
 // Stop baby class
-#include "../StopCORE/stop_1l_babyAnalyzer.h"
+#include "../StopCORE/StopTree.h"
 #include "../StopCORE/TopTagger/ResolvedTopMVA.h"
 // #include "../StopCORE/stop_variables/metratio.cc"
 
@@ -35,7 +35,7 @@
 #include "Utilities.h"
 
 using namespace std;
-using namespace stop_1l;
+using namespace stop1l;
 
 class SR;
 
@@ -430,7 +430,6 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
         if (jestype_ == 0) {
           values_["mt"] = mt_met_lep();
           values_["met"] = pfmet();
-          values_["mt2w"] = MT2W();
           values_["mlb"] = Mlb_closestb();
           values_["tmod"] = topnessMod();
           values_["njet"] = ngoodjets();
@@ -453,7 +452,6 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
         } else if (jestype_ == 1) {
           values_["mt"] = mt_met_lep_jup();
           values_["met"] = pfmet_jup();
-          values_["mt2w"] = MT2W_jup();
           values_["mlb"] = Mlb_closestb_jup();
           values_["tmod"] = topnessMod_jup();
           values_["njet"] = jup_ngoodjets();
@@ -474,7 +472,6 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
         } else if (jestype_ == 2) {
           values_["mt"] = mt_met_lep_jdown();
           values_["met"] = pfmet_jdown();
-          values_["mt2w"] = MT2W_jdown();
           values_["mlb"] = Mlb_closestb_jdown();
           values_["tmod"] = topnessMod_jdown();
           values_["njet"] = jdown_ngoodjets();
@@ -509,21 +506,21 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
 
         if (jestype_ == 0) {
           values_["mt_rl"] = mt_met_lep_rl();
-          values_["mt2w_rl"] = MT2W_rl();
+          values_["mt2_ll"] = MT2_ll();
           values_["met_rl"] = pfmet_rl();
           values_["dphijmet_rl"]= mindphi_met_j1_j2_rl();
           values_["dphilmet_rl"] = lep1_dphiMET_rl();
           values_["tmod_rl"] = topnessMod_rl();
         } else if (jestype_ == 1) {
           values_["mt_rl"] = mt_met_lep_rl_jup();
-          values_["mt2w_rl"] = MT2W_rl_jup();
+          values_["mt2_ll"] = MT2_ll_jup();
           values_["met_rl"] = pfmet_rl_jup();
           values_["dphijmet_rl"]= mindphi_met_j1_j2_rl_jup();
           values_["dphilmet_rl"] = lep1_dphiMET_rl_jup();
           values_["tmod_rl"] = topnessMod_rl_jup();
         } else if (jestype_ == 2) {
           values_["mt_rl"] = mt_met_lep_rl_jdown();
-          values_["mt2w_rl"] = MT2W_rl_jdown();
+          values_["mt2_ll"] = MT2_ll_jdown();
           values_["met_rl"] = pfmet_rl_jdown();
           values_["dphijmet_rl"]= mindphi_met_j1_j2_rl_jdown();
           values_["dphilmet_rl"] = lep1_dphiMET_rl_jdown();

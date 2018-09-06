@@ -4,7 +4,7 @@
 // StopCORE
 #include "../StopCORE/eventWeight_bTagSF.h"
 #include "../StopCORE/eventWeight_lepSF.h"
-#include "../StopCORE/stop_1l_babyAnalyzer.h"
+#include "../StopCORE/StopTree.h"
 
 // ROOT
 #include "TFile.h"

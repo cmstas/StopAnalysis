@@ -41,6 +41,7 @@ std::vector<SR> getStopControlRegionsDilepton(std::vector<SR>&& SRvec) {
     cr.RemoveVar("passvetos");
     cr.SetVar("nvlep", 2, fInf);
     cr.SetVar("nlep_rl", 2, fInf);
+    cr.SetVar("mt2_ll", 0, 100);  // to avoid overlap with the stop-2l SR
     CRvec.emplace_back(cr);
   }
 
@@ -225,10 +226,9 @@ std::vector<SR> getStopInclusiveRegionsTopological() {
   sr = srbase;
   sr.SetName("srsbmet");  // MET sideband
   sr.SetVar("met", 150, 250);
+  sr.SetVar("passlep1pt", 1, 2);
   sr.SetMETBins({150, 200, 250});
   SRvec.emplace_back(sr);
-
-  return SRvec;
 
   // Test regions
   sr.Clear();
@@ -246,6 +246,8 @@ std::vector<SR> getStopInclusiveRegionsTopological() {
   sr.SetVar("dphijmet", 0.8, 3.1416);
   sr.SetMETBins({100, 1500});
   SRvec.emplace_back(sr);
+
+  return SRvec;
 
   sr.SetName("srtestMT");
   sr.SetVar("met", 250, fInf);

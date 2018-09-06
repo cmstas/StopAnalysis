@@ -292,6 +292,9 @@ void EventTree::Reset ()
     topnessMod_jdown       = -9999.;
     topnessMod_rl_jup      = -9999.;
     topnessMod_rl_jdown    = -9999.;
+    MT2_ll                 = -9999.;
+    MT2_ll_jup             = -9999.;
+    MT2_ll_jdown           = -9999.;
     MT2_lb_b               = -9999.; 
     MT2_lb_b_lep2          = -9999.; 
     MT2_lb_b_mass          = -9999.; 
@@ -385,7 +388,7 @@ void EventTree::Reset ()
     sparms_pdfWeight2		= -9999.;
     sparms_weight		= -9999.;
     sparms_xsec			= -9999.;
-*/
+  */
     sparms_values.clear();
     sparms_subProcessId 	= -9999;
     mass_stop                   = -9999;
@@ -395,11 +398,11 @@ void EventTree::Reset ()
 
     genmet 	= -9999.;
     genmet_phi 	= -9999.;
-     nupt = -99999.;
+    nupt  = -99999.;
     genht = -9999.;
     PassTrackVeto    = false;
-//    PassTrackVeto_v2 = false;
-//    PassTrackVeto_v3 = false;
+    // PassTrackVeto_v2 = false;
+    // PassTrackVeto_v3 = false;
     PassTauVeto      = false;
 
     HLT_SingleMu           = -9999.; 
@@ -540,7 +543,7 @@ void EventTree::Reset ()
     ph_MT2W              = -9999.;
     ph_topness           = -9999.;
     ph_topnessMod        = -9999.;
-    ph_MT2_l_l           = -9999.;
+    ph_MT2_ll            = -9999.;
     ph_MT2_lb_b_mass     = -9999.;
     ph_MT2_lb_b          = -9999.;
     ph_MT2_lb_bqq_mass   = -9999.;
@@ -571,7 +574,7 @@ void EventTree::Reset ()
     Zll_topness           = -9999.;
     Zll_topnessMod        = -9999.;
     Zll_MT2_lb_b_mass     = -9999.;
-    Zll_MT2_l_l           = -9999.;
+    Zll_MT2_ll            = -9999.;
     Zll_MT2_lb_b          = -9999.;
     Zll_MT2_lb_bqq_mass   = -9999.;
     Zll_MT2_lb_bqq        = -9999.;
@@ -632,18 +635,21 @@ void EventTree::SetBranches (TTree* tree)
     tree->Branch("is1lepFromTop", &is1lepFromTop);
     tree->Branch("MT2W",&MT2W);
     tree->Branch("MT2W_rl",&MT2W_rl); 
+    tree->Branch("MT2_ll", &MT2_ll);
     tree->Branch("mindphi_met_j1_j2", &mindphi_met_j1_j2);
     tree->Branch("mindphi_met_j1_j2_rl", &mindphi_met_j1_j2_rl);
     tree->Branch("mt_met_lep", &mt_met_lep);
     tree->Branch("mt_met_lep_rl", &mt_met_lep_rl);
     tree->Branch("MT2W_jup",&MT2W_jup);
     tree->Branch("MT2W_rl_jup",&MT2W_rl_jup);
+    tree->Branch("MT2_ll_jup", &MT2_ll_jup);
     tree->Branch("mindphi_met_j1_j2_jup", &mindphi_met_j1_j2_jup);
     tree->Branch("mindphi_met_j1_j2_rl_jup", &mindphi_met_j1_j2_rl_jup);
     tree->Branch("mt_met_lep_jup", &mt_met_lep_jup);
     tree->Branch("mt_met_lep_rl_jup", &mt_met_lep_rl_jup);
     tree->Branch("MT2W_jdown",&MT2W_jdown);
     tree->Branch("MT2W_rl_jdown",&MT2W_rl_jdown);
+    tree->Branch("MT2_ll_jdown", &MT2_ll_jdown);
     tree->Branch("mindphi_met_j1_j2_jdown", &mindphi_met_j1_j2_jdown);
     tree->Branch("mindphi_met_j1_j2_rl_jdown", &mindphi_met_j1_j2_rl_jdown);
     tree->Branch("mt_met_lep_jdown", &mt_met_lep_jdown);
@@ -750,7 +756,7 @@ void EventTree::SetBranches (TTree* tree)
     tree->Branch("ph_ngoodjets",         &ph_ngoodjets);
     tree->Branch("ph_ngoodbtags",        &ph_ngoodbtags);
     tree->Branch("hardgenpt", &hardgenpt);
-   tree->Branch("calomet", &calomet);
+    tree->Branch("calomet", &calomet);
     tree->Branch("calomet_phi", &calomet_phi);
 }
 
@@ -774,7 +780,7 @@ void EventTree::SetExtraVariablesBranches (TTree* tree)
     tree->Branch("dR_lep_leadb", &dR_lep_leadb);
     tree->Branch("dphi_Wlep", &dphi_Wlep);
     tree->Branch("MET_over_sqrtHT", &MET_over_sqrtHT);
-    tree->Branch("MT2_l_l", &MT2_l_l); 
+    // tree->Branch("MT2_l_l", &MT2_l_l);
     tree->Branch("MT2_lb_b", &MT2_lb_b); 
     tree->Branch("MT2_lb_b_mass", &MT2_lb_b_mass); 
     tree->Branch("MT2_lb_bqq", &MT2_lb_bqq); 
@@ -835,7 +841,7 @@ void EventTree::SetPhotonBranches (TTree* tree)
     tree->Branch("ph_MT2W",              &ph_MT2W);
     tree->Branch("ph_topness",           &ph_topness);
     tree->Branch("ph_topnessMod",        &ph_topnessMod);
-    tree->Branch("ph_MT2_l_l",           &ph_MT2_l_l);
+    tree->Branch("ph_MT2_ll",            &ph_MT2_ll);
     tree->Branch("ph_MT2_lb_b_mass",     &ph_MT2_lb_b_mass);
     tree->Branch("ph_MT2_lb_b",          &ph_MT2_lb_b);
     tree->Branch("ph_MT2_lb_bqq_mass",   &ph_MT2_lb_bqq_mass);
@@ -884,7 +890,7 @@ void EventTree::SetZllBranches (TTree* tree)
     tree->Branch("Zll_MT2W", &Zll_MT2W);
     tree->Branch("Zll_topness", &Zll_topness);
     tree->Branch("Zll_topnessMod", &Zll_topnessMod);
-    tree->Branch("Zll_MT2_l_l", &Zll_MT2_l_l);
+    tree->Branch("Zll_MT2_ll", &Zll_MT2_ll);
     tree->Branch("Zll_MT2_lb_b_mass", &Zll_MT2_lb_b_mass);
     tree->Branch("Zll_MT2_lb_b", &Zll_MT2_lb_b);
     tree->Branch("Zll_MT2_lb_bqq_mass", &Zll_MT2_lb_bqq_mass);

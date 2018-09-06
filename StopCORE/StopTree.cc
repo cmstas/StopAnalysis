@@ -1,7 +1,7 @@
-#include "stop_1l_babyAnalyzer.h"
-stop_1l_babyAnalyzer babyAnalyzer;
+#include "StopTree.h"
+StopTree babyAnalyzer;
 
-void stop_1l_babyAnalyzer::Init(TTree *tree) {
+void StopTree::Init(TTree *tree) {
   lep1_p4_branch = tree->GetBranch("lep1_p4");
   if (lep1_p4_branch) lep1_p4_branch->SetAddress(&lep1_p4_);
   lep1_mcp4_branch = tree->GetBranch("lep1_mcp4");
@@ -213,6 +213,8 @@ void stop_1l_babyAnalyzer::Init(TTree *tree) {
   if (MT2W_branch) MT2W_branch->SetAddress(&MT2W_);
   MT2W_rl_branch = tree->GetBranch("MT2W_rl");
   if (MT2W_rl_branch) MT2W_rl_branch->SetAddress(&MT2W_rl_);
+  MT2_ll_branch = tree->GetBranch("MT2_ll");
+  if (MT2_ll_branch) MT2_ll_branch->SetAddress(&MT2_ll_);
   mindphi_met_j1_j2_branch = tree->GetBranch("mindphi_met_j1_j2");
   if (mindphi_met_j1_j2_branch) mindphi_met_j1_j2_branch->SetAddress(&mindphi_met_j1_j2_);
   mindphi_met_j1_j2_rl_branch = tree->GetBranch("mindphi_met_j1_j2_rl");
@@ -225,6 +227,8 @@ void stop_1l_babyAnalyzer::Init(TTree *tree) {
   if (MT2W_jup_branch) MT2W_jup_branch->SetAddress(&MT2W_jup_);
   MT2W_rl_jup_branch = tree->GetBranch("MT2W_rl_jup");
   if (MT2W_rl_jup_branch) MT2W_rl_jup_branch->SetAddress(&MT2W_rl_jup_);
+  MT2_ll_jup_branch = tree->GetBranch("MT2_ll_jup");
+  if (MT2_ll_jup_branch) MT2_ll_jup_branch->SetAddress(&MT2_ll_jup_);
   mindphi_met_j1_j2_jup_branch = tree->GetBranch("mindphi_met_j1_j2_jup");
   if (mindphi_met_j1_j2_jup_branch) mindphi_met_j1_j2_jup_branch->SetAddress(&mindphi_met_j1_j2_jup_);
   mindphi_met_j1_j2_rl_jup_branch = tree->GetBranch("mindphi_met_j1_j2_rl_jup");
@@ -237,6 +241,8 @@ void stop_1l_babyAnalyzer::Init(TTree *tree) {
   if (MT2W_jdown_branch) MT2W_jdown_branch->SetAddress(&MT2W_jdown_);
   MT2W_rl_jdown_branch = tree->GetBranch("MT2W_rl_jdown");
   if (MT2W_rl_jdown_branch) MT2W_rl_jdown_branch->SetAddress(&MT2W_rl_jdown_);
+  MT2_ll_jdown_branch = tree->GetBranch("MT2_ll_jdown");
+  if (MT2_ll_jdown_branch) MT2_ll_jdown_branch->SetAddress(&MT2_ll_jdown_);
   mindphi_met_j1_j2_jdown_branch = tree->GetBranch("mindphi_met_j1_j2_jdown");
   if (mindphi_met_j1_j2_jdown_branch) mindphi_met_j1_j2_jdown_branch->SetAddress(&mindphi_met_j1_j2_jdown_);
   mindphi_met_j1_j2_rl_jdown_branch = tree->GetBranch("mindphi_met_j1_j2_rl_jdown");
@@ -915,16 +921,12 @@ void stop_1l_babyAnalyzer::Init(TTree *tree) {
   if (ak4pfjets_axis2_branch) ak4pfjets_axis2_branch->SetAddress(&ak4pfjets_axis2_);
   ak4pfjets_mult_branch = tree->GetBranch("ak4pfjets_mult");
   if (ak4pfjets_mult_branch) ak4pfjets_mult_branch->SetAddress(&ak4pfjets_mult_);
-  ak4pfjets_csvbtag_branch = tree->GetBranch("ak4pfjets_csvbtag");
-  if (ak4pfjets_csvbtag_branch) ak4pfjets_csvbtag_branch->SetAddress(&ak4pfjets_csvbtag_);
   ak4pfjets_deepCSVb_branch = tree->GetBranch("ak4pfjets_deepCSVb");
   if (ak4pfjets_deepCSVb_branch) ak4pfjets_deepCSVb_branch->SetAddress(&ak4pfjets_deepCSVb_);
   ak4pfjets_deepCSVbb_branch = tree->GetBranch("ak4pfjets_deepCSVbb");
   if (ak4pfjets_deepCSVbb_branch) ak4pfjets_deepCSVbb_branch->SetAddress(&ak4pfjets_deepCSVbb_);
   ak4pfjets_deepCSVc_branch = tree->GetBranch("ak4pfjets_deepCSVc");
   if (ak4pfjets_deepCSVc_branch) ak4pfjets_deepCSVc_branch->SetAddress(&ak4pfjets_deepCSVc_);
-  ak4pfjets_deepCSVcc_branch = tree->GetBranch("ak4pfjets_deepCSVcc");
-  if (ak4pfjets_deepCSVcc_branch) ak4pfjets_deepCSVcc_branch->SetAddress(&ak4pfjets_deepCSVcc_);
   ak4pfjets_deepCSVl_branch = tree->GetBranch("ak4pfjets_deepCSVl");
   if (ak4pfjets_deepCSVl_branch) ak4pfjets_deepCSVl_branch->SetAddress(&ak4pfjets_deepCSVl_);
   topcands_ak4idx_branch = tree->GetBranch("topcands_ak4idx");
@@ -949,16 +951,12 @@ void stop_1l_babyAnalyzer::Init(TTree *tree) {
   if (jup_ak4pfjets_axis2_branch) jup_ak4pfjets_axis2_branch->SetAddress(&jup_ak4pfjets_axis2_);
   jup_ak4pfjets_mult_branch = tree->GetBranch("jup_ak4pfjets_mult");
   if (jup_ak4pfjets_mult_branch) jup_ak4pfjets_mult_branch->SetAddress(&jup_ak4pfjets_mult_);
-  jup_ak4pfjets_csvbtag_branch = tree->GetBranch("jup_ak4pfjets_csvbtag");
-  if (jup_ak4pfjets_csvbtag_branch) jup_ak4pfjets_csvbtag_branch->SetAddress(&jup_ak4pfjets_csvbtag_);
   jup_ak4pfjets_deepCSVb_branch = tree->GetBranch("jup_ak4pfjets_deepCSVb");
   if (jup_ak4pfjets_deepCSVb_branch) jup_ak4pfjets_deepCSVb_branch->SetAddress(&jup_ak4pfjets_deepCSVb_);
   jup_ak4pfjets_deepCSVbb_branch = tree->GetBranch("jup_ak4pfjets_deepCSVbb");
   if (jup_ak4pfjets_deepCSVbb_branch) jup_ak4pfjets_deepCSVbb_branch->SetAddress(&jup_ak4pfjets_deepCSVbb_);
   jup_ak4pfjets_deepCSVc_branch = tree->GetBranch("jup_ak4pfjets_deepCSVc");
   if (jup_ak4pfjets_deepCSVc_branch) jup_ak4pfjets_deepCSVc_branch->SetAddress(&jup_ak4pfjets_deepCSVc_);
-  jup_ak4pfjets_deepCSVcc_branch = tree->GetBranch("jup_ak4pfjets_deepCSVcc");
-  if (jup_ak4pfjets_deepCSVcc_branch) jup_ak4pfjets_deepCSVcc_branch->SetAddress(&jup_ak4pfjets_deepCSVcc_);
   jup_ak4pfjets_deepCSVl_branch = tree->GetBranch("jup_ak4pfjets_deepCSVl");
   if (jup_ak4pfjets_deepCSVl_branch) jup_ak4pfjets_deepCSVl_branch->SetAddress(&jup_ak4pfjets_deepCSVl_);
   jup_topcands_ak4idx_branch = tree->GetBranch("jup_topcands_ak4idx");
@@ -983,16 +981,12 @@ void stop_1l_babyAnalyzer::Init(TTree *tree) {
   if (jdown_ak4pfjets_axis2_branch) jdown_ak4pfjets_axis2_branch->SetAddress(&jdown_ak4pfjets_axis2_);
   jdown_ak4pfjets_mult_branch = tree->GetBranch("jdown_ak4pfjets_mult");
   if (jdown_ak4pfjets_mult_branch) jdown_ak4pfjets_mult_branch->SetAddress(&jdown_ak4pfjets_mult_);
-  jdown_ak4pfjets_csvbtag_branch = tree->GetBranch("jdown_ak4pfjets_csvbtag");
-  if (jdown_ak4pfjets_csvbtag_branch) jdown_ak4pfjets_csvbtag_branch->SetAddress(&jdown_ak4pfjets_csvbtag_);
   jdown_ak4pfjets_deepCSVb_branch = tree->GetBranch("jdown_ak4pfjets_deepCSVb");
   if (jdown_ak4pfjets_deepCSVb_branch) jdown_ak4pfjets_deepCSVb_branch->SetAddress(&jdown_ak4pfjets_deepCSVb_);
   jdown_ak4pfjets_deepCSVbb_branch = tree->GetBranch("jdown_ak4pfjets_deepCSVbb");
   if (jdown_ak4pfjets_deepCSVbb_branch) jdown_ak4pfjets_deepCSVbb_branch->SetAddress(&jdown_ak4pfjets_deepCSVbb_);
   jdown_ak4pfjets_deepCSVc_branch = tree->GetBranch("jdown_ak4pfjets_deepCSVc");
   if (jdown_ak4pfjets_deepCSVc_branch) jdown_ak4pfjets_deepCSVc_branch->SetAddress(&jdown_ak4pfjets_deepCSVc_);
-  jdown_ak4pfjets_deepCSVcc_branch = tree->GetBranch("jdown_ak4pfjets_deepCSVcc");
-  if (jdown_ak4pfjets_deepCSVcc_branch) jdown_ak4pfjets_deepCSVcc_branch->SetAddress(&jdown_ak4pfjets_deepCSVcc_);
   jdown_ak4pfjets_deepCSVl_branch = tree->GetBranch("jdown_ak4pfjets_deepCSVl");
   if (jdown_ak4pfjets_deepCSVl_branch) jdown_ak4pfjets_deepCSVl_branch->SetAddress(&jdown_ak4pfjets_deepCSVl_);
   jdown_topcands_ak4idx_branch = tree->GetBranch("jdown_topcands_ak4idx");
@@ -1107,7 +1101,7 @@ void stop_1l_babyAnalyzer::Init(TTree *tree) {
   tree->SetMakeClass(0);
 }
 
-void stop_1l_babyAnalyzer::GetEntry(unsigned int idx) {
+void StopTree::GetEntry(unsigned int idx) {
   // this only marks branches as not loaded, saving a lot of time
   index = idx;
   run_isLoaded = false;
@@ -1162,18 +1156,21 @@ void stop_1l_babyAnalyzer::GetEntry(unsigned int idx) {
   is1lepFromTop_isLoaded = false;
   MT2W_isLoaded = false;
   MT2W_rl_isLoaded = false;
+  MT2_ll_isLoaded = false;
   mindphi_met_j1_j2_isLoaded = false;
   mindphi_met_j1_j2_rl_isLoaded = false;
   mt_met_lep_isLoaded = false;
   mt_met_lep_rl_isLoaded = false;
   MT2W_jup_isLoaded = false;
   MT2W_rl_jup_isLoaded = false;
+  MT2_ll_jup_isLoaded = false;
   mindphi_met_j1_j2_jup_isLoaded = false;
   mindphi_met_j1_j2_rl_jup_isLoaded = false;
   mt_met_lep_jup_isLoaded = false;
   mt_met_lep_rl_jup_isLoaded = false;
   MT2W_jdown_isLoaded = false;
   MT2W_rl_jdown_isLoaded = false;
+  MT2_ll_jdown_isLoaded = false;
   mindphi_met_j1_j2_jdown_isLoaded = false;
   mindphi_met_j1_j2_rl_jdown_isLoaded = false;
   mt_met_lep_jdown_isLoaded = false;
@@ -1552,11 +1549,9 @@ void stop_1l_babyAnalyzer::GetEntry(unsigned int idx) {
   ak4pfjets_axis1_isLoaded = false;
   ak4pfjets_axis2_isLoaded = false;
   ak4pfjets_mult_isLoaded = false;
-  ak4pfjets_csvbtag_isLoaded = false;
   ak4pfjets_deepCSVb_isLoaded = false;
   ak4pfjets_deepCSVbb_isLoaded = false;
   ak4pfjets_deepCSVc_isLoaded = false;
-  ak4pfjets_deepCSVcc_isLoaded = false;
   ak4pfjets_deepCSVl_isLoaded = false;
   topcands_ak4idx_isLoaded = false;
   topcands_disc_isLoaded = false;
@@ -1572,11 +1567,9 @@ void stop_1l_babyAnalyzer::GetEntry(unsigned int idx) {
   jup_ak4pfjets_axis1_isLoaded = false;
   jup_ak4pfjets_axis2_isLoaded = false;
   jup_ak4pfjets_mult_isLoaded = false;
-  jup_ak4pfjets_csvbtag_isLoaded = false;
   jup_ak4pfjets_deepCSVb_isLoaded = false;
   jup_ak4pfjets_deepCSVbb_isLoaded = false;
   jup_ak4pfjets_deepCSVc_isLoaded = false;
-  jup_ak4pfjets_deepCSVcc_isLoaded = false;
   jup_ak4pfjets_deepCSVl_isLoaded = false;
   jup_topcands_ak4idx_isLoaded = false;
   jup_topcands_disc_isLoaded = false;
@@ -1592,11 +1585,9 @@ void stop_1l_babyAnalyzer::GetEntry(unsigned int idx) {
   jdown_ak4pfjets_axis1_isLoaded = false;
   jdown_ak4pfjets_axis2_isLoaded = false;
   jdown_ak4pfjets_mult_isLoaded = false;
-  jdown_ak4pfjets_csvbtag_isLoaded = false;
   jdown_ak4pfjets_deepCSVb_isLoaded = false;
   jdown_ak4pfjets_deepCSVbb_isLoaded = false;
   jdown_ak4pfjets_deepCSVc_isLoaded = false;
-  jdown_ak4pfjets_deepCSVcc_isLoaded = false;
   jdown_ak4pfjets_deepCSVl_isLoaded = false;
   jdown_topcands_ak4idx_isLoaded = false;
   jdown_topcands_disc_isLoaded = false;
@@ -1661,7 +1652,7 @@ void stop_1l_babyAnalyzer::GetEntry(unsigned int idx) {
   filt_nobadmuons_isLoaded = false;
 }
 
-void stop_1l_babyAnalyzer::LoadAllBranches() {
+void StopTree::LoadAllBranches() {
   // load all branches
   if (run_branch != 0) run();
   if (ls_branch != 0) ls();
@@ -1715,18 +1706,21 @@ void stop_1l_babyAnalyzer::LoadAllBranches() {
   if (is1lepFromTop_branch != 0) is1lepFromTop();
   if (MT2W_branch != 0) MT2W();
   if (MT2W_rl_branch != 0) MT2W_rl();
+  if (MT2_ll_branch != 0) MT2_ll();
   if (mindphi_met_j1_j2_branch != 0) mindphi_met_j1_j2();
   if (mindphi_met_j1_j2_rl_branch != 0) mindphi_met_j1_j2_rl();
   if (mt_met_lep_branch != 0) mt_met_lep();
   if (mt_met_lep_rl_branch != 0) mt_met_lep_rl();
   if (MT2W_jup_branch != 0) MT2W_jup();
   if (MT2W_rl_jup_branch != 0) MT2W_rl_jup();
+  if (MT2_ll_jup_branch != 0) MT2_ll_jup();
   if (mindphi_met_j1_j2_jup_branch != 0) mindphi_met_j1_j2_jup();
   if (mindphi_met_j1_j2_rl_jup_branch != 0) mindphi_met_j1_j2_rl_jup();
   if (mt_met_lep_jup_branch != 0) mt_met_lep_jup();
   if (mt_met_lep_rl_jup_branch != 0) mt_met_lep_rl_jup();
   if (MT2W_jdown_branch != 0) MT2W_jdown();
   if (MT2W_rl_jdown_branch != 0) MT2W_rl_jdown();
+  if (MT2_ll_jdown_branch != 0) MT2_ll_jdown();
   if (mindphi_met_j1_j2_jdown_branch != 0) mindphi_met_j1_j2_jdown();
   if (mindphi_met_j1_j2_rl_jdown_branch != 0) mindphi_met_j1_j2_rl_jdown();
   if (mt_met_lep_jdown_branch != 0) mt_met_lep_jdown();
@@ -2105,11 +2099,9 @@ void stop_1l_babyAnalyzer::LoadAllBranches() {
   if (ak4pfjets_axis1_branch != 0) ak4pfjets_axis1();
   if (ak4pfjets_axis2_branch != 0) ak4pfjets_axis2();
   if (ak4pfjets_mult_branch != 0) ak4pfjets_mult();
-  if (ak4pfjets_csvbtag_branch != 0) ak4pfjets_csvbtag();
   if (ak4pfjets_deepCSVb_branch != 0) ak4pfjets_deepCSVb();
   if (ak4pfjets_deepCSVbb_branch != 0) ak4pfjets_deepCSVbb();
   if (ak4pfjets_deepCSVc_branch != 0) ak4pfjets_deepCSVc();
-  if (ak4pfjets_deepCSVcc_branch != 0) ak4pfjets_deepCSVcc();
   if (ak4pfjets_deepCSVl_branch != 0) ak4pfjets_deepCSVl();
   if (topcands_ak4idx_branch != 0) topcands_ak4idx();
   if (topcands_disc_branch != 0) topcands_disc();
@@ -2125,11 +2117,9 @@ void stop_1l_babyAnalyzer::LoadAllBranches() {
   if (jup_ak4pfjets_axis1_branch != 0) jup_ak4pfjets_axis1();
   if (jup_ak4pfjets_axis2_branch != 0) jup_ak4pfjets_axis2();
   if (jup_ak4pfjets_mult_branch != 0) jup_ak4pfjets_mult();
-  if (jup_ak4pfjets_csvbtag_branch != 0) jup_ak4pfjets_csvbtag();
   if (jup_ak4pfjets_deepCSVb_branch != 0) jup_ak4pfjets_deepCSVb();
   if (jup_ak4pfjets_deepCSVbb_branch != 0) jup_ak4pfjets_deepCSVbb();
   if (jup_ak4pfjets_deepCSVc_branch != 0) jup_ak4pfjets_deepCSVc();
-  if (jup_ak4pfjets_deepCSVcc_branch != 0) jup_ak4pfjets_deepCSVcc();
   if (jup_ak4pfjets_deepCSVl_branch != 0) jup_ak4pfjets_deepCSVl();
   if (jup_topcands_ak4idx_branch != 0) jup_topcands_ak4idx();
   if (jup_topcands_disc_branch != 0) jup_topcands_disc();
@@ -2145,11 +2135,9 @@ void stop_1l_babyAnalyzer::LoadAllBranches() {
   if (jdown_ak4pfjets_axis1_branch != 0) jdown_ak4pfjets_axis1();
   if (jdown_ak4pfjets_axis2_branch != 0) jdown_ak4pfjets_axis2();
   if (jdown_ak4pfjets_mult_branch != 0) jdown_ak4pfjets_mult();
-  if (jdown_ak4pfjets_csvbtag_branch != 0) jdown_ak4pfjets_csvbtag();
   if (jdown_ak4pfjets_deepCSVb_branch != 0) jdown_ak4pfjets_deepCSVb();
   if (jdown_ak4pfjets_deepCSVbb_branch != 0) jdown_ak4pfjets_deepCSVbb();
   if (jdown_ak4pfjets_deepCSVc_branch != 0) jdown_ak4pfjets_deepCSVc();
-  if (jdown_ak4pfjets_deepCSVcc_branch != 0) jdown_ak4pfjets_deepCSVcc();
   if (jdown_ak4pfjets_deepCSVl_branch != 0) jdown_ak4pfjets_deepCSVl();
   if (jdown_topcands_ak4idx_branch != 0) jdown_topcands_ak4idx();
   if (jdown_topcands_disc_branch != 0) jdown_topcands_disc();
@@ -2214,7 +2202,7 @@ void stop_1l_babyAnalyzer::LoadAllBranches() {
   if (filt_nobadmuons_branch != 0) filt_nobadmuons();
 }
 
-const unsigned int &stop_1l_babyAnalyzer::run() {
+const unsigned int &StopTree::run() {
   if (not run_isLoaded) {
     if (run_branch != 0) {
       run_branch->GetEntry(index);
@@ -2227,7 +2215,7 @@ const unsigned int &stop_1l_babyAnalyzer::run() {
   return run_;
 }
 
-const unsigned int &stop_1l_babyAnalyzer::ls() {
+const unsigned int &StopTree::ls() {
   if (not ls_isLoaded) {
     if (ls_branch != 0) {
       ls_branch->GetEntry(index);
@@ -2240,7 +2228,7 @@ const unsigned int &stop_1l_babyAnalyzer::ls() {
   return ls_;
 }
 
-const unsigned int &stop_1l_babyAnalyzer::evt() {
+const unsigned int &StopTree::evt() {
   if (not evt_isLoaded) {
     if (evt_branch != 0) {
       evt_branch->GetEntry(index);
@@ -2253,7 +2241,7 @@ const unsigned int &stop_1l_babyAnalyzer::evt() {
   return evt_;
 }
 
-const int &stop_1l_babyAnalyzer::nvtxs() {
+const int &StopTree::nvtxs() {
   if (not nvtxs_isLoaded) {
     if (nvtxs_branch != 0) {
       nvtxs_branch->GetEntry(index);
@@ -2266,7 +2254,7 @@ const int &stop_1l_babyAnalyzer::nvtxs() {
   return nvtxs_;
 }
 
-const int &stop_1l_babyAnalyzer::pu_nvtxs() {
+const int &StopTree::pu_nvtxs() {
   if (not pu_nvtxs_isLoaded) {
     if (pu_nvtxs_branch != 0) {
       pu_nvtxs_branch->GetEntry(index);
@@ -2279,7 +2267,7 @@ const int &stop_1l_babyAnalyzer::pu_nvtxs() {
   return pu_nvtxs_;
 }
 
-const float &stop_1l_babyAnalyzer::pfmet() {
+const float &StopTree::pfmet() {
   if (not pfmet_isLoaded) {
     if (pfmet_branch != 0) {
       pfmet_branch->GetEntry(index);
@@ -2292,7 +2280,7 @@ const float &stop_1l_babyAnalyzer::pfmet() {
   return pfmet_;
 }
 
-const float &stop_1l_babyAnalyzer::pfmet_phi() {
+const float &StopTree::pfmet_phi() {
   if (not pfmet_phi_isLoaded) {
     if (pfmet_phi_branch != 0) {
       pfmet_phi_branch->GetEntry(index);
@@ -2305,7 +2293,7 @@ const float &stop_1l_babyAnalyzer::pfmet_phi() {
   return pfmet_phi_;
 }
 
-const float &stop_1l_babyAnalyzer::pfmet_jup() {
+const float &StopTree::pfmet_jup() {
   if (not pfmet_jup_isLoaded) {
     if (pfmet_jup_branch != 0) {
       pfmet_jup_branch->GetEntry(index);
@@ -2318,7 +2306,7 @@ const float &stop_1l_babyAnalyzer::pfmet_jup() {
   return pfmet_jup_;
 }
 
-const float &stop_1l_babyAnalyzer::pfmet_phi_jup() {
+const float &StopTree::pfmet_phi_jup() {
   if (not pfmet_phi_jup_isLoaded) {
     if (pfmet_phi_jup_branch != 0) {
       pfmet_phi_jup_branch->GetEntry(index);
@@ -2331,7 +2319,7 @@ const float &stop_1l_babyAnalyzer::pfmet_phi_jup() {
   return pfmet_phi_jup_;
 }
 
-const float &stop_1l_babyAnalyzer::pfmet_jdown() {
+const float &StopTree::pfmet_jdown() {
   if (not pfmet_jdown_isLoaded) {
     if (pfmet_jdown_branch != 0) {
       pfmet_jdown_branch->GetEntry(index);
@@ -2344,7 +2332,7 @@ const float &stop_1l_babyAnalyzer::pfmet_jdown() {
   return pfmet_jdown_;
 }
 
-const float &stop_1l_babyAnalyzer::pfmet_phi_jdown() {
+const float &StopTree::pfmet_phi_jdown() {
   if (not pfmet_phi_jdown_isLoaded) {
     if (pfmet_phi_jdown_branch != 0) {
       pfmet_phi_jdown_branch->GetEntry(index);
@@ -2357,7 +2345,7 @@ const float &stop_1l_babyAnalyzer::pfmet_phi_jdown() {
   return pfmet_phi_jdown_;
 }
 
-const float &stop_1l_babyAnalyzer::pfmet_rl() {
+const float &StopTree::pfmet_rl() {
   if (not pfmet_rl_isLoaded) {
     if (pfmet_rl_branch != 0) {
       pfmet_rl_branch->GetEntry(index);
@@ -2370,7 +2358,7 @@ const float &stop_1l_babyAnalyzer::pfmet_rl() {
   return pfmet_rl_;
 }
 
-const float &stop_1l_babyAnalyzer::pfmet_phi_rl() {
+const float &StopTree::pfmet_phi_rl() {
   if (not pfmet_phi_rl_isLoaded) {
     if (pfmet_phi_rl_branch != 0) {
       pfmet_phi_rl_branch->GetEntry(index);
@@ -2383,7 +2371,7 @@ const float &stop_1l_babyAnalyzer::pfmet_phi_rl() {
   return pfmet_phi_rl_;
 }
 
-const float &stop_1l_babyAnalyzer::pfmet_rl_jup() {
+const float &StopTree::pfmet_rl_jup() {
   if (not pfmet_rl_jup_isLoaded) {
     if (pfmet_rl_jup_branch != 0) {
       pfmet_rl_jup_branch->GetEntry(index);
@@ -2396,7 +2384,7 @@ const float &stop_1l_babyAnalyzer::pfmet_rl_jup() {
   return pfmet_rl_jup_;
 }
 
-const float &stop_1l_babyAnalyzer::pfmet_phi_rl_jup() {
+const float &StopTree::pfmet_phi_rl_jup() {
   if (not pfmet_phi_rl_jup_isLoaded) {
     if (pfmet_phi_rl_jup_branch != 0) {
       pfmet_phi_rl_jup_branch->GetEntry(index);
@@ -2409,7 +2397,7 @@ const float &stop_1l_babyAnalyzer::pfmet_phi_rl_jup() {
   return pfmet_phi_rl_jup_;
 }
 
-const float &stop_1l_babyAnalyzer::pfmet_rl_jdown() {
+const float &StopTree::pfmet_rl_jdown() {
   if (not pfmet_rl_jdown_isLoaded) {
     if (pfmet_rl_jdown_branch != 0) {
       pfmet_rl_jdown_branch->GetEntry(index);
@@ -2422,7 +2410,7 @@ const float &stop_1l_babyAnalyzer::pfmet_rl_jdown() {
   return pfmet_rl_jdown_;
 }
 
-const float &stop_1l_babyAnalyzer::pfmet_phi_rl_jdown() {
+const float &StopTree::pfmet_phi_rl_jdown() {
   if (not pfmet_phi_rl_jdown_isLoaded) {
     if (pfmet_phi_rl_jdown_branch != 0) {
       pfmet_phi_rl_jdown_branch->GetEntry(index);
@@ -2435,7 +2423,7 @@ const float &stop_1l_babyAnalyzer::pfmet_phi_rl_jdown() {
   return pfmet_phi_rl_jdown_;
 }
 
-const float &stop_1l_babyAnalyzer::pfmet_egclean() {
+const float &StopTree::pfmet_egclean() {
   if (not pfmet_egclean_isLoaded) {
     if (pfmet_egclean_branch != 0) {
       pfmet_egclean_branch->GetEntry(index);
@@ -2448,7 +2436,7 @@ const float &stop_1l_babyAnalyzer::pfmet_egclean() {
   return pfmet_egclean_;
 }
 
-const float &stop_1l_babyAnalyzer::pfmet_egclean_phi() {
+const float &StopTree::pfmet_egclean_phi() {
   if (not pfmet_egclean_phi_isLoaded) {
     if (pfmet_egclean_phi_branch != 0) {
       pfmet_egclean_phi_branch->GetEntry(index);
@@ -2461,7 +2449,7 @@ const float &stop_1l_babyAnalyzer::pfmet_egclean_phi() {
   return pfmet_egclean_phi_;
 }
 
-const float &stop_1l_babyAnalyzer::pfmet_muegclean() {
+const float &StopTree::pfmet_muegclean() {
   if (not pfmet_muegclean_isLoaded) {
     if (pfmet_muegclean_branch != 0) {
       pfmet_muegclean_branch->GetEntry(index);
@@ -2474,7 +2462,7 @@ const float &stop_1l_babyAnalyzer::pfmet_muegclean() {
   return pfmet_muegclean_;
 }
 
-const float &stop_1l_babyAnalyzer::pfmet_muegclean_phi() {
+const float &StopTree::pfmet_muegclean_phi() {
   if (not pfmet_muegclean_phi_isLoaded) {
     if (pfmet_muegclean_phi_branch != 0) {
       pfmet_muegclean_phi_branch->GetEntry(index);
@@ -2487,7 +2475,7 @@ const float &stop_1l_babyAnalyzer::pfmet_muegclean_phi() {
   return pfmet_muegclean_phi_;
 }
 
-const float &stop_1l_babyAnalyzer::pfmet_muegcleanfix() {
+const float &StopTree::pfmet_muegcleanfix() {
   if (not pfmet_muegcleanfix_isLoaded) {
     if (pfmet_muegcleanfix_branch != 0) {
       pfmet_muegcleanfix_branch->GetEntry(index);
@@ -2500,7 +2488,7 @@ const float &stop_1l_babyAnalyzer::pfmet_muegcleanfix() {
   return pfmet_muegcleanfix_;
 }
 
-const float &stop_1l_babyAnalyzer::pfmet_muegcleanfix_phi() {
+const float &StopTree::pfmet_muegcleanfix_phi() {
   if (not pfmet_muegcleanfix_phi_isLoaded) {
     if (pfmet_muegcleanfix_phi_branch != 0) {
       pfmet_muegcleanfix_phi_branch->GetEntry(index);
@@ -2513,7 +2501,7 @@ const float &stop_1l_babyAnalyzer::pfmet_muegcleanfix_phi() {
   return pfmet_muegcleanfix_phi_;
 }
 
-const float &stop_1l_babyAnalyzer::pfmet_uncorr() {
+const float &StopTree::pfmet_uncorr() {
   if (not pfmet_uncorr_isLoaded) {
     if (pfmet_uncorr_branch != 0) {
       pfmet_uncorr_branch->GetEntry(index);
@@ -2526,7 +2514,7 @@ const float &stop_1l_babyAnalyzer::pfmet_uncorr() {
   return pfmet_uncorr_;
 }
 
-const float &stop_1l_babyAnalyzer::pfmet_uncorr_phi() {
+const float &StopTree::pfmet_uncorr_phi() {
   if (not pfmet_uncorr_phi_isLoaded) {
     if (pfmet_uncorr_phi_branch != 0) {
       pfmet_uncorr_phi_branch->GetEntry(index);
@@ -2539,7 +2527,7 @@ const float &stop_1l_babyAnalyzer::pfmet_uncorr_phi() {
   return pfmet_uncorr_phi_;
 }
 
-const float &stop_1l_babyAnalyzer::pfmet_original() {
+const float &StopTree::pfmet_original() {
   if (not pfmet_original_isLoaded) {
     if (pfmet_original_branch != 0) {
       pfmet_original_branch->GetEntry(index);
@@ -2552,7 +2540,7 @@ const float &stop_1l_babyAnalyzer::pfmet_original() {
   return pfmet_original_;
 }
 
-const float &stop_1l_babyAnalyzer::pfmet_original_phi() {
+const float &StopTree::pfmet_original_phi() {
   if (not pfmet_original_phi_isLoaded) {
     if (pfmet_original_phi_branch != 0) {
       pfmet_original_phi_branch->GetEntry(index);
@@ -2565,7 +2553,7 @@ const float &stop_1l_babyAnalyzer::pfmet_original_phi() {
   return pfmet_original_phi_;
 }
 
-const float &stop_1l_babyAnalyzer::scale1fb() {
+const float &StopTree::scale1fb() {
   if (not scale1fb_isLoaded) {
     if (scale1fb_branch != 0) {
       scale1fb_branch->GetEntry(index);
@@ -2578,7 +2566,7 @@ const float &stop_1l_babyAnalyzer::scale1fb() {
   return scale1fb_;
 }
 
-const float &stop_1l_babyAnalyzer::xsec() {
+const float &StopTree::xsec() {
   if (not xsec_isLoaded) {
     if (xsec_branch != 0) {
       xsec_branch->GetEntry(index);
@@ -2591,7 +2579,7 @@ const float &stop_1l_babyAnalyzer::xsec() {
   return xsec_;
 }
 
-const float &stop_1l_babyAnalyzer::xsec_uncert() {
+const float &StopTree::xsec_uncert() {
   if (not xsec_uncert_isLoaded) {
     if (xsec_uncert_branch != 0) {
       xsec_uncert_branch->GetEntry(index);
@@ -2604,7 +2592,7 @@ const float &stop_1l_babyAnalyzer::xsec_uncert() {
   return xsec_uncert_;
 }
 
-const float &stop_1l_babyAnalyzer::kfactor() {
+const float &StopTree::kfactor() {
   if (not kfactor_isLoaded) {
     if (kfactor_branch != 0) {
       kfactor_branch->GetEntry(index);
@@ -2617,7 +2605,7 @@ const float &stop_1l_babyAnalyzer::kfactor() {
   return kfactor_;
 }
 
-const float &stop_1l_babyAnalyzer::pu_ntrue() {
+const float &StopTree::pu_ntrue() {
   if (not pu_ntrue_isLoaded) {
     if (pu_ntrue_branch != 0) {
       pu_ntrue_branch->GetEntry(index);
@@ -2630,7 +2618,7 @@ const float &stop_1l_babyAnalyzer::pu_ntrue() {
   return pu_ntrue_;
 }
 
-const int &stop_1l_babyAnalyzer::ngoodleps() {
+const int &StopTree::ngoodleps() {
   if (not ngoodleps_isLoaded) {
     if (ngoodleps_branch != 0) {
       ngoodleps_branch->GetEntry(index);
@@ -2643,7 +2631,7 @@ const int &stop_1l_babyAnalyzer::ngoodleps() {
   return ngoodleps_;
 }
 
-const int &stop_1l_babyAnalyzer::nlooseleps() {
+const int &StopTree::nlooseleps() {
   if (not nlooseleps_isLoaded) {
     if (nlooseleps_branch != 0) {
       nlooseleps_branch->GetEntry(index);
@@ -2656,7 +2644,7 @@ const int &stop_1l_babyAnalyzer::nlooseleps() {
   return nlooseleps_;
 }
 
-const int &stop_1l_babyAnalyzer::nvetoleps() {
+const int &StopTree::nvetoleps() {
   if (not nvetoleps_isLoaded) {
     if (nvetoleps_branch != 0) {
       nvetoleps_branch->GetEntry(index);
@@ -2669,7 +2657,7 @@ const int &stop_1l_babyAnalyzer::nvetoleps() {
   return nvetoleps_;
 }
 
-const bool &stop_1l_babyAnalyzer::is_data() {
+const bool &StopTree::is_data() {
   if (not is_data_isLoaded) {
     if (is_data_branch != 0) {
       is_data_branch->GetEntry(index);
@@ -2682,7 +2670,7 @@ const bool &stop_1l_babyAnalyzer::is_data() {
   return is_data_;
 }
 
-const string &stop_1l_babyAnalyzer::dataset() {
+const string &StopTree::dataset() {
   if (not dataset_isLoaded) {
     if (dataset_branch != 0) {
       dataset_branch->GetEntry(index);
@@ -2695,7 +2683,7 @@ const string &stop_1l_babyAnalyzer::dataset() {
   return *dataset_;
 }
 
-const string &stop_1l_babyAnalyzer::filename() {
+const string &StopTree::filename() {
   if (not filename_isLoaded) {
     if (filename_branch != 0) {
       filename_branch->GetEntry(index);
@@ -2708,7 +2696,7 @@ const string &stop_1l_babyAnalyzer::filename() {
   return *filename_;
 }
 
-const string &stop_1l_babyAnalyzer::cms3tag() {
+const string &StopTree::cms3tag() {
   if (not cms3tag_isLoaded) {
     if (cms3tag_branch != 0) {
       cms3tag_branch->GetEntry(index);
@@ -2721,7 +2709,7 @@ const string &stop_1l_babyAnalyzer::cms3tag() {
   return *cms3tag_;
 }
 
-const unsigned int &stop_1l_babyAnalyzer::nEvents() {
+const unsigned int &StopTree::nEvents() {
   if (not nEvents_isLoaded) {
     if (nEvents_branch != 0) {
       nEvents_branch->GetEntry(index);
@@ -2734,7 +2722,7 @@ const unsigned int &stop_1l_babyAnalyzer::nEvents() {
   return nEvents_;
 }
 
-const unsigned int &stop_1l_babyAnalyzer::nEvents_goodvtx() {
+const unsigned int &StopTree::nEvents_goodvtx() {
   if (not nEvents_goodvtx_isLoaded) {
     if (nEvents_goodvtx_branch != 0) {
       nEvents_goodvtx_branch->GetEntry(index);
@@ -2747,7 +2735,7 @@ const unsigned int &stop_1l_babyAnalyzer::nEvents_goodvtx() {
   return nEvents_goodvtx_;
 }
 
-const unsigned int &stop_1l_babyAnalyzer::nEvents_MET30() {
+const unsigned int &StopTree::nEvents_MET30() {
   if (not nEvents_MET30_isLoaded) {
     if (nEvents_MET30_branch != 0) {
       nEvents_MET30_branch->GetEntry(index);
@@ -2760,7 +2748,7 @@ const unsigned int &stop_1l_babyAnalyzer::nEvents_MET30() {
   return nEvents_MET30_;
 }
 
-const unsigned int &stop_1l_babyAnalyzer::nEvents_1goodlep() {
+const unsigned int &StopTree::nEvents_1goodlep() {
   if (not nEvents_1goodlep_isLoaded) {
     if (nEvents_1goodlep_branch != 0) {
       nEvents_1goodlep_branch->GetEntry(index);
@@ -2773,7 +2761,7 @@ const unsigned int &stop_1l_babyAnalyzer::nEvents_1goodlep() {
   return nEvents_1goodlep_;
 }
 
-const unsigned int &stop_1l_babyAnalyzer::nEvents_2goodjets() {
+const unsigned int &StopTree::nEvents_2goodjets() {
   if (not nEvents_2goodjets_isLoaded) {
     if (nEvents_2goodjets_branch != 0) {
       nEvents_2goodjets_branch->GetEntry(index);
@@ -2786,7 +2774,7 @@ const unsigned int &stop_1l_babyAnalyzer::nEvents_2goodjets() {
   return nEvents_2goodjets_;
 }
 
-const int &stop_1l_babyAnalyzer::is0lep() {
+const int &StopTree::is0lep() {
   if (not is0lep_isLoaded) {
     if (is0lep_branch != 0) {
       is0lep_branch->GetEntry(index);
@@ -2799,7 +2787,7 @@ const int &stop_1l_babyAnalyzer::is0lep() {
   return is0lep_;
 }
 
-const int &stop_1l_babyAnalyzer::is1lep() {
+const int &StopTree::is1lep() {
   if (not is1lep_isLoaded) {
     if (is1lep_branch != 0) {
       is1lep_branch->GetEntry(index);
@@ -2812,7 +2800,7 @@ const int &stop_1l_babyAnalyzer::is1lep() {
   return is1lep_;
 }
 
-const int &stop_1l_babyAnalyzer::is2lep() {
+const int &StopTree::is2lep() {
   if (not is2lep_isLoaded) {
     if (is2lep_branch != 0) {
       is2lep_branch->GetEntry(index);
@@ -2825,7 +2813,7 @@ const int &stop_1l_babyAnalyzer::is2lep() {
   return is2lep_;
 }
 
-const int &stop_1l_babyAnalyzer::isZtoNuNu() {
+const int &StopTree::isZtoNuNu() {
   if (not isZtoNuNu_isLoaded) {
     if (isZtoNuNu_branch != 0) {
       isZtoNuNu_branch->GetEntry(index);
@@ -2838,7 +2826,7 @@ const int &stop_1l_babyAnalyzer::isZtoNuNu() {
   return isZtoNuNu_;
 }
 
-const int &stop_1l_babyAnalyzer::is1lepFromW() {
+const int &StopTree::is1lepFromW() {
   if (not is1lepFromW_isLoaded) {
     if (is1lepFromW_branch != 0) {
       is1lepFromW_branch->GetEntry(index);
@@ -2851,7 +2839,7 @@ const int &stop_1l_babyAnalyzer::is1lepFromW() {
   return is1lepFromW_;
 }
 
-const int &stop_1l_babyAnalyzer::is1lepFromTop() {
+const int &StopTree::is1lepFromTop() {
   if (not is1lepFromTop_isLoaded) {
     if (is1lepFromTop_branch != 0) {
       is1lepFromTop_branch->GetEntry(index);
@@ -2864,7 +2852,7 @@ const int &stop_1l_babyAnalyzer::is1lepFromTop() {
   return is1lepFromTop_;
 }
 
-const float &stop_1l_babyAnalyzer::MT2W() {
+const float &StopTree::MT2W() {
   if (not MT2W_isLoaded) {
     if (MT2W_branch != 0) {
       MT2W_branch->GetEntry(index);
@@ -2877,7 +2865,7 @@ const float &stop_1l_babyAnalyzer::MT2W() {
   return MT2W_;
 }
 
-const float &stop_1l_babyAnalyzer::MT2W_rl() {
+const float &StopTree::MT2W_rl() {
   if (not MT2W_rl_isLoaded) {
     if (MT2W_rl_branch != 0) {
       MT2W_rl_branch->GetEntry(index);
@@ -2890,7 +2878,20 @@ const float &stop_1l_babyAnalyzer::MT2W_rl() {
   return MT2W_rl_;
 }
 
-const float &stop_1l_babyAnalyzer::mindphi_met_j1_j2() {
+const float &StopTree::MT2_ll() {
+  if (not MT2_ll_isLoaded) {
+    if (MT2_ll_branch != 0) {
+      MT2_ll_branch->GetEntry(index);
+    } else {
+      printf("branch MT2_ll_branch does not exist!\n");
+      exit(1);
+    }
+    MT2_ll_isLoaded = true;
+  }
+  return MT2_ll_;
+}
+
+const float &StopTree::mindphi_met_j1_j2() {
   if (not mindphi_met_j1_j2_isLoaded) {
     if (mindphi_met_j1_j2_branch != 0) {
       mindphi_met_j1_j2_branch->GetEntry(index);
@@ -2903,7 +2904,7 @@ const float &stop_1l_babyAnalyzer::mindphi_met_j1_j2() {
   return mindphi_met_j1_j2_;
 }
 
-const float &stop_1l_babyAnalyzer::mindphi_met_j1_j2_rl() {
+const float &StopTree::mindphi_met_j1_j2_rl() {
   if (not mindphi_met_j1_j2_rl_isLoaded) {
     if (mindphi_met_j1_j2_rl_branch != 0) {
       mindphi_met_j1_j2_rl_branch->GetEntry(index);
@@ -2916,7 +2917,7 @@ const float &stop_1l_babyAnalyzer::mindphi_met_j1_j2_rl() {
   return mindphi_met_j1_j2_rl_;
 }
 
-const float &stop_1l_babyAnalyzer::mt_met_lep() {
+const float &StopTree::mt_met_lep() {
   if (not mt_met_lep_isLoaded) {
     if (mt_met_lep_branch != 0) {
       mt_met_lep_branch->GetEntry(index);
@@ -2929,7 +2930,7 @@ const float &stop_1l_babyAnalyzer::mt_met_lep() {
   return mt_met_lep_;
 }
 
-const float &stop_1l_babyAnalyzer::mt_met_lep_rl() {
+const float &StopTree::mt_met_lep_rl() {
   if (not mt_met_lep_rl_isLoaded) {
     if (mt_met_lep_rl_branch != 0) {
       mt_met_lep_rl_branch->GetEntry(index);
@@ -2942,7 +2943,7 @@ const float &stop_1l_babyAnalyzer::mt_met_lep_rl() {
   return mt_met_lep_rl_;
 }
 
-const float &stop_1l_babyAnalyzer::MT2W_jup() {
+const float &StopTree::MT2W_jup() {
   if (not MT2W_jup_isLoaded) {
     if (MT2W_jup_branch != 0) {
       MT2W_jup_branch->GetEntry(index);
@@ -2955,7 +2956,7 @@ const float &stop_1l_babyAnalyzer::MT2W_jup() {
   return MT2W_jup_;
 }
 
-const float &stop_1l_babyAnalyzer::MT2W_rl_jup() {
+const float &StopTree::MT2W_rl_jup() {
   if (not MT2W_rl_jup_isLoaded) {
     if (MT2W_rl_jup_branch != 0) {
       MT2W_rl_jup_branch->GetEntry(index);
@@ -2968,7 +2969,20 @@ const float &stop_1l_babyAnalyzer::MT2W_rl_jup() {
   return MT2W_rl_jup_;
 }
 
-const float &stop_1l_babyAnalyzer::mindphi_met_j1_j2_jup() {
+const float &StopTree::MT2_ll_jup() {
+  if (not MT2_ll_jup_isLoaded) {
+    if (MT2_ll_jup_branch != 0) {
+      MT2_ll_jup_branch->GetEntry(index);
+    } else {
+      printf("branch MT2_ll_jup_branch does not exist!\n");
+      exit(1);
+    }
+    MT2_ll_jup_isLoaded = true;
+  }
+  return MT2_ll_jup_;
+}
+
+const float &StopTree::mindphi_met_j1_j2_jup() {
   if (not mindphi_met_j1_j2_jup_isLoaded) {
     if (mindphi_met_j1_j2_jup_branch != 0) {
       mindphi_met_j1_j2_jup_branch->GetEntry(index);
@@ -2981,7 +2995,7 @@ const float &stop_1l_babyAnalyzer::mindphi_met_j1_j2_jup() {
   return mindphi_met_j1_j2_jup_;
 }
 
-const float &stop_1l_babyAnalyzer::mindphi_met_j1_j2_rl_jup() {
+const float &StopTree::mindphi_met_j1_j2_rl_jup() {
   if (not mindphi_met_j1_j2_rl_jup_isLoaded) {
     if (mindphi_met_j1_j2_rl_jup_branch != 0) {
       mindphi_met_j1_j2_rl_jup_branch->GetEntry(index);
@@ -2994,7 +3008,7 @@ const float &stop_1l_babyAnalyzer::mindphi_met_j1_j2_rl_jup() {
   return mindphi_met_j1_j2_rl_jup_;
 }
 
-const float &stop_1l_babyAnalyzer::mt_met_lep_jup() {
+const float &StopTree::mt_met_lep_jup() {
   if (not mt_met_lep_jup_isLoaded) {
     if (mt_met_lep_jup_branch != 0) {
       mt_met_lep_jup_branch->GetEntry(index);
@@ -3007,7 +3021,7 @@ const float &stop_1l_babyAnalyzer::mt_met_lep_jup() {
   return mt_met_lep_jup_;
 }
 
-const float &stop_1l_babyAnalyzer::mt_met_lep_rl_jup() {
+const float &StopTree::mt_met_lep_rl_jup() {
   if (not mt_met_lep_rl_jup_isLoaded) {
     if (mt_met_lep_rl_jup_branch != 0) {
       mt_met_lep_rl_jup_branch->GetEntry(index);
@@ -3020,7 +3034,7 @@ const float &stop_1l_babyAnalyzer::mt_met_lep_rl_jup() {
   return mt_met_lep_rl_jup_;
 }
 
-const float &stop_1l_babyAnalyzer::MT2W_jdown() {
+const float &StopTree::MT2W_jdown() {
   if (not MT2W_jdown_isLoaded) {
     if (MT2W_jdown_branch != 0) {
       MT2W_jdown_branch->GetEntry(index);
@@ -3033,7 +3047,7 @@ const float &stop_1l_babyAnalyzer::MT2W_jdown() {
   return MT2W_jdown_;
 }
 
-const float &stop_1l_babyAnalyzer::MT2W_rl_jdown() {
+const float &StopTree::MT2W_rl_jdown() {
   if (not MT2W_rl_jdown_isLoaded) {
     if (MT2W_rl_jdown_branch != 0) {
       MT2W_rl_jdown_branch->GetEntry(index);
@@ -3046,7 +3060,20 @@ const float &stop_1l_babyAnalyzer::MT2W_rl_jdown() {
   return MT2W_rl_jdown_;
 }
 
-const float &stop_1l_babyAnalyzer::mindphi_met_j1_j2_jdown() {
+const float &StopTree::MT2_ll_jdown() {
+  if (not MT2_ll_jdown_isLoaded) {
+    if (MT2_ll_jdown_branch != 0) {
+      MT2_ll_jdown_branch->GetEntry(index);
+    } else {
+      printf("branch MT2_ll_jdown_branch does not exist!\n");
+      exit(1);
+    }
+    MT2_ll_jdown_isLoaded = true;
+  }
+  return MT2_ll_jdown_;
+}
+
+const float &StopTree::mindphi_met_j1_j2_jdown() {
   if (not mindphi_met_j1_j2_jdown_isLoaded) {
     if (mindphi_met_j1_j2_jdown_branch != 0) {
       mindphi_met_j1_j2_jdown_branch->GetEntry(index);
@@ -3059,7 +3086,7 @@ const float &stop_1l_babyAnalyzer::mindphi_met_j1_j2_jdown() {
   return mindphi_met_j1_j2_jdown_;
 }
 
-const float &stop_1l_babyAnalyzer::mindphi_met_j1_j2_rl_jdown() {
+const float &StopTree::mindphi_met_j1_j2_rl_jdown() {
   if (not mindphi_met_j1_j2_rl_jdown_isLoaded) {
     if (mindphi_met_j1_j2_rl_jdown_branch != 0) {
       mindphi_met_j1_j2_rl_jdown_branch->GetEntry(index);
@@ -3072,7 +3099,7 @@ const float &stop_1l_babyAnalyzer::mindphi_met_j1_j2_rl_jdown() {
   return mindphi_met_j1_j2_rl_jdown_;
 }
 
-const float &stop_1l_babyAnalyzer::mt_met_lep_jdown() {
+const float &StopTree::mt_met_lep_jdown() {
   if (not mt_met_lep_jdown_isLoaded) {
     if (mt_met_lep_jdown_branch != 0) {
       mt_met_lep_jdown_branch->GetEntry(index);
@@ -3085,7 +3112,7 @@ const float &stop_1l_babyAnalyzer::mt_met_lep_jdown() {
   return mt_met_lep_jdown_;
 }
 
-const float &stop_1l_babyAnalyzer::mt_met_lep_rl_jdown() {
+const float &StopTree::mt_met_lep_rl_jdown() {
   if (not mt_met_lep_rl_jdown_isLoaded) {
     if (mt_met_lep_rl_jdown_branch != 0) {
       mt_met_lep_rl_jdown_branch->GetEntry(index);
@@ -3098,7 +3125,7 @@ const float &stop_1l_babyAnalyzer::mt_met_lep_rl_jdown() {
   return mt_met_lep_rl_jdown_;
 }
 
-const float &stop_1l_babyAnalyzer::hadronic_top_chi2() {
+const float &StopTree::hadronic_top_chi2() {
   if (not hadronic_top_chi2_isLoaded) {
     if (hadronic_top_chi2_branch != 0) {
       hadronic_top_chi2_branch->GetEntry(index);
@@ -3111,7 +3138,7 @@ const float &stop_1l_babyAnalyzer::hadronic_top_chi2() {
   return hadronic_top_chi2_;
 }
 
-const float &stop_1l_babyAnalyzer::ak4pfjets_rho() {
+const float &StopTree::ak4pfjets_rho() {
   if (not ak4pfjets_rho_isLoaded) {
     if (ak4pfjets_rho_branch != 0) {
       ak4pfjets_rho_branch->GetEntry(index);
@@ -3124,7 +3151,7 @@ const float &stop_1l_babyAnalyzer::ak4pfjets_rho() {
   return ak4pfjets_rho_;
 }
 
-const float &stop_1l_babyAnalyzer::pdf_up_weight() {
+const float &StopTree::pdf_up_weight() {
   if (not pdf_up_weight_isLoaded) {
     if (pdf_up_weight_branch != 0) {
       pdf_up_weight_branch->GetEntry(index);
@@ -3137,7 +3164,7 @@ const float &stop_1l_babyAnalyzer::pdf_up_weight() {
   return pdf_up_weight_;
 }
 
-const float &stop_1l_babyAnalyzer::pdf_down_weight() {
+const float &StopTree::pdf_down_weight() {
   if (not pdf_down_weight_isLoaded) {
     if (pdf_down_weight_branch != 0) {
       pdf_down_weight_branch->GetEntry(index);
@@ -3150,7 +3177,7 @@ const float &stop_1l_babyAnalyzer::pdf_down_weight() {
   return pdf_down_weight_;
 }
 
-const vector<string> &stop_1l_babyAnalyzer::genweightsID() {
+const vector<string> &StopTree::genweightsID() {
   if (not genweightsID_isLoaded) {
     if (genweightsID_branch != 0) {
       genweightsID_branch->GetEntry(index);
@@ -3163,7 +3190,7 @@ const vector<string> &stop_1l_babyAnalyzer::genweightsID() {
   return *genweightsID_;
 }
 
-const int &stop_1l_babyAnalyzer::ngenweights() {
+const int &StopTree::ngenweights() {
   if (not ngenweights_isLoaded) {
     if (ngenweights_branch != 0) {
       ngenweights_branch->GetEntry(index);
@@ -3176,7 +3203,7 @@ const int &stop_1l_babyAnalyzer::ngenweights() {
   return ngenweights_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::genweights() {
+const vector<float> &StopTree::genweights() {
   if (not genweights_isLoaded) {
     if (genweights_branch != 0) {
       genweights_branch->GetEntry(index);
@@ -3189,7 +3216,7 @@ const vector<float> &stop_1l_babyAnalyzer::genweights() {
   return *genweights_;
 }
 
-const float &stop_1l_babyAnalyzer::weight_Q2_up() {
+const float &StopTree::weight_Q2_up() {
   if (not weight_Q2_up_isLoaded) {
     if (weight_Q2_up_branch != 0) {
       weight_Q2_up_branch->GetEntry(index);
@@ -3202,7 +3229,7 @@ const float &stop_1l_babyAnalyzer::weight_Q2_up() {
   return weight_Q2_up_;
 }
 
-const float &stop_1l_babyAnalyzer::weight_Q2_down() {
+const float &StopTree::weight_Q2_down() {
   if (not weight_Q2_down_isLoaded) {
     if (weight_Q2_down_branch != 0) {
       weight_Q2_down_branch->GetEntry(index);
@@ -3215,7 +3242,7 @@ const float &stop_1l_babyAnalyzer::weight_Q2_down() {
   return weight_Q2_down_;
 }
 
-const float &stop_1l_babyAnalyzer::weight_alphas_up() {
+const float &StopTree::weight_alphas_up() {
   if (not weight_alphas_up_isLoaded) {
     if (weight_alphas_up_branch != 0) {
       weight_alphas_up_branch->GetEntry(index);
@@ -3228,7 +3255,7 @@ const float &stop_1l_babyAnalyzer::weight_alphas_up() {
   return weight_alphas_up_;
 }
 
-const float &stop_1l_babyAnalyzer::weight_alphas_down() {
+const float &StopTree::weight_alphas_down() {
   if (not weight_alphas_down_isLoaded) {
     if (weight_alphas_down_branch != 0) {
       weight_alphas_down_branch->GetEntry(index);
@@ -3241,7 +3268,7 @@ const float &stop_1l_babyAnalyzer::weight_alphas_down() {
   return weight_alphas_down_;
 }
 
-const float &stop_1l_babyAnalyzer::weight_btagsf() {
+const float &StopTree::weight_btagsf() {
   if (not weight_btagsf_isLoaded) {
     if (weight_btagsf_branch != 0) {
       weight_btagsf_branch->GetEntry(index);
@@ -3254,7 +3281,7 @@ const float &stop_1l_babyAnalyzer::weight_btagsf() {
   return weight_btagsf_;
 }
 
-const float &stop_1l_babyAnalyzer::weight_btagsf_heavy_UP() {
+const float &StopTree::weight_btagsf_heavy_UP() {
   if (not weight_btagsf_heavy_UP_isLoaded) {
     if (weight_btagsf_heavy_UP_branch != 0) {
       weight_btagsf_heavy_UP_branch->GetEntry(index);
@@ -3267,7 +3294,7 @@ const float &stop_1l_babyAnalyzer::weight_btagsf_heavy_UP() {
   return weight_btagsf_heavy_UP_;
 }
 
-const float &stop_1l_babyAnalyzer::weight_btagsf_light_UP() {
+const float &StopTree::weight_btagsf_light_UP() {
   if (not weight_btagsf_light_UP_isLoaded) {
     if (weight_btagsf_light_UP_branch != 0) {
       weight_btagsf_light_UP_branch->GetEntry(index);
@@ -3280,7 +3307,7 @@ const float &stop_1l_babyAnalyzer::weight_btagsf_light_UP() {
   return weight_btagsf_light_UP_;
 }
 
-const float &stop_1l_babyAnalyzer::weight_btagsf_heavy_DN() {
+const float &StopTree::weight_btagsf_heavy_DN() {
   if (not weight_btagsf_heavy_DN_isLoaded) {
     if (weight_btagsf_heavy_DN_branch != 0) {
       weight_btagsf_heavy_DN_branch->GetEntry(index);
@@ -3293,7 +3320,7 @@ const float &stop_1l_babyAnalyzer::weight_btagsf_heavy_DN() {
   return weight_btagsf_heavy_DN_;
 }
 
-const float &stop_1l_babyAnalyzer::weight_btagsf_light_DN() {
+const float &StopTree::weight_btagsf_light_DN() {
   if (not weight_btagsf_light_DN_isLoaded) {
     if (weight_btagsf_light_DN_branch != 0) {
       weight_btagsf_light_DN_branch->GetEntry(index);
@@ -3306,7 +3333,7 @@ const float &stop_1l_babyAnalyzer::weight_btagsf_light_DN() {
   return weight_btagsf_light_DN_;
 }
 
-const float &stop_1l_babyAnalyzer::weight_btagsf_fastsim_UP() {
+const float &StopTree::weight_btagsf_fastsim_UP() {
   if (not weight_btagsf_fastsim_UP_isLoaded) {
     if (weight_btagsf_fastsim_UP_branch != 0) {
       weight_btagsf_fastsim_UP_branch->GetEntry(index);
@@ -3319,7 +3346,7 @@ const float &stop_1l_babyAnalyzer::weight_btagsf_fastsim_UP() {
   return weight_btagsf_fastsim_UP_;
 }
 
-const float &stop_1l_babyAnalyzer::weight_btagsf_fastsim_DN() {
+const float &StopTree::weight_btagsf_fastsim_DN() {
   if (not weight_btagsf_fastsim_DN_isLoaded) {
     if (weight_btagsf_fastsim_DN_branch != 0) {
       weight_btagsf_fastsim_DN_branch->GetEntry(index);
@@ -3332,7 +3359,7 @@ const float &stop_1l_babyAnalyzer::weight_btagsf_fastsim_DN() {
   return weight_btagsf_fastsim_DN_;
 }
 
-const float &stop_1l_babyAnalyzer::weight_analysisbtagsf() {
+const float &StopTree::weight_analysisbtagsf() {
   if (not weight_analysisbtagsf_isLoaded) {
     if (weight_analysisbtagsf_branch != 0) {
       weight_analysisbtagsf_branch->GetEntry(index);
@@ -3345,7 +3372,7 @@ const float &stop_1l_babyAnalyzer::weight_analysisbtagsf() {
   return weight_analysisbtagsf_;
 }
 
-const float &stop_1l_babyAnalyzer::weight_analysisbtagsf_heavy_UP() {
+const float &StopTree::weight_analysisbtagsf_heavy_UP() {
   if (not weight_analysisbtagsf_heavy_UP_isLoaded) {
     if (weight_analysisbtagsf_heavy_UP_branch != 0) {
       weight_analysisbtagsf_heavy_UP_branch->GetEntry(index);
@@ -3358,7 +3385,7 @@ const float &stop_1l_babyAnalyzer::weight_analysisbtagsf_heavy_UP() {
   return weight_analysisbtagsf_heavy_UP_;
 }
 
-const float &stop_1l_babyAnalyzer::weight_analysisbtagsf_light_UP() {
+const float &StopTree::weight_analysisbtagsf_light_UP() {
   if (not weight_analysisbtagsf_light_UP_isLoaded) {
     if (weight_analysisbtagsf_light_UP_branch != 0) {
       weight_analysisbtagsf_light_UP_branch->GetEntry(index);
@@ -3371,7 +3398,7 @@ const float &stop_1l_babyAnalyzer::weight_analysisbtagsf_light_UP() {
   return weight_analysisbtagsf_light_UP_;
 }
 
-const float &stop_1l_babyAnalyzer::weight_analysisbtagsf_heavy_DN() {
+const float &StopTree::weight_analysisbtagsf_heavy_DN() {
   if (not weight_analysisbtagsf_heavy_DN_isLoaded) {
     if (weight_analysisbtagsf_heavy_DN_branch != 0) {
       weight_analysisbtagsf_heavy_DN_branch->GetEntry(index);
@@ -3384,7 +3411,7 @@ const float &stop_1l_babyAnalyzer::weight_analysisbtagsf_heavy_DN() {
   return weight_analysisbtagsf_heavy_DN_;
 }
 
-const float &stop_1l_babyAnalyzer::weight_analysisbtagsf_light_DN() {
+const float &StopTree::weight_analysisbtagsf_light_DN() {
   if (not weight_analysisbtagsf_light_DN_isLoaded) {
     if (weight_analysisbtagsf_light_DN_branch != 0) {
       weight_analysisbtagsf_light_DN_branch->GetEntry(index);
@@ -3397,7 +3424,7 @@ const float &stop_1l_babyAnalyzer::weight_analysisbtagsf_light_DN() {
   return weight_analysisbtagsf_light_DN_;
 }
 
-const float &stop_1l_babyAnalyzer::weight_analysisbtagsf_fastsim_UP() {
+const float &StopTree::weight_analysisbtagsf_fastsim_UP() {
   if (not weight_analysisbtagsf_fastsim_UP_isLoaded) {
     if (weight_analysisbtagsf_fastsim_UP_branch != 0) {
       weight_analysisbtagsf_fastsim_UP_branch->GetEntry(index);
@@ -3410,7 +3437,7 @@ const float &stop_1l_babyAnalyzer::weight_analysisbtagsf_fastsim_UP() {
   return weight_analysisbtagsf_fastsim_UP_;
 }
 
-const float &stop_1l_babyAnalyzer::weight_analysisbtagsf_fastsim_DN() {
+const float &StopTree::weight_analysisbtagsf_fastsim_DN() {
   if (not weight_analysisbtagsf_fastsim_DN_isLoaded) {
     if (weight_analysisbtagsf_fastsim_DN_branch != 0) {
       weight_analysisbtagsf_fastsim_DN_branch->GetEntry(index);
@@ -3423,7 +3450,7 @@ const float &stop_1l_babyAnalyzer::weight_analysisbtagsf_fastsim_DN() {
   return weight_analysisbtagsf_fastsim_DN_;
 }
 
-const float &stop_1l_babyAnalyzer::weight_tightbtagsf() {
+const float &StopTree::weight_tightbtagsf() {
   if (not weight_tightbtagsf_isLoaded) {
     if (weight_tightbtagsf_branch != 0) {
       weight_tightbtagsf_branch->GetEntry(index);
@@ -3436,7 +3463,7 @@ const float &stop_1l_babyAnalyzer::weight_tightbtagsf() {
   return weight_tightbtagsf_;
 }
 
-const float &stop_1l_babyAnalyzer::weight_tightbtagsf_heavy_UP() {
+const float &StopTree::weight_tightbtagsf_heavy_UP() {
   if (not weight_tightbtagsf_heavy_UP_isLoaded) {
     if (weight_tightbtagsf_heavy_UP_branch != 0) {
       weight_tightbtagsf_heavy_UP_branch->GetEntry(index);
@@ -3449,7 +3476,7 @@ const float &stop_1l_babyAnalyzer::weight_tightbtagsf_heavy_UP() {
   return weight_tightbtagsf_heavy_UP_;
 }
 
-const float &stop_1l_babyAnalyzer::weight_tightbtagsf_light_UP() {
+const float &StopTree::weight_tightbtagsf_light_UP() {
   if (not weight_tightbtagsf_light_UP_isLoaded) {
     if (weight_tightbtagsf_light_UP_branch != 0) {
       weight_tightbtagsf_light_UP_branch->GetEntry(index);
@@ -3462,7 +3489,7 @@ const float &stop_1l_babyAnalyzer::weight_tightbtagsf_light_UP() {
   return weight_tightbtagsf_light_UP_;
 }
 
-const float &stop_1l_babyAnalyzer::weight_tightbtagsf_heavy_DN() {
+const float &StopTree::weight_tightbtagsf_heavy_DN() {
   if (not weight_tightbtagsf_heavy_DN_isLoaded) {
     if (weight_tightbtagsf_heavy_DN_branch != 0) {
       weight_tightbtagsf_heavy_DN_branch->GetEntry(index);
@@ -3475,7 +3502,7 @@ const float &stop_1l_babyAnalyzer::weight_tightbtagsf_heavy_DN() {
   return weight_tightbtagsf_heavy_DN_;
 }
 
-const float &stop_1l_babyAnalyzer::weight_tightbtagsf_light_DN() {
+const float &StopTree::weight_tightbtagsf_light_DN() {
   if (not weight_tightbtagsf_light_DN_isLoaded) {
     if (weight_tightbtagsf_light_DN_branch != 0) {
       weight_tightbtagsf_light_DN_branch->GetEntry(index);
@@ -3488,7 +3515,7 @@ const float &stop_1l_babyAnalyzer::weight_tightbtagsf_light_DN() {
   return weight_tightbtagsf_light_DN_;
 }
 
-const float &stop_1l_babyAnalyzer::weight_tightbtagsf_fastsim_UP() {
+const float &StopTree::weight_tightbtagsf_fastsim_UP() {
   if (not weight_tightbtagsf_fastsim_UP_isLoaded) {
     if (weight_tightbtagsf_fastsim_UP_branch != 0) {
       weight_tightbtagsf_fastsim_UP_branch->GetEntry(index);
@@ -3501,7 +3528,7 @@ const float &stop_1l_babyAnalyzer::weight_tightbtagsf_fastsim_UP() {
   return weight_tightbtagsf_fastsim_UP_;
 }
 
-const float &stop_1l_babyAnalyzer::weight_tightbtagsf_fastsim_DN() {
+const float &StopTree::weight_tightbtagsf_fastsim_DN() {
   if (not weight_tightbtagsf_fastsim_DN_isLoaded) {
     if (weight_tightbtagsf_fastsim_DN_branch != 0) {
       weight_tightbtagsf_fastsim_DN_branch->GetEntry(index);
@@ -3514,7 +3541,7 @@ const float &stop_1l_babyAnalyzer::weight_tightbtagsf_fastsim_DN() {
   return weight_tightbtagsf_fastsim_DN_;
 }
 
-const float &stop_1l_babyAnalyzer::weight_loosebtagsf() {
+const float &StopTree::weight_loosebtagsf() {
   if (not weight_loosebtagsf_isLoaded) {
     if (weight_loosebtagsf_branch != 0) {
       weight_loosebtagsf_branch->GetEntry(index);
@@ -3527,7 +3554,7 @@ const float &stop_1l_babyAnalyzer::weight_loosebtagsf() {
   return weight_loosebtagsf_;
 }
 
-const float &stop_1l_babyAnalyzer::weight_loosebtagsf_heavy_UP() {
+const float &StopTree::weight_loosebtagsf_heavy_UP() {
   if (not weight_loosebtagsf_heavy_UP_isLoaded) {
     if (weight_loosebtagsf_heavy_UP_branch != 0) {
       weight_loosebtagsf_heavy_UP_branch->GetEntry(index);
@@ -3540,7 +3567,7 @@ const float &stop_1l_babyAnalyzer::weight_loosebtagsf_heavy_UP() {
   return weight_loosebtagsf_heavy_UP_;
 }
 
-const float &stop_1l_babyAnalyzer::weight_loosebtagsf_light_UP() {
+const float &StopTree::weight_loosebtagsf_light_UP() {
   if (not weight_loosebtagsf_light_UP_isLoaded) {
     if (weight_loosebtagsf_light_UP_branch != 0) {
       weight_loosebtagsf_light_UP_branch->GetEntry(index);
@@ -3553,7 +3580,7 @@ const float &stop_1l_babyAnalyzer::weight_loosebtagsf_light_UP() {
   return weight_loosebtagsf_light_UP_;
 }
 
-const float &stop_1l_babyAnalyzer::weight_loosebtagsf_heavy_DN() {
+const float &StopTree::weight_loosebtagsf_heavy_DN() {
   if (not weight_loosebtagsf_heavy_DN_isLoaded) {
     if (weight_loosebtagsf_heavy_DN_branch != 0) {
       weight_loosebtagsf_heavy_DN_branch->GetEntry(index);
@@ -3566,7 +3593,7 @@ const float &stop_1l_babyAnalyzer::weight_loosebtagsf_heavy_DN() {
   return weight_loosebtagsf_heavy_DN_;
 }
 
-const float &stop_1l_babyAnalyzer::weight_loosebtagsf_light_DN() {
+const float &StopTree::weight_loosebtagsf_light_DN() {
   if (not weight_loosebtagsf_light_DN_isLoaded) {
     if (weight_loosebtagsf_light_DN_branch != 0) {
       weight_loosebtagsf_light_DN_branch->GetEntry(index);
@@ -3579,7 +3606,7 @@ const float &stop_1l_babyAnalyzer::weight_loosebtagsf_light_DN() {
   return weight_loosebtagsf_light_DN_;
 }
 
-const float &stop_1l_babyAnalyzer::weight_loosebtagsf_fastsim_UP() {
+const float &StopTree::weight_loosebtagsf_fastsim_UP() {
   if (not weight_loosebtagsf_fastsim_UP_isLoaded) {
     if (weight_loosebtagsf_fastsim_UP_branch != 0) {
       weight_loosebtagsf_fastsim_UP_branch->GetEntry(index);
@@ -3592,7 +3619,7 @@ const float &stop_1l_babyAnalyzer::weight_loosebtagsf_fastsim_UP() {
   return weight_loosebtagsf_fastsim_UP_;
 }
 
-const float &stop_1l_babyAnalyzer::weight_loosebtagsf_fastsim_DN() {
+const float &StopTree::weight_loosebtagsf_fastsim_DN() {
   if (not weight_loosebtagsf_fastsim_DN_isLoaded) {
     if (weight_loosebtagsf_fastsim_DN_branch != 0) {
       weight_loosebtagsf_fastsim_DN_branch->GetEntry(index);
@@ -3605,7 +3632,7 @@ const float &stop_1l_babyAnalyzer::weight_loosebtagsf_fastsim_DN() {
   return weight_loosebtagsf_fastsim_DN_;
 }
 
-const float &stop_1l_babyAnalyzer::weight_lepSF() {
+const float &StopTree::weight_lepSF() {
   if (not weight_lepSF_isLoaded) {
     if (weight_lepSF_branch != 0) {
       weight_lepSF_branch->GetEntry(index);
@@ -3618,7 +3645,7 @@ const float &stop_1l_babyAnalyzer::weight_lepSF() {
   return weight_lepSF_;
 }
 
-const float &stop_1l_babyAnalyzer::weight_lepSF_up() {
+const float &StopTree::weight_lepSF_up() {
   if (not weight_lepSF_up_isLoaded) {
     if (weight_lepSF_up_branch != 0) {
       weight_lepSF_up_branch->GetEntry(index);
@@ -3631,7 +3658,7 @@ const float &stop_1l_babyAnalyzer::weight_lepSF_up() {
   return weight_lepSF_up_;
 }
 
-const float &stop_1l_babyAnalyzer::weight_lepSF_down() {
+const float &StopTree::weight_lepSF_down() {
   if (not weight_lepSF_down_isLoaded) {
     if (weight_lepSF_down_branch != 0) {
       weight_lepSF_down_branch->GetEntry(index);
@@ -3644,7 +3671,7 @@ const float &stop_1l_babyAnalyzer::weight_lepSF_down() {
   return weight_lepSF_down_;
 }
 
-const float &stop_1l_babyAnalyzer::weight_vetoLepSF() {
+const float &StopTree::weight_vetoLepSF() {
   if (not weight_vetoLepSF_isLoaded) {
     if (weight_vetoLepSF_branch != 0) {
       weight_vetoLepSF_branch->GetEntry(index);
@@ -3657,7 +3684,7 @@ const float &stop_1l_babyAnalyzer::weight_vetoLepSF() {
   return weight_vetoLepSF_;
 }
 
-const float &stop_1l_babyAnalyzer::weight_vetoLepSF_up() {
+const float &StopTree::weight_vetoLepSF_up() {
   if (not weight_vetoLepSF_up_isLoaded) {
     if (weight_vetoLepSF_up_branch != 0) {
       weight_vetoLepSF_up_branch->GetEntry(index);
@@ -3670,7 +3697,7 @@ const float &stop_1l_babyAnalyzer::weight_vetoLepSF_up() {
   return weight_vetoLepSF_up_;
 }
 
-const float &stop_1l_babyAnalyzer::weight_vetoLepSF_down() {
+const float &StopTree::weight_vetoLepSF_down() {
   if (not weight_vetoLepSF_down_isLoaded) {
     if (weight_vetoLepSF_down_branch != 0) {
       weight_vetoLepSF_down_branch->GetEntry(index);
@@ -3683,7 +3710,7 @@ const float &stop_1l_babyAnalyzer::weight_vetoLepSF_down() {
   return weight_vetoLepSF_down_;
 }
 
-const float &stop_1l_babyAnalyzer::weight_lepSF_fastSim() {
+const float &StopTree::weight_lepSF_fastSim() {
   if (not weight_lepSF_fastSim_isLoaded) {
     if (weight_lepSF_fastSim_branch != 0) {
       weight_lepSF_fastSim_branch->GetEntry(index);
@@ -3696,7 +3723,7 @@ const float &stop_1l_babyAnalyzer::weight_lepSF_fastSim() {
   return weight_lepSF_fastSim_;
 }
 
-const float &stop_1l_babyAnalyzer::weight_lepSF_fastSim_up() {
+const float &StopTree::weight_lepSF_fastSim_up() {
   if (not weight_lepSF_fastSim_up_isLoaded) {
     if (weight_lepSF_fastSim_up_branch != 0) {
       weight_lepSF_fastSim_up_branch->GetEntry(index);
@@ -3709,7 +3736,7 @@ const float &stop_1l_babyAnalyzer::weight_lepSF_fastSim_up() {
   return weight_lepSF_fastSim_up_;
 }
 
-const float &stop_1l_babyAnalyzer::weight_lepSF_fastSim_down() {
+const float &StopTree::weight_lepSF_fastSim_down() {
   if (not weight_lepSF_fastSim_down_isLoaded) {
     if (weight_lepSF_fastSim_down_branch != 0) {
       weight_lepSF_fastSim_down_branch->GetEntry(index);
@@ -3722,7 +3749,7 @@ const float &stop_1l_babyAnalyzer::weight_lepSF_fastSim_down() {
   return weight_lepSF_fastSim_down_;
 }
 
-const float &stop_1l_babyAnalyzer::weight_ISR() {
+const float &StopTree::weight_ISR() {
   if (not weight_ISR_isLoaded) {
     if (weight_ISR_branch != 0) {
       weight_ISR_branch->GetEntry(index);
@@ -3735,7 +3762,7 @@ const float &stop_1l_babyAnalyzer::weight_ISR() {
   return weight_ISR_;
 }
 
-const float &stop_1l_babyAnalyzer::weight_ISRup() {
+const float &StopTree::weight_ISRup() {
   if (not weight_ISRup_isLoaded) {
     if (weight_ISRup_branch != 0) {
       weight_ISRup_branch->GetEntry(index);
@@ -3748,7 +3775,7 @@ const float &stop_1l_babyAnalyzer::weight_ISRup() {
   return weight_ISRup_;
 }
 
-const float &stop_1l_babyAnalyzer::weight_ISRdown() {
+const float &StopTree::weight_ISRdown() {
   if (not weight_ISRdown_isLoaded) {
     if (weight_ISRdown_branch != 0) {
       weight_ISRdown_branch->GetEntry(index);
@@ -3761,7 +3788,7 @@ const float &stop_1l_babyAnalyzer::weight_ISRdown() {
   return weight_ISRdown_;
 }
 
-const float &stop_1l_babyAnalyzer::weight_PU() {
+const float &StopTree::weight_PU() {
   if (not weight_PU_isLoaded) {
     if (weight_PU_branch != 0) {
       weight_PU_branch->GetEntry(index);
@@ -3774,7 +3801,7 @@ const float &stop_1l_babyAnalyzer::weight_PU() {
   return weight_PU_;
 }
 
-const float &stop_1l_babyAnalyzer::weight_PUup() {
+const float &StopTree::weight_PUup() {
   if (not weight_PUup_isLoaded) {
     if (weight_PUup_branch != 0) {
       weight_PUup_branch->GetEntry(index);
@@ -3787,7 +3814,7 @@ const float &stop_1l_babyAnalyzer::weight_PUup() {
   return weight_PUup_;
 }
 
-const float &stop_1l_babyAnalyzer::weight_PUdown() {
+const float &StopTree::weight_PUdown() {
   if (not weight_PUdown_isLoaded) {
     if (weight_PUdown_branch != 0) {
       weight_PUdown_branch->GetEntry(index);
@@ -3800,7 +3827,7 @@ const float &stop_1l_babyAnalyzer::weight_PUdown() {
   return weight_PUdown_;
 }
 
-const float &stop_1l_babyAnalyzer::weight_ISRnjets() {
+const float &StopTree::weight_ISRnjets() {
   if (not weight_ISRnjets_isLoaded) {
     if (weight_ISRnjets_branch != 0) {
       weight_ISRnjets_branch->GetEntry(index);
@@ -3813,7 +3840,7 @@ const float &stop_1l_babyAnalyzer::weight_ISRnjets() {
   return weight_ISRnjets_;
 }
 
-const float &stop_1l_babyAnalyzer::weight_ISRnjets_UP() {
+const float &StopTree::weight_ISRnjets_UP() {
   if (not weight_ISRnjets_UP_isLoaded) {
     if (weight_ISRnjets_UP_branch != 0) {
       weight_ISRnjets_UP_branch->GetEntry(index);
@@ -3826,7 +3853,7 @@ const float &stop_1l_babyAnalyzer::weight_ISRnjets_UP() {
   return weight_ISRnjets_UP_;
 }
 
-const float &stop_1l_babyAnalyzer::weight_ISRnjets_DN() {
+const float &StopTree::weight_ISRnjets_DN() {
   if (not weight_ISRnjets_DN_isLoaded) {
     if (weight_ISRnjets_DN_branch != 0) {
       weight_ISRnjets_DN_branch->GetEntry(index);
@@ -3839,7 +3866,7 @@ const float &stop_1l_babyAnalyzer::weight_ISRnjets_DN() {
   return weight_ISRnjets_DN_;
 }
 
-const int &stop_1l_babyAnalyzer::NISRjets() {
+const int &StopTree::NISRjets() {
   if (not NISRjets_isLoaded) {
     if (NISRjets_branch != 0) {
       NISRjets_branch->GetEntry(index);
@@ -3852,7 +3879,7 @@ const int &stop_1l_babyAnalyzer::NISRjets() {
   return NISRjets_;
 }
 
-const int &stop_1l_babyAnalyzer::NnonISRjets() {
+const int &StopTree::NnonISRjets() {
   if (not NnonISRjets_isLoaded) {
     if (NnonISRjets_branch != 0) {
       NnonISRjets_branch->GetEntry(index);
@@ -3865,7 +3892,7 @@ const int &stop_1l_babyAnalyzer::NnonISRjets() {
   return NnonISRjets_;
 }
 
-const vector<string> &stop_1l_babyAnalyzer::sparms_names() {
+const vector<string> &StopTree::sparms_names() {
   if (not sparms_names_isLoaded) {
     if (sparms_names_branch != 0) {
       sparms_names_branch->GetEntry(index);
@@ -3878,7 +3905,7 @@ const vector<string> &stop_1l_babyAnalyzer::sparms_names() {
   return *sparms_names_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::sparms_values() {
+const vector<float> &StopTree::sparms_values() {
   if (not sparms_values_isLoaded) {
     if (sparms_values_branch != 0) {
       sparms_values_branch->GetEntry(index);
@@ -3891,7 +3918,7 @@ const vector<float> &stop_1l_babyAnalyzer::sparms_values() {
   return *sparms_values_;
 }
 
-const int &stop_1l_babyAnalyzer::sparms_subProcessId() {
+const int &StopTree::sparms_subProcessId() {
   if (not sparms_subProcessId_isLoaded) {
     if (sparms_subProcessId_branch != 0) {
       sparms_subProcessId_branch->GetEntry(index);
@@ -3904,7 +3931,7 @@ const int &stop_1l_babyAnalyzer::sparms_subProcessId() {
   return sparms_subProcessId_;
 }
 
-const float &stop_1l_babyAnalyzer::mass_lsp() {
+const float &StopTree::mass_lsp() {
   if (not mass_lsp_isLoaded) {
     if (mass_lsp_branch != 0) {
       mass_lsp_branch->GetEntry(index);
@@ -3917,7 +3944,7 @@ const float &stop_1l_babyAnalyzer::mass_lsp() {
   return mass_lsp_;
 }
 
-const float &stop_1l_babyAnalyzer::mass_chargino() {
+const float &StopTree::mass_chargino() {
   if (not mass_chargino_isLoaded) {
     if (mass_chargino_branch != 0) {
       mass_chargino_branch->GetEntry(index);
@@ -3930,7 +3957,7 @@ const float &stop_1l_babyAnalyzer::mass_chargino() {
   return mass_chargino_;
 }
 
-const float &stop_1l_babyAnalyzer::mass_stop() {
+const float &StopTree::mass_stop() {
   if (not mass_stop_isLoaded) {
     if (mass_stop_branch != 0) {
       mass_stop_branch->GetEntry(index);
@@ -3943,7 +3970,7 @@ const float &stop_1l_babyAnalyzer::mass_stop() {
   return mass_stop_;
 }
 
-const float &stop_1l_babyAnalyzer::mass_gluino() {
+const float &StopTree::mass_gluino() {
   if (not mass_gluino_isLoaded) {
     if (mass_gluino_branch != 0) {
       mass_gluino_branch->GetEntry(index);
@@ -3956,7 +3983,7 @@ const float &stop_1l_babyAnalyzer::mass_gluino() {
   return mass_gluino_;
 }
 
-const float &stop_1l_babyAnalyzer::genmet() {
+const float &StopTree::genmet() {
   if (not genmet_isLoaded) {
     if (genmet_branch != 0) {
       genmet_branch->GetEntry(index);
@@ -3969,7 +3996,7 @@ const float &stop_1l_babyAnalyzer::genmet() {
   return genmet_;
 }
 
-const float &stop_1l_babyAnalyzer::genmet_phi() {
+const float &StopTree::genmet_phi() {
   if (not genmet_phi_isLoaded) {
     if (genmet_phi_branch != 0) {
       genmet_phi_branch->GetEntry(index);
@@ -3982,7 +4009,7 @@ const float &stop_1l_babyAnalyzer::genmet_phi() {
   return genmet_phi_;
 }
 
-const float &stop_1l_babyAnalyzer::nupt() {
+const float &StopTree::nupt() {
   if (not nupt_isLoaded) {
     if (nupt_branch != 0) {
       nupt_branch->GetEntry(index);
@@ -3995,7 +4022,7 @@ const float &stop_1l_babyAnalyzer::nupt() {
   return nupt_;
 }
 
-const float &stop_1l_babyAnalyzer::genht() {
+const float &StopTree::genht() {
   if (not genht_isLoaded) {
     if (genht_branch != 0) {
       genht_branch->GetEntry(index);
@@ -4008,7 +4035,7 @@ const float &stop_1l_babyAnalyzer::genht() {
   return genht_;
 }
 
-const bool &stop_1l_babyAnalyzer::PassTrackVeto() {
+const bool &StopTree::PassTrackVeto() {
   if (not PassTrackVeto_isLoaded) {
     if (PassTrackVeto_branch != 0) {
       PassTrackVeto_branch->GetEntry(index);
@@ -4021,7 +4048,7 @@ const bool &stop_1l_babyAnalyzer::PassTrackVeto() {
   return PassTrackVeto_;
 }
 
-const bool &stop_1l_babyAnalyzer::PassTauVeto() {
+const bool &StopTree::PassTauVeto() {
   if (not PassTauVeto_isLoaded) {
     if (PassTauVeto_branch != 0) {
       PassTauVeto_branch->GetEntry(index);
@@ -4034,7 +4061,7 @@ const bool &stop_1l_babyAnalyzer::PassTauVeto() {
   return PassTauVeto_;
 }
 
-const float &stop_1l_babyAnalyzer::topness() {
+const float &StopTree::topness() {
   if (not topness_isLoaded) {
     if (topness_branch != 0) {
       topness_branch->GetEntry(index);
@@ -4047,7 +4074,7 @@ const float &stop_1l_babyAnalyzer::topness() {
   return topness_;
 }
 
-const float &stop_1l_babyAnalyzer::topnessMod() {
+const float &StopTree::topnessMod() {
   if (not topnessMod_isLoaded) {
     if (topnessMod_branch != 0) {
       topnessMod_branch->GetEntry(index);
@@ -4060,7 +4087,7 @@ const float &stop_1l_babyAnalyzer::topnessMod() {
   return topnessMod_;
 }
 
-const float &stop_1l_babyAnalyzer::topnessMod_rl() {
+const float &StopTree::topnessMod_rl() {
   if (not topnessMod_rl_isLoaded) {
     if (topnessMod_rl_branch != 0) {
       topnessMod_rl_branch->GetEntry(index);
@@ -4073,7 +4100,7 @@ const float &stop_1l_babyAnalyzer::topnessMod_rl() {
   return topnessMod_rl_;
 }
 
-const float &stop_1l_babyAnalyzer::topnessMod_jup() {
+const float &StopTree::topnessMod_jup() {
   if (not topnessMod_jup_isLoaded) {
     if (topnessMod_jup_branch != 0) {
       topnessMod_jup_branch->GetEntry(index);
@@ -4086,7 +4113,7 @@ const float &stop_1l_babyAnalyzer::topnessMod_jup() {
   return topnessMod_jup_;
 }
 
-const float &stop_1l_babyAnalyzer::topnessMod_rl_jup() {
+const float &StopTree::topnessMod_rl_jup() {
   if (not topnessMod_rl_jup_isLoaded) {
     if (topnessMod_rl_jup_branch != 0) {
       topnessMod_rl_jup_branch->GetEntry(index);
@@ -4099,7 +4126,7 @@ const float &stop_1l_babyAnalyzer::topnessMod_rl_jup() {
   return topnessMod_rl_jup_;
 }
 
-const float &stop_1l_babyAnalyzer::topnessMod_jdown() {
+const float &StopTree::topnessMod_jdown() {
   if (not topnessMod_jdown_isLoaded) {
     if (topnessMod_jdown_branch != 0) {
       topnessMod_jdown_branch->GetEntry(index);
@@ -4112,7 +4139,7 @@ const float &stop_1l_babyAnalyzer::topnessMod_jdown() {
   return topnessMod_jdown_;
 }
 
-const float &stop_1l_babyAnalyzer::topnessMod_rl_jdown() {
+const float &StopTree::topnessMod_rl_jdown() {
   if (not topnessMod_rl_jdown_isLoaded) {
     if (topnessMod_rl_jdown_branch != 0) {
       topnessMod_rl_jdown_branch->GetEntry(index);
@@ -4125,7 +4152,7 @@ const float &stop_1l_babyAnalyzer::topnessMod_rl_jdown() {
   return topnessMod_rl_jdown_;
 }
 
-const float &stop_1l_babyAnalyzer::Mlb_closestb() {
+const float &StopTree::Mlb_closestb() {
   if (not Mlb_closestb_isLoaded) {
     if (Mlb_closestb_branch != 0) {
       Mlb_closestb_branch->GetEntry(index);
@@ -4138,7 +4165,7 @@ const float &stop_1l_babyAnalyzer::Mlb_closestb() {
   return Mlb_closestb_;
 }
 
-const float &stop_1l_babyAnalyzer::Mlb_lead_bdiscr() {
+const float &StopTree::Mlb_lead_bdiscr() {
   if (not Mlb_lead_bdiscr_isLoaded) {
     if (Mlb_lead_bdiscr_branch != 0) {
       Mlb_lead_bdiscr_branch->GetEntry(index);
@@ -4151,7 +4178,7 @@ const float &stop_1l_babyAnalyzer::Mlb_lead_bdiscr() {
   return Mlb_lead_bdiscr_;
 }
 
-const float &stop_1l_babyAnalyzer::Mlb_closestb_jup() {
+const float &StopTree::Mlb_closestb_jup() {
   if (not Mlb_closestb_jup_isLoaded) {
     if (Mlb_closestb_jup_branch != 0) {
       Mlb_closestb_jup_branch->GetEntry(index);
@@ -4164,7 +4191,7 @@ const float &stop_1l_babyAnalyzer::Mlb_closestb_jup() {
   return Mlb_closestb_jup_;
 }
 
-const float &stop_1l_babyAnalyzer::Mlb_lead_bdiscr_jup() {
+const float &StopTree::Mlb_lead_bdiscr_jup() {
   if (not Mlb_lead_bdiscr_jup_isLoaded) {
     if (Mlb_lead_bdiscr_jup_branch != 0) {
       Mlb_lead_bdiscr_jup_branch->GetEntry(index);
@@ -4177,7 +4204,7 @@ const float &stop_1l_babyAnalyzer::Mlb_lead_bdiscr_jup() {
   return Mlb_lead_bdiscr_jup_;
 }
 
-const float &stop_1l_babyAnalyzer::Mlb_closestb_jdown() {
+const float &StopTree::Mlb_closestb_jdown() {
   if (not Mlb_closestb_jdown_isLoaded) {
     if (Mlb_closestb_jdown_branch != 0) {
       Mlb_closestb_jdown_branch->GetEntry(index);
@@ -4190,7 +4217,7 @@ const float &stop_1l_babyAnalyzer::Mlb_closestb_jdown() {
   return Mlb_closestb_jdown_;
 }
 
-const float &stop_1l_babyAnalyzer::Mlb_lead_bdiscr_jdown() {
+const float &StopTree::Mlb_lead_bdiscr_jdown() {
   if (not Mlb_lead_bdiscr_jdown_isLoaded) {
     if (Mlb_lead_bdiscr_jdown_branch != 0) {
       Mlb_lead_bdiscr_jdown_branch->GetEntry(index);
@@ -4203,7 +4230,7 @@ const float &stop_1l_babyAnalyzer::Mlb_lead_bdiscr_jdown() {
   return Mlb_lead_bdiscr_jdown_;
 }
 
-const int &stop_1l_babyAnalyzer::HLT_SingleEl() {
+const int &StopTree::HLT_SingleEl() {
   if (not HLT_SingleEl_isLoaded) {
     if (HLT_SingleEl_branch != 0) {
       HLT_SingleEl_branch->GetEntry(index);
@@ -4216,7 +4243,7 @@ const int &stop_1l_babyAnalyzer::HLT_SingleEl() {
   return HLT_SingleEl_;
 }
 
-const int &stop_1l_babyAnalyzer::HLT_SingleMu() {
+const int &StopTree::HLT_SingleMu() {
   if (not HLT_SingleMu_isLoaded) {
     if (HLT_SingleMu_branch != 0) {
       HLT_SingleMu_branch->GetEntry(index);
@@ -4229,7 +4256,7 @@ const int &stop_1l_babyAnalyzer::HLT_SingleMu() {
   return HLT_SingleMu_;
 }
 
-const int &stop_1l_babyAnalyzer::HLT_MET() {
+const int &StopTree::HLT_MET() {
   if (not HLT_MET_isLoaded) {
     if (HLT_MET_branch != 0) {
       HLT_MET_branch->GetEntry(index);
@@ -4242,7 +4269,7 @@ const int &stop_1l_babyAnalyzer::HLT_MET() {
   return HLT_MET_;
 }
 
-const int &stop_1l_babyAnalyzer::HLT_MET_MHT() {
+const int &StopTree::HLT_MET_MHT() {
   if (not HLT_MET_MHT_isLoaded) {
     if (HLT_MET_MHT_branch != 0) {
       HLT_MET_MHT_branch->GetEntry(index);
@@ -4255,7 +4282,7 @@ const int &stop_1l_babyAnalyzer::HLT_MET_MHT() {
   return HLT_MET_MHT_;
 }
 
-const int &stop_1l_babyAnalyzer::HLT_MET100_MHT100() {
+const int &StopTree::HLT_MET100_MHT100() {
   if (not HLT_MET100_MHT100_isLoaded) {
     if (HLT_MET100_MHT100_branch != 0) {
       HLT_MET100_MHT100_branch->GetEntry(index);
@@ -4268,7 +4295,7 @@ const int &stop_1l_babyAnalyzer::HLT_MET100_MHT100() {
   return HLT_MET100_MHT100_;
 }
 
-const int &stop_1l_babyAnalyzer::HLT_MET110_MHT110() {
+const int &StopTree::HLT_MET110_MHT110() {
   if (not HLT_MET110_MHT110_isLoaded) {
     if (HLT_MET110_MHT110_branch != 0) {
       HLT_MET110_MHT110_branch->GetEntry(index);
@@ -4281,7 +4308,7 @@ const int &stop_1l_babyAnalyzer::HLT_MET110_MHT110() {
   return HLT_MET110_MHT110_;
 }
 
-const int &stop_1l_babyAnalyzer::HLT_MET120_MHT120() {
+const int &StopTree::HLT_MET120_MHT120() {
   if (not HLT_MET120_MHT120_isLoaded) {
     if (HLT_MET120_MHT120_branch != 0) {
       HLT_MET120_MHT120_branch->GetEntry(index);
@@ -4294,7 +4321,7 @@ const int &stop_1l_babyAnalyzer::HLT_MET120_MHT120() {
   return HLT_MET120_MHT120_;
 }
 
-const int &stop_1l_babyAnalyzer::HLT_MET130_MHT130() {
+const int &StopTree::HLT_MET130_MHT130() {
   if (not HLT_MET130_MHT130_isLoaded) {
     if (HLT_MET130_MHT130_branch != 0) {
       HLT_MET130_MHT130_branch->GetEntry(index);
@@ -4307,7 +4334,7 @@ const int &stop_1l_babyAnalyzer::HLT_MET130_MHT130() {
   return HLT_MET130_MHT130_;
 }
 
-const int &stop_1l_babyAnalyzer::HLT_PFHT_unprescaled() {
+const int &StopTree::HLT_PFHT_unprescaled() {
   if (not HLT_PFHT_unprescaled_isLoaded) {
     if (HLT_PFHT_unprescaled_branch != 0) {
       HLT_PFHT_unprescaled_branch->GetEntry(index);
@@ -4320,7 +4347,7 @@ const int &stop_1l_babyAnalyzer::HLT_PFHT_unprescaled() {
   return HLT_PFHT_unprescaled_;
 }
 
-const int &stop_1l_babyAnalyzer::HLT_PFHT_prescaled() {
+const int &StopTree::HLT_PFHT_prescaled() {
   if (not HLT_PFHT_prescaled_isLoaded) {
     if (HLT_PFHT_prescaled_branch != 0) {
       HLT_PFHT_prescaled_branch->GetEntry(index);
@@ -4333,7 +4360,7 @@ const int &stop_1l_babyAnalyzer::HLT_PFHT_prescaled() {
   return HLT_PFHT_prescaled_;
 }
 
-const int &stop_1l_babyAnalyzer::HLT_DiEl() {
+const int &StopTree::HLT_DiEl() {
   if (not HLT_DiEl_isLoaded) {
     if (HLT_DiEl_branch != 0) {
       HLT_DiEl_branch->GetEntry(index);
@@ -4346,7 +4373,7 @@ const int &stop_1l_babyAnalyzer::HLT_DiEl() {
   return HLT_DiEl_;
 }
 
-const int &stop_1l_babyAnalyzer::HLT_DiMu() {
+const int &StopTree::HLT_DiMu() {
   if (not HLT_DiMu_isLoaded) {
     if (HLT_DiMu_branch != 0) {
       HLT_DiMu_branch->GetEntry(index);
@@ -4359,7 +4386,7 @@ const int &stop_1l_babyAnalyzer::HLT_DiMu() {
   return HLT_DiMu_;
 }
 
-const int &stop_1l_babyAnalyzer::HLT_MuE() {
+const int &StopTree::HLT_MuE() {
   if (not HLT_MuE_isLoaded) {
     if (HLT_MuE_branch != 0) {
       HLT_MuE_branch->GetEntry(index);
@@ -4372,7 +4399,7 @@ const int &stop_1l_babyAnalyzer::HLT_MuE() {
   return HLT_MuE_;
 }
 
-const int &stop_1l_babyAnalyzer::nPhotons() {
+const int &StopTree::nPhotons() {
   if (not nPhotons_isLoaded) {
     if (nPhotons_branch != 0) {
       nPhotons_branch->GetEntry(index);
@@ -4385,7 +4412,7 @@ const int &stop_1l_babyAnalyzer::nPhotons() {
   return nPhotons_;
 }
 
-const int &stop_1l_babyAnalyzer::ph_ngoodjets() {
+const int &StopTree::ph_ngoodjets() {
   if (not ph_ngoodjets_isLoaded) {
     if (ph_ngoodjets_branch != 0) {
       ph_ngoodjets_branch->GetEntry(index);
@@ -4398,7 +4425,7 @@ const int &stop_1l_babyAnalyzer::ph_ngoodjets() {
   return ph_ngoodjets_;
 }
 
-const int &stop_1l_babyAnalyzer::ph_ngoodbtags() {
+const int &StopTree::ph_ngoodbtags() {
   if (not ph_ngoodbtags_isLoaded) {
     if (ph_ngoodbtags_branch != 0) {
       ph_ngoodbtags_branch->GetEntry(index);
@@ -4411,7 +4438,7 @@ const int &stop_1l_babyAnalyzer::ph_ngoodbtags() {
   return ph_ngoodbtags_;
 }
 
-const float &stop_1l_babyAnalyzer::hardgenpt() {
+const float &StopTree::hardgenpt() {
   if (not hardgenpt_isLoaded) {
     if (hardgenpt_branch != 0) {
       hardgenpt_branch->GetEntry(index);
@@ -4424,7 +4451,7 @@ const float &stop_1l_babyAnalyzer::hardgenpt() {
   return hardgenpt_;
 }
 
-const float &stop_1l_babyAnalyzer::calomet() {
+const float &StopTree::calomet() {
   if (not calomet_isLoaded) {
     if (calomet_branch != 0) {
       calomet_branch->GetEntry(index);
@@ -4437,7 +4464,7 @@ const float &stop_1l_babyAnalyzer::calomet() {
   return calomet_;
 }
 
-const float &stop_1l_babyAnalyzer::calomet_phi() {
+const float &StopTree::calomet_phi() {
   if (not calomet_phi_isLoaded) {
     if (calomet_phi_branch != 0) {
       calomet_phi_branch->GetEntry(index);
@@ -4450,7 +4477,7 @@ const float &stop_1l_babyAnalyzer::calomet_phi() {
   return calomet_phi_;
 }
 
-const int &stop_1l_babyAnalyzer::lep1_pdgid() {
+const int &StopTree::lep1_pdgid() {
   if (not lep1_pdgid_isLoaded) {
     if (lep1_pdgid_branch != 0) {
       lep1_pdgid_branch->GetEntry(index);
@@ -4463,7 +4490,7 @@ const int &stop_1l_babyAnalyzer::lep1_pdgid() {
   return lep1_pdgid_;
 }
 
-const int &stop_1l_babyAnalyzer::lep1_production_type() {
+const int &StopTree::lep1_production_type() {
   if (not lep1_production_type_isLoaded) {
     if (lep1_production_type_branch != 0) {
       lep1_production_type_branch->GetEntry(index);
@@ -4476,7 +4503,7 @@ const int &stop_1l_babyAnalyzer::lep1_production_type() {
   return lep1_production_type_;
 }
 
-const float &stop_1l_babyAnalyzer::lep1_MiniIso() {
+const float &StopTree::lep1_MiniIso() {
   if (not lep1_MiniIso_isLoaded) {
     if (lep1_MiniIso_branch != 0) {
       lep1_MiniIso_branch->GetEntry(index);
@@ -4489,7 +4516,7 @@ const float &stop_1l_babyAnalyzer::lep1_MiniIso() {
   return lep1_MiniIso_;
 }
 
-const float &stop_1l_babyAnalyzer::lep1_relIso() {
+const float &StopTree::lep1_relIso() {
   if (not lep1_relIso_isLoaded) {
     if (lep1_relIso_branch != 0) {
       lep1_relIso_branch->GetEntry(index);
@@ -4502,7 +4529,7 @@ const float &stop_1l_babyAnalyzer::lep1_relIso() {
   return lep1_relIso_;
 }
 
-const bool &stop_1l_babyAnalyzer::lep1_passLooseID() {
+const bool &StopTree::lep1_passLooseID() {
   if (not lep1_passLooseID_isLoaded) {
     if (lep1_passLooseID_branch != 0) {
       lep1_passLooseID_branch->GetEntry(index);
@@ -4515,7 +4542,7 @@ const bool &stop_1l_babyAnalyzer::lep1_passLooseID() {
   return lep1_passLooseID_;
 }
 
-const bool &stop_1l_babyAnalyzer::lep1_passMediumID() {
+const bool &StopTree::lep1_passMediumID() {
   if (not lep1_passMediumID_isLoaded) {
     if (lep1_passMediumID_branch != 0) {
       lep1_passMediumID_branch->GetEntry(index);
@@ -4528,7 +4555,7 @@ const bool &stop_1l_babyAnalyzer::lep1_passMediumID() {
   return lep1_passMediumID_;
 }
 
-const bool &stop_1l_babyAnalyzer::lep1_passTightID() {
+const bool &StopTree::lep1_passTightID() {
   if (not lep1_passTightID_isLoaded) {
     if (lep1_passTightID_branch != 0) {
       lep1_passTightID_branch->GetEntry(index);
@@ -4541,7 +4568,7 @@ const bool &stop_1l_babyAnalyzer::lep1_passTightID() {
   return lep1_passTightID_;
 }
 
-const bool &stop_1l_babyAnalyzer::lep1_passVeto() {
+const bool &StopTree::lep1_passVeto() {
   if (not lep1_passVeto_isLoaded) {
     if (lep1_passVeto_branch != 0) {
       lep1_passVeto_branch->GetEntry(index);
@@ -4554,7 +4581,7 @@ const bool &stop_1l_babyAnalyzer::lep1_passVeto() {
   return lep1_passVeto_;
 }
 
-const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &stop_1l_babyAnalyzer::lep1_p4() {
+const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &StopTree::lep1_p4() {
   if (not lep1_p4_isLoaded) {
     if (lep1_p4_branch != 0) {
       lep1_p4_branch->GetEntry(index);
@@ -4567,7 +4594,7 @@ const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &stop_1l_babyAnal
   return *lep1_p4_;
 }
 
-const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &stop_1l_babyAnalyzer::lep1_mcp4() {
+const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &StopTree::lep1_mcp4() {
   if (not lep1_mcp4_isLoaded) {
     if (lep1_mcp4_branch != 0) {
       lep1_mcp4_branch->GetEntry(index);
@@ -4580,7 +4607,7 @@ const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &stop_1l_babyAnal
   return *lep1_mcp4_;
 }
 
-const int &stop_1l_babyAnalyzer::lep1_mc_motherid() {
+const int &StopTree::lep1_mc_motherid() {
   if (not lep1_mc_motherid_isLoaded) {
     if (lep1_mc_motherid_branch != 0) {
       lep1_mc_motherid_branch->GetEntry(index);
@@ -4593,7 +4620,7 @@ const int &stop_1l_babyAnalyzer::lep1_mc_motherid() {
   return lep1_mc_motherid_;
 }
 
-const float &stop_1l_babyAnalyzer::lep1_dphiMET() {
+const float &StopTree::lep1_dphiMET() {
   if (not lep1_dphiMET_isLoaded) {
     if (lep1_dphiMET_branch != 0) {
       lep1_dphiMET_branch->GetEntry(index);
@@ -4606,7 +4633,7 @@ const float &stop_1l_babyAnalyzer::lep1_dphiMET() {
   return lep1_dphiMET_;
 }
 
-const float &stop_1l_babyAnalyzer::lep1_dphiMET_jup() {
+const float &StopTree::lep1_dphiMET_jup() {
   if (not lep1_dphiMET_jup_isLoaded) {
     if (lep1_dphiMET_jup_branch != 0) {
       lep1_dphiMET_jup_branch->GetEntry(index);
@@ -4619,7 +4646,7 @@ const float &stop_1l_babyAnalyzer::lep1_dphiMET_jup() {
   return lep1_dphiMET_jup_;
 }
 
-const float &stop_1l_babyAnalyzer::lep1_dphiMET_jdown() {
+const float &StopTree::lep1_dphiMET_jdown() {
   if (not lep1_dphiMET_jdown_isLoaded) {
     if (lep1_dphiMET_jdown_branch != 0) {
       lep1_dphiMET_jdown_branch->GetEntry(index);
@@ -4632,7 +4659,7 @@ const float &stop_1l_babyAnalyzer::lep1_dphiMET_jdown() {
   return lep1_dphiMET_jdown_;
 }
 
-const float &stop_1l_babyAnalyzer::lep1_dphiMET_rl() {
+const float &StopTree::lep1_dphiMET_rl() {
   if (not lep1_dphiMET_rl_isLoaded) {
     if (lep1_dphiMET_rl_branch != 0) {
       lep1_dphiMET_rl_branch->GetEntry(index);
@@ -4645,7 +4672,7 @@ const float &stop_1l_babyAnalyzer::lep1_dphiMET_rl() {
   return lep1_dphiMET_rl_;
 }
 
-const float &stop_1l_babyAnalyzer::lep1_dphiMET_rl_jup() {
+const float &StopTree::lep1_dphiMET_rl_jup() {
   if (not lep1_dphiMET_rl_jup_isLoaded) {
     if (lep1_dphiMET_rl_jup_branch != 0) {
       lep1_dphiMET_rl_jup_branch->GetEntry(index);
@@ -4658,7 +4685,7 @@ const float &stop_1l_babyAnalyzer::lep1_dphiMET_rl_jup() {
   return lep1_dphiMET_rl_jup_;
 }
 
-const float &stop_1l_babyAnalyzer::lep1_dphiMET_rl_jdown() {
+const float &StopTree::lep1_dphiMET_rl_jdown() {
   if (not lep1_dphiMET_rl_jdown_isLoaded) {
     if (lep1_dphiMET_rl_jdown_branch != 0) {
       lep1_dphiMET_rl_jdown_branch->GetEntry(index);
@@ -4671,7 +4698,7 @@ const float &stop_1l_babyAnalyzer::lep1_dphiMET_rl_jdown() {
   return lep1_dphiMET_rl_jdown_;
 }
 
-const int &stop_1l_babyAnalyzer::lep2_pdgid() {
+const int &StopTree::lep2_pdgid() {
   if (not lep2_pdgid_isLoaded) {
     if (lep2_pdgid_branch != 0) {
       lep2_pdgid_branch->GetEntry(index);
@@ -4684,7 +4711,7 @@ const int &stop_1l_babyAnalyzer::lep2_pdgid() {
   return lep2_pdgid_;
 }
 
-const int &stop_1l_babyAnalyzer::lep2_production_type() {
+const int &StopTree::lep2_production_type() {
   if (not lep2_production_type_isLoaded) {
     if (lep2_production_type_branch != 0) {
       lep2_production_type_branch->GetEntry(index);
@@ -4697,7 +4724,7 @@ const int &stop_1l_babyAnalyzer::lep2_production_type() {
   return lep2_production_type_;
 }
 
-const float &stop_1l_babyAnalyzer::lep2_MiniIso() {
+const float &StopTree::lep2_MiniIso() {
   if (not lep2_MiniIso_isLoaded) {
     if (lep2_MiniIso_branch != 0) {
       lep2_MiniIso_branch->GetEntry(index);
@@ -4710,7 +4737,7 @@ const float &stop_1l_babyAnalyzer::lep2_MiniIso() {
   return lep2_MiniIso_;
 }
 
-const float &stop_1l_babyAnalyzer::lep2_relIso() {
+const float &StopTree::lep2_relIso() {
   if (not lep2_relIso_isLoaded) {
     if (lep2_relIso_branch != 0) {
       lep2_relIso_branch->GetEntry(index);
@@ -4723,7 +4750,7 @@ const float &stop_1l_babyAnalyzer::lep2_relIso() {
   return lep2_relIso_;
 }
 
-const bool &stop_1l_babyAnalyzer::lep2_passLooseID() {
+const bool &StopTree::lep2_passLooseID() {
   if (not lep2_passLooseID_isLoaded) {
     if (lep2_passLooseID_branch != 0) {
       lep2_passLooseID_branch->GetEntry(index);
@@ -4736,7 +4763,7 @@ const bool &stop_1l_babyAnalyzer::lep2_passLooseID() {
   return lep2_passLooseID_;
 }
 
-const bool &stop_1l_babyAnalyzer::lep2_passMediumID() {
+const bool &StopTree::lep2_passMediumID() {
   if (not lep2_passMediumID_isLoaded) {
     if (lep2_passMediumID_branch != 0) {
       lep2_passMediumID_branch->GetEntry(index);
@@ -4749,7 +4776,7 @@ const bool &stop_1l_babyAnalyzer::lep2_passMediumID() {
   return lep2_passMediumID_;
 }
 
-const bool &stop_1l_babyAnalyzer::lep2_passTightID() {
+const bool &StopTree::lep2_passTightID() {
   if (not lep2_passTightID_isLoaded) {
     if (lep2_passTightID_branch != 0) {
       lep2_passTightID_branch->GetEntry(index);
@@ -4762,7 +4789,7 @@ const bool &stop_1l_babyAnalyzer::lep2_passTightID() {
   return lep2_passTightID_;
 }
 
-const bool &stop_1l_babyAnalyzer::lep2_passVeto() {
+const bool &StopTree::lep2_passVeto() {
   if (not lep2_passVeto_isLoaded) {
     if (lep2_passVeto_branch != 0) {
       lep2_passVeto_branch->GetEntry(index);
@@ -4775,7 +4802,7 @@ const bool &stop_1l_babyAnalyzer::lep2_passVeto() {
   return lep2_passVeto_;
 }
 
-const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &stop_1l_babyAnalyzer::lep2_p4() {
+const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &StopTree::lep2_p4() {
   if (not lep2_p4_isLoaded) {
     if (lep2_p4_branch != 0) {
       lep2_p4_branch->GetEntry(index);
@@ -4788,7 +4815,7 @@ const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &stop_1l_babyAnal
   return *lep2_p4_;
 }
 
-const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &stop_1l_babyAnalyzer::lep2_mcp4() {
+const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &StopTree::lep2_mcp4() {
   if (not lep2_mcp4_isLoaded) {
     if (lep2_mcp4_branch != 0) {
       lep2_mcp4_branch->GetEntry(index);
@@ -4801,7 +4828,7 @@ const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &stop_1l_babyAnal
   return *lep2_mcp4_;
 }
 
-const int &stop_1l_babyAnalyzer::lep2_mc_motherid() {
+const int &StopTree::lep2_mc_motherid() {
   if (not lep2_mc_motherid_isLoaded) {
     if (lep2_mc_motherid_branch != 0) {
       lep2_mc_motherid_branch->GetEntry(index);
@@ -4814,7 +4841,7 @@ const int &stop_1l_babyAnalyzer::lep2_mc_motherid() {
   return lep2_mc_motherid_;
 }
 
-const float &stop_1l_babyAnalyzer::lep2_dphiMET() {
+const float &StopTree::lep2_dphiMET() {
   if (not lep2_dphiMET_isLoaded) {
     if (lep2_dphiMET_branch != 0) {
       lep2_dphiMET_branch->GetEntry(index);
@@ -4827,7 +4854,7 @@ const float &stop_1l_babyAnalyzer::lep2_dphiMET() {
   return lep2_dphiMET_;
 }
 
-const float &stop_1l_babyAnalyzer::lep2_dphiMET_jup() {
+const float &StopTree::lep2_dphiMET_jup() {
   if (not lep2_dphiMET_jup_isLoaded) {
     if (lep2_dphiMET_jup_branch != 0) {
       lep2_dphiMET_jup_branch->GetEntry(index);
@@ -4840,7 +4867,7 @@ const float &stop_1l_babyAnalyzer::lep2_dphiMET_jup() {
   return lep2_dphiMET_jup_;
 }
 
-const float &stop_1l_babyAnalyzer::lep2_dphiMET_jdown() {
+const float &StopTree::lep2_dphiMET_jdown() {
   if (not lep2_dphiMET_jdown_isLoaded) {
     if (lep2_dphiMET_jdown_branch != 0) {
       lep2_dphiMET_jdown_branch->GetEntry(index);
@@ -4853,7 +4880,7 @@ const float &stop_1l_babyAnalyzer::lep2_dphiMET_jdown() {
   return lep2_dphiMET_jdown_;
 }
 
-const float &stop_1l_babyAnalyzer::lep2_dphiMET_rl() {
+const float &StopTree::lep2_dphiMET_rl() {
   if (not lep2_dphiMET_rl_isLoaded) {
     if (lep2_dphiMET_rl_branch != 0) {
       lep2_dphiMET_rl_branch->GetEntry(index);
@@ -4866,7 +4893,7 @@ const float &stop_1l_babyAnalyzer::lep2_dphiMET_rl() {
   return lep2_dphiMET_rl_;
 }
 
-const float &stop_1l_babyAnalyzer::lep2_dphiMET_rl_jup() {
+const float &StopTree::lep2_dphiMET_rl_jup() {
   if (not lep2_dphiMET_rl_jup_isLoaded) {
     if (lep2_dphiMET_rl_jup_branch != 0) {
       lep2_dphiMET_rl_jup_branch->GetEntry(index);
@@ -4879,7 +4906,7 @@ const float &stop_1l_babyAnalyzer::lep2_dphiMET_rl_jup() {
   return lep2_dphiMET_rl_jup_;
 }
 
-const float &stop_1l_babyAnalyzer::lep2_dphiMET_rl_jdown() {
+const float &StopTree::lep2_dphiMET_rl_jdown() {
   if (not lep2_dphiMET_rl_jdown_isLoaded) {
     if (lep2_dphiMET_rl_jdown_branch != 0) {
       lep2_dphiMET_rl_jdown_branch->GetEntry(index);
@@ -4892,7 +4919,7 @@ const float &stop_1l_babyAnalyzer::lep2_dphiMET_rl_jdown() {
   return lep2_dphiMET_rl_jdown_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::ph_sigmaIEtaEta_fill5x5() {
+const vector<float> &StopTree::ph_sigmaIEtaEta_fill5x5() {
   if (not ph_sigmaIEtaEta_fill5x5_isLoaded) {
     if (ph_sigmaIEtaEta_fill5x5_branch != 0) {
       ph_sigmaIEtaEta_fill5x5_branch->GetEntry(index);
@@ -4905,7 +4932,7 @@ const vector<float> &stop_1l_babyAnalyzer::ph_sigmaIEtaEta_fill5x5() {
   return *ph_sigmaIEtaEta_fill5x5_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::ph_hOverE() {
+const vector<float> &StopTree::ph_hOverE() {
   if (not ph_hOverE_isLoaded) {
     if (ph_hOverE_branch != 0) {
       ph_hOverE_branch->GetEntry(index);
@@ -4918,7 +4945,7 @@ const vector<float> &stop_1l_babyAnalyzer::ph_hOverE() {
   return *ph_hOverE_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::ph_r9() {
+const vector<float> &StopTree::ph_r9() {
   if (not ph_r9_isLoaded) {
     if (ph_r9_branch != 0) {
       ph_r9_branch->GetEntry(index);
@@ -4931,7 +4958,7 @@ const vector<float> &stop_1l_babyAnalyzer::ph_r9() {
   return *ph_r9_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::ph_chiso() {
+const vector<float> &StopTree::ph_chiso() {
   if (not ph_chiso_isLoaded) {
     if (ph_chiso_branch != 0) {
       ph_chiso_branch->GetEntry(index);
@@ -4944,7 +4971,7 @@ const vector<float> &stop_1l_babyAnalyzer::ph_chiso() {
   return *ph_chiso_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::ph_nhiso() {
+const vector<float> &StopTree::ph_nhiso() {
   if (not ph_nhiso_isLoaded) {
     if (ph_nhiso_branch != 0) {
       ph_nhiso_branch->GetEntry(index);
@@ -4957,7 +4984,7 @@ const vector<float> &stop_1l_babyAnalyzer::ph_nhiso() {
   return *ph_nhiso_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::ph_phiso() {
+const vector<float> &StopTree::ph_phiso() {
   if (not ph_phiso_isLoaded) {
     if (ph_phiso_branch != 0) {
       ph_phiso_branch->GetEntry(index);
@@ -4970,7 +4997,7 @@ const vector<float> &stop_1l_babyAnalyzer::ph_phiso() {
   return *ph_phiso_;
 }
 
-const vector<int> &stop_1l_babyAnalyzer::ph_overlapJetId() {
+const vector<int> &StopTree::ph_overlapJetId() {
   if (not ph_overlapJetId_isLoaded) {
     if (ph_overlapJetId_branch != 0) {
       ph_overlapJetId_branch->GetEntry(index);
@@ -4983,7 +5010,7 @@ const vector<int> &stop_1l_babyAnalyzer::ph_overlapJetId() {
   return *ph_overlapJetId_;
 }
 
-const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l_babyAnalyzer::ph_p4() {
+const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &StopTree::ph_p4() {
   if (not ph_p4_isLoaded) {
     if (ph_p4_branch != 0) {
       ph_p4_branch->GetEntry(index);
@@ -4996,7 +5023,7 @@ const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l
   return *ph_p4_;
 }
 
-const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l_babyAnalyzer::ph_mcp4() {
+const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &StopTree::ph_mcp4() {
   if (not ph_mcp4_isLoaded) {
     if (ph_mcp4_branch != 0) {
       ph_mcp4_branch->GetEntry(index);
@@ -5009,7 +5036,7 @@ const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l
   return *ph_mcp4_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::ph_pt() {
+const vector<float> &StopTree::ph_pt() {
   if (not ph_pt_isLoaded) {
     if (ph_pt_branch != 0) {
       ph_pt_branch->GetEntry(index);
@@ -5022,7 +5049,7 @@ const vector<float> &stop_1l_babyAnalyzer::ph_pt() {
   return *ph_pt_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::ph_eta() {
+const vector<float> &StopTree::ph_eta() {
   if (not ph_eta_isLoaded) {
     if (ph_eta_branch != 0) {
       ph_eta_branch->GetEntry(index);
@@ -5035,7 +5062,7 @@ const vector<float> &stop_1l_babyAnalyzer::ph_eta() {
   return *ph_eta_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::ph_phi() {
+const vector<float> &StopTree::ph_phi() {
   if (not ph_phi_isLoaded) {
     if (ph_phi_branch != 0) {
       ph_phi_branch->GetEntry(index);
@@ -5048,7 +5075,7 @@ const vector<float> &stop_1l_babyAnalyzer::ph_phi() {
   return *ph_phi_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::ph_mass() {
+const vector<float> &StopTree::ph_mass() {
   if (not ph_mass_isLoaded) {
     if (ph_mass_branch != 0) {
       ph_mass_branch->GetEntry(index);
@@ -5061,7 +5088,7 @@ const vector<float> &stop_1l_babyAnalyzer::ph_mass() {
   return *ph_mass_;
 }
 
-const vector<int> &stop_1l_babyAnalyzer::ph_mcMatchId() {
+const vector<int> &StopTree::ph_mcMatchId() {
   if (not ph_mcMatchId_isLoaded) {
     if (ph_mcMatchId_branch != 0) {
       ph_mcMatchId_branch->GetEntry(index);
@@ -5074,7 +5101,7 @@ const vector<int> &stop_1l_babyAnalyzer::ph_mcMatchId() {
   return *ph_mcMatchId_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::ph_genIso04() {
+const vector<float> &StopTree::ph_genIso04() {
   if (not ph_genIso04_isLoaded) {
     if (ph_genIso04_branch != 0) {
       ph_genIso04_branch->GetEntry(index);
@@ -5087,7 +5114,7 @@ const vector<float> &stop_1l_babyAnalyzer::ph_genIso04() {
   return *ph_genIso04_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::ph_drMinParton() {
+const vector<float> &StopTree::ph_drMinParton() {
   if (not ph_drMinParton_isLoaded) {
     if (ph_drMinParton_branch != 0) {
       ph_drMinParton_branch->GetEntry(index);
@@ -5100,7 +5127,7 @@ const vector<float> &stop_1l_babyAnalyzer::ph_drMinParton() {
   return *ph_drMinParton_;
 }
 
-const int &stop_1l_babyAnalyzer::nskimjets() {
+const int &StopTree::nskimjets() {
   if (not nskimjets_isLoaded) {
     if (nskimjets_branch != 0) {
       nskimjets_branch->GetEntry(index);
@@ -5113,7 +5140,7 @@ const int &stop_1l_babyAnalyzer::nskimjets() {
   return nskimjets_;
 }
 
-const int &stop_1l_babyAnalyzer::nskimbtagmed() {
+const int &StopTree::nskimbtagmed() {
   if (not nskimbtagmed_isLoaded) {
     if (nskimbtagmed_branch != 0) {
       nskimbtagmed_branch->GetEntry(index);
@@ -5126,7 +5153,7 @@ const int &stop_1l_babyAnalyzer::nskimbtagmed() {
   return nskimbtagmed_;
 }
 
-const int &stop_1l_babyAnalyzer::nskimbtagloose() {
+const int &StopTree::nskimbtagloose() {
   if (not nskimbtagloose_isLoaded) {
     if (nskimbtagloose_branch != 0) {
       nskimbtagloose_branch->GetEntry(index);
@@ -5139,7 +5166,7 @@ const int &stop_1l_babyAnalyzer::nskimbtagloose() {
   return nskimbtagloose_;
 }
 
-const int &stop_1l_babyAnalyzer::nskimbtagtight() {
+const int &StopTree::nskimbtagtight() {
   if (not nskimbtagtight_isLoaded) {
     if (nskimbtagtight_branch != 0) {
       nskimbtagtight_branch->GetEntry(index);
@@ -5152,7 +5179,7 @@ const int &stop_1l_babyAnalyzer::nskimbtagtight() {
   return nskimbtagtight_;
 }
 
-const int &stop_1l_babyAnalyzer::ngoodjets() {
+const int &StopTree::ngoodjets() {
   if (not ngoodjets_isLoaded) {
     if (ngoodjets_branch != 0) {
       ngoodjets_branch->GetEntry(index);
@@ -5165,7 +5192,7 @@ const int &stop_1l_babyAnalyzer::ngoodjets() {
   return ngoodjets_;
 }
 
-const int &stop_1l_babyAnalyzer::ngoodbtags() {
+const int &StopTree::ngoodbtags() {
   if (not ngoodbtags_isLoaded) {
     if (ngoodbtags_branch != 0) {
       ngoodbtags_branch->GetEntry(index);
@@ -5178,7 +5205,7 @@ const int &stop_1l_babyAnalyzer::ngoodbtags() {
   return ngoodbtags_;
 }
 
-const int &stop_1l_babyAnalyzer::nloosebtags() {
+const int &StopTree::nloosebtags() {
   if (not nloosebtags_isLoaded) {
     if (nloosebtags_branch != 0) {
       nloosebtags_branch->GetEntry(index);
@@ -5191,7 +5218,7 @@ const int &stop_1l_babyAnalyzer::nloosebtags() {
   return nloosebtags_;
 }
 
-const int &stop_1l_babyAnalyzer::ntightbtags() {
+const int &StopTree::ntightbtags() {
   if (not ntightbtags_isLoaded) {
     if (ntightbtags_branch != 0) {
       ntightbtags_branch->GetEntry(index);
@@ -5204,7 +5231,7 @@ const int &stop_1l_babyAnalyzer::ntightbtags() {
   return ntightbtags_;
 }
 
-const int &stop_1l_babyAnalyzer::nanalysisbtags() {
+const int &StopTree::nanalysisbtags() {
   if (not nanalysisbtags_isLoaded) {
     if (nanalysisbtags_branch != 0) {
       nanalysisbtags_branch->GetEntry(index);
@@ -5217,7 +5244,7 @@ const int &stop_1l_babyAnalyzer::nanalysisbtags() {
   return nanalysisbtags_;
 }
 
-const float &stop_1l_babyAnalyzer::ak4_HT() {
+const float &StopTree::ak4_HT() {
   if (not ak4_HT_isLoaded) {
     if (ak4_HT_branch != 0) {
       ak4_HT_branch->GetEntry(index);
@@ -5230,7 +5257,7 @@ const float &stop_1l_babyAnalyzer::ak4_HT() {
   return ak4_HT_;
 }
 
-const float &stop_1l_babyAnalyzer::ak4_htratiom() {
+const float &StopTree::ak4_htratiom() {
   if (not ak4_htratiom_isLoaded) {
     if (ak4_htratiom_branch != 0) {
       ak4_htratiom_branch->GetEntry(index);
@@ -5243,7 +5270,7 @@ const float &stop_1l_babyAnalyzer::ak4_htratiom() {
   return ak4_htratiom_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::dphi_ak4pfjet_met() {
+const vector<float> &StopTree::dphi_ak4pfjet_met() {
   if (not dphi_ak4pfjet_met_isLoaded) {
     if (dphi_ak4pfjet_met_branch != 0) {
       dphi_ak4pfjet_met_branch->GetEntry(index);
@@ -5256,7 +5283,7 @@ const vector<float> &stop_1l_babyAnalyzer::dphi_ak4pfjet_met() {
   return *dphi_ak4pfjet_met_;
 }
 
-const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l_babyAnalyzer::ak4pfjets_p4() {
+const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &StopTree::ak4pfjets_p4() {
   if (not ak4pfjets_p4_isLoaded) {
     if (ak4pfjets_p4_branch != 0) {
       ak4pfjets_p4_branch->GetEntry(index);
@@ -5269,7 +5296,7 @@ const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l
   return *ak4pfjets_p4_;
 }
 
-const vector<bool> &stop_1l_babyAnalyzer::ak4pfjets_passMEDbtag() {
+const vector<bool> &StopTree::ak4pfjets_passMEDbtag() {
   if (not ak4pfjets_passMEDbtag_isLoaded) {
     if (ak4pfjets_passMEDbtag_branch != 0) {
       ak4pfjets_passMEDbtag_branch->GetEntry(index);
@@ -5282,7 +5309,7 @@ const vector<bool> &stop_1l_babyAnalyzer::ak4pfjets_passMEDbtag() {
   return *ak4pfjets_passMEDbtag_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::ak4pfjets_deepCSV() {
+const vector<float> &StopTree::ak4pfjets_deepCSV() {
   if (not ak4pfjets_deepCSV_isLoaded) {
     if (ak4pfjets_deepCSV_branch != 0) {
       ak4pfjets_deepCSV_branch->GetEntry(index);
@@ -5295,7 +5322,7 @@ const vector<float> &stop_1l_babyAnalyzer::ak4pfjets_deepCSV() {
   return *ak4pfjets_deepCSV_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::ak4pfjets_CSV() {
+const vector<float> &StopTree::ak4pfjets_CSV() {
   if (not ak4pfjets_CSV_isLoaded) {
     if (ak4pfjets_CSV_branch != 0) {
       ak4pfjets_CSV_branch->GetEntry(index);
@@ -5308,7 +5335,7 @@ const vector<float> &stop_1l_babyAnalyzer::ak4pfjets_CSV() {
   return *ak4pfjets_CSV_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::ak4pfjets_mva() {
+const vector<float> &StopTree::ak4pfjets_mva() {
   if (not ak4pfjets_mva_isLoaded) {
     if (ak4pfjets_mva_branch != 0) {
       ak4pfjets_mva_branch->GetEntry(index);
@@ -5321,7 +5348,7 @@ const vector<float> &stop_1l_babyAnalyzer::ak4pfjets_mva() {
   return *ak4pfjets_mva_;
 }
 
-const vector<int> &stop_1l_babyAnalyzer::ak4pfjets_parton_flavor() {
+const vector<int> &StopTree::ak4pfjets_parton_flavor() {
   if (not ak4pfjets_parton_flavor_isLoaded) {
     if (ak4pfjets_parton_flavor_branch != 0) {
       ak4pfjets_parton_flavor_branch->GetEntry(index);
@@ -5334,7 +5361,7 @@ const vector<int> &stop_1l_babyAnalyzer::ak4pfjets_parton_flavor() {
   return *ak4pfjets_parton_flavor_;
 }
 
-const vector<int> &stop_1l_babyAnalyzer::ak4pfjets_hadron_flavor() {
+const vector<int> &StopTree::ak4pfjets_hadron_flavor() {
   if (not ak4pfjets_hadron_flavor_isLoaded) {
     if (ak4pfjets_hadron_flavor_branch != 0) {
       ak4pfjets_hadron_flavor_branch->GetEntry(index);
@@ -5347,7 +5374,7 @@ const vector<int> &stop_1l_babyAnalyzer::ak4pfjets_hadron_flavor() {
   return *ak4pfjets_hadron_flavor_;
 }
 
-const vector<bool> &stop_1l_babyAnalyzer::ak4pfjets_loose_puid() {
+const vector<bool> &StopTree::ak4pfjets_loose_puid() {
   if (not ak4pfjets_loose_puid_isLoaded) {
     if (ak4pfjets_loose_puid_branch != 0) {
       ak4pfjets_loose_puid_branch->GetEntry(index);
@@ -5360,7 +5387,7 @@ const vector<bool> &stop_1l_babyAnalyzer::ak4pfjets_loose_puid() {
   return *ak4pfjets_loose_puid_;
 }
 
-const vector<bool> &stop_1l_babyAnalyzer::ak4pfjets_loose_pfid() {
+const vector<bool> &StopTree::ak4pfjets_loose_pfid() {
   if (not ak4pfjets_loose_pfid_isLoaded) {
     if (ak4pfjets_loose_pfid_branch != 0) {
       ak4pfjets_loose_pfid_branch->GetEntry(index);
@@ -5373,7 +5400,7 @@ const vector<bool> &stop_1l_babyAnalyzer::ak4pfjets_loose_pfid() {
   return *ak4pfjets_loose_pfid_;
 }
 
-const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &stop_1l_babyAnalyzer::ak4pfjets_leadMEDbjet_p4() {
+const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &StopTree::ak4pfjets_leadMEDbjet_p4() {
   if (not ak4pfjets_leadMEDbjet_p4_isLoaded) {
     if (ak4pfjets_leadMEDbjet_p4_branch != 0) {
       ak4pfjets_leadMEDbjet_p4_branch->GetEntry(index);
@@ -5386,7 +5413,7 @@ const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &stop_1l_babyAnal
   return *ak4pfjets_leadMEDbjet_p4_;
 }
 
-const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &stop_1l_babyAnalyzer::ak4pfjets_leadbtag_p4() {
+const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &StopTree::ak4pfjets_leadbtag_p4() {
   if (not ak4pfjets_leadbtag_p4_isLoaded) {
     if (ak4pfjets_leadbtag_p4_branch != 0) {
       ak4pfjets_leadbtag_p4_branch->GetEntry(index);
@@ -5399,7 +5426,7 @@ const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &stop_1l_babyAnal
   return *ak4pfjets_leadbtag_p4_;
 }
 
-const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l_babyAnalyzer::ak4genjets_p4() {
+const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &StopTree::ak4genjets_p4() {
   if (not ak4genjets_p4_isLoaded) {
     if (ak4genjets_p4_branch != 0) {
       ak4genjets_p4_branch->GetEntry(index);
@@ -5412,7 +5439,7 @@ const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l
   return *ak4genjets_p4_;
 }
 
-const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l_babyAnalyzer::softtags_p4() {
+const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &StopTree::softtags_p4() {
   if (not softtags_p4_isLoaded) {
     if (softtags_p4_branch != 0) {
       softtags_p4_branch->GetEntry(index);
@@ -5425,7 +5452,7 @@ const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l
   return *softtags_p4_;
 }
 
-const int &stop_1l_babyAnalyzer::nsoftbtags() {
+const int &StopTree::nsoftbtags() {
   if (not nsoftbtags_isLoaded) {
     if (nsoftbtags_branch != 0) {
       nsoftbtags_branch->GetEntry(index);
@@ -5438,7 +5465,7 @@ const int &stop_1l_babyAnalyzer::nsoftbtags() {
   return nsoftbtags_;
 }
 
-const int &stop_1l_babyAnalyzer::jup_nskimjets() {
+const int &StopTree::jup_nskimjets() {
   if (not jup_nskimjets_isLoaded) {
     if (jup_nskimjets_branch != 0) {
       jup_nskimjets_branch->GetEntry(index);
@@ -5451,7 +5478,7 @@ const int &stop_1l_babyAnalyzer::jup_nskimjets() {
   return jup_nskimjets_;
 }
 
-const int &stop_1l_babyAnalyzer::jup_nskimbtagmed() {
+const int &StopTree::jup_nskimbtagmed() {
   if (not jup_nskimbtagmed_isLoaded) {
     if (jup_nskimbtagmed_branch != 0) {
       jup_nskimbtagmed_branch->GetEntry(index);
@@ -5464,7 +5491,7 @@ const int &stop_1l_babyAnalyzer::jup_nskimbtagmed() {
   return jup_nskimbtagmed_;
 }
 
-const int &stop_1l_babyAnalyzer::jup_nskimbtagloose() {
+const int &StopTree::jup_nskimbtagloose() {
   if (not jup_nskimbtagloose_isLoaded) {
     if (jup_nskimbtagloose_branch != 0) {
       jup_nskimbtagloose_branch->GetEntry(index);
@@ -5477,7 +5504,7 @@ const int &stop_1l_babyAnalyzer::jup_nskimbtagloose() {
   return jup_nskimbtagloose_;
 }
 
-const int &stop_1l_babyAnalyzer::jup_nskimbtagtight() {
+const int &StopTree::jup_nskimbtagtight() {
   if (not jup_nskimbtagtight_isLoaded) {
     if (jup_nskimbtagtight_branch != 0) {
       jup_nskimbtagtight_branch->GetEntry(index);
@@ -5490,7 +5517,7 @@ const int &stop_1l_babyAnalyzer::jup_nskimbtagtight() {
   return jup_nskimbtagtight_;
 }
 
-const int &stop_1l_babyAnalyzer::jup_ngoodjets() {
+const int &StopTree::jup_ngoodjets() {
   if (not jup_ngoodjets_isLoaded) {
     if (jup_ngoodjets_branch != 0) {
       jup_ngoodjets_branch->GetEntry(index);
@@ -5503,7 +5530,7 @@ const int &stop_1l_babyAnalyzer::jup_ngoodjets() {
   return jup_ngoodjets_;
 }
 
-const int &stop_1l_babyAnalyzer::jup_ngoodbtags() {
+const int &StopTree::jup_ngoodbtags() {
   if (not jup_ngoodbtags_isLoaded) {
     if (jup_ngoodbtags_branch != 0) {
       jup_ngoodbtags_branch->GetEntry(index);
@@ -5516,7 +5543,7 @@ const int &stop_1l_babyAnalyzer::jup_ngoodbtags() {
   return jup_ngoodbtags_;
 }
 
-const int &stop_1l_babyAnalyzer::jup_nloosebtags() {
+const int &StopTree::jup_nloosebtags() {
   if (not jup_nloosebtags_isLoaded) {
     if (jup_nloosebtags_branch != 0) {
       jup_nloosebtags_branch->GetEntry(index);
@@ -5529,7 +5556,7 @@ const int &stop_1l_babyAnalyzer::jup_nloosebtags() {
   return jup_nloosebtags_;
 }
 
-const int &stop_1l_babyAnalyzer::jup_ntightbtags() {
+const int &StopTree::jup_ntightbtags() {
   if (not jup_ntightbtags_isLoaded) {
     if (jup_ntightbtags_branch != 0) {
       jup_ntightbtags_branch->GetEntry(index);
@@ -5542,7 +5569,7 @@ const int &stop_1l_babyAnalyzer::jup_ntightbtags() {
   return jup_ntightbtags_;
 }
 
-const int &stop_1l_babyAnalyzer::jup_nanalysisbtags() {
+const int &StopTree::jup_nanalysisbtags() {
   if (not jup_nanalysisbtags_isLoaded) {
     if (jup_nanalysisbtags_branch != 0) {
       jup_nanalysisbtags_branch->GetEntry(index);
@@ -5555,7 +5582,7 @@ const int &stop_1l_babyAnalyzer::jup_nanalysisbtags() {
   return jup_nanalysisbtags_;
 }
 
-const float &stop_1l_babyAnalyzer::jup_ak4_HT() {
+const float &StopTree::jup_ak4_HT() {
   if (not jup_ak4_HT_isLoaded) {
     if (jup_ak4_HT_branch != 0) {
       jup_ak4_HT_branch->GetEntry(index);
@@ -5568,7 +5595,7 @@ const float &stop_1l_babyAnalyzer::jup_ak4_HT() {
   return jup_ak4_HT_;
 }
 
-const float &stop_1l_babyAnalyzer::jup_ak4_htratiom() {
+const float &StopTree::jup_ak4_htratiom() {
   if (not jup_ak4_htratiom_isLoaded) {
     if (jup_ak4_htratiom_branch != 0) {
       jup_ak4_htratiom_branch->GetEntry(index);
@@ -5581,7 +5608,7 @@ const float &stop_1l_babyAnalyzer::jup_ak4_htratiom() {
   return jup_ak4_htratiom_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::jup_dphi_ak4pfjet_met() {
+const vector<float> &StopTree::jup_dphi_ak4pfjet_met() {
   if (not jup_dphi_ak4pfjet_met_isLoaded) {
     if (jup_dphi_ak4pfjet_met_branch != 0) {
       jup_dphi_ak4pfjet_met_branch->GetEntry(index);
@@ -5594,7 +5621,7 @@ const vector<float> &stop_1l_babyAnalyzer::jup_dphi_ak4pfjet_met() {
   return *jup_dphi_ak4pfjet_met_;
 }
 
-const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l_babyAnalyzer::jup_ak4pfjets_p4() {
+const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &StopTree::jup_ak4pfjets_p4() {
   if (not jup_ak4pfjets_p4_isLoaded) {
     if (jup_ak4pfjets_p4_branch != 0) {
       jup_ak4pfjets_p4_branch->GetEntry(index);
@@ -5607,7 +5634,7 @@ const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l
   return *jup_ak4pfjets_p4_;
 }
 
-const vector<bool> &stop_1l_babyAnalyzer::jup_ak4pfjets_passMEDbtag() {
+const vector<bool> &StopTree::jup_ak4pfjets_passMEDbtag() {
   if (not jup_ak4pfjets_passMEDbtag_isLoaded) {
     if (jup_ak4pfjets_passMEDbtag_branch != 0) {
       jup_ak4pfjets_passMEDbtag_branch->GetEntry(index);
@@ -5620,7 +5647,7 @@ const vector<bool> &stop_1l_babyAnalyzer::jup_ak4pfjets_passMEDbtag() {
   return *jup_ak4pfjets_passMEDbtag_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::jup_ak4pfjets_deepCSV() {
+const vector<float> &StopTree::jup_ak4pfjets_deepCSV() {
   if (not jup_ak4pfjets_deepCSV_isLoaded) {
     if (jup_ak4pfjets_deepCSV_branch != 0) {
       jup_ak4pfjets_deepCSV_branch->GetEntry(index);
@@ -5633,7 +5660,7 @@ const vector<float> &stop_1l_babyAnalyzer::jup_ak4pfjets_deepCSV() {
   return *jup_ak4pfjets_deepCSV_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::jup_ak4pfjets_CSV() {
+const vector<float> &StopTree::jup_ak4pfjets_CSV() {
   if (not jup_ak4pfjets_CSV_isLoaded) {
     if (jup_ak4pfjets_CSV_branch != 0) {
       jup_ak4pfjets_CSV_branch->GetEntry(index);
@@ -5646,7 +5673,7 @@ const vector<float> &stop_1l_babyAnalyzer::jup_ak4pfjets_CSV() {
   return *jup_ak4pfjets_CSV_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::jup_ak4pfjets_mva() {
+const vector<float> &StopTree::jup_ak4pfjets_mva() {
   if (not jup_ak4pfjets_mva_isLoaded) {
     if (jup_ak4pfjets_mva_branch != 0) {
       jup_ak4pfjets_mva_branch->GetEntry(index);
@@ -5659,7 +5686,7 @@ const vector<float> &stop_1l_babyAnalyzer::jup_ak4pfjets_mva() {
   return *jup_ak4pfjets_mva_;
 }
 
-const vector<int> &stop_1l_babyAnalyzer::jup_ak4pfjets_parton_flavor() {
+const vector<int> &StopTree::jup_ak4pfjets_parton_flavor() {
   if (not jup_ak4pfjets_parton_flavor_isLoaded) {
     if (jup_ak4pfjets_parton_flavor_branch != 0) {
       jup_ak4pfjets_parton_flavor_branch->GetEntry(index);
@@ -5672,7 +5699,7 @@ const vector<int> &stop_1l_babyAnalyzer::jup_ak4pfjets_parton_flavor() {
   return *jup_ak4pfjets_parton_flavor_;
 }
 
-const vector<int> &stop_1l_babyAnalyzer::jup_ak4pfjets_hadron_flavor() {
+const vector<int> &StopTree::jup_ak4pfjets_hadron_flavor() {
   if (not jup_ak4pfjets_hadron_flavor_isLoaded) {
     if (jup_ak4pfjets_hadron_flavor_branch != 0) {
       jup_ak4pfjets_hadron_flavor_branch->GetEntry(index);
@@ -5685,7 +5712,7 @@ const vector<int> &stop_1l_babyAnalyzer::jup_ak4pfjets_hadron_flavor() {
   return *jup_ak4pfjets_hadron_flavor_;
 }
 
-const vector<bool> &stop_1l_babyAnalyzer::jup_ak4pfjets_loose_puid() {
+const vector<bool> &StopTree::jup_ak4pfjets_loose_puid() {
   if (not jup_ak4pfjets_loose_puid_isLoaded) {
     if (jup_ak4pfjets_loose_puid_branch != 0) {
       jup_ak4pfjets_loose_puid_branch->GetEntry(index);
@@ -5698,7 +5725,7 @@ const vector<bool> &stop_1l_babyAnalyzer::jup_ak4pfjets_loose_puid() {
   return *jup_ak4pfjets_loose_puid_;
 }
 
-const vector<bool> &stop_1l_babyAnalyzer::jup_ak4pfjets_loose_pfid() {
+const vector<bool> &StopTree::jup_ak4pfjets_loose_pfid() {
   if (not jup_ak4pfjets_loose_pfid_isLoaded) {
     if (jup_ak4pfjets_loose_pfid_branch != 0) {
       jup_ak4pfjets_loose_pfid_branch->GetEntry(index);
@@ -5711,7 +5738,7 @@ const vector<bool> &stop_1l_babyAnalyzer::jup_ak4pfjets_loose_pfid() {
   return *jup_ak4pfjets_loose_pfid_;
 }
 
-const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &stop_1l_babyAnalyzer::jup_ak4pfjets_leadMEDbjet_p4() {
+const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &StopTree::jup_ak4pfjets_leadMEDbjet_p4() {
   if (not jup_ak4pfjets_leadMEDbjet_p4_isLoaded) {
     if (jup_ak4pfjets_leadMEDbjet_p4_branch != 0) {
       jup_ak4pfjets_leadMEDbjet_p4_branch->GetEntry(index);
@@ -5724,7 +5751,7 @@ const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &stop_1l_babyAnal
   return *jup_ak4pfjets_leadMEDbjet_p4_;
 }
 
-const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &stop_1l_babyAnalyzer::jup_ak4pfjets_leadbtag_p4() {
+const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &StopTree::jup_ak4pfjets_leadbtag_p4() {
   if (not jup_ak4pfjets_leadbtag_p4_isLoaded) {
     if (jup_ak4pfjets_leadbtag_p4_branch != 0) {
       jup_ak4pfjets_leadbtag_p4_branch->GetEntry(index);
@@ -5737,7 +5764,7 @@ const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &stop_1l_babyAnal
   return *jup_ak4pfjets_leadbtag_p4_;
 }
 
-const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l_babyAnalyzer::jup_ak4genjets_p4() {
+const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &StopTree::jup_ak4genjets_p4() {
   if (not jup_ak4genjets_p4_isLoaded) {
     if (jup_ak4genjets_p4_branch != 0) {
       jup_ak4genjets_p4_branch->GetEntry(index);
@@ -5750,7 +5777,7 @@ const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l
   return *jup_ak4genjets_p4_;
 }
 
-const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l_babyAnalyzer::jup_softtags_p4() {
+const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &StopTree::jup_softtags_p4() {
   if (not jup_softtags_p4_isLoaded) {
     if (jup_softtags_p4_branch != 0) {
       jup_softtags_p4_branch->GetEntry(index);
@@ -5763,7 +5790,7 @@ const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l
   return *jup_softtags_p4_;
 }
 
-const int &stop_1l_babyAnalyzer::jup_nsoftbtags() {
+const int &StopTree::jup_nsoftbtags() {
   if (not jup_nsoftbtags_isLoaded) {
     if (jup_nsoftbtags_branch != 0) {
       jup_nsoftbtags_branch->GetEntry(index);
@@ -5776,7 +5803,7 @@ const int &stop_1l_babyAnalyzer::jup_nsoftbtags() {
   return jup_nsoftbtags_;
 }
 
-const int &stop_1l_babyAnalyzer::jdown_nskimjets() {
+const int &StopTree::jdown_nskimjets() {
   if (not jdown_nskimjets_isLoaded) {
     if (jdown_nskimjets_branch != 0) {
       jdown_nskimjets_branch->GetEntry(index);
@@ -5789,7 +5816,7 @@ const int &stop_1l_babyAnalyzer::jdown_nskimjets() {
   return jdown_nskimjets_;
 }
 
-const int &stop_1l_babyAnalyzer::jdown_nskimbtagmed() {
+const int &StopTree::jdown_nskimbtagmed() {
   if (not jdown_nskimbtagmed_isLoaded) {
     if (jdown_nskimbtagmed_branch != 0) {
       jdown_nskimbtagmed_branch->GetEntry(index);
@@ -5802,7 +5829,7 @@ const int &stop_1l_babyAnalyzer::jdown_nskimbtagmed() {
   return jdown_nskimbtagmed_;
 }
 
-const int &stop_1l_babyAnalyzer::jdown_nskimbtagloose() {
+const int &StopTree::jdown_nskimbtagloose() {
   if (not jdown_nskimbtagloose_isLoaded) {
     if (jdown_nskimbtagloose_branch != 0) {
       jdown_nskimbtagloose_branch->GetEntry(index);
@@ -5815,7 +5842,7 @@ const int &stop_1l_babyAnalyzer::jdown_nskimbtagloose() {
   return jdown_nskimbtagloose_;
 }
 
-const int &stop_1l_babyAnalyzer::jdown_nskimbtagtight() {
+const int &StopTree::jdown_nskimbtagtight() {
   if (not jdown_nskimbtagtight_isLoaded) {
     if (jdown_nskimbtagtight_branch != 0) {
       jdown_nskimbtagtight_branch->GetEntry(index);
@@ -5828,7 +5855,7 @@ const int &stop_1l_babyAnalyzer::jdown_nskimbtagtight() {
   return jdown_nskimbtagtight_;
 }
 
-const int &stop_1l_babyAnalyzer::jdown_ngoodjets() {
+const int &StopTree::jdown_ngoodjets() {
   if (not jdown_ngoodjets_isLoaded) {
     if (jdown_ngoodjets_branch != 0) {
       jdown_ngoodjets_branch->GetEntry(index);
@@ -5841,7 +5868,7 @@ const int &stop_1l_babyAnalyzer::jdown_ngoodjets() {
   return jdown_ngoodjets_;
 }
 
-const int &stop_1l_babyAnalyzer::jdown_ngoodbtags() {
+const int &StopTree::jdown_ngoodbtags() {
   if (not jdown_ngoodbtags_isLoaded) {
     if (jdown_ngoodbtags_branch != 0) {
       jdown_ngoodbtags_branch->GetEntry(index);
@@ -5854,7 +5881,7 @@ const int &stop_1l_babyAnalyzer::jdown_ngoodbtags() {
   return jdown_ngoodbtags_;
 }
 
-const int &stop_1l_babyAnalyzer::jdown_nloosebtags() {
+const int &StopTree::jdown_nloosebtags() {
   if (not jdown_nloosebtags_isLoaded) {
     if (jdown_nloosebtags_branch != 0) {
       jdown_nloosebtags_branch->GetEntry(index);
@@ -5867,7 +5894,7 @@ const int &stop_1l_babyAnalyzer::jdown_nloosebtags() {
   return jdown_nloosebtags_;
 }
 
-const int &stop_1l_babyAnalyzer::jdown_ntightbtags() {
+const int &StopTree::jdown_ntightbtags() {
   if (not jdown_ntightbtags_isLoaded) {
     if (jdown_ntightbtags_branch != 0) {
       jdown_ntightbtags_branch->GetEntry(index);
@@ -5880,7 +5907,7 @@ const int &stop_1l_babyAnalyzer::jdown_ntightbtags() {
   return jdown_ntightbtags_;
 }
 
-const int &stop_1l_babyAnalyzer::jdown_nanalysisbtags() {
+const int &StopTree::jdown_nanalysisbtags() {
   if (not jdown_nanalysisbtags_isLoaded) {
     if (jdown_nanalysisbtags_branch != 0) {
       jdown_nanalysisbtags_branch->GetEntry(index);
@@ -5893,7 +5920,7 @@ const int &stop_1l_babyAnalyzer::jdown_nanalysisbtags() {
   return jdown_nanalysisbtags_;
 }
 
-const float &stop_1l_babyAnalyzer::jdown_ak4_HT() {
+const float &StopTree::jdown_ak4_HT() {
   if (not jdown_ak4_HT_isLoaded) {
     if (jdown_ak4_HT_branch != 0) {
       jdown_ak4_HT_branch->GetEntry(index);
@@ -5906,7 +5933,7 @@ const float &stop_1l_babyAnalyzer::jdown_ak4_HT() {
   return jdown_ak4_HT_;
 }
 
-const float &stop_1l_babyAnalyzer::jdown_ak4_htratiom() {
+const float &StopTree::jdown_ak4_htratiom() {
   if (not jdown_ak4_htratiom_isLoaded) {
     if (jdown_ak4_htratiom_branch != 0) {
       jdown_ak4_htratiom_branch->GetEntry(index);
@@ -5919,7 +5946,7 @@ const float &stop_1l_babyAnalyzer::jdown_ak4_htratiom() {
   return jdown_ak4_htratiom_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::jdown_dphi_ak4pfjet_met() {
+const vector<float> &StopTree::jdown_dphi_ak4pfjet_met() {
   if (not jdown_dphi_ak4pfjet_met_isLoaded) {
     if (jdown_dphi_ak4pfjet_met_branch != 0) {
       jdown_dphi_ak4pfjet_met_branch->GetEntry(index);
@@ -5932,7 +5959,7 @@ const vector<float> &stop_1l_babyAnalyzer::jdown_dphi_ak4pfjet_met() {
   return *jdown_dphi_ak4pfjet_met_;
 }
 
-const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l_babyAnalyzer::jdown_ak4pfjets_p4() {
+const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &StopTree::jdown_ak4pfjets_p4() {
   if (not jdown_ak4pfjets_p4_isLoaded) {
     if (jdown_ak4pfjets_p4_branch != 0) {
       jdown_ak4pfjets_p4_branch->GetEntry(index);
@@ -5945,7 +5972,7 @@ const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l
   return *jdown_ak4pfjets_p4_;
 }
 
-const vector<bool> &stop_1l_babyAnalyzer::jdown_ak4pfjets_passMEDbtag() {
+const vector<bool> &StopTree::jdown_ak4pfjets_passMEDbtag() {
   if (not jdown_ak4pfjets_passMEDbtag_isLoaded) {
     if (jdown_ak4pfjets_passMEDbtag_branch != 0) {
       jdown_ak4pfjets_passMEDbtag_branch->GetEntry(index);
@@ -5958,7 +5985,7 @@ const vector<bool> &stop_1l_babyAnalyzer::jdown_ak4pfjets_passMEDbtag() {
   return *jdown_ak4pfjets_passMEDbtag_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::jdown_ak4pfjets_deepCSV() {
+const vector<float> &StopTree::jdown_ak4pfjets_deepCSV() {
   if (not jdown_ak4pfjets_deepCSV_isLoaded) {
     if (jdown_ak4pfjets_deepCSV_branch != 0) {
       jdown_ak4pfjets_deepCSV_branch->GetEntry(index);
@@ -5971,7 +5998,7 @@ const vector<float> &stop_1l_babyAnalyzer::jdown_ak4pfjets_deepCSV() {
   return *jdown_ak4pfjets_deepCSV_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::jdown_ak4pfjets_CSV() {
+const vector<float> &StopTree::jdown_ak4pfjets_CSV() {
   if (not jdown_ak4pfjets_CSV_isLoaded) {
     if (jdown_ak4pfjets_CSV_branch != 0) {
       jdown_ak4pfjets_CSV_branch->GetEntry(index);
@@ -5984,7 +6011,7 @@ const vector<float> &stop_1l_babyAnalyzer::jdown_ak4pfjets_CSV() {
   return *jdown_ak4pfjets_CSV_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::jdown_ak4pfjets_mva() {
+const vector<float> &StopTree::jdown_ak4pfjets_mva() {
   if (not jdown_ak4pfjets_mva_isLoaded) {
     if (jdown_ak4pfjets_mva_branch != 0) {
       jdown_ak4pfjets_mva_branch->GetEntry(index);
@@ -5997,7 +6024,7 @@ const vector<float> &stop_1l_babyAnalyzer::jdown_ak4pfjets_mva() {
   return *jdown_ak4pfjets_mva_;
 }
 
-const vector<int> &stop_1l_babyAnalyzer::jdown_ak4pfjets_parton_flavor() {
+const vector<int> &StopTree::jdown_ak4pfjets_parton_flavor() {
   if (not jdown_ak4pfjets_parton_flavor_isLoaded) {
     if (jdown_ak4pfjets_parton_flavor_branch != 0) {
       jdown_ak4pfjets_parton_flavor_branch->GetEntry(index);
@@ -6010,7 +6037,7 @@ const vector<int> &stop_1l_babyAnalyzer::jdown_ak4pfjets_parton_flavor() {
   return *jdown_ak4pfjets_parton_flavor_;
 }
 
-const vector<int> &stop_1l_babyAnalyzer::jdown_ak4pfjets_hadron_flavor() {
+const vector<int> &StopTree::jdown_ak4pfjets_hadron_flavor() {
   if (not jdown_ak4pfjets_hadron_flavor_isLoaded) {
     if (jdown_ak4pfjets_hadron_flavor_branch != 0) {
       jdown_ak4pfjets_hadron_flavor_branch->GetEntry(index);
@@ -6023,7 +6050,7 @@ const vector<int> &stop_1l_babyAnalyzer::jdown_ak4pfjets_hadron_flavor() {
   return *jdown_ak4pfjets_hadron_flavor_;
 }
 
-const vector<bool> &stop_1l_babyAnalyzer::jdown_ak4pfjets_loose_puid() {
+const vector<bool> &StopTree::jdown_ak4pfjets_loose_puid() {
   if (not jdown_ak4pfjets_loose_puid_isLoaded) {
     if (jdown_ak4pfjets_loose_puid_branch != 0) {
       jdown_ak4pfjets_loose_puid_branch->GetEntry(index);
@@ -6036,7 +6063,7 @@ const vector<bool> &stop_1l_babyAnalyzer::jdown_ak4pfjets_loose_puid() {
   return *jdown_ak4pfjets_loose_puid_;
 }
 
-const vector<bool> &stop_1l_babyAnalyzer::jdown_ak4pfjets_loose_pfid() {
+const vector<bool> &StopTree::jdown_ak4pfjets_loose_pfid() {
   if (not jdown_ak4pfjets_loose_pfid_isLoaded) {
     if (jdown_ak4pfjets_loose_pfid_branch != 0) {
       jdown_ak4pfjets_loose_pfid_branch->GetEntry(index);
@@ -6049,7 +6076,7 @@ const vector<bool> &stop_1l_babyAnalyzer::jdown_ak4pfjets_loose_pfid() {
   return *jdown_ak4pfjets_loose_pfid_;
 }
 
-const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &stop_1l_babyAnalyzer::jdown_ak4pfjets_leadMEDbjet_p4() {
+const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &StopTree::jdown_ak4pfjets_leadMEDbjet_p4() {
   if (not jdown_ak4pfjets_leadMEDbjet_p4_isLoaded) {
     if (jdown_ak4pfjets_leadMEDbjet_p4_branch != 0) {
       jdown_ak4pfjets_leadMEDbjet_p4_branch->GetEntry(index);
@@ -6062,7 +6089,7 @@ const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &stop_1l_babyAnal
   return *jdown_ak4pfjets_leadMEDbjet_p4_;
 }
 
-const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &stop_1l_babyAnalyzer::jdown_ak4pfjets_leadbtag_p4() {
+const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &StopTree::jdown_ak4pfjets_leadbtag_p4() {
   if (not jdown_ak4pfjets_leadbtag_p4_isLoaded) {
     if (jdown_ak4pfjets_leadbtag_p4_branch != 0) {
       jdown_ak4pfjets_leadbtag_p4_branch->GetEntry(index);
@@ -6075,7 +6102,7 @@ const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &stop_1l_babyAnal
   return *jdown_ak4pfjets_leadbtag_p4_;
 }
 
-const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l_babyAnalyzer::jdown_ak4genjets_p4() {
+const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &StopTree::jdown_ak4genjets_p4() {
   if (not jdown_ak4genjets_p4_isLoaded) {
     if (jdown_ak4genjets_p4_branch != 0) {
       jdown_ak4genjets_p4_branch->GetEntry(index);
@@ -6088,7 +6115,7 @@ const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l
   return *jdown_ak4genjets_p4_;
 }
 
-const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l_babyAnalyzer::jdown_softtags_p4() {
+const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &StopTree::jdown_softtags_p4() {
   if (not jdown_softtags_p4_isLoaded) {
     if (jdown_softtags_p4_branch != 0) {
       jdown_softtags_p4_branch->GetEntry(index);
@@ -6101,7 +6128,7 @@ const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l
   return *jdown_softtags_p4_;
 }
 
-const int &stop_1l_babyAnalyzer::jdown_nsoftbtags() {
+const int &StopTree::jdown_nsoftbtags() {
   if (not jdown_nsoftbtags_isLoaded) {
     if (jdown_nsoftbtags_branch != 0) {
       jdown_nsoftbtags_branch->GetEntry(index);
@@ -6114,7 +6141,7 @@ const int &stop_1l_babyAnalyzer::jdown_nsoftbtags() {
   return jdown_nsoftbtags_;
 }
 
-const vector<bool> &stop_1l_babyAnalyzer::genleps_isfromt() {
+const vector<bool> &StopTree::genleps_isfromt() {
   if (not genleps_isfromt_isLoaded) {
     if (genleps_isfromt_branch != 0) {
       genleps_isfromt_branch->GetEntry(index);
@@ -6127,7 +6154,7 @@ const vector<bool> &stop_1l_babyAnalyzer::genleps_isfromt() {
   return *genleps_isfromt_;
 }
 
-const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l_babyAnalyzer::genleps_p4() {
+const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &StopTree::genleps_p4() {
   if (not genleps_p4_isLoaded) {
     if (genleps_p4_branch != 0) {
       genleps_p4_branch->GetEntry(index);
@@ -6140,7 +6167,7 @@ const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l
   return *genleps_p4_;
 }
 
-const vector<int> &stop_1l_babyAnalyzer::genleps_id() {
+const vector<int> &StopTree::genleps_id() {
   if (not genleps_id_isLoaded) {
     if (genleps_id_branch != 0) {
       genleps_id_branch->GetEntry(index);
@@ -6153,7 +6180,7 @@ const vector<int> &stop_1l_babyAnalyzer::genleps_id() {
   return *genleps_id_;
 }
 
-const vector<int> &stop_1l_babyAnalyzer::genleps__genpsidx() {
+const vector<int> &StopTree::genleps__genpsidx() {
   if (not genleps__genpsidx_isLoaded) {
     if (genleps__genpsidx_branch != 0) {
       genleps__genpsidx_branch->GetEntry(index);
@@ -6166,7 +6193,7 @@ const vector<int> &stop_1l_babyAnalyzer::genleps__genpsidx() {
   return *genleps__genpsidx_;
 }
 
-const vector<int> &stop_1l_babyAnalyzer::genleps_status() {
+const vector<int> &StopTree::genleps_status() {
   if (not genleps_status_isLoaded) {
     if (genleps_status_branch != 0) {
       genleps_status_branch->GetEntry(index);
@@ -6179,7 +6206,7 @@ const vector<int> &stop_1l_babyAnalyzer::genleps_status() {
   return *genleps_status_;
 }
 
-const vector<bool> &stop_1l_babyAnalyzer::genleps_fromHardProcessDecayed() {
+const vector<bool> &StopTree::genleps_fromHardProcessDecayed() {
   if (not genleps_fromHardProcessDecayed_isLoaded) {
     if (genleps_fromHardProcessDecayed_branch != 0) {
       genleps_fromHardProcessDecayed_branch->GetEntry(index);
@@ -6192,7 +6219,7 @@ const vector<bool> &stop_1l_babyAnalyzer::genleps_fromHardProcessDecayed() {
   return *genleps_fromHardProcessDecayed_;
 }
 
-const vector<bool> &stop_1l_babyAnalyzer::genleps_fromHardProcessFinalState() {
+const vector<bool> &StopTree::genleps_fromHardProcessFinalState() {
   if (not genleps_fromHardProcessFinalState_isLoaded) {
     if (genleps_fromHardProcessFinalState_branch != 0) {
       genleps_fromHardProcessFinalState_branch->GetEntry(index);
@@ -6205,7 +6232,7 @@ const vector<bool> &stop_1l_babyAnalyzer::genleps_fromHardProcessFinalState() {
   return *genleps_fromHardProcessFinalState_;
 }
 
-const vector<bool> &stop_1l_babyAnalyzer::genleps_isHardProcess() {
+const vector<bool> &StopTree::genleps_isHardProcess() {
   if (not genleps_isHardProcess_isLoaded) {
     if (genleps_isHardProcess_branch != 0) {
       genleps_isHardProcess_branch->GetEntry(index);
@@ -6218,7 +6245,7 @@ const vector<bool> &stop_1l_babyAnalyzer::genleps_isHardProcess() {
   return *genleps_isHardProcess_;
 }
 
-const vector<bool> &stop_1l_babyAnalyzer::genleps_isLastCopy() {
+const vector<bool> &StopTree::genleps_isLastCopy() {
   if (not genleps_isLastCopy_isLoaded) {
     if (genleps_isLastCopy_branch != 0) {
       genleps_isLastCopy_branch->GetEntry(index);
@@ -6231,7 +6258,7 @@ const vector<bool> &stop_1l_babyAnalyzer::genleps_isLastCopy() {
   return *genleps_isLastCopy_;
 }
 
-const vector<int> &stop_1l_babyAnalyzer::genleps_gentaudecay() {
+const vector<int> &StopTree::genleps_gentaudecay() {
   if (not genleps_gentaudecay_isLoaded) {
     if (genleps_gentaudecay_branch != 0) {
       genleps_gentaudecay_branch->GetEntry(index);
@@ -6244,7 +6271,7 @@ const vector<int> &stop_1l_babyAnalyzer::genleps_gentaudecay() {
   return *genleps_gentaudecay_;
 }
 
-const int &stop_1l_babyAnalyzer::gen_nfromtleps_() {
+const int &StopTree::gen_nfromtleps_() {
   if (not gen_nfromtleps__isLoaded) {
     if (gen_nfromtleps__branch != 0) {
       gen_nfromtleps__branch->GetEntry(index);
@@ -6257,7 +6284,7 @@ const int &stop_1l_babyAnalyzer::gen_nfromtleps_() {
   return gen_nfromtleps__;
 }
 
-const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l_babyAnalyzer::genleps_motherp4() {
+const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &StopTree::genleps_motherp4() {
   if (not genleps_motherp4_isLoaded) {
     if (genleps_motherp4_branch != 0) {
       genleps_motherp4_branch->GetEntry(index);
@@ -6270,7 +6297,7 @@ const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l
   return *genleps_motherp4_;
 }
 
-const vector<int> &stop_1l_babyAnalyzer::genleps_motherid() {
+const vector<int> &StopTree::genleps_motherid() {
   if (not genleps_motherid_isLoaded) {
     if (genleps_motherid_branch != 0) {
       genleps_motherid_branch->GetEntry(index);
@@ -6283,7 +6310,7 @@ const vector<int> &stop_1l_babyAnalyzer::genleps_motherid() {
   return *genleps_motherid_;
 }
 
-const vector<int> &stop_1l_babyAnalyzer::genleps_motheridx() {
+const vector<int> &StopTree::genleps_motheridx() {
   if (not genleps_motheridx_isLoaded) {
     if (genleps_motheridx_branch != 0) {
       genleps_motheridx_branch->GetEntry(index);
@@ -6296,7 +6323,7 @@ const vector<int> &stop_1l_babyAnalyzer::genleps_motheridx() {
   return *genleps_motheridx_;
 }
 
-const vector<int> &stop_1l_babyAnalyzer::genleps_motherstatus() {
+const vector<int> &StopTree::genleps_motherstatus() {
   if (not genleps_motherstatus_isLoaded) {
     if (genleps_motherstatus_branch != 0) {
       genleps_motherstatus_branch->GetEntry(index);
@@ -6309,7 +6336,7 @@ const vector<int> &stop_1l_babyAnalyzer::genleps_motherstatus() {
   return *genleps_motherstatus_;
 }
 
-const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l_babyAnalyzer::genleps_gmotherp4() {
+const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &StopTree::genleps_gmotherp4() {
   if (not genleps_gmotherp4_isLoaded) {
     if (genleps_gmotherp4_branch != 0) {
       genleps_gmotherp4_branch->GetEntry(index);
@@ -6322,7 +6349,7 @@ const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l
   return *genleps_gmotherp4_;
 }
 
-const vector<int> &stop_1l_babyAnalyzer::genleps_gmotherid() {
+const vector<int> &StopTree::genleps_gmotherid() {
   if (not genleps_gmotherid_isLoaded) {
     if (genleps_gmotherid_branch != 0) {
       genleps_gmotherid_branch->GetEntry(index);
@@ -6335,7 +6362,7 @@ const vector<int> &stop_1l_babyAnalyzer::genleps_gmotherid() {
   return *genleps_gmotherid_;
 }
 
-const vector<int> &stop_1l_babyAnalyzer::genleps_gmotheridx() {
+const vector<int> &StopTree::genleps_gmotheridx() {
   if (not genleps_gmotheridx_isLoaded) {
     if (genleps_gmotheridx_branch != 0) {
       genleps_gmotheridx_branch->GetEntry(index);
@@ -6348,7 +6375,7 @@ const vector<int> &stop_1l_babyAnalyzer::genleps_gmotheridx() {
   return *genleps_gmotheridx_;
 }
 
-const vector<int> &stop_1l_babyAnalyzer::genleps_gmotherstatus() {
+const vector<int> &StopTree::genleps_gmotherstatus() {
   if (not genleps_gmotherstatus_isLoaded) {
     if (genleps_gmotherstatus_branch != 0) {
       genleps_gmotherstatus_branch->GetEntry(index);
@@ -6361,7 +6388,7 @@ const vector<int> &stop_1l_babyAnalyzer::genleps_gmotherstatus() {
   return *genleps_gmotherstatus_;
 }
 
-const vector<bool> &stop_1l_babyAnalyzer::gennus_isfromt() {
+const vector<bool> &StopTree::gennus_isfromt() {
   if (not gennus_isfromt_isLoaded) {
     if (gennus_isfromt_branch != 0) {
       gennus_isfromt_branch->GetEntry(index);
@@ -6374,7 +6401,7 @@ const vector<bool> &stop_1l_babyAnalyzer::gennus_isfromt() {
   return *gennus_isfromt_;
 }
 
-const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l_babyAnalyzer::gennus_p4() {
+const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &StopTree::gennus_p4() {
   if (not gennus_p4_isLoaded) {
     if (gennus_p4_branch != 0) {
       gennus_p4_branch->GetEntry(index);
@@ -6387,7 +6414,7 @@ const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l
   return *gennus_p4_;
 }
 
-const vector<int> &stop_1l_babyAnalyzer::gennus_id() {
+const vector<int> &StopTree::gennus_id() {
   if (not gennus_id_isLoaded) {
     if (gennus_id_branch != 0) {
       gennus_id_branch->GetEntry(index);
@@ -6400,7 +6427,7 @@ const vector<int> &stop_1l_babyAnalyzer::gennus_id() {
   return *gennus_id_;
 }
 
-const vector<int> &stop_1l_babyAnalyzer::gennus__genpsidx() {
+const vector<int> &StopTree::gennus__genpsidx() {
   if (not gennus__genpsidx_isLoaded) {
     if (gennus__genpsidx_branch != 0) {
       gennus__genpsidx_branch->GetEntry(index);
@@ -6413,7 +6440,7 @@ const vector<int> &stop_1l_babyAnalyzer::gennus__genpsidx() {
   return *gennus__genpsidx_;
 }
 
-const vector<int> &stop_1l_babyAnalyzer::gennus_status() {
+const vector<int> &StopTree::gennus_status() {
   if (not gennus_status_isLoaded) {
     if (gennus_status_branch != 0) {
       gennus_status_branch->GetEntry(index);
@@ -6426,7 +6453,7 @@ const vector<int> &stop_1l_babyAnalyzer::gennus_status() {
   return *gennus_status_;
 }
 
-const vector<bool> &stop_1l_babyAnalyzer::gennus_fromHardProcessDecayed() {
+const vector<bool> &StopTree::gennus_fromHardProcessDecayed() {
   if (not gennus_fromHardProcessDecayed_isLoaded) {
     if (gennus_fromHardProcessDecayed_branch != 0) {
       gennus_fromHardProcessDecayed_branch->GetEntry(index);
@@ -6439,7 +6466,7 @@ const vector<bool> &stop_1l_babyAnalyzer::gennus_fromHardProcessDecayed() {
   return *gennus_fromHardProcessDecayed_;
 }
 
-const vector<bool> &stop_1l_babyAnalyzer::gennus_fromHardProcessFinalState() {
+const vector<bool> &StopTree::gennus_fromHardProcessFinalState() {
   if (not gennus_fromHardProcessFinalState_isLoaded) {
     if (gennus_fromHardProcessFinalState_branch != 0) {
       gennus_fromHardProcessFinalState_branch->GetEntry(index);
@@ -6452,7 +6479,7 @@ const vector<bool> &stop_1l_babyAnalyzer::gennus_fromHardProcessFinalState() {
   return *gennus_fromHardProcessFinalState_;
 }
 
-const vector<bool> &stop_1l_babyAnalyzer::gennus_isHardProcess() {
+const vector<bool> &StopTree::gennus_isHardProcess() {
   if (not gennus_isHardProcess_isLoaded) {
     if (gennus_isHardProcess_branch != 0) {
       gennus_isHardProcess_branch->GetEntry(index);
@@ -6465,7 +6492,7 @@ const vector<bool> &stop_1l_babyAnalyzer::gennus_isHardProcess() {
   return *gennus_isHardProcess_;
 }
 
-const vector<bool> &stop_1l_babyAnalyzer::gennus_isLastCopy() {
+const vector<bool> &StopTree::gennus_isLastCopy() {
   if (not gennus_isLastCopy_isLoaded) {
     if (gennus_isLastCopy_branch != 0) {
       gennus_isLastCopy_branch->GetEntry(index);
@@ -6478,7 +6505,7 @@ const vector<bool> &stop_1l_babyAnalyzer::gennus_isLastCopy() {
   return *gennus_isLastCopy_;
 }
 
-const vector<int> &stop_1l_babyAnalyzer::gennus_gentaudecay() {
+const vector<int> &StopTree::gennus_gentaudecay() {
   if (not gennus_gentaudecay_isLoaded) {
     if (gennus_gentaudecay_branch != 0) {
       gennus_gentaudecay_branch->GetEntry(index);
@@ -6491,7 +6518,7 @@ const vector<int> &stop_1l_babyAnalyzer::gennus_gentaudecay() {
   return *gennus_gentaudecay_;
 }
 
-const int &stop_1l_babyAnalyzer::gen_nfromtnus_() {
+const int &StopTree::gen_nfromtnus_() {
   if (not gen_nfromtnus__isLoaded) {
     if (gen_nfromtnus__branch != 0) {
       gen_nfromtnus__branch->GetEntry(index);
@@ -6504,7 +6531,7 @@ const int &stop_1l_babyAnalyzer::gen_nfromtnus_() {
   return gen_nfromtnus__;
 }
 
-const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l_babyAnalyzer::gennus_motherp4() {
+const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &StopTree::gennus_motherp4() {
   if (not gennus_motherp4_isLoaded) {
     if (gennus_motherp4_branch != 0) {
       gennus_motherp4_branch->GetEntry(index);
@@ -6517,7 +6544,7 @@ const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l
   return *gennus_motherp4_;
 }
 
-const vector<int> &stop_1l_babyAnalyzer::gennus_motherid() {
+const vector<int> &StopTree::gennus_motherid() {
   if (not gennus_motherid_isLoaded) {
     if (gennus_motherid_branch != 0) {
       gennus_motherid_branch->GetEntry(index);
@@ -6530,7 +6557,7 @@ const vector<int> &stop_1l_babyAnalyzer::gennus_motherid() {
   return *gennus_motherid_;
 }
 
-const vector<int> &stop_1l_babyAnalyzer::gennus_motheridx() {
+const vector<int> &StopTree::gennus_motheridx() {
   if (not gennus_motheridx_isLoaded) {
     if (gennus_motheridx_branch != 0) {
       gennus_motheridx_branch->GetEntry(index);
@@ -6543,7 +6570,7 @@ const vector<int> &stop_1l_babyAnalyzer::gennus_motheridx() {
   return *gennus_motheridx_;
 }
 
-const vector<int> &stop_1l_babyAnalyzer::gennus_motherstatus() {
+const vector<int> &StopTree::gennus_motherstatus() {
   if (not gennus_motherstatus_isLoaded) {
     if (gennus_motherstatus_branch != 0) {
       gennus_motherstatus_branch->GetEntry(index);
@@ -6556,7 +6583,7 @@ const vector<int> &stop_1l_babyAnalyzer::gennus_motherstatus() {
   return *gennus_motherstatus_;
 }
 
-const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l_babyAnalyzer::gennus_gmotherp4() {
+const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &StopTree::gennus_gmotherp4() {
   if (not gennus_gmotherp4_isLoaded) {
     if (gennus_gmotherp4_branch != 0) {
       gennus_gmotherp4_branch->GetEntry(index);
@@ -6569,7 +6596,7 @@ const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l
   return *gennus_gmotherp4_;
 }
 
-const vector<int> &stop_1l_babyAnalyzer::gennus_gmotherid() {
+const vector<int> &StopTree::gennus_gmotherid() {
   if (not gennus_gmotherid_isLoaded) {
     if (gennus_gmotherid_branch != 0) {
       gennus_gmotherid_branch->GetEntry(index);
@@ -6582,7 +6609,7 @@ const vector<int> &stop_1l_babyAnalyzer::gennus_gmotherid() {
   return *gennus_gmotherid_;
 }
 
-const vector<int> &stop_1l_babyAnalyzer::gennus_gmotheridx() {
+const vector<int> &StopTree::gennus_gmotheridx() {
   if (not gennus_gmotheridx_isLoaded) {
     if (gennus_gmotheridx_branch != 0) {
       gennus_gmotheridx_branch->GetEntry(index);
@@ -6595,7 +6622,7 @@ const vector<int> &stop_1l_babyAnalyzer::gennus_gmotheridx() {
   return *gennus_gmotheridx_;
 }
 
-const vector<int> &stop_1l_babyAnalyzer::gennus_gmotherstatus() {
+const vector<int> &StopTree::gennus_gmotherstatus() {
   if (not gennus_gmotherstatus_isLoaded) {
     if (gennus_gmotherstatus_branch != 0) {
       gennus_gmotherstatus_branch->GetEntry(index);
@@ -6608,7 +6635,7 @@ const vector<int> &stop_1l_babyAnalyzer::gennus_gmotherstatus() {
   return *gennus_gmotherstatus_;
 }
 
-const vector<bool> &stop_1l_babyAnalyzer::genqs_isfromt() {
+const vector<bool> &StopTree::genqs_isfromt() {
   if (not genqs_isfromt_isLoaded) {
     if (genqs_isfromt_branch != 0) {
       genqs_isfromt_branch->GetEntry(index);
@@ -6621,7 +6648,7 @@ const vector<bool> &stop_1l_babyAnalyzer::genqs_isfromt() {
   return *genqs_isfromt_;
 }
 
-const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l_babyAnalyzer::genqs_p4() {
+const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &StopTree::genqs_p4() {
   if (not genqs_p4_isLoaded) {
     if (genqs_p4_branch != 0) {
       genqs_p4_branch->GetEntry(index);
@@ -6634,7 +6661,7 @@ const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l
   return *genqs_p4_;
 }
 
-const vector<int> &stop_1l_babyAnalyzer::genqs_id() {
+const vector<int> &StopTree::genqs_id() {
   if (not genqs_id_isLoaded) {
     if (genqs_id_branch != 0) {
       genqs_id_branch->GetEntry(index);
@@ -6647,7 +6674,7 @@ const vector<int> &stop_1l_babyAnalyzer::genqs_id() {
   return *genqs_id_;
 }
 
-const vector<int> &stop_1l_babyAnalyzer::genqs__genpsidx() {
+const vector<int> &StopTree::genqs__genpsidx() {
   if (not genqs__genpsidx_isLoaded) {
     if (genqs__genpsidx_branch != 0) {
       genqs__genpsidx_branch->GetEntry(index);
@@ -6660,7 +6687,7 @@ const vector<int> &stop_1l_babyAnalyzer::genqs__genpsidx() {
   return *genqs__genpsidx_;
 }
 
-const vector<int> &stop_1l_babyAnalyzer::genqs_status() {
+const vector<int> &StopTree::genqs_status() {
   if (not genqs_status_isLoaded) {
     if (genqs_status_branch != 0) {
       genqs_status_branch->GetEntry(index);
@@ -6673,7 +6700,7 @@ const vector<int> &stop_1l_babyAnalyzer::genqs_status() {
   return *genqs_status_;
 }
 
-const vector<bool> &stop_1l_babyAnalyzer::genqs_fromHardProcessDecayed() {
+const vector<bool> &StopTree::genqs_fromHardProcessDecayed() {
   if (not genqs_fromHardProcessDecayed_isLoaded) {
     if (genqs_fromHardProcessDecayed_branch != 0) {
       genqs_fromHardProcessDecayed_branch->GetEntry(index);
@@ -6686,7 +6713,7 @@ const vector<bool> &stop_1l_babyAnalyzer::genqs_fromHardProcessDecayed() {
   return *genqs_fromHardProcessDecayed_;
 }
 
-const vector<bool> &stop_1l_babyAnalyzer::genqs_fromHardProcessFinalState() {
+const vector<bool> &StopTree::genqs_fromHardProcessFinalState() {
   if (not genqs_fromHardProcessFinalState_isLoaded) {
     if (genqs_fromHardProcessFinalState_branch != 0) {
       genqs_fromHardProcessFinalState_branch->GetEntry(index);
@@ -6699,7 +6726,7 @@ const vector<bool> &stop_1l_babyAnalyzer::genqs_fromHardProcessFinalState() {
   return *genqs_fromHardProcessFinalState_;
 }
 
-const vector<bool> &stop_1l_babyAnalyzer::genqs_isHardProcess() {
+const vector<bool> &StopTree::genqs_isHardProcess() {
   if (not genqs_isHardProcess_isLoaded) {
     if (genqs_isHardProcess_branch != 0) {
       genqs_isHardProcess_branch->GetEntry(index);
@@ -6712,7 +6739,7 @@ const vector<bool> &stop_1l_babyAnalyzer::genqs_isHardProcess() {
   return *genqs_isHardProcess_;
 }
 
-const vector<bool> &stop_1l_babyAnalyzer::genqs_isLastCopy() {
+const vector<bool> &StopTree::genqs_isLastCopy() {
   if (not genqs_isLastCopy_isLoaded) {
     if (genqs_isLastCopy_branch != 0) {
       genqs_isLastCopy_branch->GetEntry(index);
@@ -6725,7 +6752,7 @@ const vector<bool> &stop_1l_babyAnalyzer::genqs_isLastCopy() {
   return *genqs_isLastCopy_;
 }
 
-const vector<int> &stop_1l_babyAnalyzer::genqs_gentaudecay() {
+const vector<int> &StopTree::genqs_gentaudecay() {
   if (not genqs_gentaudecay_isLoaded) {
     if (genqs_gentaudecay_branch != 0) {
       genqs_gentaudecay_branch->GetEntry(index);
@@ -6738,7 +6765,7 @@ const vector<int> &stop_1l_babyAnalyzer::genqs_gentaudecay() {
   return *genqs_gentaudecay_;
 }
 
-const int &stop_1l_babyAnalyzer::gen_nfromtqs_() {
+const int &StopTree::gen_nfromtqs_() {
   if (not gen_nfromtqs__isLoaded) {
     if (gen_nfromtqs__branch != 0) {
       gen_nfromtqs__branch->GetEntry(index);
@@ -6751,7 +6778,7 @@ const int &stop_1l_babyAnalyzer::gen_nfromtqs_() {
   return gen_nfromtqs__;
 }
 
-const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l_babyAnalyzer::genqs_motherp4() {
+const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &StopTree::genqs_motherp4() {
   if (not genqs_motherp4_isLoaded) {
     if (genqs_motherp4_branch != 0) {
       genqs_motherp4_branch->GetEntry(index);
@@ -6764,7 +6791,7 @@ const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l
   return *genqs_motherp4_;
 }
 
-const vector<int> &stop_1l_babyAnalyzer::genqs_motherid() {
+const vector<int> &StopTree::genqs_motherid() {
   if (not genqs_motherid_isLoaded) {
     if (genqs_motherid_branch != 0) {
       genqs_motherid_branch->GetEntry(index);
@@ -6777,7 +6804,7 @@ const vector<int> &stop_1l_babyAnalyzer::genqs_motherid() {
   return *genqs_motherid_;
 }
 
-const vector<int> &stop_1l_babyAnalyzer::genqs_motheridx() {
+const vector<int> &StopTree::genqs_motheridx() {
   if (not genqs_motheridx_isLoaded) {
     if (genqs_motheridx_branch != 0) {
       genqs_motheridx_branch->GetEntry(index);
@@ -6790,7 +6817,7 @@ const vector<int> &stop_1l_babyAnalyzer::genqs_motheridx() {
   return *genqs_motheridx_;
 }
 
-const vector<int> &stop_1l_babyAnalyzer::genqs_motherstatus() {
+const vector<int> &StopTree::genqs_motherstatus() {
   if (not genqs_motherstatus_isLoaded) {
     if (genqs_motherstatus_branch != 0) {
       genqs_motherstatus_branch->GetEntry(index);
@@ -6803,7 +6830,7 @@ const vector<int> &stop_1l_babyAnalyzer::genqs_motherstatus() {
   return *genqs_motherstatus_;
 }
 
-const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l_babyAnalyzer::genqs_gmotherp4() {
+const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &StopTree::genqs_gmotherp4() {
   if (not genqs_gmotherp4_isLoaded) {
     if (genqs_gmotherp4_branch != 0) {
       genqs_gmotherp4_branch->GetEntry(index);
@@ -6816,7 +6843,7 @@ const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l
   return *genqs_gmotherp4_;
 }
 
-const vector<int> &stop_1l_babyAnalyzer::genqs_gmotherid() {
+const vector<int> &StopTree::genqs_gmotherid() {
   if (not genqs_gmotherid_isLoaded) {
     if (genqs_gmotherid_branch != 0) {
       genqs_gmotherid_branch->GetEntry(index);
@@ -6829,7 +6856,7 @@ const vector<int> &stop_1l_babyAnalyzer::genqs_gmotherid() {
   return *genqs_gmotherid_;
 }
 
-const vector<int> &stop_1l_babyAnalyzer::genqs_gmotheridx() {
+const vector<int> &StopTree::genqs_gmotheridx() {
   if (not genqs_gmotheridx_isLoaded) {
     if (genqs_gmotheridx_branch != 0) {
       genqs_gmotheridx_branch->GetEntry(index);
@@ -6842,7 +6869,7 @@ const vector<int> &stop_1l_babyAnalyzer::genqs_gmotheridx() {
   return *genqs_gmotheridx_;
 }
 
-const vector<int> &stop_1l_babyAnalyzer::genqs_gmotherstatus() {
+const vector<int> &StopTree::genqs_gmotherstatus() {
   if (not genqs_gmotherstatus_isLoaded) {
     if (genqs_gmotherstatus_branch != 0) {
       genqs_gmotherstatus_branch->GetEntry(index);
@@ -6855,7 +6882,7 @@ const vector<int> &stop_1l_babyAnalyzer::genqs_gmotherstatus() {
   return *genqs_gmotherstatus_;
 }
 
-const vector<bool> &stop_1l_babyAnalyzer::genbosons_isfromt() {
+const vector<bool> &StopTree::genbosons_isfromt() {
   if (not genbosons_isfromt_isLoaded) {
     if (genbosons_isfromt_branch != 0) {
       genbosons_isfromt_branch->GetEntry(index);
@@ -6868,7 +6895,7 @@ const vector<bool> &stop_1l_babyAnalyzer::genbosons_isfromt() {
   return *genbosons_isfromt_;
 }
 
-const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l_babyAnalyzer::genbosons_p4() {
+const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &StopTree::genbosons_p4() {
   if (not genbosons_p4_isLoaded) {
     if (genbosons_p4_branch != 0) {
       genbosons_p4_branch->GetEntry(index);
@@ -6881,7 +6908,7 @@ const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l
   return *genbosons_p4_;
 }
 
-const vector<int> &stop_1l_babyAnalyzer::genbosons_id() {
+const vector<int> &StopTree::genbosons_id() {
   if (not genbosons_id_isLoaded) {
     if (genbosons_id_branch != 0) {
       genbosons_id_branch->GetEntry(index);
@@ -6894,7 +6921,7 @@ const vector<int> &stop_1l_babyAnalyzer::genbosons_id() {
   return *genbosons_id_;
 }
 
-const vector<int> &stop_1l_babyAnalyzer::genbosons__genpsidx() {
+const vector<int> &StopTree::genbosons__genpsidx() {
   if (not genbosons__genpsidx_isLoaded) {
     if (genbosons__genpsidx_branch != 0) {
       genbosons__genpsidx_branch->GetEntry(index);
@@ -6907,7 +6934,7 @@ const vector<int> &stop_1l_babyAnalyzer::genbosons__genpsidx() {
   return *genbosons__genpsidx_;
 }
 
-const vector<int> &stop_1l_babyAnalyzer::genbosons_status() {
+const vector<int> &StopTree::genbosons_status() {
   if (not genbosons_status_isLoaded) {
     if (genbosons_status_branch != 0) {
       genbosons_status_branch->GetEntry(index);
@@ -6920,7 +6947,7 @@ const vector<int> &stop_1l_babyAnalyzer::genbosons_status() {
   return *genbosons_status_;
 }
 
-const vector<bool> &stop_1l_babyAnalyzer::genbosons_fromHardProcessDecayed() {
+const vector<bool> &StopTree::genbosons_fromHardProcessDecayed() {
   if (not genbosons_fromHardProcessDecayed_isLoaded) {
     if (genbosons_fromHardProcessDecayed_branch != 0) {
       genbosons_fromHardProcessDecayed_branch->GetEntry(index);
@@ -6933,7 +6960,7 @@ const vector<bool> &stop_1l_babyAnalyzer::genbosons_fromHardProcessDecayed() {
   return *genbosons_fromHardProcessDecayed_;
 }
 
-const vector<bool> &stop_1l_babyAnalyzer::genbosons_fromHardProcessFinalState() {
+const vector<bool> &StopTree::genbosons_fromHardProcessFinalState() {
   if (not genbosons_fromHardProcessFinalState_isLoaded) {
     if (genbosons_fromHardProcessFinalState_branch != 0) {
       genbosons_fromHardProcessFinalState_branch->GetEntry(index);
@@ -6946,7 +6973,7 @@ const vector<bool> &stop_1l_babyAnalyzer::genbosons_fromHardProcessFinalState() 
   return *genbosons_fromHardProcessFinalState_;
 }
 
-const vector<bool> &stop_1l_babyAnalyzer::genbosons_isHardProcess() {
+const vector<bool> &StopTree::genbosons_isHardProcess() {
   if (not genbosons_isHardProcess_isLoaded) {
     if (genbosons_isHardProcess_branch != 0) {
       genbosons_isHardProcess_branch->GetEntry(index);
@@ -6959,7 +6986,7 @@ const vector<bool> &stop_1l_babyAnalyzer::genbosons_isHardProcess() {
   return *genbosons_isHardProcess_;
 }
 
-const vector<bool> &stop_1l_babyAnalyzer::genbosons_isLastCopy() {
+const vector<bool> &StopTree::genbosons_isLastCopy() {
   if (not genbosons_isLastCopy_isLoaded) {
     if (genbosons_isLastCopy_branch != 0) {
       genbosons_isLastCopy_branch->GetEntry(index);
@@ -6972,7 +6999,7 @@ const vector<bool> &stop_1l_babyAnalyzer::genbosons_isLastCopy() {
   return *genbosons_isLastCopy_;
 }
 
-const vector<int> &stop_1l_babyAnalyzer::genbosons_gentaudecay() {
+const vector<int> &StopTree::genbosons_gentaudecay() {
   if (not genbosons_gentaudecay_isLoaded) {
     if (genbosons_gentaudecay_branch != 0) {
       genbosons_gentaudecay_branch->GetEntry(index);
@@ -6985,7 +7012,7 @@ const vector<int> &stop_1l_babyAnalyzer::genbosons_gentaudecay() {
   return *genbosons_gentaudecay_;
 }
 
-const int &stop_1l_babyAnalyzer::gen_nfromtbosons_() {
+const int &StopTree::gen_nfromtbosons_() {
   if (not gen_nfromtbosons__isLoaded) {
     if (gen_nfromtbosons__branch != 0) {
       gen_nfromtbosons__branch->GetEntry(index);
@@ -6998,7 +7025,7 @@ const int &stop_1l_babyAnalyzer::gen_nfromtbosons_() {
   return gen_nfromtbosons__;
 }
 
-const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l_babyAnalyzer::genbosons_motherp4() {
+const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &StopTree::genbosons_motherp4() {
   if (not genbosons_motherp4_isLoaded) {
     if (genbosons_motherp4_branch != 0) {
       genbosons_motherp4_branch->GetEntry(index);
@@ -7011,7 +7038,7 @@ const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l
   return *genbosons_motherp4_;
 }
 
-const vector<int> &stop_1l_babyAnalyzer::genbosons_motherid() {
+const vector<int> &StopTree::genbosons_motherid() {
   if (not genbosons_motherid_isLoaded) {
     if (genbosons_motherid_branch != 0) {
       genbosons_motherid_branch->GetEntry(index);
@@ -7024,7 +7051,7 @@ const vector<int> &stop_1l_babyAnalyzer::genbosons_motherid() {
   return *genbosons_motherid_;
 }
 
-const vector<int> &stop_1l_babyAnalyzer::genbosons_motheridx() {
+const vector<int> &StopTree::genbosons_motheridx() {
   if (not genbosons_motheridx_isLoaded) {
     if (genbosons_motheridx_branch != 0) {
       genbosons_motheridx_branch->GetEntry(index);
@@ -7037,7 +7064,7 @@ const vector<int> &stop_1l_babyAnalyzer::genbosons_motheridx() {
   return *genbosons_motheridx_;
 }
 
-const vector<int> &stop_1l_babyAnalyzer::genbosons_motherstatus() {
+const vector<int> &StopTree::genbosons_motherstatus() {
   if (not genbosons_motherstatus_isLoaded) {
     if (genbosons_motherstatus_branch != 0) {
       genbosons_motherstatus_branch->GetEntry(index);
@@ -7050,7 +7077,7 @@ const vector<int> &stop_1l_babyAnalyzer::genbosons_motherstatus() {
   return *genbosons_motherstatus_;
 }
 
-const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l_babyAnalyzer::genbosons_gmotherp4() {
+const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &StopTree::genbosons_gmotherp4() {
   if (not genbosons_gmotherp4_isLoaded) {
     if (genbosons_gmotherp4_branch != 0) {
       genbosons_gmotherp4_branch->GetEntry(index);
@@ -7063,7 +7090,7 @@ const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l
   return *genbosons_gmotherp4_;
 }
 
-const vector<int> &stop_1l_babyAnalyzer::genbosons_gmotherid() {
+const vector<int> &StopTree::genbosons_gmotherid() {
   if (not genbosons_gmotherid_isLoaded) {
     if (genbosons_gmotherid_branch != 0) {
       genbosons_gmotherid_branch->GetEntry(index);
@@ -7076,7 +7103,7 @@ const vector<int> &stop_1l_babyAnalyzer::genbosons_gmotherid() {
   return *genbosons_gmotherid_;
 }
 
-const vector<int> &stop_1l_babyAnalyzer::genbosons_gmotheridx() {
+const vector<int> &StopTree::genbosons_gmotheridx() {
   if (not genbosons_gmotheridx_isLoaded) {
     if (genbosons_gmotheridx_branch != 0) {
       genbosons_gmotheridx_branch->GetEntry(index);
@@ -7089,7 +7116,7 @@ const vector<int> &stop_1l_babyAnalyzer::genbosons_gmotheridx() {
   return *genbosons_gmotheridx_;
 }
 
-const vector<int> &stop_1l_babyAnalyzer::genbosons_gmotherstatus() {
+const vector<int> &StopTree::genbosons_gmotherstatus() {
   if (not genbosons_gmotherstatus_isLoaded) {
     if (genbosons_gmotherstatus_branch != 0) {
       genbosons_gmotherstatus_branch->GetEntry(index);
@@ -7102,7 +7129,7 @@ const vector<int> &stop_1l_babyAnalyzer::genbosons_gmotherstatus() {
   return *genbosons_gmotherstatus_;
 }
 
-const vector<bool> &stop_1l_babyAnalyzer::gensusy_isfromt() {
+const vector<bool> &StopTree::gensusy_isfromt() {
   if (not gensusy_isfromt_isLoaded) {
     if (gensusy_isfromt_branch != 0) {
       gensusy_isfromt_branch->GetEntry(index);
@@ -7115,7 +7142,7 @@ const vector<bool> &stop_1l_babyAnalyzer::gensusy_isfromt() {
   return *gensusy_isfromt_;
 }
 
-const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l_babyAnalyzer::gensusy_p4() {
+const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &StopTree::gensusy_p4() {
   if (not gensusy_p4_isLoaded) {
     if (gensusy_p4_branch != 0) {
       gensusy_p4_branch->GetEntry(index);
@@ -7128,7 +7155,7 @@ const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l
   return *gensusy_p4_;
 }
 
-const vector<int> &stop_1l_babyAnalyzer::gensusy_id() {
+const vector<int> &StopTree::gensusy_id() {
   if (not gensusy_id_isLoaded) {
     if (gensusy_id_branch != 0) {
       gensusy_id_branch->GetEntry(index);
@@ -7141,7 +7168,7 @@ const vector<int> &stop_1l_babyAnalyzer::gensusy_id() {
   return *gensusy_id_;
 }
 
-const vector<int> &stop_1l_babyAnalyzer::gensusy__genpsidx() {
+const vector<int> &StopTree::gensusy__genpsidx() {
   if (not gensusy__genpsidx_isLoaded) {
     if (gensusy__genpsidx_branch != 0) {
       gensusy__genpsidx_branch->GetEntry(index);
@@ -7154,7 +7181,7 @@ const vector<int> &stop_1l_babyAnalyzer::gensusy__genpsidx() {
   return *gensusy__genpsidx_;
 }
 
-const vector<int> &stop_1l_babyAnalyzer::gensusy_status() {
+const vector<int> &StopTree::gensusy_status() {
   if (not gensusy_status_isLoaded) {
     if (gensusy_status_branch != 0) {
       gensusy_status_branch->GetEntry(index);
@@ -7167,7 +7194,7 @@ const vector<int> &stop_1l_babyAnalyzer::gensusy_status() {
   return *gensusy_status_;
 }
 
-const vector<bool> &stop_1l_babyAnalyzer::gensusy_fromHardProcessDecayed() {
+const vector<bool> &StopTree::gensusy_fromHardProcessDecayed() {
   if (not gensusy_fromHardProcessDecayed_isLoaded) {
     if (gensusy_fromHardProcessDecayed_branch != 0) {
       gensusy_fromHardProcessDecayed_branch->GetEntry(index);
@@ -7180,7 +7207,7 @@ const vector<bool> &stop_1l_babyAnalyzer::gensusy_fromHardProcessDecayed() {
   return *gensusy_fromHardProcessDecayed_;
 }
 
-const vector<bool> &stop_1l_babyAnalyzer::gensusy_fromHardProcessFinalState() {
+const vector<bool> &StopTree::gensusy_fromHardProcessFinalState() {
   if (not gensusy_fromHardProcessFinalState_isLoaded) {
     if (gensusy_fromHardProcessFinalState_branch != 0) {
       gensusy_fromHardProcessFinalState_branch->GetEntry(index);
@@ -7193,7 +7220,7 @@ const vector<bool> &stop_1l_babyAnalyzer::gensusy_fromHardProcessFinalState() {
   return *gensusy_fromHardProcessFinalState_;
 }
 
-const vector<bool> &stop_1l_babyAnalyzer::gensusy_isHardProcess() {
+const vector<bool> &StopTree::gensusy_isHardProcess() {
   if (not gensusy_isHardProcess_isLoaded) {
     if (gensusy_isHardProcess_branch != 0) {
       gensusy_isHardProcess_branch->GetEntry(index);
@@ -7206,7 +7233,7 @@ const vector<bool> &stop_1l_babyAnalyzer::gensusy_isHardProcess() {
   return *gensusy_isHardProcess_;
 }
 
-const vector<bool> &stop_1l_babyAnalyzer::gensusy_isLastCopy() {
+const vector<bool> &StopTree::gensusy_isLastCopy() {
   if (not gensusy_isLastCopy_isLoaded) {
     if (gensusy_isLastCopy_branch != 0) {
       gensusy_isLastCopy_branch->GetEntry(index);
@@ -7219,7 +7246,7 @@ const vector<bool> &stop_1l_babyAnalyzer::gensusy_isLastCopy() {
   return *gensusy_isLastCopy_;
 }
 
-const vector<int> &stop_1l_babyAnalyzer::gensusy_gentaudecay() {
+const vector<int> &StopTree::gensusy_gentaudecay() {
   if (not gensusy_gentaudecay_isLoaded) {
     if (gensusy_gentaudecay_branch != 0) {
       gensusy_gentaudecay_branch->GetEntry(index);
@@ -7232,7 +7259,7 @@ const vector<int> &stop_1l_babyAnalyzer::gensusy_gentaudecay() {
   return *gensusy_gentaudecay_;
 }
 
-const int &stop_1l_babyAnalyzer::gen_nfromtsusy_() {
+const int &StopTree::gen_nfromtsusy_() {
   if (not gen_nfromtsusy__isLoaded) {
     if (gen_nfromtsusy__branch != 0) {
       gen_nfromtsusy__branch->GetEntry(index);
@@ -7245,7 +7272,7 @@ const int &stop_1l_babyAnalyzer::gen_nfromtsusy_() {
   return gen_nfromtsusy__;
 }
 
-const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l_babyAnalyzer::gensusy_motherp4() {
+const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &StopTree::gensusy_motherp4() {
   if (not gensusy_motherp4_isLoaded) {
     if (gensusy_motherp4_branch != 0) {
       gensusy_motherp4_branch->GetEntry(index);
@@ -7258,7 +7285,7 @@ const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l
   return *gensusy_motherp4_;
 }
 
-const vector<int> &stop_1l_babyAnalyzer::gensusy_motherid() {
+const vector<int> &StopTree::gensusy_motherid() {
   if (not gensusy_motherid_isLoaded) {
     if (gensusy_motherid_branch != 0) {
       gensusy_motherid_branch->GetEntry(index);
@@ -7271,7 +7298,7 @@ const vector<int> &stop_1l_babyAnalyzer::gensusy_motherid() {
   return *gensusy_motherid_;
 }
 
-const vector<int> &stop_1l_babyAnalyzer::gensusy_motheridx() {
+const vector<int> &StopTree::gensusy_motheridx() {
   if (not gensusy_motheridx_isLoaded) {
     if (gensusy_motheridx_branch != 0) {
       gensusy_motheridx_branch->GetEntry(index);
@@ -7284,7 +7311,7 @@ const vector<int> &stop_1l_babyAnalyzer::gensusy_motheridx() {
   return *gensusy_motheridx_;
 }
 
-const vector<int> &stop_1l_babyAnalyzer::gensusy_motherstatus() {
+const vector<int> &StopTree::gensusy_motherstatus() {
   if (not gensusy_motherstatus_isLoaded) {
     if (gensusy_motherstatus_branch != 0) {
       gensusy_motherstatus_branch->GetEntry(index);
@@ -7297,7 +7324,7 @@ const vector<int> &stop_1l_babyAnalyzer::gensusy_motherstatus() {
   return *gensusy_motherstatus_;
 }
 
-const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l_babyAnalyzer::gensusy_gmotherp4() {
+const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &StopTree::gensusy_gmotherp4() {
   if (not gensusy_gmotherp4_isLoaded) {
     if (gensusy_gmotherp4_branch != 0) {
       gensusy_gmotherp4_branch->GetEntry(index);
@@ -7310,7 +7337,7 @@ const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l
   return *gensusy_gmotherp4_;
 }
 
-const vector<int> &stop_1l_babyAnalyzer::gensusy_gmotherid() {
+const vector<int> &StopTree::gensusy_gmotherid() {
   if (not gensusy_gmotherid_isLoaded) {
     if (gensusy_gmotherid_branch != 0) {
       gensusy_gmotherid_branch->GetEntry(index);
@@ -7323,7 +7350,7 @@ const vector<int> &stop_1l_babyAnalyzer::gensusy_gmotherid() {
   return *gensusy_gmotherid_;
 }
 
-const vector<int> &stop_1l_babyAnalyzer::gensusy_gmotheridx() {
+const vector<int> &StopTree::gensusy_gmotheridx() {
   if (not gensusy_gmotheridx_isLoaded) {
     if (gensusy_gmotheridx_branch != 0) {
       gensusy_gmotheridx_branch->GetEntry(index);
@@ -7336,7 +7363,7 @@ const vector<int> &stop_1l_babyAnalyzer::gensusy_gmotheridx() {
   return *gensusy_gmotheridx_;
 }
 
-const vector<int> &stop_1l_babyAnalyzer::gensusy_gmotherstatus() {
+const vector<int> &StopTree::gensusy_gmotherstatus() {
   if (not gensusy_gmotherstatus_isLoaded) {
     if (gensusy_gmotherstatus_branch != 0) {
       gensusy_gmotherstatus_branch->GetEntry(index);
@@ -7349,7 +7376,7 @@ const vector<int> &stop_1l_babyAnalyzer::gensusy_gmotherstatus() {
   return *gensusy_gmotherstatus_;
 }
 
-const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l_babyAnalyzer::ak8pfjets_p4() {
+const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &StopTree::ak8pfjets_p4() {
   if (not ak8pfjets_p4_isLoaded) {
     if (ak8pfjets_p4_branch != 0) {
       ak8pfjets_p4_branch->GetEntry(index);
@@ -7362,7 +7389,7 @@ const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l
   return *ak8pfjets_p4_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::ak8pfjets_tau1() {
+const vector<float> &StopTree::ak8pfjets_tau1() {
   if (not ak8pfjets_tau1_isLoaded) {
     if (ak8pfjets_tau1_branch != 0) {
       ak8pfjets_tau1_branch->GetEntry(index);
@@ -7375,7 +7402,7 @@ const vector<float> &stop_1l_babyAnalyzer::ak8pfjets_tau1() {
   return *ak8pfjets_tau1_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::ak8pfjets_tau2() {
+const vector<float> &StopTree::ak8pfjets_tau2() {
   if (not ak8pfjets_tau2_isLoaded) {
     if (ak8pfjets_tau2_branch != 0) {
       ak8pfjets_tau2_branch->GetEntry(index);
@@ -7388,7 +7415,7 @@ const vector<float> &stop_1l_babyAnalyzer::ak8pfjets_tau2() {
   return *ak8pfjets_tau2_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::ak8pfjets_tau3() {
+const vector<float> &StopTree::ak8pfjets_tau3() {
   if (not ak8pfjets_tau3_isLoaded) {
     if (ak8pfjets_tau3_branch != 0) {
       ak8pfjets_tau3_branch->GetEntry(index);
@@ -7401,7 +7428,7 @@ const vector<float> &stop_1l_babyAnalyzer::ak8pfjets_tau3() {
   return *ak8pfjets_tau3_;
 }
 
-const vector<int> &stop_1l_babyAnalyzer::ak8pfjets_parton_flavor() {
+const vector<int> &StopTree::ak8pfjets_parton_flavor() {
   if (not ak8pfjets_parton_flavor_isLoaded) {
     if (ak8pfjets_parton_flavor_branch != 0) {
       ak8pfjets_parton_flavor_branch->GetEntry(index);
@@ -7414,7 +7441,7 @@ const vector<int> &stop_1l_babyAnalyzer::ak8pfjets_parton_flavor() {
   return *ak8pfjets_parton_flavor_;
 }
 
-const int &stop_1l_babyAnalyzer::nGoodAK8PFJets() {
+const int &StopTree::nGoodAK8PFJets() {
   if (not nGoodAK8PFJets_isLoaded) {
     if (nGoodAK8PFJets_branch != 0) {
       nGoodAK8PFJets_branch->GetEntry(index);
@@ -7427,7 +7454,7 @@ const int &stop_1l_babyAnalyzer::nGoodAK8PFJets() {
   return nGoodAK8PFJets_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::ak8pfjets_deepdisc_qcd() {
+const vector<float> &StopTree::ak8pfjets_deepdisc_qcd() {
   if (not ak8pfjets_deepdisc_qcd_isLoaded) {
     if (ak8pfjets_deepdisc_qcd_branch != 0) {
       ak8pfjets_deepdisc_qcd_branch->GetEntry(index);
@@ -7440,7 +7467,7 @@ const vector<float> &stop_1l_babyAnalyzer::ak8pfjets_deepdisc_qcd() {
   return *ak8pfjets_deepdisc_qcd_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::ak8pfjets_deepdisc_top() {
+const vector<float> &StopTree::ak8pfjets_deepdisc_top() {
   if (not ak8pfjets_deepdisc_top_isLoaded) {
     if (ak8pfjets_deepdisc_top_branch != 0) {
       ak8pfjets_deepdisc_top_branch->GetEntry(index);
@@ -7453,7 +7480,7 @@ const vector<float> &stop_1l_babyAnalyzer::ak8pfjets_deepdisc_top() {
   return *ak8pfjets_deepdisc_top_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::ak8pfjets_deepdisc_w() {
+const vector<float> &StopTree::ak8pfjets_deepdisc_w() {
   if (not ak8pfjets_deepdisc_w_isLoaded) {
     if (ak8pfjets_deepdisc_w_branch != 0) {
       ak8pfjets_deepdisc_w_branch->GetEntry(index);
@@ -7466,7 +7493,7 @@ const vector<float> &stop_1l_babyAnalyzer::ak8pfjets_deepdisc_w() {
   return *ak8pfjets_deepdisc_w_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::ak8pfjets_deepdisc_z() {
+const vector<float> &StopTree::ak8pfjets_deepdisc_z() {
   if (not ak8pfjets_deepdisc_z_isLoaded) {
     if (ak8pfjets_deepdisc_z_branch != 0) {
       ak8pfjets_deepdisc_z_branch->GetEntry(index);
@@ -7479,7 +7506,7 @@ const vector<float> &stop_1l_babyAnalyzer::ak8pfjets_deepdisc_z() {
   return *ak8pfjets_deepdisc_z_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::ak8pfjets_deepdisc_zbb() {
+const vector<float> &StopTree::ak8pfjets_deepdisc_zbb() {
   if (not ak8pfjets_deepdisc_zbb_isLoaded) {
     if (ak8pfjets_deepdisc_zbb_branch != 0) {
       ak8pfjets_deepdisc_zbb_branch->GetEntry(index);
@@ -7492,7 +7519,7 @@ const vector<float> &stop_1l_babyAnalyzer::ak8pfjets_deepdisc_zbb() {
   return *ak8pfjets_deepdisc_zbb_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::ak8pfjets_deepdisc_hbb() {
+const vector<float> &StopTree::ak8pfjets_deepdisc_hbb() {
   if (not ak8pfjets_deepdisc_hbb_isLoaded) {
     if (ak8pfjets_deepdisc_hbb_branch != 0) {
       ak8pfjets_deepdisc_hbb_branch->GetEntry(index);
@@ -7505,7 +7532,7 @@ const vector<float> &stop_1l_babyAnalyzer::ak8pfjets_deepdisc_hbb() {
   return *ak8pfjets_deepdisc_hbb_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::ak8pfjets_deepdisc_h4q() {
+const vector<float> &StopTree::ak8pfjets_deepdisc_h4q() {
   if (not ak8pfjets_deepdisc_h4q_isLoaded) {
     if (ak8pfjets_deepdisc_h4q_branch != 0) {
       ak8pfjets_deepdisc_h4q_branch->GetEntry(index);
@@ -7518,7 +7545,7 @@ const vector<float> &stop_1l_babyAnalyzer::ak8pfjets_deepdisc_h4q() {
   return *ak8pfjets_deepdisc_h4q_;
 }
 
-const float &stop_1l_babyAnalyzer::lead_ak8deepdisc_top() {
+const float &StopTree::lead_ak8deepdisc_top() {
   if (not lead_ak8deepdisc_top_isLoaded) {
     if (lead_ak8deepdisc_top_branch != 0) {
       lead_ak8deepdisc_top_branch->GetEntry(index);
@@ -7531,7 +7558,7 @@ const float &stop_1l_babyAnalyzer::lead_ak8deepdisc_top() {
   return lead_ak8deepdisc_top_;
 }
 
-const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l_babyAnalyzer::jup_ak8pfjets_p4() {
+const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &StopTree::jup_ak8pfjets_p4() {
   if (not jup_ak8pfjets_p4_isLoaded) {
     if (jup_ak8pfjets_p4_branch != 0) {
       jup_ak8pfjets_p4_branch->GetEntry(index);
@@ -7544,7 +7571,7 @@ const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l
   return *jup_ak8pfjets_p4_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::jup_ak8pfjets_tau1() {
+const vector<float> &StopTree::jup_ak8pfjets_tau1() {
   if (not jup_ak8pfjets_tau1_isLoaded) {
     if (jup_ak8pfjets_tau1_branch != 0) {
       jup_ak8pfjets_tau1_branch->GetEntry(index);
@@ -7557,7 +7584,7 @@ const vector<float> &stop_1l_babyAnalyzer::jup_ak8pfjets_tau1() {
   return *jup_ak8pfjets_tau1_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::jup_ak8pfjets_tau2() {
+const vector<float> &StopTree::jup_ak8pfjets_tau2() {
   if (not jup_ak8pfjets_tau2_isLoaded) {
     if (jup_ak8pfjets_tau2_branch != 0) {
       jup_ak8pfjets_tau2_branch->GetEntry(index);
@@ -7570,7 +7597,7 @@ const vector<float> &stop_1l_babyAnalyzer::jup_ak8pfjets_tau2() {
   return *jup_ak8pfjets_tau2_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::jup_ak8pfjets_tau3() {
+const vector<float> &StopTree::jup_ak8pfjets_tau3() {
   if (not jup_ak8pfjets_tau3_isLoaded) {
     if (jup_ak8pfjets_tau3_branch != 0) {
       jup_ak8pfjets_tau3_branch->GetEntry(index);
@@ -7583,7 +7610,7 @@ const vector<float> &stop_1l_babyAnalyzer::jup_ak8pfjets_tau3() {
   return *jup_ak8pfjets_tau3_;
 }
 
-const vector<int> &stop_1l_babyAnalyzer::jup_ak8pfjets_parton_flavor() {
+const vector<int> &StopTree::jup_ak8pfjets_parton_flavor() {
   if (not jup_ak8pfjets_parton_flavor_isLoaded) {
     if (jup_ak8pfjets_parton_flavor_branch != 0) {
       jup_ak8pfjets_parton_flavor_branch->GetEntry(index);
@@ -7596,7 +7623,7 @@ const vector<int> &stop_1l_babyAnalyzer::jup_ak8pfjets_parton_flavor() {
   return *jup_ak8pfjets_parton_flavor_;
 }
 
-const int &stop_1l_babyAnalyzer::jup_nGoodAK8PFJets() {
+const int &StopTree::jup_nGoodAK8PFJets() {
   if (not jup_nGoodAK8PFJets_isLoaded) {
     if (jup_nGoodAK8PFJets_branch != 0) {
       jup_nGoodAK8PFJets_branch->GetEntry(index);
@@ -7609,7 +7636,7 @@ const int &stop_1l_babyAnalyzer::jup_nGoodAK8PFJets() {
   return jup_nGoodAK8PFJets_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::jup_ak8pfjets_deepdisc_qcd() {
+const vector<float> &StopTree::jup_ak8pfjets_deepdisc_qcd() {
   if (not jup_ak8pfjets_deepdisc_qcd_isLoaded) {
     if (jup_ak8pfjets_deepdisc_qcd_branch != 0) {
       jup_ak8pfjets_deepdisc_qcd_branch->GetEntry(index);
@@ -7622,7 +7649,7 @@ const vector<float> &stop_1l_babyAnalyzer::jup_ak8pfjets_deepdisc_qcd() {
   return *jup_ak8pfjets_deepdisc_qcd_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::jup_ak8pfjets_deepdisc_top() {
+const vector<float> &StopTree::jup_ak8pfjets_deepdisc_top() {
   if (not jup_ak8pfjets_deepdisc_top_isLoaded) {
     if (jup_ak8pfjets_deepdisc_top_branch != 0) {
       jup_ak8pfjets_deepdisc_top_branch->GetEntry(index);
@@ -7635,7 +7662,7 @@ const vector<float> &stop_1l_babyAnalyzer::jup_ak8pfjets_deepdisc_top() {
   return *jup_ak8pfjets_deepdisc_top_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::jup_ak8pfjets_deepdisc_w() {
+const vector<float> &StopTree::jup_ak8pfjets_deepdisc_w() {
   if (not jup_ak8pfjets_deepdisc_w_isLoaded) {
     if (jup_ak8pfjets_deepdisc_w_branch != 0) {
       jup_ak8pfjets_deepdisc_w_branch->GetEntry(index);
@@ -7648,7 +7675,7 @@ const vector<float> &stop_1l_babyAnalyzer::jup_ak8pfjets_deepdisc_w() {
   return *jup_ak8pfjets_deepdisc_w_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::jup_ak8pfjets_deepdisc_z() {
+const vector<float> &StopTree::jup_ak8pfjets_deepdisc_z() {
   if (not jup_ak8pfjets_deepdisc_z_isLoaded) {
     if (jup_ak8pfjets_deepdisc_z_branch != 0) {
       jup_ak8pfjets_deepdisc_z_branch->GetEntry(index);
@@ -7661,7 +7688,7 @@ const vector<float> &stop_1l_babyAnalyzer::jup_ak8pfjets_deepdisc_z() {
   return *jup_ak8pfjets_deepdisc_z_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::jup_ak8pfjets_deepdisc_zbb() {
+const vector<float> &StopTree::jup_ak8pfjets_deepdisc_zbb() {
   if (not jup_ak8pfjets_deepdisc_zbb_isLoaded) {
     if (jup_ak8pfjets_deepdisc_zbb_branch != 0) {
       jup_ak8pfjets_deepdisc_zbb_branch->GetEntry(index);
@@ -7674,7 +7701,7 @@ const vector<float> &stop_1l_babyAnalyzer::jup_ak8pfjets_deepdisc_zbb() {
   return *jup_ak8pfjets_deepdisc_zbb_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::jup_ak8pfjets_deepdisc_hbb() {
+const vector<float> &StopTree::jup_ak8pfjets_deepdisc_hbb() {
   if (not jup_ak8pfjets_deepdisc_hbb_isLoaded) {
     if (jup_ak8pfjets_deepdisc_hbb_branch != 0) {
       jup_ak8pfjets_deepdisc_hbb_branch->GetEntry(index);
@@ -7687,7 +7714,7 @@ const vector<float> &stop_1l_babyAnalyzer::jup_ak8pfjets_deepdisc_hbb() {
   return *jup_ak8pfjets_deepdisc_hbb_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::jup_ak8pfjets_deepdisc_h4q() {
+const vector<float> &StopTree::jup_ak8pfjets_deepdisc_h4q() {
   if (not jup_ak8pfjets_deepdisc_h4q_isLoaded) {
     if (jup_ak8pfjets_deepdisc_h4q_branch != 0) {
       jup_ak8pfjets_deepdisc_h4q_branch->GetEntry(index);
@@ -7700,7 +7727,7 @@ const vector<float> &stop_1l_babyAnalyzer::jup_ak8pfjets_deepdisc_h4q() {
   return *jup_ak8pfjets_deepdisc_h4q_;
 }
 
-const float &stop_1l_babyAnalyzer::jup_lead_ak8deepdisc_top() {
+const float &StopTree::jup_lead_ak8deepdisc_top() {
   if (not jup_lead_ak8deepdisc_top_isLoaded) {
     if (jup_lead_ak8deepdisc_top_branch != 0) {
       jup_lead_ak8deepdisc_top_branch->GetEntry(index);
@@ -7713,7 +7740,7 @@ const float &stop_1l_babyAnalyzer::jup_lead_ak8deepdisc_top() {
   return jup_lead_ak8deepdisc_top_;
 }
 
-const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l_babyAnalyzer::jdown_ak8pfjets_p4() {
+const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &StopTree::jdown_ak8pfjets_p4() {
   if (not jdown_ak8pfjets_p4_isLoaded) {
     if (jdown_ak8pfjets_p4_branch != 0) {
       jdown_ak8pfjets_p4_branch->GetEntry(index);
@@ -7726,7 +7753,7 @@ const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l
   return *jdown_ak8pfjets_p4_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::jdown_ak8pfjets_tau1() {
+const vector<float> &StopTree::jdown_ak8pfjets_tau1() {
   if (not jdown_ak8pfjets_tau1_isLoaded) {
     if (jdown_ak8pfjets_tau1_branch != 0) {
       jdown_ak8pfjets_tau1_branch->GetEntry(index);
@@ -7739,7 +7766,7 @@ const vector<float> &stop_1l_babyAnalyzer::jdown_ak8pfjets_tau1() {
   return *jdown_ak8pfjets_tau1_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::jdown_ak8pfjets_tau2() {
+const vector<float> &StopTree::jdown_ak8pfjets_tau2() {
   if (not jdown_ak8pfjets_tau2_isLoaded) {
     if (jdown_ak8pfjets_tau2_branch != 0) {
       jdown_ak8pfjets_tau2_branch->GetEntry(index);
@@ -7752,7 +7779,7 @@ const vector<float> &stop_1l_babyAnalyzer::jdown_ak8pfjets_tau2() {
   return *jdown_ak8pfjets_tau2_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::jdown_ak8pfjets_tau3() {
+const vector<float> &StopTree::jdown_ak8pfjets_tau3() {
   if (not jdown_ak8pfjets_tau3_isLoaded) {
     if (jdown_ak8pfjets_tau3_branch != 0) {
       jdown_ak8pfjets_tau3_branch->GetEntry(index);
@@ -7765,7 +7792,7 @@ const vector<float> &stop_1l_babyAnalyzer::jdown_ak8pfjets_tau3() {
   return *jdown_ak8pfjets_tau3_;
 }
 
-const vector<int> &stop_1l_babyAnalyzer::jdown_ak8pfjets_parton_flavor() {
+const vector<int> &StopTree::jdown_ak8pfjets_parton_flavor() {
   if (not jdown_ak8pfjets_parton_flavor_isLoaded) {
     if (jdown_ak8pfjets_parton_flavor_branch != 0) {
       jdown_ak8pfjets_parton_flavor_branch->GetEntry(index);
@@ -7778,7 +7805,7 @@ const vector<int> &stop_1l_babyAnalyzer::jdown_ak8pfjets_parton_flavor() {
   return *jdown_ak8pfjets_parton_flavor_;
 }
 
-const int &stop_1l_babyAnalyzer::jdown_nGoodAK8PFJets() {
+const int &StopTree::jdown_nGoodAK8PFJets() {
   if (not jdown_nGoodAK8PFJets_isLoaded) {
     if (jdown_nGoodAK8PFJets_branch != 0) {
       jdown_nGoodAK8PFJets_branch->GetEntry(index);
@@ -7791,7 +7818,7 @@ const int &stop_1l_babyAnalyzer::jdown_nGoodAK8PFJets() {
   return jdown_nGoodAK8PFJets_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::jdown_ak8pfjets_deepdisc_qcd() {
+const vector<float> &StopTree::jdown_ak8pfjets_deepdisc_qcd() {
   if (not jdown_ak8pfjets_deepdisc_qcd_isLoaded) {
     if (jdown_ak8pfjets_deepdisc_qcd_branch != 0) {
       jdown_ak8pfjets_deepdisc_qcd_branch->GetEntry(index);
@@ -7804,7 +7831,7 @@ const vector<float> &stop_1l_babyAnalyzer::jdown_ak8pfjets_deepdisc_qcd() {
   return *jdown_ak8pfjets_deepdisc_qcd_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::jdown_ak8pfjets_deepdisc_top() {
+const vector<float> &StopTree::jdown_ak8pfjets_deepdisc_top() {
   if (not jdown_ak8pfjets_deepdisc_top_isLoaded) {
     if (jdown_ak8pfjets_deepdisc_top_branch != 0) {
       jdown_ak8pfjets_deepdisc_top_branch->GetEntry(index);
@@ -7817,7 +7844,7 @@ const vector<float> &stop_1l_babyAnalyzer::jdown_ak8pfjets_deepdisc_top() {
   return *jdown_ak8pfjets_deepdisc_top_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::jdown_ak8pfjets_deepdisc_w() {
+const vector<float> &StopTree::jdown_ak8pfjets_deepdisc_w() {
   if (not jdown_ak8pfjets_deepdisc_w_isLoaded) {
     if (jdown_ak8pfjets_deepdisc_w_branch != 0) {
       jdown_ak8pfjets_deepdisc_w_branch->GetEntry(index);
@@ -7830,7 +7857,7 @@ const vector<float> &stop_1l_babyAnalyzer::jdown_ak8pfjets_deepdisc_w() {
   return *jdown_ak8pfjets_deepdisc_w_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::jdown_ak8pfjets_deepdisc_z() {
+const vector<float> &StopTree::jdown_ak8pfjets_deepdisc_z() {
   if (not jdown_ak8pfjets_deepdisc_z_isLoaded) {
     if (jdown_ak8pfjets_deepdisc_z_branch != 0) {
       jdown_ak8pfjets_deepdisc_z_branch->GetEntry(index);
@@ -7843,7 +7870,7 @@ const vector<float> &stop_1l_babyAnalyzer::jdown_ak8pfjets_deepdisc_z() {
   return *jdown_ak8pfjets_deepdisc_z_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::jdown_ak8pfjets_deepdisc_zbb() {
+const vector<float> &StopTree::jdown_ak8pfjets_deepdisc_zbb() {
   if (not jdown_ak8pfjets_deepdisc_zbb_isLoaded) {
     if (jdown_ak8pfjets_deepdisc_zbb_branch != 0) {
       jdown_ak8pfjets_deepdisc_zbb_branch->GetEntry(index);
@@ -7856,7 +7883,7 @@ const vector<float> &stop_1l_babyAnalyzer::jdown_ak8pfjets_deepdisc_zbb() {
   return *jdown_ak8pfjets_deepdisc_zbb_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::jdown_ak8pfjets_deepdisc_hbb() {
+const vector<float> &StopTree::jdown_ak8pfjets_deepdisc_hbb() {
   if (not jdown_ak8pfjets_deepdisc_hbb_isLoaded) {
     if (jdown_ak8pfjets_deepdisc_hbb_branch != 0) {
       jdown_ak8pfjets_deepdisc_hbb_branch->GetEntry(index);
@@ -7869,7 +7896,7 @@ const vector<float> &stop_1l_babyAnalyzer::jdown_ak8pfjets_deepdisc_hbb() {
   return *jdown_ak8pfjets_deepdisc_hbb_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::jdown_ak8pfjets_deepdisc_h4q() {
+const vector<float> &StopTree::jdown_ak8pfjets_deepdisc_h4q() {
   if (not jdown_ak8pfjets_deepdisc_h4q_isLoaded) {
     if (jdown_ak8pfjets_deepdisc_h4q_branch != 0) {
       jdown_ak8pfjets_deepdisc_h4q_branch->GetEntry(index);
@@ -7882,7 +7909,7 @@ const vector<float> &stop_1l_babyAnalyzer::jdown_ak8pfjets_deepdisc_h4q() {
   return *jdown_ak8pfjets_deepdisc_h4q_;
 }
 
-const float &stop_1l_babyAnalyzer::jdown_lead_ak8deepdisc_top() {
+const float &StopTree::jdown_lead_ak8deepdisc_top() {
   if (not jdown_lead_ak8deepdisc_top_isLoaded) {
     if (jdown_lead_ak8deepdisc_top_branch != 0) {
       jdown_lead_ak8deepdisc_top_branch->GetEntry(index);
@@ -7895,7 +7922,7 @@ const float &stop_1l_babyAnalyzer::jdown_lead_ak8deepdisc_top() {
   return jdown_lead_ak8deepdisc_top_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::ak4pfjets_cvsl() {
+const vector<float> &StopTree::ak4pfjets_cvsl() {
   if (not ak4pfjets_cvsl_isLoaded) {
     if (ak4pfjets_cvsl_branch != 0) {
       ak4pfjets_cvsl_branch->GetEntry(index);
@@ -7908,7 +7935,7 @@ const vector<float> &stop_1l_babyAnalyzer::ak4pfjets_cvsl() {
   return *ak4pfjets_cvsl_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::ak4pfjets_ptD() {
+const vector<float> &StopTree::ak4pfjets_ptD() {
   if (not ak4pfjets_ptD_isLoaded) {
     if (ak4pfjets_ptD_branch != 0) {
       ak4pfjets_ptD_branch->GetEntry(index);
@@ -7921,7 +7948,7 @@ const vector<float> &stop_1l_babyAnalyzer::ak4pfjets_ptD() {
   return *ak4pfjets_ptD_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::ak4pfjets_axis1() {
+const vector<float> &StopTree::ak4pfjets_axis1() {
   if (not ak4pfjets_axis1_isLoaded) {
     if (ak4pfjets_axis1_branch != 0) {
       ak4pfjets_axis1_branch->GetEntry(index);
@@ -7934,7 +7961,7 @@ const vector<float> &stop_1l_babyAnalyzer::ak4pfjets_axis1() {
   return *ak4pfjets_axis1_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::ak4pfjets_axis2() {
+const vector<float> &StopTree::ak4pfjets_axis2() {
   if (not ak4pfjets_axis2_isLoaded) {
     if (ak4pfjets_axis2_branch != 0) {
       ak4pfjets_axis2_branch->GetEntry(index);
@@ -7947,7 +7974,7 @@ const vector<float> &stop_1l_babyAnalyzer::ak4pfjets_axis2() {
   return *ak4pfjets_axis2_;
 }
 
-const vector<int> &stop_1l_babyAnalyzer::ak4pfjets_mult() {
+const vector<int> &StopTree::ak4pfjets_mult() {
   if (not ak4pfjets_mult_isLoaded) {
     if (ak4pfjets_mult_branch != 0) {
       ak4pfjets_mult_branch->GetEntry(index);
@@ -7960,20 +7987,7 @@ const vector<int> &stop_1l_babyAnalyzer::ak4pfjets_mult() {
   return *ak4pfjets_mult_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::ak4pfjets_csvbtag() {
-  if (not ak4pfjets_csvbtag_isLoaded) {
-    if (ak4pfjets_csvbtag_branch != 0) {
-      ak4pfjets_csvbtag_branch->GetEntry(index);
-    } else {
-      printf("branch ak4pfjets_csvbtag_branch does not exist!\n");
-      exit(1);
-    }
-    ak4pfjets_csvbtag_isLoaded = true;
-  }
-  return *ak4pfjets_csvbtag_;
-}
-
-const vector<float> &stop_1l_babyAnalyzer::ak4pfjets_deepCSVb() {
+const vector<float> &StopTree::ak4pfjets_deepCSVb() {
   if (not ak4pfjets_deepCSVb_isLoaded) {
     if (ak4pfjets_deepCSVb_branch != 0) {
       ak4pfjets_deepCSVb_branch->GetEntry(index);
@@ -7986,7 +8000,7 @@ const vector<float> &stop_1l_babyAnalyzer::ak4pfjets_deepCSVb() {
   return *ak4pfjets_deepCSVb_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::ak4pfjets_deepCSVbb() {
+const vector<float> &StopTree::ak4pfjets_deepCSVbb() {
   if (not ak4pfjets_deepCSVbb_isLoaded) {
     if (ak4pfjets_deepCSVbb_branch != 0) {
       ak4pfjets_deepCSVbb_branch->GetEntry(index);
@@ -7999,7 +8013,7 @@ const vector<float> &stop_1l_babyAnalyzer::ak4pfjets_deepCSVbb() {
   return *ak4pfjets_deepCSVbb_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::ak4pfjets_deepCSVc() {
+const vector<float> &StopTree::ak4pfjets_deepCSVc() {
   if (not ak4pfjets_deepCSVc_isLoaded) {
     if (ak4pfjets_deepCSVc_branch != 0) {
       ak4pfjets_deepCSVc_branch->GetEntry(index);
@@ -8012,20 +8026,7 @@ const vector<float> &stop_1l_babyAnalyzer::ak4pfjets_deepCSVc() {
   return *ak4pfjets_deepCSVc_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::ak4pfjets_deepCSVcc() {
-  if (not ak4pfjets_deepCSVcc_isLoaded) {
-    if (ak4pfjets_deepCSVcc_branch != 0) {
-      ak4pfjets_deepCSVcc_branch->GetEntry(index);
-    } else {
-      printf("branch ak4pfjets_deepCSVcc_branch does not exist!\n");
-      exit(1);
-    }
-    ak4pfjets_deepCSVcc_isLoaded = true;
-  }
-  return *ak4pfjets_deepCSVcc_;
-}
-
-const vector<float> &stop_1l_babyAnalyzer::ak4pfjets_deepCSVl() {
+const vector<float> &StopTree::ak4pfjets_deepCSVl() {
   if (not ak4pfjets_deepCSVl_isLoaded) {
     if (ak4pfjets_deepCSVl_branch != 0) {
       ak4pfjets_deepCSVl_branch->GetEntry(index);
@@ -8038,7 +8039,7 @@ const vector<float> &stop_1l_babyAnalyzer::ak4pfjets_deepCSVl() {
   return *ak4pfjets_deepCSVl_;
 }
 
-const vector<vector<int> > &stop_1l_babyAnalyzer::topcands_ak4idx() {
+const vector<vector<int> > &StopTree::topcands_ak4idx() {
   if (not topcands_ak4idx_isLoaded) {
     if (topcands_ak4idx_branch != 0) {
       topcands_ak4idx_branch->GetEntry(index);
@@ -8051,7 +8052,7 @@ const vector<vector<int> > &stop_1l_babyAnalyzer::topcands_ak4idx() {
   return *topcands_ak4idx_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::topcands_disc() {
+const vector<float> &StopTree::topcands_disc() {
   if (not topcands_disc_isLoaded) {
     if (topcands_disc_branch != 0) {
       topcands_disc_branch->GetEntry(index);
@@ -8064,7 +8065,7 @@ const vector<float> &stop_1l_babyAnalyzer::topcands_disc() {
   return *topcands_disc_;
 }
 
-const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l_babyAnalyzer::topcands_p4() {
+const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &StopTree::topcands_p4() {
   if (not topcands_p4_isLoaded) {
     if (topcands_p4_branch != 0) {
       topcands_p4_branch->GetEntry(index);
@@ -8077,7 +8078,7 @@ const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l
   return *topcands_p4_;
 }
 
-const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l_babyAnalyzer::topcands_Wp4() {
+const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &StopTree::topcands_Wp4() {
   if (not topcands_Wp4_isLoaded) {
     if (topcands_Wp4_branch != 0) {
       topcands_Wp4_branch->GetEntry(index);
@@ -8090,7 +8091,7 @@ const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l
   return *topcands_Wp4_;
 }
 
-const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l_babyAnalyzer::tftops_p4() {
+const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &StopTree::tftops_p4() {
   if (not tftops_p4_isLoaded) {
     if (tftops_p4_branch != 0) {
       tftops_p4_branch->GetEntry(index);
@@ -8103,7 +8104,7 @@ const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l
   return *tftops_p4_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::tftops_disc() {
+const vector<float> &StopTree::tftops_disc() {
   if (not tftops_disc_isLoaded) {
     if (tftops_disc_branch != 0) {
       tftops_disc_branch->GetEntry(index);
@@ -8116,7 +8117,7 @@ const vector<float> &stop_1l_babyAnalyzer::tftops_disc() {
   return *tftops_disc_;
 }
 
-const vector<vector<float> > &stop_1l_babyAnalyzer::tftops_subjet_pt() {
+const vector<vector<float> > &StopTree::tftops_subjet_pt() {
   if (not tftops_subjet_pt_isLoaded) {
     if (tftops_subjet_pt_branch != 0) {
       tftops_subjet_pt_branch->GetEntry(index);
@@ -8129,7 +8130,7 @@ const vector<vector<float> > &stop_1l_babyAnalyzer::tftops_subjet_pt() {
   return *tftops_subjet_pt_;
 }
 
-const vector<vector<float> > &stop_1l_babyAnalyzer::tftops_subjet_eta() {
+const vector<vector<float> > &StopTree::tftops_subjet_eta() {
   if (not tftops_subjet_eta_isLoaded) {
     if (tftops_subjet_eta_branch != 0) {
       tftops_subjet_eta_branch->GetEntry(index);
@@ -8142,7 +8143,7 @@ const vector<vector<float> > &stop_1l_babyAnalyzer::tftops_subjet_eta() {
   return *tftops_subjet_eta_;
 }
 
-const vector<vector<float> > &stop_1l_babyAnalyzer::tftops_subjet_phi() {
+const vector<vector<float> > &StopTree::tftops_subjet_phi() {
   if (not tftops_subjet_phi_isLoaded) {
     if (tftops_subjet_phi_branch != 0) {
       tftops_subjet_phi_branch->GetEntry(index);
@@ -8155,7 +8156,7 @@ const vector<vector<float> > &stop_1l_babyAnalyzer::tftops_subjet_phi() {
   return *tftops_subjet_phi_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::jup_ak4pfjets_cvsl() {
+const vector<float> &StopTree::jup_ak4pfjets_cvsl() {
   if (not jup_ak4pfjets_cvsl_isLoaded) {
     if (jup_ak4pfjets_cvsl_branch != 0) {
       jup_ak4pfjets_cvsl_branch->GetEntry(index);
@@ -8168,7 +8169,7 @@ const vector<float> &stop_1l_babyAnalyzer::jup_ak4pfjets_cvsl() {
   return *jup_ak4pfjets_cvsl_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::jup_ak4pfjets_ptD() {
+const vector<float> &StopTree::jup_ak4pfjets_ptD() {
   if (not jup_ak4pfjets_ptD_isLoaded) {
     if (jup_ak4pfjets_ptD_branch != 0) {
       jup_ak4pfjets_ptD_branch->GetEntry(index);
@@ -8181,7 +8182,7 @@ const vector<float> &stop_1l_babyAnalyzer::jup_ak4pfjets_ptD() {
   return *jup_ak4pfjets_ptD_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::jup_ak4pfjets_axis1() {
+const vector<float> &StopTree::jup_ak4pfjets_axis1() {
   if (not jup_ak4pfjets_axis1_isLoaded) {
     if (jup_ak4pfjets_axis1_branch != 0) {
       jup_ak4pfjets_axis1_branch->GetEntry(index);
@@ -8194,7 +8195,7 @@ const vector<float> &stop_1l_babyAnalyzer::jup_ak4pfjets_axis1() {
   return *jup_ak4pfjets_axis1_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::jup_ak4pfjets_axis2() {
+const vector<float> &StopTree::jup_ak4pfjets_axis2() {
   if (not jup_ak4pfjets_axis2_isLoaded) {
     if (jup_ak4pfjets_axis2_branch != 0) {
       jup_ak4pfjets_axis2_branch->GetEntry(index);
@@ -8207,7 +8208,7 @@ const vector<float> &stop_1l_babyAnalyzer::jup_ak4pfjets_axis2() {
   return *jup_ak4pfjets_axis2_;
 }
 
-const vector<int> &stop_1l_babyAnalyzer::jup_ak4pfjets_mult() {
+const vector<int> &StopTree::jup_ak4pfjets_mult() {
   if (not jup_ak4pfjets_mult_isLoaded) {
     if (jup_ak4pfjets_mult_branch != 0) {
       jup_ak4pfjets_mult_branch->GetEntry(index);
@@ -8220,20 +8221,7 @@ const vector<int> &stop_1l_babyAnalyzer::jup_ak4pfjets_mult() {
   return *jup_ak4pfjets_mult_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::jup_ak4pfjets_csvbtag() {
-  if (not jup_ak4pfjets_csvbtag_isLoaded) {
-    if (jup_ak4pfjets_csvbtag_branch != 0) {
-      jup_ak4pfjets_csvbtag_branch->GetEntry(index);
-    } else {
-      printf("branch jup_ak4pfjets_csvbtag_branch does not exist!\n");
-      exit(1);
-    }
-    jup_ak4pfjets_csvbtag_isLoaded = true;
-  }
-  return *jup_ak4pfjets_csvbtag_;
-}
-
-const vector<float> &stop_1l_babyAnalyzer::jup_ak4pfjets_deepCSVb() {
+const vector<float> &StopTree::jup_ak4pfjets_deepCSVb() {
   if (not jup_ak4pfjets_deepCSVb_isLoaded) {
     if (jup_ak4pfjets_deepCSVb_branch != 0) {
       jup_ak4pfjets_deepCSVb_branch->GetEntry(index);
@@ -8246,7 +8234,7 @@ const vector<float> &stop_1l_babyAnalyzer::jup_ak4pfjets_deepCSVb() {
   return *jup_ak4pfjets_deepCSVb_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::jup_ak4pfjets_deepCSVbb() {
+const vector<float> &StopTree::jup_ak4pfjets_deepCSVbb() {
   if (not jup_ak4pfjets_deepCSVbb_isLoaded) {
     if (jup_ak4pfjets_deepCSVbb_branch != 0) {
       jup_ak4pfjets_deepCSVbb_branch->GetEntry(index);
@@ -8259,7 +8247,7 @@ const vector<float> &stop_1l_babyAnalyzer::jup_ak4pfjets_deepCSVbb() {
   return *jup_ak4pfjets_deepCSVbb_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::jup_ak4pfjets_deepCSVc() {
+const vector<float> &StopTree::jup_ak4pfjets_deepCSVc() {
   if (not jup_ak4pfjets_deepCSVc_isLoaded) {
     if (jup_ak4pfjets_deepCSVc_branch != 0) {
       jup_ak4pfjets_deepCSVc_branch->GetEntry(index);
@@ -8272,20 +8260,7 @@ const vector<float> &stop_1l_babyAnalyzer::jup_ak4pfjets_deepCSVc() {
   return *jup_ak4pfjets_deepCSVc_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::jup_ak4pfjets_deepCSVcc() {
-  if (not jup_ak4pfjets_deepCSVcc_isLoaded) {
-    if (jup_ak4pfjets_deepCSVcc_branch != 0) {
-      jup_ak4pfjets_deepCSVcc_branch->GetEntry(index);
-    } else {
-      printf("branch jup_ak4pfjets_deepCSVcc_branch does not exist!\n");
-      exit(1);
-    }
-    jup_ak4pfjets_deepCSVcc_isLoaded = true;
-  }
-  return *jup_ak4pfjets_deepCSVcc_;
-}
-
-const vector<float> &stop_1l_babyAnalyzer::jup_ak4pfjets_deepCSVl() {
+const vector<float> &StopTree::jup_ak4pfjets_deepCSVl() {
   if (not jup_ak4pfjets_deepCSVl_isLoaded) {
     if (jup_ak4pfjets_deepCSVl_branch != 0) {
       jup_ak4pfjets_deepCSVl_branch->GetEntry(index);
@@ -8298,7 +8273,7 @@ const vector<float> &stop_1l_babyAnalyzer::jup_ak4pfjets_deepCSVl() {
   return *jup_ak4pfjets_deepCSVl_;
 }
 
-const vector<vector<int> > &stop_1l_babyAnalyzer::jup_topcands_ak4idx() {
+const vector<vector<int> > &StopTree::jup_topcands_ak4idx() {
   if (not jup_topcands_ak4idx_isLoaded) {
     if (jup_topcands_ak4idx_branch != 0) {
       jup_topcands_ak4idx_branch->GetEntry(index);
@@ -8311,7 +8286,7 @@ const vector<vector<int> > &stop_1l_babyAnalyzer::jup_topcands_ak4idx() {
   return *jup_topcands_ak4idx_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::jup_topcands_disc() {
+const vector<float> &StopTree::jup_topcands_disc() {
   if (not jup_topcands_disc_isLoaded) {
     if (jup_topcands_disc_branch != 0) {
       jup_topcands_disc_branch->GetEntry(index);
@@ -8324,7 +8299,7 @@ const vector<float> &stop_1l_babyAnalyzer::jup_topcands_disc() {
   return *jup_topcands_disc_;
 }
 
-const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l_babyAnalyzer::jup_topcands_p4() {
+const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &StopTree::jup_topcands_p4() {
   if (not jup_topcands_p4_isLoaded) {
     if (jup_topcands_p4_branch != 0) {
       jup_topcands_p4_branch->GetEntry(index);
@@ -8337,7 +8312,7 @@ const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l
   return *jup_topcands_p4_;
 }
 
-const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l_babyAnalyzer::jup_topcands_Wp4() {
+const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &StopTree::jup_topcands_Wp4() {
   if (not jup_topcands_Wp4_isLoaded) {
     if (jup_topcands_Wp4_branch != 0) {
       jup_topcands_Wp4_branch->GetEntry(index);
@@ -8350,7 +8325,7 @@ const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l
   return *jup_topcands_Wp4_;
 }
 
-const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l_babyAnalyzer::jup_tftops_p4() {
+const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &StopTree::jup_tftops_p4() {
   if (not jup_tftops_p4_isLoaded) {
     if (jup_tftops_p4_branch != 0) {
       jup_tftops_p4_branch->GetEntry(index);
@@ -8363,7 +8338,7 @@ const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l
   return *jup_tftops_p4_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::jup_tftops_disc() {
+const vector<float> &StopTree::jup_tftops_disc() {
   if (not jup_tftops_disc_isLoaded) {
     if (jup_tftops_disc_branch != 0) {
       jup_tftops_disc_branch->GetEntry(index);
@@ -8376,7 +8351,7 @@ const vector<float> &stop_1l_babyAnalyzer::jup_tftops_disc() {
   return *jup_tftops_disc_;
 }
 
-const vector<vector<float> > &stop_1l_babyAnalyzer::jup_tftops_subjet_pt() {
+const vector<vector<float> > &StopTree::jup_tftops_subjet_pt() {
   if (not jup_tftops_subjet_pt_isLoaded) {
     if (jup_tftops_subjet_pt_branch != 0) {
       jup_tftops_subjet_pt_branch->GetEntry(index);
@@ -8389,7 +8364,7 @@ const vector<vector<float> > &stop_1l_babyAnalyzer::jup_tftops_subjet_pt() {
   return *jup_tftops_subjet_pt_;
 }
 
-const vector<vector<float> > &stop_1l_babyAnalyzer::jup_tftops_subjet_eta() {
+const vector<vector<float> > &StopTree::jup_tftops_subjet_eta() {
   if (not jup_tftops_subjet_eta_isLoaded) {
     if (jup_tftops_subjet_eta_branch != 0) {
       jup_tftops_subjet_eta_branch->GetEntry(index);
@@ -8402,7 +8377,7 @@ const vector<vector<float> > &stop_1l_babyAnalyzer::jup_tftops_subjet_eta() {
   return *jup_tftops_subjet_eta_;
 }
 
-const vector<vector<float> > &stop_1l_babyAnalyzer::jup_tftops_subjet_phi() {
+const vector<vector<float> > &StopTree::jup_tftops_subjet_phi() {
   if (not jup_tftops_subjet_phi_isLoaded) {
     if (jup_tftops_subjet_phi_branch != 0) {
       jup_tftops_subjet_phi_branch->GetEntry(index);
@@ -8415,7 +8390,7 @@ const vector<vector<float> > &stop_1l_babyAnalyzer::jup_tftops_subjet_phi() {
   return *jup_tftops_subjet_phi_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::jdown_ak4pfjets_cvsl() {
+const vector<float> &StopTree::jdown_ak4pfjets_cvsl() {
   if (not jdown_ak4pfjets_cvsl_isLoaded) {
     if (jdown_ak4pfjets_cvsl_branch != 0) {
       jdown_ak4pfjets_cvsl_branch->GetEntry(index);
@@ -8428,7 +8403,7 @@ const vector<float> &stop_1l_babyAnalyzer::jdown_ak4pfjets_cvsl() {
   return *jdown_ak4pfjets_cvsl_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::jdown_ak4pfjets_ptD() {
+const vector<float> &StopTree::jdown_ak4pfjets_ptD() {
   if (not jdown_ak4pfjets_ptD_isLoaded) {
     if (jdown_ak4pfjets_ptD_branch != 0) {
       jdown_ak4pfjets_ptD_branch->GetEntry(index);
@@ -8441,7 +8416,7 @@ const vector<float> &stop_1l_babyAnalyzer::jdown_ak4pfjets_ptD() {
   return *jdown_ak4pfjets_ptD_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::jdown_ak4pfjets_axis1() {
+const vector<float> &StopTree::jdown_ak4pfjets_axis1() {
   if (not jdown_ak4pfjets_axis1_isLoaded) {
     if (jdown_ak4pfjets_axis1_branch != 0) {
       jdown_ak4pfjets_axis1_branch->GetEntry(index);
@@ -8454,7 +8429,7 @@ const vector<float> &stop_1l_babyAnalyzer::jdown_ak4pfjets_axis1() {
   return *jdown_ak4pfjets_axis1_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::jdown_ak4pfjets_axis2() {
+const vector<float> &StopTree::jdown_ak4pfjets_axis2() {
   if (not jdown_ak4pfjets_axis2_isLoaded) {
     if (jdown_ak4pfjets_axis2_branch != 0) {
       jdown_ak4pfjets_axis2_branch->GetEntry(index);
@@ -8467,7 +8442,7 @@ const vector<float> &stop_1l_babyAnalyzer::jdown_ak4pfjets_axis2() {
   return *jdown_ak4pfjets_axis2_;
 }
 
-const vector<int> &stop_1l_babyAnalyzer::jdown_ak4pfjets_mult() {
+const vector<int> &StopTree::jdown_ak4pfjets_mult() {
   if (not jdown_ak4pfjets_mult_isLoaded) {
     if (jdown_ak4pfjets_mult_branch != 0) {
       jdown_ak4pfjets_mult_branch->GetEntry(index);
@@ -8480,20 +8455,7 @@ const vector<int> &stop_1l_babyAnalyzer::jdown_ak4pfjets_mult() {
   return *jdown_ak4pfjets_mult_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::jdown_ak4pfjets_csvbtag() {
-  if (not jdown_ak4pfjets_csvbtag_isLoaded) {
-    if (jdown_ak4pfjets_csvbtag_branch != 0) {
-      jdown_ak4pfjets_csvbtag_branch->GetEntry(index);
-    } else {
-      printf("branch jdown_ak4pfjets_csvbtag_branch does not exist!\n");
-      exit(1);
-    }
-    jdown_ak4pfjets_csvbtag_isLoaded = true;
-  }
-  return *jdown_ak4pfjets_csvbtag_;
-}
-
-const vector<float> &stop_1l_babyAnalyzer::jdown_ak4pfjets_deepCSVb() {
+const vector<float> &StopTree::jdown_ak4pfjets_deepCSVb() {
   if (not jdown_ak4pfjets_deepCSVb_isLoaded) {
     if (jdown_ak4pfjets_deepCSVb_branch != 0) {
       jdown_ak4pfjets_deepCSVb_branch->GetEntry(index);
@@ -8506,7 +8468,7 @@ const vector<float> &stop_1l_babyAnalyzer::jdown_ak4pfjets_deepCSVb() {
   return *jdown_ak4pfjets_deepCSVb_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::jdown_ak4pfjets_deepCSVbb() {
+const vector<float> &StopTree::jdown_ak4pfjets_deepCSVbb() {
   if (not jdown_ak4pfjets_deepCSVbb_isLoaded) {
     if (jdown_ak4pfjets_deepCSVbb_branch != 0) {
       jdown_ak4pfjets_deepCSVbb_branch->GetEntry(index);
@@ -8519,7 +8481,7 @@ const vector<float> &stop_1l_babyAnalyzer::jdown_ak4pfjets_deepCSVbb() {
   return *jdown_ak4pfjets_deepCSVbb_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::jdown_ak4pfjets_deepCSVc() {
+const vector<float> &StopTree::jdown_ak4pfjets_deepCSVc() {
   if (not jdown_ak4pfjets_deepCSVc_isLoaded) {
     if (jdown_ak4pfjets_deepCSVc_branch != 0) {
       jdown_ak4pfjets_deepCSVc_branch->GetEntry(index);
@@ -8532,20 +8494,7 @@ const vector<float> &stop_1l_babyAnalyzer::jdown_ak4pfjets_deepCSVc() {
   return *jdown_ak4pfjets_deepCSVc_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::jdown_ak4pfjets_deepCSVcc() {
-  if (not jdown_ak4pfjets_deepCSVcc_isLoaded) {
-    if (jdown_ak4pfjets_deepCSVcc_branch != 0) {
-      jdown_ak4pfjets_deepCSVcc_branch->GetEntry(index);
-    } else {
-      printf("branch jdown_ak4pfjets_deepCSVcc_branch does not exist!\n");
-      exit(1);
-    }
-    jdown_ak4pfjets_deepCSVcc_isLoaded = true;
-  }
-  return *jdown_ak4pfjets_deepCSVcc_;
-}
-
-const vector<float> &stop_1l_babyAnalyzer::jdown_ak4pfjets_deepCSVl() {
+const vector<float> &StopTree::jdown_ak4pfjets_deepCSVl() {
   if (not jdown_ak4pfjets_deepCSVl_isLoaded) {
     if (jdown_ak4pfjets_deepCSVl_branch != 0) {
       jdown_ak4pfjets_deepCSVl_branch->GetEntry(index);
@@ -8558,7 +8507,7 @@ const vector<float> &stop_1l_babyAnalyzer::jdown_ak4pfjets_deepCSVl() {
   return *jdown_ak4pfjets_deepCSVl_;
 }
 
-const vector<vector<int> > &stop_1l_babyAnalyzer::jdown_topcands_ak4idx() {
+const vector<vector<int> > &StopTree::jdown_topcands_ak4idx() {
   if (not jdown_topcands_ak4idx_isLoaded) {
     if (jdown_topcands_ak4idx_branch != 0) {
       jdown_topcands_ak4idx_branch->GetEntry(index);
@@ -8571,7 +8520,7 @@ const vector<vector<int> > &stop_1l_babyAnalyzer::jdown_topcands_ak4idx() {
   return *jdown_topcands_ak4idx_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::jdown_topcands_disc() {
+const vector<float> &StopTree::jdown_topcands_disc() {
   if (not jdown_topcands_disc_isLoaded) {
     if (jdown_topcands_disc_branch != 0) {
       jdown_topcands_disc_branch->GetEntry(index);
@@ -8584,7 +8533,7 @@ const vector<float> &stop_1l_babyAnalyzer::jdown_topcands_disc() {
   return *jdown_topcands_disc_;
 }
 
-const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l_babyAnalyzer::jdown_topcands_p4() {
+const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &StopTree::jdown_topcands_p4() {
   if (not jdown_topcands_p4_isLoaded) {
     if (jdown_topcands_p4_branch != 0) {
       jdown_topcands_p4_branch->GetEntry(index);
@@ -8597,7 +8546,7 @@ const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l
   return *jdown_topcands_p4_;
 }
 
-const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l_babyAnalyzer::jdown_topcands_Wp4() {
+const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &StopTree::jdown_topcands_Wp4() {
   if (not jdown_topcands_Wp4_isLoaded) {
     if (jdown_topcands_Wp4_branch != 0) {
       jdown_topcands_Wp4_branch->GetEntry(index);
@@ -8610,7 +8559,7 @@ const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l
   return *jdown_topcands_Wp4_;
 }
 
-const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l_babyAnalyzer::jdown_tftops_p4() {
+const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &StopTree::jdown_tftops_p4() {
   if (not jdown_tftops_p4_isLoaded) {
     if (jdown_tftops_p4_branch != 0) {
       jdown_tftops_p4_branch->GetEntry(index);
@@ -8623,7 +8572,7 @@ const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l
   return *jdown_tftops_p4_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::jdown_tftops_disc() {
+const vector<float> &StopTree::jdown_tftops_disc() {
   if (not jdown_tftops_disc_isLoaded) {
     if (jdown_tftops_disc_branch != 0) {
       jdown_tftops_disc_branch->GetEntry(index);
@@ -8636,7 +8585,7 @@ const vector<float> &stop_1l_babyAnalyzer::jdown_tftops_disc() {
   return *jdown_tftops_disc_;
 }
 
-const vector<vector<float> > &stop_1l_babyAnalyzer::jdown_tftops_subjet_pt() {
+const vector<vector<float> > &StopTree::jdown_tftops_subjet_pt() {
   if (not jdown_tftops_subjet_pt_isLoaded) {
     if (jdown_tftops_subjet_pt_branch != 0) {
       jdown_tftops_subjet_pt_branch->GetEntry(index);
@@ -8649,7 +8598,7 @@ const vector<vector<float> > &stop_1l_babyAnalyzer::jdown_tftops_subjet_pt() {
   return *jdown_tftops_subjet_pt_;
 }
 
-const vector<vector<float> > &stop_1l_babyAnalyzer::jdown_tftops_subjet_eta() {
+const vector<vector<float> > &StopTree::jdown_tftops_subjet_eta() {
   if (not jdown_tftops_subjet_eta_isLoaded) {
     if (jdown_tftops_subjet_eta_branch != 0) {
       jdown_tftops_subjet_eta_branch->GetEntry(index);
@@ -8662,7 +8611,7 @@ const vector<vector<float> > &stop_1l_babyAnalyzer::jdown_tftops_subjet_eta() {
   return *jdown_tftops_subjet_eta_;
 }
 
-const vector<vector<float> > &stop_1l_babyAnalyzer::jdown_tftops_subjet_phi() {
+const vector<vector<float> > &StopTree::jdown_tftops_subjet_phi() {
   if (not jdown_tftops_subjet_phi_isLoaded) {
     if (jdown_tftops_subjet_phi_branch != 0) {
       jdown_tftops_subjet_phi_branch->GetEntry(index);
@@ -8675,7 +8624,7 @@ const vector<vector<float> > &stop_1l_babyAnalyzer::jdown_tftops_subjet_phi() {
   return *jdown_tftops_subjet_phi_;
 }
 
-const vector<TString> &stop_1l_babyAnalyzer::tau_IDnames() {
+const vector<TString> &StopTree::tau_IDnames() {
   if (not tau_IDnames_isLoaded) {
     if (tau_IDnames_branch != 0) {
       tau_IDnames_branch->GetEntry(index);
@@ -8688,7 +8637,7 @@ const vector<TString> &stop_1l_babyAnalyzer::tau_IDnames() {
   return *tau_IDnames_;
 }
 
-const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l_babyAnalyzer::tau_leadtrack_p4() {
+const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &StopTree::tau_leadtrack_p4() {
   if (not tau_leadtrack_p4_isLoaded) {
     if (tau_leadtrack_p4_branch != 0) {
       tau_leadtrack_p4_branch->GetEntry(index);
@@ -8701,7 +8650,7 @@ const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l
   return *tau_leadtrack_p4_;
 }
 
-const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l_babyAnalyzer::tau_leadneutral_p4() {
+const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &StopTree::tau_leadneutral_p4() {
   if (not tau_leadneutral_p4_isLoaded) {
     if (tau_leadneutral_p4_branch != 0) {
       tau_leadneutral_p4_branch->GetEntry(index);
@@ -8714,7 +8663,7 @@ const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l
   return *tau_leadneutral_p4_;
 }
 
-const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l_babyAnalyzer::tau_p4() {
+const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &StopTree::tau_p4() {
   if (not tau_p4_isLoaded) {
     if (tau_p4_branch != 0) {
       tau_p4_branch->GetEntry(index);
@@ -8727,7 +8676,7 @@ const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l
   return *tau_p4_;
 }
 
-const vector<vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > > &stop_1l_babyAnalyzer::tau_isocand_p4() {
+const vector<vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > > &StopTree::tau_isocand_p4() {
   if (not tau_isocand_p4_isLoaded) {
     if (tau_isocand_p4_branch != 0) {
       tau_isocand_p4_branch->GetEntry(index);
@@ -8740,7 +8689,7 @@ const vector<vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > >
   return *tau_isocand_p4_;
 }
 
-const vector<vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > > &stop_1l_babyAnalyzer::tau_sigcand_p4() {
+const vector<vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > > &StopTree::tau_sigcand_p4() {
   if (not tau_sigcand_p4_isLoaded) {
     if (tau_sigcand_p4_branch != 0) {
       tau_sigcand_p4_branch->GetEntry(index);
@@ -8753,7 +8702,7 @@ const vector<vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > >
   return *tau_sigcand_p4_;
 }
 
-const vector<vector<float> > &stop_1l_babyAnalyzer::tau_ID() {
+const vector<vector<float> > &StopTree::tau_ID() {
   if (not tau_ID_isLoaded) {
     if (tau_ID_branch != 0) {
       tau_ID_branch->GetEntry(index);
@@ -8766,7 +8715,7 @@ const vector<vector<float> > &stop_1l_babyAnalyzer::tau_ID() {
   return *tau_ID_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::tau_passID() {
+const vector<float> &StopTree::tau_passID() {
   if (not tau_passID_isLoaded) {
     if (tau_passID_branch != 0) {
       tau_passID_branch->GetEntry(index);
@@ -8779,7 +8728,7 @@ const vector<float> &stop_1l_babyAnalyzer::tau_passID() {
   return *tau_passID_;
 }
 
-const int &stop_1l_babyAnalyzer::ngoodtaus() {
+const int &StopTree::ngoodtaus() {
   if (not ngoodtaus_isLoaded) {
     if (ngoodtaus_branch != 0) {
       ngoodtaus_branch->GetEntry(index);
@@ -8792,7 +8741,7 @@ const int &stop_1l_babyAnalyzer::ngoodtaus() {
   return ngoodtaus_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::tau_againstMuonTight() {
+const vector<float> &StopTree::tau_againstMuonTight() {
   if (not tau_againstMuonTight_isLoaded) {
     if (tau_againstMuonTight_branch != 0) {
       tau_againstMuonTight_branch->GetEntry(index);
@@ -8805,7 +8754,7 @@ const vector<float> &stop_1l_babyAnalyzer::tau_againstMuonTight() {
   return *tau_againstMuonTight_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::tau_againstElectronLoose() {
+const vector<float> &StopTree::tau_againstElectronLoose() {
   if (not tau_againstElectronLoose_isLoaded) {
     if (tau_againstElectronLoose_branch != 0) {
       tau_againstElectronLoose_branch->GetEntry(index);
@@ -8818,7 +8767,7 @@ const vector<float> &stop_1l_babyAnalyzer::tau_againstElectronLoose() {
   return *tau_againstElectronLoose_;
 }
 
-const vector<bool> &stop_1l_babyAnalyzer::tau_isVetoTau() {
+const vector<bool> &StopTree::tau_isVetoTau() {
   if (not tau_isVetoTau_isLoaded) {
     if (tau_isVetoTau_branch != 0) {
       tau_isVetoTau_branch->GetEntry(index);
@@ -8831,7 +8780,7 @@ const vector<bool> &stop_1l_babyAnalyzer::tau_isVetoTau() {
   return *tau_isVetoTau_;
 }
 
-const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l_babyAnalyzer::isoTracks_p4() {
+const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &StopTree::isoTracks_p4() {
   if (not isoTracks_p4_isLoaded) {
     if (isoTracks_p4_branch != 0) {
       isoTracks_p4_branch->GetEntry(index);
@@ -8844,7 +8793,7 @@ const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &stop_1l
   return *isoTracks_p4_;
 }
 
-const vector<int> &stop_1l_babyAnalyzer::isoTracks_charge() {
+const vector<int> &StopTree::isoTracks_charge() {
   if (not isoTracks_charge_isLoaded) {
     if (isoTracks_charge_branch != 0) {
       isoTracks_charge_branch->GetEntry(index);
@@ -8857,7 +8806,7 @@ const vector<int> &stop_1l_babyAnalyzer::isoTracks_charge() {
   return *isoTracks_charge_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::isoTracks_absIso() {
+const vector<float> &StopTree::isoTracks_absIso() {
   if (not isoTracks_absIso_isLoaded) {
     if (isoTracks_absIso_branch != 0) {
       isoTracks_absIso_branch->GetEntry(index);
@@ -8870,7 +8819,7 @@ const vector<float> &stop_1l_babyAnalyzer::isoTracks_absIso() {
   return *isoTracks_absIso_;
 }
 
-const vector<float> &stop_1l_babyAnalyzer::isoTracks_dz() {
+const vector<float> &StopTree::isoTracks_dz() {
   if (not isoTracks_dz_isLoaded) {
     if (isoTracks_dz_branch != 0) {
       isoTracks_dz_branch->GetEntry(index);
@@ -8883,7 +8832,7 @@ const vector<float> &stop_1l_babyAnalyzer::isoTracks_dz() {
   return *isoTracks_dz_;
 }
 
-const vector<int> &stop_1l_babyAnalyzer::isoTracks_pdgId() {
+const vector<int> &StopTree::isoTracks_pdgId() {
   if (not isoTracks_pdgId_isLoaded) {
     if (isoTracks_pdgId_branch != 0) {
       isoTracks_pdgId_branch->GetEntry(index);
@@ -8896,7 +8845,7 @@ const vector<int> &stop_1l_babyAnalyzer::isoTracks_pdgId() {
   return *isoTracks_pdgId_;
 }
 
-const vector<bool> &stop_1l_babyAnalyzer::isoTracks_isVetoTrack() {
+const vector<bool> &StopTree::isoTracks_isVetoTrack() {
   if (not isoTracks_isVetoTrack_isLoaded) {
     if (isoTracks_isVetoTrack_branch != 0) {
       isoTracks_isVetoTrack_branch->GetEntry(index);
@@ -8909,7 +8858,7 @@ const vector<bool> &stop_1l_babyAnalyzer::isoTracks_isVetoTrack() {
   return *isoTracks_isVetoTrack_;
 }
 
-const vector<bool> &stop_1l_babyAnalyzer::isoTracks_isVetoTrack_v2() {
+const vector<bool> &StopTree::isoTracks_isVetoTrack_v2() {
   if (not isoTracks_isVetoTrack_v2_isLoaded) {
     if (isoTracks_isVetoTrack_v2_branch != 0) {
       isoTracks_isVetoTrack_v2_branch->GetEntry(index);
@@ -8922,7 +8871,7 @@ const vector<bool> &stop_1l_babyAnalyzer::isoTracks_isVetoTrack_v2() {
   return *isoTracks_isVetoTrack_v2_;
 }
 
-const vector<bool> &stop_1l_babyAnalyzer::isoTracks_isVetoTrack_v3() {
+const vector<bool> &StopTree::isoTracks_isVetoTrack_v3() {
   if (not isoTracks_isVetoTrack_v3_isLoaded) {
     if (isoTracks_isVetoTrack_v3_branch != 0) {
       isoTracks_isVetoTrack_v3_branch->GetEntry(index);
@@ -8935,7 +8884,7 @@ const vector<bool> &stop_1l_babyAnalyzer::isoTracks_isVetoTrack_v3() {
   return *isoTracks_isVetoTrack_v3_;
 }
 
-const bool &stop_1l_babyAnalyzer::filt_cscbeamhalo() {
+const bool &StopTree::filt_cscbeamhalo() {
   if (not filt_cscbeamhalo_isLoaded) {
     if (filt_cscbeamhalo_branch != 0) {
       filt_cscbeamhalo_branch->GetEntry(index);
@@ -8948,7 +8897,7 @@ const bool &stop_1l_babyAnalyzer::filt_cscbeamhalo() {
   return filt_cscbeamhalo_;
 }
 
-const bool &stop_1l_babyAnalyzer::filt_cscbeamhalo2015() {
+const bool &StopTree::filt_cscbeamhalo2015() {
   if (not filt_cscbeamhalo2015_isLoaded) {
     if (filt_cscbeamhalo2015_branch != 0) {
       filt_cscbeamhalo2015_branch->GetEntry(index);
@@ -8961,7 +8910,7 @@ const bool &stop_1l_babyAnalyzer::filt_cscbeamhalo2015() {
   return filt_cscbeamhalo2015_;
 }
 
-const bool &stop_1l_babyAnalyzer::filt_globaltighthalo2016() {
+const bool &StopTree::filt_globaltighthalo2016() {
   if (not filt_globaltighthalo2016_isLoaded) {
     if (filt_globaltighthalo2016_branch != 0) {
       filt_globaltighthalo2016_branch->GetEntry(index);
@@ -8974,7 +8923,7 @@ const bool &stop_1l_babyAnalyzer::filt_globaltighthalo2016() {
   return filt_globaltighthalo2016_;
 }
 
-const bool &stop_1l_babyAnalyzer::filt_globalsupertighthalo2016() {
+const bool &StopTree::filt_globalsupertighthalo2016() {
   if (not filt_globalsupertighthalo2016_isLoaded) {
     if (filt_globalsupertighthalo2016_branch != 0) {
       filt_globalsupertighthalo2016_branch->GetEntry(index);
@@ -8987,7 +8936,7 @@ const bool &stop_1l_babyAnalyzer::filt_globalsupertighthalo2016() {
   return filt_globalsupertighthalo2016_;
 }
 
-const bool &stop_1l_babyAnalyzer::filt_ecallaser() {
+const bool &StopTree::filt_ecallaser() {
   if (not filt_ecallaser_isLoaded) {
     if (filt_ecallaser_branch != 0) {
       filt_ecallaser_branch->GetEntry(index);
@@ -9000,7 +8949,7 @@ const bool &stop_1l_babyAnalyzer::filt_ecallaser() {
   return filt_ecallaser_;
 }
 
-const bool &stop_1l_babyAnalyzer::filt_ecaltp() {
+const bool &StopTree::filt_ecaltp() {
   if (not filt_ecaltp_isLoaded) {
     if (filt_ecaltp_branch != 0) {
       filt_ecaltp_branch->GetEntry(index);
@@ -9013,7 +8962,7 @@ const bool &stop_1l_babyAnalyzer::filt_ecaltp() {
   return filt_ecaltp_;
 }
 
-const bool &stop_1l_babyAnalyzer::filt_ecalbadcalib() {
+const bool &StopTree::filt_ecalbadcalib() {
   if (not filt_ecalbadcalib_isLoaded) {
     if (filt_ecalbadcalib_branch != 0) {
       filt_ecalbadcalib_branch->GetEntry(index);
@@ -9026,7 +8975,7 @@ const bool &stop_1l_babyAnalyzer::filt_ecalbadcalib() {
   return filt_ecalbadcalib_;
 }
 
-const bool &stop_1l_babyAnalyzer::filt_eebadsc() {
+const bool &StopTree::filt_eebadsc() {
   if (not filt_eebadsc_isLoaded) {
     if (filt_eebadsc_branch != 0) {
       filt_eebadsc_branch->GetEntry(index);
@@ -9039,7 +8988,7 @@ const bool &stop_1l_babyAnalyzer::filt_eebadsc() {
   return filt_eebadsc_;
 }
 
-const bool &stop_1l_babyAnalyzer::filt_goodvtx() {
+const bool &StopTree::filt_goodvtx() {
   if (not filt_goodvtx_isLoaded) {
     if (filt_goodvtx_branch != 0) {
       filt_goodvtx_branch->GetEntry(index);
@@ -9052,7 +9001,7 @@ const bool &stop_1l_babyAnalyzer::filt_goodvtx() {
   return filt_goodvtx_;
 }
 
-const bool &stop_1l_babyAnalyzer::filt_badevents() {
+const bool &StopTree::filt_badevents() {
   if (not filt_badevents_isLoaded) {
     if (filt_badevents_branch != 0) {
       filt_badevents_branch->GetEntry(index);
@@ -9065,7 +9014,7 @@ const bool &stop_1l_babyAnalyzer::filt_badevents() {
   return filt_badevents_;
 }
 
-const bool &stop_1l_babyAnalyzer::filt_hbhenoise() {
+const bool &StopTree::filt_hbhenoise() {
   if (not filt_hbhenoise_isLoaded) {
     if (filt_hbhenoise_branch != 0) {
       filt_hbhenoise_branch->GetEntry(index);
@@ -9078,7 +9027,7 @@ const bool &stop_1l_babyAnalyzer::filt_hbhenoise() {
   return filt_hbhenoise_;
 }
 
-const bool &stop_1l_babyAnalyzer::filt_hbheisonoise() {
+const bool &StopTree::filt_hbheisonoise() {
   if (not filt_hbheisonoise_isLoaded) {
     if (filt_hbheisonoise_branch != 0) {
       filt_hbheisonoise_branch->GetEntry(index);
@@ -9091,7 +9040,7 @@ const bool &stop_1l_babyAnalyzer::filt_hbheisonoise() {
   return filt_hbheisonoise_;
 }
 
-const bool &stop_1l_babyAnalyzer::filt_hcallaser() {
+const bool &StopTree::filt_hcallaser() {
   if (not filt_hcallaser_isLoaded) {
     if (filt_hcallaser_branch != 0) {
       filt_hcallaser_branch->GetEntry(index);
@@ -9104,7 +9053,7 @@ const bool &stop_1l_babyAnalyzer::filt_hcallaser() {
   return filt_hcallaser_;
 }
 
-const bool &stop_1l_babyAnalyzer::filt_trkfail() {
+const bool &StopTree::filt_trkfail() {
   if (not filt_trkfail_isLoaded) {
     if (filt_trkfail_branch != 0) {
       filt_trkfail_branch->GetEntry(index);
@@ -9117,7 +9066,7 @@ const bool &stop_1l_babyAnalyzer::filt_trkfail() {
   return filt_trkfail_;
 }
 
-const bool &stop_1l_babyAnalyzer::filt_trkPOG() {
+const bool &StopTree::filt_trkPOG() {
   if (not filt_trkPOG_isLoaded) {
     if (filt_trkPOG_branch != 0) {
       filt_trkPOG_branch->GetEntry(index);
@@ -9130,7 +9079,7 @@ const bool &stop_1l_babyAnalyzer::filt_trkPOG() {
   return filt_trkPOG_;
 }
 
-const bool &stop_1l_babyAnalyzer::filt_trkPOG_logerr_tmc() {
+const bool &StopTree::filt_trkPOG_logerr_tmc() {
   if (not filt_trkPOG_logerr_tmc_isLoaded) {
     if (filt_trkPOG_logerr_tmc_branch != 0) {
       filt_trkPOG_logerr_tmc_branch->GetEntry(index);
@@ -9143,7 +9092,7 @@ const bool &stop_1l_babyAnalyzer::filt_trkPOG_logerr_tmc() {
   return filt_trkPOG_logerr_tmc_;
 }
 
-const bool &stop_1l_babyAnalyzer::filt_trkPOG_tmc() {
+const bool &StopTree::filt_trkPOG_tmc() {
   if (not filt_trkPOG_tmc_isLoaded) {
     if (filt_trkPOG_tmc_branch != 0) {
       filt_trkPOG_tmc_branch->GetEntry(index);
@@ -9156,7 +9105,7 @@ const bool &stop_1l_babyAnalyzer::filt_trkPOG_tmc() {
   return filt_trkPOG_tmc_;
 }
 
-const bool &stop_1l_babyAnalyzer::filt_trkPOG_tms() {
+const bool &StopTree::filt_trkPOG_tms() {
   if (not filt_trkPOG_tms_isLoaded) {
     if (filt_trkPOG_tms_branch != 0) {
       filt_trkPOG_tms_branch->GetEntry(index);
@@ -9169,7 +9118,7 @@ const bool &stop_1l_babyAnalyzer::filt_trkPOG_tms() {
   return filt_trkPOG_tms_;
 }
 
-const int &stop_1l_babyAnalyzer::firstGoodVtxIdx() {
+const int &StopTree::firstGoodVtxIdx() {
   if (not firstGoodVtxIdx_isLoaded) {
     if (firstGoodVtxIdx_branch != 0) {
       firstGoodVtxIdx_branch->GetEntry(index);
@@ -9182,7 +9131,7 @@ const int &stop_1l_babyAnalyzer::firstGoodVtxIdx() {
   return firstGoodVtxIdx_;
 }
 
-const bool &stop_1l_babyAnalyzer::filt_badChargedCandidateFilter() {
+const bool &StopTree::filt_badChargedCandidateFilter() {
   if (not filt_badChargedCandidateFilter_isLoaded) {
     if (filt_badChargedCandidateFilter_branch != 0) {
       filt_badChargedCandidateFilter_branch->GetEntry(index);
@@ -9195,7 +9144,7 @@ const bool &stop_1l_babyAnalyzer::filt_badChargedCandidateFilter() {
   return filt_badChargedCandidateFilter_;
 }
 
-const bool &stop_1l_babyAnalyzer::filt_badMuonFilter() {
+const bool &StopTree::filt_badMuonFilter() {
   if (not filt_badMuonFilter_isLoaded) {
     if (filt_badMuonFilter_branch != 0) {
       filt_badMuonFilter_branch->GetEntry(index);
@@ -9208,7 +9157,7 @@ const bool &stop_1l_babyAnalyzer::filt_badMuonFilter() {
   return filt_badMuonFilter_;
 }
 
-const bool &stop_1l_babyAnalyzer::filt_met() {
+const bool &StopTree::filt_met() {
   if (not filt_met_isLoaded) {
     if (filt_met_branch != 0) {
       filt_met_branch->GetEntry(index);
@@ -9221,7 +9170,7 @@ const bool &stop_1l_babyAnalyzer::filt_met() {
   return filt_met_;
 }
 
-const bool &stop_1l_babyAnalyzer::filt_fastsimjets() {
+const bool &StopTree::filt_fastsimjets() {
   if (not filt_fastsimjets_isLoaded) {
     if (filt_fastsimjets_branch != 0) {
       filt_fastsimjets_branch->GetEntry(index);
@@ -9234,7 +9183,7 @@ const bool &stop_1l_babyAnalyzer::filt_fastsimjets() {
   return filt_fastsimjets_;
 }
 
-const bool &stop_1l_babyAnalyzer::filt_fastsimjets_jup() {
+const bool &StopTree::filt_fastsimjets_jup() {
   if (not filt_fastsimjets_jup_isLoaded) {
     if (filt_fastsimjets_jup_branch != 0) {
       filt_fastsimjets_jup_branch->GetEntry(index);
@@ -9247,7 +9196,7 @@ const bool &stop_1l_babyAnalyzer::filt_fastsimjets_jup() {
   return filt_fastsimjets_jup_;
 }
 
-const bool &stop_1l_babyAnalyzer::filt_fastsimjets_jdown() {
+const bool &StopTree::filt_fastsimjets_jdown() {
   if (not filt_fastsimjets_jdown_isLoaded) {
     if (filt_fastsimjets_jdown_branch != 0) {
       filt_fastsimjets_jdown_branch->GetEntry(index);
@@ -9260,7 +9209,7 @@ const bool &stop_1l_babyAnalyzer::filt_fastsimjets_jdown() {
   return filt_fastsimjets_jdown_;
 }
 
-const bool &stop_1l_babyAnalyzer::filt_jetWithBadMuon() {
+const bool &StopTree::filt_jetWithBadMuon() {
   if (not filt_jetWithBadMuon_isLoaded) {
     if (filt_jetWithBadMuon_branch != 0) {
       filt_jetWithBadMuon_branch->GetEntry(index);
@@ -9273,7 +9222,7 @@ const bool &stop_1l_babyAnalyzer::filt_jetWithBadMuon() {
   return filt_jetWithBadMuon_;
 }
 
-const bool &stop_1l_babyAnalyzer::filt_jetWithBadMuon_jup() {
+const bool &StopTree::filt_jetWithBadMuon_jup() {
   if (not filt_jetWithBadMuon_jup_isLoaded) {
     if (filt_jetWithBadMuon_jup_branch != 0) {
       filt_jetWithBadMuon_jup_branch->GetEntry(index);
@@ -9286,7 +9235,7 @@ const bool &stop_1l_babyAnalyzer::filt_jetWithBadMuon_jup() {
   return filt_jetWithBadMuon_jup_;
 }
 
-const bool &stop_1l_babyAnalyzer::filt_jetWithBadMuon_jdown() {
+const bool &StopTree::filt_jetWithBadMuon_jdown() {
   if (not filt_jetWithBadMuon_jdown_isLoaded) {
     if (filt_jetWithBadMuon_jdown_branch != 0) {
       filt_jetWithBadMuon_jdown_branch->GetEntry(index);
@@ -9299,7 +9248,7 @@ const bool &stop_1l_babyAnalyzer::filt_jetWithBadMuon_jdown() {
   return filt_jetWithBadMuon_jdown_;
 }
 
-const bool &stop_1l_babyAnalyzer::filt_pfovercalomet() {
+const bool &StopTree::filt_pfovercalomet() {
   if (not filt_pfovercalomet_isLoaded) {
     if (filt_pfovercalomet_branch != 0) {
       filt_pfovercalomet_branch->GetEntry(index);
@@ -9312,7 +9261,7 @@ const bool &stop_1l_babyAnalyzer::filt_pfovercalomet() {
   return filt_pfovercalomet_;
 }
 
-const bool &stop_1l_babyAnalyzer::filt_badmuons() {
+const bool &StopTree::filt_badmuons() {
   if (not filt_badmuons_isLoaded) {
     if (filt_badmuons_branch != 0) {
       filt_badmuons_branch->GetEntry(index);
@@ -9325,7 +9274,7 @@ const bool &stop_1l_babyAnalyzer::filt_badmuons() {
   return filt_badmuons_;
 }
 
-const bool &stop_1l_babyAnalyzer::filt_duplicatemuons() {
+const bool &StopTree::filt_duplicatemuons() {
   if (not filt_duplicatemuons_isLoaded) {
     if (filt_duplicatemuons_branch != 0) {
       filt_duplicatemuons_branch->GetEntry(index);
@@ -9338,7 +9287,7 @@ const bool &stop_1l_babyAnalyzer::filt_duplicatemuons() {
   return filt_duplicatemuons_;
 }
 
-const bool &stop_1l_babyAnalyzer::filt_nobadmuons() {
+const bool &StopTree::filt_nobadmuons() {
   if (not filt_nobadmuons_isLoaded) {
     if (filt_nobadmuons_branch != 0) {
       filt_nobadmuons_branch->GetEntry(index);
@@ -9352,7 +9301,7 @@ const bool &stop_1l_babyAnalyzer::filt_nobadmuons() {
 }
 
 
-void stop_1l_babyAnalyzer::progress( int nEventsTotal, int nEventsChain ){
+void StopTree::progress( int nEventsTotal, int nEventsChain ){
   int period = 1000;
   if (nEventsTotal%1000 == 0) {
     // xterm magic from L. Vacavant and A. Cerri
@@ -9372,7 +9321,7 @@ void stop_1l_babyAnalyzer::progress( int nEventsTotal, int nEventsChain ){
   }
 }
 
-namespace stop_1l {
+namespace stop1l {
 
 const unsigned int &run() { return babyAnalyzer.run(); }
 const unsigned int &ls() { return babyAnalyzer.ls(); }
@@ -9426,18 +9375,21 @@ const int &is1lepFromW() { return babyAnalyzer.is1lepFromW(); }
 const int &is1lepFromTop() { return babyAnalyzer.is1lepFromTop(); }
 const float &MT2W() { return babyAnalyzer.MT2W(); }
 const float &MT2W_rl() { return babyAnalyzer.MT2W_rl(); }
+const float &MT2_ll() { return babyAnalyzer.MT2_ll(); }
 const float &mindphi_met_j1_j2() { return babyAnalyzer.mindphi_met_j1_j2(); }
 const float &mindphi_met_j1_j2_rl() { return babyAnalyzer.mindphi_met_j1_j2_rl(); }
 const float &mt_met_lep() { return babyAnalyzer.mt_met_lep(); }
 const float &mt_met_lep_rl() { return babyAnalyzer.mt_met_lep_rl(); }
 const float &MT2W_jup() { return babyAnalyzer.MT2W_jup(); }
 const float &MT2W_rl_jup() { return babyAnalyzer.MT2W_rl_jup(); }
+const float &MT2_ll_jup() { return babyAnalyzer.MT2_ll_jup(); }
 const float &mindphi_met_j1_j2_jup() { return babyAnalyzer.mindphi_met_j1_j2_jup(); }
 const float &mindphi_met_j1_j2_rl_jup() { return babyAnalyzer.mindphi_met_j1_j2_rl_jup(); }
 const float &mt_met_lep_jup() { return babyAnalyzer.mt_met_lep_jup(); }
 const float &mt_met_lep_rl_jup() { return babyAnalyzer.mt_met_lep_rl_jup(); }
 const float &MT2W_jdown() { return babyAnalyzer.MT2W_jdown(); }
 const float &MT2W_rl_jdown() { return babyAnalyzer.MT2W_rl_jdown(); }
+const float &MT2_ll_jdown() { return babyAnalyzer.MT2_ll_jdown(); }
 const float &mindphi_met_j1_j2_jdown() { return babyAnalyzer.mindphi_met_j1_j2_jdown(); }
 const float &mindphi_met_j1_j2_rl_jdown() { return babyAnalyzer.mindphi_met_j1_j2_rl_jdown(); }
 const float &mt_met_lep_jdown() { return babyAnalyzer.mt_met_lep_jdown(); }
@@ -9816,11 +9768,9 @@ const vector<float> &ak4pfjets_ptD() { return babyAnalyzer.ak4pfjets_ptD(); }
 const vector<float> &ak4pfjets_axis1() { return babyAnalyzer.ak4pfjets_axis1(); }
 const vector<float> &ak4pfjets_axis2() { return babyAnalyzer.ak4pfjets_axis2(); }
 const vector<int> &ak4pfjets_mult() { return babyAnalyzer.ak4pfjets_mult(); }
-const vector<float> &ak4pfjets_csvbtag() { return babyAnalyzer.ak4pfjets_csvbtag(); }
 const vector<float> &ak4pfjets_deepCSVb() { return babyAnalyzer.ak4pfjets_deepCSVb(); }
 const vector<float> &ak4pfjets_deepCSVbb() { return babyAnalyzer.ak4pfjets_deepCSVbb(); }
 const vector<float> &ak4pfjets_deepCSVc() { return babyAnalyzer.ak4pfjets_deepCSVc(); }
-const vector<float> &ak4pfjets_deepCSVcc() { return babyAnalyzer.ak4pfjets_deepCSVcc(); }
 const vector<float> &ak4pfjets_deepCSVl() { return babyAnalyzer.ak4pfjets_deepCSVl(); }
 const vector<vector<int> > &topcands_ak4idx() { return babyAnalyzer.topcands_ak4idx(); }
 const vector<float> &topcands_disc() { return babyAnalyzer.topcands_disc(); }
@@ -9836,11 +9786,9 @@ const vector<float> &jup_ak4pfjets_ptD() { return babyAnalyzer.jup_ak4pfjets_ptD
 const vector<float> &jup_ak4pfjets_axis1() { return babyAnalyzer.jup_ak4pfjets_axis1(); }
 const vector<float> &jup_ak4pfjets_axis2() { return babyAnalyzer.jup_ak4pfjets_axis2(); }
 const vector<int> &jup_ak4pfjets_mult() { return babyAnalyzer.jup_ak4pfjets_mult(); }
-const vector<float> &jup_ak4pfjets_csvbtag() { return babyAnalyzer.jup_ak4pfjets_csvbtag(); }
 const vector<float> &jup_ak4pfjets_deepCSVb() { return babyAnalyzer.jup_ak4pfjets_deepCSVb(); }
 const vector<float> &jup_ak4pfjets_deepCSVbb() { return babyAnalyzer.jup_ak4pfjets_deepCSVbb(); }
 const vector<float> &jup_ak4pfjets_deepCSVc() { return babyAnalyzer.jup_ak4pfjets_deepCSVc(); }
-const vector<float> &jup_ak4pfjets_deepCSVcc() { return babyAnalyzer.jup_ak4pfjets_deepCSVcc(); }
 const vector<float> &jup_ak4pfjets_deepCSVl() { return babyAnalyzer.jup_ak4pfjets_deepCSVl(); }
 const vector<vector<int> > &jup_topcands_ak4idx() { return babyAnalyzer.jup_topcands_ak4idx(); }
 const vector<float> &jup_topcands_disc() { return babyAnalyzer.jup_topcands_disc(); }
@@ -9856,11 +9804,9 @@ const vector<float> &jdown_ak4pfjets_ptD() { return babyAnalyzer.jdown_ak4pfjets
 const vector<float> &jdown_ak4pfjets_axis1() { return babyAnalyzer.jdown_ak4pfjets_axis1(); }
 const vector<float> &jdown_ak4pfjets_axis2() { return babyAnalyzer.jdown_ak4pfjets_axis2(); }
 const vector<int> &jdown_ak4pfjets_mult() { return babyAnalyzer.jdown_ak4pfjets_mult(); }
-const vector<float> &jdown_ak4pfjets_csvbtag() { return babyAnalyzer.jdown_ak4pfjets_csvbtag(); }
 const vector<float> &jdown_ak4pfjets_deepCSVb() { return babyAnalyzer.jdown_ak4pfjets_deepCSVb(); }
 const vector<float> &jdown_ak4pfjets_deepCSVbb() { return babyAnalyzer.jdown_ak4pfjets_deepCSVbb(); }
 const vector<float> &jdown_ak4pfjets_deepCSVc() { return babyAnalyzer.jdown_ak4pfjets_deepCSVc(); }
-const vector<float> &jdown_ak4pfjets_deepCSVcc() { return babyAnalyzer.jdown_ak4pfjets_deepCSVcc(); }
 const vector<float> &jdown_ak4pfjets_deepCSVl() { return babyAnalyzer.jdown_ak4pfjets_deepCSVl(); }
 const vector<vector<int> > &jdown_topcands_ak4idx() { return babyAnalyzer.jdown_topcands_ak4idx(); }
 const vector<float> &jdown_topcands_disc() { return babyAnalyzer.jdown_topcands_disc(); }

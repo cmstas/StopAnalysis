@@ -1,9 +1,9 @@
 // -*- C++ -*-
 // This is a header file generated with the command:
-// makeCMS3ClassFiles("/home/users/sicheng/working/StopAnalysis/StopBabyMaker/stopbaby_4.root", "t", "stop_1l_babyAnalyzer", "stop_1l", "babyAnalyzer")
+// makeCMS3ClassFiles("/home/users/sicheng/working/StopAnalysis/StopBabyMaker/stopbaby_9.root", "t", "StopTree", "stop1l", "babyAnalyzer")
 
-#ifndef stop_1l_babyAnalyzer_H
-#define stop_1l_babyAnalyzer_H
+#ifndef StopTree_H
+#define StopTree_H
 
 #include "Math/LorentzVector.h"
 #include "Math/Point3D.h"
@@ -18,7 +18,7 @@
 typedef ROOT::Math::LorentzVector< ROOT::Math::PxPyPzE4D<float> > LorentzVector;
 
 using namespace std; 
-class stop_1l_babyAnalyzer {
+class StopTree {
  private: 
  protected: 
   unsigned int index;
@@ -178,6 +178,9 @@ class stop_1l_babyAnalyzer {
   float    MT2W_rl_;
   TBranch *MT2W_rl_branch;
   bool     MT2W_rl_isLoaded;
+  float    MT2_ll_;
+  TBranch *MT2_ll_branch;
+  bool     MT2_ll_isLoaded;
   float    mindphi_met_j1_j2_;
   TBranch *mindphi_met_j1_j2_branch;
   bool     mindphi_met_j1_j2_isLoaded;
@@ -196,6 +199,9 @@ class stop_1l_babyAnalyzer {
   float    MT2W_rl_jup_;
   TBranch *MT2W_rl_jup_branch;
   bool     MT2W_rl_jup_isLoaded;
+  float    MT2_ll_jup_;
+  TBranch *MT2_ll_jup_branch;
+  bool     MT2_ll_jup_isLoaded;
   float    mindphi_met_j1_j2_jup_;
   TBranch *mindphi_met_j1_j2_jup_branch;
   bool     mindphi_met_j1_j2_jup_isLoaded;
@@ -214,6 +220,9 @@ class stop_1l_babyAnalyzer {
   float    MT2W_rl_jdown_;
   TBranch *MT2W_rl_jdown_branch;
   bool     MT2W_rl_jdown_isLoaded;
+  float    MT2_ll_jdown_;
+  TBranch *MT2_ll_jdown_branch;
+  bool     MT2_ll_jdown_isLoaded;
   float    mindphi_met_j1_j2_jdown_;
   TBranch *mindphi_met_j1_j2_jdown_branch;
   bool     mindphi_met_j1_j2_jdown_isLoaded;
@@ -1348,9 +1357,6 @@ class stop_1l_babyAnalyzer {
   vector<int> *ak4pfjets_mult_;
   TBranch *ak4pfjets_mult_branch;
   bool     ak4pfjets_mult_isLoaded;
-  vector<float> *ak4pfjets_csvbtag_;
-  TBranch *ak4pfjets_csvbtag_branch;
-  bool     ak4pfjets_csvbtag_isLoaded;
   vector<float> *ak4pfjets_deepCSVb_;
   TBranch *ak4pfjets_deepCSVb_branch;
   bool     ak4pfjets_deepCSVb_isLoaded;
@@ -1360,9 +1366,6 @@ class stop_1l_babyAnalyzer {
   vector<float> *ak4pfjets_deepCSVc_;
   TBranch *ak4pfjets_deepCSVc_branch;
   bool     ak4pfjets_deepCSVc_isLoaded;
-  vector<float> *ak4pfjets_deepCSVcc_;
-  TBranch *ak4pfjets_deepCSVcc_branch;
-  bool     ak4pfjets_deepCSVcc_isLoaded;
   vector<float> *ak4pfjets_deepCSVl_;
   TBranch *ak4pfjets_deepCSVl_branch;
   bool     ak4pfjets_deepCSVl_isLoaded;
@@ -1408,9 +1411,6 @@ class stop_1l_babyAnalyzer {
   vector<int> *jup_ak4pfjets_mult_;
   TBranch *jup_ak4pfjets_mult_branch;
   bool     jup_ak4pfjets_mult_isLoaded;
-  vector<float> *jup_ak4pfjets_csvbtag_;
-  TBranch *jup_ak4pfjets_csvbtag_branch;
-  bool     jup_ak4pfjets_csvbtag_isLoaded;
   vector<float> *jup_ak4pfjets_deepCSVb_;
   TBranch *jup_ak4pfjets_deepCSVb_branch;
   bool     jup_ak4pfjets_deepCSVb_isLoaded;
@@ -1420,9 +1420,6 @@ class stop_1l_babyAnalyzer {
   vector<float> *jup_ak4pfjets_deepCSVc_;
   TBranch *jup_ak4pfjets_deepCSVc_branch;
   bool     jup_ak4pfjets_deepCSVc_isLoaded;
-  vector<float> *jup_ak4pfjets_deepCSVcc_;
-  TBranch *jup_ak4pfjets_deepCSVcc_branch;
-  bool     jup_ak4pfjets_deepCSVcc_isLoaded;
   vector<float> *jup_ak4pfjets_deepCSVl_;
   TBranch *jup_ak4pfjets_deepCSVl_branch;
   bool     jup_ak4pfjets_deepCSVl_isLoaded;
@@ -1468,9 +1465,6 @@ class stop_1l_babyAnalyzer {
   vector<int> *jdown_ak4pfjets_mult_;
   TBranch *jdown_ak4pfjets_mult_branch;
   bool     jdown_ak4pfjets_mult_isLoaded;
-  vector<float> *jdown_ak4pfjets_csvbtag_;
-  TBranch *jdown_ak4pfjets_csvbtag_branch;
-  bool     jdown_ak4pfjets_csvbtag_isLoaded;
   vector<float> *jdown_ak4pfjets_deepCSVb_;
   TBranch *jdown_ak4pfjets_deepCSVb_branch;
   bool     jdown_ak4pfjets_deepCSVb_isLoaded;
@@ -1480,9 +1474,6 @@ class stop_1l_babyAnalyzer {
   vector<float> *jdown_ak4pfjets_deepCSVc_;
   TBranch *jdown_ak4pfjets_deepCSVc_branch;
   bool     jdown_ak4pfjets_deepCSVc_isLoaded;
-  vector<float> *jdown_ak4pfjets_deepCSVcc_;
-  TBranch *jdown_ak4pfjets_deepCSVcc_branch;
-  bool     jdown_ak4pfjets_deepCSVcc_isLoaded;
   vector<float> *jdown_ak4pfjets_deepCSVl_;
   TBranch *jdown_ak4pfjets_deepCSVl_branch;
   bool     jdown_ak4pfjets_deepCSVl_isLoaded;
@@ -1725,18 +1716,21 @@ void LoadAllBranches();
   const int &is1lepFromTop();
   const float &MT2W();
   const float &MT2W_rl();
+  const float &MT2_ll();
   const float &mindphi_met_j1_j2();
   const float &mindphi_met_j1_j2_rl();
   const float &mt_met_lep();
   const float &mt_met_lep_rl();
   const float &MT2W_jup();
   const float &MT2W_rl_jup();
+  const float &MT2_ll_jup();
   const float &mindphi_met_j1_j2_jup();
   const float &mindphi_met_j1_j2_rl_jup();
   const float &mt_met_lep_jup();
   const float &mt_met_lep_rl_jup();
   const float &MT2W_jdown();
   const float &MT2W_rl_jdown();
+  const float &MT2_ll_jdown();
   const float &mindphi_met_j1_j2_jdown();
   const float &mindphi_met_j1_j2_rl_jdown();
   const float &mt_met_lep_jdown();
@@ -2115,11 +2109,9 @@ void LoadAllBranches();
   const vector<float> &ak4pfjets_axis1();
   const vector<float> &ak4pfjets_axis2();
   const vector<int> &ak4pfjets_mult();
-  const vector<float> &ak4pfjets_csvbtag();
   const vector<float> &ak4pfjets_deepCSVb();
   const vector<float> &ak4pfjets_deepCSVbb();
   const vector<float> &ak4pfjets_deepCSVc();
-  const vector<float> &ak4pfjets_deepCSVcc();
   const vector<float> &ak4pfjets_deepCSVl();
   const vector<vector<int> > &topcands_ak4idx();
   const vector<float> &topcands_disc();
@@ -2135,11 +2127,9 @@ void LoadAllBranches();
   const vector<float> &jup_ak4pfjets_axis1();
   const vector<float> &jup_ak4pfjets_axis2();
   const vector<int> &jup_ak4pfjets_mult();
-  const vector<float> &jup_ak4pfjets_csvbtag();
   const vector<float> &jup_ak4pfjets_deepCSVb();
   const vector<float> &jup_ak4pfjets_deepCSVbb();
   const vector<float> &jup_ak4pfjets_deepCSVc();
-  const vector<float> &jup_ak4pfjets_deepCSVcc();
   const vector<float> &jup_ak4pfjets_deepCSVl();
   const vector<vector<int> > &jup_topcands_ak4idx();
   const vector<float> &jup_topcands_disc();
@@ -2155,11 +2145,9 @@ void LoadAllBranches();
   const vector<float> &jdown_ak4pfjets_axis1();
   const vector<float> &jdown_ak4pfjets_axis2();
   const vector<int> &jdown_ak4pfjets_mult();
-  const vector<float> &jdown_ak4pfjets_csvbtag();
   const vector<float> &jdown_ak4pfjets_deepCSVb();
   const vector<float> &jdown_ak4pfjets_deepCSVbb();
   const vector<float> &jdown_ak4pfjets_deepCSVc();
-  const vector<float> &jdown_ak4pfjets_deepCSVcc();
   const vector<float> &jdown_ak4pfjets_deepCSVl();
   const vector<vector<int> > &jdown_topcands_ak4idx();
   const vector<float> &jdown_topcands_disc();
@@ -2227,10 +2215,10 @@ void LoadAllBranches();
 };
 
 #ifndef __CINT__
-extern stop_1l_babyAnalyzer babyAnalyzer;
+extern StopTree babyAnalyzer;
 #endif
 
-namespace stop_1l {
+namespace stop1l {
   const unsigned int &run();
   const unsigned int &ls();
   const unsigned int &evt();
@@ -2283,18 +2271,21 @@ namespace stop_1l {
   const int &is1lepFromTop();
   const float &MT2W();
   const float &MT2W_rl();
+  const float &MT2_ll();
   const float &mindphi_met_j1_j2();
   const float &mindphi_met_j1_j2_rl();
   const float &mt_met_lep();
   const float &mt_met_lep_rl();
   const float &MT2W_jup();
   const float &MT2W_rl_jup();
+  const float &MT2_ll_jup();
   const float &mindphi_met_j1_j2_jup();
   const float &mindphi_met_j1_j2_rl_jup();
   const float &mt_met_lep_jup();
   const float &mt_met_lep_rl_jup();
   const float &MT2W_jdown();
   const float &MT2W_rl_jdown();
+  const float &MT2_ll_jdown();
   const float &mindphi_met_j1_j2_jdown();
   const float &mindphi_met_j1_j2_rl_jdown();
   const float &mt_met_lep_jdown();
@@ -2673,11 +2664,9 @@ namespace stop_1l {
   const vector<float> &ak4pfjets_axis1();
   const vector<float> &ak4pfjets_axis2();
   const vector<int> &ak4pfjets_mult();
-  const vector<float> &ak4pfjets_csvbtag();
   const vector<float> &ak4pfjets_deepCSVb();
   const vector<float> &ak4pfjets_deepCSVbb();
   const vector<float> &ak4pfjets_deepCSVc();
-  const vector<float> &ak4pfjets_deepCSVcc();
   const vector<float> &ak4pfjets_deepCSVl();
   const vector<vector<int> > &topcands_ak4idx();
   const vector<float> &topcands_disc();
@@ -2693,11 +2682,9 @@ namespace stop_1l {
   const vector<float> &jup_ak4pfjets_axis1();
   const vector<float> &jup_ak4pfjets_axis2();
   const vector<int> &jup_ak4pfjets_mult();
-  const vector<float> &jup_ak4pfjets_csvbtag();
   const vector<float> &jup_ak4pfjets_deepCSVb();
   const vector<float> &jup_ak4pfjets_deepCSVbb();
   const vector<float> &jup_ak4pfjets_deepCSVc();
-  const vector<float> &jup_ak4pfjets_deepCSVcc();
   const vector<float> &jup_ak4pfjets_deepCSVl();
   const vector<vector<int> > &jup_topcands_ak4idx();
   const vector<float> &jup_topcands_disc();
@@ -2713,11 +2700,9 @@ namespace stop_1l {
   const vector<float> &jdown_ak4pfjets_axis1();
   const vector<float> &jdown_ak4pfjets_axis2();
   const vector<int> &jdown_ak4pfjets_mult();
-  const vector<float> &jdown_ak4pfjets_csvbtag();
   const vector<float> &jdown_ak4pfjets_deepCSVb();
   const vector<float> &jdown_ak4pfjets_deepCSVbb();
   const vector<float> &jdown_ak4pfjets_deepCSVc();
-  const vector<float> &jdown_ak4pfjets_deepCSVcc();
   const vector<float> &jdown_ak4pfjets_deepCSVl();
   const vector<vector<int> > &jdown_topcands_ak4idx();
   const vector<float> &jdown_topcands_disc();

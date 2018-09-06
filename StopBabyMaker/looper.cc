@@ -1652,6 +1652,12 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
         dummy_sigma.push_back(0.1);
       }
 
+      // MT2(ll) <-- to avoid overlap with stop-2l signal region
+      if(nVetoLeptons>1) {
+        StopEvt.MT2_ll = CalcMT2_(StopEvt.pfmet,StopEvt.pfmet_phi,lep1.p4,lep2.p4,false,0);
+        StopEvt.MT2_ll_jup = CalcMT2_(StopEvt.pfmet_jup,StopEvt.pfmet_phi_jup,lep1.p4,lep2.p4,false,0);
+        StopEvt.MT2_ll_jdown = CalcMT2_(StopEvt.pfmet_jdown,StopEvt.pfmet_phi_jdown,lep1.p4,lep2.p4,false,0);
+      }
 
       if(jets.ak4pfjets_p4.size()>1){
 
@@ -1680,8 +1686,6 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
         if(nVetoLeptons>0) StopEvt.MT2_lb_bqq = CalcMT2_lb_bqq_(StopEvt.pfmet,StopEvt.pfmet_phi,lep1.p4,mybjets,myaddjets,jets.ak4pfjets_p4,0,false);
         if(nVetoLeptons>1) StopEvt.MT2_lb_bqq_mass_lep2 = CalcMT2_lb_bqq_(StopEvt.pfmet,StopEvt.pfmet_phi,lep2.p4,mybjets,myaddjets,jets.ak4pfjets_p4,0,true);
         if(nVetoLeptons>1) StopEvt.MT2_lb_bqq_lep2 = CalcMT2_lb_bqq_(StopEvt.pfmet,StopEvt.pfmet_phi,lep2.p4,mybjets,myaddjets,jets.ak4pfjets_p4,0,false);
-        //MT2(l,l)
-        if(nVetoLeptons>1) StopEvt.MT2_l_l = CalcMT2_(StopEvt.pfmet,StopEvt.pfmet_phi,lep1.p4,lep2.p4,false,0);
       }
 
       if(jets_jup.ak4pfjets_p4.size()>1){
@@ -1861,7 +1865,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
             StopEvt.Zll_met     = sqrt(pow(Zllmetpx,2)+pow(Zllmetpy,2) );
             StopEvt.Zll_met_phi = atan2(Zllmetpy,Zllmetpx);
             if(jets.ak4pfjets_p4.size()>1) StopEvt.Zll_mindphi_met_j1_j2 =  getMinDphi(StopEvt.Zll_met_phi,jets.ak4pfjets_p4.at(0),jets.ak4pfjets_p4.at(1));
-            if(nVetoLeptons>2) StopEvt.Zll_MT2_l_l = CalcMT2_(StopEvt.pfmet,StopEvt.pfmet_phi,AllLeps[Zl1].p4,AllLeps[Zl2].p4,false,0);
+            if(nVetoLeptons>2) StopEvt.Zll_MT2_ll = CalcMT2_(StopEvt.pfmet,StopEvt.pfmet_phi,AllLeps[Zl1].p4,AllLeps[Zl2].p4,false,0);
             if(StopEvt.Zll_selLep == 1){
               StopEvt.Zll_mt_met_lep = calculateMt(lep1.p4, StopEvt.Zll_met, StopEvt.Zll_met_phi);
               StopEvt.Zll_dphi_Wlep = DPhi_W_lep(StopEvt.Zll_met, StopEvt.Zll_met_phi, lep1.p4);
@@ -1939,7 +1943,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
             StopEvt.ph_mt_met_lep = calculateMt(lep1.p4, StopEvt.ph_met, StopEvt.ph_met_phi);
             StopEvt.ph_dphi_Wlep = DPhi_W_lep(StopEvt.ph_met, StopEvt.ph_met_phi, lep1.p4);
           }
-          if(nVetoLeptons>1) StopEvt.ph_MT2_l_l = CalcMT2_(StopEvt.pfmet,StopEvt.pfmet_phi,lep1.p4,lep2.p4,false,0);
+          if(nVetoLeptons>1) StopEvt.ph_MT2_ll = CalcMT2_(StopEvt.pfmet,StopEvt.pfmet_phi,lep1.p4,lep2.p4,false,0);
           if(jetsp4_phcleaned.size()>1){
             if(nVetoLeptons>0) {
               StopEvt.ph_MT2W = CalcMT2W_(mybjets,myaddjets,lep1.p4,StopEvt.ph_met, StopEvt.ph_met_phi);

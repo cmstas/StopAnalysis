@@ -76,6 +76,7 @@ public:
     float MT2W_lep2;
     float topness_lep2;
     float topnessMod_lep2;
+    float MT2_ll;
 
     float MT2W_rl;
     float topnessMod_rl;
@@ -86,12 +87,13 @@ public:
 
     float MT2W_jup;
     float topnessMod_jup;
+    float MT2_ll_jup;
     float MT2W_jdown;
     float topnessMod_jdown;
+    float MT2_ll_jdown;
 
     float MT2_lb_b;
     float MT2_lb_b_lep2;
-    float MT2_l_l;
     float MT2_lb_b_mass;
     float MT2_lb_b_mass_lep2;
     float MT2_lb_bqq;
@@ -334,7 +336,7 @@ public:
     float ph_topnessMod;
     float ph_MT2_lb_b_mass;
     float ph_MT2_lb_b;
-    float ph_MT2_l_l;
+    float ph_MT2_ll;
     float ph_MT2_lb_bqq_mass;
     float ph_MT2_lb_bqq;
     float ph_hadronic_top_chi2;
@@ -364,7 +366,7 @@ public:
     float Zll_topnessMod;
     float Zll_MT2_lb_b_mass;
     float Zll_MT2_lb_b;
-    float Zll_MT2_l_l;
+    float Zll_MT2_ll;
     float Zll_MT2_lb_bqq_mass;
     float Zll_MT2_lb_bqq;
 
