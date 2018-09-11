@@ -79,6 +79,7 @@ bool isVetoTrack(int ipf, LorentzVector lepp4_, int charge);
 bool isVetoTrack_v2(int ipf, LorentzVector lepp4_, int charge);
 bool isVetoTrack_v3(int ipf, LorentzVector lepp4_, int charge);
 bool isVetoTau(int ipf, LorentzVector lepp4_, int charge);
+bool isVetoTau_v2(int ipf, LorentzVector lepp4_, int charge);
 float DPhi_W_lep(float MET, float MET_Phi, LorentzVector p4);
 //int leptonIsFromW(int idx, int id, bool alsoSusy);
 //bool idIsCharm(int id);

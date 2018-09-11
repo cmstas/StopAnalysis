@@ -2,6 +2,7 @@
 #include "Math/LorentzVector.h"
 #include "Math/VectorUtil.h"
 #include "CMS3.h"
+#include "Config.h"
 #include "ElectronSelections.h"
 #include "MuonSelections.h"
 #include "VertexSelections.h"
@@ -51,38 +52,47 @@ bool PassMuonPreSelections(unsigned int muIdx,float pt, float eta){
 bool PassJetPreSelections(unsigned int jetIdx,float pt, float eta, bool passjid,FactorizedJetCorrector* corrector,bool applynewcorr,JetCorrectionUncertainty* jetcorr_uncertainty, int JES_type, bool isFastsim){
 
   if(jetIdx>=pfjets_p4().size()) return false;//safety requirement
-  if(!isFastsim && passjid && !isLoosePFJetV2(jetIdx)) return false;
+  if (gconf.year == 2016 && gconf.cmssw_ver == 80) {
+    if(!isFastsim && passjid && !isLoosePFJetV2(jetIdx)) return false;
+  } else if (gconf.year == 2016 && gconf.cmssw_ver == 94) {
+    if(!isFastsim && passjid && !isTightPFJetV2(jetIdx)) return false;
+  } else if (gconf.year == 2017) {
+    if(!isFastsim && passjid && !isTightPFJetV3(jetIdx)) return false;
+  }
   if(fabs(pfjets_p4().at(jetIdx).eta()) > eta) return false;
   //apply JEC
-        LorentzVector pfjet_p4_cor = cms3.pfjets_p4().at(jetIdx);
-          // get uncorrected jet p4 to use as input for corrections
-        LorentzVector pfjet_p4_uncor = pfjets_p4().at(jetIdx) * cms3.pfjets_undoJEC().at(jetIdx);
+  LorentzVector pfjet_p4_cor = cms3.pfjets_p4().at(jetIdx);
+  if (applynewcorr) {
+    // get uncorrected jet p4 to use as input for corrections
+    LorentzVector pfjet_p4_uncor = pfjets_p4().at(jetIdx) * cms3.pfjets_undoJEC().at(jetIdx);
+    double corr = 1;
 
-        double corr = 1;
-        if (applynewcorr) {
-          // get L1FastL2L3Residual total correction
-          corrector->setRho   ( cms3.evt_fixgridfastjet_all_rho() );
-          corrector->setJetA  ( cms3.pfjets_area().at(jetIdx)       );
-          corrector->setJetPt ( pfjet_p4_uncor.pt()               );
-          corrector->setJetEta( pfjet_p4_uncor.eta()              );
-          corr = corrector->getCorrection();
-        }
-          // check for negative correction
-          if (corr < 0. && fabs(pfjet_p4_uncor.eta()) < 4.7) {
-            std::cout << "ScanChain::Looper: WARNING: negative jet correction: " << corr
-                      << ", raw jet pt: " << pfjet_p4_uncor.pt() << ", eta: " << pfjet_p4_uncor.eta() << std::endl;
-          }
-	  // include protections here on jet kinematics to prevent rare warnings/crashes
-	  double var = 1.;
-	  if (!evt_isRealData() && JES_type != 0 && pfjet_p4_uncor.pt()*corr > 0. && fabs(pfjet_p4_uncor.eta()) < 5.4) {
-	    jetcorr_uncertainty->setJetEta(pfjet_p4_uncor.eta());
-	    jetcorr_uncertainty->setJetPt(pfjet_p4_uncor.pt() * corr); // must use CORRECTED pt
-	    double unc = jetcorr_uncertainty->getUncertainty(true);
-	    var = (1. + JES_type * unc);
-	  }
-
-          // apply new JEC to p4
-          if(applynewcorr) pfjet_p4_cor = pfjet_p4_uncor * corr*var;
+    // get L1FastL2L3Residual total correction
+    corrector->setRho   ( cms3.evt_fixgridfastjet_all_rho() );
+    corrector->setJetA  ( cms3.pfjets_area().at(jetIdx)       );
+    corrector->setJetPt ( pfjet_p4_uncor.pt()               );
+    corrector->setJetEta( pfjet_p4_uncor.eta()              );
+    corr = corrector->getCorrection();
+    // check for negative correction
+    if (corr < 0. && fabs(pfjet_p4_uncor.eta()) < 4.7) {
+      std::cout << "StopSelections.cc: WARNING: negative jet correction: " << corr << ", raw jet pt: " << pfjet_p4_uncor.pt() << ", eta: " << pfjet_p4_uncor.eta() << std::endl;
+    }
+    // apply new JEC to p4
+    pfjet_p4_cor = pfjet_p4_uncor * corr;
+  }
+  // include protections here on jet kinematics to prevent rare warnings/crashes
+  double var = 1.;
+  if (!evt_isRealData() && JES_type != 0 && pfjet_p4_cor.pt() > 0. && fabs(pfjet_p4_cor.eta()) < 5.4) {
+    if (!jetcorr_uncertainty) {
+      std::cout << "StopSelections.cc::PassJetPreSelections(): ERROR: Didn't pass jetcorr_uncertainty to but ask for JES_type = " << JES_type << std::endl;
+    }
+    jetcorr_uncertainty->setJetEta(pfjet_p4_cor.eta());
+    jetcorr_uncertainty->setJetPt(pfjet_p4_cor.pt()); // must use CORRECTED pt
+    double unc = jetcorr_uncertainty->getUncertainty(true);
+    var = (1. + JES_type * unc);
+  }
+  // apply new JEC to p4
+  if (var != 1) pfjet_p4_cor *= var;
 
   if(pfjet_p4_cor.pt() < pt) return false;
   return true;
@@ -166,6 +176,17 @@ bool isVetoTau(int ipf, LorentzVector lepp4_, int charge){
       if(taus_pf_charge().at(ipf) * charge > 0) return false;
       //if(taus_pf_IDs().at(ipf).at(33) < 1) return false;
       return true;
+}
+
+bool isVetoTau_v2(int ipf, LorentzVector lepp4_, int charge){
+  // if(taus_pf_p4().at(ipf).pt() < 20) return false;
+  // if(fabs(taus_pf_p4().at(ipf).eta()) > 2.4) return false;
+  if(passTauID("decayModeFindingNewDMs", ipf) < 1) return false;
+  if(passTauID("byMediumIsolationMVArun2v1DBnewDMwLT", ipf) < 1) return false;
+  if(abs(charge) >= 99 || lepp4_.E() < 0.000001) return true; //If the lepton is a dummy, bypass the Delta-R and charge cuts
+  if(ROOT::Math::VectorUtil::DeltaR(taus_pf_p4().at(ipf), lepp4_) < 0.4)  return false;
+  if(taus_pf_charge().at(ipf) * charge > 0) return false;
+  return true;
 }
 
 //overlap removal

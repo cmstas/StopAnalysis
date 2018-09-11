@@ -1993,15 +1993,18 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
       Taus.tau_IDnames = taus_pf_IDnames();
 
       for(unsigned int iTau = 0; iTau < taus_pf_p4().size(); iTau++){
-
         if( taus_pf_p4().at(iTau).Pt() < tau_pt ) continue;
         if( fabs(taus_pf_p4().at(iTau).Eta()) > tau_eta ) continue;
 
         Taus.FillCommon(iTau, tau_pt, tau_eta);
-        if(isVetoTau(iTau, lep1.p4, lep1.charge)){
-          Taus.tau_isVetoTau.push_back(true);
-          vetotaus++;
-        }else Taus.tau_isVetoTau.push_back(false);
+        bool is_vetotau;
+        if (gconf.cmssw_ver == 80) {  // Moriond17 analysis selection
+          is_vetotau = isVetoTau(iTau, lep1.p4, lep1.charge);
+        } else if (gconf.cmssw_ver == 94) {  // Legacy analysis selection: new decay mode
+          is_vetotau = isVetoTau_v2(iTau, lep1.p4, lep1.charge);
+        }
+        Taus.tau_isVetoTau.push_back(is_vetotau);
+        if (is_vetotau) vetotaus++;
       }
 
       if(vetotaus<1) StopEvt.PassTauVeto = true;
@@ -2080,15 +2083,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
 
       } // end loop over pfCands
 
-      /*obsolete
-        if(vetotracks<1) StopEvt.PassTrackVeto = true;
-        else StopEvt.PassTrackVeto = false;
-
-        if(vetotracks_v2<1) StopEvt.PassTrackVeto_v2 = true;
-        else StopEvt.PassTrackVeto_v2 = false;
-      */
-      if(vetotracks_v3<1) StopEvt.PassTrackVeto = true;
-      else StopEvt.PassTrackVeto = false;
+      StopEvt.PassTrackVeto = (vetotracks_v3 < 1);
 
       if(apply2ndLepVeto){
         if(StopEvt.nvetoleps!=1) continue;
