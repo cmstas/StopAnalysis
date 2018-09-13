@@ -212,20 +212,7 @@ void eventWeight_lepSF::setup( bool isFastsim, int inyear = 2017, TString filelo
   TH2F *h_el_SF_id  = (TH2F*)h_el_SF_id_temp->Clone("h_el_SF_id");
   TH2F *h_el_SF_iso = (TH2F*)h_el_SF_iso_temp->Clone("h_el_SF_iso");
   h_el_SF = (TH2F*)h_el_SF_id->Clone("h_el_SF");
-  if (year == 2017) {
-    TH2F *h_el_SF_iso2 = (TH2F*)h_el_SF_id_temp->Clone("h_el_SF_iso2");
-    // 2017 elelctron scale factors iso hists has an extra 5-10 GeV bin for pt (y-axis)
-    // this way no need to deal with multiplication errors by hand
-    for (int x=1; x <= h_el_SF->GetNbinsX(); x++) {
-      for (int y=1; y <= h_el_SF->GetNbinsY(); y++) {
-        h_el_SF_iso2->SetBinContent(x, y, h_el_SF_iso_temp->GetBinContent(x,y+1));
-        h_el_SF_iso2->SetBinError(x, y, h_el_SF_iso_temp->GetBinError(x,y+1));
-      }
-    }
-    h_el_SF->Multiply(h_el_SF_iso2);
-  } else {
-    h_el_SF->Multiply(h_el_SF_iso);
-  }
+  h_el_SF->Multiply(h_el_SF_iso);
   xmin_h_el_SF = h_el_SF->GetXaxis()->GetBinLowEdge(1)+ferr;
   xmax_h_el_SF = h_el_SF->GetXaxis()->GetBinLowEdge(h_el_SF->GetNbinsX()+1)-ferr;
   ymin_h_el_SF = h_el_SF->GetYaxis()->GetBinLowEdge(1)+ferr;
@@ -242,19 +229,7 @@ void eventWeight_lepSF::setup( bool isFastsim, int inyear = 2017, TString filelo
   TH2F *h_el_SF_veto_id  = (TH2F*)h_el_SF_veto_id_temp->Clone("h_el_SF_veto_id");
   TH2F *h_el_SF_veto_iso = (TH2F*)h_el_SF_veto_iso_temp->Clone("h_el_SF_veto_iso");
   h_el_SF_veto = (TH2F*)h_el_SF_veto_id->Clone("h_el_SF_veto");
-  if (year == 2017) {
-    TH2F *h_el_SF_veto_iso2 = (TH2F*)h_el_SF_veto_id_temp->Clone("h_el_SF_veto_iso2");
-    // 2017 elelctron scale factors iso hists has an extra 5-10 GeV bin for pt (y-axis)
-    for (int x=1; x <= h_el_SF_veto->GetNbinsX(); x++) {
-      for (int y=1; y <= h_el_SF_veto->GetNbinsY(); y++) {
-        h_el_SF_veto_iso2->SetBinContent(x, y, h_el_SF_veto_iso_temp->GetBinContent(x,y+1));
-        h_el_SF_veto_iso2->SetBinError(x, y, h_el_SF_veto_iso_temp->GetBinError(x,y+1));
-      }
-    }
-    h_el_SF_veto->Multiply(h_el_SF_veto_iso2);
-  } else {
-    h_el_SF_veto->Multiply(h_el_SF_veto_iso);
-  }
+  h_el_SF_veto->Multiply(h_el_SF_veto_iso);
   // Double unc. on veto electron sfs, since we go lower in pT
   for (int x=1; x <= h_el_SF_veto->GetNbinsX(); x++) {
     for (int y=1; y <= h_el_SF_veto->GetNbinsY(); y++) {
