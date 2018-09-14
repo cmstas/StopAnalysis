@@ -37,13 +37,16 @@ public:
     void SetMetFilterEvents(); 
 private:
     std::string prefix_;
-      eventFilter metFilterTxt; 
+    eventFilter metFilterTxt;
 public:
     // branch objects
     unsigned int run;
     unsigned int ls;
     unsigned int evt;
     int nvtxs;
+
+    int year;
+    int sampver;
 
     int   firstGoodVtxIdx;
 

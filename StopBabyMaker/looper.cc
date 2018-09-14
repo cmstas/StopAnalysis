@@ -186,7 +186,6 @@ void babyMaker::MakeBabyNtuple(const char* output_name){
   if(fillIso)  lep2.SetBranches_Iso(BabyTree);
   if(fillLepSynch)  lep2.SetBranches_SynchTools(BabyTree);
 
-
   //obsolete
   //gen_els.SetBranches(BabyTree);
   //gen_mus.SetBranches(BabyTree);
@@ -1411,14 +1410,17 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
         //else if(NISRjets==4){ StopEvt.weight_ISRnjets = 0.6480; StopEvt.weight_ISRnjets_UP = 0.8240; StopEvt.weight_ISRnjets_DN = 0.4720; }
         //else if(NISRjets==5){ StopEvt.weight_ISRnjets = 0.6010; StopEvt.weight_ISRnjets_UP = 0.8005; StopEvt.weight_ISRnjets_DN = 0.4015; }
         //else {                StopEvt.weight_ISRnjets = 0.5150; StopEvt.weight_ISRnjets_UP = 0.7575; StopEvt.weight_ISRnjets_DN = 0.2725; }
-        //Moriond 2017
-        if(NISRjets     ==0){ StopEvt.weight_ISRnjets = 1.000; StopEvt.weight_ISRnjets_UP = 1.0000; StopEvt.weight_ISRnjets_DN = 1.0000; }
-        else if(NISRjets==1){ StopEvt.weight_ISRnjets = 0.920; StopEvt.weight_ISRnjets_UP = 0.960; StopEvt.weight_ISRnjets_DN = 0.880; }
-        else if(NISRjets==2){ StopEvt.weight_ISRnjets = 0.821; StopEvt.weight_ISRnjets_UP = 0.911; StopEvt.weight_ISRnjets_DN = 0.731; }
-        else if(NISRjets==3){ StopEvt.weight_ISRnjets = 0.715; StopEvt.weight_ISRnjets_UP = 0.858; StopEvt.weight_ISRnjets_DN = 0.572; }
-        else if(NISRjets==4){ StopEvt.weight_ISRnjets = 0.662; StopEvt.weight_ISRnjets_UP = 0.832; StopEvt.weight_ISRnjets_DN = 0.492; }
-        else if(NISRjets==5){ StopEvt.weight_ISRnjets = 0.561; StopEvt.weight_ISRnjets_UP = 0.782; StopEvt.weight_ISRnjets_DN = 0.340; }
-        else {                StopEvt.weight_ISRnjets = 0.511; StopEvt.weight_ISRnjets_UP = 0.769; StopEvt.weight_ISRnjets_DN = 0.253; }
+        if (gconf.year == 2016) {
+          // Moriond 2017 values
+          if (NISRjets     ==0) { StopEvt.weight_ISRnjets = 1.000; StopEvt.weight_ISRnjets_UP = 1.000; StopEvt.weight_ISRnjets_DN = 1.000; }
+          else if (NISRjets==1) { StopEvt.weight_ISRnjets = 0.920; StopEvt.weight_ISRnjets_UP = 0.960; StopEvt.weight_ISRnjets_DN = 0.880; }
+          else if (NISRjets==2) { StopEvt.weight_ISRnjets = 0.821; StopEvt.weight_ISRnjets_UP = 0.911; StopEvt.weight_ISRnjets_DN = 0.731; }
+          else if (NISRjets==3) { StopEvt.weight_ISRnjets = 0.715; StopEvt.weight_ISRnjets_UP = 0.858; StopEvt.weight_ISRnjets_DN = 0.572; }
+          else if (NISRjets==4) { StopEvt.weight_ISRnjets = 0.662; StopEvt.weight_ISRnjets_UP = 0.832; StopEvt.weight_ISRnjets_DN = 0.492; }
+          else if (NISRjets==5) { StopEvt.weight_ISRnjets = 0.561; StopEvt.weight_ISRnjets_UP = 0.782; StopEvt.weight_ISRnjets_DN = 0.340; }
+          else {                  StopEvt.weight_ISRnjets = 0.511; StopEvt.weight_ISRnjets_UP = 0.769; StopEvt.weight_ISRnjets_DN = 0.253; }
+        } else if (gconf.year == 2017) {
+        }
         StopEvt.NISRjets = NISRjets;
         StopEvt.NnonISRjets = nonISRjets;
 
@@ -2085,6 +2087,50 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
 
       StopEvt.PassTrackVeto = (vetotracks_v3 < 1);
 
+      int iv3 = -1;
+      int iitk = -1;
+      if (vetotracks_v3 > 0) {
+        for (iv3 = 0; iv3 < (int)Tracks.isoTracks_isVetoTrack_v3.size() && !Tracks.isoTracks_isVetoTrack_v3[iv3]; ++iv3);
+      }
+
+      int nIsoTracks_pfiso = 0;
+      for (unsigned int itrk = 0; itrk < isotracks_p4().size(); ++itrk) {
+        if (!isotracks_isPFCand().at(itrk)) continue;  // only consider pfcandidates
+        if (isotracks_p4().at(itrk).pt() < 10) continue;
+        if (fabs(isotracks_p4().at(itrk).eta()) > 2.4 ) continue;
+        if (isotracks_charge().at(itrk) == 0) continue;
+        if (fabs(isotracks_dz().at(itrk)) > 0.1) continue;
+        if (isotracks_lepOverlap().at(itrk)) continue;  // should remove all lep overlap, but it didn't, so we need the line below
+        if (utils::isCloseObject(isotracks_p4().at(itrk), lep1.p4, 0.4)) continue;
+        if (isotracks_charge().at(itrk) * lep1.charge >= 0) continue; // opposite to lead lepton
+
+        // float pfiso = isotracks_pfIso_ch().at(itrk) + isotracks_pfIso_nh().at(itrk) + isotracks_pfIso_em().at(itrk);
+        float pfiso = isotracks_pfIso_ch().at(itrk);
+
+        // isVetoTrack_v3 selections
+        if (ROOT::Math::VectorUtil::DeltaR(isotracks_p4().at(itrk), lep1.p4) < 0.4) {
+          cout << "[looper]>> Find isotrack overlapping with lep1 <-- shouldn't happen." << endl;
+        }
+        //if not electron or muon
+        if (abs(isotracks_particleId().at(itrk))==11 || abs(isotracks_particleId().at(itrk))==13) 
+          cout << "[looper]>> Find isotrack that is a lepton <-- shouldn't happen." << endl;
+        if (isotracks_p4().at(itrk).pt() > 60. ){
+          if (pfiso > 6.0 ) continue;
+        } else{
+          if (pfiso/isotracks_p4().at(itrk).pt() > 0.1) continue;
+        }
+
+        iitk = itrk;
+        nIsoTracks_pfiso++;
+      }
+      if (nIsoTracks_pfiso != vetotracks_v3) {
+        cout << "[looper]: We are having a disagreement here:  nIsoTracks_pfiso= " << nIsoTracks_pfiso << ", vetotracks_v3= " << vetotracks_v3 << ", evt= " << evt << endl;
+      }
+      else if (vetotracks_v3 == 1) {
+        if (!utils::isCloseObject(Tracks.isoTracks_p4.at(iv3), isotracks_p4().at(iitk), 0.01))
+          cout << "[looper]: We have a disagreement here:  nIsoTracks_pfiso= " << nIsoTracks_pfiso << ", vetotracks_v3= " << vetotracks_v3 << ", evt= " << evt << endl;
+      }
+
       if(apply2ndLepVeto){
         if(StopEvt.nvetoleps!=1) continue;
         if(!StopEvt.PassTrackVeto) continue;
@@ -2222,8 +2268,6 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
           new_pfmet_y += tau_p4s.at(0).py();
         }
       }
-      else
-        ;
 
       float new_pfmet_x_jup = new_pfmet_x + (StopEvt.pfmet_jup * std::cos(StopEvt.pfmet_phi_jup));
       float new_pfmet_y_jup = new_pfmet_y + (StopEvt.pfmet_jup * std::sin(StopEvt.pfmet_phi_jup));

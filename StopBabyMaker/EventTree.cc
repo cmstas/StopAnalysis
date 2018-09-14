@@ -74,6 +74,9 @@ void EventTree::FillCommon (const std::string &root_file_name)
     nvtxs = numberOfGoodVertices();
     firstGoodVtxIdx = firstGoodVertex();
  
+    year = gconf.year;
+    sampver = gconf.cmssw_ver;
+
     calomet = evt_calomet();
     calomet_phi = evt_calometPhi();
 
@@ -587,6 +590,8 @@ void EventTree::SetBranches (TTree* tree)
     tree->Branch("ls", &ls);
     tree->Branch("evt", &evt);   
     tree->Branch("nvtxs", &nvtxs);
+    tree->Branch("year", &year);
+    tree->Branch("sampver", &sampver);
     tree->Branch("pu_nvtxs", &pu_nvtxs);
     tree->Branch("pfmet", &pfmet);
     tree->Branch("pfmet_phi", &pfmet_phi);
