@@ -1530,6 +1530,20 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
         nEvents_pass_skim_met++;
       */
 
+      // Fill the tree for top tagger training flat ntuple before rejecting on leptons
+      // TODO: fix the ntau, ntrack information which only come after (or maybe they are most likely not needed)
+      if (runTopCandTreeMaker) {
+        topcandTreeMaker->Reset();  // be here for safe first
+        topcandTreeMaker->AddEventInfo(evt_event(), evt_scale1fb(), evt_pfmet(), numberOfGoodVertices(), nVetoLeptons, 0/*vetotaus*/,
+                                       0/*vetotrks*/, jets.ak4_HT, jets.ngoodjets, jets.ngoodbtags, jets.nloosebtags);
+        topcandTreeMaker->SetJetVectors(&jets.ak4pfjets_p4, &jets.ak4pfjets_CSV, &jets.ak4pfjets_cvsl,
+                                        &jets.ak4pfjets_ptD, &jets.ak4pfjets_axis1, &jets.ak4pfjets_axis2, &jets.ak4pfjets_mult,
+                                        &jets.ak4pfjets_deepCSVb, &jets.ak4pfjets_deepCSVc, &jets.ak4pfjets_deepCSVl, &jets.ak4pfjets_deepCSVbb);
+        // topcandTreeMaker->SetGenParticleVectors(&gen_qs.p4, &gen_qs.id, &gen_qs.isLastCopy, &gen_qs.motherid, &gen_qs.motheridx);
+        topcandTreeMaker->SetGenParticleVectors(&genps_p4(), &genps_id(), &genps_isLastCopy(), &genps_id_mother(), &genps_idx_mother());
+        topcandTreeMaker->FillTree();
+      }
+
       if(nGoodLeptons < skim_nGoodLep) continue;
       nEvents_pass_skim_nGoodLep++;
 
@@ -2555,6 +2569,10 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
   BabyFile->Close();
   //delete BabyFile;
   //histFile->cd();
+
+  if (runTopCandTreeMaker) {
+    topcandTreeMaker->WriteToFile();
+  }
 
   //
   // Some clean up

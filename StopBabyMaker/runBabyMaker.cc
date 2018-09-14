@@ -149,6 +149,14 @@ int main(int argc, char **argv){
   mylooper->fillIso         =  false;
   mylooper->fillLepSynch    =  false;
 
+  mylooper->runTopCandTreeMaker = true;
+
+  if(mylooper->runTopCandTreeMaker) {
+    TTree* tctree = new TTree("tree", "Flat ntuple for top tagger training");
+    mylooper->topcandTreeMaker = new TopCandTree;
+    mylooper->topcandTreeMaker->Setup(tctree, Form("topcandTree%s.root", suffix), "ttbar");
+  }
+
   // Input sanitation
   if( !(mylooper->skim_goodLep_mu_pt > mylooper->skim_looseLep_mu_pt &&
         mylooper->skim_looseLep_mu_pt > mylooper->skim_vetoLep_mu_pt) ){
@@ -213,14 +221,8 @@ int main(int argc, char **argv){
     }
   }
 
-  //
   // Run Looper
-  //
-  mylooper->looper(sample, Form("%s%s", argv[1],suffix), nevents,dirpath);
+  mylooper->looper(sample, Form("%s%s", argv[1], suffix), nevents, dirpath);
 
-
-  //
-  // Return
-  //
   return 0;
 }

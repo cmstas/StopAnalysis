@@ -16,6 +16,7 @@
 #include "Math/VectorUtil.h"
 #include "TChain.h"
 #include "Math/LorentzVector.h"
+#include "ResTopTagger/TopCandTree.h"
 
 // typedefs
 typedef ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > LorentzVector;
@@ -100,6 +101,10 @@ class babyMaker {
   bool fillLepSynch;
 
   bool isFastsim;
+
+  // Flat tree maker for top tagger training
+  bool runTopCandTreeMaker;
+  TopCandTree* topcandTreeMaker;
 
  protected:
   TFile* BabyFile;
