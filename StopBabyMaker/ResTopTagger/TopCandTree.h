@@ -11,6 +11,7 @@ class TopCandTree {
  public:
   // flatTree(TString fileName, TString treeName, TString outfileName, size randomSeed, bool isMCTree, cfgSet::ConfigSet *pars);
   TopCandTree();
+  TopCandTree(std::string treeName, std::string outputName, std::string sampletype);
   ~TopCandTree();
   void AddEventInfo(int evt, float wgt, float pfmet, int nPV, int nleps, int ntaus, int ntrks, float HT, int nJets, int nBJets, int nLBJets);
   void AddTopCandInfo(const TopCand *topcand, bool isSignal);
@@ -23,16 +24,16 @@ class TopCandTree {
   void SetGenParticleVectors(const std::vector<LorentzVector>* p4, const std::vector<int>* id, const std::vector<bool>* isLastCopy,
                              const std::vector<int>* motherid, const std::vector<int>* motheridx);
   void SetBranches();
-  void Setup(TTree* inputTree, std::string oname, std::string sampletype);
+  void Setup(std::string treeName, std::string outputName, std::string sampletype);
   void Reset();
-  void WriteToFile(std::string prefix = "");
+  void Write();
 
+  TFile* outfile;
   TTree* tree;
   TRandom3* randGen;
 
   // Configurations
   size_t max_ntopcand;
-  std::string outname;
 
   // Pointers to vectors to jet collections to be passed in for each event
   const std::vector<LorentzVector>* jets_p4;
@@ -65,7 +66,7 @@ class TopCandTree {
   int   njets;
   int   nbjets;
   int   nlbjets;
-  int   flag_signal;
+  bool  flag_signal;
   float met;
   float ht;
   float gen_top_pt;

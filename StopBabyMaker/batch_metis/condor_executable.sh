@@ -10,6 +10,7 @@ IFILE=$4
 CMSSW_VERSION=$5
 SCRAM_ARCH=$6
 ISFASTSIM=$7
+EXTRAOUT=$8
 
 OUTPUTNAME=$(echo $OUTPUTNAME | sed 's/\.root//')
 
@@ -53,7 +54,7 @@ NEVENTS=-1
 
 echo "Running BabyMaker:"
 echo "  ./runBabyMaker $SAMPLE_NAME $NEVENTS $IMERGED ./ $INPUTFILENAMES $ISFASTSIM"
-./runBabyMaker $SAMPLE_NAME $NEVENTS $IFILE ./ $INPUTFILENAMES $ISFASTSIM
+./runBabyMaker $SAMPLE_NAME $NEVENTS $IFILE ./ $INPUTFILENAMES $ISFASTSIM $EXTRAOUT
 
 echo ----------------------------------------------
 ls -ltrha
@@ -95,6 +96,9 @@ echo -e "\n--- end running ---\n" #                             <----- section d
 
 export LD_PRELOAD=/usr/lib64/gfal2-plugins//libgfal_plugin_xrootd.so # needed in cmssw versions later than 9_3_X
 gfal-copy -p -f -t 4200 --verbose file://`pwd`/${OUTPUTNAME}_${IFILE}.root gsiftp://gftp.t2.ucsd.edu${OUTPUTDIR}/${OUTPUTNAME}_${IFILE}.root --checksum ADLER32
+if [ ! -z $EXTRAOUT ]; then
+    gfal-copy -p -f -t 4200 --verbose file://`pwd`/${EXTRAOUT}_${IFILE}.root gsiftp://gftp.t2.ucsd.edu${OUTPUTDIR}/${EXTRAOUT}/${EXTRAOUT}_${IFILE}.root --checksum ADLER32
+fi
 
 echo -e "\n--- cleaning up ---\n" #                             <----- section division
 cd ..

@@ -12,12 +12,17 @@ from metis.Utils import do_cmd
 if __name__ == "__main__":
 
     cms4_samples = {
-        "TTJets_amcnlo" : "/hadoop/cms/store/user/sicheng/ProjectMetis/TTJets_TuneCP5_13TeV-amcatnloFXFX-pythia8_RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v1_MINIAODSIM_CMS4_V09-04-14",
+        # "TTJets_amcnlo" : "/hadoop/cms/store/user/sicheng/ProjectMetis/TTJets_TuneCP5_13TeV-amcatnloFXFX-pythia8_RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v1_MINIAODSIM_CMS4_V09-04-14",
         # "tt1l_madgraph" : "/hadoop/cms/store/user/sicheng/ProjectMetis/TTJets_SingleLeptFromT_TuneCP5_13TeV-madgraphMLM-pythia8_RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v1_MINIAODSIM_CMS4_V09-04-14",
 
         # "TTJets_amcnlo_94X" : "/hadoop/cms/store/user/sicheng/ProjectMetis/TTJets_TuneCP5_13TeV-amcatnloFXFX-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_CMS4_V09-04-13",
         # "tt1l_madgraph" : "/hadoop/cms/store/user/sicheng/ProjectMetis/TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_CMS4_V09-04-13",
         # "ttbar_singleLeptFromT_amcnlo_94X" : "/hadoop/cms/store/user/sicheng/ProjectMetis/TTJets_SingleLeptFromT_TuneCP5_13TeV-madgraphMLM-pythia8_RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v1_MINIAODSIM_CMS4_V09-04-13",
+
+        # "TTJets_amcnlo_80X" : "/hadoop/cms/store/user/sicheng/ProjectMetis/TTJets_TuneCUETP8M2T4_13TeV-amcatnloFXFX-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2_MINIAODSIM_CMS4_V00-00-02_toptags",
+        "tt2l_madgraph_80X" : "/hadoop/cms/store/user/sicheng/ProjectMetis/TTJets_DiLept_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_CMS4_V00-00-02_toptags",
+        "tt1l_tbar_madgraph_80X" : "/hadoop/cms/store/user/sicheng/ProjectMetis/TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_CMS4_V00-00-02_toptags",
+        "TTJets_madgraph_80X" : "/hadoop/cms/store/user/sicheng/ProjectMetis/TTJets_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_MINIAODSIM_CMS4_V00-00-02_toptags",
 
         # "TTJets_amcnlo_94X" : "/hadoop/cms/store/user/sicheng/ProjectMetis/TTJets_TuneCP5_13TeV-amcatnloFXFX-pythia8_RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v1_MINIAODSIM_CMS4_V00-00-12",
         # "TTJets_amcnlo" : "/hadoop/cms/store/user/sicheng/ProjectMetis/TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISummer17MiniAOD-92X_upgrade2017_realistic_v10-v3_MINIAODSIM_CMS4_V00-00-07_test",
@@ -40,8 +45,8 @@ if __name__ == "__main__":
     for dsname, samploc in cms4_samples.items():
         cmsswver = "CMSSW_10_1_0"
         scramarch = "slc6_amd64_gcc700"
-        tarfile = "input.tar.gz"
-        tag = "v28_5"
+        tarfile = "tarfiles/input_v28_7.tar.gz"
+        tag = "v28_7"
         maker_task = CondorTask(
             sample = DirectorySample(
                 dataset=dsname,
@@ -58,8 +63,8 @@ if __name__ == "__main__":
             output_name = "stopbaby.root",
             arguments = "1" if "SMS" in dsname else "0", # isFastsim
             # condor_submit_params = {"sites": "UAF,T2_US_UCSD,UCSB"},
-            # condor_submit_params = {"sites": "T2_US_UCSD,UCSB"},
-            condor_submit_params = {"use_xrootd": True},
+            condor_submit_params = {"sites": "T2_US_UCSD,UCSB"},
+            # condor_submit_params = {"use_xrootd": True},
             # no_load_from_backup = True,
         )
         merge_task = CondorTask(
@@ -73,7 +78,8 @@ if __name__ == "__main__":
             files_per_output = 100000,
             output_dir = maker_task.get_outputdir() + "/merged",
             output_name = dsname + ".root",
-            condor_submit_params = {"sites":"UAF"},
+            # condor_submit_params = {"sites":"UAF"},
+            condor_submit_params = {"sites":"T2_US_UCSD"},
             output_is_tree = True,
             # check_expectedevents = True,
             tag = tag,

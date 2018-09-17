@@ -34,6 +34,13 @@ TopCandTree::TopCandTree() :
     max_ntopcand(4)
 {}
 
+TopCandTree::TopCandTree(string treeName, string outputName, string sampletype) :
+    randGen(nullptr),
+    max_ntopcand(4)
+{
+  Setup(treeName, outputName, sampletype);
+}
+
 TopCandTree::~TopCandTree() {}
 
 void TopCandTree::AddEventInfo(int evt, float wgt, float pfmet, int nPV, int nleps, int ntaus, int ntrks, float HT, int nJets, int nBJets, int nLBJets)
@@ -283,10 +290,10 @@ void TopCandTree::FillTree() {
 
 }
 
-void TopCandTree::Setup(TTree* inputTree, string oname, string sampletype)
+void TopCandTree::Setup(string treeName, string outputName, string sampletype)
 {
-  tree = inputTree;
-  outname = oname;
+  outfile = new TFile(outputName.c_str(), "RECREATE");
+  tree = new TTree("tree", "Flat ntuple for top tagger training");
   if (sampletype.find("tt") == string::npos)
     randGen = new TRandom3();
 
@@ -514,10 +521,9 @@ void TopCandTree::SetGenParticleVectors(const vector<LorentzVector>* p4, const v
   genps_motheridx = motheridx;
 }
 
-void TopCandTree::WriteToFile(string prefix)
+void TopCandTree::Write()
 {
-  TFile outfile((prefix+outname).c_str(), "RECREATE");
-  outfile.cd();
+  outfile->cd();
   tree->Write();
-  outfile.Close();
+  outfile->Close();
 }

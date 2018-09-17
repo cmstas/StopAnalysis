@@ -8,7 +8,6 @@ from metis.CondorTask import CondorTask
 from metis.StatsParser import StatsParser
 from metis.Utils import do_cmd
 
-
 if __name__ == "__main__":
 
     snt_samples = {
@@ -18,24 +17,24 @@ if __name__ == "__main__":
         # "stopbaby" : "/SMS-T8bbstausnu_XCha0p5_XStau0p5_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16MiniAODv2-PUSummer16Fast_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM",
         # "stopbaby" : "/SMS-T8bbstausnu_XCha0p5_XStau0p75_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16MiniAODv2-PUSummer16Fast_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM",
 
-        # 2017 ReReco (94X)
-        "data_2017B_met" : "/MET/Run2017B-31Mar2018-v1/MINIAOD",
-        "data_2017C_met" : "/MET/Run2017C-31Mar2018-v1/MINIAOD",
-        "data_2017E_met" : "/MET/Run2017E-31Mar2018-v1/MINIAOD",
-        "data_2017D_met" : "/MET/Run2017D-31Mar2018-v1/MINIAOD",
-        "data_2017F_met" : "/MET/Run2017F-31Mar2018-v1/MINIAOD",
+        # # 2017 ReReco (94X)
+        # "data_2017B_met" : "/MET/Run2017B-31Mar2018-v1/MINIAOD",
+        # "data_2017C_met" : "/MET/Run2017C-31Mar2018-v1/MINIAOD",
+        # "data_2017E_met" : "/MET/Run2017E-31Mar2018-v1/MINIAOD",
+        # "data_2017D_met" : "/MET/Run2017D-31Mar2018-v1/MINIAOD",
+        # "data_2017F_met" : "/MET/Run2017F-31Mar2018-v1/MINIAOD",
 
-        "data_2017B_singleel" : "/SingleElectron/Run2017B-31Mar2018-v1/MINIAOD",
-        "data_2017C_singleel" : "/SingleElectron/Run2017C-31Mar2018-v1/MINIAOD",
-        "data_2017D_singleel" : "/SingleElectron/Run2017D-31Mar2018-v1/MINIAOD",
-        "data_2017E_singleel" : "/SingleElectron/Run2017E-31Mar2018-v1/MINIAOD",
-        "data_2017F_singleel" : "/SingleElectron/Run2017F-31Mar2018-v1/MINIAOD",
+        # "data_2017B_singleel" : "/SingleElectron/Run2017B-31Mar2018-v1/MINIAOD",
+        # "data_2017C_singleel" : "/SingleElectron/Run2017C-31Mar2018-v1/MINIAOD",
+        # "data_2017D_singleel" : "/SingleElectron/Run2017D-31Mar2018-v1/MINIAOD",
+        # "data_2017E_singleel" : "/SingleElectron/Run2017E-31Mar2018-v1/MINIAOD",
+        # "data_2017F_singleel" : "/SingleElectron/Run2017F-31Mar2018-v1/MINIAOD",
 
-        "data_2017B_singlemu" : "/SingleMuon/Run2017B-31Mar2018-v1/MINIAOD",
-        "data_2017C_singlemu" : "/SingleMuon/Run2017C-31Mar2018-v1/MINIAOD",
-        "data_2017D_singlemu" : "/SingleMuon/Run2017D-31Mar2018-v1/MINIAOD",
-        "data_2017E_singlemu" : "/SingleMuon/Run2017E-31Mar2018-v1/MINIAOD",
-        "data_2017F_singlemu" : "/SingleMuon/Run2017F-31Mar2018-v1/MINIAOD",
+        # "data_2017B_singlemu" : "/SingleMuon/Run2017B-31Mar2018-v1/MINIAOD",
+        # "data_2017C_singlemu" : "/SingleMuon/Run2017C-31Mar2018-v1/MINIAOD",
+        # "data_2017D_singlemu" : "/SingleMuon/Run2017D-31Mar2018-v1/MINIAOD",
+        # "data_2017E_singlemu" : "/SingleMuon/Run2017E-31Mar2018-v1/MINIAOD",
+        # "data_2017F_singlemu" : "/SingleMuon/Run2017F-31Mar2018-v1/MINIAOD",
 
         # "data_2017B_jetht" : "/JetHT/Run2017B-31Mar2018-v1/MINIAOD",
         # "data_2017C_jetht" : "/JetHT/Run2017C-31Mar2018-v1/MINIAOD",
@@ -45,15 +44,18 @@ if __name__ == "__main__":
 
         # 2017 MC (94X MiniAODv2) CMS4_V09-04-17
         "TTJets_incl_amcnlo" : "/TTJets_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM",
-        "W3JetsToLNu_madgraph" : "/W3JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM",
-        "W4JetsToLNu_madgraph" : "/W4JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM",
-        "WJetsToLNu_madgraph_ext1" : "/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14_ext1-v2/MINIAODSIM",
-        "WZTo3LNu_amcnlo" : "/WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM",
-        "ST_tW_antitop_5f_noHadDecays_powheg" : "/ST_tW_antitop_5f_NoFullyHadronicDecays_TuneCP5_13TeV-powheg-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM",
-        "ST_tW_top_5f_noHadDecays_powheg" : "/ST_tW_top_5f_NoFullyHadronicDecays_TuneCP5_13TeV-powheg-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM",
-        "ST_schan_4f_lepDecays_amcnlo" : "/ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM",
-        "TTZToLLNuNu_M10_amcnlo" : "/TTZToLLNuNu_M-10_TuneCP5_13TeV-amcatnlo-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM",
-        "TTWJetsToLNu_amcnlo" : "/TTWJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM",
+        # "W1JetsToLNu_madgraph" : "/W1JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v3/MINIAODSIM",
+        # "W2JetsToLNu_madgraph" : "/W2JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v4/MINIAODSIM",
+        # "W3JetsToLNu_madgraph" : "/W3JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM",
+        # "W4JetsToLNu_madgraph" : "/W4JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM",
+        # "WJetsToLNu_madgraph_ext1" : "/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14_ext1-v2/MINIAODSIM",
+        # "ST_tW_antitop_5f_noHadDecays_powheg" : "/ST_tW_antitop_5f_NoFullyHadronicDecays_TuneCP5_13TeV-powheg-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM",
+        # "ST_tW_top_5f_noHadDecays_powheg" : "/ST_tW_top_5f_NoFullyHadronicDecays_TuneCP5_13TeV-powheg-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM",
+        # "ST_schan_4f_lepDecays_amcnlo" : "/ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM",
+        # "TTZToLLNuNu_M10_amcnlo" : "/TTZToLLNuNu_M-10_TuneCP5_13TeV-amcatnlo-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM",
+        # "TTWJetsToLNu_amcnlo" : "/TTWJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM",
+        # "WZTo3LNu_amcnlo" : "/WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM",
+        # "WZ_incl" : "/WZ_TuneCP5_13TeV-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM",
 
         # # 2016 Legacy ReReco (94X)
         # "data_2016B_met_v1" : "/MET/Run2016B-17Jul2018_ver1-v1/MINIAOD",
@@ -65,7 +67,8 @@ if __name__ == "__main__":
         # "data_2016G_met" : "/MET/Run2016G-17Jul2018-v1/MINIAOD",
         # # "data_2016H_met" : "/MET/Run2016H-17Jul2018-v1/MINIAOD",
 
-        # "data_2016B_singleel" : "/SingleElectron/Run2016B-17Jul2018-v1/MINIAOD",
+        # "data_2016B_singleel_v1" : "/SingleElectron/Run2016B-17Jul2018_ver1-v1/MINIAOD",
+        # "data_2016B_singleel_v2" : "/SingleElectron/Run2016B-17Jul2018_ver2-v1/MINIAOD",
         # "data_2016C_singleel" : "/SingleElectron/Run2016C-17Jul2018-v1/MINIAOD",
         # "data_2016D_singleel" : "/SingleElectron/Run2016D-17Jul2018-v1/MINIAOD",
         # "data_2016E_singleel" : "/SingleElectron/Run2016E-17Jul2018-v1/MINIAOD",
@@ -73,8 +76,9 @@ if __name__ == "__main__":
         # "data_2016G_singleel" : "/SingleElectron/Run2016G-17Jul2018-v1/MINIAOD",
         # "data_2016H_singleel" : "/SingleElectron/Run2016H-17Jul2018-v1/MINIAOD",
 
-        # # "data_2016B_singlemu" : "/SingleMuon/Run2016B-17Jul2018-v1/MINIAOD",
-        # # "data_2016C_singlemu" : "/SingleMuon/Run2016C-17Jul2018-v1/MINIAOD",
+        # "data_2016B_singlemu_v1" : "/SingleMuon/Run2016B-17Jul2018_ver1-v1/MINIAOD",
+        # "data_2016B_singlemu_v2" : "/SingleMuon/Run2016B-17Jul2018_ver2-v1/MINIAOD",
+        # "data_2016C_singlemu" : "/SingleMuon/Run2016C-17Jul2018-v1/MINIAOD",
         # "data_2016D_singlemu" : "/SingleMuon/Run2016D-17Jul2018-v1/MINIAOD",
         # "data_2016E_singlemu" : "/SingleMuon/Run2016E-17Jul2018-v1/MINIAOD",
         # "data_2016F_singlemu" : "/SingleMuon/Run2016F-17Jul2018-v1/MINIAOD",
@@ -186,8 +190,11 @@ if __name__ == "__main__":
     for babyname, dsname in snt_samples.items():
         cmsswver = "CMSSW_10_1_0"
         scramarch = "slc6_amd64_gcc700"
-        tarfile = "tarfiles/input_v28_6.tar.gz"
-        tag = "v28_6"
+        tarfile = "tarfiles/input_v28_8.tar.gz"
+        tag = "v28_8"
+        extraarg = "1" if "SMS" in dsname else "0"
+        if "TTJets" in dsname and True: # to add switch later
+            extraarg += " topcands"
         maker_task = CondorTask(
             sample = SNTSample(dataset=dsname),
             files_per_output = 20 if "data" in babyname else 1,
@@ -197,10 +204,12 @@ if __name__ == "__main__":
             executable = "condor_executable.sh",
             cmssw_version = cmsswver,
             scram_arch = scramarch,
-            arguments = "1" if "SMS" in dsname else "0", # isFastsim
+            arguments = extraarg, # isFastsim
             tarfile = tarfile,
-            # condor_submit_params = {"sites": "UAF,T2_US_UCSD,UCSB"},
-            condor_submit_params = {"use_xrootd": True},
+            condor_submit_params = {"sites": "UAF,T2_US_UCSD,UCSB"},
+            # condor_submit_params = {"use_xrootd": True},
+            # max_jobs = 10,      # temporary for submission test
+            # no_load_from_backup = True,
         )
         merge_task = CondorTask(
             sample = DirectorySample(
@@ -213,7 +222,7 @@ if __name__ == "__main__":
             files_per_output = 100000,
             output_dir = maker_task.get_outputdir() + "/merged",
             output_name = babyname + ".root",
-            condor_submit_params = {"sites":"UAF"},
+            condor_submit_params = {"sites":"T2_US_UCSD"},
             output_is_tree = True,
             # check_expectedevents = True,
             tag = tag,
