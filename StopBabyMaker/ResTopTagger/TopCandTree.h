@@ -13,8 +13,9 @@ class TopCandTree {
   TopCandTree();
   TopCandTree(std::string treeName, std::string outputName, std::string sampletype);
   ~TopCandTree();
-  void AddEventInfo(int evt, float wgt, float pfmet, int nPV, int nleps, int ntaus, int ntrks, float HT, int nJets, int nBJets, int nLBJets);
-  void AddTopCandInfo(const TopCand *topcand, bool isSignal);
+  void AddEventInfo(int evt, float wgt, float pfmet, int nPV, int nLeps, int nJets, int nBJets, int nLBJets);
+  void AddGenTopInfo(int topidx);
+  void AddTopCandInfo(const TopCand *topcand, int isGenMatched);
   bool IsGenTopMatched(const TopCand* topcand);
   int  IsGenTopMatchedSloppy(const TopCand* topcand);
   void FillTree();
@@ -25,7 +26,7 @@ class TopCandTree {
                              const std::vector<int>* motherid, const std::vector<int>* motheridx);
   void SetBranches();
   void Setup(std::string treeName, std::string outputName, std::string sampletype);
-  void Reset();
+  void ResetAll();
   void Write();
 
   TFile* outfile;
@@ -33,7 +34,7 @@ class TopCandTree {
   TRandom3* randGen;
 
   // Configurations
-  size_t max_ntopcand;
+  size_t max_nbcand;
 
   // Pointers to vectors to jet collections to be passed in for each event
   const std::vector<LorentzVector>* jets_p4;
@@ -59,63 +60,63 @@ class TopCandTree {
   // Variables to be stored int the tree
   int   event;
   float weight;
-  int   npv;
-  int   nvetolep;
-  int   nvetotau;
-  int   nvetotrk;
-  int   njets;
-  int   nbjets;
-  int   nlbjets;
-  bool  flag_signal;
+  short npv;
+  short nlep;
+  short ntau;
+  short ntrk;
+  short njets;
+  short nbjets;
+  short nlbjets;
+  short flag_signal;
+  bool  flag_shuffle;
   float met;
   float ht;
+
   float gen_top_pt;
   float gen_w_pt;
   float gen_b_diag;
   float gen_w_diag;
   int   gen_top_resolved;
+
   float var_b_pt;
   float var_b_mass;
   float var_b_csv;
-  float var_b_dcsv;
-  float var_b_dcsvb;
-  float var_b_dcsvc;
-  float var_b_dcsvl;
-  float var_b_dcsvbb;
   float var_b_cvsb;
+  float var_b_dcsv;
+  float var_b_dcvsb;
+  float var_b_dcvsl;
   float var_b_qgl;
   float var_b_ptD;
   float var_b_axis1;
   float var_b_axis2;
   int   var_b_mult;
+
   float var_j2_pt;
   float var_j2_csv;
-  float var_j2_dcsv;
-  float var_j2_dcsvb;
-  float var_j2_dcsvc;
-  float var_j2_dcsvl;
-  float var_j2_dcsvbb;
   float var_j2_cvsl;
   float var_j2_cvsb;
+  float var_j2_dcsv;
+  float var_j2_dcvsb;
+  float var_j2_dcvsl;
   float var_j2_qgl;
   float var_j2_ptD;
   float var_j2_axis1;
   float var_j2_axis2;
   int   var_j2_mult;
+
   float var_j3_pt;
   float var_j3_csv;
-  float var_j3_dcsv;
-  float var_j3_dcsvb;
-  float var_j3_dcsvc;
-  float var_j3_dcsvl;
-  float var_j3_dcsvbb;
   float var_j3_cvsl;
   float var_j3_cvsb;
+  float var_j3_dcsv;
+  float var_j3_dcvsb;
+  float var_j3_dcvsl;
   float var_j3_qgl;
   float var_j3_ptD;
   float var_j3_axis1;
   float var_j3_axis2;
   int   var_j3_mult;
+
   float var_topcand_pt;
   float var_topcand_mass;
   float var_topcand_ptDR;

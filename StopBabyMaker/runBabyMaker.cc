@@ -80,6 +80,9 @@ int main(int argc, char **argv){
   if(argc>6) isFastsim = atoi(argv[6]);
   //isFastsim = true does not work, need to use = 1
 
+  string topCandTreeName;
+  if(argc>7) topCandTreeName = argv[7];
+
   //
   // Initialize looper
   //
@@ -149,12 +152,9 @@ int main(int argc, char **argv){
   mylooper->fillIso         =  false;
   mylooper->fillLepSynch    =  false;
 
-  mylooper->runTopCandTreeMaker = true;
-
-  if(mylooper->runTopCandTreeMaker) {
-    TTree* tctree = new TTree("tree", "Flat ntuple for top tagger training");
-    mylooper->topcandTreeMaker = new TopCandTree;
-    mylooper->topcandTreeMaker->Setup(tctree, Form("topcandTree%s.root", suffix), "ttbar");
+  if (!topCandTreeName.empty()) {
+    mylooper->runTopCandTreeMaker = true;
+    mylooper->topcandTreeMaker = new TopCandTree("tree", Form("%s%s.root", topCandTreeName.c_str(), suffix), "ttbar");
   }
 
   // Input sanitation

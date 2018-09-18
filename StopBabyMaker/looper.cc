@@ -1534,10 +1534,10 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
       // TODO: fix the ntau, ntrack information which only come after (or maybe they are most likely not needed)
       if (runTopCandTreeMaker) {
         bool eventHasTop = (StopEvt.dataset.find("TTJets") != string::npos && !StopEvt.is2lep);
-        if (eventHasTop || evt %4 != 0) {
-          topcandTreeMaker->Reset();  // be here for safe first
-          topcandTreeMaker->AddEventInfo(evt_event(), evt_scale1fb(), evt_pfmet(), numberOfGoodVertices(), nVetoLeptons, 0/*vetotaus*/,
-                                         0/*vetotrks*/, jets.ak4_HT, jets.ngoodjets, jets.ngoodbtags, jets.nloosebtags);
+        if (eventHasTop || evt %4 == 0) {
+          topcandTreeMaker->ResetAll();  // be here for safe first
+          topcandTreeMaker->AddEventInfo(evt_event(), evt_scale1fb(), evt_pfmet(), numberOfGoodVertices(), nVetoLeptons,
+                                         jets.ngoodjets, jets.ngoodbtags, jets.nloosebtags);
           topcandTreeMaker->SetJetVectors(&jets.ak4pfjets_p4, &jets.ak4pfjets_CSV, &jets.ak4pfjets_cvsl,
                                           &jets.ak4pfjets_ptD, &jets.ak4pfjets_axis1, &jets.ak4pfjets_axis2, &jets.ak4pfjets_mult,
                                           &jets.ak4pfjets_deepCSVb, &jets.ak4pfjets_deepCSVc, &jets.ak4pfjets_deepCSVl, &jets.ak4pfjets_deepCSVbb);

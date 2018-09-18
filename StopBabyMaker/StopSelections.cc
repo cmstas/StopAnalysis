@@ -57,7 +57,7 @@ bool PassJetPreSelections(unsigned int jetIdx,float pt, float eta, bool passjid,
   } else if (gconf.year == 2016 && gconf.cmssw_ver == 94) {
     if(!isFastsim && passjid && !isTightPFJetV2(jetIdx)) return false;
   } else if (gconf.year == 2017) {
-    if(!isFastsim && passjid && !isTightPFJetV3(jetIdx)) return false;
+    if(!isFastsim && passjid && !isTightPFJet_2017_v1(jetIdx)) return false;
   }
   if(fabs(pfjets_p4().at(jetIdx).eta()) > eta) return false;
   //apply JEC

@@ -190,8 +190,8 @@ if __name__ == "__main__":
     for babyname, dsname in snt_samples.items():
         cmsswver = "CMSSW_10_1_0"
         scramarch = "slc6_amd64_gcc700"
-        tarfile = "tarfiles/input_v28_8.tar.gz"
-        tag = "v28_8"
+        tarfile = "tarfiles/input_v28_9.tar.gz"
+        tag = "v28_9"
         extraarg = "1" if "SMS" in dsname else "0"
         if "TTJets" in dsname and True: # to add switch later
             extraarg += " topcands"

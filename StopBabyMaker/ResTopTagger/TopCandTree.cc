@@ -31,35 +31,36 @@ bool isCloseObject(const LorentzVector p1, const LorentzVector p2, const float c
 
 TopCandTree::TopCandTree() :
     randGen(nullptr),
-    max_ntopcand(4)
+    max_nbcand(4)
 {}
 
 TopCandTree::TopCandTree(string treeName, string outputName, string sampletype) :
     randGen(nullptr),
-    max_ntopcand(4)
+    max_nbcand(4)
 {
   Setup(treeName, outputName, sampletype);
 }
 
 TopCandTree::~TopCandTree() {}
 
-void TopCandTree::AddEventInfo(int evt, float wgt, float pfmet, int nPV, int nleps, int ntaus, int ntrks, float HT, int nJets, int nBJets, int nLBJets)
+// void TopCandTree::AddEventInfo(int evt, float wgt, float pfmet, int nPV, int nleps, int ntaus, int ntrks, float HT, int nJets, int nBJets, int nLBJets)
+void TopCandTree::AddEventInfo(int evt, float wgt, float pfmet, int nPV, int nLeps, int nJets, int nBJets, int nLBJets)
 {
   event = evt;
   weight = wgt;
   met = pfmet;
   npv = nPV;
-  nvetolep = nleps;
-  nvetotau = ntaus;
-  nvetotrk = ntrks;
-  ht = HT;
+  nlep = nLeps;
+  // nvetotau = ntaus;
+  // nvetotrk = ntrks;
+  // ht = HT;
   njets = nJets;
   nbjets = nBJets;
   nlbjets = nLBJets;
 }
 
-void TopCandTree::AddTopCandInfo(const TopCand* topcand, bool isSignal) {
-  flag_signal = isSignal;
+void TopCandTree::AddTopCandInfo(const TopCand* topcand, int genmatch) {
+  flag_signal = genmatch;
 
   int ib  = topcand->getIdxForb();
   int ij2 = topcand->getIdxForj2();
@@ -72,11 +73,9 @@ void TopCandTree::AddTopCandInfo(const TopCand* topcand, bool isSignal) {
   var_b_axis1   = jets_axis1->at(ib);
   var_b_axis2   = jets_axis2->at(ib);
   var_b_mult    = jets_mult->at(ib);
-  var_b_dcsvb   = jets_deepcsvb->at(ib);
-  var_b_dcsvc   = jets_deepcsvc->at(ib);
-  var_b_dcsvl   = jets_deepcsvl->at(ib);
-  var_b_dcsvbb  = jets_deepcsvbb->at(ib);
-  var_b_dcsv    = var_b_dcsvb + var_b_dcsvbb;
+  var_b_dcsv    = jets_deepcsvb->at(ib) + jets_deepcsvbb->at(ib);
+  var_b_dcvsb   = jets_deepcsvc->at(ib) / (jets_deepcsvc->at(ib) + var_b_dcsv);
+  var_b_dcvsl   = jets_deepcsvc->at(ib) / (jets_deepcsvc->at(ib) + jets_deepcsvl->at(ib));
 
   var_j2_pt     = jets_p4->at(ij2).pt();
   var_j2_csv    = jets_csv->at(ij2);
@@ -85,11 +84,9 @@ void TopCandTree::AddTopCandInfo(const TopCand* topcand, bool isSignal) {
   var_j2_axis1  = jets_axis1->at(ij2);
   var_j2_axis2  = jets_axis2->at(ij2);
   var_j2_mult   = jets_mult->at(ij2);
-  var_j2_dcsvb  = jets_deepcsvb->at(ij2);
-  var_j2_dcsvc  = jets_deepcsvc->at(ij2);
-  var_j2_dcsvl  = jets_deepcsvl->at(ij2);
-  var_j2_dcsvbb = jets_deepcsvbb->at(ij2);
-  var_j2_dcsv   = var_j2_dcsvb + var_j2_dcsvbb;
+  var_j2_dcsv   = jets_deepcsvb->at(ij2) + jets_deepcsvbb->at(ij2);
+  var_j2_dcvsb  = jets_deepcsvc->at(ij2) / (jets_deepcsvc->at(ij2) + var_j2_dcsv);
+  var_j2_dcvsl  = jets_deepcsvc->at(ij2) / (jets_deepcsvc->at(ij2) + jets_deepcsvl->at(ij2));
 
   var_j3_pt     = jets_p4->at(ij3).pt();
   var_j3_csv    = jets_csv->at(ij3);
@@ -98,11 +95,9 @@ void TopCandTree::AddTopCandInfo(const TopCand* topcand, bool isSignal) {
   var_j3_axis1  = jets_axis1->at(ij3);
   var_j3_axis2  = jets_axis2->at(ij3);
   var_j3_mult   = jets_mult->at(ij3);
-  var_j3_dcsvb  = jets_deepcsvb->at(ij3);
-  var_j3_dcsvc  = jets_deepcsvc->at(ij3);
-  var_j3_dcsvl  = jets_deepcsvl->at(ij3);
-  var_j3_dcsvbb = jets_deepcsvbb->at(ij3);
-  var_j3_dcsv   = var_j3_dcsvb + var_j3_dcsvbb;
+  var_j3_dcsv   = jets_deepcsvb->at(ij3) + jets_deepcsvbb->at(ij3);
+  var_j3_dcvsb  = jets_deepcsvc->at(ij3) / (jets_deepcsvc->at(ij3) + var_j3_dcsv);
+  var_j3_dcvsl  = jets_deepcsvc->at(ij3) / (jets_deepcsvc->at(ij3) + jets_deepcsvl->at(ij3));
 
   // var_b_cvsb   = jets_cvsb->at(ib);
   // var_b_qgl    = jets_qgl->at(ib);
@@ -130,14 +125,13 @@ void TopCandTree::AddTopCandInfo(const TopCand* topcand, bool isSignal) {
     };
   var_chi2 = calcChi2(*topcand);
 
-  var_sd_0 = jets_p4->at(ij3).pt() / (jets_p4->at(ij2).pt()+jets_p4->at(ij3).pt());
-  var_sd_0    = var_sd_0;
-  var_sd_0p5  = var_sd_0/std::pow(var_wcand_deltaR, 0.5);
-  var_sd_1    = var_sd_0/var_wcand_deltaR;
-  var_sd_1p5  = var_sd_0/std::pow(var_wcand_deltaR, 1.5);
-  var_sd_n0p5 = var_sd_0/std::pow(var_wcand_deltaR, -0.5);
+  var_sd_0    = jets_p4->at(ij3).pt() / (jets_p4->at(ij2).pt()+jets_p4->at(ij3).pt());
+  // var_sd_0p5  = var_sd_0/std::pow(var_wcand_deltaR, 0.5);
+  // var_sd_1    = var_sd_0/var_wcand_deltaR;
+  // var_sd_1p5  = var_sd_0/std::pow(var_wcand_deltaR, 1.5);
+  // var_sd_n0p5 = var_sd_0/std::pow(var_wcand_deltaR, -0.5);
   var_sd_n1   = var_sd_0/std::pow(var_wcand_deltaR, -1);
-  var_sd_n1p5 = var_sd_0/std::pow(var_wcand_deltaR, -1.5);
+  // var_sd_n1p5 = var_sd_0/std::pow(var_wcand_deltaR, -1.5);
   var_sd_n2   = var_sd_0/std::pow(var_wcand_deltaR, -2);
 
   var_b_j2_mass = (jets_p4->at(ib) + jets_p4->at(ij2)).mass();
@@ -159,13 +153,15 @@ void TopCandTree::AddTopCandInfo(const TopCand* topcand, bool isSignal) {
   var_n_extra_jets = n_extra_jets;
 }
 
-// void TopCandTree::AddGenTopInfo() {
-//   gen_top_pt, topDecay->top->pt() ;
-//   gen_w_pt,   topDecay->W->pt() ;
-//   gen_b_diag, topDecay->b->diag ;
-//   gen_w_diag, topDecay->W_decay->diag ;
-//   gen_top_resolved, true ;
-// }
+void TopCandTree::AddGenTopInfo(int itop) {
+  if (!genps_p4) throw std::logic_error("[TopCandTree::AddGenTopInfo]: The genps branches hasn't get setup!! Cannot fill gen information!");
+
+  gen_top_pt = genps_p4->at(itop).pt();
+  // gen_w_pt,   topDecay->W->pt() ;
+  // gen_b_diag, topDecay->b->diag ;
+  // gen_w_diag, topDecay->W_decay->diag ;
+  // gen_top_resolved, true ;
+}
 
 bool TopCandTree::IsGenTopMatched(const TopCand* topcand) {
   // Place holder for future development
@@ -177,7 +173,7 @@ int TopCandTree::IsGenTopMatchedSloppy(const TopCand* topcand) {
   //
   // also doesn't care about if jet not matching to any gen part (return -1)
 
-  if (!genps_id) throw std::logic_error("The genps branches hasn't get setup!! Cannot perform gen-matching!");
+  if (!genps_id) throw std::logic_error("[TopCandTree::IsGenTopMatched]: The genps branches hasn't get setup!! Cannot perform gen-matching!");
 
 
   vector<int> gentopidx;
@@ -220,8 +216,10 @@ int TopCandTree::IsGenTopMatchedSloppy(const TopCand* topcand) {
         b_matched = true;
       genqidx_fromtop.erase(matchq);
     }
-    if (genqidx_fromtop.size() == 0)
+    if (genqidx_fromtop.size() == 0) {
+      AddGenTopInfo(itop);
       return true + !b_matched;  // return 2 if is a permutation of the top cand
+    }
   }
 
   return false;
@@ -238,7 +236,7 @@ void TopCandTree::FillTree() {
   if (nbjets < 1) return;
   if (nlbjets < 2) return;
 
-  // jets sorted by CSV
+  // jets sorted by CSV, the jet vector size should be at least 3
   std::vector<size_t> jetidx( jets_p4->size() );
   std::iota(jetidx.begin(), jetidx.end(), 0);
   std::sort(jetidx.begin(), jetidx.end(), [&](size_t i, size_t j) { return jets_csv->at(i) > jets_csv->at(j); });
@@ -246,7 +244,7 @@ void TopCandTree::FillTree() {
   // ------------------------------
   // form all possible candidates
   vector<TopCand> allCands;
-  for (size_t ib = 0; ib < max_ntopcand; ++ib) {
+  for (size_t ib = 0; ib < max_nbcand; ++ib) {
     // if(csvJets.at(iB)->csv() < defaults::CSV_LOOSE) break; // b must pass CSVL
     for (size_t ij2 = 0; ij2 < jetidx.size()-1; ++ij2) {
       if (ij2 == ib) continue;
@@ -261,13 +259,24 @@ void TopCandTree::FillTree() {
 
   if (allCands.empty()) return;
 
+  auto addOverlapInfo = [&](const TopCand& topcand) {
+      flag_shuffle = false;
+      for (const auto &c : allCands) {
+        if (&c != &topcand && topcand.similarAs(c)) {
+          flag_shuffle = true;
+          break;
+        }
+      }
+    };
+
   // ------------------------------
   // treat signal and bkg differently
   if (!randGen) {
     vector<const TopCand*> fakeCands;
-    for (const auto &topcand : allCands){
-      if (IsGenTopMatchedSloppy(&topcand) == 1) {
-        AddTopCandInfo(&topcand, true);
+    for (const auto &topcand : allCands) {
+      if (int type = IsGenTopMatchedSloppy(&topcand); type > 0) {
+        AddTopCandInfo(&topcand, type);
+        addOverlapInfo(topcand);
         tree->Fill();
       } else {
         fakeCands.push_back(&topcand);
@@ -276,6 +285,7 @@ void TopCandTree::FillTree() {
     std::random_shuffle(fakeCands.begin(), fakeCands.end());
     for (size_t i = 0; i < 2 && i < fakeCands.size(); ++i) {
       AddTopCandInfo(fakeCands.at(i), false);
+      addOverlapInfo(*(fakeCands.at(i)));
       tree->Fill();
     }
   } else {
@@ -300,7 +310,7 @@ void TopCandTree::Setup(string treeName, string outputName, string sampletype)
   SetBranches();
 }
 
-void TopCandTree::Reset() {
+void TopCandTree::ResetAll() {
 
   // Reset these branches every event, just to be save
   jets_p4 = nullptr;
@@ -323,16 +333,16 @@ void TopCandTree::Reset() {
 
   event = -1;
   weight = -1;
-  npv = -1;
-  nvetolep = -1;
-  nvetotau = -1;
-  nvetotrk = -1;
+  // npv = -1;
+  nlep = -1;
+  // ntau = -1;
+  // ntrk = -1;
   njets = -1;
   nbjets = -1;
   nlbjets = -1;
   flag_signal = -1;
   met = -1;
-  ht = -1;
+  // ht = -1;
 
   gen_top_pt = -1;
   gen_w_pt = -1;
@@ -343,48 +353,44 @@ void TopCandTree::Reset() {
   var_b_pt = -1;
   var_b_mass = -1;
   var_b_csv = -1;
-  var_b_dcsv = -1;
-  var_b_dcsvb = -1;
-  var_b_dcsvc = -1;
-  var_b_dcsvl = -1;
-  var_b_dcsvbb = -1;
   var_b_cvsb = -1;
+  var_b_dcsv = -1;
+  var_b_dcvsb = -1;
+  var_b_dcvsl = -1;
   var_b_qgl = -1;
   var_b_ptD = -1;
   var_b_axis1 = -1;
   var_b_axis2 = -1;
   var_b_mult = -1;
+
   var_j2_pt = -1;
   var_j2_csv = -1;
-  var_j2_dcsv = -1;
-  var_j2_dcsvb = -1;
-  var_j2_dcsvc = -1;
-  var_j2_dcsvl = -1;
-  var_j2_dcsvbb = -1;
   var_j2_cvsl = -1;
   var_j2_cvsb = -1;
+  var_j2_dcsv = -1;
+  var_j2_dcvsb = -1;
+  var_j2_dcvsl = -1;
   var_j2_qgl = -1;
   var_j2_ptD = -1;
   var_j2_axis1 = -1;
   var_j2_axis2 = -1;
   var_j2_mult = -1;
+
   var_j3_pt = -1;
   var_j3_csv = -1;
-  var_j3_dcsv = -1;
-  var_j3_dcsvb = -1;
-  var_j3_dcsvc = -1;
-  var_j3_dcsvl = -1;
-  var_j3_dcsvbb = -1;
   var_j3_cvsl = -1;
   var_j3_cvsb = -1;
+  var_j3_dcsv = -1;
+  var_j3_dcvsb = -1;
+  var_j3_dcvsl = -1;
   var_j3_qgl = -1;
   var_j3_ptD = -1;
   var_j3_axis1 = -1;
   var_j3_axis2 = -1;
   var_j3_mult = -1;
 
-  var_topcand_mass = -1;
   var_topcand_pt = -1;
+  var_topcand_mass = -1;
   var_topcand_ptDR = -1;
   var_b_wcand_deltaR = -1;
   var_wcand_mass = -1;
@@ -410,15 +416,15 @@ void TopCandTree::SetBranches() {
   tree->Branch("event", &event);
   tree->Branch("weight", &weight);
   tree->Branch("npv", &npv);
-  tree->Branch("nvetolep", &nvetolep);
-  tree->Branch("nvetotau", &nvetotau);
-  tree->Branch("nvetotrk", &nvetotrk);
+  tree->Branch("nlep", &nlep);
   tree->Branch("njets", &njets);
   tree->Branch("nbjets", &nbjets);
   tree->Branch("nlbjets", &nlbjets);
   tree->Branch("flag_signal", &flag_signal);
   tree->Branch("met", &met);
-  tree->Branch("ht", &ht);
+  // tree->Branch("ntau", &ntau);
+  // tree->Branch("ntrk", &ntrk);
+  // tree->Branch("ht", &ht);
 
   tree->Branch("gen_top_pt", &gen_top_pt);
   tree->Branch("gen_w_pt", &gen_w_pt);
@@ -429,41 +435,37 @@ void TopCandTree::SetBranches() {
   tree->Branch("var_b_pt", &var_b_pt);
   tree->Branch("var_b_mass", &var_b_mass);
   tree->Branch("var_b_csv", &var_b_csv);
+  // tree->Branch("var_b_cvsb", &var_b_cvsb);
   tree->Branch("var_b_dcsv", &var_b_dcsv);
-  tree->Branch("var_b_dcsvb", &var_b_dcsvb);
-  tree->Branch("var_b_dcsvc", &var_b_dcsvc);
-  tree->Branch("var_b_dcsvl", &var_b_dcsvl);
-  tree->Branch("var_b_dcsvbb", &var_b_dcsvbb);
-  tree->Branch("var_b_cvsb", &var_b_cvsb);
-  tree->Branch("var_b_qgl", &var_b_qgl);
+  tree->Branch("var_b_dcvsb", &var_b_dcvsb);
+  tree->Branch("var_b_dcvsl", &var_b_dcvsl);
+  // tree->Branch("var_b_qgl", &var_b_qgl);
   tree->Branch("var_b_ptD", &var_b_ptD);
   tree->Branch("var_b_axis1", &var_b_axis1);
   tree->Branch("var_b_axis2", &var_b_axis2);
   tree->Branch("var_b_mult", &var_b_mult);
+
   tree->Branch("var_j2_pt", &var_j2_pt);
   tree->Branch("var_j2_csv", &var_j2_csv);
-  tree->Branch("var_j2_dcsv", &var_j2_dcsv);
-  tree->Branch("var_j2_dcsvb", &var_j2_dcsvb);
-  tree->Branch("var_j2_dcsvc", &var_j2_dcsvc);
-  tree->Branch("var_j2_dcsvl", &var_j2_dcsvl);
-  tree->Branch("var_j2_dcsvbb", &var_j2_dcsvbb);
   tree->Branch("var_j2_cvsl", &var_j2_cvsl);
-  tree->Branch("var_j2_cvsb", &var_j2_cvsb);
-  tree->Branch("var_j2_qgl", &var_j2_qgl);
+  // tree->Branch("var_j2_cvsb", &var_j2_cvsb);
+  tree->Branch("var_j2_dcsv", &var_j2_dcsv);
+  tree->Branch("var_j2_dcvsb", &var_j2_dcvsb);
+  tree->Branch("var_j2_dcvsl", &var_j2_dcvsl);
+  // tree->Branch("var_j2_qgl", &var_j2_qgl);
   tree->Branch("var_j2_ptD", &var_j2_ptD);
   tree->Branch("var_j2_axis1", &var_j2_axis1);
   tree->Branch("var_j2_axis2", &var_j2_axis2);
   tree->Branch("var_j2_mult", &var_j2_mult);
+
   tree->Branch("var_j3_pt", &var_j3_pt);
   tree->Branch("var_j3_csv", &var_j3_csv);
-  tree->Branch("var_j3_dcsv", &var_j3_dcsv);
-  tree->Branch("var_j3_dcsvb", &var_j3_dcsvb);
-  tree->Branch("var_j3_dcsvc", &var_j3_dcsvc);
-  tree->Branch("var_j3_dcsvl", &var_j3_dcsvl);
-  tree->Branch("var_j3_dcsvbb", &var_j3_dcsvbb);
   tree->Branch("var_j3_cvsl", &var_j3_cvsl);
-  tree->Branch("var_j3_cvsb", &var_j3_cvsb);
-  tree->Branch("var_j3_qgl", &var_j3_qgl);
+  // tree->Branch("var_j3_cvsb", &var_j3_cvsb);
+  tree->Branch("var_j3_dcsv", &var_j3_dcsv);
+  tree->Branch("var_j3_dcvsb", &var_j3_dcvsb);
+  tree->Branch("var_j3_dcvsl", &var_j3_dcvsl);
+  // tree->Branch("var_j3_qgl", &var_j3_qgl);
   tree->Branch("var_j3_ptD", &var_j3_ptD);
   tree->Branch("var_j3_axis1", &var_j3_axis1);
   tree->Branch("var_j3_axis2", &var_j3_axis2);
@@ -479,17 +481,17 @@ void TopCandTree::SetBranches() {
   tree->Branch("var_wcand_deltaR", &var_wcand_deltaR);
   tree->Branch("var_chi2", &var_chi2);
   tree->Branch("var_sd_0", &var_sd_0);
-  tree->Branch("var_sd_0p5", &var_sd_0p5);
-  tree->Branch("var_sd_1", &var_sd_1);
-  tree->Branch("var_sd_1p5", &var_sd_1p5);
-  tree->Branch("var_sd_n0p5", &var_sd_n0p5);
+  // tree->Branch("var_sd_0p5", &var_sd_0p5);
+  // tree->Branch("var_sd_1", &var_sd_1);
+  // tree->Branch("var_sd_1p5", &var_sd_1p5);
+  // tree->Branch("var_sd_n0p5", &var_sd_n0p5);
   tree->Branch("var_sd_n1", &var_sd_n1);
-  tree->Branch("var_sd_n1p5", &var_sd_n1p5);
+  // tree->Branch("var_sd_n1p5", &var_sd_n1p5);
   tree->Branch("var_sd_n2", &var_sd_n2);
   tree->Branch("var_b_j2_mass", &var_b_j2_mass);
   tree->Branch("var_b_j3_mass", &var_b_j3_mass);
   tree->Branch("var_top_radius", &var_top_radius);
-  tree->Branch("var_n_extra_jets", &var_n_extra_jets);
+  // tree->Branch("var_n_extra_jets", &var_n_extra_jets);
 
 }
 
