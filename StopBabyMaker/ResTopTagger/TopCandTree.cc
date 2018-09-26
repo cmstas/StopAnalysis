@@ -41,22 +41,26 @@ TopCandTree::TopCandTree(string treeName, string outputName, string sampletype) 
   Setup(treeName, outputName, sampletype);
 }
 
-TopCandTree::~TopCandTree() {}
+TopCandTree::~TopCandTree() {
+  delete tree;
+  if (outfile) outfile->Close();
+  delete outfile;
+  delete randGen;
+}
 
-// void TopCandTree::AddEventInfo(int evt, float wgt, float pfmet, int nPV, int nleps, int ntaus, int ntrks, float HT, int nJets, int nBJets, int nLBJets)
-void TopCandTree::AddEventInfo(int evt, float wgt, float pfmet, int nPV, int nLeps, int nJets, int nBJets, int nLBJets)
+void TopCandTree::AddEventInfo(int evt, float wgt, float pfmet, int nPV, int nLeps, int nJets, int nBJets, int nLBJets, float MT, float tMod, float Mlb)
 {
   event = evt;
   weight = wgt;
   met = pfmet;
   npv = nPV;
   nlep = nLeps;
-  // nvetotau = ntaus;
-  // nvetotrk = ntrks;
-  // ht = HT;
   njets = nJets;
   nbjets = nBJets;
   nlbjets = nLBJets;
+  mt = MT;
+  mlb = Mlb;
+  tmod = tMod;
 }
 
 void TopCandTree::AddTopCandInfo(const TopCand* topcand, int genmatch) {
@@ -343,6 +347,10 @@ void TopCandTree::ResetAll() {
   flag_signal = -1;
   met = -1;
   // ht = -1;
+  mt = -1;
+  mlb = -1;
+  tmod = -1;
+
 
   gen_top_pt = -1;
   gen_w_pt = -1;
@@ -422,6 +430,9 @@ void TopCandTree::SetBranches() {
   tree->Branch("nlbjets", &nlbjets);
   tree->Branch("flag_signal", &flag_signal);
   tree->Branch("met", &met);
+  tree->Branch("mt", &mt);
+  tree->Branch("mlb", &mlb);
+  tree->Branch("tmod", &tmod);
   // tree->Branch("ntau", &ntau);
   // tree->Branch("ntrk", &ntrk);
   // tree->Branch("ht", &ht);
@@ -527,5 +538,4 @@ void TopCandTree::Write()
 {
   outfile->cd();
   tree->Write();
-  outfile->Close();
 }

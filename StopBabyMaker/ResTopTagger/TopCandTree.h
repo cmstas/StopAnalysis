@@ -13,7 +13,7 @@ class TopCandTree {
   TopCandTree();
   TopCandTree(std::string treeName, std::string outputName, std::string sampletype);
   ~TopCandTree();
-  void AddEventInfo(int evt, float wgt, float pfmet, int nPV, int nLeps, int nJets, int nBJets, int nLBJets);
+  void AddEventInfo(int evt, float wgt, float pfmet, int nPV, int nLeps, int nJets, int nBJets, int nLBJets, float MT, float tMod, float Mlb);
   void AddGenTopInfo(int topidx);
   void AddTopCandInfo(const TopCand *topcand, int isGenMatched);
   bool IsGenTopMatched(const TopCand* topcand);
@@ -70,7 +70,9 @@ class TopCandTree {
   short flag_signal;
   bool  flag_shuffle;
   float met;
-  float ht;
+  float mt;
+  float mlb;
+  float tmod;
 
   float gen_top_pt;
   float gen_w_pt;

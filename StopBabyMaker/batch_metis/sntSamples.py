@@ -190,8 +190,9 @@ if __name__ == "__main__":
     for babyname, dsname in snt_samples.items():
         cmsswver = "CMSSW_10_1_0"
         scramarch = "slc6_amd64_gcc700"
-        tarfile = "tarfiles/input_v28_9.tar.gz"
-        tag = "v28_9"
+        # tarfile = "tarfiles/input_v28_9.tar.gz"
+        tarfile = "input.tar.gz"
+        tag = "v28_10"
         extraarg = "1" if "SMS" in dsname else "0"
         if "TTJets" in dsname and True: # to add switch later
             extraarg += " topcands"
@@ -206,10 +207,10 @@ if __name__ == "__main__":
             scram_arch = scramarch,
             arguments = extraarg, # isFastsim
             tarfile = tarfile,
-            condor_submit_params = {"sites": "UAF,T2_US_UCSD,UCSB"},
-            # condor_submit_params = {"use_xrootd": True},
+            # condor_submit_params = {"sites": "UAF,T2_US_UCSD,UCSB"},
+            condor_submit_params = {"use_xrootd": True},
             # max_jobs = 10,      # temporary for submission test
-            # no_load_from_backup = True,
+            no_load_from_backup = True,
         )
         merge_task = CondorTask(
             sample = DirectorySample(

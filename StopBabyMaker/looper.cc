@@ -1530,30 +1530,15 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
         nEvents_pass_skim_met++;
       */
 
-      // Fill the tree for top tagger training flat ntuple before rejecting on leptons
-      // TODO: fix the ntau, ntrack information which only come after (or maybe they are most likely not needed)
-      if (runTopCandTreeMaker) {
-        bool eventHasTop = (StopEvt.dataset.find("TTJets") != string::npos && !StopEvt.is2lep);
-        if (eventHasTop || evt %4 == 0) {
-          topcandTreeMaker->ResetAll();  // be here for safe first
-          topcandTreeMaker->AddEventInfo(evt_event(), evt_scale1fb(), evt_pfmet(), numberOfGoodVertices(), nVetoLeptons,
-                                         jets.ngoodjets, jets.ngoodbtags, jets.nloosebtags);
-          topcandTreeMaker->SetJetVectors(&jets.ak4pfjets_p4, &jets.ak4pfjets_CSV, &jets.ak4pfjets_cvsl,
-                                          &jets.ak4pfjets_ptD, &jets.ak4pfjets_axis1, &jets.ak4pfjets_axis2, &jets.ak4pfjets_mult,
-                                          &jets.ak4pfjets_deepCSVb, &jets.ak4pfjets_deepCSVc, &jets.ak4pfjets_deepCSVl, &jets.ak4pfjets_deepCSVbb);
-          // topcandTreeMaker->SetGenParticleVectors(&gen_qs.p4, &gen_qs.id, &gen_qs.isLastCopy, &gen_qs.motherid, &gen_qs.motheridx);
-          topcandTreeMaker->SetGenParticleVectors(&genps_p4(), &genps_id(), &genps_isLastCopy(), &genps_id_mother(), &genps_idx_mother());
-          topcandTreeMaker->FillTree();
-        }
-      }
-
-      if(nGoodLeptons < skim_nGoodLep) continue;
-      nEvents_pass_skim_nGoodLep++;
-
       if(!(jets.ngoodjets >= skim_nJets) && !(jets_jup.ngoodjets >= skim_nJets) && !(jets_jdown.ngoodjets >= skim_nJets)) continue;
       nEvents_pass_skim_nJets++;
       if(!(jets.ngoodbtags >= skim_nBJets) && !(jets_jup.ngoodbtags >= skim_nBJets) && !(jets_jdown.ngoodbtags >= skim_nBJets)) continue;
       nEvents_pass_skim_nBJets++;
+
+      if(!runTopCandTreeMaker){
+        if(nGoodLeptons < skim_nGoodLep) continue;
+        nEvents_pass_skim_nGoodLep++;
+      }
 
       // FastSim filter, Nominal Jets
       bool fastsimfilt = false;
@@ -1832,6 +1817,27 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
           break;
         }
         if(nVetoLeptons>0) StopEvt.Mlb_lead_bdiscr_jdown = (jets_jdown.ak4pfjets_p4.at(jetIndexSortedBdisc_jdown[0])+lep1.p4).M();
+      }
+
+      // Fill the tree for top tagger training flat ntuple before rejecting on leptons
+      // TODO: fix the ntau, ntrack information which only come after (or maybe they are most likely not needed)
+      if(runTopCandTreeMaker){
+        bool eventHasTop = (StopEvt.dataset.find("TTJets") != string::npos && !StopEvt.is2lep);
+        if(eventHasTop || evt %4 == 0){
+          topcandTreeMaker->ResetAll();  // be here for safe first
+          topcandTreeMaker->AddEventInfo(evt_event(), evt_scale1fb(), evt_pfmet(), numberOfGoodVertices(),
+                                         nVetoLeptons, jets.ngoodjets, jets.ngoodbtags, jets.nloosebtags,
+                                         StopEvt.mt_met_lep, StopEvt.topnessMod, StopEvt.Mlb_closestb);
+          topcandTreeMaker->SetJetVectors(&jets.ak4pfjets_p4, &jets.ak4pfjets_CSV, &jets.ak4pfjets_cvsl,
+                                          &jets.ak4pfjets_ptD, &jets.ak4pfjets_axis1, &jets.ak4pfjets_axis2, &jets.ak4pfjets_mult,
+                                          &jets.ak4pfjets_deepCSVb, &jets.ak4pfjets_deepCSVc, &jets.ak4pfjets_deepCSVl, &jets.ak4pfjets_deepCSVbb);
+          // topcandTreeMaker->SetGenParticleVectors(&gen_qs.p4, &gen_qs.id, &gen_qs.isLastCopy, &gen_qs.motherid, &gen_qs.motheridx);
+          topcandTreeMaker->SetGenParticleVectors(&genps_p4(), &genps_id(), &genps_isLastCopy(), &genps_id_mother(), &genps_idx_mother());
+          topcandTreeMaker->FillTree();
+        }
+
+        if(nGoodLeptons < skim_nGoodLep) continue;
+        nEvents_pass_skim_nGoodLep++;
       }
 
       if(fillZll){
@@ -2351,7 +2357,6 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
 
       if(!(StopEvt.pfmet >= skim_met) && !(StopEvt.pfmet_rl >= skim_met) && !(StopEvt.pfmet_rl_jup >= skim_met) && !(StopEvt.pfmet_rl_jdown >= skim_met) && !(StopEvt.pfmet_jup >= skim_met) && !(StopEvt.pfmet_jdown >= skim_met) ) continue;
       //if(!(StopEvt.pfmet >= skim_met) && !(StopEvt.pfmet_rl >= skim_met) && !(StopEvt.pfmet_rl_jup >= skim_met) && !(StopEvt.pfmet_rl_jdown >= skim_met) && !(StopEvt.pfmet_jup >= skim_met) && !(StopEvt.pfmet_jdown >= skim_met) && !(StopEvt.pfmet_egclean >= skim_met) && !(StopEvt.pfmet_muegclean >= skim_met) && !(StopEvt.pfmet_muegcleanfix >= skim_met) && !(StopEvt.pfmet_uncorrcalomet >= skim_met) ) continue;
-      if (StopEvt.pfmet < skim_met && StopEvt.pfmet_rl < skim_met) continue; // Temporary!!
       nEvents_pass_skim_met++;
       /////////////////////////////////////////////////////////
 
@@ -2606,9 +2611,9 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
   cout << "-----------------------------" << endl;
   cout << "Events Processed                     " << nEvents_processed << endl;
   cout << "Events with " << skim_nvtx << " Good Vertex            " << nEvents_pass_skim_nVtx << endl;
-  cout << "Events with at least " << skim_nGoodLep << " Good Lepton   " << nEvents_pass_skim_nGoodLep << endl;
   cout << "Events with at least " << skim_nJets << " Good Jets     " << nEvents_pass_skim_nJets << endl;
   cout << "Events with at least " << skim_nBJets << " Good BJets   " << nEvents_pass_skim_nBJets << endl;
+  cout << "Events with at least " << skim_nGoodLep << " Good Lepton   " << nEvents_pass_skim_nGoodLep << endl;
   cout << "Events passing 2nd Lep Veto " << apply2ndLepVeto << "    " << nEvents_pass_skim_2ndlepVeto << endl;
   cout << "Events with MET > " << skim_met << " GeV             " << nEvents_pass_skim_met << endl;
   cout << "-----------------------------" << endl;
