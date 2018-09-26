@@ -6,10 +6,11 @@
  *  Modified on: Oct 23, 2017
  */
 
+#include <numeric>
+#include <algorithm>
 #include "ResolvedTopMVA.h"
 #include "Math/VectorUtil.h"
 
-using namespace tas;
 using vecf = std::vector<float>;
 using veci = std::vector<int>;
 
@@ -22,23 +23,23 @@ std::map<TString,float> ResolvedTopMVA::calcTopCandVars(const TopCand& topjet) {
 
   vars["var_b_pt"]         = p4vec->at(ib).pt();
   vars["var_b_mass"]       = p4vec->at(ib).mass();
-  vars["var_b_csv"]        = csvvec->at(ib);
+  vars["var_b_dcsv"]       = csvvec->at(ib);
   // vars["var_b_ptD"]        = ptDvec->at(ib);
   // vars["var_b_axis1"]      = axis1vec->at(ib);
   // vars["var_b_mult"]       = multvec->at(ib);
 
   vars["var_j2_pt"]        = p4vec->at(ij2).pt();
   vars["var_j2_mass"]      = p4vec->at(ij2).mass();
-  vars["var_j2_csv"]       = csvvec->at(ij2);
-  vars["var_j2_cvsl"]      = cvslvec->at(ij2);
+  vars["var_j2_dcsv"]      = csvvec->at(ij2);
+  vars["var_j2_dcvsl"]     = cvslvec->at(ij2);
   vars["var_j2_ptD"]       = ptDvec->at(ij2);
   vars["var_j2_axis1"]     = axis1vec->at(ij2);
   vars["var_j2_mult"]      = multvec->at(ij2);
 
   vars["var_j3_pt"]        = p4vec->at(ij3).pt();
   vars["var_j3_mass"]      = p4vec->at(ij3).mass();
-  vars["var_j3_csv"]       = csvvec->at(ij3);
-  vars["var_j3_cvsl"]      = cvslvec->at(ij3);
+  vars["var_j3_dcsv"]      = csvvec->at(ij3);
+  vars["var_j3_dcvsl"]     = cvslvec->at(ij3);
   vars["var_j3_ptD"]       = ptDvec->at(ij3);
   vars["var_j3_axis1"]     = axis1vec->at(ij3);
   vars["var_j3_mult"]      = multvec->at(ij3);
@@ -87,13 +88,13 @@ void ResolvedTopMVA::initTopMVA() {
 
   vars = {
     "var_b_mass",
-    "var_b_csv",
-    "var_j2_csv",
-    "var_j2_cvsl",
+    "var_b_dcsv",
+    "var_j2_dcsv",
+    "var_j2_dcvsl",
     "var_j2_ptD",
     "var_j2_axis1",
-    "var_j3_csv",
-    "var_j3_cvsl",
+    "var_j3_dcsv",
+    "var_j3_dcvsl",
     "var_j3_ptD",
     "var_j3_axis1",
     "var_topcand_mass",
@@ -163,8 +164,8 @@ std::vector<TopCand> ResolvedTopMVA::getTopCandidates(const double WP, const siz
     }
   }
 
-  // auto cands = removeOverlap(allCands, WP);
-  return allCands;
+  auto cands = removeOverlap(allCands, WP);
+  return cands;
 }
 
 std::vector<TopCand> ResolvedTopMVA::removeOverlap(std::vector<TopCand>& cands, double threshold) {

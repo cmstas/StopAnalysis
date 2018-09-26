@@ -55,7 +55,7 @@ const bool doTopTagging = true;
 // turn on to apply json file to data
 const bool applyGoodRunList = true;
 // re-run resolved top MVA locally
-const bool runResTopMVA = false;
+const bool runResTopMVA = true;
 // only produce yield histos
 const bool runYieldsOnly = false;
 // only running selected signal points to speed up
@@ -154,7 +154,10 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
   if (printPassedEvents) ofile.open("passEventList.txt");
 
   if (runResTopMVA)
-    resTopMVA = new ResolvedTopMVA("../StopCORE/TopTagger/resTop_xGBoost_v0.weights.xml", "BDT");
+    // resTopMVA = new ResolvedTopMVA("../StopCORE/TopTagger/resTop_xGBoost_v0.weights.xml", "BDT");
+    // resTopMVA = new ResolvedTopMVA("/home/users/sicheng/working/training/test/results_deepCSV/xgboost.xml", "BDT");
+    resTopMVA = new ResolvedTopMVA("/home/users/sicheng/working/training/test/results_1lep/xgboost.xml", "BDT");
+    // resTopMVA = new ResolvedTopMVA("/home/users/sicheng/working/training/test/results_flag2/xgboost.xml", "BDT");
 
   outfile_ = new TFile(output_name.Data(), "RECREATE") ;
 
@@ -379,9 +382,6 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
         plot1d("h_nvtxs_rwtd", nvtxs(), evtweight_, testVec[0].histMap, ";Number of vertices", 100, 1, 101);
       }
 
-      // Temporary test for top tagging efficiency
-      testTopTaggingEffficiency(testVec[1]);
-
       // nbtag for CSV valued btags -- for comparison between the 2016 analysis
       int nbtagCSV = 0;
       int ntbtagCSV = 0;
@@ -416,6 +416,20 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
       // For toptagging, add correct switch later
       values_["resttag"] = lead_restopdisc;
       values_["deepttag"] = lead_deepdisc_top;
+
+      if (runResTopMVA) {
+        // Prepare deep_cvsl vector
+        vector<float> ak4pfjets_dcvsl;
+        for (size_t j = 0; j < ak4pfjets_deepCSV().size(); ++j) {
+          ak4pfjets_dcvsl.push_back(ak4pfjets_deepCSVc().at(j) / (ak4pfjets_deepCSVc().at(j) + ak4pfjets_deepCSVl().at(j)));
+        }
+        resTopMVA->setJetVecPtrs(&ak4pfjets_p4(), &ak4pfjets_deepCSV(), &ak4pfjets_dcvsl, &ak4pfjets_ptD(), &ak4pfjets_axis1(), &ak4pfjets_mult());
+        std::vector<TopCand> topcands = resTopMVA->getTopCandidates(-1);
+        values_["resttag"] = (topcands.size() > 0)? topcands[0].disc : -1.1;
+      }
+
+      // Temporary test for top tagging efficiency
+      testTopTaggingEffficiency(testVec[1]);
 
       /// Values only for hist filling or testing
       values_["chi2"] = hadronic_top_chi2();
@@ -497,40 +511,43 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
         // values_["ntbtag"] = ntbtagCSV;
 
         // Filling histograms for SR
-        fillHistosForSR(suffix);
+        // fillHistosForSR(suffix);
 
-        fillHistosForCR0b(suffix);
+        // fillHistosForCR0b(suffix);
 
         values_["nlep_rl"] = (ngoodleps() == 1 && nvetoleps() >= 2 && lep2_p4().Pt() > 10)? 2 : ngoodleps();
         values_["mll"] = (lep1_p4() + lep2_p4()).M();
 
         if (jestype_ == 0) {
           values_["mt_rl"] = mt_met_lep_rl();
-          values_["mt2_ll"] = MT2_ll();
+          // values_["mt2_ll"] = MT2_ll();
+          values_["mt2_ll"] = 150;
           values_["met_rl"] = pfmet_rl();
           values_["dphijmet_rl"]= mindphi_met_j1_j2_rl();
           values_["dphilmet_rl"] = lep1_dphiMET_rl();
           values_["tmod_rl"] = topnessMod_rl();
         } else if (jestype_ == 1) {
           values_["mt_rl"] = mt_met_lep_rl_jup();
-          values_["mt2_ll"] = MT2_ll_jup();
+          // values_["mt2_ll"] = MT2_ll_jup();
+          values_["mt2_ll"] = 150;
           values_["met_rl"] = pfmet_rl_jup();
           values_["dphijmet_rl"]= mindphi_met_j1_j2_rl_jup();
           values_["dphilmet_rl"] = lep1_dphiMET_rl_jup();
           values_["tmod_rl"] = topnessMod_rl_jup();
         } else if (jestype_ == 2) {
           values_["mt_rl"] = mt_met_lep_rl_jdown();
-          values_["mt2_ll"] = MT2_ll_jdown();
+          // values_["mt2_ll"] = MT2_ll_jdown();
+          values_["mt2_ll"] = 150;
           values_["met_rl"] = pfmet_rl_jdown();
           values_["dphijmet_rl"]= mindphi_met_j1_j2_rl_jdown();
           values_["dphilmet_rl"] = lep1_dphiMET_rl_jdown();
           values_["tmod_rl"] = topnessMod_rl_jdown();
         }
-        fillHistosForCR2l(suffix);
-        fillHistosForCRemu(suffix);
+        // fillHistosForCR2l(suffix);
+        // fillHistosForCRemu(suffix);
 
         // testCutFlowHistos(testVec[2]);
-        fillTopTaggingHistos(suffix);
+        // fillTopTaggingHistos(suffix);
 
         // // Also do yield using genmet for fastsim samples
         // if (is_fastsim_ && jestype_ == 0) {
@@ -870,13 +887,13 @@ void StopLooper::fillHistosForCR0b(string suf) {
 
     if (runYieldsOnly) continue;
 
-    // Temporary solution to no resttag value for CR0b: to rerun the resolvedTopMVA in looper
-    if (runResTopMVA && cr.GetName() == "cr0bbase") {
-      // make use of the fact that the first cr should always be cr0bbase to reduce the time this is called
-      resTopMVA->setJetVecPtrs(&ak4pfjets_p4(), &ak4pfjets_CSV(), &ak4pfjets_cvsl(), &ak4pfjets_ptD(), &ak4pfjets_axis1(), &ak4pfjets_mult());
-      std::vector<TopCand> topcands = resTopMVA->getTopCandidates(-1);
-      values_["resttag"] = (topcands.size() > 0)? topcands[0].disc : -1.1;
-    }
+    // // Re-doing the resolvedTopMVA in looper
+    // if (runResTopMVA && cr.GetName() == "cr0bbase") {
+    //   // make use of the fact that the first cr should always be cr0bbase to reduce the time this is called
+    //   resTopMVA->setJetVecPtrs(&ak4pfjets_p4(), &ak4pfjets_CSV(), &ak4pfjets_cvsl(), &ak4pfjets_ptD(), &ak4pfjets_axis1(), &ak4pfjets_mult());
+    //   std::vector<TopCand> topcands = resTopMVA->getTopCandidates(-1);
+    //   values_["resttag"] = (topcands.size() > 0)? topcands[0].disc : -1.1;
+    // }
 
     auto fillKineHists = [&] (string s) {
       plot1d("h_mt"+s,       values_["mt"]      , evtweight_, cr.histMap, ";M_{T} [GeV]"          , 12, 150, 600);
@@ -1213,6 +1230,9 @@ void StopLooper::testTopTaggingEffficiency(SR& sr) {
 
   int ntopcands = topcands_disc().size();
   float lead_disc = (ntopcands > 0)? topcands_disc().at(0) : -1.1; // lead_bdt_disc
+  if (runResTopMVA) {
+    lead_disc = values_["resttag"];
+  }
 
   int ntftops = 0;
   float lead_tftop_disc = -0.09;
@@ -1385,6 +1405,18 @@ void StopLooper::testTopTaggingEffficiency(SR& sr) {
     plot1d("h_ntftops", ntftops, evtweight_, sr.histMap, ";ntops from TF tagger", 4, 0, 4);
     plot1d("h_lead_tftop_disc", lead_tftop_disc, evtweight_, sr.histMap, ";ntops from TF tagger", 120, -0.1, 1.1);
     plot1d("h_lead_tftop_finedisc", lead_tftop_disc, evtweight_, sr.histMap, ";ntops from TF tagger", 1200, -0.1, 1.1);
+
+    if (mt_met_lep() > 150) {
+      plot1d("h_chi2_disc1_mt150", chi2_disc, evtweight_, sr.histMap, ";discriminator", 220, -1.1, 1.1);
+      plot1d("h_lead_topcand_finedisc_mt150", lead_disc, evtweight_, sr.histMap, ";lead topcand discriminator", 1100, -1.1, 1.1);
+      plot1d("h_lead_tftop_finedisc_mt150", lead_tftop_disc, evtweight_, sr.histMap, ";ntops from TF tagger", 1200, -0.1, 1.1);
+    }
+
+    if (mindphi_met_j1_j2() > 0.5) {
+      plot1d("h_chi2_disc1_dphigp5", chi2_disc, evtweight_, sr.histMap, ";discriminator", 220, -1.1, 1.1);
+      plot1d("h_lead_topcand_finedisc_dphigp5", lead_disc, evtweight_, sr.histMap, ";lead topcand discriminator", 1100, -1.1, 1.1);
+      plot1d("h_lead_tftop_finedisc_dphigp5", lead_tftop_disc, evtweight_, sr.histMap, ";ntops from TF tagger", 1200, -0.1, 1.1);
+    }
 
     for (float disc : topcands_disc()) {
       plot1d("h_all_topcand_disc", disc, evtweight_, sr.histMap, ";discriminator", 110, -1.1, 1.1);

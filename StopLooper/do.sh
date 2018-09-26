@@ -66,6 +66,7 @@ mkdir -p ${LOGDIR}
 # INDIR=/nfs-7/userdata/sicheng/stopbabies/merged_v25_7
 # INDIR=/nfs-7/userdata/sicheng/stopbabies/merged_v27_5/shuffle
 INDIR=/nfs-7/userdata/sicheng/stopbabies/merged_v28_6
+# INDIR=/nfs-7/userdata/sicheng/stopbabies/skimmed_v28_6
 OUTDIR=output/samp17_v1
 LOGDIR=$OUTDIR/logs
 
@@ -77,30 +78,31 @@ declare -a Samples=(data_2017B data_2017C data_2017D data_2017E data_2017F)
 # declare -a Samples=(data_2017B_singlemu data_2017C_singlemu data_2017D_singlemu data_2017E_singlemu data_2017F_singlemu)
 # Samples+=(data_2017B_singleel data_2017C_singleel data_2017D_singleel data_2017E_singleel data_2017F_singleel)
 
-for SAMPLE in ${Samples[@]}; do
-    # ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
-    echo ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} '>&' ${LOGDIR}/log_${SAMPLE}.txt
-    eval "nohup nice -n -10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
-done
+# for SAMPLE in ${Samples[@]}; do
+#     # ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
+#     echo ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} '>&' ${LOGDIR}/log_${SAMPLE}.txt
+#     eval "nohup nice -n -10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
+# done
 
 # 2017 MC test
 
 # INDIR=/nfs-7/userdata/sicheng/stopbabies/merged_v25_4
 # INDIR=/hadoop/cms/store/user/sicheng/ProjectMetis/stopBaby_ttbar_semileptonic_madgraph_v27_2/skimmed
 INDIR=/nfs-7/userdata/sicheng/stopbabies/merged_v28_6
-# OUTDIR=output/tempIncl
-# LOGDIR=${OUTDIR}/logs
+# INDIR=/nfs-7/userdata/sicheng/stopbabies/skimmed_v28_6
+OUTDIR=output/testTraining3
+LOGDIR=${OUTDIR}/logs
 
 mkdir -p ${OUTDIR}
 mkdir -p ${LOGDIR}
 
 declare -a Samples=()
 # declare -a Samples=(TTJets W2Jets W3Jets W4Jets)
-# declare -a Samples=(ttbar_semileptonic)
+# declare -a Samples=(TTJets_incl_amcnlo)
 Samples+=( TTJets_incl_amcnlo_0 TTJets_incl_amcnlo_1 TTJets_incl_amcnlo_2 )    # ttbar
-Samples+=( ST_tW_top ST_tW_antitop ST_schan )      # singleT
-Samples+=( W3Jets W4Jets)       # Vjets : Wjets + DY
-Samples+=( TTZToLLNuNu TTWJetsToLNu WZTo3LNu )      # rare  : ttV + diboson
+# Samples+=( ST_tW_top ST_tW_antitop ST_schan )      # singleT
+# Samples+=( W3Jets W4Jets)       # Vjets : Wjets + DY
+# Samples+=( TTZToLLNuNu TTWJetsToLNu WZTo3LNu )      # rare  : ttV + diboson
 
 for SAMPLE in ${Samples[@]}; do
     # ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
@@ -112,14 +114,16 @@ done
 # INDIR=/nfs-7/userdata/stopRun2/analysis2016_SUS-16-051_35p9fbinv/v24/skim
 # INDIR=/nfs-7/userdata/stopRun2/analysis2016_SUS-16-051_35p9fbinv/v24/output
 INDIR=/nfs-7/userdata/sicheng/stopbabies/merged_v25_10
+# INDIR=/nfs-7/userdata/sicheng/stopbabies/merged_v28_6
 # OUTDIR=output/temp
-# OUTDIR=output/samp16all
+# OUTDIR=output/samp16_incl_80x
 # LOGDIR=${OUTDIR}/logs
+# cd ../StopCORE; cp stop_1l_babyAnalyzer.h.old stop_1l_babyAnalyzer.h; cp stop_1l_babyAnalyzer.cc.old stop_1l_babyAnalyzer.cc; mkc; cd -
 
 mkdir -p ${OUTDIR}
 mkdir -p ${LOGDIR}
 
-# declare -a Samples=(2016data_sample)
+# declare -a Samples=(all_2016_samples)
 declare -a Samples=(data_2016B data_2016C data_2016D data_2016E data_2016F data_2016G data_2016H)
 # declare -a Samples=(data_met)
 
@@ -144,6 +148,10 @@ INDIR=/nfs-7/userdata/sicheng/stopbabies/merged_v25_9
 # INDIR=/nfs-7/userdata/sicheng/stopbabies/skimmed_v25_9
 # INDIR=/nfs-7/userdata/sicheng/stopbabies/skimmed_v27_1
 # OUTDIR=output/tempI2
+# INDIR=/hadoop/cms/store/user/sicheng/ProjectMetis/stopBaby_TTJets_amcnlo_80X_v28_7/merged/
+# INDIR=/hadoop/cms/store/user/sicheng/ProjectMetis/stopBaby_TTJets_madgraph_80X_v28_7/merged
+# INDIR=../StopBabyMaker
+# OUTDIR=output/testTFTagger
 
 mkdir -p ${OUTDIR}
 mkdir -p ${LOGDIR}
@@ -155,6 +163,8 @@ Samples+=( W1Jets W2Jets W3Jets W4Jets)       # Vjets : Wjets + DY
 Samples+=( TTZToLLNuNu WZTo1L3Nu )            # rare  : ttV + diboson
 
 # declare -a Samples=(ttbar_singleLeptFromT_amcnlo_94X)
+# declare -a Samples=(TTJets_amcnlo_80X)
+declare -a Samples=(stopbaby_9)
 
 # for SAMPLE in ${Samples[@]}; do
 #     # ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
@@ -210,24 +220,24 @@ echo -e 'All looper jobs done!\a'
 # cp data_single_lepton_met.root data_2016_all.root 
 # popd > /dev/null
 
-# Local merge for the v28_6 babies
-pushd ${OUTDIR}
-hadd -f ttbar_17.root    TTJets*.root > /dev/null
-hadd -f singleT_17.root  ST_*.root  > /dev/null
-hadd -f Vjets_17.root    W3Jets*.root W4Jets*.root > /dev/null
-hadd -f rare_17.root     TTZ*.root WZ*.root TTW*.root > /dev/null
-hadd -f allBkg_17.root   ttbar_17.root singleT_17.root Vjets_17.root rare_17.root > /dev/null
-hadd -f allData_17.root  data_2017*.root > /dev/null
-popd > /dev/null
+# # Local merge for the v28_6 babies
+# pushd ${OUTDIR}
+# hadd -f ttbar_17.root    TTJets*.root > /dev/null
+# hadd -f singleT_17.root  ST_*.root  > /dev/null
+# hadd -f Vjets_17.root    W3Jets*.root W4Jets*.root > /dev/null
+# hadd -f rare_17.root     TTZ*.root WZ*.root TTW*.root > /dev/null
+# hadd -f allBkg_17.root   ttbar_17.root singleT_17.root Vjets_17.root rare_17.root > /dev/null
+# hadd -f allData_17.root  data_2017*.root > /dev/null
+# popd > /dev/null
 
 # # Local merge for the v25_9 babies
 # pushd ${OUTDIR}
-# hadd -f ttbar_25ns.root    ttbar_*Lept*.root > /dev/null
-# hadd -f singleT_25ns.root  t_tW_*.root  > /dev/null
-# hadd -f Vjets_25ns.root    W1Jets*.root W2Jets*.root W3Jets*.root W4Jets*.root > /dev/null
-# hadd -f rare_25ns.root     TTZ*.root WZ*.root  > /dev/null
-# hadd -f allBkg_25ns.root   ttbar_25ns.root singleT_25ns.root Vjets_25ns.root rare_25ns.root > /dev/null
-# hadd -f allData_25ns.root  data_2016*.root > /dev/null
+# hadd -f ttbar_16.root    ttbar_*Lept*.root > /dev/null
+# hadd -f singleT_16.root  t_tW_*.root  > /dev/null
+# hadd -f Vjets_16.root    W1Jets*.root W2Jets*.root W3Jets*.root W4Jets*.root > /dev/null
+# hadd -f rare_16.root     TTZ*.root WZ*.root  > /dev/null
+# hadd -f allBkg_16.root   ttbar_16.root singleT_16.root Vjets_16.root rare_16.root > /dev/null
+# hadd -f allData_16.root  data_2016*.root > /dev/null
 # # hadd -f SMS_T2tt.root      SMS_T2tt_mStop_400to1200_madgraph_?.root > /dev/null
 # # hadd -f SMS_T2bW.root      SMS_T2bW_madgraph_?.root > /dev/null
 # # hadd -f SMS_T2tb.root      SMS_T2tb_madgraph_?.root > /dev/null

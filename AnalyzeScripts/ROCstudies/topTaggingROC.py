@@ -64,6 +64,24 @@ def getNSigPointsNew(f1):
                 count += 1
     return count
 
+def getTopCandROC(folder, sample="TTJets_incl_amcnlo.root"):
+    f1 = r.TFile("../../StopLooper/output/"+folder+"/"+sample)
+
+    hgood = f1.Get("testTopTagging/h_lead_topcand_finedisc")
+    hfake = f1.Get("testTopTagging/h_lead_fakecand_finedisc")
+
+    if not hgood: print "Cannot find hgood!"
+    if not hfake: print "Cannot find hfake!"
+
+    ngood = hgood.Integral()
+    nfake = hfake.Integral()
+
+    lst_tageff, lst_fkrate, lst_disc = makeROClist(hgood, hfake)
+
+    groc = r.TGraph(lst_tageff.size, lst_tageff, lst_fkrate)
+
+    return groc
+
 if __name__ == "__main__":
 
     os.system("mkdir -p plots")
@@ -76,7 +94,10 @@ if __name__ == "__main__":
     # hfake = f2.Get("srNJet2/h_leadtopcand_finedisc")
 
     # f1 = r.TFile("../../StopLooper/output/tempNewTagger2/TTJets_amcnlo.root")
-    f1 = r.TFile("../../StopLooper/output/tempNewTagger5/stopbaby.root")
+    # f1 = r.TFile("../../StopLooper/output/tempNewTagger5/stopbaby.root")
+    # f1 = r.TFile("../../StopLooper/output/testTFTagger/ttbar_madgraph.root")
+    f1 = r.TFile("../../StopLooper/output/testTraining_org/TTJets_incl_amcnlo.root")
+    # f1 = r.TFile("../../StopLooper/output/testTraining0/TTJets_incl_amcnlo.root")
     f2 = f1
 
     hgood = f1.Get("testTopTagging/h_lead_topcand_finedisc")
@@ -105,7 +126,7 @@ if __name__ == "__main__":
     print lst_sigyld[-1], lst_bkgyld[-1]
 
     lst_StoSnB = np.array([lst_sigyld[i] / sqrt(lst_sigyld[i]+lst_bkgyld[i]) for i in range(len(lst_sigyld))], dtype=float)
-    lst_StoB = np.array([lst_sigyld[i] / sqrt(lst_bkgyld[i]) for i in range(len(lst_sigyld))], dtype=float)
+    # lst_StoB = np.array([lst_sigyld[i] / sqrt(lst_bkgyld[i]) for i in range(len(lst_sigyld))], dtype=float)
     # print lst_sigyld, lst_bkgyld, lst_disc, lst_StoSnB
 
     groc = r.TGraph(lst_tageff.size, lst_tageff, lst_fkrate)
@@ -122,7 +143,7 @@ if __name__ == "__main__":
     gstob.GetYaxis().SetTitle("S / #sqrt{S+B}")
     gstob.Draw()
 
-    c1.Print("stob_test_tftop.pdf")
+    # c1.Print("stob_test_bdtres.pdf")
 
     c1.Clear()
 
@@ -138,7 +159,7 @@ if __name__ == "__main__":
 
     groc.Draw()
 
-    c1.Print("roc_test_tftop.pdf")
+    # c1.Print("roc_test_bdtres.pdf")
 
     # c1.Clear()
 
@@ -163,8 +184,8 @@ if __name__ == "__main__":
     tfroc.GetYaxis().SetTitle("fake rate")
     tfroc.Draw("same")
 
-    leg = r.TLegend(0.16, 0.68, 0.42, 0.86)
-    leg.AddEntry(groc, "BDT top tagger")
+    leg = r.TLegend(0.16, 0.48, 0.46, 0.86)
+    leg.AddEntry(groc, "BDT original")
     leg.AddEntry(tfroc, "TF top tagger")
     leg.Draw()
 
@@ -195,6 +216,35 @@ if __name__ == "__main__":
     leg.Draw()
 
     c1.Print("roc_test_AddChi2.pdf")
+
+    # exit()
+    # roc_new = getTopCandROC("testTraining1", "skimmed_TTJets_incl_amcnlo.root")
+    roc_new = getTopCandROC("testTraining1")
+    roc_new.SetLineColor(r.kTeal)
+    roc_new.Draw("same")
+    leg.AddEntry(roc_new, "New training")
+
+    # roc_dcsv = getTopCandROC("testTraining_dcsv", "skimmed_TTJets_incl_amcnlo.root")
+    roc_dcsv = getTopCandROC("testTraining_dcsv")
+    roc_dcsv.SetLineColor(r.kViolet)
+    roc_dcsv.Draw("same")
+    leg.AddEntry(roc_dcsv, "With deepCSV")
+
+    roc_f2 = getTopCandROC("testTraining_flag2")
+    roc_f2.SetLineColor(r.kGray+2)
+    roc_f2.Draw("same")
+    leg.AddEntry(roc_f2, "allow !b-matched")
+
+    roc_1l = getTopCandROC("testTraining_1lep")
+    roc_1l.SetLineColor(r.kAzure+2)
+    roc_1l.Draw("same")
+    leg.AddEntry(roc_1l, "train on 1lep")
+
+    leg.Draw()
+    c1.Print("roc_trainings.pdf")
+
+
+    exit()
 
     hgood = f1.Get("srNJet2/h_tmod_finedisc")
     hfake = f2.Get("srNJet2/h_tmod_finedisc")
