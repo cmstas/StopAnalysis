@@ -16,14 +16,15 @@ class TopCandTree {
   void AddEventInfo(int evt, float wgt, float pfmet, int nPV, int nLeps, int nJets, int nBJets, int nLBJets, float MT, float tMod, float Mlb);
   void AddGenTopInfo(int topidx);
   void AddTopCandInfo(const TopCand *topcand, int isGenMatched);
-  bool IsGenTopMatched(const TopCand* topcand);
-  int  IsGenTopMatchedSloppy(const TopCand* topcand);
+  int IsGenTopMatched(const TopCand* topcand);
+  int IsGenTopMatchedSloppy(const TopCand* topcand);
+  int FillTreeFromGenTop();
   void FillTree();
   void SetJetVectors(const std::vector<LorentzVector>* p4, const std::vector<float>* csv, const std::vector<float>* cvsl,
                      const std::vector<float>* ptD, const std::vector<float>* axis1, const std::vector<float>* axis2, const std::vector<int>* mult,
                      const std::vector<float>* deepcsvb, const std::vector<float>* deepcsvc, const std::vector<float>* deepcsvl, const std::vector<float>* deepcsvbb);
-  void SetGenParticleVectors(const std::vector<LorentzVector>* p4, const std::vector<int>* id, const std::vector<bool>* isLastCopy,
-                             const std::vector<int>* motherid, const std::vector<int>* motheridx);
+  void SetGenParticleVectors(const std::vector<LorentzVector>* p4, const std::vector<int>* id, const std::vector<int>* motherid, const std::vector<int>* motheridx,
+                             const std::vector<bool>* isLastCopy, const std::vector<LorentzVector>* alljetp4, const std::vector<int>* alljetpartonid);
   void SetBranches();
   void Setup(std::string treeName, std::string outputName, std::string sampletype);
   void ResetAll();
@@ -35,6 +36,9 @@ class TopCandTree {
 
   // Configurations
   size_t max_nbcand;
+  bool doSloppyMatch;
+
+  std::map<std::string, TH1*> hvec;  // for testing
 
   // Pointers to vectors to jet collections to be passed in for each event
   const std::vector<LorentzVector>* jets_p4;
@@ -55,6 +59,13 @@ class TopCandTree {
   const std::vector<bool>* genps_isLastCopy;
   const std::vector<int>*  genps_motherid;
   const std::vector<int>*  genps_motheridx;
+  const std::vector<LorentzVector>* alljets_p4;
+  const std::vector<int>*  alljets_partonid;
+
+  // Helper for gen matching
+  bool processed_gen;
+  std::vector<std::vector<int>> jetset_fromtop;
+  std::vector<TopCand> truecands;
 
  public:
   // Variables to be stored int the tree
@@ -73,6 +84,8 @@ class TopCandTree {
   float mt;
   float mlb;
   float tmod;
+  float min_jetpt;  // threshold for input jet pt
+  float max_jeteta; // threshold for input jet eta
 
   float gen_top_pt;
   float gen_w_pt;

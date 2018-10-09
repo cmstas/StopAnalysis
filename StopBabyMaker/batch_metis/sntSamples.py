@@ -65,6 +65,7 @@ if __name__ == "__main__":
         # "data_2016E_met" : "/MET/Run2016E-17Jul2018-v1/MINIAOD",
         # "data_2016F_met" : "/MET/Run2016F-17Jul2018-v1/MINIAOD",
         # "data_2016G_met" : "/MET/Run2016G-17Jul2018-v1/MINIAOD",
+        # "data_2016H_met" : "/MET/Run2016H-17Jul2018-v2/MINIAOD",
         # # "data_2016H_met" : "/MET/Run2016H-17Jul2018-v1/MINIAOD",
 
         # "data_2016B_singleel_v1" : "/SingleElectron/Run2016B-17Jul2018_ver1-v1/MINIAOD",
@@ -85,7 +86,8 @@ if __name__ == "__main__":
         # "data_2016G_singlemu" : "/SingleMuon/Run2016G-17Jul2018-v1/MINIAOD",
         # "data_2016H_singlemu" : "/SingleMuon/Run2016H-17Jul2018-v1/MINIAOD",
 
-        # "data_2016B_jetht" : "/JetHT/Run2016B-17Jul2018-v1/MINIAOD",
+        # "data_2016B_jetht" : "/JetHT/Run2016B-17Jul2018_ver1-v1/MINIAOD",
+        # "data_2016B_jetht" : "/JetHT/Run2016B-17Jul2018_ver2-v2/MINIAOD",
         # "data_2016C_jetht" : "/JetHT/Run2016C-17Jul2018-v1/MINIAOD",
         # "data_2016D_jetht" : "/JetHT/Run2016D-17Jul2018-v1/MINIAOD",
         # "data_2016E_jetht" : "/JetHT/Run2016E-17Jul2018-v1/MINIAOD",
@@ -190,9 +192,9 @@ if __name__ == "__main__":
     for babyname, dsname in snt_samples.items():
         cmsswver = "CMSSW_10_1_0"
         scramarch = "slc6_amd64_gcc700"
-        # tarfile = "tarfiles/input_v28_9.tar.gz"
-        tarfile = "input.tar.gz"
-        tag = "v28_10"
+        tarfile = "tarfiles/input_v29_1.tar.gz"
+        # tarfile = "input.tar.gz"
+        tag = "v29_1"
         extraarg = "1" if "SMS" in dsname else "0"
         if "TTJets" in dsname and True: # to add switch later
             extraarg += " topcands"

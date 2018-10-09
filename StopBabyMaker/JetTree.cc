@@ -319,11 +319,13 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx, Factorize
         //Jet selections
         if(p4sCorrJets.at(jindex).pt() < m_ak4_pt_cut) continue;
         if(fabs(p4sCorrJets.at(jindex).eta()) > m_ak4_eta_cut) continue;
-	if(!isLoosePFJetV2(jindex)) ++nFailJets;
-        if(!isFastsim && m_ak4_passid && !isLoosePFJetV2(jindex)) continue;
+        bool passJetID = (gconf.year < 2017)? ((gconf.cmssw_ver < 94)? isLoosePFJetV2(jindex) : isTightPFJetV2(jindex)) : isTightPFJet_2017_v1(jindex);
+        if(!passJetID) ++nFailJets;
+        if(!isFastsim && m_ak4_passid && !passJetID) continue;
         nskimjets++;
         bool is_jetpt30 = (p4sCorrJets.at(jindex).pt() >= 30);
         if (is_jetpt30) nGoodJets++;
+        // bool is_jetpt20 = (p4sCorrJets.at(jindex).pt() >= 20);
 
         ak4pfjets_p4.push_back(p4sCorrJets.at(jindex));
         ak4pfjets_pt.push_back(p4sCorrJets.at(jindex).pt());
@@ -400,7 +402,7 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx, Factorize
 	float weight_cent(1.), weight_UP(1.), weight_DN(1.), weight_FS_UP(1.), weight_FS_DN(1.);
 	float weight_loose_cent(1.), weight_loose_UP(1.), weight_loose_DN(1.), weight_loose_FS_UP(1.), weight_loose_FS_DN(1.);
 	float weight_tight_cent(1.), weight_tight_UP(1.), weight_tight_DN(1.), weight_tight_FS_UP(1.), weight_tight_FS_DN(1.);
-	if(applyBtagSFs){
+	if(applyBtagSFs && is_jetpt30){
 	  //put all b-tag issues outside what is possible
 	  effloose = getBtagEffFromFile(p4sCorrJets[jindex].pt(),p4sCorrJets[jindex].eta(), pfjets_hadronFlavour().at(jindex), 0, isFastsim);
 	  eff      = getBtagEffFromFile(p4sCorrJets[jindex].pt(),p4sCorrJets[jindex].eta(), pfjets_hadronFlavour().at(jindex), 1, isFastsim);
@@ -449,7 +451,7 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx, Factorize
                 ak4pfjets_MEDbjet_pt.push_back(p4sCorrJets.at(jindex).pt());
                //bool isFastsim = false; 
               // btag SF - not final yet
-              if (!evt_isRealData()&&applyBtagSFs) {
+              if (!evt_isRealData() && applyBtagSFs && is_jetpt30) {
   //              cout<<"got uncertainty from btagsf reader:"<<endl;
                 btagprob_data *= weight_cent * eff;
                 btagprob_mc *= eff;
@@ -472,7 +474,7 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx, Factorize
                }
             }else{ 
              ak4pfjets_passMEDbtag.push_back(false);
-             if (!evt_isRealData()&&applyBtagSFs) { // fail med btag -- needed for SF event weights
+             if (!evt_isRealData() && applyBtagSFs && is_jetpt30) { // fail med btag -- needed for SF event weights
               btagprob_data *= (1. - weight_cent * eff);
               btagprob_mc *= (1. - eff);
 	      if (flavor == BTagEntry::FLAV_UDSG) {
@@ -500,7 +502,7 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx, Factorize
 	if (value_deepCSV > gconf.WP_DEEPCSV_LOOSE) {
               nskimbtagloose++;
               if (is_jetpt30) nbtags_loose++;
-              if (!evt_isRealData()&&applyBtagSFs) {
+              if (!evt_isRealData() && applyBtagSFs && is_jetpt30) {
                 loosebtagprob_data *= weight_loose_cent * effloose;
                 loosebtagprob_mc *= effloose;
 		if (flavor == BTagEntry::FLAV_UDSG) {
@@ -520,7 +522,7 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx, Factorize
 		}
                }
             }else{ 
-             if (!evt_isRealData()&&applyBtagSFs) { // fail loose btag -- needed for SF event weights
+             if (!evt_isRealData() && applyBtagSFs && is_jetpt30) { // fail loose btag -- needed for SF event weights
               loosebtagprob_data *= (1. - weight_loose_cent * effloose);
               loosebtagprob_mc *= (1. - effloose);
 	      if (flavor == BTagEntry::FLAV_UDSG) {
@@ -544,7 +546,7 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx, Factorize
 	if (value_deepCSV > gconf.WP_DEEPCSV_TIGHT) {
              nskimbtagtight++;
              if (is_jetpt30) nbtags_tight++;
-              if (!evt_isRealData()&&applyBtagSFs) {
+              if (!evt_isRealData() && applyBtagSFs && is_jetpt30) {
                 tightbtagprob_data *= weight_tight_cent * efftight;
                 tightbtagprob_mc *= efftight;
 		if (flavor == BTagEntry::FLAV_UDSG) {
@@ -564,7 +566,7 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx, Factorize
 		}
                }
         } else { 
-          if (!evt_isRealData()&&applyBtagSFs) { // fail tight btag -- needed for SF event weights
+          if (!evt_isRealData() && applyBtagSFs && is_jetpt30) { // fail tight btag -- needed for SF event weights
               tightbtagprob_data *= (1. - weight_tight_cent * efftight);
               tightbtagprob_mc *= (1. - efftight);
 	      if (flavor == BTagEntry::FLAV_UDSG) {
@@ -616,7 +618,11 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx, Factorize
 
     nGoodJets = 0;
     if (doResolveTopMVA) {
-      resTopMVA->setJetVecPtrs(&ak4pfjets_p4, &ak4pfjets_CSV, &ak4pfjets_cvsl, &ak4pfjets_ptD, &ak4pfjets_axis1, &ak4pfjets_mult);
+      vector<float> ak4pfjets_dcvsl;
+      for (size_t j = 0; j < ak4pfjets_deepCSV.size(); ++j) {
+        ak4pfjets_dcvsl.push_back(ak4pfjets_deepCSVc.at(j) / (ak4pfjets_deepCSVc.at(j) + ak4pfjets_deepCSVl.at(j)));
+      }
+      resTopMVA->setJetVecPtrs(&ak4pfjets_p4, &ak4pfjets_deepCSV, &ak4pfjets_dcvsl, &ak4pfjets_ptD, &ak4pfjets_axis1, &ak4pfjets_mult);
       std::vector<TopCand> resMVATopCands = resTopMVA->getTopCandidates(-1);
       for (auto tcand : resMVATopCands) {
         topcands_ak4idx.emplace_back( std::vector<int>{tcand.getIdxForb(), tcand.getIdxForj2(), tcand.getIdxForj3()} );

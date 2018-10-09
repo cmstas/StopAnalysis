@@ -4,6 +4,7 @@
 #include <algorithm>
 
 #include "TopCandTree.h"
+#include "TH1.h"
 #include "TFile.h"
 #include "TMath.h"
 #include "Math/VectorUtil.h"
@@ -27,16 +28,30 @@ bool isCloseObject(const LorentzVector p1, const LorentzVector p2, const float c
   return true;
 }
 
+template<typename... TArgs>
+void plot1d(std::string name, double xval, double weight, std::map<std::string, TH1*> &allhistos, TArgs... args)
+{
+  auto iter = allhistos.find(name);
+  if (iter == allhistos.end()) {
+    TH1D* currentHisto= new TH1D(name.c_str(), args...);
+    currentHisto->SetDirectory(0);
+    currentHisto->Sumw2();
+    currentHisto->Fill(xval, weight);
+    allhistos.insert( std::pair<std::string, TH1*>(name, currentHisto) );
+  } else {
+    iter->second->Fill(xval, weight);
+  }
+}
+
 }
 
 TopCandTree::TopCandTree() :
     randGen(nullptr),
-    max_nbcand(4)
+    max_nbcand(4),
+    doSloppyMatch(true)
 {}
 
-TopCandTree::TopCandTree(string treeName, string outputName, string sampletype) :
-    randGen(nullptr),
-    max_nbcand(4)
+TopCandTree::TopCandTree(string treeName, string outputName, string sampletype) : TopCandTree()
 {
   Setup(treeName, outputName, sampletype);
 }
@@ -167,9 +182,197 @@ void TopCandTree::AddGenTopInfo(int itop) {
   // gen_top_resolved, true ;
 }
 
-bool TopCandTree::IsGenTopMatched(const TopCand* topcand) {
-  // Place holder for future development
-  return false;
+int TopCandTree::FillTreeFromGenTop() {
+
+  if (njets < 4) return -1;
+  if (met < 100) return -1;
+  if (nbjets < 1) return -1;
+  // if (nlbjets < 2) return -1;
+
+  const bool verbose = true;
+  const bool testplots = true;
+  jetset_fromtop.clear();
+
+  vector<int> gentopidx;
+  for (size_t q = 0; q < genps_id->size(); ++q) {
+    if (!genps_isLastCopy->at(q)) continue;
+    if (abs(genps_id->at(q)) != 6) continue;
+    gentopidx.push_back(q);
+  }
+  if (testplots) plot1d("h_sanity_ngentop", gentopidx.size(), 1, hvec, ";N gen top", 5, 0, 5);
+
+  // Find all genps that decay from top
+  for (int itop : gentopidx) {  // in case there are 2 tops (or more!)
+    vector<int> genq_fromtop;
+    for (size_t q = 0; q < genps_id->size(); ++q) {
+      if (!genps_isLastCopy->at(q)) continue;
+      if (abs(genps_id->at(q)) > 5 ) continue;
+      if ((abs(genps_id->at(q)) == 5 && abs(genps_motheridx->at(q)) == itop) ||
+          (abs(genps_motherid->at(q)) == 24 && abs(genps_motheridx->at(genps_motheridx->at(q))) == itop))
+        genq_fromtop.push_back(q);
+
+      // // Sanity checks
+      // if (verbose) {
+      //   if (abs(genps_motheridx->at(q)) == itop && abs(genps_id->at(q)) != 5) 
+      //     cout << __FILE__ << ":" << __LINE__ << ": Mother is top but itself is not b!! genps_id->at(q)= " << genps_id->at(q) << endl;
+      //   if (abs(genps_motheridx->at(genps_motheridx->at(q))) == itop && abs(genps_motherid->at(q)) == 24 && abs(genps_id->at(q)) == 5)
+      //     // cout << __FILE__ << ":" << __LINE__ << ": Gandmother is top but mother is not W!! genps_id->at(q)= " << genps_id->at(q) << ", genps_motherid->at(q)= " << genps_motherid->at(q) << endl;
+      //     cout << __FILE__ << ":" << __LINE__ << ": A b whose mother is W!! genps_id->at(q)= " << genps_id->at(q) << ", genps_motherid->at(q)= " << genps_motherid->at(q) << endl;
+      // }
+    }
+
+    if (testplots) plot1d("h_ngenq_fromtop", genq_fromtop.size(), 1, hvec, ";N gen q from top", 7, 0, 7); // should be 1 or 3
+    if (genq_fromtop.size() == 1) continue;      // this is a leptonic decaying top, skip
+    else if (genq_fromtop.size() < 3) return -1; // this is a rare case of lost gen particle, skip the event
+
+    vector<int> jets_fromtop;
+    vector<pair<int,int>> jet_quark_pair;  // jet-quark pair
+    long matchedjetidx = 0;                // for fast duplicate check
+    // int bjetidx = -1;
+    if (verbose && alljets_p4->size() > 63) cout << __FILE__ << ":" << __LINE__ << ": We have a super large jet vector!! jets_p4->size()= " << jets_p4->size() << endl;
+    // Sort genq_fromtop first to put the b quark from top at first
+    std::sort(genq_fromtop.begin(), genq_fromtop.end(), [&](int q1, int q2) { return abs(genps_motherid->at(q1)) == 6; });
+    for (int q : genq_fromtop) {
+      int genqid = genps_id->at(q);
+      int jetidx = -1;
+      float minDR = 0.6;
+      for (size_t j = 0; j < alljets_p4->size(); ++j) {
+        if (alljets_partonid->at(j) != genqid) continue;  // use genjet info to narrow down
+        if (float dr = 1; isCloseObject(alljets_p4->at(j), genps_p4->at(q), 0.6, &dr) && dr < minDR) {
+          minDR = dr;
+          jetidx = j;
+        }
+      }
+      if (minDR < 0.6 && !(matchedjetidx & 1<<jetidx)) {
+        matchedjetidx |= 1<<jetidx;
+        jets_fromtop.push_back(jetidx);
+        if (abs(genqid) == 5 && abs(genps_motherid->at(q)) == 6) {
+          // bjetidx = jetidx;
+          if (testplots) {
+            plot1d("h_genbfromtop_pt", genps_p4->at(q).pt(), 1, hvec, ";p_{T}(gen b from top)", 100, 0, 500);
+            plot1d("h_genbfromtop_eta", genps_p4->at(q).eta(), 1, hvec, ";#eta(gen b from top)", 100, -5, 5);
+            plot1d("h_bjetfromtop_pt", alljets_p4->at(jetidx).pt(), 1, hvec, ";p_{T}(gen b from top)", 100, 0, 500);
+            plot1d("h_bjetfromtop_eta", alljets_p4->at(jetidx).eta(), 1, hvec, ";#eta(gen b from top)", 100, -5, 5);
+          }
+        }
+        jet_quark_pair.emplace_back(jetidx, q);
+      }
+    }
+
+    if (jets_fromtop.size() > 2)
+      std::sort(jets_fromtop.begin()+1, jets_fromtop.end(), [&](int j1, int j2) { return alljets_p4->at(j1).pt() > alljets_p4->at(j2).pt(); });
+
+    vector<int> jet10_fromtop;
+    vector<int> jet15_fromtop;
+    vector<int> jet20_fromtop;
+    vector<int> jet30_fromtop;
+    for (int j : jets_fromtop) {
+      if (fabs(alljets_p4->at(j).eta()) > 2.4) continue;
+      if (alljets_p4->at(j).pt() < 10) continue;
+      jet10_fromtop.push_back(j);
+      if (alljets_p4->at(j).pt() < 15) continue;
+      jet15_fromtop.push_back(j);
+      if (alljets_p4->at(j).pt() < 20) continue;
+      jet20_fromtop.push_back(j);
+      if (alljets_p4->at(j).pt() < 30) continue;
+      jet30_fromtop.push_back(j);
+    }
+
+    auto fillLostJetPlot = [&](vector<int>& jetidxs, string suf) {
+      plot1d("h_njets"+suf+"_fromtop", jetidxs.size(), 1, hvec, ";N jets fromtop", 7, 0, 7);
+      if (mt > 150) plot1d("h_njets"+suf+"_fromtop_mt150", jetidxs.size(), 1, hvec, ";N jets fromtop", 7, 0, 7);
+
+      // Find properties of the gen_q that didn't have jet-match
+      if (jetidxs.size() < 3) {
+        for (auto q : genq_fromtop) {
+          bool matched = false;
+          for (auto jq : jet_quark_pair) {
+            if (q == jq.second) {
+              matched = true; break;
+            }
+          }
+          if (!matched) {
+            plot1d("h_lostjet"+suf+"_genq_id", abs(genps_id->at(q)), 1, hvec, ";pdgID", 7, 0, 7);
+            plot1d("h_lostjet"+suf+"_genq_pt", genps_p4->at(q).pt(), 1, hvec, ";p_{T}(gen q from top)", 50, 0, 200);
+            plot1d("h_lostjet"+suf+"_genq_eta", genps_p4->at(q).eta(), 1, hvec, ";#eta(gen q from top)", 50, -5, 5);
+            if (fabs(genps_p4->at(q).eta()) < 2.4)
+              plot1d("h_lostjet"+suf+"_ineta_genq_pt", genps_p4->at(q).pt(), 1, hvec, ";p_{T}(gen q from top)", 50, 0, 200);
+            if (genps_p4->at(q).pt() > 30)
+              plot1d("h_lostjet"+suf+"_inpt_genq_eta", genps_p4->at(q).eta(), 1, hvec, ";#eta(gen q from top)", 50, -5, 5);
+
+            float minDR_genqs = 7;
+            for (auto q2 : genq_fromtop) {
+              if (float dr = 7; q != q2 && isCloseObject(genps_p4->at(q), genps_p4->at(q2), 6, &dr) && dr < minDR_genqs) 
+                minDR_genqs = dr;
+            }
+            plot1d("h_lostjet"+suf+"_genq_minDR", minDR_genqs, 1, hvec, ";#DeltaR(gen quarks)", 50, 0, 5);
+          } else {
+            plot1d("h_acptjet"+suf+"_genq_pt", genps_p4->at(q).pt(), 1, hvec, ";p_{T}(gen q from top)", 50, 0, 200);
+            plot1d("h_acptjet"+suf+"_genq_eta", genps_p4->at(q).eta(), 1, hvec, ";#eta(gen q from top)", 50, -5, 5);
+          }
+        }
+      }
+
+      // To test if the masses are passed
+      else if (jetidxs.size() == 3) {
+        TopCand tc(jetidxs[0], jetidxs[1], jetidxs[2], alljets_p4);
+        plot1d("h_truecand"+suf+"_topcandpt", tc.topcand.pt(), 1, hvec, ";p_{T}(true topcand)", 60, 0, 600);
+        plot1d("h_truecand"+suf+"_topmass", tc.topcand.mass(), 1, hvec, ";Mass(true topcand)", 60, 0, 300);
+        plot1d("h_truecand"+suf+"_Wmass", tc.wcand.mass(), 1, hvec, ";Mass(true Wcand)", 60, 0, 300);
+        int cat = tc.passMassW() + 2*tc.passMassTop();
+        plot1d("h_truecand"+suf+"_cat", cat, 1, hvec, ";category", 5, 0, 5);
+      }
+    };
+
+    if (testplots) {
+      fillLostJetPlot(jets_fromtop, "_allpf");
+      fillLostJetPlot(jet10_fromtop, "10");
+      fillLostJetPlot(jet15_fromtop, "15");
+      fillLostJetPlot(jet20_fromtop, "20");
+      fillLostJetPlot(jet30_fromtop, "30");
+    }
+
+    if (testplots) {
+      // General for DR between gen_qs
+      float minDR_genqs = 7;
+      for (auto q1 : genq_fromtop) {
+        for (auto q2 : genq_fromtop) {
+          if (float dr = 7; q1 != q2 && isCloseObject(genps_p4->at(q1), genps_p4->at(q2), 6, &dr) && dr < minDR_genqs) 
+            minDR_genqs = dr;
+        }
+      }
+      plot1d("h_minDR_genqs", minDR_genqs, 1, hvec, ";#DeltaR(gen quarks)", 50, 0, 5);
+    }
+
+    if (jet10_fromtop.size() >= 3) {
+      TopCand topcand(jets_fromtop[0], jets_fromtop[1], jets_fromtop[2], alljets_p4);
+      AddTopCandInfo(&topcand, true);
+      AddGenTopInfo(itop);
+      flag_shuffle = false;
+      min_jetpt = std::min(alljets_p4->at(topcand.ib_).pt(), alljets_p4->at(topcand.ij3_).pt());
+      max_jeteta = std::max(fabs(alljets_p4->at(topcand.ib_).eta()), std::max(fabs(alljets_p4->at(topcand.ij2_).eta()), fabs(alljets_p4->at(topcand.ij3_).eta())));
+      tree->Fill();
+      jetset_fromtop.push_back(jets_fromtop);
+      truecands.push_back(topcand);
+      if (testplots) {
+        plot1d("h_truecand_min_jetpt", min_jetpt, 1, hvec, ";min(jet pt)", 60, 0, 150);
+        plot1d("h_truecand_max_jeteta", max_jeteta, 1, hvec, ";max(jet eta)", 50, 0, 5);
+      }
+    }
+  }
+
+  // return jetset_fromtop.size();
+  return jetset_fromtop.size();
+}
+
+int TopCandTree::IsGenTopMatched(const TopCand* topcand) {
+
+  if (!processed_gen) {
+    // GetJetsFromGenTop();
+    processed_gen = true;
+  }
+
+  return 0;
 }
 
 int TopCandTree::IsGenTopMatchedSloppy(const TopCand* topcand) {
@@ -194,7 +397,8 @@ int TopCandTree::IsGenTopMatchedSloppy(const TopCand* topcand) {
     for (size_t q = 0; q < genps_id->size(); ++q) {
       if (!genps_isLastCopy->at(q)) continue;
       if (abs(genps_id->at(q)) > 5 ) continue;
-      if (abs(genps_motheridx->at(q)) == itop || abs(genps_motheridx->at(genps_motheridx->at(q))) == itop)
+      if ((abs(genps_id->at(q)) == 5 && abs(genps_motheridx->at(q)) == itop) ||
+          (abs(genps_motherid->at(q)) == 24 && abs(genps_motheridx->at(genps_motheridx->at(q))) == itop))
         genqidx_fromtop.push_back(q);
     }
     if (genqidx_fromtop.size() != 3) { // This is a leptonic decaying top, skip
@@ -277,20 +481,39 @@ void TopCandTree::FillTree() {
   // treat signal and bkg differently
   if (!randGen) {
     vector<const TopCand*> fakeCands;
+    int ntruecand_filled = (doSloppyMatch)? 0 : truecands.size();
     for (const auto &topcand : allCands) {
-      if (int type = IsGenTopMatchedSloppy(&topcand); type > 0) {
+      if (int type = (doSloppyMatch)? IsGenTopMatchedSloppy(&topcand) : 0; type > 0) {
         AddTopCandInfo(&topcand, type);
         addOverlapInfo(topcand);
+        min_jetpt = std::min(jets_p4->at(topcand.ib_).pt(), jets_p4->at(topcand.ij3_).pt());
+        max_jeteta = std::max(fabs(jets_p4->at(topcand.ib_).eta()), std::max(fabs(jets_p4->at(topcand.ij2_).eta()), fabs(jets_p4->at(topcand.ij3_).eta())));
         tree->Fill();
+        ntruecand_filled++;
       } else {
         fakeCands.push_back(&topcand);
       }
     }
     std::random_shuffle(fakeCands.begin(), fakeCands.end());
-    for (size_t i = 0; i < 2 && i < fakeCands.size(); ++i) {
-      AddTopCandInfo(fakeCands.at(i), false);
+    int nfakecand_filled = 0;
+    for (size_t i = 0; i < fakeCands.size(); ++i) {
+      if (ntruecand_filled + nfakecand_filled > 2) break;
+      min_jetpt = std::min(jets_p4->at(fakeCands.at(i)->ib_).pt(), jets_p4->at(fakeCands.at(i)->ij3_).pt());
+      max_jeteta = std::max(fabs(jets_p4->at(fakeCands.at(i)->ib_).eta()), std::max(fabs(jets_p4->at(fakeCands.at(i)->ij2_).eta()), fabs(jets_p4->at(fakeCands.at(i)->ij3_).eta())));
+      if ((min_jetpt < 20 || max_jeteta > 2.4) && event %3 != 0) continue;
+      if ((min_jetpt < 15) && event %5 != 0) continue;
+      int type = false;
+      if (!doSloppyMatch) {
+        for (auto tc : truecands) {
+          if (tc.sameAs(*fakeCands.at(i))) type = 1;
+          else if (tc.similarAs(*fakeCands.at(i))) type = 2;
+        }
+        if (type == 1) continue;
+      }
+      AddTopCandInfo(fakeCands.at(i), type);
       addOverlapInfo(*(fakeCands.at(i)));
       tree->Fill();
+      nfakecand_filled++;
     }
   } else {
     // Fill at most 2 candiates from each event
@@ -350,7 +573,12 @@ void TopCandTree::ResetAll() {
   mt = -1;
   mlb = -1;
   tmod = -1;
+  min_jetpt = -1;
+  max_jeteta = -1;
 
+  processed_gen = false;
+  jetset_fromtop.clear();
+  truecands.clear();
 
   gen_top_pt = -1;
   gen_w_pt = -1;
@@ -433,6 +661,8 @@ void TopCandTree::SetBranches() {
   tree->Branch("mt", &mt);
   tree->Branch("mlb", &mlb);
   tree->Branch("tmod", &tmod);
+  tree->Branch("min_jetpt", &min_jetpt);
+  tree->Branch("max_jeteta", &max_jeteta);
   // tree->Branch("ntau", &ntau);
   // tree->Branch("ntrk", &ntrk);
   // tree->Branch("ht", &ht);
@@ -524,18 +754,39 @@ void TopCandTree::SetJetVectors(const vector<LorentzVector>* p4, const vector<fl
   jets_deepcsvbb = deepcsvbb;
 }
 
-void TopCandTree::SetGenParticleVectors(const vector<LorentzVector>* p4, const vector<int>* id, const vector<bool>* isLastCopy,
-                                        const vector<int>* motherid, const vector<int>* motheridx)
+void TopCandTree::SetGenParticleVectors(const vector<LorentzVector>* p4, const vector<int>* id, const vector<int>* motherid, const vector<int>* motheridx,
+                                        const vector<bool>* isLastCopy, const vector<LorentzVector>* alljetp4, const vector<int>* partonid)
 {
   genps_p4 = p4;
   genps_id = id;
-  genps_isLastCopy = isLastCopy;
   genps_motherid = motherid;
   genps_motheridx = motheridx;
+  genps_isLastCopy = isLastCopy;
+  alljets_p4 = alljetp4;
+  alljets_partonid = partonid;
 }
 
 void TopCandTree::Write()
 {
   outfile->cd();
   tree->Write();
+
+  if (hvec.size() > 0) {
+    TDirectory* dir = outfile->mkdir("TestPlots");
+    dir->cd();
+    for (auto& h : hvec) {
+      // Move overflows of the yield hist to the last bin of histograms
+      int nbin = h.second->GetNbinsX();
+      if (h.second->GetBinContent(nbin+1) > 0) {
+        double err = 0;
+        h.second->SetBinContent(nbin, h.second->IntegralAndError(nbin, -1, err));
+        h.second->SetBinError(nbin, err);
+        h.second->SetBinContent(nbin+1, 0);
+        h.second->SetBinError(nbin+1, 0);
+      }
+
+      h.second->Write();
+    }
+  }
+
 }

@@ -160,7 +160,8 @@ void babyMaker::MakeBabyNtuple(const char* output_name){
     jets_jdown.SetAK4Branches_TopTag(BabyTree);
 
     // Setup MVA Reader TopTagging for 
-    ResolvedTopMVA* resTopMVAptr =  new ResolvedTopMVA("ResTopTagger/resTop_xGBoost_v0.weights.xml", "BDT");
+    // ResolvedTopMVA* resTopMVAptr =  new ResolvedTopMVA("ResTopTagger/resTop_xGBoost_v0.weights.xml", "BDT");
+    ResolvedTopMVA* resTopMVAptr =  new ResolvedTopMVA("ResTopTagger/resTop_weights_xGBoost_v2.xml", "BDT");
     jets.InitTopMVA(resTopMVAptr);
     jets_jup.InitTopMVA(resTopMVAptr);
     jets_jdown.InitTopMVA(resTopMVAptr);
@@ -304,6 +305,8 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
     isDataFromFileName = false;
     isSignalFromFileName = true;
     cout << ", running on SIGNAL, based on input file name." << endl;
+    if ((filestr.find("SMS") | filestr.find("mStop") | filestr.find("mLSP")) < std::string::npos)
+      isSignalFromFileName = false;
   }
   else {
     isDataFromFileName = false;
@@ -1832,7 +1835,9 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
                                           &jets.ak4pfjets_ptD, &jets.ak4pfjets_axis1, &jets.ak4pfjets_axis2, &jets.ak4pfjets_mult,
                                           &jets.ak4pfjets_deepCSVb, &jets.ak4pfjets_deepCSVc, &jets.ak4pfjets_deepCSVl, &jets.ak4pfjets_deepCSVbb);
           // topcandTreeMaker->SetGenParticleVectors(&gen_qs.p4, &gen_qs.id, &gen_qs.isLastCopy, &gen_qs.motherid, &gen_qs.motheridx);
-          topcandTreeMaker->SetGenParticleVectors(&genps_p4(), &genps_id(), &genps_isLastCopy(), &genps_id_mother(), &genps_idx_mother());
+          topcandTreeMaker->SetGenParticleVectors(&genps_p4(), &genps_id(), &genps_id_mother(), &genps_idx_mother(), &genps_isLastCopy(),
+                                                  &pfjets_p4(), &pfjets_partonFlavour());
+                                                  // &jets.ak4pfjets_p4, &jets.ak4pfjets_parton_flavor);
           topcandTreeMaker->FillTree();
         }
 
