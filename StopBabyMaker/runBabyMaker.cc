@@ -111,7 +111,7 @@ int main(int argc, char **argv){
   mylooper->skim_vetoLep_mu_eta  = 2.4;
 
   mylooper->skim_nJets           = 2;
-  mylooper->skim_jet_pt          = 15.0;
+  mylooper->skim_jet_pt          = 20.0;
   mylooper->skim_jet_eta         = 2.4;
 
   mylooper->skim_nBJets          = 0;

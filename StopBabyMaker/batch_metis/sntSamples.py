@@ -48,7 +48,7 @@ if __name__ == "__main__":
         # "W2JetsToLNu_madgraph" : "/W2JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v4/MINIAODSIM",
         # "W3JetsToLNu_madgraph" : "/W3JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM",
         # "W4JetsToLNu_madgraph" : "/W4JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM",
-        # "WJetsToLNu_madgraph_ext1" : "/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14_ext1-v2/MINIAODSIM",
+        # "WJetsToLNu_madgraph_ext1" : "/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/RupnIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14_ext1-v2/MINIAODSIM",
         # "ST_tW_antitop_5f_noHadDecays_powheg" : "/ST_tW_antitop_5f_NoFullyHadronicDecays_TuneCP5_13TeV-powheg-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM",
         # "ST_tW_top_5f_noHadDecays_powheg" : "/ST_tW_top_5f_NoFullyHadronicDecays_TuneCP5_13TeV-powheg-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM",
         # "ST_schan_4f_lepDecays_amcnlo" : "/ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM",
@@ -192,12 +192,12 @@ if __name__ == "__main__":
     for babyname, dsname in snt_samples.items():
         cmsswver = "CMSSW_10_1_0"
         scramarch = "slc6_amd64_gcc700"
-        tarfile = "tarfiles/input_v29_1.tar.gz"
+        tarfile = "tarfiles/input_v29_2.tar.gz"
         # tarfile = "input.tar.gz"
-        tag = "v29_1"
+        tag = "v29_2"
         extraarg = "1" if "SMS" in dsname else "0"
-        if "TTJets" in dsname and True: # to add switch later
-            extraarg += " topcands"
+        # if "TTJets" in dsname and True: # to add switch later
+        #     extraarg += " topcands"
         maker_task = CondorTask(
             sample = SNTSample(dataset=dsname),
             files_per_output = 20 if "data" in babyname else 1,
