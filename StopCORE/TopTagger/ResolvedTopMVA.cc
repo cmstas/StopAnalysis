@@ -75,8 +75,8 @@ std::map<TString,float> ResolvedTopMVA::calcTopCandVars(const TopCand& topjet) {
   return vars;
 }
 
-ResolvedTopMVA::ResolvedTopMVA(TString weightfile, TString mvaname)
-    : mvaReader(weightfile, mvaname)
+ResolvedTopMVA::ResolvedTopMVA(TString weightfile, TString mvaname, float ptcut)
+    : mvaReader(weightfile, mvaname), cut_jetpt(ptcut)
 {
   initTopMVA();
 }
@@ -140,8 +140,8 @@ std::vector<TopCand> ResolvedTopMVA::getTopCandidates(const double WP, const siz
   // sort jets by CSV
   std::vector<size_t> jetidx( p4vec->size() );
   std::iota(jetidx.begin(), jetidx.end(), 0);
-  std::sort(jetidx.begin(), jetidx.end(), [&](size_t i, size_t j) { 
-      return csvvec->at(i) > csvvec->at(j);
+  std::sort(jetidx.begin(), jetidx.end(), [&](size_t i, size_t j) {
+      return p4vec->at(i).pt() > cut_jetpt && csvvec->at(i) > csvvec->at(j);
     });
 
   std::vector<TopCand> allCands;
@@ -149,6 +149,7 @@ std::vector<TopCand> ResolvedTopMVA::getTopCandidates(const double WP, const siz
     // if(csvJets.at(iB)->csv() < defaults::CSV_LOOSE) break; // b must pass CSVL
     for (size_t ij2 = 0; ij2 < jetidx.size()-1; ++ij2) {
       if (ij2 == ib) continue;
+      if (p4vec->at(ij2).pt() < cut_jetpt) break;
       for (size_t ij3 = ij2+1; ij3 < jetidx.size(); ++ij3) {
         if (ij3 == ib) continue;
         TopCand tmpCand(jetidx[ib], jetidx[ij2], jetidx[ij3], p4vec);

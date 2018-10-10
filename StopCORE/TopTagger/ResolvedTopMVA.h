@@ -14,7 +14,7 @@
 
 class ResolvedTopMVA {
  public:
-  ResolvedTopMVA(TString weightfile, TString mvaname);
+  ResolvedTopMVA(TString weightfile, TString mvaname, float ptcut = 30);
   virtual ~ResolvedTopMVA();
 
   // Working points for the MVA output
@@ -44,6 +44,7 @@ class ResolvedTopMVA {
   TMVAReader mvaReader;
   std::vector<TString> vars;
 
+  float cut_jetpt;  // minimum requirement on jetpt
 };
 
 #endif /* STOPCORE_TOPTAGGER_RESOLVEDTOPMVA_H */
