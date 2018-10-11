@@ -24,7 +24,7 @@ public:
     void Reset ();
     void SetBranches (TTree* tree);
     void SetAliases (TTree* tree) const;
-    void FillCommon (int idx);
+    void FillCommon (int idx, int idxtype = 0);
 
     vecLorentzVector isoTracks_p4;
     veci isoTracks_charge;

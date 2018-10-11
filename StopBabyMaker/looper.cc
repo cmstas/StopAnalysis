@@ -2044,84 +2044,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
       //
       // IsoTracks (Charged pfLeptons and pfChargedHadrons)
       //
-      //std::cout << "[babymaker::laooper]: filling isotrack vars" << std::endl;
-      int vetotracks = 0;
-      int vetotracks_v2 = 0;
-      int vetotracks_v3 = 0;
-      for (unsigned int ipf = 0; ipf < pfcands_p4().size(); ipf++) {
-
-        //some selections
-        if(pfcands_charge().at(ipf) == 0) continue;
-        if(pfcands_p4().at(ipf).pt() < 5) continue;
-        if(fabs(pfcands_p4().at(ipf).eta()) > 2.4 ) continue;
-        if(fabs(pfcands_dz().at(ipf)) > 0.1) continue;
-
-        //remove everything that is within 0.1 of selected lead and subleading leptons
-        if(nVetoLeptons>0){
-          if(ROOT::Math::VectorUtil::DeltaR(pfcands_p4().at(ipf), lep1.p4)<0.1) continue;
-        }
-        if(nVetoLeptons>1){
-          if(ROOT::Math::VectorUtil::DeltaR(pfcands_p4().at(ipf), lep2.p4)<0.1) continue;
-        }
-
-        Tracks.FillCommon(ipf);
-
-        // 8 TeV Track Isolation Configuration
-        if(nVetoLeptons>0){
-          if(isVetoTrack(ipf, lep1.p4, lep1.charge)){
-            Tracks.isoTracks_isVetoTrack.push_back(true);
-            vetotracks++;
-          }else Tracks.isoTracks_isVetoTrack.push_back(false);
-        }
-        else{
-          LorentzVector temp( -99.9, -99.9, -99.9, -99.9 );
-          if(isVetoTrack(ipf, temp, 0)){
-            Tracks.isoTracks_isVetoTrack.push_back(true);
-            vetotracks++;
-          }else Tracks.isoTracks_isVetoTrack.push_back(false);
-        }
-
-        // 13 TeV Track Isolation Configuration, pfLep and pfCH
-        if(nVetoLeptons>0){
-          if(isVetoTrack_v2(ipf, lep1.p4, lep1.charge)){
-            Tracks.isoTracks_isVetoTrack_v2.push_back(true);
-            vetotracks_v2++;
-          }else Tracks.isoTracks_isVetoTrack_v2.push_back(false);
-        }
-        else{
-          LorentzVector temp( -99.9, -99.9, -99.9, -99.9 );
-          if(isVetoTrack_v2(ipf, temp, 0)){
-            Tracks.isoTracks_isVetoTrack_v2.push_back(true);
-            vetotracks_v2++;
-          }else Tracks.isoTracks_isVetoTrack_v2.push_back(false);
-        }
-
-        // 13 TeV Track Isolation Configuration, pfCH
-        if(nVetoLeptons>0){
-          if(isVetoTrack_v3(ipf, lep1.p4, lep1.charge)){
-            Tracks.isoTracks_isVetoTrack_v3.push_back(true);
-            vetotracks_v3++;
-          }else Tracks.isoTracks_isVetoTrack_v3.push_back(false);
-        }
-        else{
-          LorentzVector temp( -99.9, -99.9, -99.9, -99.9 );
-          if(isVetoTrack_v3(ipf, temp, 0)){
-            Tracks.isoTracks_isVetoTrack_v3.push_back(true);
-            vetotracks_v3++;
-          }else Tracks.isoTracks_isVetoTrack_v3.push_back(false);
-        }
-
-      } // end loop over pfCands
-
-      StopEvt.PassTrackVeto = (vetotracks_v3 < 1);
-
-      int iv3 = -1;
-      int iitk = -1;
-      if (vetotracks_v3 > 0) {
-        for (iv3 = 0; iv3 < (int)Tracks.isoTracks_isVetoTrack_v3.size() && !Tracks.isoTracks_isVetoTrack_v3[iv3]; ++iv3);
-      }
-
-      int nIsoTracks_pfiso = 0;
+      int nIsoTracks = 0;
       for (unsigned int itrk = 0; itrk < isotracks_p4().size(); ++itrk) {
         if (!isotracks_isPFCand().at(itrk)) continue;  // only consider pfcandidates
         if (isotracks_p4().at(itrk).pt() < 10) continue;
@@ -2129,35 +2052,30 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
         if (isotracks_charge().at(itrk) == 0) continue;
         if (fabs(isotracks_dz().at(itrk)) > 0.1) continue;
         if (isotracks_lepOverlap().at(itrk)) continue;  // should remove all lep overlap, but it didn't, so we need the line below
-        if (utils::isCloseObject(isotracks_p4().at(itrk), lep1.p4, 0.4)) continue;
+        if (nVetoLeptons > 0 && utils::isCloseObject(isotracks_p4().at(itrk), lep1.p4, 0.4)) continue;
+        if (nVetoLeptons > 1 && utils::isCloseObject(isotracks_p4().at(itrk), lep2.p4, 0.4)) continue;
         if (isotracks_charge().at(itrk) * lep1.charge >= 0) continue; // opposite to lead lepton
 
+        Tracks.FillCommon(itrk, 1);
         // float pfiso = isotracks_pfIso_ch().at(itrk) + isotracks_pfIso_nh().at(itrk) + isotracks_pfIso_em().at(itrk);
         float pfiso = isotracks_pfIso_ch().at(itrk);
 
-        // isVetoTrack_v3 selections
-        if (ROOT::Math::VectorUtil::DeltaR(isotracks_p4().at(itrk), lep1.p4) < 0.4) {
-          cout << "[looper]>> Find isotrack overlapping with lep1 <-- shouldn't happen." << endl;
-        }
         //if not electron or muon
         if (abs(isotracks_particleId().at(itrk))==11 || abs(isotracks_particleId().at(itrk))==13) 
           cout << "[looper]>> Find isotrack that is a lepton <-- shouldn't happen." << endl;
-        if (isotracks_p4().at(itrk).pt() > 60. ){
-          if (pfiso > 6.0 ) continue;
-        } else{
-          if (pfiso/isotracks_p4().at(itrk).pt() > 0.1) continue;
-        }
 
-        iitk = itrk;
-        nIsoTracks_pfiso++;
+        bool isVetoTrack = false;
+        if (isotracks_p4().at(itrk).pt() > 60.) {
+          if (pfiso < 6.0 ) isVetoTrack = true;
+        } else {
+          if (pfiso/isotracks_p4().at(itrk).pt() < 0.1) isVetoTrack = true;
+        }
+        Tracks.isoTracks_isVetoTrack_v3.push_back(isVetoTrack);
+
+        if (isVetoTrack) nIsoTracks++;
       }
-      if (nIsoTracks_pfiso != vetotracks_v3) {
-        cout << "[looper]: We are having a disagreement here:  nIsoTracks_pfiso= " << nIsoTracks_pfiso << ", vetotracks_v3= " << vetotracks_v3 << ", evt= " << evt << endl;
-      }
-      else if (vetotracks_v3 == 1) {
-        if (!utils::isCloseObject(Tracks.isoTracks_p4.at(iv3), isotracks_p4().at(iitk), 0.01))
-          cout << "[looper]: We have a disagreement here:  nIsoTracks_pfiso= " << nIsoTracks_pfiso << ", vetotracks_v3= " << vetotracks_v3 << ", evt= " << evt << endl;
-      }
+      StopEvt.PassTrackVeto = (nIsoTracks < 1);
+
 
       if(apply2ndLepVeto){
         if(StopEvt.nvetoleps!=1) continue;

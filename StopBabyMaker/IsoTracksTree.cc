@@ -10,16 +10,25 @@ IsoTracksTree::IsoTracksTree ()
 
 using namespace tas;
 
-void IsoTracksTree::FillCommon (int idx)
+void IsoTracksTree::FillCommon (int idx, int idxtype /* = 0 */)
 {
-       if (idx < 0) return;
+    if (idx < 0) return;
 
-     //if electron or muon, iso < 0.2
+    if (idxtype == 0) { // idx type 0: idx for pfcand
+      //if electron or muon, iso < 0.2
       isoTracks_charge.push_back( pfcands_charge().at(idx)    );
       isoTracks_p4.push_back    ( pfcands_p4().at(idx)        );
       isoTracks_absIso.push_back( pfcands_trackIso().at(idx)  );
       isoTracks_dz.push_back    ( pfcands_dz().at(idx)        );
       isoTracks_pdgId.push_back ( pfcands_particleId().at(idx));
+    } else if (idxtype == 1) { // idx type 1: idx for isotrack
+      isoTracks_charge.push_back( isotracks_charge().at(idx)     );
+      isoTracks_p4.push_back    ( isotracks_p4().at(idx)         );
+      isoTracks_absIso.push_back( isotracks_pfIso_ch().at(idx)   );
+      isoTracks_dz.push_back    ( isotracks_dz().at(idx)         );
+      isoTracks_pdgId.push_back ( isotracks_particleId().at(idx) );
+    }
+
 }
 
 
