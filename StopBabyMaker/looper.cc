@@ -2044,38 +2044,111 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
       //
       // IsoTracks (Charged pfLeptons and pfChargedHadrons)
       //
-      int nIsoTracks = 0;
-      for (unsigned int itrk = 0; itrk < isotracks_p4().size(); ++itrk) {
-        if (!isotracks_isPFCand().at(itrk)) continue;  // only consider pfcandidates
-        if (isotracks_p4().at(itrk).pt() < 10) continue;
-        if (fabs(isotracks_p4().at(itrk).eta()) > 2.4 ) continue;
-        if (isotracks_charge().at(itrk) == 0) continue;
-        if (fabs(isotracks_dz().at(itrk)) > 0.1) continue;
-        if (isotracks_lepOverlap().at(itrk)) continue;  // should remove all lep overlap, but it didn't, so we need the line below
-        if (nVetoLeptons > 0 && utils::isCloseObject(isotracks_p4().at(itrk), lep1.p4, 0.4)) continue;
-        if (nVetoLeptons > 1 && utils::isCloseObject(isotracks_p4().at(itrk), lep2.p4, 0.4)) continue;
-        if (isotracks_charge().at(itrk) * lep1.charge >= 0) continue; // opposite to lead lepton
+      if (gconf.cmssw_ver < 90) {
+        // Old method for 80X samples when isotrack branches are not available in MiniAOD
+        int vetotracks = 0;
+        int vetotracks_v2 = 0;
+        int vetotracks_v3 = 0;
+        for (unsigned int ipf = 0; ipf < pfcands_p4().size(); ipf++) {
 
-        Tracks.FillCommon(itrk, 1);
-        // float pfiso = isotracks_pfIso_ch().at(itrk) + isotracks_pfIso_nh().at(itrk) + isotracks_pfIso_em().at(itrk);
-        float pfiso = isotracks_pfIso_ch().at(itrk);
+          //some selections
+          if(pfcands_charge().at(ipf) == 0) continue;
+          if(pfcands_p4().at(ipf).pt() < 5) continue;
+          if(fabs(pfcands_p4().at(ipf).eta()) > 2.4 ) continue;
+          if(fabs(pfcands_dz().at(ipf)) > 0.1) continue;
 
-        //if not electron or muon
-        if (abs(isotracks_particleId().at(itrk))==11 || abs(isotracks_particleId().at(itrk))==13) 
-          cout << "[looper]>> Find isotrack that is a lepton <-- shouldn't happen." << endl;
+          //remove everything that is within 0.1 of selected lead and subleading leptons
+          if(nVetoLeptons>0){
+            if(ROOT::Math::VectorUtil::DeltaR(pfcands_p4().at(ipf), lep1.p4)<0.1) continue;
+          }
+          if(nVetoLeptons>1){
+            if(ROOT::Math::VectorUtil::DeltaR(pfcands_p4().at(ipf), lep2.p4)<0.1) continue;
+          }
 
-        bool isVetoTrack = false;
-        if (isotracks_p4().at(itrk).pt() > 60.) {
-          if (pfiso < 6.0 ) isVetoTrack = true;
-        } else {
-          if (pfiso/isotracks_p4().at(itrk).pt() < 0.1) isVetoTrack = true;
+          Tracks.FillCommon(ipf);
+
+          // 8 TeV Track Isolation Configuration
+          if(nVetoLeptons>0){
+            if(isVetoTrack(ipf, lep1.p4, lep1.charge)){
+              Tracks.isoTracks_isVetoTrack.push_back(true);
+              vetotracks++;
+            }else Tracks.isoTracks_isVetoTrack.push_back(false);
+          }
+          else{
+            LorentzVector temp( -99.9, -99.9, -99.9, -99.9 );
+            if(isVetoTrack(ipf, temp, 0)){
+              Tracks.isoTracks_isVetoTrack.push_back(true);
+              vetotracks++;
+            }else Tracks.isoTracks_isVetoTrack.push_back(false);
+          }
+
+          // 13 TeV Track Isolation Configuration, pfLep and pfCH
+          if(nVetoLeptons>0){
+            if(isVetoTrack_v2(ipf, lep1.p4, lep1.charge)){
+              Tracks.isoTracks_isVetoTrack_v2.push_back(true);
+              vetotracks_v2++;
+            }else Tracks.isoTracks_isVetoTrack_v2.push_back(false);
+          }
+          else{
+            LorentzVector temp( -99.9, -99.9, -99.9, -99.9 );
+            if(isVetoTrack_v2(ipf, temp, 0)){
+              Tracks.isoTracks_isVetoTrack_v2.push_back(true);
+              vetotracks_v2++;
+            }else Tracks.isoTracks_isVetoTrack_v2.push_back(false);
+          }
+
+          // 13 TeV Track Isolation Configuration, pfCH
+          if(nVetoLeptons>0){
+            if(isVetoTrack_v3(ipf, lep1.p4, lep1.charge)){
+              Tracks.isoTracks_isVetoTrack_v3.push_back(true);
+              vetotracks_v3++;
+            }else Tracks.isoTracks_isVetoTrack_v3.push_back(false);
+          }
+          else{
+            LorentzVector temp( -99.9, -99.9, -99.9, -99.9 );
+            if(isVetoTrack_v3(ipf, temp, 0)){
+              Tracks.isoTracks_isVetoTrack_v3.push_back(true);
+              vetotracks_v3++;
+            }else Tracks.isoTracks_isVetoTrack_v3.push_back(false);
+          }
+
+        } // end loop over pfCands
+
+        StopEvt.PassTrackVeto = (vetotracks_v3 < 1);
+      } else {
+        // Newer method when isotrack branches are available
+        int nIsoTracks = 0;
+        for (unsigned int itrk = 0; itrk < isotracks_p4().size(); ++itrk) {
+          if (!isotracks_isPFCand().at(itrk)) continue;  // only consider pfcandidates
+          if (isotracks_p4().at(itrk).pt() < 10) continue;
+          if (fabs(isotracks_p4().at(itrk).eta()) > 2.4 ) continue;
+          if (isotracks_charge().at(itrk) == 0) continue;
+          if (fabs(isotracks_dz().at(itrk)) > 0.1) continue;
+          if (isotracks_lepOverlap().at(itrk)) continue;  // should remove all lep overlap, but it didn't, so we need the line below
+          if (nVetoLeptons > 0 && utils::isCloseObject(isotracks_p4().at(itrk), lep1.p4, 0.4)) continue;
+          if (nVetoLeptons > 1 && utils::isCloseObject(isotracks_p4().at(itrk), lep2.p4, 0.4)) continue;
+          if (isotracks_charge().at(itrk) * lep1.charge >= 0) continue; // opposite to lead lepton
+
+          Tracks.FillCommon(itrk, 1);
+          // float pfiso = isotracks_pfIso_ch().at(itrk) + isotracks_pfIso_nh().at(itrk) + isotracks_pfIso_em().at(itrk);
+          float pfiso = isotracks_pfIso_ch().at(itrk);
+
+          //if not electron or muon
+          if (abs(isotracks_particleId().at(itrk))==11 || abs(isotracks_particleId().at(itrk))==13)
+            cout << "[looper]>> Find isotrack that is a lepton <-- shouldn't happen." << endl;
+
+          bool isVetoTrack = false;
+          if (isotracks_p4().at(itrk).pt() > 60.) {
+            if (pfiso < 6.0 ) isVetoTrack = true;
+          } else {
+            if (pfiso/isotracks_p4().at(itrk).pt() < 0.1) isVetoTrack = true;
+          }
+          Tracks.isoTracks_isVetoTrack_v3.push_back(isVetoTrack);
+
+          if (isVetoTrack) nIsoTracks++;
         }
-        Tracks.isoTracks_isVetoTrack_v3.push_back(isVetoTrack);
-
-        if (isVetoTrack) nIsoTracks++;
+        StopEvt.PassTrackVeto = (nIsoTracks < 1);
       }
-      StopEvt.PassTrackVeto = (nIsoTracks < 1);
-
 
       if(apply2ndLepVeto){
         if(StopEvt.nvetoleps!=1) continue;
