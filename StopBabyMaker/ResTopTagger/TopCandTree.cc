@@ -213,7 +213,7 @@ int TopCandTree::FillTreeFromGenTop() {
 
       // // Sanity checks
       // if (verbose) {
-      //   if (abs(genps_motheridx->at(q)) == itop && abs(genps_id->at(q)) != 5) 
+      //   if (abs(genps_motheridx->at(q)) == itop && abs(genps_id->at(q)) != 5)
       //     cout << __FILE__ << ":" << __LINE__ << ": Mother is top but itself is not b!! genps_id->at(q)= " << genps_id->at(q) << endl;
       //   if (abs(genps_motheridx->at(genps_motheridx->at(q))) == itop && abs(genps_motherid->at(q)) == 24 && abs(genps_id->at(q)) == 5)
       //     // cout << __FILE__ << ":" << __LINE__ << ": Gandmother is top but mother is not W!! genps_id->at(q)= " << genps_id->at(q) << ", genps_motherid->at(q)= " << genps_motherid->at(q) << endl;
@@ -238,7 +238,8 @@ int TopCandTree::FillTreeFromGenTop() {
       float minDR = 0.6;
       for (size_t j = 0; j < alljets_p4->size(); ++j) {
         if (alljets_partonid->at(j) != genqid) continue;  // use genjet info to narrow down
-        if (float dr = 1; isCloseObject(alljets_p4->at(j), genps_p4->at(q), 0.6, &dr) && dr < minDR) {
+        float dr = 1;
+        if (isCloseObject(alljets_p4->at(j), genps_p4->at(q), 0.6, &dr) && dr < minDR) {
           minDR = dr;
           jetidx = j;
         }
@@ -302,7 +303,8 @@ int TopCandTree::FillTreeFromGenTop() {
 
             float minDR_genqs = 7;
             for (auto q2 : genq_fromtop) {
-              if (float dr = 7; q != q2 && isCloseObject(genps_p4->at(q), genps_p4->at(q2), 6, &dr) && dr < minDR_genqs) 
+              float dr = 7;
+              if (q != q2 && isCloseObject(genps_p4->at(q), genps_p4->at(q2), 6, &dr) && dr < minDR_genqs)
                 minDR_genqs = dr;
             }
             plot1d("h_lostjet"+suf+"_genq_minDR", minDR_genqs, 1, hvec, ";#DeltaR(gen quarks)", 50, 0, 5);
@@ -337,7 +339,8 @@ int TopCandTree::FillTreeFromGenTop() {
       float minDR_genqs = 7;
       for (auto q1 : genq_fromtop) {
         for (auto q2 : genq_fromtop) {
-          if (float dr = 7; q1 != q2 && isCloseObject(genps_p4->at(q1), genps_p4->at(q2), 6, &dr) && dr < minDR_genqs) 
+          float dr = 7;
+          if (q1 != q2 && isCloseObject(genps_p4->at(q1), genps_p4->at(q2), 6, &dr) && dr < minDR_genqs)
             minDR_genqs = dr;
         }
       }
@@ -483,7 +486,8 @@ void TopCandTree::FillTree() {
     vector<const TopCand*> fakeCands;
     int ntruecand_filled = (doSloppyMatch)? 0 : truecands.size();
     for (const auto &topcand : allCands) {
-      if (int type = (doSloppyMatch)? IsGenTopMatchedSloppy(&topcand) : 0; type > 0) {
+      int type = (doSloppyMatch)? IsGenTopMatchedSloppy(&topcand) : 0;
+      if (type > 0) {
         AddTopCandInfo(&topcand, type);
         addOverlapInfo(topcand);
         min_jetpt = std::min(jets_p4->at(topcand.ib_).pt(), jets_p4->at(topcand.ij3_).pt());
