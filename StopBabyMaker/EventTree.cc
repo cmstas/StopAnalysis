@@ -126,7 +126,7 @@ void EventTree::FillCommon (const std::string &root_file_name)
       // Only store the first 120 genweights <-- new after 94X to have > 1000 genweights taking up unnecessary spaces.
       ngenweights = std::min(cms3.genweights().size(), 112UL);
       genweights = vector<float>(cms3.genweights().begin(), cms3.genweights().begin()+ngenweights);
-      genweightsID = vector<string>(cms3.genweightsID().begin(), cms3.genweightsID().begin()+ngenweights);
+      genweightsID = vector<string>(cms3.genweightsID().begin(), cms3.genweightsID().begin()+std::min(cms3.genweightsID().size(), 112UL));
 
       if(signal){
 	sparms_values = sparm_values();
