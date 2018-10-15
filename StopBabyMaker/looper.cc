@@ -525,11 +525,11 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
   if (isDataFromFileName) {
     if      (filestr.find("2016B") != std::string::npos ||
              filestr.find("2016C") != std::string::npos ||
-             filestr.find("2016D") != std::string::npos) jecVer = "Summer16_07Aug2017BCD_V10";
+             filestr.find("2016D") != std::string::npos) jecVer = (gconf.cmssw_ver == 80)? "Summer16_23Sep2016BCDV4" : "Summer16_07Aug2017BCD_V18";
     else if (filestr.find("2016E") != std::string::npos ||
-             filestr.find("2016F") != std::string::npos) jecVer = "Summer16_07Aug2017EF_V10";
-    else if (filestr.find("2016G") != std::string::npos ||
-             filestr.find("2016H") != std::string::npos) jecVer = "Summer16_07Aug2017GH_V10";
+             filestr.find("2016F") != std::string::npos) jecVer = (gconf.cmssw_ver == 80)? "Summer16_23Sep2016EFV4" : "Summer16_07Aug2017EF_V18";
+    else if (filestr.find("2016G") != std::string::npos) jecVer = (gconf.cmssw_ver == 80)? "Summer16_23Sep2016GV4" : "Summer16_07Aug2017GH_V18";
+    else if (filestr.find("2016H") != std::string::npos) jecVer = (gconf.cmssw_ver == 80)? "Summer16_23Sep2016HV4" : "Summer16_07Aug2017GH_V18";
 
     else if (filestr.find("2017B") != std::string::npos) jecVer = "Fall17_17Nov2017B_V6";
     else if (filestr.find("2017C") != std::string::npos) jecVer = "Fall17_17Nov2017C_V6";

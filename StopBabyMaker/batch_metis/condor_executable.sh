@@ -83,6 +83,7 @@ except Exception as ex:
     msg = traceback.format_exc()
     print "Encounter error during SweepRoot:"
     print msg
+    foundBad = True
 if foundBad:
     print "[RSR] removing output file because it does not deserve to live"
     os.system("rm ${OUTPUTNAME}_${IFILE}.root")
