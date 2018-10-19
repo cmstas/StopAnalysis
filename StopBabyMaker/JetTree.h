@@ -121,6 +121,8 @@ public:
 
     vecd ak4pfjets_cm;
     vecd ak4pfjets_nm;
+    vecd ak4pfjets_chm;
+    vecd ak4pfjets_nhm;
     vecd ak4pfjets_em;
     vecd ak4pfjets_mm;
     vecd ak4pfjets_pm;

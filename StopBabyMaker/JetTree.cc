@@ -377,6 +377,8 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx, Factorize
 
         ak4pfjets_cm.push_back(pfjets_chargedMultiplicity().at(jindex));
         ak4pfjets_nm.push_back(pfjets_neutralMultiplicity().at(jindex));
+        ak4pfjets_chm.push_back(pfjets_chargedHadronMultiplicity().at(jindex));
+        ak4pfjets_nhm.push_back(pfjets_neutralHadronMultiplicity().at(jindex));
         ak4pfjets_em.push_back(pfjets_electronMultiplicity().at(jindex));
         ak4pfjets_mm.push_back(pfjets_muonMultiplicity().at(jindex));
         ak4pfjets_pm.push_back(pfjets_photonMultiplicity().at(jindex));
@@ -649,8 +651,8 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx, Factorize
       AK4Inputs.addSupplamentalVector("recoJetsneutralEnergyFraction",        ak4pfjets_nhf);
       AK4Inputs.addSupplamentalVector("PhotonEnergyFraction",                 ak4pfjets_phf);
       AK4Inputs.addSupplamentalVector("ElectronEnergyFraction",               ak4pfjets_elf);
-      AK4Inputs.addSupplamentalVector("ChargedHadronMultiplicity",            ak4pfjets_cm);
-      AK4Inputs.addSupplamentalVector("NeutralHadronMultiplicity",            ak4pfjets_nm);
+      AK4Inputs.addSupplamentalVector("ChargedHadronMultiplicity",            ak4pfjets_chm);
+      AK4Inputs.addSupplamentalVector("NeutralHadronMultiplicity",            ak4pfjets_nhm);
       AK4Inputs.addSupplamentalVector("PhotonMultiplicity",                   ak4pfjets_pm);
       AK4Inputs.addSupplamentalVector("ElectronMultiplicity",                 ak4pfjets_em);
       AK4Inputs.addSupplamentalVector("MuonMultiplicity",                     ak4pfjets_mm);
@@ -877,6 +879,8 @@ void JetTree::Reset ()
 
     ak4pfjets_cm.clear();
     ak4pfjets_nm.clear();
+    ak4pfjets_chm.clear();
+    ak4pfjets_nhm.clear();
     ak4pfjets_em.clear();
     ak4pfjets_mm.clear();
     ak4pfjets_pm.clear();
@@ -1057,11 +1061,13 @@ void JetTree::SetAK4Branches_EF(TTree* tree)
     tree->Branch(Form("%sak4pfjets_hhf", prefix_.c_str()) , &ak4pfjets_hhf);
     tree->Branch(Form("%sak4pfjets_hef", prefix_.c_str()) , &ak4pfjets_hef);
 
-    tree->Branch(Form("%sak4pfjets_cm", prefix_.c_str()) , &ak4pfjets_cm);
-    tree->Branch(Form("%sak4pfjets_nm", prefix_.c_str()) , &ak4pfjets_nm);
-    tree->Branch(Form("%sak4pfjets_em", prefix_.c_str()) , &ak4pfjets_em);
-    tree->Branch(Form("%sak4pfjets_mm", prefix_.c_str()) , &ak4pfjets_mm);
-    tree->Branch(Form("%sak4pfjets_pm", prefix_.c_str()) , &ak4pfjets_pm);
+    tree->Branch(Form("%sak4pfjets_cm",  prefix_.c_str()) , &ak4pfjets_cm);
+    tree->Branch(Form("%sak4pfjets_nm",  prefix_.c_str()) , &ak4pfjets_nm);
+    tree->Branch(Form("%sak4pfjets_chm", prefix_.c_str()) , &ak4pfjets_chm);
+    tree->Branch(Form("%sak4pfjets_nhm", prefix_.c_str()) , &ak4pfjets_nhm);
+    tree->Branch(Form("%sak4pfjets_em",  prefix_.c_str()) , &ak4pfjets_em);
+    tree->Branch(Form("%sak4pfjets_mm",  prefix_.c_str()) , &ak4pfjets_mm);
+    tree->Branch(Form("%sak4pfjets_pm",  prefix_.c_str()) , &ak4pfjets_pm);
 }
 
 void JetTree::SetAK4Branches_TopTag(TTree* tree)
