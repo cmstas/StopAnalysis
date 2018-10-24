@@ -1339,8 +1339,8 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
         if(nVetoLeptons>1) jet_overlep2_idx = getOverlappingJetIndex(lep2.p4, pfjets_p4(), 0.4, skim_jet_pt, skim_jet_eta, false,jet_corrector_pfL1FastJetL2L3,applyJECfromFile,jetcorr_uncertainty,JES_type,isFastsim);  //don't care about jid
 
         // Jets and b-tag variables feeding the index for the jet overlapping the selected leptons
-        jets.SetJetSelection("ak4", skim_jet_pt, skim_jet_eta, true); //save only jets passing jid
-        jets.SetJetSelection("ak8", skim_jet_ak8_pt, skim_jet_ak8_eta, true); //save only jets passing jid
+        jets.SetJetSelection("ak4", skim_jet_pt, skim_jet_eta, true, analysis_jet_pt, analysis_bjet_pt); //save only jets passing jid
+        jets.SetJetSelection("ak8", skim_jet_ak8_pt, skim_jet_ak8_eta, false); //save all AK8 jets
         //jets.FillCommon(idx_alloverlapjets, jet_corrector_pfL1FastJetL2L3,btagprob_data,btagprob_mc,btagprob_heavy_UP, btagprob_heavy_DN, btagprob_light_UP,btagprob_light_DN,btagprob_FS_UP,btagprob_FS_DN,jet_overlep1_idx, jet_overlep2_idx,applyJECfromFile,jetcorr_uncertainty,JES_type, applyBtagSFs, isFastsim);
         jets.FillCommon(idx_alloverlapjets, jet_corrector_pfL1FastJetL2L3,btagprob_data,btagprob_mc,btagprob_heavy_UP, btagprob_heavy_DN, btagprob_light_UP,btagprob_light_DN,btagprob_FS_UP,btagprob_FS_DN,loosebtagprob_data,loosebtagprob_mc,loosebtagprob_heavy_UP, loosebtagprob_heavy_DN, loosebtagprob_light_UP,loosebtagprob_light_DN,loosebtagprob_FS_UP,loosebtagprob_FS_DN,tightbtagprob_data,tightbtagprob_mc,tightbtagprob_heavy_UP, tightbtagprob_heavy_DN, tightbtagprob_light_UP,tightbtagprob_light_DN,tightbtagprob_FS_UP,tightbtagprob_FS_DN,jet_overlep1_idx, jet_overlep2_idx,applyJECfromFile,jetcorr_uncertainty,JES_type, applyBtagSFs, isFastsim);
         jets.FillAK8Jets(applyAK8JECfromFile, ak8jet_corrector_pfL1FastJetL2L3, ak8jetcorr_uncertainty, JES_type);
@@ -1627,8 +1627,10 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
       StopEvt.ak4pfjets_rho = evt_fixgridfastjet_all_rho();
 
       vector<int> jetIndexSortedBdisc;
-      if(isFastsim) jetIndexSortedBdisc = JetUtil::JetIndexBdiscSorted(jets.ak4pfjets_deepCSV, jets.ak4pfjets_p4, jets.ak4pfjets_loose_pfid, skim_jet_pt, skim_jet_eta, false);
-      else jetIndexSortedBdisc = JetUtil::JetIndexBdiscSorted(jets.ak4pfjets_deepCSV, jets.ak4pfjets_p4, jets.ak4pfjets_loose_pfid, skim_jet_pt, skim_jet_eta, true);
+      // Sorted indexes with analysis pt cut, should have enough by requiring ngoodjets >= 2
+      if(isFastsim) jetIndexSortedBdisc = JetUtil::JetIndexBdiscSorted(jets.ak4pfjets_deepCSV, jets.ak4pfjets_p4, jets.ak4pfjets_tight_pfid, analysis_bjet_pt, skim_jet_eta, false);
+      else jetIndexSortedBdisc = JetUtil::JetIndexBdiscSorted(jets.ak4pfjets_deepCSV, jets.ak4pfjets_p4, jets.ak4pfjets_tight_pfid, analysis_bjet_pt, skim_jet_eta, true);
+      if (jetIndexSortedBdisc.size() < 1) { cout << "looper.cc: WARNING: Not having enough bs identified in jetIndexSortedBdisc!\n"; continue; }
       vector<LorentzVector> mybjets; vector<LorentzVector> myaddjets;
       for(unsigned int idx = 0; idx<jetIndexSortedBdisc.size(); ++idx){
         if(jets.ak4pfjets_passMEDbtag.at(jetIndexSortedBdisc[idx])==true) mybjets.push_back(jets.ak4pfjets_p4.at(jetIndexSortedBdisc[idx]) );
@@ -1640,15 +1642,15 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
       vector<LorentzVector> mybjets_jup; vector<LorentzVector> myaddjets_jup;
       vector<LorentzVector> mybjets_jdown; vector<LorentzVector> myaddjets_jdown;
       if(applyJECfromFile){
-        if(isFastsim) jetIndexSortedBdisc_jup = JetUtil::JetIndexBdiscSorted(jets_jup.ak4pfjets_deepCSV, jets_jup.ak4pfjets_p4, jets_jup.ak4pfjets_loose_pfid, skim_jet_pt, skim_jet_eta, false);
-        else jetIndexSortedBdisc_jup = JetUtil::JetIndexBdiscSorted(jets_jup.ak4pfjets_deepCSV, jets_jup.ak4pfjets_p4, jets_jup.ak4pfjets_loose_pfid, skim_jet_pt, skim_jet_eta, true);
+        if(isFastsim) jetIndexSortedBdisc_jup = JetUtil::JetIndexBdiscSorted(jets_jup.ak4pfjets_deepCSV, jets_jup.ak4pfjets_p4, jets_jup.ak4pfjets_tight_pfid, skim_jet_pt, skim_jet_eta, false);
+        else jetIndexSortedBdisc_jup = JetUtil::JetIndexBdiscSorted(jets_jup.ak4pfjets_deepCSV, jets_jup.ak4pfjets_p4, jets_jup.ak4pfjets_tight_pfid, skim_jet_pt, skim_jet_eta, true);
         for(unsigned int idx = 0; idx<jetIndexSortedBdisc_jup.size(); ++idx){
           if(jets_jup.ak4pfjets_passMEDbtag.at(jetIndexSortedBdisc_jup[idx])==true) mybjets_jup.push_back(jets_jup.ak4pfjets_p4.at(jetIndexSortedBdisc_jup[idx]) );
           else if(mybjets_jup.size()<=1 && (mybjets_jup.size()+myaddjets_jup.size())<3) myaddjets_jup.push_back(jets_jup.ak4pfjets_p4.at(jetIndexSortedBdisc_jup[idx]) );
         }
 
-        if(isFastsim) jetIndexSortedBdisc_jdown = JetUtil::JetIndexBdiscSorted(jets_jdown.ak4pfjets_deepCSV, jets_jdown.ak4pfjets_p4, jets_jdown.ak4pfjets_loose_pfid, skim_jet_pt, skim_jet_eta, false);
-        else jetIndexSortedBdisc_jdown = JetUtil::JetIndexBdiscSorted(jets_jdown.ak4pfjets_deepCSV, jets_jdown.ak4pfjets_p4, jets_jdown.ak4pfjets_loose_pfid, skim_jet_pt, skim_jet_eta, true);
+        if(isFastsim) jetIndexSortedBdisc_jdown = JetUtil::JetIndexBdiscSorted(jets_jdown.ak4pfjets_deepCSV, jets_jdown.ak4pfjets_p4, jets_jdown.ak4pfjets_tight_pfid, skim_jet_pt, skim_jet_eta, false);
+        else jetIndexSortedBdisc_jdown = JetUtil::JetIndexBdiscSorted(jets_jdown.ak4pfjets_deepCSV, jets_jdown.ak4pfjets_p4, jets_jdown.ak4pfjets_tight_pfid, skim_jet_pt, skim_jet_eta, true);
         for(unsigned int idx = 0; idx<jetIndexSortedBdisc_jdown.size(); ++idx){
           if(jets_jdown.ak4pfjets_passMEDbtag.at(jetIndexSortedBdisc_jdown[idx])==true) mybjets_jdown.push_back(jets_jdown.ak4pfjets_p4.at(jetIndexSortedBdisc_jdown[idx]) );
           else if(mybjets_jdown.size()<=1 && (mybjets_jdown.size()+myaddjets_jdown.size())<3) myaddjets_jdown.push_back(jets_jdown.ak4pfjets_p4.at(jetIndexSortedBdisc_jdown[idx]) );
@@ -1825,7 +1827,6 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
       }
 
       // Fill the tree for top tagger training flat ntuple before rejecting on leptons
-      // TODO: fix the ntau, ntrack information which only come after (or maybe they are most likely not needed)
       if(runTopCandTreeMaker){
         bool eventHasTop = (StopEvt.dataset.find("TTJets") != string::npos && !StopEvt.is2lep);
         if(eventHasTop || evt %4 == 0){
@@ -2559,6 +2560,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
     //
     file->Close();
     delete file;
+    cout << "[looper]>> Closed output file!" << endl;
   }//close file loop
 
   //

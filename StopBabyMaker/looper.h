@@ -62,9 +62,11 @@ class babyMaker {
   float skim_vetoLep_mu_eta;
 
   int   skim_nJets;
+  int   skim_nBJets;
   float skim_jet_pt;
   float skim_jet_eta;
-  int   skim_nBJets;
+  float analysis_jet_pt;
+  float analysis_bjet_pt;
 
   float skim_jet_ak8_pt;
   float skim_jet_ak8_eta;

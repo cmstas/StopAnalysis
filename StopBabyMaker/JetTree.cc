@@ -323,8 +323,9 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx, Factorize
         if(!passJetID) ++nFailJets;
         if(!isFastsim && m_ak4_passid && !passJetID) continue;
         nskimjets++;
-        bool is_jetpt30 = (p4sCorrJets.at(jindex).pt() >= 30);
-        if (is_jetpt30) nGoodJets++;
+        bool isGoodJet = (p4sCorrJets.at(jindex).pt() >= m_goodjet_pt);
+        bool isGoodJet_b = (p4sCorrJets.at(jindex).pt() >= m_goodbjet_pt);
+        if (isGoodJet) nGoodJets++;
         // bool is_jetpt20 = (p4sCorrJets.at(jindex).pt() >= 20);
 
         ak4pfjets_p4.push_back(p4sCorrJets.at(jindex));
@@ -355,8 +356,10 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx, Factorize
 	ak4pfjets_hadron_flavor.push_back(pfjets_hadronFlavour().at(jindex));
         ak4pfjets_loose_puid.push_back(loosePileupJetId(jindex));
         ak4pfjets_loose_pfid.push_back(isLoosePFJetV2(jindex));
-        //ak4pfjets_medium_pfid.push_back(isMediumPFJetV2(jindex));
-        ak4pfjets_tight_pfid.push_back(isTightPFJetV2(jindex));
+        if (gconf.year < 2017)
+          ak4pfjets_tight_pfid.push_back(isTightPFJetV2(jindex));
+        else
+          ak4pfjets_tight_pfid.push_back(isTightPFJet_2017_v1(jindex));
 
         // QG likelihood variables
         ak4pfjets_ptD.push_back(pfjets_ptDistribution().at(jindex));
@@ -404,7 +407,7 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx, Factorize
 	float weight_cent(1.), weight_UP(1.), weight_DN(1.), weight_FS_UP(1.), weight_FS_DN(1.);
 	float weight_loose_cent(1.), weight_loose_UP(1.), weight_loose_DN(1.), weight_loose_FS_UP(1.), weight_loose_FS_DN(1.);
 	float weight_tight_cent(1.), weight_tight_UP(1.), weight_tight_DN(1.), weight_tight_FS_UP(1.), weight_tight_FS_DN(1.);
-	if(applyBtagSFs && is_jetpt30){
+	if(applyBtagSFs && isGoodJet){
 	  //put all b-tag issues outside what is possible
 	  effloose = getBtagEffFromFile(p4sCorrJets[jindex].pt(),p4sCorrJets[jindex].eta(), pfjets_hadronFlavour().at(jindex), 0, isFastsim);
 	  eff      = getBtagEffFromFile(p4sCorrJets[jindex].pt(),p4sCorrJets[jindex].eta(), pfjets_hadronFlavour().at(jindex), 1, isFastsim);
@@ -445,15 +448,15 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx, Factorize
 	if (value_deepCSV > gconf.WP_DEEPCSV_MEDIUM) {
              ak4pfjets_passMEDbtag.push_back(true);
              nskimbtagmed++;
-             if (is_jetpt30) nbtags_med++;
+             if (isGoodJet_b) nbtags_med++;
              if(nbtags_med == 1){
                 ak4pfjets_leadMEDbjet_pt = p4sCorrJets.at(jindex).pt();  //plot leading bjet pT
                 ak4pfjets_leadMEDbjet_p4 = p4sCorrJets.at(jindex);
              }
-                ak4pfjets_MEDbjet_pt.push_back(p4sCorrJets.at(jindex).pt());
+             ak4pfjets_MEDbjet_pt.push_back(p4sCorrJets.at(jindex).pt());
                //bool isFastsim = false; 
               // btag SF - not final yet
-              if (!evt_isRealData() && applyBtagSFs && is_jetpt30) {
+             if (!evt_isRealData() && applyBtagSFs && isGoodJet_b) {
   //              cout<<"got uncertainty from btagsf reader:"<<endl;
                 btagprob_data *= weight_cent * eff;
                 btagprob_mc *= eff;
@@ -474,9 +477,9 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx, Factorize
 		}
 //                cout<<"btagprob_err_heavy_UP"<<btagprob_err_heavy_UP<<endl;
                }
-            }else{ 
+        }else{ 
              ak4pfjets_passMEDbtag.push_back(false);
-             if (!evt_isRealData() && applyBtagSFs && is_jetpt30) { // fail med btag -- needed for SF event weights
+             if (!evt_isRealData() && applyBtagSFs && isGoodJet_b) { // fail med btag -- needed for SF event weights
               btagprob_data *= (1. - weight_cent * eff);
               btagprob_mc *= (1. - eff);
 	      if (flavor == BTagEntry::FLAV_UDSG) {
@@ -503,8 +506,8 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx, Factorize
 	//loose btag
 	if (value_deepCSV > gconf.WP_DEEPCSV_LOOSE) {
               nskimbtagloose++;
-              if (is_jetpt30) nbtags_loose++;
-              if (!evt_isRealData() && applyBtagSFs && is_jetpt30) {
+              if (isGoodJet_b) nbtags_loose++;
+              if (!evt_isRealData() && applyBtagSFs && isGoodJet_b) {
                 loosebtagprob_data *= weight_loose_cent * effloose;
                 loosebtagprob_mc *= effloose;
 		if (flavor == BTagEntry::FLAV_UDSG) {
@@ -524,7 +527,7 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx, Factorize
 		}
                }
             }else{ 
-             if (!evt_isRealData() && applyBtagSFs && is_jetpt30) { // fail loose btag -- needed for SF event weights
+             if (!evt_isRealData() && applyBtagSFs && isGoodJet_b) { // fail loose btag -- needed for SF event weights
               loosebtagprob_data *= (1. - weight_loose_cent * effloose);
               loosebtagprob_mc *= (1. - effloose);
 	      if (flavor == BTagEntry::FLAV_UDSG) {
@@ -547,8 +550,8 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx, Factorize
 	//tight btag
 	if (value_deepCSV > gconf.WP_DEEPCSV_TIGHT) {
              nskimbtagtight++;
-             if (is_jetpt30) nbtags_tight++;
-              if (!evt_isRealData() && applyBtagSFs && is_jetpt30) {
+             if (isGoodJet_b) nbtags_tight++;
+              if (!evt_isRealData() && applyBtagSFs && isGoodJet_b) {
                 tightbtagprob_data *= weight_tight_cent * efftight;
                 tightbtagprob_mc *= efftight;
 		if (flavor == BTagEntry::FLAV_UDSG) {
@@ -568,7 +571,7 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx, Factorize
 		}
                }
         } else { 
-          if (!evt_isRealData() && applyBtagSFs && is_jetpt30) { // fail tight btag -- needed for SF event weights
+          if (!evt_isRealData() && applyBtagSFs && isGoodJet_b) { // fail tight btag -- needed for SF event weights
               tightbtagprob_data *= (1. - weight_tight_cent * efftight);
               tightbtagprob_mc *= (1. - efftight);
 	      if (flavor == BTagEntry::FLAV_UDSG) {
@@ -660,7 +663,7 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx, Factorize
       AK4Inputs.addSupplamentalVector("DeepCSVc",                             ak4pfjets_deepCSVc);
       AK4Inputs.addSupplamentalVector("DeepCSVl",                             ak4pfjets_deepCSVl);
       AK4Inputs.addSupplamentalVector("DeepCSVbb",                            ak4pfjets_deepCSVbb);
-      auto dummy_deepCSVcc = vector<float>(ak4jets_TLV.size(), 0); // Temporary dealing with deepCSVcc not present in 94X
+      auto dummy_deepCSVcc = vector<float>(ak4jets_TLV.size(), 0); // dealing with the fact that deepCSVcc not present in 94X
       AK4Inputs.addSupplamentalVector("DeepCSVcc",                            dummy_deepCSVcc);
 
       std::vector<Constituent> constituents = ttUtility::packageConstituents(AK4Inputs);
@@ -723,7 +726,9 @@ void JetTree::FillAK8Jets(bool applynewcorr, FactorizedJetCorrector* corrector, 
   for (size_t idx = 0; idx < ak8jets_p4().size(); ++idx) {
     if (ak8jets_p4()[idx].pt() < m_ak8_pt_cut) continue;
     if (fabs(ak8jets_p4()[idx].eta()) > m_ak8_eta_cut) continue;
-    if (!isFastsim && m_ak8_passid && !isLoosePFJetV2(idx)) continue;
+    // -- AK8 jetID: should be the same as PF jets <-- not enough information available in cms4 yet --
+    // bool passJetID = (gconf.year < 2017)? isTightPFJetV2(jindex)) : isTightPFJet_2017_v1(jindex);
+    // if (!isFastsim && m_ak8_passid && !passJetID) continue;
     nGoodJets++;
 
     float corr = 1;
@@ -789,11 +794,23 @@ void JetTree::FillAK8Jets(bool applynewcorr, FactorizedJetCorrector* corrector, 
 
 }
 
-void JetTree::SetJetSelection (std::string cone_size, float pt_cut,float eta, bool id)
+void JetTree::SetJetSelection (std::string cone_size, float pt_cut, float eta, bool id, float goodjet_pt, float goodb_pt)
 {
-  if (cone_size == "ak4") { m_ak4_pt_cut = pt_cut; m_ak4_eta_cut = eta; m_ak4_passid = id; }
-  else if (cone_size == "ak8") { m_ak8_pt_cut = pt_cut; m_ak8_eta_cut = eta; m_ak8_passid = id; }
-  else {std::cout << "Invalid cone size." << std::endl;}
+  if (cone_size == "ak4") {
+    m_ak4_pt_cut = pt_cut;
+    m_ak4_eta_cut = eta;
+    m_ak4_passid = id;
+    m_goodjet_pt = goodjet_pt;
+    m_goodbjet_pt = goodb_pt;
+  }
+  else if (cone_size == "ak8") {
+    m_ak8_pt_cut = pt_cut;
+    m_ak8_eta_cut = eta;
+    m_ak8_passid = id;
+  }
+  else {
+    std::cout << "Invalid jet collection." << std::endl;
+  }
 
   return;
 }
