@@ -17,7 +17,7 @@ void mergeHadoopFiles(const TString& indir, const TString& outpath) {
 
   // Declare new TChain
   TChain *chain = new TChain("t");
-  chain->SetMaxTreeSize(5000000000LL); //default is 100000000000LL = 100Gb
+  chain->SetMaxTreeSize(5'000'000'000LL); //default is 100000000000LL = 100Gb
 
   // Get number of files from input directory
   int nFiles_in = (int)chain->Add( Form("%s/*.root", indir.Data() ) );

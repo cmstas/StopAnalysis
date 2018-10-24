@@ -565,7 +565,8 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
   jetcorr_filenames_pfL1FastJetL2L3.push_back("jecfiles/"+jecVer+"/"+jecVer+"_L1FastJet_AK4PFchs.txt");
   jetcorr_filenames_pfL1FastJetL2L3.push_back("jecfiles/"+jecVer+"/"+jecVer+"_L2Relative_AK4PFchs.txt");
   jetcorr_filenames_pfL1FastJetL2L3.push_back("jecfiles/"+jecVer+"/"+jecVer+"_L3Absolute_AK4PFchs.txt");
-  jetcorr_filenames_pfL1FastJetL2L3.push_back("jecfiles/"+jecVer+"/"+jecVer+"_L2L3Residual_AK4PFchs.txt");
+  if (!isSignalFromFileName)
+    jetcorr_filenames_pfL1FastJetL2L3.push_back("jecfiles/"+jecVer+"/"+jecVer+"_L2L3Residual_AK4PFchs.txt");
   jetcorr_uncertainty_filename = "jecfiles/"+jecVer+"/"+jecVer+"_Uncertainty_AK4PFchs.txt";
 
   if (applyJECfromFile) {
@@ -1002,7 +1003,8 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
         StopEvt.pfmet_jdown = newmet_jdown.first;
         StopEvt.pfmet_phi_jdown = newmet_jdown.second;
         if(TMath::IsNaN(StopEvt.pfmet)||(!TMath::Finite(StopEvt.pfmet))||StopEvt.pfmet>14000.) {
-          cout << "Invalid MET value after correction, skipping event!" << endl;
+          cout << "Invalid MET value after correction, skipping event! run:lumi:event = " << evt_run() << ":" << evt_lumiBlock() << ":" << evt_event()
+               << ", evt_pfmet()= " << evt_pfmet() << ", StopEvt.pfmet= " << StopEvt.pfmet << endl;
           continue;
         }
       }

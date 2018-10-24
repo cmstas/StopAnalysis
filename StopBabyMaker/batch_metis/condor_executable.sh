@@ -53,7 +53,7 @@ NEVENTS=-1
 # fi
 
 echo "Running BabyMaker:"
-echo "  ./runBabyMaker $SAMPLE_NAME $NEVENTS $IMERGED ./ $INPUTFILENAMES $ISFASTSIM"
+echo "  ./runBabyMaker $SAMPLE_NAME $NEVENTS $IFILE ./ $INPUTFILENAMES $ISFASTSIM $EXTRAOUT"
 ./runBabyMaker $SAMPLE_NAME $NEVENTS $IFILE ./ $INPUTFILENAMES $ISFASTSIM $EXTRAOUT
 
 echo ----------------------------------------------

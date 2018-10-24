@@ -59,6 +59,13 @@ echo "Will merge $in_folder/*.root into $out_file"
 echo root -l -n -b -q mergeHadoopFiles.C\(\"${in_folder}\",\"${out_file}\"\)
 root -l -n -b -q mergeHadoopFiles.C\(\"${in_folder}\",\"${out_file}\"\)
 
+# Make sure to always have outname_1.root to make metis happy
+if [[ ! -f ${OUTPUTNAME}_1.root ]]; then
+    mv ${OUTPUTNAME}.root ${OUTPUTNAME}_1.root
+else
+    mv ${OUTPUTNAME}.root ${OUTPUTNAME}_0.root
+fi
+
 # Perform Skim
 out_file=${skimout_folder}/skimmed_${OUTPUTNAME}.root
 
@@ -103,8 +110,6 @@ echo ----------------------------------------------
 # EOL
 
 echo -e "\n--- end running ---\n" #                             <----- section division
-
-[[ ! -f ${OUTPUTNAME}_1.root ]] && mv ${OUTPUTNAME}.root ${OUTPUTNAME}_1.root
 
 # Copy back the output file
 for mergeout in ${OUTPUTNAME}*.root; do
