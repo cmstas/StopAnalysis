@@ -1,6 +1,6 @@
 // -*- C++ -*-
 // This is a header file generated with the command:
-// makeCMS3ClassFiles("/home/users/sicheng/working/StopAnalysis/StopBabyMaker/stopbaby_9.root", "t", "StopTree", "stop1l", "babyAnalyzer")
+// makeCMS3ClassFiles("/home/users/sicheng/working/StopAnalysis/StopBabyMaker/stopbaby_29.root", "t", "StopTree", "stop1l", "babyAnalyzer")
 
 #ifndef StopTree_H
 #define StopTree_H
@@ -34,6 +34,12 @@ class StopTree {
   int      nvtxs_;
   TBranch *nvtxs_branch;
   bool     nvtxs_isLoaded;
+  int      year_;
+  TBranch *year_branch;
+  bool     year_isLoaded;
+  int      sampver_;
+  TBranch *sampver_branch;
+  bool     sampver_isLoaded;
   int      pu_nvtxs_;
   TBranch *pu_nvtxs_branch;
   bool     pu_nvtxs_isLoaded;
@@ -1668,6 +1674,8 @@ void LoadAllBranches();
   const unsigned int &ls();
   const unsigned int &evt();
   const int &nvtxs();
+  const int &year();
+  const int &sampver();
   const int &pu_nvtxs();
   const float &pfmet();
   const float &pfmet_phi();
@@ -2223,6 +2231,8 @@ namespace stop1l {
   const unsigned int &ls();
   const unsigned int &evt();
   const int &nvtxs();
+  const int &year();
+  const int &sampver();
   const int &pu_nvtxs();
   const float &pfmet();
   const float &pfmet_phi();

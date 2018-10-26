@@ -1394,40 +1394,16 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
       }
 
       if (!evt_isRealData()){
+        // Input should have pt > 30, |eta| < 2.4, PF Loose ID, leptons removed
         int NISRjets = get_nisrMatch(jets.ak4pfjets_p4);
-        int nonISRjets = jets.ak4pfjets_p4.size() - NISRjets;
-        // for(unsigned int jix = 0; jix<jets.ak4pfjets_p4.size(); ++jix){
-        //   bool ismatched = false;
-        //   for(unsigned int gpix = 0; gpix<genpnotISR.size(); ++gpix){
-        //     if(dRbetweenVectors(jets.ak4pfjets_p4[jix],genpnotISR[gpix])<=0.3){
-        //       ismatched = true;
-        //       break;
-        //     }
-        //   }
-        //   if(!ismatched) ++NISRjets;
-        //   else ++nonISRjets;
-        // }
-        //ICHEP 2016
-        //if(NISRjets     ==0){ StopEvt.weight_ISRnjets = 1.0000; StopEvt.weight_ISRnjets_UP = 1.0000; StopEvt.weight_ISRnjets_DN = 1.0000; }
-        //else if(NISRjets==1){ StopEvt.weight_ISRnjets = 0.8820; StopEvt.weight_ISRnjets_UP = 0.9410; StopEvt.weight_ISRnjets_DN = 0.8230; }
-        //else if(NISRjets==2){ StopEvt.weight_ISRnjets = 0.7920; StopEvt.weight_ISRnjets_UP = 0.8960; StopEvt.weight_ISRnjets_DN = 0.6880; }
-        //else if(NISRjets==3){ StopEvt.weight_ISRnjets = 0.7020; StopEvt.weight_ISRnjets_UP = 0.8510; StopEvt.weight_ISRnjets_DN = 0.5530; }
-        //else if(NISRjets==4){ StopEvt.weight_ISRnjets = 0.6480; StopEvt.weight_ISRnjets_UP = 0.8240; StopEvt.weight_ISRnjets_DN = 0.4720; }
-        //else if(NISRjets==5){ StopEvt.weight_ISRnjets = 0.6010; StopEvt.weight_ISRnjets_UP = 0.8005; StopEvt.weight_ISRnjets_DN = 0.4015; }
-        //else {                StopEvt.weight_ISRnjets = 0.5150; StopEvt.weight_ISRnjets_UP = 0.7575; StopEvt.weight_ISRnjets_DN = 0.2725; }
-        if (gconf.year == 2016) {
-          // Moriond 2017 values
-          if (NISRjets     ==0) { StopEvt.weight_ISRnjets = 1.000; StopEvt.weight_ISRnjets_UP = 1.000; StopEvt.weight_ISRnjets_DN = 1.000; }
-          else if (NISRjets==1) { StopEvt.weight_ISRnjets = 0.920; StopEvt.weight_ISRnjets_UP = 0.960; StopEvt.weight_ISRnjets_DN = 0.880; }
-          else if (NISRjets==2) { StopEvt.weight_ISRnjets = 0.821; StopEvt.weight_ISRnjets_UP = 0.911; StopEvt.weight_ISRnjets_DN = 0.731; }
-          else if (NISRjets==3) { StopEvt.weight_ISRnjets = 0.715; StopEvt.weight_ISRnjets_UP = 0.858; StopEvt.weight_ISRnjets_DN = 0.572; }
-          else if (NISRjets==4) { StopEvt.weight_ISRnjets = 0.662; StopEvt.weight_ISRnjets_UP = 0.832; StopEvt.weight_ISRnjets_DN = 0.492; }
-          else if (NISRjets==5) { StopEvt.weight_ISRnjets = 0.561; StopEvt.weight_ISRnjets_UP = 0.782; StopEvt.weight_ISRnjets_DN = 0.340; }
-          else {                  StopEvt.weight_ISRnjets = 0.511; StopEvt.weight_ISRnjets_UP = 0.769; StopEvt.weight_ISRnjets_DN = 0.253; }
-        } else if (gconf.year == 2017) {
-        }
+
+        StopEvt.weight_ISRnjets = get_isrWeight(NISRjets, gconf.year);
+        float unc_ISRnjets = get_isrUnc(NISRjets, gconf.year);
+        StopEvt.weight_ISRnjets_UP = StopEvt.weight_ISRnjets + unc_ISRnjets;
+        StopEvt.weight_ISRnjets_DN = StopEvt.weight_ISRnjets - unc_ISRnjets;
+
         StopEvt.NISRjets = NISRjets;
-        StopEvt.NnonISRjets = nonISRjets;
+        StopEvt.NnonISRjets = jets.ngoodjets - NISRjets;
 
         counterhist->Fill(25,StopEvt.weight_ISRnjets);
         counterhist->Fill(26,StopEvt.weight_ISRnjets_UP);
@@ -1630,7 +1606,6 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
       // Sorted indexes with analysis pt cut, should have enough by requiring ngoodjets >= 2
       if(isFastsim) jetIndexSortedBdisc = JetUtil::JetIndexBdiscSorted(jets.ak4pfjets_deepCSV, jets.ak4pfjets_p4, jets.ak4pfjets_tight_pfid, analysis_bjet_pt, skim_jet_eta, false);
       else jetIndexSortedBdisc = JetUtil::JetIndexBdiscSorted(jets.ak4pfjets_deepCSV, jets.ak4pfjets_p4, jets.ak4pfjets_tight_pfid, analysis_bjet_pt, skim_jet_eta, true);
-      if (jetIndexSortedBdisc.size() < 1) { cout << "looper.cc: WARNING: Not having enough bs identified in jetIndexSortedBdisc!\n"; continue; }
       vector<LorentzVector> mybjets; vector<LorentzVector> myaddjets;
       for(unsigned int idx = 0; idx<jetIndexSortedBdisc.size(); ++idx){
         if(jets.ak4pfjets_passMEDbtag.at(jetIndexSortedBdisc[idx])==true) mybjets.push_back(jets.ak4pfjets_p4.at(jetIndexSortedBdisc[idx]) );
@@ -1670,7 +1645,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
         StopEvt.MT2_ll_jdown = CalcMT2_(StopEvt.pfmet_jdown,StopEvt.pfmet_phi_jdown,lep1.p4,lep2.p4,false,0);
       }
 
-      if(jets.ak4pfjets_p4.size()>1){
+      if(jets.ngoodjets>1){
 
         // DR(lep, leadB) with medium discriminator
         if(nVetoLeptons>0) StopEvt.dR_lep_leadb = dRbetweenVectors(jets.ak4pfjets_leadMEDbjet_p4, lep1.p4);
@@ -1699,7 +1674,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
         if(nVetoLeptons>1) StopEvt.MT2_lb_bqq_lep2 = CalcMT2_lb_bqq_(StopEvt.pfmet,StopEvt.pfmet_phi,lep2.p4,mybjets,myaddjets,jets.ak4pfjets_p4,0,false);
       }
 
-      if(jets_jup.ak4pfjets_p4.size()>1){
+      if(jets_jup.ngoodjets>1){
         // Jets & MET
         StopEvt.mindphi_met_j1_j2_jup =  getMinDphi(StopEvt.pfmet_phi_jup,jets_jup.ak4pfjets_p4.at(0),jets_jup.ak4pfjets_p4.at(1));
         // MT2W
@@ -1708,7 +1683,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
         if(nVetoLeptons>0) StopEvt.topnessMod_jup = CalcTopness_(1,StopEvt.pfmet_jup,StopEvt.pfmet_phi_jup,lep1.p4,mybjets_jup,myaddjets_jup);
       }
 
-      if(jets_jdown.ak4pfjets_p4.size()>1){
+      if(jets_jdown.ngoodjets>1){
         // Jets & MET
         StopEvt.mindphi_met_j1_j2_jdown =  getMinDphi(StopEvt.pfmet_phi_jdown,jets_jdown.ak4pfjets_p4.at(0),jets_jdown.ak4pfjets_p4.at(1));
         // MT2W
@@ -1759,7 +1734,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
       sort(rankmaxDPhi.begin(),      rankmaxDPhi.end(),      CompareIndexValueGreatest);
       sort(rankmaxDPhi_lep2.begin(), rankmaxDPhi_lep2.end(), CompareIndexValueGreatest);
 
-      if(jets.ak4pfjets_p4.size()>0){
+      if(jets.ngoodjets>0){
         for (unsigned int idx = 0; idx < rankminDR.size(); ++idx){
           if(nVetoLeptons==0) continue;
           if(!(jets.ak4pfjets_passMEDbtag.at(rankminDR[idx].second)) ) continue;
@@ -1807,7 +1782,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
         }
 
       } // end if >0 jets
-      if(jets_jup.ak4pfjets_p4.size()>0){
+      if(jets_jup.ngoodjets>0){
         for (unsigned int idx = 0; idx < rankminDR_jup.size(); ++idx){
           if(nVetoLeptons==0) continue;
           if(!(jets_jup.ak4pfjets_passMEDbtag.at(rankminDR_jup[idx].second)) ) continue;
@@ -1816,7 +1791,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
         }
         if(nVetoLeptons>0) StopEvt.Mlb_lead_bdiscr_jup = (jets_jup.ak4pfjets_p4.at(jetIndexSortedBdisc_jup[0])+lep1.p4).M();
       }
-      if(jets_jdown.ak4pfjets_p4.size()>0){
+      if(jets_jdown.ngoodjets>0){
         for (unsigned int idx = 0; idx < rankminDR_jdown.size(); ++idx){
           if(nVetoLeptons==0) continue;
           if(!(jets_jdown.ak4pfjets_passMEDbtag.at(rankminDR_jdown[idx].second)) ) continue;
@@ -1897,12 +1872,12 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
             double Zllmetpy = ( StopEvt.pfmet * sin(StopEvt.pfmet_phi) ) + ( StopEvt.Zll_p4.Py() );
             StopEvt.Zll_met     = sqrt(pow(Zllmetpx,2)+pow(Zllmetpy,2) );
             StopEvt.Zll_met_phi = atan2(Zllmetpy,Zllmetpx);
-            if(jets.ak4pfjets_p4.size()>1) StopEvt.Zll_mindphi_met_j1_j2 =  getMinDphi(StopEvt.Zll_met_phi,jets.ak4pfjets_p4.at(0),jets.ak4pfjets_p4.at(1));
+            if(jets.ngoodjets>1) StopEvt.Zll_mindphi_met_j1_j2 =  getMinDphi(StopEvt.Zll_met_phi,jets.ak4pfjets_p4.at(0),jets.ak4pfjets_p4.at(1));
             if(nVetoLeptons>2) StopEvt.Zll_MT2_ll = CalcMT2_(StopEvt.pfmet,StopEvt.pfmet_phi,AllLeps[Zl1].p4,AllLeps[Zl2].p4,false,0);
             if(StopEvt.Zll_selLep == 1){
               StopEvt.Zll_mt_met_lep = calculateMt(lep1.p4, StopEvt.Zll_met, StopEvt.Zll_met_phi);
               StopEvt.Zll_dphi_Wlep = DPhi_W_lep(StopEvt.Zll_met, StopEvt.Zll_met_phi, lep1.p4);
-              if(jets.ak4pfjets_p4.size()>1){
+              if(jets.ngoodjets>1){
                 StopEvt.Zll_MT2W = CalcMT2W_(mybjets,myaddjets,lep1.p4,StopEvt.Zll_met, StopEvt.Zll_met_phi);
                 StopEvt.Zll_topness = CalcTopness_(0,StopEvt.Zll_met, StopEvt.Zll_met_phi,lep1.p4,mybjets,myaddjets);
                 StopEvt.Zll_topnessMod = CalcTopness_(1,StopEvt.Zll_met, StopEvt.Zll_met_phi,lep1.p4,mybjets,myaddjets);
@@ -1914,7 +1889,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
             } else {
               StopEvt.Zll_mt_met_lep = calculateMt(lep2.p4, StopEvt.Zll_met, StopEvt.Zll_met_phi);
               StopEvt.Zll_dphi_Wlep = DPhi_W_lep(StopEvt.Zll_met, StopEvt.Zll_met_phi, lep2.p4);
-              if(jets.ak4pfjets_p4.size()>1){
+              if(jets.ngoodjets>1){
                 StopEvt.Zll_MT2W = CalcMT2W_(mybjets,myaddjets,lep2.p4,StopEvt.Zll_met, StopEvt.Zll_met_phi);
                 StopEvt.Zll_topness = CalcTopness_(0,StopEvt.Zll_met, StopEvt.Zll_met_phi,lep2.p4,mybjets,myaddjets);
                 StopEvt.Zll_topnessMod = CalcTopness_(1,StopEvt.Zll_met, StopEvt.Zll_met_phi,lep2.p4,mybjets,myaddjets);
@@ -2310,7 +2285,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
         StopEvt.topnessMod_rl = CalcTopness_(1,StopEvt.pfmet_rl,StopEvt.pfmet_phi_rl,lep1.p4,mybjets,myaddjets);
       }
 
-      if(jets.ak4pfjets_p4.size()>1) StopEvt.mindphi_met_j1_j2_rl = getMinDphi(StopEvt.pfmet_phi_rl,jets.ak4pfjets_p4.at(0),jets.ak4pfjets_p4.at(1));
+      if(jets.ngoodjets>1) StopEvt.mindphi_met_j1_j2_rl = getMinDphi(StopEvt.pfmet_phi_rl,jets.ak4pfjets_p4.at(0),jets.ak4pfjets_p4.at(1));
 
       //JEC up
       if(applyJECfromFile){
@@ -2323,7 +2298,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
           StopEvt.topnessMod_rl_jup = CalcTopness_(1,StopEvt.pfmet_rl_jup,StopEvt.pfmet_phi_rl_jup,lep1.p4,mybjets_jup,myaddjets_jup);
         }
 
-        if(jets_jup.ak4pfjets_p4.size()>1) StopEvt.mindphi_met_j1_j2_rl_jup = getMinDphi(StopEvt.pfmet_phi_rl_jup,jets_jup.ak4pfjets_p4.at(0),jets_jup.ak4pfjets_p4.at(1));
+        if(jets_jup.ngoodjets>1) StopEvt.mindphi_met_j1_j2_rl_jup = getMinDphi(StopEvt.pfmet_phi_rl_jup,jets_jup.ak4pfjets_p4.at(0),jets_jup.ak4pfjets_p4.at(1));
 
         //JEC down
         StopEvt.pfmet_rl_jdown     = std::sqrt(new_pfmet_x_jdown*new_pfmet_x_jdown + new_pfmet_y_jdown*new_pfmet_y_jdown);
@@ -2335,7 +2310,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
           StopEvt.topnessMod_rl_jdown = CalcTopness_(1,StopEvt.pfmet_rl_jdown,StopEvt.pfmet_phi_rl_jdown,lep1.p4,mybjets_jdown,myaddjets_jdown);
         }
 
-        if(jets_jdown.ak4pfjets_p4.size()>1) StopEvt.mindphi_met_j1_j2_rl_jdown = getMinDphi(StopEvt.pfmet_phi_rl_jdown,jets_jdown.ak4pfjets_p4.at(0),jets_jdown.ak4pfjets_p4.at(1));
+        if(jets_jdown.ngoodjets>1) StopEvt.mindphi_met_j1_j2_rl_jdown = getMinDphi(StopEvt.pfmet_phi_rl_jdown,jets_jdown.ak4pfjets_p4.at(0),jets_jdown.ak4pfjets_p4.at(1));
       }
       //fill lepDPhi _rl
       if( nVetoLeptons > 0 ) {
@@ -2560,7 +2535,6 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
     //
     file->Close();
     delete file;
-    cout << "[looper]>> Closed output file!" << endl;
   }//close file loop
 
   //

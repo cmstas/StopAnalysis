@@ -117,6 +117,10 @@ void StopTree::Init(TTree *tree) {
   if (evt_branch) evt_branch->SetAddress(&evt_);
   nvtxs_branch = tree->GetBranch("nvtxs");
   if (nvtxs_branch) nvtxs_branch->SetAddress(&nvtxs_);
+  year_branch = tree->GetBranch("year");
+  if (year_branch) year_branch->SetAddress(&year_);
+  sampver_branch = tree->GetBranch("sampver");
+  if (sampver_branch) sampver_branch->SetAddress(&sampver_);
   pu_nvtxs_branch = tree->GetBranch("pu_nvtxs");
   if (pu_nvtxs_branch) pu_nvtxs_branch->SetAddress(&pu_nvtxs_);
   pfmet_branch = tree->GetBranch("pfmet");
@@ -1108,6 +1112,8 @@ void StopTree::GetEntry(unsigned int idx) {
   ls_isLoaded = false;
   evt_isLoaded = false;
   nvtxs_isLoaded = false;
+  year_isLoaded = false;
+  sampver_isLoaded = false;
   pu_nvtxs_isLoaded = false;
   pfmet_isLoaded = false;
   pfmet_phi_isLoaded = false;
@@ -1658,6 +1664,8 @@ void StopTree::LoadAllBranches() {
   if (ls_branch != 0) ls();
   if (evt_branch != 0) evt();
   if (nvtxs_branch != 0) nvtxs();
+  if (year_branch != 0) year();
+  if (sampver_branch != 0) sampver();
   if (pu_nvtxs_branch != 0) pu_nvtxs();
   if (pfmet_branch != 0) pfmet();
   if (pfmet_phi_branch != 0) pfmet_phi();
@@ -2252,6 +2260,32 @@ const int &StopTree::nvtxs() {
     nvtxs_isLoaded = true;
   }
   return nvtxs_;
+}
+
+const int &StopTree::year() {
+  if (not year_isLoaded) {
+    if (year_branch != 0) {
+      year_branch->GetEntry(index);
+    } else {
+      printf("branch year_branch does not exist!\n");
+      exit(1);
+    }
+    year_isLoaded = true;
+  }
+  return year_;
+}
+
+const int &StopTree::sampver() {
+  if (not sampver_isLoaded) {
+    if (sampver_branch != 0) {
+      sampver_branch->GetEntry(index);
+    } else {
+      printf("branch sampver_branch does not exist!\n");
+      exit(1);
+    }
+    sampver_isLoaded = true;
+  }
+  return sampver_;
 }
 
 const int &StopTree::pu_nvtxs() {
@@ -9327,6 +9361,8 @@ const unsigned int &run() { return babyAnalyzer.run(); }
 const unsigned int &ls() { return babyAnalyzer.ls(); }
 const unsigned int &evt() { return babyAnalyzer.evt(); }
 const int &nvtxs() { return babyAnalyzer.nvtxs(); }
+const int &year() { return babyAnalyzer.year(); }
+const int &sampver() { return babyAnalyzer.sampver(); }
 const int &pu_nvtxs() { return babyAnalyzer.pu_nvtxs(); }
 const float &pfmet() { return babyAnalyzer.pfmet(); }
 const float &pfmet_phi() { return babyAnalyzer.pfmet_phi(); }
