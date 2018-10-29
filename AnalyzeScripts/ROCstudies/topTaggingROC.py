@@ -19,8 +19,8 @@ def makeROClist(hgood, hfake, *args, **kwargs):
     print "startbin is", startbin
     print "bindiv is", bindiv
 
-    ngood = hgood.Integral()
-    nfake = hfake.Integral()
+    ngood = hgood.Integral(0,-1)
+    nfake = hfake.Integral(0,-1)
 
     if raw_yields:
         ngood = 1
@@ -64,11 +64,13 @@ def getNSigPointsNew(f1):
                 count += 1
     return count
 
-def getTopCandROC(folder, sample="TTJets_incl_amcnlo.root"):
+def getTopCandROC(folder, sample="TTJets_incl_amcnlo.root", ttype = "topcand", hsuf="finedisc"):
+    ftype = "faketftop" if ttype is "tftop" else "fakecand"
+
     f1 = r.TFile("../../StopLooper/output/"+folder+"/"+sample)
 
-    hgood = f1.Get("testTopTagging/h_lead_topcand_finedisc")
-    hfake = f1.Get("testTopTagging/h_lead_fakecand_finedisc")
+    hgood = f1.Get("testTopTagging/h_lead_"+ttype+"_"+hsuf)
+    hfake = f1.Get("testTopTagging/h_lead_"+ftype+"_"+hsuf)
 
     if not hgood: print "Cannot find hgood!"
     if not hfake: print "Cannot find hfake!"
@@ -79,6 +81,7 @@ def getTopCandROC(folder, sample="TTJets_incl_amcnlo.root"):
     lst_tageff, lst_fkrate, lst_disc = makeROClist(hgood, hfake)
 
     groc = r.TGraph(lst_tageff.size, lst_tageff, lst_fkrate)
+    groc.SetLineWidth(2)
 
     return groc
 
@@ -96,12 +99,16 @@ if __name__ == "__main__":
     # f1 = r.TFile("../../StopLooper/output/tempNewTagger2/TTJets_amcnlo.root")
     # f1 = r.TFile("../../StopLooper/output/tempNewTagger5/stopbaby.root")
     # f1 = r.TFile("../../StopLooper/output/testTFTagger/ttbar_madgraph.root")
-    f1 = r.TFile("../../StopLooper/output/testTraining_org/TTJets_incl_amcnlo.root")
+    # f1 = r.TFile("../../StopLooper/output/testTraining_org/TTJets_incl_amcnlo.root")
+    # f1 = r.TFile("../../StopLooper/output/testResTopJet20_6/TTJets_madgraph.root")
     # f1 = r.TFile("../../StopLooper/output/testTraining0/TTJets_incl_amcnlo.root")
-    f2 = f1
+    f1 = r.TFile("../../StopLooper/output/samp17_m9/SMS_T2tt_dM200to400.root")
+    f2 = r.TFile("../../StopLooper/output/samp17_m9/allBkg_17.root")
 
-    hgood = f1.Get("testTopTagging/h_lead_topcand_finedisc")
-    hfake = f1.Get("testTopTagging/h_lead_fakecand_finedisc")
+    # hgood = f1.Get("testTopTagging/h_lead_topcand_finedisc")
+    # hfake = f1.Get("testTopTagging/h_lead_fakecand_finedisc")
+    hgood = f1.Get("srbase/h_leadtopcand_finedisc")
+    hfake = f2.Get("srbase/h_leadtopcand_finedisc")
 
     if not hgood: print "Cannot find hgood!"
     if not hfake: print "Cannot find hfake!"
@@ -109,11 +116,11 @@ if __name__ == "__main__":
     ngood = hgood.Integral()
     nfake = hfake.Integral()
 
-    lst_tageff, lst_fkrate, lst_disc = makeROClist(hgood, hfake)
+    lst_tageff, lst_fkrate, lst_disc = makeROClist(hgood, hfake, hrange=2.2)
 
     for i, disc in enumerate(lst_disc):
         if disc == 0.98 or disc == 0.9 or disc == 0.5:
-            print disc, lst_tageff[i], lst_fkrate[i]
+            print 'BDT:', disc, lst_tageff[i], lst_fkrate[i]
         if disc == 0.98 :
             p98_tageff = np.array([lst_tageff[i]], dtype=float)
             p98_fkrate = np.array([lst_fkrate[i]], dtype=float)
@@ -153,9 +160,9 @@ if __name__ == "__main__":
     groc.SetLineColor(r.kGreen+2)
     groc.SetLineWidth(2)
 
-    # groc.SetTitle("Graph for background vs signal efficiency")
-    # groc.GetXaxis().SetTitle("sig eff.")
-    # groc.GetYaxis().SetTitle("bkg eff.")
+    groc.SetTitle("Graph for background vs signal efficiency")
+    groc.GetXaxis().SetTitle("T2tt (200< #DeltaM <500) sig eff.")
+    groc.GetYaxis().SetTitle("SM bkg eff.")
 
     groc.Draw()
 
@@ -163,18 +170,20 @@ if __name__ == "__main__":
 
     # c1.Clear()
 
-    hgood = f1.Get("testTopTagging/h_lead_tftop_finedisc")
-    hfake = f1.Get("testTopTagging/h_lead_faketftop_finedisc")
+    # hgood = f1.Get("testTopTagging/h_lead_tftop_finedisc")
+    # hfake = f1.Get("testTopTagging/h_lead_faketftop_finedisc")
+    hgood = f1.Get("srbase/h_leadtftop_finedisc")
+    hfake = f2.Get("srbase/h_leadtftop_finedisc")
 
     if not hgood: print "Cannot find hgood!"
     if not hfake: print "Cannot find hfake!"
 
     lst_eff, lst_fkr, lst_disc = makeROClist(hgood, hfake)
 
-    print lst_disc
+    # print lst_disc
     for i, disc in enumerate(lst_disc):
-        if disc == 0.998 or disc == 0.995 or disc == 0.99 or disc == 0.98:
-            print "TF: ", disc, lst_tageff[i], lst_fkrate[i]
+        if disc == 0.98 or disc == 0.96 or disc == 0.94 or disc == 0.92 or disc == 0.9:
+            print "TF: ", disc, lst_eff[i], lst_fkr[i]
 
     tfroc = r.TGraph(lst_eff.size, lst_eff, lst_fkr)
     tfroc.SetLineColor(r.kOrange+7)
@@ -184,18 +193,21 @@ if __name__ == "__main__":
     tfroc.GetYaxis().SetTitle("fake rate")
     tfroc.Draw("same")
 
-    leg = r.TLegend(0.16, 0.48, 0.46, 0.86)
-    leg.AddEntry(groc, "BDT original")
-    leg.AddEntry(tfroc, "TF top tagger")
+    # leg = r.TLegend(0.16, 0.48, 0.46, 0.86)
+    leg = r.TLegend(0.16, 0.64, 0.46, 0.86)
+    # leg.AddEntry(groc, "BDT original")
+    # leg.AddEntry(tfroc, "TF top tagger")
+    leg.AddEntry(groc, "BDT jet30")
+    leg.AddEntry(tfroc, "DeepResolved jet30")
     leg.Draw()
 
-    c1.Print("roc_test_BDTvsTF.pdf")
+    c1.Print("roc_srbase_BDTvsTF.pdf")
 
-    hgood = f1.Get("testTopTagging/h_chi2_disc1")
-    hfake = f2.Get("testTopTagging/h_chi2fake_disc1")
+    # hgood = f1.Get("testTopTagging/h_chi2_disc1")
+    # hfake = f2.Get("testTopTagging/h_chi2fake_disc1")
 
-    # hgood = f1.Get("srNJet2/h_chi2_disc")
-    # hfake = f2.Get("srNJet2/h_chi2_disc")
+    hgood = f1.Get("srbase/h_chi2_finedisc_ge4j")
+    hfake = f2.Get("srbase/h_chi2_finedisc_ge4j")
 
     if not hgood: print "Cannot find hgood!"
     if not hfake: print "Cannot find hfake!"
@@ -215,34 +227,67 @@ if __name__ == "__main__":
     leg.AddEntry(chi2roc, "had #chi^{2}")
     leg.Draw()
 
-    c1.Print("roc_test_AddChi2.pdf")
+    c1.Print("roc_srbase_AddChi2.pdf")
 
-    # exit()
-    # roc_new = getTopCandROC("testTraining1", "skimmed_TTJets_incl_amcnlo.root")
-    roc_new = getTopCandROC("testTraining1")
-    roc_new.SetLineColor(r.kTeal)
-    roc_new.Draw("same")
-    leg.AddEntry(roc_new, "New training")
+    # c1.Clear()
+    # leg = r.TLegend(0.16, 0.68, 0.50, 0.86)
 
-    # roc_dcsv = getTopCandROC("testTraining_dcsv", "skimmed_TTJets_incl_amcnlo.root")
-    roc_dcsv = getTopCandROC("testTraining_dcsv")
-    roc_dcsv.SetLineColor(r.kViolet)
-    roc_dcsv.Draw("same")
-    leg.AddEntry(roc_dcsv, "With deepCSV")
+    # # exit()
 
-    roc_f2 = getTopCandROC("testTraining_flag2")
-    roc_f2.SetLineColor(r.kGray+2)
-    roc_f2.Draw("same")
-    leg.AddEntry(roc_f2, "allow !b-matched")
+    # roc_jet20 = getTopCandROC("testResTopJet20_8", "stopbaby.root")
+    roc_jet20 = getTopCandROC("testResTopJet20_4", "TTJets_madgraph.root")
+    roc_jet20.SetLineColor(r.kAzure+2)
+    roc_jet20.Draw()
+    leg.AddEntry(roc_jet20, "BDT jet20")
 
-    roc_1l = getTopCandROC("testTraining_1lep")
-    roc_1l.SetLineColor(r.kAzure+2)
-    roc_1l.Draw("same")
-    leg.AddEntry(roc_1l, "train on 1lep")
+    roc_dpg5 = getTopCandROC("testResTopJet20_4", "TTJets_madgraph.root", hsuf="finedisc_dphigp5")
+    roc_dpg5.SetLineColor(r.kRed)
+    roc_dpg5.Draw()
+    leg.AddEntry(roc_dpg5, "BDT jet20, dphi>0.5")
+
+    roc_mt150 = getTopCandROC("testResTopJet20_4", "TTJets_madgraph.root", hsuf="finedisc_mt150")
+    roc_mt150.SetLineColor(r.kGray+2)
+    roc_mt150.Draw()
+    leg.AddEntry(roc_mt150, "BDT jet20, MT>150")
+
+    # # roc_dcsv = getTopCandROC("testTraining_dcsv", "skimmed_TTJets_incl_amcnlo.root")
+    # roc_dcsv = getTopCandROC("testTraining_dcsv")
+    # roc_dcsv.SetLineColor(r.kViolet)
+    # roc_dcsv.Draw("same")
+    # leg.AddEntry(roc_dcsv, "With deepCSV")
+
+    # roc_f2 = getTopCandROC("testTraining_flag2")
+    # roc_f2.SetLineColor(r.kGray+2)
+    # roc_f2.Draw("same")
+    # leg.AddEntry(roc_f2, "allow !b-matched")
+
+    # roc_1l = getTopCandROC("testTraining3")
+    # roc_1l.SetLineColor(r.kAzure+2)
+    # roc_1l.Draw("same")
+    # leg.AddEntry(roc_1l, "train on 1lep")
+
+    # roc_tfbj20 = getTopCandROC("testResTopJet20_8", "stopbaby.root", ttype='tftop')
+    # roc_tfbj20.SetLineColor(r.kViolet)
+    # roc_tfbj20.Draw("same")
+    # leg.AddEntry(roc_tfbj20, "DeepRes w/ bug jet20")
+
+    # roc_tfj20 = getTopCandROC("testResTopJet20_4", "TTJets_madgraph.root", ttype='tftop')
+    # roc_tfj20.SetLineColor(r.kTeal)
+    # roc_tfj20.Draw("same")
+    # leg.AddEntry(roc_tfj20, "DeepRes w/ fix jet20")
+
+    # roc_dphi = getTopCandROC("testTraining3",hsuf="finedisc_dphigp5")
+    # roc_dphi.SetLineColor(r.kOrange+3)
+    # roc_dphi.Draw("same")
+    # leg.AddEntry(roc_dphi, "eval at #delta#phi > 0.5")
+
+    # roc_mt = getTopCandROC("testTraining3",hsuf="finedisc_mt150")
+    # roc_mt.SetLineColor(r.kTeal)
+    # roc_mt.Draw("same")
+    # leg.AddEntry(roc_mt, "eval at MT > 150")
 
     leg.Draw()
     c1.Print("roc_trainings.pdf")
-
 
     exit()
 
