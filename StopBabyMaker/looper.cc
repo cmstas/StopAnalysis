@@ -551,7 +551,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
   }
   // Moriond17 samples
   else if (filestr.find("Summer16") != std::string::npos) {
-    jecVer = "Summer16_23Sep2016V3_MC";
+    jecVer = "Summer16_23Sep2016V4_MC";
   }
   // 2017 94X MiniAODv2
   else if (filestr.find("Fall17") != std::string::npos) {
