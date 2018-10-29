@@ -1617,15 +1617,15 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
       vector<LorentzVector> mybjets_jup; vector<LorentzVector> myaddjets_jup;
       vector<LorentzVector> mybjets_jdown; vector<LorentzVector> myaddjets_jdown;
       if(applyJECfromFile){
-        if(isFastsim) jetIndexSortedBdisc_jup = JetUtil::JetIndexBdiscSorted(jets_jup.ak4pfjets_deepCSV, jets_jup.ak4pfjets_p4, jets_jup.ak4pfjets_tight_pfid, skim_jet_pt, skim_jet_eta, false);
-        else jetIndexSortedBdisc_jup = JetUtil::JetIndexBdiscSorted(jets_jup.ak4pfjets_deepCSV, jets_jup.ak4pfjets_p4, jets_jup.ak4pfjets_tight_pfid, skim_jet_pt, skim_jet_eta, true);
+        if(isFastsim) jetIndexSortedBdisc_jup = JetUtil::JetIndexBdiscSorted(jets_jup.ak4pfjets_deepCSV, jets_jup.ak4pfjets_p4, jets_jup.ak4pfjets_tight_pfid, analysis_bjet_pt, skim_jet_eta, false);
+        else jetIndexSortedBdisc_jup = JetUtil::JetIndexBdiscSorted(jets_jup.ak4pfjets_deepCSV, jets_jup.ak4pfjets_p4, jets_jup.ak4pfjets_tight_pfid, analysis_bjet_pt, skim_jet_eta, true);
         for(unsigned int idx = 0; idx<jetIndexSortedBdisc_jup.size(); ++idx){
           if(jets_jup.ak4pfjets_passMEDbtag.at(jetIndexSortedBdisc_jup[idx])==true) mybjets_jup.push_back(jets_jup.ak4pfjets_p4.at(jetIndexSortedBdisc_jup[idx]) );
           else if(mybjets_jup.size()<=1 && (mybjets_jup.size()+myaddjets_jup.size())<3) myaddjets_jup.push_back(jets_jup.ak4pfjets_p4.at(jetIndexSortedBdisc_jup[idx]) );
         }
 
-        if(isFastsim) jetIndexSortedBdisc_jdown = JetUtil::JetIndexBdiscSorted(jets_jdown.ak4pfjets_deepCSV, jets_jdown.ak4pfjets_p4, jets_jdown.ak4pfjets_tight_pfid, skim_jet_pt, skim_jet_eta, false);
-        else jetIndexSortedBdisc_jdown = JetUtil::JetIndexBdiscSorted(jets_jdown.ak4pfjets_deepCSV, jets_jdown.ak4pfjets_p4, jets_jdown.ak4pfjets_tight_pfid, skim_jet_pt, skim_jet_eta, true);
+        if(isFastsim) jetIndexSortedBdisc_jdown = JetUtil::JetIndexBdiscSorted(jets_jdown.ak4pfjets_deepCSV, jets_jdown.ak4pfjets_p4, jets_jdown.ak4pfjets_tight_pfid, analysis_bjet_pt, skim_jet_eta, false);
+        else jetIndexSortedBdisc_jdown = JetUtil::JetIndexBdiscSorted(jets_jdown.ak4pfjets_deepCSV, jets_jdown.ak4pfjets_p4, jets_jdown.ak4pfjets_tight_pfid, analysis_bjet_pt, skim_jet_eta, true);
         for(unsigned int idx = 0; idx<jetIndexSortedBdisc_jdown.size(); ++idx){
           if(jets_jdown.ak4pfjets_passMEDbtag.at(jetIndexSortedBdisc_jdown[idx])==true) mybjets_jdown.push_back(jets_jdown.ak4pfjets_p4.at(jetIndexSortedBdisc_jdown[idx]) );
           else if(mybjets_jdown.size()<=1 && (mybjets_jdown.size()+myaddjets_jdown.size())<3) myaddjets_jdown.push_back(jets_jdown.ak4pfjets_p4.at(jetIndexSortedBdisc_jdown[idx]) );

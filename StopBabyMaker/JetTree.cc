@@ -319,7 +319,7 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx, Factorize
         //Jet selections
         if(p4sCorrJets.at(jindex).pt() < m_ak4_pt_cut) continue;
         if(fabs(p4sCorrJets.at(jindex).eta()) > m_ak4_eta_cut) continue;
-        bool passJetID = (gconf.year < 2017)? ((gconf.cmssw_ver < 94)? isLoosePFJetV2(jindex) : isTightPFJetV2(jindex)) : isTightPFJet_2017_v1(jindex);
+        bool passJetID = (gconf.year < 2017)? isTightPFJetV2(jindex) : isTightPFJet_2017_v1(jindex);
         if(!passJetID) ++nFailJets;
         if(!isFastsim && m_ak4_passid && !passJetID) continue;
         nskimjets++;
