@@ -70,7 +70,7 @@ void plot1D(string name, float xval, double weight, std::map<string, TH1*> &allh
 
 // Templated function
 template<class LorentzVectorType>
-bool isCloseObject(const LorentzVectorType p1, const LorentzVectorType p2, const float conesize)
+bool isCloseObject(const LorentzVectorType p1, const LorentzVectorType p2, const float conesize, float* deltaR = nullptr)
 {
   const float PI = TMath::Pi();
   float deltaEta = fabs(p1.eta() - p2.eta());
@@ -80,6 +80,7 @@ bool isCloseObject(const LorentzVectorType p1, const LorentzVectorType p2, const
   if (deltaPhi > conesize) return false;
   float deltaR2 = deltaEta*deltaEta + deltaPhi*deltaPhi;
   if (deltaR2 > conesize*conesize) return false;
+  if (deltaR) *deltaR = sqrt(deltaR2);
 
   return true;
 }

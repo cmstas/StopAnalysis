@@ -829,6 +829,14 @@ std::vector<SR> getStopSignalRegionsNewMETBinning() {
 
   SRvec.emplace_back(srbase);
 
+  // Test region at MET sideband for top taggers
+  sr = srbase;
+  sr.SetName("srsbmet");  // MET sideband
+  sr.SetVar("met", 150, 250);
+  sr.SetVar("passlep1pt", 1, 2);
+  sr.SetMETBins({150, 200, 250});
+  SRvec.emplace_back(sr);
+
   sr = srbase;
 
   // SR 2-3j
@@ -942,16 +950,16 @@ std::vector<SR> getStopSignalRegionsNewMETBinning() {
   SRvec.emplace_back(sr);
 
 
-  // sr.SetName("srE0");
-  // sr.SetDetailName("geq4j_tmod0to10_mlb0to175");
-  // sr.SetVar("njet", 4, fInf);
-  // sr.SetVar("tmod", 0, 10);
-  // sr.SetVar("mlb", 0, 175);
-  // sr.SetVar("deepttag", -2, 1);
-  // sr.SetVar("resttag", -2, 1);
-  // // sr.SetMETBins({250, 350, 450, 600, 1500});
-  // sr.SetMETBins({450, 600, 1500});
-  // SRvec.emplace_back(sr);
+  sr.SetName("srE0");
+  sr.SetDetailName("geq4j_tmod0to10_mlb0to175");
+  sr.SetVar("njet", 4, fInf);
+  sr.SetVar("tmod", 0, 10);
+  sr.SetVar("mlb", 0, 175);
+  sr.SetVar("deepttag", -2, 1);
+  sr.SetVar("resttag", -2, 1);
+  // sr.SetMETBins({250, 350, 450, 600, 1500});
+  sr.SetMETBins({450, 600, 1500});
+  SRvec.emplace_back(sr);
 
   sr.SetName("srE1");
   sr.SetDetailName("geq4j_tmod0to10_mlb0to175_nottag");
@@ -992,15 +1000,15 @@ std::vector<SR> getStopSignalRegionsNewMETBinning() {
   SRvec.emplace_back(sr);
 
 
-  // sr.SetName("srG0");
-  // sr.SetDetailName("geq4j_tmod10toInf_mlb0to175");
-  // sr.SetVar("njet", 4, fInf);
-  // sr.SetVar("tmod", 10, fInf);
-  // sr.SetVar("mlb", 0, 175);
-  // sr.SetVar("deepttag", -2, 1);
-  // sr.SetVar("resttag", -2, 1);
-  // sr.SetMETBins({450, 550, 750, 1500});
-  // SRvec.emplace_back(sr);
+  sr.SetName("srG0");
+  sr.SetDetailName("geq4j_tmod10toInf_mlb0to175");
+  sr.SetVar("njet", 4, fInf);
+  sr.SetVar("tmod", 10, fInf);
+  sr.SetVar("mlb", 0, 175);
+  sr.SetVar("deepttag", -2, 1);
+  sr.SetVar("resttag", -2, 1);
+  sr.SetMETBins({450, 550, 750, 1500});
+  SRvec.emplace_back(sr);
 
   sr.SetName("srG1");
   sr.SetDetailName("geq4j_tmod10toInf_mlb0to175_nottag");
