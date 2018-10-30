@@ -73,9 +73,9 @@ void JetTree::InitBtagSFTool(bool isFastsim_) {
       feff =  new TFile("btagsf/run2_fastsim/btageff__SMS-T1bbbb-T1qqqq_25ns_Moriond17.root");
     } else {
       // TODO: create efficiency in the phase space of the stop analysis
-      if (gconf.cmssw_ver == 94)
+      if (gconf.year >= 2017)
         feff =  new TFile("btagsf/run2_25ns/btageff__ttbar_amc_94X_deepCSV.root");
-      else if (gconf.cmssw_ver == 80)
+      else if (gconf.year == 2016)
         feff =  new TFile("btagsf/run2_25ns/btageff__ttbar_powheg_pythia8_25ns_Moriond17_deepCSV.root");
     }
     if (!feff) throw std::invalid_argument("JetTree.cc: btagsf file does not exist!");

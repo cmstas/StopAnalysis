@@ -67,12 +67,8 @@ void LeptonTree::FillCommon (int id, int idx)
         passTightID  = electronID(idx, STOP_tight_v4);
         passVeto     = electronID(idx, STOP_veto_v4);
 
-        if (gconf.year == 2016 && gconf.cmssw_ver == 80) {
+        if (gconf.year == 2016) {
             is_lepid_loose_noiso  = isLooseElectronPOGspring15noIso_v1(idx);
-            is_lepid_medium_noiso = isMediumElectronPOGspring15noIso_v1(idx);
-            is_lepid_tight_noiso  = isTightElectronPOGspring15noIso_v1(idx);
-        } else if (gconf.year == 2016 && gconf.cmssw_ver == 94) {
-            is_lepid_loose_noiso  = isLooseElectronPOGspring15noIso_v1(idx); // to be updated
             is_lepid_medium_noiso = isMediumElectronPOGspring15noIso_v1(idx);
             is_lepid_tight_noiso  = isTightElectronPOGspring15noIso_v1(idx);
         } else if (gconf.year == 2017) {

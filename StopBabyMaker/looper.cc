@@ -2005,14 +2005,12 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
         if( fabs(taus_pf_p4().at(iTau).Eta()) > tau_eta ) continue;
 
         Taus.FillCommon(iTau, tau_pt, tau_eta);
-        bool is_vetotau;
-        if (gconf.cmssw_ver == 80) {  // Moriond17 analysis selection
-          is_vetotau = isVetoTau(iTau, lep1.p4, lep1.charge);
-        } else if (gconf.cmssw_ver == 94) {  // Legacy analysis selection: new decay mode
-          is_vetotau = isVetoTau_v2(iTau, lep1.p4, lep1.charge);
-        }
+        bool is_vetotau = isVetoTau(iTau, lep1.p4, lep1.charge);  // Moriond17 analysis selection
         Taus.tau_isVetoTau.push_back(is_vetotau);
-        if (is_vetotau) vetotaus++;
+        bool is_vetotau_v2 = isVetoTau_v2(iTau, lep1.p4, lep1.charge); // Legacy analysis selection: new decay mode
+        Taus.tau_isVetoTau_v2.push_back(is_vetotau_v2);
+
+        if (is_vetotau_v2) vetotaus++;
       }
 
       if(vetotaus<1) StopEvt.PassTauVeto = true;
@@ -2022,7 +2020,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
       //
       // IsoTracks (Charged pfLeptons and pfChargedHadrons)
       //
-      if (gconf.cmssw_ver < 90) {
+      if (gconf.cmssw_ver < 94) {
         // Old method for 80X samples when isotrack branches are not available in MiniAOD
         int vetotracks = 0;
         int vetotracks_v2 = 0;
@@ -2252,8 +2250,8 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
       }
       else if (!StopEvt.PassTauVeto) {
         vecLorentzVector tau_p4s;
-        for (unsigned int idx = 0; idx < Taus.tau_isVetoTau.size(); idx++) {
-          if (!Taus.tau_isVetoTau.at(idx)) continue;
+        for (unsigned int idx = 0; idx < Taus.tau_isVetoTau_v2.size(); idx++) {
+          if (!Taus.tau_isVetoTau_v2.at(idx)) continue;
           tau_p4s.push_back(Taus.tau_p4.at(idx));
         }
         if (tau_p4s.size() == 0) {

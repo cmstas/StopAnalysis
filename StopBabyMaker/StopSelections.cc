@@ -52,9 +52,7 @@ bool PassMuonPreSelections(unsigned int muIdx,float pt, float eta){
 bool PassJetPreSelections(unsigned int jetIdx,float pt, float eta, bool passjid,FactorizedJetCorrector* corrector,bool applynewcorr,JetCorrectionUncertainty* jetcorr_uncertainty, int JES_type, bool isFastsim){
 
   if(jetIdx>=pfjets_p4().size()) return false;//safety requirement
-  if (gconf.year == 2016 && gconf.cmssw_ver == 80) {
-    if(!isFastsim && passjid && !isLoosePFJetV2(jetIdx)) return false;
-  } else if (gconf.year == 2016 && gconf.cmssw_ver == 94) {
+  if (gconf.year == 2016) {
     if(!isFastsim && passjid && !isTightPFJetV2(jetIdx)) return false;
   } else if (gconf.year == 2017) {
     if(!isFastsim && passjid && !isTightPFJet_2017_v1(jetIdx)) return false;

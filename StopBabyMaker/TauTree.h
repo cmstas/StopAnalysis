@@ -40,6 +40,7 @@ public:
     vecd tau_againstMuonTight;
     vecd tau_againstElectronLoose;
     vecb tau_isVetoTau;
+    vecb tau_isVetoTau_v2;
 };
 
 #endif

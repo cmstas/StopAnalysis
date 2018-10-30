@@ -21,7 +21,7 @@ void TauTree::FillCommon (int idx,float tau_pt_cut, float tau_eta_cut)
     //tau_sigcand_p4.push_back(taus_pf_signalcands_p4().at(idx));//this does crash constantly
     tau_ID.push_back(taus_pf_IDs().at(idx));
     tau_passID.push_back(passTauID("decayModeFinding",idx) &&
-						 passTauID("byMediumCombinedIsolationDeltaBetaCorr3Hits",idx) );
+                         passTauID("byMediumCombinedIsolationDeltaBetaCorr3Hits",idx) );
     //tau_againstMuonTight.push_back();
     //tau_againstElectronLoose.push_back();
    // tau_isVetoTau.push_back();
@@ -43,20 +43,22 @@ void TauTree::Reset()
     tau_againstMuonTight.clear();
     tau_againstElectronLoose.clear();
     tau_isVetoTau.clear();
+    tau_isVetoTau_v2.clear();
 }
 
 void TauTree::SetBranches(TTree* tree)
 {
     tree->Branch("tau_IDnames",&tau_IDnames);
-    tree->Branch("tau_leadtrack_p4",&tau_leadtrack_p4);
-    tree->Branch("tau_leadneutral_p4",&tau_leadneutral_p4);
+    // tree->Branch("tau_leadtrack_p4",&tau_leadtrack_p4);
+    // tree->Branch("tau_leadneutral_p4",&tau_leadneutral_p4);
     tree->Branch("tau_p4",&tau_p4);
-    tree->Branch("tau_isocand_p4",&tau_isocand_p4);
-    tree->Branch("tau_sigcand_p4",&tau_sigcand_p4);
+    // tree->Branch("tau_isocand_p4",&tau_isocand_p4);
+    // tree->Branch("tau_sigcand_p4",&tau_sigcand_p4);
     tree->Branch("tau_ID",&tau_ID);
     tree->Branch("tau_passID",&tau_passID);
     tree->Branch("ngoodtaus",&ngoodtaus);
-    tree->Branch("tau_againstMuonTight",&tau_againstMuonTight);
-    tree->Branch("tau_againstElectronLoose",&tau_againstElectronLoose);
+    // tree->Branch("tau_againstMuonTight",&tau_againstMuonTight);
+    // tree->Branch("tau_againstElectronLoose",&tau_againstElectronLoose);
     tree->Branch("tau_isVetoTau",&tau_isVetoTau);
+    tree->Branch("tau_isVetoTau_v2",&tau_isVetoTau_v2);
 }
