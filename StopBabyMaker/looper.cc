@@ -976,19 +976,24 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
       //keep those here - any event without vertex is BS
       //save met here because of JEC
       if(applyJECfromFile){
+        int useCleanedMET = 0;
+        if (gconf.year == 2017) {
+          useCleanedMET = 2;
+          StopEvt.pfmet_original = evt_old_pfmet_raw();
+          StopEvt.pfmet_original_phi = evt_old_pfmetPhi_raw();
+        }
         pair<float,float> newmet;
         pair<float,float> newmet_jup;
         pair<float,float> newmet_jdown;
         if(!evt_isRealData() && applyJECunc){
-          if      (JES_type > 0) newmet = getT1CHSMET_fromMINIAOD(jet_corrector_pfL1FastJetL2L3, jetcorr_uncertainty, true, isbadrawMET);
-          else if (JES_type < 0) newmet = getT1CHSMET_fromMINIAOD(jet_corrector_pfL1FastJetL2L3, jetcorr_uncertainty, false, isbadrawMET);
+          if      (JES_type > 0) newmet = getT1CHSMET_fromMINIAOD(jet_corrector_pfL1FastJetL2L3, jetcorr_uncertainty, true, isbadrawMET, useCleanedMET);
+          else if (JES_type < 0) newmet = getT1CHSMET_fromMINIAOD(jet_corrector_pfL1FastJetL2L3, jetcorr_uncertainty, false, isbadrawMET, useCleanedMET);
           else cout << "This should not happen" << endl;
         }
-        // else if (isbadrawMET) newmet = getT1CHSMET_fromMINIAOD(jet_corrector_pfL1FastJetL2L3, NULL, 0, isbadrawMET);
-        else newmet = getT1CHSMET_fromMINIAOD(jet_corrector_pfL1FastJetL2L3);
+        else newmet = getT1CHSMET_fromMINIAOD(jet_corrector_pfL1FastJetL2L3, nullptr, 0, isbadrawMET, useCleanedMET);
 
-        newmet_jup   = getT1CHSMET_fromMINIAOD(jet_corrector_pfL1FastJetL2L3, jetcorr_uncertainty_sys, true, isbadrawMET);
-        newmet_jdown = getT1CHSMET_fromMINIAOD(jet_corrector_pfL1FastJetL2L3, jetcorr_uncertainty_sys, false, isbadrawMET);
+        newmet_jup   = getT1CHSMET_fromMINIAOD(jet_corrector_pfL1FastJetL2L3, jetcorr_uncertainty_sys, true, isbadrawMET, useCleanedMET);
+        newmet_jdown = getT1CHSMET_fromMINIAOD(jet_corrector_pfL1FastJetL2L3, jetcorr_uncertainty_sys, false, isbadrawMET, useCleanedMET);
 
         StopEvt.pfmet = newmet.first;
         StopEvt.pfmet_phi = newmet.second;
@@ -1011,6 +1016,14 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
       else{
         StopEvt.pfmet = evt_pfmet();
         StopEvt.pfmet_phi = evt_pfmetPhi();
+        StopEvt.pfmet_jup = evt_pfmet_JetResUp();
+        StopEvt.pfmet_phi_jup = evt_pfmetPhi_JetResUp();
+        StopEvt.pfmet_jdown = evt_pfmet_JetResDown();
+        StopEvt.pfmet_phi_jdown = evt_pfmetPhi_JetResDown();
+        if (gconf.year == 2017) {
+          StopEvt.pfmet_original = evt_old_pfmet_raw();
+          StopEvt.pfmet_original_phi = evt_old_pfmetPhi_raw();
+        }
         if(evt_isRealData() && thisFile.Contains("03Feb2017")){
           StopEvt.pfmet = evt_muegclean_pfmet();
           StopEvt.pfmet_phi = evt_muegclean_pfmetPhi();

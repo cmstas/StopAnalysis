@@ -118,8 +118,8 @@ int main(int argc, char **argv){
   mylooper->analysis_bjet_pt     = 30;
 
   //temporarily set to false in order to take JECs from miniAOD directly for 2017 early data
-  mylooper->applyJECfromFile    = true; //THIS FLAG DECIDES NOW TOO IF JESUP/DOWN VALUES ARE CALCULATED
-  mylooper->applyAK8JECfromFile = false;
+  mylooper->applyJECfromFile    = true;  //THIS FLAG DECIDES NOW TOO IF JESUP/DOWN VALUES ARE CALCULATED
+  mylooper->applyAK8JECfromFile = false; // not needed as DeepAK8 uses uncorrected jets
   mylooper->JES_type            = 0;  //0 central, 1 up, -1 down; // not needed anymore
 
   mylooper->applyBtagSFs       = true;
