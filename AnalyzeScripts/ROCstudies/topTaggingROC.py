@@ -229,26 +229,26 @@ if __name__ == "__main__":
 
     c1.Print("roc_srbase_AddChi2.pdf")
 
-    # c1.Clear()
-    # leg = r.TLegend(0.16, 0.68, 0.50, 0.86)
+    c1.Clear()
+    leg = r.TLegend(0.16, 0.68, 0.50, 0.86)
 
     # # exit()
 
     # roc_jet20 = getTopCandROC("testResTopJet20_8", "stopbaby.root")
-    roc_jet20 = getTopCandROC("testResTopJet20_4", "TTJets_madgraph.root")
+    roc_jet20 = getTopCandROC("testResTopJet30_12", "TTJets_incl_amcnlo.root", hsuf="finedisc_mt150")
     roc_jet20.SetLineColor(r.kAzure+2)
     roc_jet20.Draw()
-    leg.AddEntry(roc_jet20, "BDT jet20")
+    leg.AddEntry(roc_jet20, "BDT jet30")
 
-    roc_dpg5 = getTopCandROC("testResTopJet20_4", "TTJets_madgraph.root", hsuf="finedisc_dphigp5")
-    roc_dpg5.SetLineColor(r.kRed)
-    roc_dpg5.Draw()
-    leg.AddEntry(roc_dpg5, "BDT jet20, dphi>0.5")
+    # roc_dpg5 = getTopCandROC("testResTopJet20_4", "TTJets_madgraph.root", hsuf="finedisc_dphigp5")
+    # roc_dpg5.SetLineColor(r.kRed)
+    # roc_dpg5.Draw()
+    # leg.AddEntry(roc_dpg5, "BDT jet20, dphi>0.5")
 
-    roc_mt150 = getTopCandROC("testResTopJet20_4", "TTJets_madgraph.root", hsuf="finedisc_mt150")
-    roc_mt150.SetLineColor(r.kGray+2)
-    roc_mt150.Draw()
-    leg.AddEntry(roc_mt150, "BDT jet20, MT>150")
+    # roc_mt150 = getTopCandROC("testResTopJet20_4", "TTJets_madgraph.root", hsuf="finedisc_mt150")
+    # roc_mt150.SetLineColor(r.kGray+2)
+    # roc_mt150.Draw()
+    # leg.AddEntry(roc_mt150, "BDT jet20, MT>150")
 
     # # roc_dcsv = getTopCandROC("testTraining_dcsv", "skimmed_TTJets_incl_amcnlo.root")
     # roc_dcsv = getTopCandROC("testTraining_dcsv")
@@ -275,6 +275,16 @@ if __name__ == "__main__":
     # roc_tfj20.SetLineColor(r.kTeal)
     # roc_tfj20.Draw("same")
     # leg.AddEntry(roc_tfj20, "DeepRes w/ fix jet20")
+
+    roc_tfj30 = getTopCandROC("samp17_m9", "ttbar_17.root", ttype='tftop', hsuf="finedisc_mt150")
+    roc_tfj30.SetLineColor(r.kTeal)
+    roc_tfj30.Draw("same")
+    leg.AddEntry(roc_tfj30, "DeepRes w/ 40,30,20")
+
+    roc_tfj130 = getTopCandROC("testResTopJet30_12", "TTJets_incl_amcnlo.root", ttype='tftop', hsuf="finedisc_mt150")
+    roc_tfj130.SetLineColor(r.kMagenta)
+    roc_tfj130.Draw("same")
+    leg.AddEntry(roc_tfj130, "DeepRes w/ 30,30,20")
 
     # roc_dphi = getTopCandROC("testTraining3",hsuf="finedisc_dphigp5")
     # roc_dphi.SetLineColor(r.kOrange+3)

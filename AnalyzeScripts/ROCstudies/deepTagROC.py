@@ -95,13 +95,16 @@ def getNSigPoints(f1):
 def getNSigPointsNew(f1):
     count = float(0)
     hmpt = f1.Get("srbase/h2d_signal_masspts")
-    for ibx in hmpt.GetNbinsX():
-        for iby in hmpt.GetNbinsY():
+    if not hmpt:
+        print "Cannot find masspt hist, returning 1."
+        return 1;
+    for ibx in range(1, hmpt.GetNbinsX()+1):
+        for iby in range(1, hmpt.GetNbinsY()+1):
             if hmpt.GetBinContent(ibx, iby) > 0:
                 count += 1
     return count
 
-def getStoNSigVBkg(f1, f2, sr, hname="h_deepttag"):
+def getStoNSigVBkg(f1, f2, sr, hname="h_deepttag", norm_sig=34.03, norm_bkg=825.9):
     hgood = f1.Get(sr+'/'+hname)
     hfake = f2.Get(sr+'/'+hname)
 
@@ -110,10 +113,17 @@ def getStoNSigVBkg(f1, f2, sr, hname="h_deepttag"):
 
     lst_sigyld, lst_bkgyld, lst_disc, lst_sigerr, lst_bkgerr = makeROClist(hgood, hfake, raw_yields=True, get_errors=True)
 
-    nsigs = getNSigPoints(f1)
+    nsigs = getNSigPointsNew(f1)
     print "Found", nsigs, "signal points at " + f1.GetName().split('/')[-1] + ":" + sr
     lst_sigyld /= nsigs;
     lst_sigerr /= nsigs;
+
+    norm_sig /= lst_sigyld[-1]
+    norm_bkg /= lst_bkgyld[-1]
+    lst_sigyld *= norm_sig
+    lst_bkgyld *= norm_bkg
+    lst_sigerr *= norm_sig
+    lst_bkgerr *= norm_bkg
 
     lst_StoN = np.array([lst_sigyld[i] / sqrt(lst_sigyld[i]+lst_bkgyld[i]) for i in range(len(lst_sigyld)) if lst_sigyld[i] > 0], dtype=float)
     lst_StoNerr = np.array([StoNErr(lst_sigyld[i],lst_bkgyld[i],lst_sigerr[i],lst_bkgerr[i]) for i in range(len(lst_sigyld)) if lst_sigyld[i] > 0], dtype=float)
@@ -134,27 +144,29 @@ if __name__ == "__main__":
 
     r.gROOT.SetBatch(1)
 
-    f1 = r.TFile("../../StopLooper/output/temp11/SMS_T2tt.root")
-    f2 = r.TFile("../../StopLooper/output/temp11/allBkg_25ns.root")
-    f3 = r.TFile("../../StopLooper/output/temp11/SMS_T2bW.root")
+    f1 = r.TFile("../../StopLooper/output/samp17_s9/SMS_T2tt_dMgt600.root")
+    f2 = r.TFile("../../StopLooper/output/samp17_s9/allBkg_17.root")
+    # f3 = r.TFile("../../StopLooper/output/temp11/SMS_T2bW.root")
 
     c1 = r.TCanvas("c1", "c1", 800, 600)
 
-    groc = getROCSigVBkg(f1, f2, "srNJet1", "h_deepttag", starval=[0.4, 0.6])
+    groc = getROCSigVBkg(f1, f2, "srbase", "h_deepttag", starval=[0.4, 0.6])
+    groc.SetLineColor(r.kAzure)
     groc.SetLineWidth(3)
     groc.Draw()
     # c1.Print("roc_deepdisc_top.pdf")
 
     grocb = getROCSigVBkg(f1, f2, "srbase", "h_binttag")
-    grocb.SetLineColor(r.kRed)
+    grocb.SetLineWidth(3)
+    grocb.SetLineColor(r.kTeal)
     grocb.Draw("same")
 
-    leg = r.TLegend(0.2, 0.7, 0.36, 0.8)
+    leg = r.TLegend(0.2, 0.64, 0.38, 0.8)
     leg.AddEntry(groc, "raw disc")
     leg.AddEntry(grocb, "binerized")
     leg.Draw()
 
-    # c1.Print("roc_rawvsbin_top_base_dm600.pdf")
+    c1.Print("roc_rawvsbin_top_base_dm600.pdf")
 
     # fxra = r.TFile("temp.root")
     # gak4 = fxra.Get("roc_ltc_dm600")
@@ -163,6 +175,19 @@ if __name__ == "__main__":
 
     # c1.Print("roc_mvr_dm600.pdf")
 
+    c1.Clear()
+
+    gstob = getStoNSigVBkg(f1, f2, "srbase", "h_deepttag")
+    gstob.Draw()
+    c1.Print("stob_raw_top_base_dm600.pdf")
+
+    c1.Clear()
+
+    gstob = getStoNSigVBkg(f1, f2, "srbase", "h_binttag")
+    gstob.Draw()
+    c1.Print("stob_bin_top_base_dm600.pdf")
+
+    exit()
     c1.Clear()
 
     grocw = getROCSigVBkg(f1, f2, "srbase", "h_deepWtag", starval=[0.3,])
