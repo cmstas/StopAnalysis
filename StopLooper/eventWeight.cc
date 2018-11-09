@@ -1427,9 +1427,7 @@ void evtWgtInfo::getTauSFWeight( double &weight_tau, double &weight_tau_up, doub
   weight_tau_dn = 1.0;
 
   if ( !apply_tau_sf ) return;
-
   if ( is_data_ ) return;
-
   if ( !babyAnalyzer.is2lep() ) return;
 
   // Check if there is had tau in event
@@ -1446,9 +1444,20 @@ void evtWgtInfo::getTauSFWeight( double &weight_tau, double &weight_tau_up, doub
     int binY = h_recoEff_tau->GetYaxis()->FindBin( fabs(babyAnalyzer.genleps_p4().at(iGen).Eta()) );
     double eff = h_recoEff_tau->GetBinContent( binX, binY );
 
+    // Old cutbase medium
     double sf = 0.91;
-    double sf_up = 0.91+0.05;
-    double sf_dn = 0.91-0.05;
+    double sf_err = 0.05;
+    // MVA medium
+    if (year == 2016) {
+      sf = 0.97;
+      sf_err = 0.05;
+    } else if (year == 2017) {
+      sf = 0.89;
+      sf_err = 0.03;
+    }
+
+    double sf_up = sf + sf_err;
+    double sf_dn = sf - sf_err;
 
     if ( eff>0.0 ) {
       // If passes tau filter, means tau was lost
@@ -2323,10 +2332,10 @@ void evtWgtInfo::setDefaultSystematics( int syst_set ) {
 
     // Set of systematics prepared for legacy analysis using 94X samples
     case 1:
-      apply_cr2lTrigger_sf = false;  // not available yet
+      apply_cr2lTrigger_sf = true;  // not available yet
       apply_bTag_sf        = true;
-      apply_lep_sf         = false;  // available but not updated yet
-      apply_vetoLep_sf     = false;  // same as above
+      apply_lep_sf         = true;   // available but not updated yet
+      apply_vetoLep_sf     = true;   // same as above
       apply_tau_sf         = false;  // same as above
       apply_topPt_sf       = false;
       apply_metRes_sf      = false;  // not developed for 94X yet
