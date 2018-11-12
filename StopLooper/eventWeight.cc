@@ -2332,7 +2332,7 @@ void evtWgtInfo::setDefaultSystematics( int syst_set ) {
 
     // Set of systematics prepared for legacy analysis using 94X samples
     case 1:
-      apply_cr2lTrigger_sf = true;  // not available yet
+      apply_cr2lTrigger_sf = false;  // not available yet
       apply_bTag_sf        = true;
       apply_lep_sf         = true;   // available but not updated yet
       apply_vetoLep_sf     = true;   // same as above

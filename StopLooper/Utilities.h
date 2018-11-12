@@ -68,6 +68,14 @@ void plot1D(string name, float xval, double weight, std::map<string, TH1*> &allh
   }
 }
 
+void linkHist(string hnew, string hexist, std::map<std::string, TH1*> &allhistos)
+{
+  if (allhistos.count(hnew)) return;
+  auto iter = allhistos.find(hexist);
+  if (iter == allhistos.end()) throw std::logic_error("linkHist(): Histogram "+hexist+" need to be plotted first");
+  allhistos.insert( std::pair<std::string, TH1*>(hnew, iter->second) );
+}
+
 // Templated function
 template<class LorentzVectorType>
 bool isCloseObject(const LorentzVectorType p1, const LorentzVectorType p2, const float conesize, float* deltaR = nullptr)

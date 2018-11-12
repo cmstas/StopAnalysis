@@ -373,7 +373,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
         }
       }
 
-      // fillEfficiencyHistos(testVec[0], "triggers");
+      fillEfficiencyHistos(testVec[0], "triggers");
 
       // Plot nvtxs on the base selection of stopbaby for reweighting purpose
       plot1d("h_nvtxs", nvtxs(), 1, testVec[0].histMap, ";Number of vertices", 100, 1, 101);
@@ -1101,19 +1101,38 @@ void StopLooper::fillEfficiencyHistos(SR& sr, string type, string suffix) {
 
     // Study the OR of the 3 triggers, uses jetht dataset
     if (HLT_PFHT_unprescaled())
-      plot1d("h_ht"+suffix, ak4_HT(), 1, sr.histMap, ";p_{T}(lep1) [GeV];#slash{E}_{T} [GeV]", 30, 800, 1400);
+      plot1d("h_ht"+suffix, ak4_HT(), 1, sr.histMap, ";H_{T} [GeV];#slash{E}_{T} [GeV]", 30, 800, 1400);
 
-    if (HLT_PFHT_unprescaled() || HLT_PFHT_prescaled()) {
+    // Measure the efficiencies of all 3 trigger combined in a JetHT dataset
+    // if (HLT_PFHT_unprescaled() || HLT_PFHT_prescaled()) {
     // if (HLT_PFHT_unprescaled() && ak4_HT() > 1200) {
-    // if (true) {
-      const float TEbins_met[] = {200, 225, 250, 275, 300, 400, 550};
+    if (true) {
+      const float TEbins_met[] = {150, 200, 225, 250, 275, 300, 400, 550};
       const float TEbins_lep[] = {20, 22.5, 25, 30, 40, 55, 100, 200};
       float met = (pfmet() > 550)? 549 : pfmet();
       float lep1pt = lep1_p4().pt();
+      int lep1id = abs(lep1_pdgid());
       lep1pt = (lep1pt > 200)? 199 : lep1pt;
-      plot2d("hden2d_met_lep1pt_hlt3"+suffix, lep1pt, met, 1, sr.histMap, ";p_{T}(lep1) [GeV];#slash{E}_{T} [GeV]", 7, TEbins_lep, 6, TEbins_met);
-      if (HLT_MET_MHT() || HLT_SingleMu() || HLT_SingleEl())
-        plot2d("hnum2d_met_lep1pt_hlt3"+suffix, lep1pt, met, 1, sr.histMap, ";p_{T}(lep1) [GeV];#slash{E}_{T} [GeV]", 7, TEbins_lep, 6, TEbins_met);
+      plot2d("hden2d_trigeff_met_lep1pt"+suffix, lep1pt, met, 1, sr.histMap, ";p_{T}(lep1) [GeV];#slash{E}_{T} [GeV]", 7, TEbins_lep, 7, TEbins_met);
+      if      (lep1id == 11) plot2d("hden2d_trigeff_met_lep1pt_el"+suffix, lep1pt, met, 1, sr.histMap, ";p_{T}(lep1) [GeV];#slash{E}_{T} [GeV]", 7, TEbins_lep, 7, TEbins_met);
+      else if (lep1id == 13) plot2d("hden2d_trigeff_met_lep1pt_mu"+suffix, lep1pt, met, 1, sr.histMap, ";p_{T}(lep1) [GeV];#slash{E}_{T} [GeV]", 7, TEbins_lep, 7, TEbins_met);
+      if (HLT_MET_MHT() || HLT_SingleMu() || HLT_SingleEl()) {
+        plot2d("hnum2d_trigeff_met_lep1pt"+suffix, lep1pt, met, 1, sr.histMap, ";p_{T}(lep1) [GeV];#slash{E}_{T} [GeV]", 7, TEbins_lep, 7, TEbins_met);
+        if      (lep1id == 11) plot2d("hnum2d_trigeff_met_lep1pt_el"+suffix, lep1pt, met, 1, sr.histMap, ";p_{T}(lep1-e) [GeV];#slash{E}_{T} [GeV]", 7, TEbins_lep, 7, TEbins_met);
+        else if (lep1id == 13) plot2d("hnum2d_trigeff_met_lep1pt_mu"+suffix, lep1pt, met, 1, sr.histMap, ";p_{T}(lep1-#mu) [GeV];#slash{E}_{T} [GeV]", 7, TEbins_lep, 7, TEbins_met);
+      }
+      // Trigger efficiency for CR2l
+      if (fabs(pfmet() - pfmet_rl()) > 0.001) {
+        float met_rl = (pfmet_rl() > 550)? 549 : pfmet();
+        plot2d("hden2d_trigeff_metrl_lep1pt"+suffix, lep1pt, met_rl, 1, sr.histMap, ";p_{T}(lep1) [GeV];#slash{E}_{T}(rl) [GeV]", 7, TEbins_lep, 7, TEbins_met);
+        if      (lep1id == 11) plot2d("hden2d_trigeff_metrl_lep1pt_el"+suffix, lep1pt, met_rl, 1, sr.histMap, ";p_{T}(lep1) [GeV];#slash{E}_{T}(rl) [GeV]", 7, TEbins_lep, 7, TEbins_met);
+        else if (lep1id == 13) plot2d("hden2d_trigeff_metrl_lep1pt_mu"+suffix, lep1pt, met_rl, 1, sr.histMap, ";p_{T}(lep1) [GeV];#slash{E}_{T}(rl) [GeV]", 7, TEbins_lep, 7, TEbins_met);
+        if (HLT_MET_MHT() || HLT_SingleMu() || HLT_SingleEl()) {
+          plot2d("hnum2d_trigeff_metrl_lep1pt"+suffix, lep1pt, met_rl, 1, sr.histMap, ";p_{T}(lep1) [GeV];#slash{E}_{T}(rl) [GeV]", 7, TEbins_lep, 7, TEbins_met);
+          if      (lep1id == 11) plot2d("hnum2d_trigeff_metrl_lep1pt_el"+suffix, lep1pt, met_rl, 1, sr.histMap, ";p_{T}(lep1-e) [GeV];#slash{E}_{T}(rl) [GeV]", 7, TEbins_lep, 7, TEbins_met);
+          else if (lep1id == 13) plot2d("hnum2d_trigeff_metrl_lep1pt_mu"+suffix, lep1pt, met_rl, 1, sr.histMap, ";p_{T}(lep1-#mu) [GeV];#slash{E}_{T}(rl) [GeV]", 7, TEbins_lep, 7, TEbins_met);
+        }
+      }
     }
   }
 }

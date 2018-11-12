@@ -65,7 +65,7 @@ int main(int argc, char** argv)
   // else if (sample == "data_2017B") doData2017B = true;
   // else if (sample == "data_2017C") doData2017C = true;
   else if (sample == "data_2017dilep") doData2017dilep = true;
-  else if (sample == "data_2016") doData2016 = true;
+  else if (sample == "data_2016_v24") doData2016 = true;
   else if (sample == "data_2016dilep") doData2016dilep = true;
   else if (sample == "data_2016Sync") doData2016Sync = true;
   else if (sample == "data_2016all") {
