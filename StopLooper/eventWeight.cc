@@ -495,9 +495,25 @@ void evtWgtInfo::Setup(string samplestr, int inyear, bool useBTagUtils, bool use
 
   // Get SR trigger histos
   if ( !is_data_ && apply_cr2lTrigger_sf) {
-    f_cr2lTrigger_sf = new TFile("../StopCORE/inputs/trigger/TriggerEff_2016.root","read");
-    h_cr2lTrigger_sf_el = (TEfficiency*) f_cr2lTrigger_sf->Get("Efficiency_ge2l_metrl_el");
-    h_cr2lTrigger_sf_mu = (TEfficiency*) f_cr2lTrigger_sf->Get("Efficiency_ge2l_metrl_mu");
+    f_cr2lTrigger_sf = new TFile("../StopCORE/inputs/trigger/TrigEfficiencies_all.root","read");
+    if (year == 2016) {
+      h_cr2lTrigger_sf_el = (TEfficiency*) f_cr2lTrigger_sf->Get("Efficiency_ge2l_metrl_el");
+      h_cr2lTrigger_sf_mu = (TEfficiency*) f_cr2lTrigger_sf->Get("Efficiency_ge2l_metrl_mu");
+    } else if (year == 2017) {
+      h_cr2lTrigger_sf_el = (TEfficiency*) f_cr2lTrigger_sf->Get("heff17_trigeff_metrl_lep1pt_el");
+      h_cr2lTrigger_sf_mu = (TEfficiency*) f_cr2lTrigger_sf->Get("heff17_trigeff_metrl_lep1pt_mu");
+    } else if (year == 2018) {
+      // TODO: to update this when 2018 data is available
+      h_cr2lTrigger_sf_el = (TEfficiency*) f_cr2lTrigger_sf->Get("heff17_trigeff_metrl_lep1pt_el");
+      h_cr2lTrigger_sf_mu = (TEfficiency*) f_cr2lTrigger_sf->Get("heff17_trigeff_metrl_lep1pt_mu");
+    }
+    if (!h_cr2lTrigger_sf_mu || !h_cr2lTrigger_sf_el) {
+      cout << "[eventWeight::Setup] >> Cannot find histogram for cr2lTrigger!! Turning it off!!" << endl;
+      apply_cr2lTrigger_sf = false;
+    } else {
+      max_metrl  = h_cr2lTrigger_sf_mu->GetTotalHistogram()->GetYaxis()->GetXmax() - 0.001;
+      max_lep1pt = h_cr2lTrigger_sf_mu->GetTotalHistogram()->GetXaxis()->GetXmax() - 0.001;
+    }
   }
 
   // Initialize bTag SF machinery
@@ -1061,14 +1077,14 @@ void evtWgtInfo::getCR2lTriggerWeight( double &wgt_trigger, double &wgt_trigger_
   double sf_err_dn = 0.0;
 
   double met = babyAnalyzer.pfmet_rl();
-  const double max_met = 499.9;
-  const double min_met = 250.1;
-  met = (met < min_met)? min_met : (met > max_met)? max_met : met;
+  // const double max_metrl = 499.9;
+  const double min_metrl = 250.1;
+  met = (met < min_metrl)? min_metrl : (met > max_metrl)? max_metrl : met;
 
   double lep_pt = babyAnalyzer.lep1_p4().Pt();
-  const double max_lep_pt = 49.9;
-  const double min_lep_pt = 20.1;
-  lep_pt = (lep_pt < min_lep_pt)? min_lep_pt : (lep_pt > max_lep_pt)? max_lep_pt : lep_pt;
+  // const double max_lep1pt = 49.9;
+  const double min_lep1pt = 20.1;
+  lep_pt = (lep_pt < min_lep1pt)? min_lep1pt : (lep_pt > max_lep1pt)? max_lep1pt : lep_pt;
 
   if ( abs(babyAnalyzer.lep1_pdgid()) == 11 ) {
     int bin   = h_cr2lTrigger_sf_el->FindFixBin( lep_pt, met );

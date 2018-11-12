@@ -1109,7 +1109,7 @@ void StopLooper::fillEfficiencyHistos(SR& sr, string type, string suffix) {
     if (true) {
       const float TEbins_met[] = {150, 200, 225, 250, 275, 300, 400, 550};
       const float TEbins_lep[] = {20, 22.5, 25, 30, 40, 55, 100, 200};
-      float met = (pfmet() > 550)? 549 : pfmet();
+      float met = (pfmet() > 550)? 549.9 : pfmet();
       float lep1pt = lep1_p4().pt();
       int lep1id = abs(lep1_pdgid());
       lep1pt = (lep1pt > 200)? 199 : lep1pt;
@@ -1123,7 +1123,7 @@ void StopLooper::fillEfficiencyHistos(SR& sr, string type, string suffix) {
       }
       // Trigger efficiency for CR2l
       if (fabs(pfmet() - pfmet_rl()) > 0.001) {
-        float met_rl = (pfmet_rl() > 550)? 549 : pfmet();
+        float met_rl = (pfmet_rl() > 550)? 549.9 : pfmet_rl();
         plot2d("hden2d_trigeff_metrl_lep1pt"+suffix, lep1pt, met_rl, 1, sr.histMap, ";p_{T}(lep1) [GeV];#slash{E}_{T}(rl) [GeV]", 7, TEbins_lep, 7, TEbins_met);
         if      (lep1id == 11) plot2d("hden2d_trigeff_metrl_lep1pt_el"+suffix, lep1pt, met_rl, 1, sr.histMap, ";p_{T}(lep1) [GeV];#slash{E}_{T}(rl) [GeV]", 7, TEbins_lep, 7, TEbins_met);
         else if (lep1id == 13) plot2d("hden2d_trigeff_metrl_lep1pt_mu"+suffix, lep1pt, met_rl, 1, sr.histMap, ";p_{T}(lep1) [GeV];#slash{E}_{T}(rl) [GeV]", 7, TEbins_lep, 7, TEbins_met);

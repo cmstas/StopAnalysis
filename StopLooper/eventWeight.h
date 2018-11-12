@@ -106,6 +106,8 @@ class evtWgtInfo {
   TFile *f_cr2lTrigger_sf;
   TEfficiency *h_cr2lTrigger_sf_el;
   TEfficiency *h_cr2lTrigger_sf_mu;
+  double max_metrl;
+  double max_lep1pt;
 
   // bTag machinery
   bool useBTagSFs_fromFiles;
