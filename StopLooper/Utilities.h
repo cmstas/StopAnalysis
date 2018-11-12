@@ -39,7 +39,7 @@ inline void moveXOverFlowToLastBin3D(TH3* hist) {
   }
 }
 
-// Old functions with float for ranges to be consistent with xval for floating point errors
+// Old functions that enforce float for ranges to be consistent with xval for floating point errors
 void plot1D(string name, float xval, double weight, std::map<string, TH1*> &allhistos, string title, int numbinsx, float xmin, float xmax)
 {
   if (title=="") title=name;
@@ -54,22 +54,9 @@ void plot1D(string name, float xval, double weight, std::map<string, TH1*> &allh
   }
 }
 
-void plot1D(string name, float xval, double weight, std::map<string, TH1*> &allhistos, string title, int numbinsx, const float* xbins)
-{
-  if (title=="") title=name;
-  std::map<string, TH1*>::iterator iter= allhistos.find(name);
-  if (iter == allhistos.end()) { //no histo for this yet, so make a new one
-    TH1D* currentHisto= new TH1D(name.c_str(), title.c_str(), numbinsx, xbins);
-    currentHisto->Sumw2();
-    currentHisto->Fill(xval, weight);
-    allhistos.insert(std::pair<string, TH1*>(name, currentHisto) );
-  } else {
-    iter->second->Fill(xval, weight);
-  }
-}
-
 void linkHist(string hnew, string hexist, std::map<std::string, TH1*> &allhistos)
 {
+  // Could be useful when mutiple ratio hists sharing a common denominator
   if (allhistos.count(hnew)) return;
   auto iter = allhistos.find(hexist);
   if (iter == allhistos.end()) throw std::logic_error("linkHist(): Histogram "+hexist+" need to be plotted first");
