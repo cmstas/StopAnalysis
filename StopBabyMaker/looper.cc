@@ -2375,7 +2375,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
                                    passHLTTriggerPattern("HLT_PFMETNoMu120_JetIdCleaned_PFMHTNoMu120_IDTight_v") || passHLTTriggerPattern("HLT_PFMETNoMu120_NoiseCleaned_PFMHTNoMu120_IDTight_v")
                                    );
           StopEvt.HLT_MET100_MHT100 = ( passHLTTriggerPattern("HLT_PFMET100_PFMHT100_IDTight_v") ||
-                                        passHLTTriggerPattern("HLT_PFMETNoMu100_PFMHTNoMu100_IDTight_v") );
+                                        passHLTTriggerPattern("HLT_PFMETNoMu100_PFMHTNoMu100_IDTight_v") ); // disabled most of the time
           StopEvt.HLT_MET110_MHT110 = ( passHLTTriggerPattern("HLT_PFMET110_PFMHT110_IDTight_v") ||
                                         passHLTTriggerPattern("HLT_PFMETNoMu110_PFMHTNoMu110_IDTight_v") );
           StopEvt.HLT_MET120_MHT120 = ( passHLTTriggerPattern("HLT_PFMET120_PFMHT120_IDTight_v") || passHLTTriggerPattern("HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v") ||
