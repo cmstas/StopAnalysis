@@ -63,10 +63,9 @@ const bool runFullSignalScan = false;
 // debug symbol, for printing exact event kinematics that passes
 const bool printPassedEvents = false;
 
-// set bool def here for member function usage
+// some global helper variables to be used in member functions
 int datayear = -1;
-// string samplever = "Fall17v2";
-string samplever = "Summer16v2";
+string samplever;
 
 const float fInf = std::numeric_limits<float>::max();
 
@@ -138,6 +137,30 @@ void StopLooper::GenerateAllSRptrSets() {
   // cout << __FILE__ << __LINE__ << ": all_SRptrs.size(): " << all_SRptrs.size() << endl;
   // for (auto a : all_SRptrs) cout << __FILE__ << ':' << __LINE__ << ": a= " << a << endl;
   // allSRptrSets = generateSRptrSet(all_SRptrs);
+}
+
+bool StopLooper::PassingHLTriggers(int nlep) {
+  if (nlep == 1) {
+    switch (year()) {
+      case 2016:
+        return ( (HLT_MET110_MHT110() || HLT_MET120_MHT120() || HLT_MET()) ||
+                 (abs(lep1_pdgid()) == 11 && HLT_SingleEl()) || (abs(lep1_pdgid()) == 13 && HLT_SingleMu()) );
+      case 2017:
+      case 2018:
+        return ( HLT_MET_MHT() || (abs(lep1_pdgid()) == 11 && HLT_SingleEl()) || (abs(lep1_pdgid()) == 13 && HLT_SingleMu()) );
+    }
+  } else if (nlep == 2) {
+    switch (year()) {
+      case 2016:
+        return ( (HLT_MET() || HLT_MET110_MHT110() || HLT_MET120_MHT120()) || (HLT_SingleEl() && (abs(lep1_pdgid())==11 || abs(lep2_pdgid())==11)) ||
+                 (HLT_SingleMu() && (abs(lep1_pdgid())==13 || abs(lep2_pdgid())==13)) );
+      case 2017:
+      case 2018:
+        return ( HLT_MET_MHT() || (HLT_SingleEl() && (abs(lep1_pdgid())==11 || abs(lep2_pdgid())==11)) ||
+                  (HLT_SingleMu() && (abs(lep1_pdgid())==13 || abs(lep2_pdgid())==13)) );
+    }
+  }
+  return false;
 }
 
 void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int jes_type) {
@@ -227,11 +250,16 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
     TString dsname = dataset();
     cout << "[StopLooper::looper] running on sample: " << dsname << endl;
 
-    if (dsname.Contains("RunIIFall17MiniAODv2")) samplever = "Fall17v2";
-    else if (dsname.Contains("RunIISummer16MiniAODv2")) samplever = "Summer16v2";
-    else if (dsname.Contains("RunIISummer16MiniAODv3")) samplever = "Summer16v3";
-    else if (dsname.Contains("RunIISpring16MiniAODv2")) samplever = "Spring16v2";
-    else samplever = "Undetermined";
+    // Find the stopbaby versions automatically from file path
+    if (int i = fname.First("_v"); i >= 0) samplever = fname(i+1, 3); // ignore subversions
+    else if (fname.Contains("v24")) samplever = "v24";
+    else cout << "[looper] >> Cannot find the sample version!" << endl;
+
+    // Attach the MiniAOD version from dsname
+    if (dsname.Contains("RunIIFall17MiniAODv2")) samplever += ":Fall17v2";
+    else if (dsname.Contains("RunIISummer16MiniAODv2")) samplever += ":Summer16v2";
+    else if (dsname.Contains("RunIISummer16MiniAODv3")) samplever += ":Summer16v3";
+    else if (dsname.Contains("RunIISpring16MiniAODv2")) samplever += ":Spring16v2";
 
     is_fastsim_ = dsname.Contains("SMS") || fname.Contains("SMS") || fname.Contains("Signal");
 
@@ -252,7 +280,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
 
     evtWgt.getCounterHistogramFromBaby(&file);
     // Extra file weight for extension dataset, should move these code to other places
-    if (year() == 2016)
+    if (year() == 2016 && samplever.find("v24") == 0)
       evtWgt.getSampleWeightSummer16v2(fname);
 
     if (year() == 2016) kLumi = 35.867;
@@ -715,12 +743,7 @@ void StopLooper::fillYieldHistos(SR& sr, float met, string suf, bool is_cr2l) {
 void StopLooper::fillHistosForSR(string suf) {
 
   // Trigger requirements
-  // if (is_data() && datayear >= 2017) { // 2017 Triggers
-  if (year() >= 2017) { // TODO: confirm if trigger should be applied to 94X MC
-    if (not ( (abs(lep1_pdgid()) == 11 && HLT_SingleEl()) || (abs(lep1_pdgid()) == 13 && HLT_SingleMu()) || HLT_MET_MHT() )) return;
-  } else if (datayear == 2016) { // 2016 MET Triggers
-    if (not ( (abs(lep1_pdgid()) == 11 && HLT_SingleEl()) || (abs(lep1_pdgid()) == 13 && HLT_SingleMu()) ||(HLT_MET() || HLT_MET110_MHT110() || HLT_MET120_MHT120()) )) return;
-  }
+  if (is_data() && !PassingHLTriggers()) return;
 
   // // For getting into full trigger efficiency in 2017 data
   // if ( (abs(lep1_pdgid()) == 11 && values_["lep1pt"] < 40) || (abs(lep1_pdgid()) == 13 && values_["lep1pt"] < 30) ) return;
@@ -812,14 +835,7 @@ void StopLooper::fillHistosForSR(string suf) {
 void StopLooper::fillHistosForCR2l(string suf) {
 
   // Trigger requirements
-  // if (is_data() && datayear >= 2017) { // 2017 Triggers
-  if (year() >= 2017) { // to confirm if trigger should be applied to 94X MC
-    if (not ( (abs(lep1_pdgid()) == 11 && HLT_SingleEl()) || (abs(lep1_pdgid()) == 13 && HLT_SingleMu()) || HLT_MET_MHT() )) return;
-  } else if (datayear == 2016) { // 2016 CR2l Triggers
-    // if (not ( (abs(lep1_pdgid()) == 11 && HLT_SingleEl()) || (abs(lep1_pdgid()) == 13 && HLT_SingleMu()) || (HLT_MET() || HLT_MET110_MHT110() || HLT_MET120_MHT120()) )) return;
-    if (not ( ( HLT_SingleEl() && (abs(lep1_pdgid())==11 || abs(lep2_pdgid())==11) ) || ( HLT_SingleMu() && (abs(lep1_pdgid())==13 || abs(lep2_pdgid())==13) ) ||
-              ( HLT_MET()) || ( HLT_MET110_MHT110()) || ( HLT_MET120_MHT120()) )) return;
-  }
+  if (is_data() && !PassingHLTriggers(2)) return;
 
   // For getting into full trigger efficiency in 2017 & 2018 data
   // if (not( (HLT_SingleEl() && abs(lep1_pdgid()) == 11 && values_["lep1pt"] < 45) ||
@@ -896,14 +912,7 @@ void StopLooper::fillHistosForCR2l(string suf) {
 void StopLooper::fillHistosForCR0b(string suf) {
 
   // Trigger requirements
-  // if (is_data() && datayear >= 2017) { // 2017 Triggers
-  if (year() >= 2017) { // to confirm if trigger should be applied to 94X MC
-    if (not ( (abs(lep1_pdgid()) == 11 && HLT_SingleEl()) || (abs(lep1_pdgid()) == 13 && HLT_SingleMu()) || HLT_MET_MHT() )) return;
-  } else if (datayear == 2016) { // 2016 MET Triggers
-    if (not ( (abs(lep1_pdgid()) == 11 && HLT_SingleEl()) || (abs(lep1_pdgid()) == 13 && HLT_SingleMu()) ||(HLT_MET() || HLT_MET110_MHT110() || HLT_MET120_MHT120()) )) return;
-  }
-
-  if (year() == 2017 && values_["njet"] < 4) return;  // TODO: remove this line when we have samples of W2jets
+  if (is_data() && !PassingHLTriggers()) return;
 
   for (auto& cr : CR0bVec) {
     if (!cr.PassesSelection(values_)) continue;
@@ -1070,13 +1079,13 @@ void StopLooper::fillEfficiencyHistos(SR& sr, string type, string suffix) {
     if (HLT_SingleMu() && abs(lep1_pdgid()) == 13 && nvetoleps() == 1 && lep1_p4().pt() > 40) {
       plot1d("hden_met_hltmet"+suffix, pfmet(), 1, sr.histMap, ";#slash{E}_{T} [GeV]"  , 60,  50, 650);
       plot1d("hden_met_hltmetmht120"+suffix, pfmet(), 1, sr.histMap, ";#slash{E}_{T} [GeV]"  , 60,  50, 650);
-      plot1d("hden_ht_hltht1050"+suffix, ak4_HT(), 1, sr.histMap, ";H_{T} [GeV]", 30, 800, 1400);
+      plot1d("hden_ht_hltht_unprescaled"+suffix, ak4_HT(), 1, sr.histMap, ";H_{T} [GeV]", 30, 800, 1400);
       if (HLT_MET_MHT())
         plot1d("hnum_met_hltmet"+suffix, pfmet(), 1, sr.histMap, ";#slash{E}_{T} [GeV]"  , 60,  50, 650);
       if (HLT_MET120_MHT120())
         plot1d("hnum_met_hltmetmht120"+suffix, pfmet(), 1, sr.histMap, ";#slash{E}_{T} [GeV]"  , 60,  50, 650);
       if (HLT_PFHT_unprescaled())
-        plot1d("hnum_ht_hltht1050"+suffix, ak4_HT(), 1, sr.histMap, ";H_{T} [GeV]", 30, 800, 1400);
+        plot1d("hnum_ht_hltht_unprescaled"+suffix, ak4_HT(), 1, sr.histMap, ";H_{T} [GeV]", 30, 800, 1400);
     } else if (HLT_SingleEl() && abs(lep1_pdgid()) == 11 && nvetoleps() == 1 && lep1_p4().pt() > 45) {
       plot1d("hden_met_hltmet_eden"+suffix, pfmet(), 1, sr.histMap, ";#slash{E}_{T} [GeV]"  , 60,  50, 650);
       if (HLT_MET_MHT())
@@ -1104,33 +1113,34 @@ void StopLooper::fillEfficiencyHistos(SR& sr, string type, string suffix) {
       plot1d("h_ht"+suffix, ak4_HT(), 1, sr.histMap, ";H_{T} [GeV];#slash{E}_{T} [GeV]", 30, 800, 1400);
 
     // Measure the efficiencies of all 3 trigger combined in a JetHT dataset
-    // if (HLT_PFHT_unprescaled() || HLT_PFHT_prescaled()) {
+    if ((HLT_PFHT_unprescaled() || HLT_PFHT_prescaled())) {
     // if (HLT_PFHT_unprescaled() && ak4_HT() > 1200) {
-    if (true) {
-      const float TEbins_met[] = {150, 200, 225, 250, 275, 300, 400, 550};
+    // if (HLT_PFHT_unprescaled()) {
+    // if (true) {
+      const float TEbins_met[] = {150, 200, 225, 250, 275, 300, 350, 400, 550};
       const float TEbins_lep[] = {20, 22.5, 25, 30, 40, 55, 100, 200};
       float met = (pfmet() > 550)? 549.9 : pfmet();
       float lep1pt = lep1_p4().pt();
       int lep1id = abs(lep1_pdgid());
       lep1pt = (lep1pt > 200)? 199 : lep1pt;
-      plot2d("hden2d_trigeff_met_lep1pt"+suffix, lep1pt, met, 1, sr.histMap, ";p_{T}(lep1) [GeV];#slash{E}_{T} [GeV]", 7, TEbins_lep, 7, TEbins_met);
-      if      (lep1id == 11) plot2d("hden2d_trigeff_met_lep1pt_el"+suffix, lep1pt, met, 1, sr.histMap, ";p_{T}(lep1) [GeV];#slash{E}_{T} [GeV]", 7, TEbins_lep, 7, TEbins_met);
-      else if (lep1id == 13) plot2d("hden2d_trigeff_met_lep1pt_mu"+suffix, lep1pt, met, 1, sr.histMap, ";p_{T}(lep1) [GeV];#slash{E}_{T} [GeV]", 7, TEbins_lep, 7, TEbins_met);
-      if (HLT_MET_MHT() || HLT_SingleMu() || HLT_SingleEl()) {
-        plot2d("hnum2d_trigeff_met_lep1pt"+suffix, lep1pt, met, 1, sr.histMap, ";p_{T}(lep1) [GeV];#slash{E}_{T} [GeV]", 7, TEbins_lep, 7, TEbins_met);
-        if      (lep1id == 11) plot2d("hnum2d_trigeff_met_lep1pt_el"+suffix, lep1pt, met, 1, sr.histMap, ";p_{T}(lep1-e) [GeV];#slash{E}_{T} [GeV]", 7, TEbins_lep, 7, TEbins_met);
-        else if (lep1id == 13) plot2d("hnum2d_trigeff_met_lep1pt_mu"+suffix, lep1pt, met, 1, sr.histMap, ";p_{T}(lep1-#mu) [GeV];#slash{E}_{T} [GeV]", 7, TEbins_lep, 7, TEbins_met);
+      plot2d("hden2d_trigeff_met_lep1pt"+suffix, lep1pt, met, 1, sr.histMap, ";p_{T}(lep1) [GeV];#slash{E}_{T} [GeV]", 7, TEbins_lep, 8, TEbins_met);
+      if      (lep1id == 11) plot2d("hden2d_trigeff_met_lep1pt_el"+suffix, lep1pt, met, 1, sr.histMap, ";p_{T}(lep1) [GeV];#slash{E}_{T} [GeV]", 7, TEbins_lep, 8, TEbins_met);
+      else if (lep1id == 13) plot2d("hden2d_trigeff_met_lep1pt_mu"+suffix, lep1pt, met, 1, sr.histMap, ";p_{T}(lep1) [GeV];#slash{E}_{T} [GeV]", 7, TEbins_lep, 8, TEbins_met);
+      if (PassingHLTriggers()) {
+        plot2d("hnum2d_trigeff_met_lep1pt"+suffix, lep1pt, met, 1, sr.histMap, ";p_{T}(lep1) [GeV];#slash{E}_{T} [GeV]", 7, TEbins_lep, 8, TEbins_met);
+        if      (lep1id == 11) plot2d("hnum2d_trigeff_met_lep1pt_el"+suffix, lep1pt, met, 1, sr.histMap, ";p_{T}(lep1-e) [GeV];#slash{E}_{T} [GeV]", 7, TEbins_lep, 8, TEbins_met);
+        else if (lep1id == 13) plot2d("hnum2d_trigeff_met_lep1pt_mu"+suffix, lep1pt, met, 1, sr.histMap, ";p_{T}(lep1-#mu) [GeV];#slash{E}_{T} [GeV]", 7, TEbins_lep, 8, TEbins_met);
       }
       // Trigger efficiency for CR2l
-      if (fabs(pfmet() - pfmet_rl()) > 0.001) {
+      if (nvetoleps() > 1) {
         float met_rl = (pfmet_rl() > 550)? 549.9 : pfmet_rl();
-        plot2d("hden2d_trigeff_metrl_lep1pt"+suffix, lep1pt, met_rl, 1, sr.histMap, ";p_{T}(lep1) [GeV];#slash{E}_{T}(rl) [GeV]", 7, TEbins_lep, 7, TEbins_met);
-        if      (lep1id == 11) plot2d("hden2d_trigeff_metrl_lep1pt_el"+suffix, lep1pt, met_rl, 1, sr.histMap, ";p_{T}(lep1) [GeV];#slash{E}_{T}(rl) [GeV]", 7, TEbins_lep, 7, TEbins_met);
-        else if (lep1id == 13) plot2d("hden2d_trigeff_metrl_lep1pt_mu"+suffix, lep1pt, met_rl, 1, sr.histMap, ";p_{T}(lep1) [GeV];#slash{E}_{T}(rl) [GeV]", 7, TEbins_lep, 7, TEbins_met);
-        if (HLT_MET_MHT() || HLT_SingleMu() || HLT_SingleEl()) {
-          plot2d("hnum2d_trigeff_metrl_lep1pt"+suffix, lep1pt, met_rl, 1, sr.histMap, ";p_{T}(lep1) [GeV];#slash{E}_{T}(rl) [GeV]", 7, TEbins_lep, 7, TEbins_met);
-          if      (lep1id == 11) plot2d("hnum2d_trigeff_metrl_lep1pt_el"+suffix, lep1pt, met_rl, 1, sr.histMap, ";p_{T}(lep1-e) [GeV];#slash{E}_{T}(rl) [GeV]", 7, TEbins_lep, 7, TEbins_met);
-          else if (lep1id == 13) plot2d("hnum2d_trigeff_metrl_lep1pt_mu"+suffix, lep1pt, met_rl, 1, sr.histMap, ";p_{T}(lep1-#mu) [GeV];#slash{E}_{T}(rl) [GeV]", 7, TEbins_lep, 7, TEbins_met);
+        plot2d("hden2d_trigeff_metrl_lep1pt"+suffix, lep1pt, met_rl, 1, sr.histMap, ";p_{T}(lep1) [GeV];#slash{E}_{T}(rl) [GeV]", 7, TEbins_lep, 8, TEbins_met);
+        if      (lep1id == 11) plot2d("hden2d_trigeff_metrl_lep1pt_el"+suffix, lep1pt, met_rl, 1, sr.histMap, ";p_{T}(lep1) [GeV];#slash{E}_{T}(rl) [GeV]", 7, TEbins_lep, 8, TEbins_met);
+        else if (lep1id == 13) plot2d("hden2d_trigeff_metrl_lep1pt_mu"+suffix, lep1pt, met_rl, 1, sr.histMap, ";p_{T}(lep1) [GeV];#slash{E}_{T}(rl) [GeV]", 7, TEbins_lep, 8, TEbins_met);
+        if (PassingHLTriggers(2)) {
+          plot2d("hnum2d_trigeff_metrl_lep1pt"+suffix, lep1pt, met_rl, 1, sr.histMap, ";p_{T}(lep1) [GeV];#slash{E}_{T}(rl) [GeV]", 7, TEbins_lep, 8, TEbins_met);
+          if      (lep1id == 11) plot2d("hnum2d_trigeff_metrl_lep1pt_el"+suffix, lep1pt, met_rl, 1, sr.histMap, ";p_{T}(lep1-e) [GeV];#slash{E}_{T}(rl) [GeV]", 7, TEbins_lep, 8, TEbins_met);
+          else if (lep1id == 13) plot2d("hnum2d_trigeff_metrl_lep1pt_mu"+suffix, lep1pt, met_rl, 1, sr.histMap, ";p_{T}(lep1-#mu) [GeV];#slash{E}_{T}(rl) [GeV]", 7, TEbins_lep, 8, TEbins_met);
         }
       }
     }
