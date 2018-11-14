@@ -141,21 +141,23 @@ void StopLooper::GenerateAllSRptrSets() {
 
 bool StopLooper::PassingHLTriggers(int nlep) {
   if (nlep == 1) {
-    switch (year()) {
+    switch (year_) {
       case 2016:
         return ( (HLT_MET110_MHT110() || HLT_MET120_MHT120() || HLT_MET()) ||
                  (abs(lep1_pdgid()) == 11 && HLT_SingleEl()) || (abs(lep1_pdgid()) == 13 && HLT_SingleMu()) );
       case 2017:
       case 2018:
+      default:
         return ( HLT_MET_MHT() || (abs(lep1_pdgid()) == 11 && HLT_SingleEl()) || (abs(lep1_pdgid()) == 13 && HLT_SingleMu()) );
     }
   } else if (nlep == 2) {
-    switch (year()) {
+    switch (year_) {
       case 2016:
         return ( (HLT_MET() || HLT_MET110_MHT110() || HLT_MET120_MHT120()) || (HLT_SingleEl() && (abs(lep1_pdgid())==11 || abs(lep2_pdgid())==11)) ||
                  (HLT_SingleMu() && (abs(lep1_pdgid())==13 || abs(lep2_pdgid())==13)) );
       case 2017:
       case 2018:
+      default:
         return ( HLT_MET_MHT() || (HLT_SingleEl() && (abs(lep1_pdgid())==11 || abs(lep2_pdgid())==11)) ||
                   (HLT_SingleMu() && (abs(lep1_pdgid())==13 || abs(lep2_pdgid())==13)) );
     }
@@ -247,6 +249,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
     tree->LoadTree(0);
     babyAnalyzer.GetEntry(0);
 
+    year_ = (doTopTagging)? year() : 2016;
     TString dsname = dataset();
     cout << "[StopLooper::looper] running on sample: " << dsname << endl;
 
@@ -272,20 +275,20 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
     }
 
     // Setup the event weight calculator
-    if (year() == 2016)
+    if (year_ == 2016)
       evtWgt.setDefaultSystematics(0);  // systematic set for Moriond17 analysis
-    else if (year() >= 2017)
+    else if (year_ >= 2017)
       evtWgt.setDefaultSystematics(1);  // systematic set for 94X
-    evtWgt.Setup(samplestr, year(), applyBtagSFfromFiles, applyLeptonSFfromFiles);
+    evtWgt.Setup(samplestr, year_, applyBtagSFfromFiles, applyLeptonSFfromFiles);
 
     evtWgt.getCounterHistogramFromBaby(&file);
     // Extra file weight for extension dataset, should move these code to other places
-    if (year() == 2016 && samplever.find("v24") == 0)
+    if (year_ == 2016 && samplever.find("v24") == 0)
       evtWgt.getSampleWeightSummer16v2(fname);
 
-    if (year() == 2016) kLumi = 35.867;
-    else if (year() == 2017) kLumi = 41.96;
-    else if (year() == 2018) kLumi = 70;
+    if (year_ == 2016) kLumi = 35.867;
+    else if (year_ == 2017) kLumi = 41.96;
+    else if (year_ == 2018) kLumi = 70;
 
     dummy.cd();
     // Loop over Events in current file
@@ -415,10 +418,10 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
       int nbtagCSV = 0;
       int ntbtagCSV = 0;
       for (float csv : ak4pfjets_CSV()) {
-        if (year() == 2016) {
+        if (year_ == 2016) {
           if (csv > 0.8484) nbtagCSV++;  // 80X Moriond17
           if (csv > 0.9535) ntbtagCSV++; // 80X Moriond17
-        } else if (year() == 2017) {
+        } else if (year_ == 2017) {
           if (csv > 0.8838) nbtagCSV++;  // 94X
           if (csv > 0.9693) ntbtagCSV++; // 94X
         }
@@ -576,21 +579,21 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
 
         if (jestype_ == 0) {
           values_["mt_rl"] = mt_met_lep_rl();
-          values_["mt2_ll"] = MT2_ll();
+          values_["mt2_ll"] = (doTopTagging)? MT2_ll() : 90;
           values_["met_rl"] = pfmet_rl();
           values_["dphijmet_rl"]= mindphi_met_j1_j2_rl();
           values_["dphilmet_rl"] = lep1_dphiMET_rl();
           values_["tmod_rl"] = topnessMod_rl();
         } else if (jestype_ == 1) {
           values_["mt_rl"] = mt_met_lep_rl_jup();
-          values_["mt2_ll"] = MT2_ll_jup();
+          values_["mt2_ll"] = (doTopTagging)? MT2_ll_jup() : 90;
           values_["met_rl"] = pfmet_rl_jup();
           values_["dphijmet_rl"]= mindphi_met_j1_j2_rl_jup();
           values_["dphilmet_rl"] = lep1_dphiMET_rl_jup();
           values_["tmod_rl"] = topnessMod_rl_jup();
         } else if (jestype_ == 2) {
           values_["mt_rl"] = mt_met_lep_rl_jdown();
-          values_["mt2_ll"] = MT2_ll_jdown();
+          values_["mt2_ll"] = (doTopTagging)? MT2_ll_jdown() : 90;
           values_["met_rl"] = pfmet_rl_jdown();
           values_["dphijmet_rl"]= mindphi_met_j1_j2_rl_jdown();
           values_["dphilmet_rl"] = lep1_dphiMET_rl_jdown();

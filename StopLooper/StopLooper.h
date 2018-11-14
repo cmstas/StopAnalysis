@@ -61,6 +61,7 @@ class StopLooper {
   bool is_bkg_;
   double evtweight_;
   int jestype_;
+  int year_;
   std::map<std::string,float> values_;
 
   // For nvtx reweighting
