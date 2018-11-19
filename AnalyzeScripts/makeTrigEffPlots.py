@@ -34,12 +34,13 @@ def printTextForHist(c1, hist, name):
     hist.Draw("text")
     c1.Print(name+".pdf")
 
-def printEfficiency(c1, eff, name):
+def printEfficiency(c1, eff, name, rerange=True):
     heff = eff.GetCopyPassedHisto()
     heff.Divide(heff, eff.GetCopyTotalHisto(), 1, 1, "B")
     heff.SetMarkerSize(1.4)
-    heff.GetXaxis().SetRangeUser(20,50)
-    heff.GetYaxis().SetRangeUser(200,500)
+    if rerange:
+        heff.GetXaxis().SetRangeUser(20,50)
+        heff.GetYaxis().SetRangeUser(200,500)
     heff.SetMaximum(1)
     heff.SetMinimum(0)
     heff.Draw("colz")
@@ -49,7 +50,7 @@ def printEfficiency(c1, eff, name):
 
 if __name__ == "__main__":
 
-    f17 = r.TFile("../StopLooper/output/data17_jetht/data_jetht_2017_v2.root")
+    f17 = r.TFile("../StopLooper/output/data17_jetht/data_jetht_2017_v1.root")
     eff17 = getTEfficiency(f17, "trigeff_metrl_lep1pt", "17")
     eff17_mu = getTEfficiency(f17, "trigeff_metrl_lep1pt_mu", "17")
     eff17_el = getTEfficiency(f17, "trigeff_metrl_lep1pt_el", "17")
@@ -110,6 +111,12 @@ if __name__ == "__main__":
     printTextForHist(c1, eff17_el.GetCopyPassedHisto(), "hnum17_el")
     printTextForHist(c1, eff17_mu.GetCopyTotalHisto(),  "hden17_mu")
     printTextForHist(c1, eff17_el.GetCopyTotalHisto(),  "hden17_el")
+
+    fa17 = r.TFile("../StopLooper/output/data17_jetht/data_jetht_2017_v2.root")
+    effa17_mu = getTEfficiency(fa17, "trigeff_metrl_lep1pt_mu", "17")
+    effa17_el = getTEfficiency(fa17, "trigeff_metrl_lep1pt_el", "17")
+    printTextForHist(c1, effa17_mu.GetCopyTotalHisto(),  "hdena17_mu")
+    printTextForHist(c1, effa17_mu.GetCopyTotalHisto(),  "hdena17_el")
 
     r.gStyle.SetPaintTextFormat("4.3f")
     # r.gStyle.SetPalette(r.kRainBow)

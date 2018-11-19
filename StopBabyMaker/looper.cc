@@ -2389,17 +2389,14 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
                               );
           // HT triggers for trigger efficiency - from MT2
           StopEvt.HLT_PFHT_unprescaled = passHLTTriggerPattern("HLT_PFHT800_v") || passHLTTriggerPattern("HLT_PFHT900_v");
-          int HT125 = passHLTTriggerPattern("HLT_PFHT125_v") ? HLT_prescale(triggerName("HLT_PFHT125_v")) : 0;
-          int HT200 = passHLTTriggerPattern("HLT_PFHT200_v") ? HLT_prescale(triggerName("HLT_PFHT200_v")) : 0;
-          int HT300 = passHLTTriggerPattern("HLT_PFHT300_v") ? HLT_prescale(triggerName("HLT_PFHT300_v")) : 0;
-          int HT350 = passHLTTriggerPattern("HLT_PFHT350_v") ? HLT_prescale(triggerName("HLT_PFHT350_v")) : 0;
-          int HT475 = passHLTTriggerPattern("HLT_PFHT475_v") ? HLT_prescale(triggerName("HLT_PFHT475_v")) : 0;
-          int HT600 = passHLTTriggerPattern("HLT_PFHT600_v") ? HLT_prescale(triggerName("HLT_PFHT600_v")) : 0;
+          StopEvt.HLT_PFHT_prescaled = ( passHLTTriggerPattern("HLT_PFHT125_v") || passHLTTriggerPattern("HLT_PFHT200_v") ||
+                                         passHLTTriggerPattern("HLT_PFHT300_v") || passHLTTriggerPattern("HLT_PFHT350_v") ||
+                                         passHLTTriggerPattern("HLT_PFHT475_v") || passHLTTriggerPattern("HLT_PFHT600_v") );
           //as we use those only for trigger efficiency measurements, we actually don't care about the exact prescale ...
-          if (HT125>0 || HT200>0 || HT300>0 || HT350>0 || HT475>0 || HT600>0)
-            StopEvt.HLT_PFHT_prescaled = 1;
-          else
-            StopEvt.HLT_PFHT_prescaled = 0;
+          StopEvt.HLT_AK8Jet_unprescaled = ( passHLTTriggerPattern("HLT_AK8PFJet360_TrimMass30_v") || passHLTTriggerPattern("HLT_AK8PFJet400_TrimMass30_v") ||
+                                             passHLTTriggerPattern("HLT_AK8PFJet500_v") || passHLTTriggerPattern("HLT_AK8PFJet450_v") );
+          StopEvt.HLT_AK8Jet_prescaled   = ( passHLTTriggerPattern("HLT_AK8PFJet260_v") || passHLTTriggerPattern("HLT_AK8PFJet320_v") ||
+                                             passHLTTriggerPattern("HLT_AK8PFJet400_v") );
         }
         else if (gconf.year == 2017) {
           StopEvt.HLT_SingleEl = ( passHLTTriggerPattern("HLT_Ele35_WPTight_Gsf_v") // lowest unprescaled single electron trigger without caveats
@@ -2433,24 +2430,16 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
           StopEvt.HLT_MET = ( passHLTTriggerPattern("HLT_PFMET250_HBHECleaned_v") ||
                               passHLTTriggerPattern("HLT_PFMET300_HBHECleaned_v") ||
                               passHLTTriggerPattern("HLT_PFMETTypeOne200_HBHE_BeamHaloCleaned_v") );
-
-          // HT triggers, updated by Dan
+          // HT triggers
           StopEvt.HLT_PFHT_unprescaled = passHLTTriggerPattern("HLT_PFHT1050_v");
-          int HT180 = passHLTTriggerPattern("HLT_PFHT180_v") ? HLT_prescale(triggerName("HLT_PFHT180_v"),true) : 0;
-          int HT250 = passHLTTriggerPattern("HLT_PFHT250_v") ? HLT_prescale(triggerName("HLT_PFHT250_v"),true) : 0;
-          int HT350 = passHLTTriggerPattern("HLT_PFHT350_v") ? HLT_prescale(triggerName("HLT_PFHT350_v"),true) : 0;
-          int HT370 = passHLTTriggerPattern("HLT_PFHT370_v") ? HLT_prescale(triggerName("HLT_PFHT370_v"),true) : 0;
-          int HT430 = passHLTTriggerPattern("HLT_PFHT430_v") ? HLT_prescale(triggerName("HLT_PFHT430_v"),true) : 0;
-          int HT510 = passHLTTriggerPattern("HLT_PFHT510_v") ? HLT_prescale(triggerName("HLT_PFHT510_v"),true) : 0;
-          int HT590 = passHLTTriggerPattern("HLT_PFHT590_v") ? HLT_prescale(triggerName("HLT_PFHT590_v"),true) : 0;
-          int HT680 = passHLTTriggerPattern("HLT_PFHT680_v") ? HLT_prescale(triggerName("HLT_PFHT680_v"),true) : 0;
-          int HT780 = passHLTTriggerPattern("HLT_PFHT780_v") ? HLT_prescale(triggerName("HLT_PFHT780_v"),true) : 0;
-          int HT890 = passHLTTriggerPattern("HLT_PFHT890_v") ? HLT_prescale(triggerName("HLT_PFHT890_v"),true) : 0;
-          //as we use those only for trigger efficiency measurements, we actually don't care about the exact prescale ...
-          if (HT180>0 || HT250>0 || HT350>0 || HT370>0 || HT430>0 || HT510>0 || HT590>0 || HT680>0 || HT780>0 || HT890>0)
-            StopEvt.HLT_PFHT_prescaled = 1;
-          else
-            StopEvt.HLT_PFHT_prescaled = 0;
+          StopEvt.HLT_PFHT_prescaled = ( passHLTTriggerPattern("HLT_PFHT430_v") || passHLTTriggerPattern("HLT_PFHT510_v") ||
+                                         passHLTTriggerPattern("HLT_PFHT590_v") || passHLTTriggerPattern("HLT_PFHT680_v") ||
+                                         passHLTTriggerPattern("HLT_PFHT780_v") || passHLTTriggerPattern("HLT_PFHT890_v") );
+          StopEvt.HLT_AK8Jet_unprescaled = ( passHLTTriggerPattern("HLT_AK8PFJet360_TrimMass30_v") || passHLTTriggerPattern("HLT_AK8PFJet380_TrimMass30_v") ||
+                                             passHLTTriggerPattern("HLT_AK8PFJet400_TrimMass30_v") || passHLTTriggerPattern("HLT_AK8PFJet420_TrimMass30_v") ||
+                                             passHLTTriggerPattern("HLT_AK8PFJet500_v") || passHLTTriggerPattern("HLT_AK8PFJet550_v") );
+          StopEvt.HLT_AK8Jet_prescaled   = ( passHLTTriggerPattern("HLT_AK8PFJet260_v") || passHLTTriggerPattern("HLT_AK8PFJet320_v") ||
+                                             passHLTTriggerPattern("HLT_AK8PFJet400_v") || passHLTTriggerPattern("HLT_AK8PFJet450_v") );
         }
         else if (gconf.year == 2018) {
           // TODO: confirm 2018 tirggers
@@ -2485,23 +2474,16 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
                               passHLTTriggerPattern("HLT_PFMET300_HBHECleaned_v") ||
                               passHLTTriggerPattern("HLT_PFMETTypeOne200_HBHE_BeamHaloCleaned_v") );
 
-          // HT triggers -- same as 2017?
+          // HT triggers -- similar to 2017
           StopEvt.HLT_PFHT_unprescaled = passHLTTriggerPattern("HLT_PFHT1050_v");
-          int HT180 = passHLTTriggerPattern("HLT_PFHT180_v") ? HLT_prescale(triggerName("HLT_PFHT180_v"),true) : 0;
-          int HT250 = passHLTTriggerPattern("HLT_PFHT250_v") ? HLT_prescale(triggerName("HLT_PFHT250_v"),true) : 0;
-          int HT350 = passHLTTriggerPattern("HLT_PFHT350_v") ? HLT_prescale(triggerName("HLT_PFHT350_v"),true) : 0;
-          int HT370 = passHLTTriggerPattern("HLT_PFHT370_v") ? HLT_prescale(triggerName("HLT_PFHT370_v"),true) : 0;
-          int HT430 = passHLTTriggerPattern("HLT_PFHT430_v") ? HLT_prescale(triggerName("HLT_PFHT430_v"),true) : 0;
-          int HT510 = passHLTTriggerPattern("HLT_PFHT510_v") ? HLT_prescale(triggerName("HLT_PFHT510_v"),true) : 0;
-          int HT590 = passHLTTriggerPattern("HLT_PFHT590_v") ? HLT_prescale(triggerName("HLT_PFHT590_v"),true) : 0;
-          int HT680 = passHLTTriggerPattern("HLT_PFHT680_v") ? HLT_prescale(triggerName("HLT_PFHT680_v"),true) : 0;
-          int HT780 = passHLTTriggerPattern("HLT_PFHT780_v") ? HLT_prescale(triggerName("HLT_PFHT780_v"),true) : 0;
-          int HT890 = passHLTTriggerPattern("HLT_PFHT890_v") ? HLT_prescale(triggerName("HLT_PFHT890_v"),true) : 0;
-          // Some of the above triggers noted as unprescaled, but they can't be
-          if (HT180>0 || HT250>0 || HT350>0 || HT370>0 || HT430>0 || HT510>0 || HT590>0 || HT680>0 || HT780>0 || HT890>0)
-            StopEvt.HLT_PFHT_prescaled = 1;
-          else
-            StopEvt.HLT_PFHT_prescaled = 0;
+          StopEvt.HLT_PFHT_prescaled = ( passHLTTriggerPattern("HLT_PFHT430_v") || passHLTTriggerPattern("HLT_PFHT510_v") ||
+                                         passHLTTriggerPattern("HLT_PFHT590_v") || passHLTTriggerPattern("HLT_PFHT680_v") ||
+                                         passHLTTriggerPattern("HLT_PFHT780_v") || passHLTTriggerPattern("HLT_PFHT890_v") );
+          // StopEvt.HLT_PFHT_MET_MHT = ( passHLTTriggerPattern("HLT_PFHT700_PFMET85_PFMHT85_IDTight_v") || );
+          StopEvt.HLT_AK8Jet_unprescaled = ( passHLTTriggerPattern("HLT_AK8PFJet400_TrimMass30_v") || passHLTTriggerPattern("HLT_AK8PFJet420_TrimMass30_v") ||
+                                             passHLTTriggerPattern("HLT_AK8PFJet500_v") || passHLTTriggerPattern("HLT_AK8PFJet550_v") );
+          StopEvt.HLT_AK8Jet_prescaled   = ( passHLTTriggerPattern("HLT_AK8PFJet260_v") || passHLTTriggerPattern("HLT_AK8PFJet320_v") ||
+                                             passHLTTriggerPattern("HLT_AK8PFJet400_v") || passHLTTriggerPattern("HLT_AK8PFJet450_v") );
         }
         // Additional unprescaled jet trigger in JetHT
         StopEvt.HLT_CaloJet500_NoJetID = passHLTTriggerPattern("HLT_CaloJet500_NoJetID_v");

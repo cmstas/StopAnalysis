@@ -423,6 +423,8 @@ void EventTree::Reset ()
 
     HLT_PFHT_unprescaled = -9999.;
     HLT_PFHT_prescaled   = -9999.;
+    HLT_AK8Jet_unprescaled = -9999.;
+    HLT_AK8Jet_prescaled   = -9999.;
     HLT_Photon22_R9Id90_HE10_IsoM = -9999.;
     HLT_Photon30_R9Id90_HE10_IsoM = -9999.;
     HLT_Photon36_R9Id90_HE10_IsoM = -9999.;
@@ -755,6 +757,9 @@ void EventTree::SetBranches (TTree* tree)
     tree->Branch("HLT_MET130_MHT130", &HLT_MET130_MHT130);
     tree->Branch("HLT_PFHT_unprescaled", &HLT_PFHT_unprescaled);
     tree->Branch("HLT_PFHT_prescaled", &HLT_PFHT_prescaled);
+    tree->Branch("HLT_AK8Jet_unprescaled", &HLT_AK8Jet_unprescaled);
+    tree->Branch("HLT_AK8Jet_prescaled", &HLT_AK8Jet_prescaled);
+    tree->Branch("HLT_CaloJet500_NoJetID", &HLT_CaloJet500_NoJetID);
     tree->Branch("HLT_DiEl", &HLT_DiEl );
     tree->Branch("HLT_DiMu", &HLT_DiMu );
     tree->Branch("HLT_MuE", &HLT_MuE);
@@ -873,7 +878,6 @@ void EventTree::SetPhotonBranches (TTree* tree)
     tree->Branch("HLT_Photon200", &HLT_Photon200);
     tree->Branch("HLT_Photon250_NoHE", &HLT_Photon250_NoHE);
     tree->Branch("HLT_Photon300_NoHE", &HLT_Photon300_NoHE);
-    tree->Branch("HLT_CaloJet500_NoJetID", &HLT_CaloJet500_NoJetID);
 }
 
 void EventTree::SetZllBranches (TTree* tree)

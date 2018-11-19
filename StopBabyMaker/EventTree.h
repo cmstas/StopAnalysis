@@ -299,6 +299,8 @@ public:
 
     int HLT_PFHT_unprescaled;
     int HLT_PFHT_prescaled;
+    int HLT_AK8Jet_unprescaled;
+    int HLT_AK8Jet_prescaled;
     int HLT_Photon22_R9Id90_HE10_IsoM;
     int HLT_Photon30_R9Id90_HE10_IsoM;
     int HLT_Photon36_R9Id90_HE10_IsoM;
