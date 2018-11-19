@@ -98,10 +98,6 @@ void StopTree::Init(TTree *tree) {
   if (jdown_topcands_Wp4_branch) jdown_topcands_Wp4_branch->SetAddress(&jdown_topcands_Wp4_);
   jdown_tftops_p4_branch = tree->GetBranch("jdown_tftops_p4");
   if (jdown_tftops_p4_branch) jdown_tftops_p4_branch->SetAddress(&jdown_tftops_p4_);
-  tau_leadtrack_p4_branch = tree->GetBranch("tau_leadtrack_p4");
-  if (tau_leadtrack_p4_branch) tau_leadtrack_p4_branch->SetAddress(&tau_leadtrack_p4_);
-  tau_leadneutral_p4_branch = tree->GetBranch("tau_leadneutral_p4");
-  if (tau_leadneutral_p4_branch) tau_leadneutral_p4_branch->SetAddress(&tau_leadneutral_p4_);
   tau_p4_branch = tree->GetBranch("tau_p4");
   if (tau_p4_branch) tau_p4_branch->SetAddress(&tau_p4_);
   isoTracks_p4_branch = tree->GetBranch("isoTracks_p4");
@@ -445,6 +441,12 @@ void StopTree::Init(TTree *tree) {
   if (HLT_PFHT_unprescaled_branch) HLT_PFHT_unprescaled_branch->SetAddress(&HLT_PFHT_unprescaled_);
   HLT_PFHT_prescaled_branch = tree->GetBranch("HLT_PFHT_prescaled");
   if (HLT_PFHT_prescaled_branch) HLT_PFHT_prescaled_branch->SetAddress(&HLT_PFHT_prescaled_);
+  HLT_AK8Jet_unprescaled_branch = tree->GetBranch("HLT_AK8Jet_unprescaled");
+  if (HLT_AK8Jet_unprescaled_branch) HLT_AK8Jet_unprescaled_branch->SetAddress(&HLT_AK8Jet_unprescaled_);
+  HLT_AK8Jet_prescaled_branch = tree->GetBranch("HLT_AK8Jet_prescaled");
+  if (HLT_AK8Jet_prescaled_branch) HLT_AK8Jet_prescaled_branch->SetAddress(&HLT_AK8Jet_prescaled_);
+  HLT_CaloJet500_NoJetID_branch = tree->GetBranch("HLT_CaloJet500_NoJetID");
+  if (HLT_CaloJet500_NoJetID_branch) HLT_CaloJet500_NoJetID_branch->SetAddress(&HLT_CaloJet500_NoJetID_);
   HLT_DiEl_branch = tree->GetBranch("HLT_DiEl");
   if (HLT_DiEl_branch) HLT_DiEl_branch->SetAddress(&HLT_DiEl_);
   HLT_DiMu_branch = tree->GetBranch("HLT_DiMu");
@@ -1007,22 +1009,16 @@ void StopTree::Init(TTree *tree) {
   if (jdown_tftops_subjet_phi_branch) jdown_tftops_subjet_phi_branch->SetAddress(&jdown_tftops_subjet_phi_);
   tau_IDnames_branch = tree->GetBranch("tau_IDnames");
   if (tau_IDnames_branch) tau_IDnames_branch->SetAddress(&tau_IDnames_);
-  tau_isocand_p4_branch = tree->GetBranch("tau_isocand_p4");
-  if (tau_isocand_p4_branch) tau_isocand_p4_branch->SetAddress(&tau_isocand_p4_);
-  tau_sigcand_p4_branch = tree->GetBranch("tau_sigcand_p4");
-  if (tau_sigcand_p4_branch) tau_sigcand_p4_branch->SetAddress(&tau_sigcand_p4_);
   tau_ID_branch = tree->GetBranch("tau_ID");
   if (tau_ID_branch) tau_ID_branch->SetAddress(&tau_ID_);
   tau_passID_branch = tree->GetBranch("tau_passID");
   if (tau_passID_branch) tau_passID_branch->SetAddress(&tau_passID_);
   ngoodtaus_branch = tree->GetBranch("ngoodtaus");
   if (ngoodtaus_branch) ngoodtaus_branch->SetAddress(&ngoodtaus_);
-  tau_againstMuonTight_branch = tree->GetBranch("tau_againstMuonTight");
-  if (tau_againstMuonTight_branch) tau_againstMuonTight_branch->SetAddress(&tau_againstMuonTight_);
-  tau_againstElectronLoose_branch = tree->GetBranch("tau_againstElectronLoose");
-  if (tau_againstElectronLoose_branch) tau_againstElectronLoose_branch->SetAddress(&tau_againstElectronLoose_);
   tau_isVetoTau_branch = tree->GetBranch("tau_isVetoTau");
   if (tau_isVetoTau_branch) tau_isVetoTau_branch->SetAddress(&tau_isVetoTau_);
+  tau_isVetoTau_v2_branch = tree->GetBranch("tau_isVetoTau_v2");
+  if (tau_isVetoTau_v2_branch) tau_isVetoTau_v2_branch->SetAddress(&tau_isVetoTau_v2_);
   isoTracks_charge_branch = tree->GetBranch("isoTracks_charge");
   if (isoTracks_charge_branch) isoTracks_charge_branch->SetAddress(&isoTracks_charge_);
   isoTracks_absIso_branch = tree->GetBranch("isoTracks_absIso");
@@ -1037,6 +1033,82 @@ void StopTree::Init(TTree *tree) {
   if (isoTracks_isVetoTrack_v2_branch) isoTracks_isVetoTrack_v2_branch->SetAddress(&isoTracks_isVetoTrack_v2_);
   isoTracks_isVetoTrack_v3_branch = tree->GetBranch("isoTracks_isVetoTrack_v3");
   if (isoTracks_isVetoTrack_v3_branch) isoTracks_isVetoTrack_v3_branch->SetAddress(&isoTracks_isVetoTrack_v3_);
+  ph_selectedidx_branch = tree->GetBranch("ph_selectedidx");
+  if (ph_selectedidx_branch) ph_selectedidx_branch->SetAddress(&ph_selectedidx_);
+  ph_met_branch = tree->GetBranch("ph_met");
+  if (ph_met_branch) ph_met_branch->SetAddress(&ph_met_);
+  ph_met_phi_branch = tree->GetBranch("ph_met_phi");
+  if (ph_met_phi_branch) ph_met_phi_branch->SetAddress(&ph_met_phi_);
+  ph_HT_branch = tree->GetBranch("ph_HT");
+  if (ph_HT_branch) ph_HT_branch->SetAddress(&ph_HT_);
+  ph_htssm_branch = tree->GetBranch("ph_htssm");
+  if (ph_htssm_branch) ph_htssm_branch->SetAddress(&ph_htssm_);
+  ph_htosm_branch = tree->GetBranch("ph_htosm");
+  if (ph_htosm_branch) ph_htosm_branch->SetAddress(&ph_htosm_);
+  ph_htratiom_branch = tree->GetBranch("ph_htratiom");
+  if (ph_htratiom_branch) ph_htratiom_branch->SetAddress(&ph_htratiom_);
+  ph_mt_met_lep_branch = tree->GetBranch("ph_mt_met_lep");
+  if (ph_mt_met_lep_branch) ph_mt_met_lep_branch->SetAddress(&ph_mt_met_lep_);
+  ph_dphi_Wlep_branch = tree->GetBranch("ph_dphi_Wlep");
+  if (ph_dphi_Wlep_branch) ph_dphi_Wlep_branch->SetAddress(&ph_dphi_Wlep_);
+  ph_MT2W_branch = tree->GetBranch("ph_MT2W");
+  if (ph_MT2W_branch) ph_MT2W_branch->SetAddress(&ph_MT2W_);
+  ph_topness_branch = tree->GetBranch("ph_topness");
+  if (ph_topness_branch) ph_topness_branch->SetAddress(&ph_topness_);
+  ph_topnessMod_branch = tree->GetBranch("ph_topnessMod");
+  if (ph_topnessMod_branch) ph_topnessMod_branch->SetAddress(&ph_topnessMod_);
+  ph_MT2_ll_branch = tree->GetBranch("ph_MT2_ll");
+  if (ph_MT2_ll_branch) ph_MT2_ll_branch->SetAddress(&ph_MT2_ll_);
+  ph_MT2_lb_b_mass_branch = tree->GetBranch("ph_MT2_lb_b_mass");
+  if (ph_MT2_lb_b_mass_branch) ph_MT2_lb_b_mass_branch->SetAddress(&ph_MT2_lb_b_mass_);
+  ph_MT2_lb_b_branch = tree->GetBranch("ph_MT2_lb_b");
+  if (ph_MT2_lb_b_branch) ph_MT2_lb_b_branch->SetAddress(&ph_MT2_lb_b_);
+  ph_MT2_lb_bqq_mass_branch = tree->GetBranch("ph_MT2_lb_bqq_mass");
+  if (ph_MT2_lb_bqq_mass_branch) ph_MT2_lb_bqq_mass_branch->SetAddress(&ph_MT2_lb_bqq_mass_);
+  ph_MT2_lb_bqq_branch = tree->GetBranch("ph_MT2_lb_bqq");
+  if (ph_MT2_lb_bqq_branch) ph_MT2_lb_bqq_branch->SetAddress(&ph_MT2_lb_bqq_);
+  ph_hadronic_top_chi2_branch = tree->GetBranch("ph_hadronic_top_chi2");
+  if (ph_hadronic_top_chi2_branch) ph_hadronic_top_chi2_branch->SetAddress(&ph_hadronic_top_chi2_);
+  ph_mindphi_met_j1_j2_branch = tree->GetBranch("ph_mindphi_met_j1_j2");
+  if (ph_mindphi_met_j1_j2_branch) ph_mindphi_met_j1_j2_branch->SetAddress(&ph_mindphi_met_j1_j2_);
+  ph_Mlb_lead_bdiscr_branch = tree->GetBranch("ph_Mlb_lead_bdiscr");
+  if (ph_Mlb_lead_bdiscr_branch) ph_Mlb_lead_bdiscr_branch->SetAddress(&ph_Mlb_lead_bdiscr_);
+  ph_dR_lep_leadb_branch = tree->GetBranch("ph_dR_lep_leadb");
+  if (ph_dR_lep_leadb_branch) ph_dR_lep_leadb_branch->SetAddress(&ph_dR_lep_leadb_);
+  ph_Mlb_closestb_branch = tree->GetBranch("ph_Mlb_closestb");
+  if (ph_Mlb_closestb_branch) ph_Mlb_closestb_branch->SetAddress(&ph_Mlb_closestb_);
+  ph_Mjjj_branch = tree->GetBranch("ph_Mjjj");
+  if (ph_Mjjj_branch) ph_Mjjj_branch->SetAddress(&ph_Mjjj_);
+  EA_fixgridfastjet_all_rho_branch = tree->GetBranch("EA_fixgridfastjet_all_rho");
+  if (EA_fixgridfastjet_all_rho_branch) EA_fixgridfastjet_all_rho_branch->SetAddress(&EA_fixgridfastjet_all_rho_);
+  HLT_Photon22_R9Id90_HE10_IsoM_branch = tree->GetBranch("HLT_Photon22_R9Id90_HE10_IsoM");
+  if (HLT_Photon22_R9Id90_HE10_IsoM_branch) HLT_Photon22_R9Id90_HE10_IsoM_branch->SetAddress(&HLT_Photon22_R9Id90_HE10_IsoM_);
+  HLT_Photon30_R9Id90_HE10_IsoM_branch = tree->GetBranch("HLT_Photon30_R9Id90_HE10_IsoM");
+  if (HLT_Photon30_R9Id90_HE10_IsoM_branch) HLT_Photon30_R9Id90_HE10_IsoM_branch->SetAddress(&HLT_Photon30_R9Id90_HE10_IsoM_);
+  HLT_Photon36_R9Id90_HE10_IsoM_branch = tree->GetBranch("HLT_Photon36_R9Id90_HE10_IsoM");
+  if (HLT_Photon36_R9Id90_HE10_IsoM_branch) HLT_Photon36_R9Id90_HE10_IsoM_branch->SetAddress(&HLT_Photon36_R9Id90_HE10_IsoM_);
+  HLT_Photon50_R9Id90_HE10_IsoM_branch = tree->GetBranch("HLT_Photon50_R9Id90_HE10_IsoM");
+  if (HLT_Photon50_R9Id90_HE10_IsoM_branch) HLT_Photon50_R9Id90_HE10_IsoM_branch->SetAddress(&HLT_Photon50_R9Id90_HE10_IsoM_);
+  HLT_Photon75_R9Id90_HE10_IsoM_branch = tree->GetBranch("HLT_Photon75_R9Id90_HE10_IsoM");
+  if (HLT_Photon75_R9Id90_HE10_IsoM_branch) HLT_Photon75_R9Id90_HE10_IsoM_branch->SetAddress(&HLT_Photon75_R9Id90_HE10_IsoM_);
+  HLT_Photon90_R9Id90_HE10_IsoM_branch = tree->GetBranch("HLT_Photon90_R9Id90_HE10_IsoM");
+  if (HLT_Photon90_R9Id90_HE10_IsoM_branch) HLT_Photon90_R9Id90_HE10_IsoM_branch->SetAddress(&HLT_Photon90_R9Id90_HE10_IsoM_);
+  HLT_Photon120_R9Id90_HE10_IsoM_branch = tree->GetBranch("HLT_Photon120_R9Id90_HE10_IsoM");
+  if (HLT_Photon120_R9Id90_HE10_IsoM_branch) HLT_Photon120_R9Id90_HE10_IsoM_branch->SetAddress(&HLT_Photon120_R9Id90_HE10_IsoM_);
+  HLT_Photon165_R9Id90_HE10_IsoM_branch = tree->GetBranch("HLT_Photon165_R9Id90_HE10_IsoM");
+  if (HLT_Photon165_R9Id90_HE10_IsoM_branch) HLT_Photon165_R9Id90_HE10_IsoM_branch->SetAddress(&HLT_Photon165_R9Id90_HE10_IsoM_);
+  HLT_Photon175_branch = tree->GetBranch("HLT_Photon175");
+  if (HLT_Photon175_branch) HLT_Photon175_branch->SetAddress(&HLT_Photon175_);
+  HLT_Photon165_HE10_branch = tree->GetBranch("HLT_Photon165_HE10");
+  if (HLT_Photon165_HE10_branch) HLT_Photon165_HE10_branch->SetAddress(&HLT_Photon165_HE10_);
+  HLT_Photon120_branch = tree->GetBranch("HLT_Photon120");
+  if (HLT_Photon120_branch) HLT_Photon120_branch->SetAddress(&HLT_Photon120_);
+  HLT_Photon200_branch = tree->GetBranch("HLT_Photon200");
+  if (HLT_Photon200_branch) HLT_Photon200_branch->SetAddress(&HLT_Photon200_);
+  HLT_Photon250_NoHE_branch = tree->GetBranch("HLT_Photon250_NoHE");
+  if (HLT_Photon250_NoHE_branch) HLT_Photon250_NoHE_branch->SetAddress(&HLT_Photon250_NoHE_);
+  HLT_Photon300_NoHE_branch = tree->GetBranch("HLT_Photon300_NoHE");
+  if (HLT_Photon300_NoHE_branch) HLT_Photon300_NoHE_branch->SetAddress(&HLT_Photon300_NoHE_);
   filt_cscbeamhalo_branch = tree->GetBranch("filt_cscbeamhalo");
   if (filt_cscbeamhalo_branch) filt_cscbeamhalo_branch->SetAddress(&filt_cscbeamhalo_);
   filt_cscbeamhalo2015_branch = tree->GetBranch("filt_cscbeamhalo2015");
@@ -1276,6 +1348,9 @@ void StopTree::GetEntry(unsigned int idx) {
   HLT_MET130_MHT130_isLoaded = false;
   HLT_PFHT_unprescaled_isLoaded = false;
   HLT_PFHT_prescaled_isLoaded = false;
+  HLT_AK8Jet_unprescaled_isLoaded = false;
+  HLT_AK8Jet_prescaled_isLoaded = false;
+  HLT_CaloJet500_NoJetID_isLoaded = false;
   HLT_DiEl_isLoaded = false;
   HLT_DiMu_isLoaded = false;
   HLT_MuE_isLoaded = false;
@@ -1605,17 +1680,12 @@ void StopTree::GetEntry(unsigned int idx) {
   jdown_tftops_subjet_eta_isLoaded = false;
   jdown_tftops_subjet_phi_isLoaded = false;
   tau_IDnames_isLoaded = false;
-  tau_leadtrack_p4_isLoaded = false;
-  tau_leadneutral_p4_isLoaded = false;
   tau_p4_isLoaded = false;
-  tau_isocand_p4_isLoaded = false;
-  tau_sigcand_p4_isLoaded = false;
   tau_ID_isLoaded = false;
   tau_passID_isLoaded = false;
   ngoodtaus_isLoaded = false;
-  tau_againstMuonTight_isLoaded = false;
-  tau_againstElectronLoose_isLoaded = false;
   tau_isVetoTau_isLoaded = false;
+  tau_isVetoTau_v2_isLoaded = false;
   isoTracks_p4_isLoaded = false;
   isoTracks_charge_isLoaded = false;
   isoTracks_absIso_isLoaded = false;
@@ -1624,6 +1694,44 @@ void StopTree::GetEntry(unsigned int idx) {
   isoTracks_isVetoTrack_isLoaded = false;
   isoTracks_isVetoTrack_v2_isLoaded = false;
   isoTracks_isVetoTrack_v3_isLoaded = false;
+  ph_selectedidx_isLoaded = false;
+  ph_met_isLoaded = false;
+  ph_met_phi_isLoaded = false;
+  ph_HT_isLoaded = false;
+  ph_htssm_isLoaded = false;
+  ph_htosm_isLoaded = false;
+  ph_htratiom_isLoaded = false;
+  ph_mt_met_lep_isLoaded = false;
+  ph_dphi_Wlep_isLoaded = false;
+  ph_MT2W_isLoaded = false;
+  ph_topness_isLoaded = false;
+  ph_topnessMod_isLoaded = false;
+  ph_MT2_ll_isLoaded = false;
+  ph_MT2_lb_b_mass_isLoaded = false;
+  ph_MT2_lb_b_isLoaded = false;
+  ph_MT2_lb_bqq_mass_isLoaded = false;
+  ph_MT2_lb_bqq_isLoaded = false;
+  ph_hadronic_top_chi2_isLoaded = false;
+  ph_mindphi_met_j1_j2_isLoaded = false;
+  ph_Mlb_lead_bdiscr_isLoaded = false;
+  ph_dR_lep_leadb_isLoaded = false;
+  ph_Mlb_closestb_isLoaded = false;
+  ph_Mjjj_isLoaded = false;
+  EA_fixgridfastjet_all_rho_isLoaded = false;
+  HLT_Photon22_R9Id90_HE10_IsoM_isLoaded = false;
+  HLT_Photon30_R9Id90_HE10_IsoM_isLoaded = false;
+  HLT_Photon36_R9Id90_HE10_IsoM_isLoaded = false;
+  HLT_Photon50_R9Id90_HE10_IsoM_isLoaded = false;
+  HLT_Photon75_R9Id90_HE10_IsoM_isLoaded = false;
+  HLT_Photon90_R9Id90_HE10_IsoM_isLoaded = false;
+  HLT_Photon120_R9Id90_HE10_IsoM_isLoaded = false;
+  HLT_Photon165_R9Id90_HE10_IsoM_isLoaded = false;
+  HLT_Photon175_isLoaded = false;
+  HLT_Photon165_HE10_isLoaded = false;
+  HLT_Photon120_isLoaded = false;
+  HLT_Photon200_isLoaded = false;
+  HLT_Photon250_NoHE_isLoaded = false;
+  HLT_Photon300_NoHE_isLoaded = false;
   filt_cscbeamhalo_isLoaded = false;
   filt_cscbeamhalo2015_isLoaded = false;
   filt_globaltighthalo2016_isLoaded = false;
@@ -1828,6 +1936,9 @@ void StopTree::LoadAllBranches() {
   if (HLT_MET130_MHT130_branch != 0) HLT_MET130_MHT130();
   if (HLT_PFHT_unprescaled_branch != 0) HLT_PFHT_unprescaled();
   if (HLT_PFHT_prescaled_branch != 0) HLT_PFHT_prescaled();
+  if (HLT_AK8Jet_unprescaled_branch != 0) HLT_AK8Jet_unprescaled();
+  if (HLT_AK8Jet_prescaled_branch != 0) HLT_AK8Jet_prescaled();
+  if (HLT_CaloJet500_NoJetID_branch != 0) HLT_CaloJet500_NoJetID();
   if (HLT_DiEl_branch != 0) HLT_DiEl();
   if (HLT_DiMu_branch != 0) HLT_DiMu();
   if (HLT_MuE_branch != 0) HLT_MuE();
@@ -2157,17 +2268,12 @@ void StopTree::LoadAllBranches() {
   if (jdown_tftops_subjet_eta_branch != 0) jdown_tftops_subjet_eta();
   if (jdown_tftops_subjet_phi_branch != 0) jdown_tftops_subjet_phi();
   if (tau_IDnames_branch != 0) tau_IDnames();
-  if (tau_leadtrack_p4_branch != 0) tau_leadtrack_p4();
-  if (tau_leadneutral_p4_branch != 0) tau_leadneutral_p4();
   if (tau_p4_branch != 0) tau_p4();
-  if (tau_isocand_p4_branch != 0) tau_isocand_p4();
-  if (tau_sigcand_p4_branch != 0) tau_sigcand_p4();
   if (tau_ID_branch != 0) tau_ID();
   if (tau_passID_branch != 0) tau_passID();
   if (ngoodtaus_branch != 0) ngoodtaus();
-  if (tau_againstMuonTight_branch != 0) tau_againstMuonTight();
-  if (tau_againstElectronLoose_branch != 0) tau_againstElectronLoose();
   if (tau_isVetoTau_branch != 0) tau_isVetoTau();
+  if (tau_isVetoTau_v2_branch != 0) tau_isVetoTau_v2();
   if (isoTracks_p4_branch != 0) isoTracks_p4();
   if (isoTracks_charge_branch != 0) isoTracks_charge();
   if (isoTracks_absIso_branch != 0) isoTracks_absIso();
@@ -2176,6 +2282,44 @@ void StopTree::LoadAllBranches() {
   if (isoTracks_isVetoTrack_branch != 0) isoTracks_isVetoTrack();
   if (isoTracks_isVetoTrack_v2_branch != 0) isoTracks_isVetoTrack_v2();
   if (isoTracks_isVetoTrack_v3_branch != 0) isoTracks_isVetoTrack_v3();
+  if (ph_selectedidx_branch != 0) ph_selectedidx();
+  if (ph_met_branch != 0) ph_met();
+  if (ph_met_phi_branch != 0) ph_met_phi();
+  if (ph_HT_branch != 0) ph_HT();
+  if (ph_htssm_branch != 0) ph_htssm();
+  if (ph_htosm_branch != 0) ph_htosm();
+  if (ph_htratiom_branch != 0) ph_htratiom();
+  if (ph_mt_met_lep_branch != 0) ph_mt_met_lep();
+  if (ph_dphi_Wlep_branch != 0) ph_dphi_Wlep();
+  if (ph_MT2W_branch != 0) ph_MT2W();
+  if (ph_topness_branch != 0) ph_topness();
+  if (ph_topnessMod_branch != 0) ph_topnessMod();
+  if (ph_MT2_ll_branch != 0) ph_MT2_ll();
+  if (ph_MT2_lb_b_mass_branch != 0) ph_MT2_lb_b_mass();
+  if (ph_MT2_lb_b_branch != 0) ph_MT2_lb_b();
+  if (ph_MT2_lb_bqq_mass_branch != 0) ph_MT2_lb_bqq_mass();
+  if (ph_MT2_lb_bqq_branch != 0) ph_MT2_lb_bqq();
+  if (ph_hadronic_top_chi2_branch != 0) ph_hadronic_top_chi2();
+  if (ph_mindphi_met_j1_j2_branch != 0) ph_mindphi_met_j1_j2();
+  if (ph_Mlb_lead_bdiscr_branch != 0) ph_Mlb_lead_bdiscr();
+  if (ph_dR_lep_leadb_branch != 0) ph_dR_lep_leadb();
+  if (ph_Mlb_closestb_branch != 0) ph_Mlb_closestb();
+  if (ph_Mjjj_branch != 0) ph_Mjjj();
+  if (EA_fixgridfastjet_all_rho_branch != 0) EA_fixgridfastjet_all_rho();
+  if (HLT_Photon22_R9Id90_HE10_IsoM_branch != 0) HLT_Photon22_R9Id90_HE10_IsoM();
+  if (HLT_Photon30_R9Id90_HE10_IsoM_branch != 0) HLT_Photon30_R9Id90_HE10_IsoM();
+  if (HLT_Photon36_R9Id90_HE10_IsoM_branch != 0) HLT_Photon36_R9Id90_HE10_IsoM();
+  if (HLT_Photon50_R9Id90_HE10_IsoM_branch != 0) HLT_Photon50_R9Id90_HE10_IsoM();
+  if (HLT_Photon75_R9Id90_HE10_IsoM_branch != 0) HLT_Photon75_R9Id90_HE10_IsoM();
+  if (HLT_Photon90_R9Id90_HE10_IsoM_branch != 0) HLT_Photon90_R9Id90_HE10_IsoM();
+  if (HLT_Photon120_R9Id90_HE10_IsoM_branch != 0) HLT_Photon120_R9Id90_HE10_IsoM();
+  if (HLT_Photon165_R9Id90_HE10_IsoM_branch != 0) HLT_Photon165_R9Id90_HE10_IsoM();
+  if (HLT_Photon175_branch != 0) HLT_Photon175();
+  if (HLT_Photon165_HE10_branch != 0) HLT_Photon165_HE10();
+  if (HLT_Photon120_branch != 0) HLT_Photon120();
+  if (HLT_Photon200_branch != 0) HLT_Photon200();
+  if (HLT_Photon250_NoHE_branch != 0) HLT_Photon250_NoHE();
+  if (HLT_Photon300_NoHE_branch != 0) HLT_Photon300_NoHE();
   if (filt_cscbeamhalo_branch != 0) filt_cscbeamhalo();
   if (filt_cscbeamhalo2015_branch != 0) filt_cscbeamhalo2015();
   if (filt_globaltighthalo2016_branch != 0) filt_globaltighthalo2016();
@@ -4392,6 +4536,45 @@ const int &StopTree::HLT_PFHT_prescaled() {
     HLT_PFHT_prescaled_isLoaded = true;
   }
   return HLT_PFHT_prescaled_;
+}
+
+const int &StopTree::HLT_AK8Jet_unprescaled() {
+  if (not HLT_AK8Jet_unprescaled_isLoaded) {
+    if (HLT_AK8Jet_unprescaled_branch != 0) {
+      HLT_AK8Jet_unprescaled_branch->GetEntry(index);
+    } else {
+      printf("branch HLT_AK8Jet_unprescaled_branch does not exist!\n");
+      exit(1);
+    }
+    HLT_AK8Jet_unprescaled_isLoaded = true;
+  }
+  return HLT_AK8Jet_unprescaled_;
+}
+
+const int &StopTree::HLT_AK8Jet_prescaled() {
+  if (not HLT_AK8Jet_prescaled_isLoaded) {
+    if (HLT_AK8Jet_prescaled_branch != 0) {
+      HLT_AK8Jet_prescaled_branch->GetEntry(index);
+    } else {
+      printf("branch HLT_AK8Jet_prescaled_branch does not exist!\n");
+      exit(1);
+    }
+    HLT_AK8Jet_prescaled_isLoaded = true;
+  }
+  return HLT_AK8Jet_prescaled_;
+}
+
+const int &StopTree::HLT_CaloJet500_NoJetID() {
+  if (not HLT_CaloJet500_NoJetID_isLoaded) {
+    if (HLT_CaloJet500_NoJetID_branch != 0) {
+      HLT_CaloJet500_NoJetID_branch->GetEntry(index);
+    } else {
+      printf("branch HLT_CaloJet500_NoJetID_branch does not exist!\n");
+      exit(1);
+    }
+    HLT_CaloJet500_NoJetID_isLoaded = true;
+  }
+  return HLT_CaloJet500_NoJetID_;
 }
 
 const int &StopTree::HLT_DiEl() {
@@ -8671,32 +8854,6 @@ const vector<TString> &StopTree::tau_IDnames() {
   return *tau_IDnames_;
 }
 
-const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &StopTree::tau_leadtrack_p4() {
-  if (not tau_leadtrack_p4_isLoaded) {
-    if (tau_leadtrack_p4_branch != 0) {
-      tau_leadtrack_p4_branch->GetEntry(index);
-    } else {
-      printf("branch tau_leadtrack_p4_branch does not exist!\n");
-      exit(1);
-    }
-    tau_leadtrack_p4_isLoaded = true;
-  }
-  return *tau_leadtrack_p4_;
-}
-
-const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &StopTree::tau_leadneutral_p4() {
-  if (not tau_leadneutral_p4_isLoaded) {
-    if (tau_leadneutral_p4_branch != 0) {
-      tau_leadneutral_p4_branch->GetEntry(index);
-    } else {
-      printf("branch tau_leadneutral_p4_branch does not exist!\n");
-      exit(1);
-    }
-    tau_leadneutral_p4_isLoaded = true;
-  }
-  return *tau_leadneutral_p4_;
-}
-
 const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &StopTree::tau_p4() {
   if (not tau_p4_isLoaded) {
     if (tau_p4_branch != 0) {
@@ -8708,32 +8865,6 @@ const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &StopTre
     tau_p4_isLoaded = true;
   }
   return *tau_p4_;
-}
-
-const vector<vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > > &StopTree::tau_isocand_p4() {
-  if (not tau_isocand_p4_isLoaded) {
-    if (tau_isocand_p4_branch != 0) {
-      tau_isocand_p4_branch->GetEntry(index);
-    } else {
-      printf("branch tau_isocand_p4_branch does not exist!\n");
-      exit(1);
-    }
-    tau_isocand_p4_isLoaded = true;
-  }
-  return *tau_isocand_p4_;
-}
-
-const vector<vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > > &StopTree::tau_sigcand_p4() {
-  if (not tau_sigcand_p4_isLoaded) {
-    if (tau_sigcand_p4_branch != 0) {
-      tau_sigcand_p4_branch->GetEntry(index);
-    } else {
-      printf("branch tau_sigcand_p4_branch does not exist!\n");
-      exit(1);
-    }
-    tau_sigcand_p4_isLoaded = true;
-  }
-  return *tau_sigcand_p4_;
 }
 
 const vector<vector<float> > &StopTree::tau_ID() {
@@ -8775,32 +8906,6 @@ const int &StopTree::ngoodtaus() {
   return ngoodtaus_;
 }
 
-const vector<float> &StopTree::tau_againstMuonTight() {
-  if (not tau_againstMuonTight_isLoaded) {
-    if (tau_againstMuonTight_branch != 0) {
-      tau_againstMuonTight_branch->GetEntry(index);
-    } else {
-      printf("branch tau_againstMuonTight_branch does not exist!\n");
-      exit(1);
-    }
-    tau_againstMuonTight_isLoaded = true;
-  }
-  return *tau_againstMuonTight_;
-}
-
-const vector<float> &StopTree::tau_againstElectronLoose() {
-  if (not tau_againstElectronLoose_isLoaded) {
-    if (tau_againstElectronLoose_branch != 0) {
-      tau_againstElectronLoose_branch->GetEntry(index);
-    } else {
-      printf("branch tau_againstElectronLoose_branch does not exist!\n");
-      exit(1);
-    }
-    tau_againstElectronLoose_isLoaded = true;
-  }
-  return *tau_againstElectronLoose_;
-}
-
 const vector<bool> &StopTree::tau_isVetoTau() {
   if (not tau_isVetoTau_isLoaded) {
     if (tau_isVetoTau_branch != 0) {
@@ -8812,6 +8917,19 @@ const vector<bool> &StopTree::tau_isVetoTau() {
     tau_isVetoTau_isLoaded = true;
   }
   return *tau_isVetoTau_;
+}
+
+const vector<bool> &StopTree::tau_isVetoTau_v2() {
+  if (not tau_isVetoTau_v2_isLoaded) {
+    if (tau_isVetoTau_v2_branch != 0) {
+      tau_isVetoTau_v2_branch->GetEntry(index);
+    } else {
+      printf("branch tau_isVetoTau_v2_branch does not exist!\n");
+      exit(1);
+    }
+    tau_isVetoTau_v2_isLoaded = true;
+  }
+  return *tau_isVetoTau_v2_;
 }
 
 const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &StopTree::isoTracks_p4() {
@@ -8916,6 +9034,500 @@ const vector<bool> &StopTree::isoTracks_isVetoTrack_v3() {
     isoTracks_isVetoTrack_v3_isLoaded = true;
   }
   return *isoTracks_isVetoTrack_v3_;
+}
+
+const int &StopTree::ph_selectedidx() {
+  if (not ph_selectedidx_isLoaded) {
+    if (ph_selectedidx_branch != 0) {
+      ph_selectedidx_branch->GetEntry(index);
+    } else {
+      printf("branch ph_selectedidx_branch does not exist!\n");
+      exit(1);
+    }
+    ph_selectedidx_isLoaded = true;
+  }
+  return ph_selectedidx_;
+}
+
+const float &StopTree::ph_met() {
+  if (not ph_met_isLoaded) {
+    if (ph_met_branch != 0) {
+      ph_met_branch->GetEntry(index);
+    } else {
+      printf("branch ph_met_branch does not exist!\n");
+      exit(1);
+    }
+    ph_met_isLoaded = true;
+  }
+  return ph_met_;
+}
+
+const float &StopTree::ph_met_phi() {
+  if (not ph_met_phi_isLoaded) {
+    if (ph_met_phi_branch != 0) {
+      ph_met_phi_branch->GetEntry(index);
+    } else {
+      printf("branch ph_met_phi_branch does not exist!\n");
+      exit(1);
+    }
+    ph_met_phi_isLoaded = true;
+  }
+  return ph_met_phi_;
+}
+
+const float &StopTree::ph_HT() {
+  if (not ph_HT_isLoaded) {
+    if (ph_HT_branch != 0) {
+      ph_HT_branch->GetEntry(index);
+    } else {
+      printf("branch ph_HT_branch does not exist!\n");
+      exit(1);
+    }
+    ph_HT_isLoaded = true;
+  }
+  return ph_HT_;
+}
+
+const float &StopTree::ph_htssm() {
+  if (not ph_htssm_isLoaded) {
+    if (ph_htssm_branch != 0) {
+      ph_htssm_branch->GetEntry(index);
+    } else {
+      printf("branch ph_htssm_branch does not exist!\n");
+      exit(1);
+    }
+    ph_htssm_isLoaded = true;
+  }
+  return ph_htssm_;
+}
+
+const float &StopTree::ph_htosm() {
+  if (not ph_htosm_isLoaded) {
+    if (ph_htosm_branch != 0) {
+      ph_htosm_branch->GetEntry(index);
+    } else {
+      printf("branch ph_htosm_branch does not exist!\n");
+      exit(1);
+    }
+    ph_htosm_isLoaded = true;
+  }
+  return ph_htosm_;
+}
+
+const float &StopTree::ph_htratiom() {
+  if (not ph_htratiom_isLoaded) {
+    if (ph_htratiom_branch != 0) {
+      ph_htratiom_branch->GetEntry(index);
+    } else {
+      printf("branch ph_htratiom_branch does not exist!\n");
+      exit(1);
+    }
+    ph_htratiom_isLoaded = true;
+  }
+  return ph_htratiom_;
+}
+
+const float &StopTree::ph_mt_met_lep() {
+  if (not ph_mt_met_lep_isLoaded) {
+    if (ph_mt_met_lep_branch != 0) {
+      ph_mt_met_lep_branch->GetEntry(index);
+    } else {
+      printf("branch ph_mt_met_lep_branch does not exist!\n");
+      exit(1);
+    }
+    ph_mt_met_lep_isLoaded = true;
+  }
+  return ph_mt_met_lep_;
+}
+
+const float &StopTree::ph_dphi_Wlep() {
+  if (not ph_dphi_Wlep_isLoaded) {
+    if (ph_dphi_Wlep_branch != 0) {
+      ph_dphi_Wlep_branch->GetEntry(index);
+    } else {
+      printf("branch ph_dphi_Wlep_branch does not exist!\n");
+      exit(1);
+    }
+    ph_dphi_Wlep_isLoaded = true;
+  }
+  return ph_dphi_Wlep_;
+}
+
+const float &StopTree::ph_MT2W() {
+  if (not ph_MT2W_isLoaded) {
+    if (ph_MT2W_branch != 0) {
+      ph_MT2W_branch->GetEntry(index);
+    } else {
+      printf("branch ph_MT2W_branch does not exist!\n");
+      exit(1);
+    }
+    ph_MT2W_isLoaded = true;
+  }
+  return ph_MT2W_;
+}
+
+const float &StopTree::ph_topness() {
+  if (not ph_topness_isLoaded) {
+    if (ph_topness_branch != 0) {
+      ph_topness_branch->GetEntry(index);
+    } else {
+      printf("branch ph_topness_branch does not exist!\n");
+      exit(1);
+    }
+    ph_topness_isLoaded = true;
+  }
+  return ph_topness_;
+}
+
+const float &StopTree::ph_topnessMod() {
+  if (not ph_topnessMod_isLoaded) {
+    if (ph_topnessMod_branch != 0) {
+      ph_topnessMod_branch->GetEntry(index);
+    } else {
+      printf("branch ph_topnessMod_branch does not exist!\n");
+      exit(1);
+    }
+    ph_topnessMod_isLoaded = true;
+  }
+  return ph_topnessMod_;
+}
+
+const float &StopTree::ph_MT2_ll() {
+  if (not ph_MT2_ll_isLoaded) {
+    if (ph_MT2_ll_branch != 0) {
+      ph_MT2_ll_branch->GetEntry(index);
+    } else {
+      printf("branch ph_MT2_ll_branch does not exist!\n");
+      exit(1);
+    }
+    ph_MT2_ll_isLoaded = true;
+  }
+  return ph_MT2_ll_;
+}
+
+const float &StopTree::ph_MT2_lb_b_mass() {
+  if (not ph_MT2_lb_b_mass_isLoaded) {
+    if (ph_MT2_lb_b_mass_branch != 0) {
+      ph_MT2_lb_b_mass_branch->GetEntry(index);
+    } else {
+      printf("branch ph_MT2_lb_b_mass_branch does not exist!\n");
+      exit(1);
+    }
+    ph_MT2_lb_b_mass_isLoaded = true;
+  }
+  return ph_MT2_lb_b_mass_;
+}
+
+const float &StopTree::ph_MT2_lb_b() {
+  if (not ph_MT2_lb_b_isLoaded) {
+    if (ph_MT2_lb_b_branch != 0) {
+      ph_MT2_lb_b_branch->GetEntry(index);
+    } else {
+      printf("branch ph_MT2_lb_b_branch does not exist!\n");
+      exit(1);
+    }
+    ph_MT2_lb_b_isLoaded = true;
+  }
+  return ph_MT2_lb_b_;
+}
+
+const float &StopTree::ph_MT2_lb_bqq_mass() {
+  if (not ph_MT2_lb_bqq_mass_isLoaded) {
+    if (ph_MT2_lb_bqq_mass_branch != 0) {
+      ph_MT2_lb_bqq_mass_branch->GetEntry(index);
+    } else {
+      printf("branch ph_MT2_lb_bqq_mass_branch does not exist!\n");
+      exit(1);
+    }
+    ph_MT2_lb_bqq_mass_isLoaded = true;
+  }
+  return ph_MT2_lb_bqq_mass_;
+}
+
+const float &StopTree::ph_MT2_lb_bqq() {
+  if (not ph_MT2_lb_bqq_isLoaded) {
+    if (ph_MT2_lb_bqq_branch != 0) {
+      ph_MT2_lb_bqq_branch->GetEntry(index);
+    } else {
+      printf("branch ph_MT2_lb_bqq_branch does not exist!\n");
+      exit(1);
+    }
+    ph_MT2_lb_bqq_isLoaded = true;
+  }
+  return ph_MT2_lb_bqq_;
+}
+
+const float &StopTree::ph_hadronic_top_chi2() {
+  if (not ph_hadronic_top_chi2_isLoaded) {
+    if (ph_hadronic_top_chi2_branch != 0) {
+      ph_hadronic_top_chi2_branch->GetEntry(index);
+    } else {
+      printf("branch ph_hadronic_top_chi2_branch does not exist!\n");
+      exit(1);
+    }
+    ph_hadronic_top_chi2_isLoaded = true;
+  }
+  return ph_hadronic_top_chi2_;
+}
+
+const float &StopTree::ph_mindphi_met_j1_j2() {
+  if (not ph_mindphi_met_j1_j2_isLoaded) {
+    if (ph_mindphi_met_j1_j2_branch != 0) {
+      ph_mindphi_met_j1_j2_branch->GetEntry(index);
+    } else {
+      printf("branch ph_mindphi_met_j1_j2_branch does not exist!\n");
+      exit(1);
+    }
+    ph_mindphi_met_j1_j2_isLoaded = true;
+  }
+  return ph_mindphi_met_j1_j2_;
+}
+
+const float &StopTree::ph_Mlb_lead_bdiscr() {
+  if (not ph_Mlb_lead_bdiscr_isLoaded) {
+    if (ph_Mlb_lead_bdiscr_branch != 0) {
+      ph_Mlb_lead_bdiscr_branch->GetEntry(index);
+    } else {
+      printf("branch ph_Mlb_lead_bdiscr_branch does not exist!\n");
+      exit(1);
+    }
+    ph_Mlb_lead_bdiscr_isLoaded = true;
+  }
+  return ph_Mlb_lead_bdiscr_;
+}
+
+const float &StopTree::ph_dR_lep_leadb() {
+  if (not ph_dR_lep_leadb_isLoaded) {
+    if (ph_dR_lep_leadb_branch != 0) {
+      ph_dR_lep_leadb_branch->GetEntry(index);
+    } else {
+      printf("branch ph_dR_lep_leadb_branch does not exist!\n");
+      exit(1);
+    }
+    ph_dR_lep_leadb_isLoaded = true;
+  }
+  return ph_dR_lep_leadb_;
+}
+
+const float &StopTree::ph_Mlb_closestb() {
+  if (not ph_Mlb_closestb_isLoaded) {
+    if (ph_Mlb_closestb_branch != 0) {
+      ph_Mlb_closestb_branch->GetEntry(index);
+    } else {
+      printf("branch ph_Mlb_closestb_branch does not exist!\n");
+      exit(1);
+    }
+    ph_Mlb_closestb_isLoaded = true;
+  }
+  return ph_Mlb_closestb_;
+}
+
+const float &StopTree::ph_Mjjj() {
+  if (not ph_Mjjj_isLoaded) {
+    if (ph_Mjjj_branch != 0) {
+      ph_Mjjj_branch->GetEntry(index);
+    } else {
+      printf("branch ph_Mjjj_branch does not exist!\n");
+      exit(1);
+    }
+    ph_Mjjj_isLoaded = true;
+  }
+  return ph_Mjjj_;
+}
+
+const float &StopTree::EA_fixgridfastjet_all_rho() {
+  if (not EA_fixgridfastjet_all_rho_isLoaded) {
+    if (EA_fixgridfastjet_all_rho_branch != 0) {
+      EA_fixgridfastjet_all_rho_branch->GetEntry(index);
+    } else {
+      printf("branch EA_fixgridfastjet_all_rho_branch does not exist!\n");
+      exit(1);
+    }
+    EA_fixgridfastjet_all_rho_isLoaded = true;
+  }
+  return EA_fixgridfastjet_all_rho_;
+}
+
+const int &StopTree::HLT_Photon22_R9Id90_HE10_IsoM() {
+  if (not HLT_Photon22_R9Id90_HE10_IsoM_isLoaded) {
+    if (HLT_Photon22_R9Id90_HE10_IsoM_branch != 0) {
+      HLT_Photon22_R9Id90_HE10_IsoM_branch->GetEntry(index);
+    } else {
+      printf("branch HLT_Photon22_R9Id90_HE10_IsoM_branch does not exist!\n");
+      exit(1);
+    }
+    HLT_Photon22_R9Id90_HE10_IsoM_isLoaded = true;
+  }
+  return HLT_Photon22_R9Id90_HE10_IsoM_;
+}
+
+const int &StopTree::HLT_Photon30_R9Id90_HE10_IsoM() {
+  if (not HLT_Photon30_R9Id90_HE10_IsoM_isLoaded) {
+    if (HLT_Photon30_R9Id90_HE10_IsoM_branch != 0) {
+      HLT_Photon30_R9Id90_HE10_IsoM_branch->GetEntry(index);
+    } else {
+      printf("branch HLT_Photon30_R9Id90_HE10_IsoM_branch does not exist!\n");
+      exit(1);
+    }
+    HLT_Photon30_R9Id90_HE10_IsoM_isLoaded = true;
+  }
+  return HLT_Photon30_R9Id90_HE10_IsoM_;
+}
+
+const int &StopTree::HLT_Photon36_R9Id90_HE10_IsoM() {
+  if (not HLT_Photon36_R9Id90_HE10_IsoM_isLoaded) {
+    if (HLT_Photon36_R9Id90_HE10_IsoM_branch != 0) {
+      HLT_Photon36_R9Id90_HE10_IsoM_branch->GetEntry(index);
+    } else {
+      printf("branch HLT_Photon36_R9Id90_HE10_IsoM_branch does not exist!\n");
+      exit(1);
+    }
+    HLT_Photon36_R9Id90_HE10_IsoM_isLoaded = true;
+  }
+  return HLT_Photon36_R9Id90_HE10_IsoM_;
+}
+
+const int &StopTree::HLT_Photon50_R9Id90_HE10_IsoM() {
+  if (not HLT_Photon50_R9Id90_HE10_IsoM_isLoaded) {
+    if (HLT_Photon50_R9Id90_HE10_IsoM_branch != 0) {
+      HLT_Photon50_R9Id90_HE10_IsoM_branch->GetEntry(index);
+    } else {
+      printf("branch HLT_Photon50_R9Id90_HE10_IsoM_branch does not exist!\n");
+      exit(1);
+    }
+    HLT_Photon50_R9Id90_HE10_IsoM_isLoaded = true;
+  }
+  return HLT_Photon50_R9Id90_HE10_IsoM_;
+}
+
+const int &StopTree::HLT_Photon75_R9Id90_HE10_IsoM() {
+  if (not HLT_Photon75_R9Id90_HE10_IsoM_isLoaded) {
+    if (HLT_Photon75_R9Id90_HE10_IsoM_branch != 0) {
+      HLT_Photon75_R9Id90_HE10_IsoM_branch->GetEntry(index);
+    } else {
+      printf("branch HLT_Photon75_R9Id90_HE10_IsoM_branch does not exist!\n");
+      exit(1);
+    }
+    HLT_Photon75_R9Id90_HE10_IsoM_isLoaded = true;
+  }
+  return HLT_Photon75_R9Id90_HE10_IsoM_;
+}
+
+const int &StopTree::HLT_Photon90_R9Id90_HE10_IsoM() {
+  if (not HLT_Photon90_R9Id90_HE10_IsoM_isLoaded) {
+    if (HLT_Photon90_R9Id90_HE10_IsoM_branch != 0) {
+      HLT_Photon90_R9Id90_HE10_IsoM_branch->GetEntry(index);
+    } else {
+      printf("branch HLT_Photon90_R9Id90_HE10_IsoM_branch does not exist!\n");
+      exit(1);
+    }
+    HLT_Photon90_R9Id90_HE10_IsoM_isLoaded = true;
+  }
+  return HLT_Photon90_R9Id90_HE10_IsoM_;
+}
+
+const int &StopTree::HLT_Photon120_R9Id90_HE10_IsoM() {
+  if (not HLT_Photon120_R9Id90_HE10_IsoM_isLoaded) {
+    if (HLT_Photon120_R9Id90_HE10_IsoM_branch != 0) {
+      HLT_Photon120_R9Id90_HE10_IsoM_branch->GetEntry(index);
+    } else {
+      printf("branch HLT_Photon120_R9Id90_HE10_IsoM_branch does not exist!\n");
+      exit(1);
+    }
+    HLT_Photon120_R9Id90_HE10_IsoM_isLoaded = true;
+  }
+  return HLT_Photon120_R9Id90_HE10_IsoM_;
+}
+
+const int &StopTree::HLT_Photon165_R9Id90_HE10_IsoM() {
+  if (not HLT_Photon165_R9Id90_HE10_IsoM_isLoaded) {
+    if (HLT_Photon165_R9Id90_HE10_IsoM_branch != 0) {
+      HLT_Photon165_R9Id90_HE10_IsoM_branch->GetEntry(index);
+    } else {
+      printf("branch HLT_Photon165_R9Id90_HE10_IsoM_branch does not exist!\n");
+      exit(1);
+    }
+    HLT_Photon165_R9Id90_HE10_IsoM_isLoaded = true;
+  }
+  return HLT_Photon165_R9Id90_HE10_IsoM_;
+}
+
+const int &StopTree::HLT_Photon175() {
+  if (not HLT_Photon175_isLoaded) {
+    if (HLT_Photon175_branch != 0) {
+      HLT_Photon175_branch->GetEntry(index);
+    } else {
+      printf("branch HLT_Photon175_branch does not exist!\n");
+      exit(1);
+    }
+    HLT_Photon175_isLoaded = true;
+  }
+  return HLT_Photon175_;
+}
+
+const int &StopTree::HLT_Photon165_HE10() {
+  if (not HLT_Photon165_HE10_isLoaded) {
+    if (HLT_Photon165_HE10_branch != 0) {
+      HLT_Photon165_HE10_branch->GetEntry(index);
+    } else {
+      printf("branch HLT_Photon165_HE10_branch does not exist!\n");
+      exit(1);
+    }
+    HLT_Photon165_HE10_isLoaded = true;
+  }
+  return HLT_Photon165_HE10_;
+}
+
+const int &StopTree::HLT_Photon120() {
+  if (not HLT_Photon120_isLoaded) {
+    if (HLT_Photon120_branch != 0) {
+      HLT_Photon120_branch->GetEntry(index);
+    } else {
+      printf("branch HLT_Photon120_branch does not exist!\n");
+      exit(1);
+    }
+    HLT_Photon120_isLoaded = true;
+  }
+  return HLT_Photon120_;
+}
+
+const int &StopTree::HLT_Photon200() {
+  if (not HLT_Photon200_isLoaded) {
+    if (HLT_Photon200_branch != 0) {
+      HLT_Photon200_branch->GetEntry(index);
+    } else {
+      printf("branch HLT_Photon200_branch does not exist!\n");
+      exit(1);
+    }
+    HLT_Photon200_isLoaded = true;
+  }
+  return HLT_Photon200_;
+}
+
+const int &StopTree::HLT_Photon250_NoHE() {
+  if (not HLT_Photon250_NoHE_isLoaded) {
+    if (HLT_Photon250_NoHE_branch != 0) {
+      HLT_Photon250_NoHE_branch->GetEntry(index);
+    } else {
+      printf("branch HLT_Photon250_NoHE_branch does not exist!\n");
+      exit(1);
+    }
+    HLT_Photon250_NoHE_isLoaded = true;
+  }
+  return HLT_Photon250_NoHE_;
+}
+
+const int &StopTree::HLT_Photon300_NoHE() {
+  if (not HLT_Photon300_NoHE_isLoaded) {
+    if (HLT_Photon300_NoHE_branch != 0) {
+      HLT_Photon300_NoHE_branch->GetEntry(index);
+    } else {
+      printf("branch HLT_Photon300_NoHE_branch does not exist!\n");
+      exit(1);
+    }
+    HLT_Photon300_NoHE_isLoaded = true;
+  }
+  return HLT_Photon300_NoHE_;
 }
 
 const bool &StopTree::filt_cscbeamhalo() {
@@ -9525,6 +10137,9 @@ const int &HLT_MET120_MHT120() { return babyAnalyzer.HLT_MET120_MHT120(); }
 const int &HLT_MET130_MHT130() { return babyAnalyzer.HLT_MET130_MHT130(); }
 const int &HLT_PFHT_unprescaled() { return babyAnalyzer.HLT_PFHT_unprescaled(); }
 const int &HLT_PFHT_prescaled() { return babyAnalyzer.HLT_PFHT_prescaled(); }
+const int &HLT_AK8Jet_unprescaled() { return babyAnalyzer.HLT_AK8Jet_unprescaled(); }
+const int &HLT_AK8Jet_prescaled() { return babyAnalyzer.HLT_AK8Jet_prescaled(); }
+const int &HLT_CaloJet500_NoJetID() { return babyAnalyzer.HLT_CaloJet500_NoJetID(); }
 const int &HLT_DiEl() { return babyAnalyzer.HLT_DiEl(); }
 const int &HLT_DiMu() { return babyAnalyzer.HLT_DiMu(); }
 const int &HLT_MuE() { return babyAnalyzer.HLT_MuE(); }
@@ -9854,17 +10469,12 @@ const vector<vector<float> > &jdown_tftops_subjet_pt() { return babyAnalyzer.jdo
 const vector<vector<float> > &jdown_tftops_subjet_eta() { return babyAnalyzer.jdown_tftops_subjet_eta(); }
 const vector<vector<float> > &jdown_tftops_subjet_phi() { return babyAnalyzer.jdown_tftops_subjet_phi(); }
 const vector<TString> &tau_IDnames() { return babyAnalyzer.tau_IDnames(); }
-const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &tau_leadtrack_p4() { return babyAnalyzer.tau_leadtrack_p4(); }
-const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &tau_leadneutral_p4() { return babyAnalyzer.tau_leadneutral_p4(); }
 const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &tau_p4() { return babyAnalyzer.tau_p4(); }
-const vector<vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > > &tau_isocand_p4() { return babyAnalyzer.tau_isocand_p4(); }
-const vector<vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > > &tau_sigcand_p4() { return babyAnalyzer.tau_sigcand_p4(); }
 const vector<vector<float> > &tau_ID() { return babyAnalyzer.tau_ID(); }
 const vector<float> &tau_passID() { return babyAnalyzer.tau_passID(); }
 const int &ngoodtaus() { return babyAnalyzer.ngoodtaus(); }
-const vector<float> &tau_againstMuonTight() { return babyAnalyzer.tau_againstMuonTight(); }
-const vector<float> &tau_againstElectronLoose() { return babyAnalyzer.tau_againstElectronLoose(); }
 const vector<bool> &tau_isVetoTau() { return babyAnalyzer.tau_isVetoTau(); }
+const vector<bool> &tau_isVetoTau_v2() { return babyAnalyzer.tau_isVetoTau_v2(); }
 const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &isoTracks_p4() { return babyAnalyzer.isoTracks_p4(); }
 const vector<int> &isoTracks_charge() { return babyAnalyzer.isoTracks_charge(); }
 const vector<float> &isoTracks_absIso() { return babyAnalyzer.isoTracks_absIso(); }
@@ -9873,6 +10483,44 @@ const vector<int> &isoTracks_pdgId() { return babyAnalyzer.isoTracks_pdgId(); }
 const vector<bool> &isoTracks_isVetoTrack() { return babyAnalyzer.isoTracks_isVetoTrack(); }
 const vector<bool> &isoTracks_isVetoTrack_v2() { return babyAnalyzer.isoTracks_isVetoTrack_v2(); }
 const vector<bool> &isoTracks_isVetoTrack_v3() { return babyAnalyzer.isoTracks_isVetoTrack_v3(); }
+const int &ph_selectedidx() { return babyAnalyzer.ph_selectedidx(); }
+const float &ph_met() { return babyAnalyzer.ph_met(); }
+const float &ph_met_phi() { return babyAnalyzer.ph_met_phi(); }
+const float &ph_HT() { return babyAnalyzer.ph_HT(); }
+const float &ph_htssm() { return babyAnalyzer.ph_htssm(); }
+const float &ph_htosm() { return babyAnalyzer.ph_htosm(); }
+const float &ph_htratiom() { return babyAnalyzer.ph_htratiom(); }
+const float &ph_mt_met_lep() { return babyAnalyzer.ph_mt_met_lep(); }
+const float &ph_dphi_Wlep() { return babyAnalyzer.ph_dphi_Wlep(); }
+const float &ph_MT2W() { return babyAnalyzer.ph_MT2W(); }
+const float &ph_topness() { return babyAnalyzer.ph_topness(); }
+const float &ph_topnessMod() { return babyAnalyzer.ph_topnessMod(); }
+const float &ph_MT2_ll() { return babyAnalyzer.ph_MT2_ll(); }
+const float &ph_MT2_lb_b_mass() { return babyAnalyzer.ph_MT2_lb_b_mass(); }
+const float &ph_MT2_lb_b() { return babyAnalyzer.ph_MT2_lb_b(); }
+const float &ph_MT2_lb_bqq_mass() { return babyAnalyzer.ph_MT2_lb_bqq_mass(); }
+const float &ph_MT2_lb_bqq() { return babyAnalyzer.ph_MT2_lb_bqq(); }
+const float &ph_hadronic_top_chi2() { return babyAnalyzer.ph_hadronic_top_chi2(); }
+const float &ph_mindphi_met_j1_j2() { return babyAnalyzer.ph_mindphi_met_j1_j2(); }
+const float &ph_Mlb_lead_bdiscr() { return babyAnalyzer.ph_Mlb_lead_bdiscr(); }
+const float &ph_dR_lep_leadb() { return babyAnalyzer.ph_dR_lep_leadb(); }
+const float &ph_Mlb_closestb() { return babyAnalyzer.ph_Mlb_closestb(); }
+const float &ph_Mjjj() { return babyAnalyzer.ph_Mjjj(); }
+const float &EA_fixgridfastjet_all_rho() { return babyAnalyzer.EA_fixgridfastjet_all_rho(); }
+const int &HLT_Photon22_R9Id90_HE10_IsoM() { return babyAnalyzer.HLT_Photon22_R9Id90_HE10_IsoM(); }
+const int &HLT_Photon30_R9Id90_HE10_IsoM() { return babyAnalyzer.HLT_Photon30_R9Id90_HE10_IsoM(); }
+const int &HLT_Photon36_R9Id90_HE10_IsoM() { return babyAnalyzer.HLT_Photon36_R9Id90_HE10_IsoM(); }
+const int &HLT_Photon50_R9Id90_HE10_IsoM() { return babyAnalyzer.HLT_Photon50_R9Id90_HE10_IsoM(); }
+const int &HLT_Photon75_R9Id90_HE10_IsoM() { return babyAnalyzer.HLT_Photon75_R9Id90_HE10_IsoM(); }
+const int &HLT_Photon90_R9Id90_HE10_IsoM() { return babyAnalyzer.HLT_Photon90_R9Id90_HE10_IsoM(); }
+const int &HLT_Photon120_R9Id90_HE10_IsoM() { return babyAnalyzer.HLT_Photon120_R9Id90_HE10_IsoM(); }
+const int &HLT_Photon165_R9Id90_HE10_IsoM() { return babyAnalyzer.HLT_Photon165_R9Id90_HE10_IsoM(); }
+const int &HLT_Photon175() { return babyAnalyzer.HLT_Photon175(); }
+const int &HLT_Photon165_HE10() { return babyAnalyzer.HLT_Photon165_HE10(); }
+const int &HLT_Photon120() { return babyAnalyzer.HLT_Photon120(); }
+const int &HLT_Photon200() { return babyAnalyzer.HLT_Photon200(); }
+const int &HLT_Photon250_NoHE() { return babyAnalyzer.HLT_Photon250_NoHE(); }
+const int &HLT_Photon300_NoHE() { return babyAnalyzer.HLT_Photon300_NoHE(); }
 const bool &filt_cscbeamhalo() { return babyAnalyzer.filt_cscbeamhalo(); }
 const bool &filt_cscbeamhalo2015() { return babyAnalyzer.filt_cscbeamhalo2015(); }
 const bool &filt_globaltighthalo2016() { return babyAnalyzer.filt_globaltighthalo2016(); }
