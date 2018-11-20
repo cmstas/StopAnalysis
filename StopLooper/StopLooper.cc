@@ -51,7 +51,7 @@ const bool doGenClassification = true;
 // turn on to apply Nvtx reweighting to MC / data2016
 const bool doNvtxReweight = false;
 // turn on top tagging studies, off for baby ver < 25
-const bool doTopTagging = true;
+const bool doTopTagging = false;
 // turn on to apply json file to data
 const bool applyGoodRunList = true;
 // re-run resolved top MVA locally
@@ -129,17 +129,15 @@ void StopLooper::GenerateAllSRptrSets() {
   allSRptrSets.clear();
 
   vector<SR*> all_SRptrs;
-  // all_SRptrs.reserve(SRVec.size() + CRVec.size());
   for (auto& sr : SRVec)   all_SRptrs.push_back(&sr);
   for (auto& cr : CR2lVec) all_SRptrs.push_back(&cr);
   for (auto& cr : CR0bVec) all_SRptrs.push_back(&cr);
 
-  // cout << __FILE__ << __LINE__ << ": all_SRptrs.size(): " << all_SRptrs.size() << endl;
-  // for (auto a : all_SRptrs) cout << __FILE__ << ':' << __LINE__ << ": a= " << a << endl;
+  // Place holder for more effective way of SR finding for each event, which is still under development
   // allSRptrSets = generateSRptrSet(all_SRptrs);
 }
 
-bool StopLooper::PassingHLTriggers(int nlep) {
+bool StopLooper::PassingHLTriggers(const int nlep) {
   if (nlep == 1) {
     switch (year_) {
       case 2016:
@@ -178,22 +176,13 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
   if (printPassedEvents) ofile.open("passEventList.txt");
 
   if (runResTopMVA)
-    // resTopMVA = new ResolvedTopMVA("../StopCORE/TopTagger/resTop_xGBoost_v0.weights.xml", "BDT");
-    resTopMVA = new ResolvedTopMVA("/home/users/sicheng/working/training/test/results_deepCSV/xgboost.xml", "BDT");
-    // resTopMVA = new ResolvedTopMVA("/home/users/sicheng/working/training/test/results_jet20/xgboost.xml", "BDT", 20);
+    resTopMVA = new ResolvedTopMVA("../StopCORE/TopTagger/resTop_xGBoost_v2.weights.xml", "BDT");
 
   outfile_ = new TFile(output_name.Data(), "RECREATE") ;
 
-  // // Full 2016 dataset json, 35.87/fb:
-  // const char* json_file = "../StopCORE/inputs/json_files/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON_snt.txt";
-  // // Full 2017 dataset json, 41.96/fb
-  // const char* json_file = "../StopBabyMaker/json_files/Cert_294927-306462_13TeV_PromptReco_Collisions17_JSON_snt.txt";
-
-  float kLumi = 135;
-  // Combined 2016 (35.87/fb), 2017 (41.96/fb) and 2018 (19.26/fb) json,
-  // const char* json_file = "../StopCORE/inputs/json_files/Cert_271036-317696_13TeV_Combined161718_JSON_snt.txt";
-  const char* json_file = "../StopCORE/inputs/json_files/Cert_271036-317591_13TeV_Combined161718_JSON_snt.txt"; // 16.59/fb
-  // const char* json_file = "../StopCORE/inputs/json_files/Cert_271036-317391_13TeV_Combined161718_JSON_snt.txt"; // 14.38/fb
+  float kLumi = 133.53;
+  // Combined 2016 (35.922/fb), 2017 (41.529/fb) and 2018 (56.077/fb) json,
+  const char* json_file = "../StopCORE/inputs/json_files/Cert_271036-325175_13TeV_Combined161718_JSON_snt.txt";
 
   // Determine datayear from the sample name
   if (samplestr == "data_single_lepton_met") datayear = 16;
@@ -204,7 +193,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
 
   // Setup pileup re-weighting for comparing data of different years
   if (doNvtxReweight) {
-    TFile f_purw("/home/users/sicheng/working/StopAnalysis/AnalyzeScripts/pu_reweighting_hists/nvtx_reweighting_alldata.root");
+    TFile f_purw("../AnalyzeScripts/pu_reweighting_hists/nvtx_reweighting_alldata.root");
     TString scaletype = "18to17";
     if (datayear == 2018) scaletype = "18to17";
     else if (datayear == 2016) scaletype = "16to17";
@@ -327,8 +316,18 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
         // if ( !filt_nobadmuons() ) continue;  // breaks for v25_*
       } else if (datayear == 2017) {
         if ( !filt_goodvtx() ) continue;
-        // if ( !is_fastsim_ && !filt_globaltighthalo2016()) continue; // problematic for 2017 & 2018 promptReco
-        if ( !is_fastsim_ && !filt_globalsupertighthalo2016()) continue;
+        // if ( !is_fastsim_ && !filt_globaltighthalo2016() ) continue; // problematic for 2017 & 2018 promptReco
+        if ( !is_fastsim_ && !filt_globalsupertighthalo2016() ) continue;
+        if ( !filt_hbhenoise() ) continue;
+        if ( !filt_hbheisonoise() )   continue;
+        if ( !filt_ecaltp() ) continue;
+        if ( !filt_badMuonFilter() ) continue;
+        if ( !filt_badChargedCandidateFilter() ) continue;
+        if ( is_data() && !filt_eebadsc() ) continue;
+        // if ( !filt_ecalbadcalib() ) continue;
+      } else if (datayear == 2018) {
+        if ( !filt_goodvtx() ) continue;
+        if ( !is_fastsim_ && !filt_globalsupertighthalo2016() ) continue;
         if ( !filt_hbhenoise() ) continue;
         if ( !filt_hbheisonoise() )   continue;
         if ( !filt_ecaltp() ) continue;
@@ -391,8 +390,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
       is_bkg_ = (!is_data() && !is_fastsim_);
 
       // Calculate event weight
-      /// the weights would be calculated but only do if the event get selected
-      evtWgt.resetEvent();
+      evtWgt.resetEvent(); // full event weights only get calculated if the event get selected for a SR
 
       // Simple weight with scale1fb only
       if (!is_data()) {
@@ -404,6 +402,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
         }
       }
 
+      // Fill tirgger efficiency histos after the MET filters are applied
       fillEfficiencyHistos(testVec[0], "triggers");
 
       // Plot nvtxs on the base selection of stopbaby for reweighting purpose
@@ -1055,7 +1054,7 @@ void StopLooper::fillHistosForCRemu(string suf) {
   }
 }
 
-void StopLooper::fillEfficiencyHistos(SR& sr, string type, string suffix) {
+void StopLooper::fillEfficiencyHistos(SR& sr, const string type, string suffix) {
 
   // // Temporary for the early 2018 PromptReco data trying to reduce the effect from HCAL issue
   // if (mindphi_met_j1_j2() < 0.5) return;
@@ -1116,9 +1115,8 @@ void StopLooper::fillEfficiencyHistos(SR& sr, string type, string suffix) {
       plot1d("h_ht"+suffix, ak4_HT(), 1, sr.histMap, ";H_{T} [GeV];#slash{E}_{T} [GeV]", 30, 800, 1400);
 
     // Measure the efficiencies of all 3 trigger combined in a JetHT dataset
-    if ((HLT_PFHT_unprescaled() || HLT_PFHT_prescaled())) {
-    // if (HLT_PFHT_unprescaled() && ak4_HT() > 1200) {
-    // if (HLT_PFHT_unprescaled()) {
+    // if ((HLT_PFHT_unprescaled() || HLT_PFHT_prescaled())) {
+    if ((HLT_PFHT_unprescaled() || HLT_PFHT_prescaled()) || HLT_AK8Jet_unprescaled() || HLT_AK8Jet_prescaled() || HLT_CaloJet500_NoJetID()) {
     // if (true) {
       const float TEbins_met[] = {150, 200, 225, 250, 275, 300, 350, 400, 550};
       const float TEbins_lep[] = {20, 22.5, 25, 30, 40, 55, 100, 200};

@@ -36,11 +36,11 @@ class StopLooper {
   void fillHistosForCRemu(std::string suffix = "");
 
   // Helper functions
-  bool PassingHLTriggers(int nlep = 1);
+  bool PassingHLTriggers(const int nlep = 1);
 
   // Testing
   void fillTopTaggingHistos(std::string suffix = "");
-  void fillEfficiencyHistos(SR& sr, std::string type = "", std::string suffix = "");
+  void fillEfficiencyHistos(SR& sr, const std::string type = "", std::string suffix = "");
   void testTopTaggingEffficiency(SR& sr);
   void testCutFlowHistos(SR& sr);
 
