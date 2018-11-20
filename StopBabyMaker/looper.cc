@@ -2339,8 +2339,11 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
         }
       }
 
+      bool pass_skim_met_photon = (fillPhoton)? (StopEvt.ph_met >= skim_met) : false;
+      bool pass_skim_met_jup = (applyJECfromFile)? (StopEvt.pfmet_jup >= skim_met || StopEvt.pfmet_rl_jup >= skim_met) : false;
+      bool pass_skim_met_jdown = (applyJECfromFile)? (StopEvt.pfmet_jdown >= skim_met || StopEvt.pfmet_rl_jdown >= skim_met) : false;
 
-      if(!(StopEvt.pfmet >= skim_met) && !(StopEvt.pfmet_rl >= skim_met) && !(StopEvt.pfmet_rl_jup >= skim_met) && !(StopEvt.pfmet_rl_jdown >= skim_met) && !(StopEvt.pfmet_jup >= skim_met) && !(StopEvt.pfmet_jdown >= skim_met) ) continue;
+      if (not ((StopEvt.pfmet >= skim_met || StopEvt.pfmet_rl >= skim_met) || pass_skim_met_jup || pass_skim_met_jdown || pass_skim_met_photon) ) continue;
       //if(!(StopEvt.pfmet >= skim_met) && !(StopEvt.pfmet_rl >= skim_met) && !(StopEvt.pfmet_rl_jup >= skim_met) && !(StopEvt.pfmet_rl_jdown >= skim_met) && !(StopEvt.pfmet_jup >= skim_met) && !(StopEvt.pfmet_jdown >= skim_met) && !(StopEvt.pfmet_egclean >= skim_met) && !(StopEvt.pfmet_muegclean >= skim_met) && !(StopEvt.pfmet_muegcleanfix >= skim_met) && !(StopEvt.pfmet_uncorrcalomet >= skim_met) ) continue;
       nEvents_pass_skim_met++;
       /////////////////////////////////////////////////////////
@@ -2494,9 +2497,9 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
         StopEvt.HLT_Photon120_R9Id90_HE10_IsoM = passHLTTriggerPattern("HLT_Photon120_R9Id90_HE10_IsoM_v") ? HLT_prescale(triggerName("HLT_Photon120_R9Id90_HE10_IsoM_v")) : 0;
         StopEvt.HLT_Photon120                  = passHLTTriggerPattern("HLT_Photon120_v")                  ? HLT_prescale(triggerName("HLT_Photon120_v"))                  : 0;
         // unprescaled triggers for 2016 but prescaled in 2017 & 2018
-        StopEvt.HLT_Photon165_R9Id90_HE10_IsoM = passHLTTriggerPattern("HLT_Photon165_R9Id90_HE10_IsoM_v");
-        StopEvt.HLT_Photon165_HE10             = passHLTTriggerPattern("HLT_Photon165_HE10_v");
-        StopEvt.HLT_Photon175                  = passHLTTriggerPattern("HLT_Photon175_v");
+        StopEvt.HLT_Photon165_R9Id90_HE10_IsoM = passHLTTriggerPattern("HLT_Photon165_R9Id90_HE10_IsoM_v") ? HLT_prescale(triggerName("HLT_Photon165_R9Id90_HE10_IsoM_v")) : 0;
+        StopEvt.HLT_Photon165_HE10             = passHLTTriggerPattern("HLT_Photon165_HE10_v")             ? HLT_prescale(triggerName("HLT_Photon165_HE10_v"))             : 0;
+        StopEvt.HLT_Photon175                  = passHLTTriggerPattern("HLT_Photon175_v")                  ? HLT_prescale(triggerName("HLT_Photon175_v"))                  : 0;
         // unprescaled triggers in SinglePhoton
         StopEvt.HLT_Photon200                  = passHLTTriggerPattern("HLT_Photon200_v");      // in 2017 & 2018 only
         StopEvt.HLT_Photon250_NoHE             = passHLTTriggerPattern("HLT_Photon250_NoHE_v"); // in 2016 only
