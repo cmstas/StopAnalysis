@@ -137,8 +137,8 @@ void StopLooper::GenerateAllSRptrSets() {
   // allSRptrSets = generateSRptrSet(all_SRptrs);
 }
 
-bool StopLooper::PassingHLTriggers(const int nlep) {
-  if (nlep == 1) {
+bool StopLooper::PassingHLTriggers(const int type) {
+  if (type == 1) {
     switch (year_) {
       case 2016:
         return ( (HLT_MET110_MHT110() || HLT_MET120_MHT120() || HLT_MET()) ||
@@ -148,7 +148,7 @@ bool StopLooper::PassingHLTriggers(const int nlep) {
       default:
         return ( HLT_MET_MHT() || (abs(lep1_pdgid()) == 11 && HLT_SingleEl()) || (abs(lep1_pdgid()) == 13 && HLT_SingleMu()) );
     }
-  } else if (nlep == 2) {
+  } else if (type == 2) {
     switch (year_) {
       case 2016:
         return ( (HLT_MET() || HLT_MET110_MHT110() || HLT_MET120_MHT120()) || (HLT_SingleEl() && (abs(lep1_pdgid())==11 || abs(lep2_pdgid())==11)) ||
@@ -158,6 +158,21 @@ bool StopLooper::PassingHLTriggers(const int nlep) {
       default:
         return ( HLT_MET_MHT() || (HLT_SingleEl() && (abs(lep1_pdgid())==11 || abs(lep2_pdgid())==11)) ||
                   (HLT_SingleMu() && (abs(lep1_pdgid())==13 || abs(lep2_pdgid())==13)) );
+    }
+  } else if (type == 3) {
+    int dilepid = abs(lep1_pdgid()*lep2_pdgid());
+    switch (year_) {
+      case 2016:
+        return ( (HLT_MET() || HLT_MET110_MHT110() || HLT_MET120_MHT120()) ||
+                 (dilepid == 121 && HLT_DiEl()) || (dilepid == 169 && HLT_DiMu()) || (dilepid == 143 && HLT_MuE()) ||
+                 (HLT_SingleEl() && (abs(lep1_pdgid())==11 || abs(lep2_pdgid())==11)) ||
+                 (HLT_SingleMu() && (abs(lep1_pdgid())==13 || abs(lep2_pdgid())==13)) );
+      case 2017:
+      case 2018:
+      default:
+        return ( HLT_MET_MHT() || (dilepid == 121 && HLT_DiEl()) || (dilepid == 169 && HLT_DiMu()) || (dilepid == 143 && HLT_MuE()) ||
+                 (HLT_SingleEl() && (abs(lep1_pdgid())==11 || abs(lep2_pdgid())==11)) ||
+                 (HLT_SingleMu() && (abs(lep1_pdgid())==13 || abs(lep2_pdgid())==13)) );
     }
   }
   return false;
@@ -238,12 +253,12 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
     tree->LoadTree(0);
     babyAnalyzer.GetEntry(0);
 
+    // Setup configs for sample dependent processes
     year_ = (doTopTagging)? year() : 2016;
     TString dsname = dataset();
-    cout << "[StopLooper::looper] running on sample: " << dsname << endl;
 
     // Find the stopbaby versions automatically from file path
-    if (int i = fname.First("_v"); i >= 0) samplever = fname(i+1, 3); // ignore subversions
+    if (int i = fname.Index("_v"); i >= 0) samplever = fname(i+1, 3); // ignore subversions
     else if (fname.Contains("v24")) samplever = "v24";
     else cout << "[looper] >> Cannot find the sample version!" << endl;
 
@@ -252,6 +267,9 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
     else if (dsname.Contains("RunIISummer16MiniAODv2")) samplever += ":Summer16v2";
     else if (dsname.Contains("RunIISummer16MiniAODv3")) samplever += ":Summer16v3";
     else if (dsname.Contains("RunIISpring16MiniAODv2")) samplever += ":Spring16v2";
+
+    cout << "[looper] >> Running on sample: " << dsname << endl;
+    cout << "[looper] >> Sample detected with year = " << year_ << " and version = " << samplever << endl;
 
     is_fastsim_ = dsname.Contains("SMS") || fname.Contains("SMS") || fname.Contains("Signal");
 
@@ -302,8 +320,24 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
       // fillEfficiencyHistos(testVec[0], "filters");
 
       // Apply met filters
-      if (datayear == 2016 || datayear == 16) {
-        // The newer version of the header file uses boolean type for all of the following, which breaks for 2016 data
+      if (doTopTagging) {
+        // Recommended filters for the legacy analysis
+        switch (year_) {
+          case 2018:  // 2017 and 2018 uses the same set of filters
+          case 2017:
+            if ( !filt_ecalbadcalib() ) continue;
+          case 2016:
+            if ( !filt_goodvtx() ) continue;
+            if ( !is_fastsim_ && !filt_globalsupertighthalo2016() ) continue;
+            if ( !filt_hbhenoise() ) continue;
+            if ( !filt_hbheisonoise() )   continue;
+            if ( !filt_ecaltp() ) continue;
+            if ( !filt_badMuonFilter() ) continue;
+            if ( !filt_badChargedCandidateFilter() ) continue;
+            if ( is_data() && !filt_eebadsc() ) continue;
+        }
+      } else if (samplever.find("v24") == 0) {
+        // Filters used in Moriond17 study, keep for sync check
         if ( !filt_met() ) continue;
         if ( !filt_goodvtx() ) continue;
         if ( firstGoodVtxIdx() == -1 ) continue;
@@ -313,41 +347,22 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
         if ( !filt_pfovercalomet() ) continue;
         if ( filt_duplicatemuons() ) continue; // Temporary, breaks for old 16 babies
         if ( filt_badmuons() ) continue;
-        // if ( !filt_nobadmuons() ) continue;  // breaks for v25_*
-      } else if (datayear == 2017) {
-        if ( !filt_goodvtx() ) continue;
-        // if ( !is_fastsim_ && !filt_globaltighthalo2016() ) continue; // problematic for 2017 & 2018 promptReco
-        if ( !is_fastsim_ && !filt_globalsupertighthalo2016() ) continue;
-        if ( !filt_hbhenoise() ) continue;
-        if ( !filt_hbheisonoise() )   continue;
-        if ( !filt_ecaltp() ) continue;
-        if ( !filt_badMuonFilter() ) continue;
-        if ( !filt_badChargedCandidateFilter() ) continue;
-        if ( is_data() && !filt_eebadsc() ) continue;
-        // if ( !filt_ecalbadcalib() ) continue;
-      } else if (datayear == 2018) {
-        if ( !filt_goodvtx() ) continue;
-        if ( !is_fastsim_ && !filt_globalsupertighthalo2016() ) continue;
-        if ( !filt_hbhenoise() ) continue;
-        if ( !filt_hbheisonoise() )   continue;
-        if ( !filt_ecaltp() ) continue;
-        if ( !filt_badMuonFilter() ) continue;
-        if ( !filt_badChargedCandidateFilter() ) continue;
-        if ( is_data() && !filt_eebadsc() ) continue;
-        // if ( !filt_ecalbadcalib() ) continue;
+        if ( !filt_nobadmuons() ) continue;
       }
 
       // stop defined filters
-      if (datayear == 2016) {
-        if ( !filt_jetWithBadMuon() ) continue;
-        if ( !filt_pfovercalomet() ) continue;
-      }
-      else if (is_fastsim_) {
+      if (is_fastsim_) {
         if ( !filt_fastsimjets() ) continue;
+      } else {
+        if ( !filt_pfovercalomet() ) continue;  // reject event if pfmet/calomet > 5
+        if ( !filt_jetWithBadMuon() ) continue; // there's a jup/jdown of this filter, but this alone should be enough
       }
 
       // Require at least 1 good vertex
       if (nvtxs() < 1) continue;
+
+      // Fill tirgger efficiency histos after the MET filters are applied
+      fillEfficiencyHistos(testVec[0], "triggers");
 
       // For testing on only subset of mass points
       if (!runFullSignalScan && is_fastsim_) {
@@ -401,9 +416,6 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
           evtweight_ = kLumi * scale1fb();
         }
       }
-
-      // Fill tirgger efficiency histos after the MET filters are applied
-      fillEfficiencyHistos(testVec[0], "triggers");
 
       // Plot nvtxs on the base selection of stopbaby for reweighting purpose
       plot1d("h_nvtxs", nvtxs(), 1, testVec[0].histMap, ";Number of vertices", 100, 1, 101);
@@ -1147,6 +1159,9 @@ void StopLooper::fillEfficiencyHistos(SR& sr, const string type, string suffix) 
     }
   }
 }
+
+////////////////////////////////////////////////////////////////////
+// Functions that are not indispensible part of the main analysis
 
 void StopLooper::fillTopTaggingHistos(string suffix) {
   if (!doTopTagging || runYieldsOnly) return;
