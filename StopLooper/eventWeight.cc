@@ -14,390 +14,198 @@ evtWgtInfo::Util::Util( systID systematic ) {
   switch( systematic ) {
 
     case( k_nominal ):
-      id          = systematic;
       label       = "nominal";
       title       = "Nominal";
-      tex         = "Nominal";
-      hasOwnBabies = true;
       break;
-
     case( k_JESUp ):
-      id          = systematic;
       label       = "jesUp";
       title       = "JES Up";
-      tex         = "JES~Up";
-      hasOwnBabies = true;
       break;
-
     case( k_JESDown ):
-      id          = systematic;
       label       = "jesDn";
       title       = "JES Down";
-      tex         = "JES~Down";
-      hasOwnBabies = true;
       break;
-
     case( k_diLepTriggerUp ):
-      id          = systematic;
       label       = "diLepTriggerSFUp";
       title       = "DiLepton Trigger Scale Factor, Up";
-      tex         = "DiLepton~Trigger~Scale~Factor,~Up";
-      hasOwnBabies = false;
       break;
-
     case( k_diLepTriggerDown ):
-      id          = systematic;
       label       = "diLepTriggerSFDn";
       title       = "DiLepton Trigger Scale Factor, Down";
-      tex         = "DiLepton~Trigger~Scale~Factor,~Down";
-      hasOwnBabies = false;
       break;
-
     case( k_cr2lTriggerUp ):
-      id          = systematic;
       label       = "cr2lTriggerSFUp";
       title       = "CR2l Trigger Scale Factor, Up";
-      tex         = "CR2l~Trigger~Scale~Factor,~Up";
-      hasOwnBabies = false;
       break;
-
     case( k_cr2lTriggerDown ):
-      id          = systematic;
       label       = "cr2lTriggerSFDn";
       title       = "CR2l Trigger Scale Factor, Down";
-      tex         = "CR2l~Trigger~Scale~Factor,~Down";
-      hasOwnBabies = false;
       break;
-
     case( k_bTagEffHFUp ):
-      id          = systematic;
       label       = "bTagEffHFUp";
       title       = "bTag Efficicency, Heavy Flavour, Up";
-      tex         = "bTag~Efficicency,~Heavy~Flavour,~Up";
-      hasOwnBabies = false;
       break;
-
     case( k_bTagEffHFDown ):
-      id          = systematic;
       label       = "bTagEffHFDn";
       title       = "bTag Efficicency, Heavy Flavour, Down";
-      tex         = "bTag~Efficicency,~Heavy~Flavour,~Down";
-      hasOwnBabies = false;
       break;
-
     case( k_bTagEffLFUp ):
-      id          = systematic;
       label       = "bTagEffLFUp";
       title       = "bTag Efficicency, Light Flavour, Up";
-      tex         = "bTag~Efficicency,~Light~Flavour,~Up";
-      hasOwnBabies = false;
       break;
-
     case( k_bTagEffLFDown ):
-      id          = systematic;
       label       = "bTagEffLFDn";
       title       = "bTag Efficicency, Light Flavour, Down";
-      tex         = "bTag~Efficicency,~Light~Flavour,~Down";
-      hasOwnBabies = false;
       break;
-
     case( k_bTagFSEffUp ):
-      id          = systematic;
       label       = "bTagFSEffUp";
       title       = "bTag Fastsim Efficiency, Up";
-      tex         = "bTag~Fastsim~Efficicency,~Up";
-      hasOwnBabies = false;
       break;
-
     case( k_bTagFSEffDown ):
-      id          = systematic;
       label       = "bTagFSEffDn";
       title       = "bTag Fastsim Efficiency, Down";
-      tex         = "bTag~Fastsim~Efficicency,~Down";
-      hasOwnBabies = false;
       break;
-
     case( k_lepSFUp ):
-      id          = systematic;
       label       = "lepSFUp";
       title       = "Lepton Scale Factor, Up";
-      tex         = "Lepton~Scale~Factor,~Up";
-      hasOwnBabies = false;
       break;
-
     case( k_lepSFDown ):
-      id          = systematic;
       label       = "lepSFDn";
       title       = "Lepton Scale Factor, Down";
-      tex         = "Lepton~Scale~Factor,~Down";
-      hasOwnBabies = false;
       break;
-
     case( k_lepFSSFUp ):
-      id          = systematic;
       label       = "lepFSSFUp";
       title       = "Lepton Fastsim Scale Factor, Up";
-      tex         = "Lepton~Fastsm~Scale~Factor,~Up";
-      hasOwnBabies = false;
       break;
-
     case( k_lepFSSFDown ):
-      id          = systematic;
       label       = "lepFSSFDn";
       title       = "Lepton Fastsim Scale Factor, Down";
-      tex         = "Lepton~Fastsim~Scale~Factor,~Down";
-      hasOwnBabies = false;
       break;
-
     case( k_topPtSFUp ):
-      id          = systematic;
       label       = "topPtSFUp";
       title       = "top pT Scale Factor, Up";
-      tex         = "top~$p_{T}$~Scale~Factor,~Up";
-      hasOwnBabies = false;
       break;
-
     case( k_topPtSFDown ):
-      id          = systematic;
       label       = "topPtSFDn";
       title       = "top pT Scale Factor, Down";
-      tex         = "top~$p_{T}$~Scale~Factor,~Down";
-      hasOwnBabies = false;
       break;
-
     case( k_metResUp ):
-      id          = systematic;
       label       = "metResUp";
       title       = "MET Resolution, Up";
-      tex         = "MET~Resolution,~Up";
-      hasOwnBabies = false;
       break;
-
     case( k_metResDown ):
-      id          = systematic;
       label       = "metResDn";
       title       = "MET Resolution, Down";
-      tex         = "MET~Resolution,~Down";
-      hasOwnBabies = false;
       break;
-
     case( k_metTTbarUp ):
-      id          = systematic;
       label       = "metTTbarUp";
       title       = "MET ttbar SF, Up";
-      tex         = "MET~$t\\bar{t}$~SF,~Up";
-      hasOwnBabies = false;
       break;
-
     case( k_metTTbarDown ):
-      id          = systematic;
       label       = "metTTbarDn";
       title       = "MET ttbar SF, Down";
-      tex         = "MET~$t\\bar{t}$~SF,~Down";
-      hasOwnBabies = false;
       break;
-
     case( k_ttbarSysPtUp ):
-      id          = systematic;
       label       = "ttbarSysPtUp";
       title       = "ttbar/tW system pT, Up";
-      tex         = "$t\\bar{t}/tW~p_{T}$,~Up";
-      hasOwnBabies = false;
       break;
-
     case( k_ttbarSysPtDown ):
-      id          = systematic;
       label       = "ttbarSysPtDn";
       title       = "ttbar/tW system pT, Down";
-      tex         = "$t\\bar{t}/tW~p_{T}$,~Down";
-      hasOwnBabies = false;
       break;
-
     case( k_nuPtSF_Up ):
-      id          = systematic;
       label       = "nuPtUp";
       title       = "nuetrino pT, Up";
-      tex         = "${\\nu}p_{T}$,~Up";
-      hasOwnBabies = false;
       break;
-
     case( k_nuPtSF_Down ):
-      id          = systematic;
       label       = "nuPtDn";
       title       = "nuetrino pT, Down";
-      tex         = "${\\nu}p_{T}$,~Down";
-      hasOwnBabies = false;
       break;
-
     case( k_WwidthSF_Up ):
-      id          = systematic;
       label       = "WwidthSFUp";
       title       = "W Width, Up";
-      tex         = "$W$~Width,~Up";
-      hasOwnBabies = false;
       break;
-
     case( k_WwidthSF_Down ):
-      id          = systematic;
       label       = "WwidthSFDn";
       title       = "W Width, Down";
-      tex         = "$W$~Width,~Down";
-      hasOwnBabies = false;
       break;
-
     case( k_WbXsec_Up ):
-      id          = systematic;
       label       = "WbXsecUp";
       title       = "W+b x-section, Up";
-      tex         = "$W+b$~x-section,~Up";
-      hasOwnBabies = false;
       break;
-
     case( k_WbXsec_Down ):
-      id          = systematic;
       label       = "WbXsecDn";
       title       = "W+b x-section, Down";
-      tex         = "$W+b$~x-section,~Down";
-      hasOwnBabies = false;
       break;
-
     case( k_pdfUp ):
-      id          = systematic;
       label       = "pdfUp";
       title       = "PDF, Up";
-      tex         = "PDF,~Up";
-      hasOwnBabies = false;
       break;
-
     case( k_pdfDown ):
-      id          = systematic;
       label       = "pdfDn";
       title       = "PDF, Down";
-      tex         = "PDF,~Down";
-      hasOwnBabies = false;
       break;
-
     case( k_alphasUp ):
-      id          = systematic;
       label       = "alphasUp";
       title       = "Alpha S, Up";
-      tex         = "$\\alpha_{S}$,~Up";
-      hasOwnBabies = false;
       break;
-
     case( k_alphasDown ):
-      id          = systematic;
       label       = "alphasDn";
       title       = "Alpha S, Down";
-      tex         = "$\\alpha_{S}$,~Down";
-      hasOwnBabies = false;
       break;
-
     case( k_q2Up ):
-      id          = systematic;
       label       = "q2Up";
       title       = "Q2, Up";
-      tex         = "$Q^{2}$,~Up";
-      hasOwnBabies = false;
       break;
-
     case( k_q2Down ):
-      id          = systematic;
       label       = "q2Dn";
       title       = "Q2, Down";
-      tex         = "$Q^{2}$,~Down";
-      hasOwnBabies = false;
       break;
-
     case( k_lumiUp ):
-      id          = systematic;
       label       = "lumiUp";
       title       = "Luminosity, Up";
-      tex         = "Luminosity,~Up";
-      hasOwnBabies = false;
       break;
-
     case( k_lumiDown ):
-      id          = systematic;
       label       = "lumiDn";
       title       = "Luminosity, Down";
-      tex         = "Luminosity,~Down";
-      hasOwnBabies = false;
       break;
-
     case( k_ISRUp ):
-      id          = systematic;
       label       = "ISRUp";
       title       = "ISR, Up";
-      tex         = "ISR,~Up";
-      hasOwnBabies = false;
       break;
-
     case( k_ISRDown ):
-      id          = systematic;
       label       = "ISRDn";
       title       = "ISR, Down";
-      tex         = "ISR,~Down";
-      hasOwnBabies = false;
       break;
-
     case( k_xsecUp ):
-      id          = systematic;
       label       = "xsecUp";
       title       = "Signal X-Sec, Up";
-      tex         = "Signal~X-Section,~Up";
-      hasOwnBabies = false;
       break;
-
     case( k_xsecDown ):
-      id          = systematic;
       label       = "xsecDn";
       title       = "Signal X-Sec, Down";
-      tex         = "Signal~X-Section,~Down";
-      hasOwnBabies = false;
       break;
-
     case( k_puUp ):
-      id          = systematic;
       label       = "pileupUp";
       title       = "Pileup Reweight, Up";
-      tex         = "Pileup~Reweight,~Up";
-      hasOwnBabies = false;
       break;
-
     case( k_puDown ):
-      id          = systematic;
       label       = "pileupDn";
       title       = "Pileup Reweight, Down";
-      tex         = "Pileup~Reweight,~Down";
-      hasOwnBabies = false;
       break;
-
     case( k_tauSFUp ):
-      id          = systematic;
       label       = "tauSFUp";
       title       = "Tau Efficiency SF, Up";
-      tex         = "$\\tau$~Efficiency~SF,~Up";
-      hasOwnBabies = false;
       break;
-
     case( k_tauSFDown ):
-      id          = systematic;
       label       = "tauSFDn";
       title       = "Tau Efficiency SF, Down";
-      tex         = "$\\tau$~Efficiency~SF,~Down";
-      hasOwnBabies = false;
       break;
-
     default:
-      std::cout << "Could not find systematic info from systematic enum provided!" << std::endl;
-      id           = systematic;
+      std::cout << "[eventWeight] >> Could not find systematic info from systematic enum provided!" << std::endl;
       label        = "NO SYSTEMATIC INFO FOUND FROM ENUM PROVIDED";
       title        = "NO SYSTEMATIC INFO FOUND FROM ENUM PROVIDED";
-      tex          = "NO SYSTEMATIC INFO FOUND FROM ENUM PROVIDED";
-      hasOwnBabies = false;
       break;
-
   } // end systematic switch
 
 }
@@ -408,6 +216,7 @@ evtWgtInfo::evtWgtInfo() {
   is_bkg_     = false;
   is_data_    = false;
   is_fastsim_ = false;
+  sync16      = false;
 
   // Initialize Switches for additional SFs
   apply_diLepTrigger_sf = false;
@@ -440,8 +249,8 @@ evtWgtInfo::evtWgtInfo() {
 
   // Utilty Var Constants
   year = 0;
-  lumi = 150;            // projected 3 years lumi
-  lumi_err = lumi*0.05;  // TODO: Update the 2018 lumi uncertainty
+  lumi = 133.53;         // Legacy lumi of RunII
+  lumi_err = lumi*0.05;  // 5% uncertainty may be enough?
 
   // Initialize event weights and related variables
   initializeWeights();
@@ -458,25 +267,20 @@ void evtWgtInfo::Setup(string samplestr, int inyear, bool useBTagUtils, bool use
   year = inyear;
 
   if (year == 2016) {
-    lumi = 35.867;         // 2016 lumi
+    lumi = 35.922;         // 2016 lumi
     lumi_err = lumi*0.026; // 2.6% uncertainty for Moriond17
   } else if (year == 2017) {
-    lumi = 41.96;          // 2017 lumi
+    lumi = 41.529;         // 2017 lumi
     lumi_err = lumi*0.026; // TODO: Update the 2017 lumi uncertainty
   } else if (year == 2018) {
-    lumi = 70;             // projected 2018 lumi
-    lumi_err = lumi*0.05;  // TODO: Update the 2018 lumi uncertainty
-  } else {
-    lumi = 150;            // projected 3 years lumi
+    lumi = 56.077;         // projected 2018 lumi
     lumi_err = lumi*0.05;  // TODO: Update the 2018 lumi uncertainty
   }
 
   // Get sample info from enum
   if ( sampletype == "data" ) {
     is_data_ = true;
-  }
-  else if ( sampletype.find("SMS") != string::npos || sampletype.find("Signal") != string::npos ||
-            sampletype.find("sig_") != string::npos) {
+  } else if ( sampletype == "fastsim" ) {
     is_fastsim_ = true;
   }
   is_bkg_ = !is_data_ && !is_fastsim_;
@@ -487,6 +291,11 @@ void evtWgtInfo::Setup(string samplestr, int inyear, bool useBTagUtils, bool use
   useBTagSFs_fromFiles = useBTagUtils;
   useLepSFs_fromFiles  = useLepSFUtils;
 
+  if (sync16 && (useBTagUtils || useLepSFUtils)) {
+    cout << "[eventWeight] >> Cannot load these SFs from file when doing sync studies, since they are have changed!" << endl;
+    useLepSFUtils = useBTagUtils = false;
+  }
+
   // Get Signal XSection File
   if ( is_fastsim_ ) {
     f_sig_xsec = new TFile("../StopCORE/inputs/signal_xsec/xsec_stop_13TeV.root","read");
@@ -496,14 +305,17 @@ void evtWgtInfo::Setup(string samplestr, int inyear, bool useBTagUtils, bool use
   // Get SR trigger histos
   if ( !is_data_ && apply_cr2lTrigger_sf) {
     f_cr2lTrigger_sf = new TFile("../StopCORE/inputs/trigger/TrigEfficiencies_all.root","read");
-    if (year == 2016) {
+    if (sync16) {
       h_cr2lTrigger_sf_el = (TEfficiency*) f_cr2lTrigger_sf->Get("Efficiency_ge2l_metrl_el");
       h_cr2lTrigger_sf_mu = (TEfficiency*) f_cr2lTrigger_sf->Get("Efficiency_ge2l_metrl_mu");
+    } else if (year == 2016) {
+        h_cr2lTrigger_sf_el = (TEfficiency*) f_cr2lTrigger_sf->Get("heff16_extb_trigeff_metrl_lep1pt_el");
+        h_cr2lTrigger_sf_mu = (TEfficiency*) f_cr2lTrigger_sf->Get("heff16_extb_trigeff_metrl_lep1pt_mu");
     } else if (year == 2017) {
-      h_cr2lTrigger_sf_el = (TEfficiency*) f_cr2lTrigger_sf->Get("heff17_trigeff_metrl_lep1pt_el");
-      h_cr2lTrigger_sf_mu = (TEfficiency*) f_cr2lTrigger_sf->Get("heff17_trigeff_metrl_lep1pt_mu");
+      h_cr2lTrigger_sf_el = (TEfficiency*) f_cr2lTrigger_sf->Get("heff17_extb_trigeff_metrl_lep1pt_el");
+      h_cr2lTrigger_sf_mu = (TEfficiency*) f_cr2lTrigger_sf->Get("heff17_extb_trigeff_metrl_lep1pt_mu");
     } else if (year == 2018) {
-      // TODO: to update this when 2018 data is available
+      // TODO: to update this when 2018 JetHT data is available
       h_cr2lTrigger_sf_el = (TEfficiency*) f_cr2lTrigger_sf->Get("heff17_trigeff_metrl_lep1pt_el");
       h_cr2lTrigger_sf_mu = (TEfficiency*) f_cr2lTrigger_sf->Get("heff17_trigeff_metrl_lep1pt_mu");
     }
@@ -2077,11 +1889,6 @@ void evtWgtInfo::getPDFWeight( double &weight_pdf_up, double &weight_pdf_dn ) {
 
   if ( babyAnalyzer.genweights().size() < 110 ) return;
 
-  if ( is_fastsim_ && ( h_sig_counter->GetBinContent(mStop,mLSP,10)<=0 ||
-                        h_sig_counter->GetBinContent(mStop,mLSP,11)<=0 ) ) return;
-  else if ( h_bkg_counter->GetBinContent(10)<=0 ||
-            h_bkg_counter->GetBinContent(11)<=0   ) return;
-
   weight_pdf_up = babyAnalyzer.pdf_up_weight();
   weight_pdf_dn = babyAnalyzer.pdf_down_weight();
 
@@ -2103,31 +1910,39 @@ void evtWgtInfo::getPDFWeight( double &weight_pdf_up, double &weight_pdf_dn ) {
 
 void evtWgtInfo::getAlphasWeight( double &weight_alphas_up, double &weight_alphas_dn ) {
 
-  weight_alphas_up = 1.0;
-  weight_alphas_dn = 1.0;
-
   if ( babyAnalyzer.genweights().size() < 110 ) return;
 
-  // Normalization
+  if (sync16) {  // Old method, to be used before v27
+    if ( is_fastsim_ ) {
+      weight_alphas_up = babyAnalyzer.genweights().at(110)/babyAnalyzer.genweights().at(1);
+      weight_alphas_dn = babyAnalyzer.genweights().at(111)/babyAnalyzer.genweights().at(1);
+      weight_alphas_up *= (  h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,1)) / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,12))  );
+      weight_alphas_dn *= (  h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,1)) / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,13))  );
+    } else {
+      weight_alphas_up = babyAnalyzer.genweights().at(109)/babyAnalyzer.genweights().at(0);
+      weight_alphas_dn = babyAnalyzer.genweights().at(110)/babyAnalyzer.genweights().at(0);
+      weight_alphas_up *= ( h_bkg_counter->GetBinContent(1) / h_bkg_counter->GetBinContent(12) );
+      weight_alphas_dn *= ( h_bkg_counter->GetBinContent(1) / h_bkg_counter->GetBinContent(13) );
+    }
+    return;
+  }
+
+  // New method, start from v27
+  weight_alphas_up = babyAnalyzer.weight_alphas_up();
+  weight_alphas_dn = babyAnalyzer.weight_alphas_down();
+
   if ( is_fastsim_ ) {
-    weight_alphas_up = babyAnalyzer.genweights().at(110)/babyAnalyzer.genweights().at(1);
-    weight_alphas_dn = babyAnalyzer.genweights().at(111)/babyAnalyzer.genweights().at(1);
-
-    weight_alphas_up *= (  h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,1)) / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,12))  );
-    weight_alphas_dn *= (  h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,1)) / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,13))  );
+    weight_alphas_up *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,12)) );
+    weight_alphas_dn *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,13)) );
   } else {
-    weight_alphas_up = babyAnalyzer.genweights().at(109)/babyAnalyzer.genweights().at(0);
-    weight_alphas_dn = babyAnalyzer.genweights().at(110)/babyAnalyzer.genweights().at(0);
-
-    weight_alphas_up *= ( h_bkg_counter->GetBinContent(1) / h_bkg_counter->GetBinContent(12) );
-    weight_alphas_dn *= ( h_bkg_counter->GetBinContent(1) / h_bkg_counter->GetBinContent(13) );
+    weight_alphas_up *= ( nEvents / h_bkg_counter->GetBinContent(12) );
+    weight_alphas_dn *= ( nEvents / h_bkg_counter->GetBinContent(13) );
   }
 
   if ( weight_alphas_up < 0.0 || weight_alphas_dn < 0.0 ) {
     weight_alphas_up = 1.0;
     weight_alphas_dn = 1.0;
   }
-
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -2136,21 +1951,37 @@ void evtWgtInfo::getQ2Weight( double &weight_q2_up, double &weight_q2_dn ) {
 
   if ( babyAnalyzer.genweights().size() < 110 ) return;
 
-  // Normalization
-  if ( is_fastsim_ ) {
-    weight_q2_up = babyAnalyzer.genweights().at(5)/babyAnalyzer.genweights().at(1);
-    weight_q2_dn = babyAnalyzer.genweights().at(9)/babyAnalyzer.genweights().at(1);
-
-    weight_q2_up *= ( h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,1)) / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,5)) );
-    weight_q2_dn *= ( h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,1)) / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,9)) );
-  } else {
-    weight_q2_up = babyAnalyzer.genweights().at(4)/babyAnalyzer.genweights().at(0);
-    weight_q2_dn = babyAnalyzer.genweights().at(8)/babyAnalyzer.genweights().at(0);
-
-    weight_q2_up *= ( h_bkg_counter->GetBinContent(1) / h_bkg_counter->GetBinContent(5) );
-    weight_q2_dn *= ( h_bkg_counter->GetBinContent(1) / h_bkg_counter->GetBinContent(9) );
+  if (sync16) { // Old method, obsolete from v27
+    if ( is_fastsim_ ) {
+      weight_q2_up = babyAnalyzer.genweights().at(5)/babyAnalyzer.genweights().at(1);
+      weight_q2_dn = babyAnalyzer.genweights().at(9)/babyAnalyzer.genweights().at(1);
+      weight_q2_up *= ( h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,1)) / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,5)) );
+      weight_q2_dn *= ( h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,1)) / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,9)) );
+    } else {
+      weight_q2_up = babyAnalyzer.genweights().at(4)/babyAnalyzer.genweights().at(0);
+      weight_q2_dn = babyAnalyzer.genweights().at(8)/babyAnalyzer.genweights().at(0);
+      weight_q2_up *= ( h_bkg_counter->GetBinContent(1) / h_bkg_counter->GetBinContent(5) );
+      weight_q2_dn *= ( h_bkg_counter->GetBinContent(1) / h_bkg_counter->GetBinContent(9) );
+    }
+    return;
   }
 
+  // New method, start from v27
+  weight_q2_up = babyAnalyzer.weight_Q2_up();
+  weight_q2_dn = babyAnalyzer.weight_Q2_down();
+
+  if ( is_fastsim_ ) {
+    weight_q2_up *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,5)) );
+    weight_q2_dn *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,9)) );
+  } else {
+    weight_q2_up *= ( nEvents / h_bkg_counter->GetBinContent(5) );
+    weight_q2_dn *= ( nEvents / h_bkg_counter->GetBinContent(9) );
+  }
+
+  if ( weight_q2_up < 0.0 || weight_q2_dn < 0.0 ) {
+    weight_q2_up = 1.0;
+    weight_q2_dn = 1.0;
+  }
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -2213,7 +2044,7 @@ inline void evtWgtInfo::getPileupWeight( double &weight_pu, double &weight_pu_up
 //////////////////////////////////////////////////////////////////////
 
 bool evtWgtInfo::doingSystematic( systID isyst ) {
-  if (is_data_) return false;  // <-- is this needed? or should it not be here?
+  if (is_data_) return false;
   if (isyst > k_JESDown && jes_type != 0) return false;
   switch (isyst) {
     case k_nominal:
@@ -2293,12 +2124,15 @@ string evtWgtInfo::findSampleType( string samplestr ) {
   TString sample(samplestr);
 
   if (sample.BeginsWith("data")) return "data";
-  else if (sample.BeginsWith("ttbar") || sample.BeginsWith("TT_")) return "ttbar";
+  else if (sample.BeginsWith("ttbar") || sample.BeginsWith("TTJets")) return "ttbar";
   else if (sample.BeginsWith("t_") || sample.BeginsWith("ST_")) return "singletop";
   else if (sample.BeginsWith("ttW") || sample.BeginsWith("TTW")) return "ttW";
   else if (sample.BeginsWith("ttZ") || sample.BeginsWith("TTZ")) return "ttZ";
-  else if (sample.BeginsWith("W") && sample.Contains("Jets")) return "wjets";
+  else if (sample.BeginsWith("W") && sample.Contains("JetsToLNu")) return "wjets";
+  else if (sample.BeginsWith("WZ")) return "WZ";
+  else if (sample.BeginsWith("SMS") || sample.BeginsWith("Signal") ) return "fastsim";
 
+  cout << "[eventWeight] >> Have not assigned sampletype for " << samplestr << endl;
   return samplestr;
 }
 
@@ -2320,7 +2154,7 @@ double evtWgtInfo::getWeight( systID isyst, bool is_cr2l ) {
 
 void evtWgtInfo::setDefaultSystematics( int syst_set ) {
   switch (syst_set) {
-    // Set of systematics used for Moriond17 analysis
+    // Set of systematics used in the Moriond17 analysis
     case 0:
       apply_cr2lTrigger_sf = true;  // only !=1 if pfmet!=pfmet_rl ie no weight for ==1lepton events in SR and CR0b
       apply_bTag_sf        = true;  // event weight, product of all jet wgts
@@ -2346,7 +2180,7 @@ void evtWgtInfo::setDefaultSystematics( int syst_set ) {
       }
       break;
 
-    // Set of systematics prepared for legacy analysis using 94X samples
+    // Set of (incomplete) systematics prepared for legacy analysis using 94X samples
     case 1:
       apply_cr2lTrigger_sf = false;  // not available yet
       apply_bTag_sf        = true;
@@ -2394,6 +2228,7 @@ double evtWgtInfo::getSampleWeightSummer16v2( TString fname ) {
     result = 1.21;
 
   sf_extra_file = result;
+  sync16 = true; // if this function is called, must be running sync checks
 
   return result;
 }

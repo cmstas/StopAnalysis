@@ -362,7 +362,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
       if (nvtxs() < 1) continue;
 
       // Fill tirgger efficiency histos after the MET filters are applied
-      fillEfficiencyHistos(testVec[0], "triggers");
+      // fillEfficiencyHistos(testVec[0], "triggers");
 
       // For testing on only subset of mass points
       if (!runFullSignalScan && is_fastsim_) {

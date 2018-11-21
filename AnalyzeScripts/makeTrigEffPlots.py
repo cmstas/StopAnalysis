@@ -75,6 +75,22 @@ if __name__ == "__main__":
     osreff16_el = fold.Get("Efficiency_ge1l_el")
     osreff16_mu = fold.Get("Efficiency_ge1l_mu")
 
+    fn17 = r.TFile("../StopLooper/output/data17_jetht/data_jetht_2017_addAK8ToBase.root")
+    effn17_mu = getTEfficiency(fn17, "trigeff_metrl_lep1pt_mu", "17_extb")
+    effn17_el = getTEfficiency(fn17, "trigeff_metrl_lep1pt_el", "17_extb")
+
+    fn16 = r.TFile("../StopLooper/output/data16_jetht/data_jetht_2016_addAK8ToBase.root")
+    effn16_mu = getTEfficiency(fn16, "trigeff_metrl_lep1pt_mu", "16_extb")
+    effn16_el = getTEfficiency(fn16, "trigeff_metrl_lep1pt_el", "16_extb")
+
+    fd17 = r.TFile("../StopLooper/output/data17_jetht/data_jetht_2017_useDilepForCR2l.root")
+    effd17_mu = getTEfficiency(fd17, "trigeff_metrl_lep1pt_mu", "17_dilep")
+    effd17_el = getTEfficiency(fd17, "trigeff_metrl_lep1pt_el", "17_dilep")
+
+    fd16 = r.TFile("../StopLooper/output/data16_jetht/data_jetht_2016_useDilepForCR2l.root")
+    effd16_mu = getTEfficiency(fd16, "trigeff_metrl_lep1pt_mu", "16_dilep")
+    effd16_el = getTEfficiency(fd16, "trigeff_metrl_lep1pt_el", "16_dilep")
+
     fout = r.TFile("TrigEfficiencies_all.root", "RECREATE")
 
     eff17.Write()
@@ -84,6 +100,16 @@ if __name__ == "__main__":
     eff16.Write()
     eff16_mu.Write()
     eff16_el.Write()
+
+    effn16_mu.Write()
+    effn16_el.Write()
+    effn17_mu.Write()
+    effn17_el.Write()
+
+    effd16_mu.Write()
+    effd16_el.Write()
+    effd17_mu.Write()
+    effd17_el.Write()
 
     sreff17.Write()
     sreff17_mu.Write()
@@ -112,25 +138,10 @@ if __name__ == "__main__":
     printTextForHist(c1, eff17_mu.GetCopyTotalHisto(),  "hden17_mu")
     printTextForHist(c1, eff17_el.GetCopyTotalHisto(),  "hden17_el")
 
-    fn17 = r.TFile("../StopLooper/output/data17_jetht/data_jetht_2017_addAK8ToBase.root")
-    effn17_mu = getTEfficiency(fn17, "trigeff_metrl_lep1pt_mu", "17")
-    effn17_el = getTEfficiency(fn17, "trigeff_metrl_lep1pt_el", "17")
     printTextForHist(c1, effn17_mu.GetCopyTotalHisto(),  "hdenn17_mu")
     printTextForHist(c1, effn17_el.GetCopyTotalHisto(),  "hdenn17_el")
-
-    fn16 = r.TFile("../StopLooper/output/data16_jetht/data_jetht_2016_addAK8ToBase.root")
-    effn16_mu = getTEfficiency(fn16, "trigeff_metrl_lep1pt_mu", "16")
-    effn16_el = getTEfficiency(fn16, "trigeff_metrl_lep1pt_el", "16")
     printTextForHist(c1, effn16_mu.GetCopyTotalHisto(),  "hdenn16_mu")
     printTextForHist(c1, effn16_el.GetCopyTotalHisto(),  "hdenn16_el")
-
-    fd17 = r.TFile("../StopLooper/output/data17_jetht/data_jetht_2017_useDilepForCR2l.root")
-    effd17_mu = getTEfficiency(fd17, "trigeff_metrl_lep1pt_mu", "17")
-    effd17_el = getTEfficiency(fd17, "trigeff_metrl_lep1pt_el", "17")
-
-    fd16 = r.TFile("../StopLooper/output/data16_jetht/data_jetht_2016_useDilepForCR2l.root")
-    effd16_mu = getTEfficiency(fd16, "trigeff_metrl_lep1pt_mu", "16")
-    effd16_el = getTEfficiency(fd16, "trigeff_metrl_lep1pt_el", "16")
 
     r.gStyle.SetPaintTextFormat("4.3f")
     # r.gStyle.SetPalette(r.kRainBow)

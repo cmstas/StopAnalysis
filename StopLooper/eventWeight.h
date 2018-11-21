@@ -79,11 +79,8 @@ class evtWgtInfo {
   // Keep this class for potential usage in the future
   class Util {
    public:
-    systID id;
     std::string label;
     std::string title;
-    std::string tex;
-    bool        hasOwnBabies;
 
     Util( systID systematic );
     ~Util() {}
@@ -138,6 +135,9 @@ class evtWgtInfo {
 
   int jes_type;
   int year;
+
+  // Switch for Moriond17 scheme for sync studies
+  bool sync16;
 
   int    nEvents;
   double xsec;
