@@ -51,7 +51,7 @@ const bool doGenClassification = true;
 // turn on to apply Nvtx reweighting to MC / data2016
 const bool doNvtxReweight = false;
 // turn on top tagging studies, off for baby ver < 25
-const bool doTopTagging = false;
+const bool doTopTagging = true;
 // turn on to apply json file to data
 const bool applyGoodRunList = true;
 // re-run resolved top MVA locally
@@ -291,7 +291,9 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
     evtWgt.getCounterHistogramFromBaby(&file);
     // Extra file weight for extension dataset, should move these code to other places
     if (year_ == 2016 && samplever.find("v24") == 0)
-      evtWgt.getSampleWeightSummer16v2(fname);
+      evtWgt.getExtSampleWeightSummer16v2(fname);
+
+    evtWgt.getZSampleWeightFromCR3l(fname);
 
     if (year_ == 2016) kLumi = 35.867;
     else if (year_ == 2017) kLumi = 41.96;

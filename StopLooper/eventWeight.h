@@ -299,9 +299,8 @@ class evtWgtInfo {
   void getISRnJetsWeight( double &weight_ISR, double &weight_ISR_up, double &weight_ISR_dn );
   void getPileupWeight( double &weight_pu, double &weight_pu_up, double &weight_pu_dn );
 
-  double getSampleWeightSummer16v2( TString sample );
-  double getSampleWeightSummer16v3( TString sample );
-  double getSampleWeightFall17v2( TString sample );
+  double getZSampleWeightFromCR3l( TString fname, bool apply=true );
+  double getExtSampleWeightSummer16v2( TString sample, bool apply=true );
   void setDefaultSystematics( int syst_set=0 );
   bool doingSystematic( systID systid );
   std::string findSampleType( std::string samplestr);  // <-- todo: finish this function

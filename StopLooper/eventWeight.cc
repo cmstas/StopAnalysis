@@ -249,7 +249,7 @@ evtWgtInfo::evtWgtInfo() {
 
   // Utilty Var Constants
   year = 0;
-  lumi = 133.53;         // Legacy lumi of RunII
+  lumi = 136.28;         // Legacy lumi of RunII
   lumi_err = lumi*0.05;  // 5% uncertainty may be enough?
 
   // Initialize event weights and related variables
@@ -268,14 +268,16 @@ void evtWgtInfo::Setup(string samplestr, int inyear, bool useBTagUtils, bool use
 
   if (year == 2016) {
     lumi = 35.922;         // 2016 lumi
-    lumi_err = lumi*0.026; // 2.6% uncertainty for Moriond17
+    lumi_err = lumi*0.025; // 2.6% uncertainty was used for Moriond17
   } else if (year == 2017) {
     lumi = 41.529;         // 2017 lumi
-    lumi_err = lumi*0.026; // TODO: Update the 2017 lumi uncertainty
+    lumi_err = lumi*0.023;
   } else if (year == 2018) {
-    lumi = 56.077;         // projected 2018 lumi
-    lumi_err = lumi*0.05;  // TODO: Update the 2018 lumi uncertainty
+    lumi = 58.83;          // projected 2018 lumi
+    lumi_err = lumi*0.05;  // preliminary value
   }
+
+  sf_extra_file = 1.0;  // reset file weight for each file
 
   // Get sample info from enum
   if ( sampletype == "data" ) {
@@ -2204,7 +2206,18 @@ void evtWgtInfo::setDefaultSystematics( int syst_set ) {
 
 }
 
-double evtWgtInfo::getSampleWeightSummer16v2( TString fname ) {
+double evtWgtInfo::getZSampleWeightFromCR3l( TString fname, bool apply ) {
+  double sf_3l = 1.0;
+  if (fname.Contains("TTZ"))
+    sf_3l = 1.14;
+  else if (fname.Contains("WZ"))
+    sf_3l = 1.21;
+
+  if (apply) sf_extra_file *= sf_3l;
+  return sf_3l;
+}
+
+double evtWgtInfo::getExtSampleWeightSummer16v2( TString fname, bool apply ) {
 
   double result = 1.0;
 
@@ -2222,12 +2235,8 @@ double evtWgtInfo::getSampleWeightSummer16v2( TString fname ) {
     result = (3146940.0)/(5029568.0+3146940.0);
   else if (fname.Contains("t_tbarW_5f_powheg_pythia8_noHadDecays"))
     result = (5029568.0)/(5029568.0+3146940.0);
-  else if (fname.Contains("ttZJets") || fname.Contains("TTZ"))
-    result = 1.14;
-  else if (fname.Contains("WZ"))
-    result = 1.21;
 
-  sf_extra_file = result;
+  if (apply) sf_extra_file *= result;
   sync16 = true; // if this function is called, must be running sync checks
 
   return result;
