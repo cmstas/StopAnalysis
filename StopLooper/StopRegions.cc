@@ -11,11 +11,13 @@ std::vector<SR> getStopControlRegionsNoBTags(std::vector<SR>&& SRvec) {
   for (SR cr : SRvec) {
     cr.SetName(cr.GetName().replace(0, 2, "cr0b"));
     cr.SetAllowDummyVars(1);
-    if (cr.VarExists("nbjet")) {  // <-- how about compressed region?
-      cr.RemoveVar("nbjet");
-      cr.RemoveVar("ntbtag");
+    if (cr.VarExists("nbjet")) cr.RemoveVar("nbjet");
+    if (cr.VarExists("ntbtag")) cr.RemoveVar("ntbtag");
+    if (cr.GetName().find("base") != std::string::npos || cr.GetName().find("cr0bI") == 0) {
+      cr.SetVar("nbjet", 0, 1);
+    } else {
+      cr.SetVar("nbtag", 0, 1);
     }
-    cr.SetVar("nbtag", 0, 1);
     if (cr.GetLowerBound("tmod") < 10)
       cr.SetVar("nbjet", 0, 1);
     cr.SetVar("mlb_0b", cr.GetLowerBound("mlb"), cr.GetUpperBound("mlb"));
@@ -818,7 +820,7 @@ std::vector<SR> getStopSignalRegionsNewMETBinning() {
   srbase.SetVar("nvlep", 1, 2);
   srbase.SetVar("passvetos", 1, 2);
   srbase.SetVar("njet", 2, fInf);
-  srbase.SetVar("nbtag", 1, fInf);
+  srbase.SetVar("nbjet", 1, fInf);
   srbase.SetVar("mlb", 0, fInf);
   srbase.SetVar("tmod", -fInf, fInf);
   srbase.SetVar("dphijmet", 0.8, 3.1416);
@@ -838,6 +840,8 @@ std::vector<SR> getStopSignalRegionsNewMETBinning() {
   SRvec.emplace_back(sr);
 
   sr = srbase;
+  sr.SetVar("nbtag", 1, fInf);
+  sr.RemoveVar("nbjet");
 
   // SR 2-3j
 
@@ -1054,7 +1058,7 @@ std::vector<SR> getStopSignalRegionsNewMETBinning() {
   sr = srbase;
   sr.SetName("srI");
   sr.SetDetailName("geq5j_lpt0to150_j1notb");
-  sr.RemoveVar("nbtag");
+  // sr.RemoveVar("nbtag");
   sr.SetVar("mt", 150, fInf);
   sr.SetVar("njet", 5, fInf);
   sr.SetVar("nbjet", 1, fInf);
