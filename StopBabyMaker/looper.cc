@@ -520,46 +520,33 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
   std::string ak8jetcorr_uncertainty_filename;
 
   // JEC file version
-  string jecVer = gconf.jecEra;
+  string jecVer = gconf.jecEraMC;
 
   if (isDataFromFileName) {
-    if      (filestr.find("2016B") != std::string::npos ||
-             filestr.find("2016C") != std::string::npos ||
-             filestr.find("2016D") != std::string::npos) jecVer = (gconf.cmssw_ver == 80)? "Summer16_23Sep2016BCDV4" : "Summer16_07Aug2017BCD_V18";
-    else if (filestr.find("2016E") != std::string::npos ||
-             filestr.find("2016F") != std::string::npos) jecVer = (gconf.cmssw_ver == 80)? "Summer16_23Sep2016EFV4" : "Summer16_07Aug2017EF_V18";
-    else if (filestr.find("2016G") != std::string::npos) jecVer = (gconf.cmssw_ver == 80)? "Summer16_23Sep2016GV4" : "Summer16_07Aug2017GH_V18";
-    else if (filestr.find("2016H") != std::string::npos) jecVer = (gconf.cmssw_ver == 80)? "Summer16_23Sep2016HV4" : "Summer16_07Aug2017GH_V18";
+    if      (filestr.find("2016B") != std::string::npos) jecVer = gconf.jecEraB;
+    else if (filestr.find("2016C") != std::string::npos) jecVer = gconf.jecEraC;
+    else if (filestr.find("2016D") != std::string::npos) jecVer = gconf.jecEraD;
+    else if (filestr.find("2016E") != std::string::npos) jecVer = gconf.jecEraE;
+    else if (filestr.find("2016F") != std::string::npos) jecVer = gconf.jecEraF;
+    else if (filestr.find("2016G") != std::string::npos) jecVer = gconf.jecEraG;
+    else if (filestr.find("2016H") != std::string::npos) jecVer = gconf.jecEraH;
 
-    else if (filestr.find("2017B") != std::string::npos) jecVer = "Fall17_17Nov2017B_V6";
-    else if (filestr.find("2017C") != std::string::npos) jecVer = "Fall17_17Nov2017C_V6";
-    else if (filestr.find("2017D") != std::string::npos) jecVer = "Fall17_17Nov2017D_V6";
-    else if (filestr.find("2017E") != std::string::npos) jecVer = "Fall17_17Nov2017E_V6";
-    else if (filestr.find("2017F") != std::string::npos) jecVer = "Fall17_17Nov2017F_V6";
+    else if (filestr.find("2017B") != std::string::npos) jecVer = gconf.jecEraB;
+    else if (filestr.find("2017C") != std::string::npos) jecVer = gconf.jecEraC;
+    else if (filestr.find("2017D") != std::string::npos) jecVer = gconf.jecEraD;
+    else if (filestr.find("2017E") != std::string::npos) jecVer = gconf.jecEraE;
+    else if (filestr.find("2017F") != std::string::npos) jecVer = gconf.jecEraF;
     else {
       cout << "[babyMaker::looper] Cannot read from filestr the data era, may not be applying the correct JEC!\n";
     }
-    jecVer += "_DATA";
   }
   // 2016 Fastsim samples
   else if (isSignalFromFileName){
-    jecVer = "Spring16_FastSimV1_MC";
+    jecVer = gconf.jecEraFS;
   }
   // ICHEP16 samples
   else if(filestr.find("Spring16") != std::string::npos){
     jecVer = "Spring16_25nsV6_MC";
-  }
-  // Moriond17 samples
-  else if (filestr.find("Summer16") != std::string::npos) {
-    jecVer = "Summer16_23Sep2016V4_MC";
-  }
-  // 2017 94X MiniAODv2
-  else if (filestr.find("Fall17") != std::string::npos) {
-    jecVer = "Fall17_17Nov2017_V6_MC";
-  }
-  // Some MC with JEC version listed in gconf
-  else {
-    jecVer += "_MC";
   }
 
   jetcorr_filenames_pfL1FastJetL2L3.push_back("jecfiles/"+jecVer+"/"+jecVer+"_L1FastJet_AK4PFchs.txt");
@@ -748,10 +735,10 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
           counterhistSig->Fill(mStop,mLSP,3,genweights()[3]*genw1inv);
           counterhistSig->Fill(mStop,mLSP,4,genweights()[4]*genw1inv);
           counterhistSig->Fill(mStop,mLSP,5,StopEvt.weight_Q2_up);
-          counterhistSig->Fill(mStop,mLSP,6,StopEvt.weight_Q2_down);
+          counterhistSig->Fill(mStop,mLSP,6,genweights()[6]*genw1inv);
           counterhistSig->Fill(mStop,mLSP,7,genweights()[7]*genw1inv);
           counterhistSig->Fill(mStop,mLSP,8,genweights()[8]*genw1inv);
-          counterhistSig->Fill(mStop,mLSP,9,genweights()[9]*genw1inv);
+          counterhistSig->Fill(mStop,mLSP,9,StopEvt.weight_Q2_down);
           counterhistSig->Fill(mStop,mLSP,10,StopEvt.pdf_up_weight);
           counterhistSig->Fill(mStop,mLSP,11,StopEvt.pdf_down_weight);
           counterhistSig->Fill(mStop,mLSP,12,StopEvt.weight_alphas_up);   // α_s variation.
