@@ -89,7 +89,7 @@ class evtWgtInfo {
   // Lost lepton analyis uses met with 2nd lepton removed
   bool add2ndLepToMet;
 
-  std::string sampletype;
+  enum SampleType {data, ttbar, Wjets, singletop, ttW, ttZ, WZ, diboson, fastsim, unknown=-1 } samptype;
 
   // Counter histograms stored in babies
   TH1D *h_bkg_counter;
@@ -245,6 +245,7 @@ class evtWgtInfo {
   double sf_WbXsec_up;
   double sf_WbXsec_dn;
 
+  bool apply_genweights_unc;
   double sf_pdf_up;
   double sf_pdf_dn;
 
@@ -264,14 +265,14 @@ class evtWgtInfo {
   double sf_extra_file;  // special weight that only initialized at constructor
 
   evtWgtInfo();
-  void Setup(std::string sample, int year = 0, bool useBTagUtils=false, bool useLepSFUtils=false);
+  void Setup(std::string sample, int year = 0, bool applyUnc=true, bool useBTagUtils=false, bool useLepSFUtils=false);
   void Cleanup();
   void resetEvent();
   void getCounterHistogramFromBaby( TFile *sourceFile );
   void setExtraFileWeight(double sf_extra) { sf_extra_file = sf_extra; }
 
   void initializeWeights();
-  void calculateWeightsForEvent( bool nominalOnly = false );
+  void calculateWeightsForEvent();
   void getSusyMasses( int &mStop, int &mLSP );
   void getNEvents( int &nEvts );
   void getXSecWeight( double &weight_xsec, double &weight_xsec_up, double &weight_xsec_dn );
@@ -303,7 +304,7 @@ class evtWgtInfo {
   double getExtSampleWeightSummer16v2( TString sample, bool apply=true );
   void setDefaultSystematics( int syst_set=0 );
   bool doingSystematic( systID systid );
-  std::string findSampleType( std::string samplestr);  // <-- todo: finish this function
+  SampleType findSampleType( std::string samplestr);  // <-- todo: finish this function
   std::string getLabel( systID systid );
   double getWeight( systID systid, bool cr2lregions=false );
 

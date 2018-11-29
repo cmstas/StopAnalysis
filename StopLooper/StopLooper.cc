@@ -286,11 +286,11 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
       evtWgt.setDefaultSystematics(0);  // systematic set for Moriond17 analysis
     else if (year_ >= 2017)
       evtWgt.setDefaultSystematics(1);  // systematic set for 94X
-    evtWgt.Setup(samplestr, year_, applyBtagSFfromFiles, applyLeptonSFfromFiles);
+    evtWgt.Setup(samplestr, year_, doSystVariations, applyBtagSFfromFiles, applyLeptonSFfromFiles);
 
     evtWgt.getCounterHistogramFromBaby(&file);
     // Extra file weight for extension dataset, should move these code to other places
-    if (year_ == 2016 && samplever.find("v24") == 0)
+    if (year_ == 2016 && samplever.find("v22") == 0)
       evtWgt.getExtSampleWeightSummer16v2(fname);
 
     evtWgt.getZSampleWeightFromCR3l(fname);

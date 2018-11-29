@@ -235,6 +235,7 @@ evtWgtInfo::evtWgtInfo() {
   apply_ISR_sf          = false;
   apply_pu_sf           = false;
   apply_sample_sf       = false;
+  apply_genweights_unc  = true;
 
   // Initialize baby weights histograms
   h_sig_counter         = nullptr;
@@ -260,9 +261,9 @@ evtWgtInfo::evtWgtInfo() {
 
 //////////////////////////////////////////////////////////////////////
 
-void evtWgtInfo::Setup(string samplestr, int inyear, bool useBTagUtils, bool useLepSFUtils) {
+void evtWgtInfo::Setup(string samplestr, int inyear, bool applyUnc, bool useBTagUtils, bool useLepSFUtils) {
 
-  sampletype = findSampleType(samplestr);
+  samptype = findSampleType(samplestr);
 
   year = inyear;
 
@@ -280,14 +281,15 @@ void evtWgtInfo::Setup(string samplestr, int inyear, bool useBTagUtils, bool use
   sf_extra_file = 1.0;  // reset file weight for each file
 
   // Get sample info from enum
-  if ( sampletype == "data" ) {
+  if ( samptype == data ) {
     is_data_ = true;
-  } else if ( sampletype == "fastsim" ) {
+  } else if ( samptype == fastsim ) {
     is_fastsim_ = true;
   }
   is_bkg_ = !is_data_ && !is_fastsim_;
 
   // The event counter hists setup is postponed to the file loop
+  apply_genweights_unc = applyUnc;
 
   // Decision to use Utilities vs direct from baby for bTag and lep SFs
   useBTagSFs_fromFiles = useBTagUtils;
@@ -516,7 +518,7 @@ void evtWgtInfo::initializeWeights() {
 
 //////////////////////////////////////////////////////////////////////
 
-void evtWgtInfo::calculateWeightsForEvent(bool nominalOnly) {
+void evtWgtInfo::calculateWeightsForEvent() {
 
   initializeWeights();
 
@@ -558,26 +560,26 @@ void evtWgtInfo::calculateWeightsForEvent(bool nominalOnly) {
     getTauSFWeight( sf_tau, sf_tau_up, sf_tau_dn );
 
   // top pT Reweighting
-  if (sampletype == "ttbar")
+  if (samptype == ttbar)
     getTopPtWeight( sf_topPt, sf_topPt_up, sf_topPt_dn );
 
   // MET resolution scale factors <-- would be easier to do it by just scaling the histogram afterwards <-- todo: not forget this
-  if (apply_metRes_sf && (sampletype == "ttbar" || sampletype == "singletop" || sampletype == "wjets"))
+  if (apply_metRes_sf && (samptype == ttbar || samptype == singletop || samptype == Wjets))
     getMetResWeight( sf_metRes, sf_metRes_up, sf_metRes_dn );
 
   if (apply_metRes_corridor_sf)
     getMetResWeight_corridor( sf_metRes_corridor, sf_metRes_corridor_up, sf_metRes_corridor_dn );
 
   // MET ttbar scale factors
-  if (apply_metTTbar_sf && is_bkg_ && (sampletype == "ttbar" || sampletype == "singletop"))
+  if (apply_metTTbar_sf && is_bkg_ && (samptype == ttbar || samptype == singletop))
     getMetTTbarWeight( sf_metTTbar, sf_metTTbar_up, sf_metTTbar_dn );
 
   // ttbar system pT scale factor, apply_ttbarSysPt_sf=false: uncertainty only
-  if (is_bkg_ && (sampletype == "ttbar" || sampletype == "singletop"))
+  if (is_bkg_ && (samptype == ttbar || samptype == singletop))
     getTTbarSysPtSF( sf_ttbarSysPt, sf_ttbarSysPt_up, sf_ttbarSysPt_dn );
 
   // ISR Correction
-  if (apply_ISR_sf)
+  if (apply_ISR_sf && samptype == ttbar)
     getISRnJetsWeight( sf_ISR, sf_ISR_up, sf_ISR_dn );
 
   // Pileup Reweighting
@@ -589,33 +591,30 @@ void evtWgtInfo::calculateWeightsForEvent(bool nominalOnly) {
   getLumi( sf_lumi, sf_lumi_up, sf_lumi_dn );
 
   // Scale Factors for Uncertainties
-  if ( !nominalOnly ) {
+  // Scale factors for 1l from W background events only
+  if (is_bkg_ && babyAnalyzer.is1lepFromW()) {
+    // Nuetrino pT scale factor
+    // getNuPtSF( sf_nuPt_up, sf_nuPt_dn );
 
-    // Scale factors for 1l from W background events only
-    if (is_bkg_ && babyAnalyzer.is1lepFromW()) {
-      // Nuetrino pT scale factor
-      // getNuPtSF( sf_nuPt_up, sf_nuPt_dn );
+    // // W width scale factor
+    // getWwidthSF( sf_Wwidth_up, sf_Wwidth_dn );
 
-      // W width scale factor
-      getWwidthSF( sf_Wwidth_up, sf_Wwidth_dn );
+    // W+HF xsec uncertainty
+    if (apply_WbXsec_sf && samptype == Wjets)
+      getWbXSecSF( sf_WbXsec_up, sf_WbXsec_dn );
+  }
 
-      // W+HF xsec uncertainty
-      if (apply_WbXsec_sf && sampletype == "wjets")
-        getWbXSecSF( sf_WbXsec_up, sf_WbXsec_dn );
-    }
+  // Pre-check genweights size
+  if ( apply_genweights_unc && babyAnalyzer.genweights().size() >= 110 ) {
+    // PDF Uncertainty
+    getPDFWeight( sf_pdf_up, sf_pdf_dn );
 
-    // Pre-check genweights size
-    if ( babyAnalyzer.genweights().size() >= 110 ) {
-      // PDF Uncertainty
-      getPDFWeight( sf_pdf_up, sf_pdf_dn );
+    // Alpha Strong, QCD variation
+    getAlphasWeight( sf_alphas_up, sf_alphas_dn );
 
-      // Alpha Strong, QCD variation
-      getAlphasWeight( sf_alphas_up, sf_alphas_dn );
-
-      // Q2 Variation, muF, muR
-      getQ2Weight( sf_q2_up, sf_q2_dn );
-    }
-  } // end if !nominalOnly
+    // Q2 Variation, muF, muR
+    getQ2Weight( sf_q2_up, sf_q2_dn );
+  }
 
   // Determine if tight btag SF should be used <-- temporary
   use_tight_bTag = ( babyAnalyzer.Mlb_closestb() >= 175. && babyAnalyzer.ntightbtags() >= 1 );
@@ -772,8 +771,6 @@ void evtWgtInfo::calculateWeightsForEvent(bool nominalOnly) {
     sys_wgts[iSys] = sys_wgt;
     sys_wgts_corridor[iSys] = wgt_corridor;
 
-    // Break if only filling nominal
-    if ( nominalOnly && iSys==k_nominal ) break;
   } // end loop over systematics
 
   event_ready = true;
@@ -1578,7 +1575,7 @@ void evtWgtInfo::getMetResWeight_corridor( double &weight_metRes, double &weight
   if ( is_fastsim_ ) return;
 
   // ttbar, tW
-  if ( sampletype != "ttbar" && sampletype != "singletop" && sampletype != "wjets" ) return;
+  if ( samptype != ttbar && samptype != singletop && samptype != Wjets ) return;
 
   // 2lep events only
   //if ( !babyAnalyzer.is2lep() ) return;
@@ -2100,7 +2097,7 @@ bool evtWgtInfo::doingSystematic( systID isyst ) {
     case k_alphasDown:
     case k_q2Up:
     case k_q2Down:
-      return true;  // <-- deduced from bkgEstimate_diLepton.C
+      return apply_genweights_unc;  // <-- deduced from bkgEstimate_diLepton.C
     case k_lumiUp:
     case k_lumiDown:
       return false;  // <-- No need ot include this in the looper
@@ -2122,20 +2119,20 @@ bool evtWgtInfo::doingSystematic( systID isyst ) {
 }
 
 // Currently only in a test state
-string evtWgtInfo::findSampleType( string samplestr ) {
+evtWgtInfo::SampleType evtWgtInfo::findSampleType( string samplestr ) {
   TString sample(samplestr);
 
-  if (sample.BeginsWith("data")) return "data";
-  else if (sample.BeginsWith("ttbar") || sample.BeginsWith("TTJets")) return "ttbar";
-  else if (sample.BeginsWith("t_") || sample.BeginsWith("ST_")) return "singletop";
-  else if (sample.BeginsWith("ttW") || sample.BeginsWith("TTW")) return "ttW";
-  else if (sample.BeginsWith("ttZ") || sample.BeginsWith("TTZ")) return "ttZ";
-  else if (sample.BeginsWith("W") && sample.Contains("JetsToLNu")) return "wjets";
-  else if (sample.BeginsWith("WZ")) return "WZ";
-  else if (sample.BeginsWith("SMS") || sample.BeginsWith("Signal") ) return "fastsim";
+  if (sample.BeginsWith("data")) return data;
+  else if (sample.BeginsWith("ttbar") || sample.BeginsWith("TTJets")) return ttbar;
+  else if (sample.BeginsWith("t_") || sample.BeginsWith("ST_")) return singletop;
+  else if (sample.BeginsWith("ttW") || sample.BeginsWith("TTW")) return ttW;
+  else if (sample.BeginsWith("ttZ") || sample.BeginsWith("TTZ")) return ttZ;
+  else if (sample.BeginsWith("W") && sample.Contains("JetsToLNu")) return Wjets;
+  else if (sample.BeginsWith("WZ")) return WZ;
+  else if (sample.BeginsWith("SMS") || sample.BeginsWith("Signal") ) return fastsim;
 
   cout << "[eventWeight] >> Have not assigned sampletype for " << samplestr << endl;
-  return samplestr;
+  return unknown;
 }
 
 string evtWgtInfo::getLabel( systID isyst ) {
