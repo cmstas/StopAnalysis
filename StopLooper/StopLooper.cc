@@ -468,9 +468,11 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
       values_["passvetos"] = PassTrackVeto() && PassTauVeto();
 
       // For toptagging, add correct switch later
-      values_["resttag"] = lead_restopdisc;
+      // values_["resttag"] = lead_restopdisc;
+      values_["resttag"] = lead_tftopdisc;
       values_["deepttag"] = lead_deepdisc_top;
       values_["tfttag"] = lead_tftopdisc;
+      values_["bdtttag"] = lead_restopdisc;
       values_["binttag"] = lead_bindisc_top;
 
       if (runResTopMVA) {
@@ -1168,7 +1170,6 @@ void StopLooper::fillEfficiencyHistos(SR& sr, const string type, string suffix) 
 void StopLooper::fillTopTaggingHistos(string suffix) {
   if (!doTopTagging || runYieldsOnly) return;
   if (suffix != "") return;
-  if (not ( (abs(lep1_pdgid()) == 11 && HLT_SingleEl()) || (abs(lep1_pdgid()) == 13 && HLT_SingleMu()) || HLT_MET_MHT() )) return;
 
   bool pass_deeptop_tag = false;
   // float lead_restopdisc = -1.1;
@@ -1218,6 +1219,7 @@ void StopLooper::fillTopTaggingHistos(string suffix) {
   auto fillTopTagHists = [&](SR& sr, string s) {
     plot1d("h_nak8jets", ak8pfjets_deepdisc_top().size(), evtweight_, sr.histMap, ";Number of AK8 jets", 7, 0, 7);
     plot1d("h_resttag", values_["resttag"], evtweight_, sr.histMap, ";resolved top tag", 110, -1.1f, 1.1f);
+    plot1d("h_bdtttag", values_["bdtttag"], evtweight_, sr.histMap, ";BDT resolved top tag", 110, -1.1f, 1.1f);
     plot1d("h_tfttag", values_["tfttag"], evtweight_, sr.histMap, ";TF resolved top tag", 120, -0.1f, 1.1f);
     plot1d("h_deepttag", values_["deepttag"], evtweight_, sr.histMap, ";deepAK8 top tag", 120, -0.1f, 1.1f);
     plot1d("h_binttag", values_["binttag"], evtweight_, sr.histMap, ";deepAK8 binarized top disc", 120, -0.1f, 1.1f);
@@ -1262,6 +1264,7 @@ void StopLooper::fillTopTaggingHistos(string suffix) {
 
   for (auto& sr : SRVec) {
     if (!sr.PassesSelection(values_)) continue;
+    if (is_data() && !PassingHLTriggers()) continue;
     // Plot kinematics histograms
     fillTopTagHists(sr, suffix);
     if (is_fastsim_ && (checkMassPt(1200, 50) || checkMassPt(800, 400)))
@@ -1269,6 +1272,7 @@ void StopLooper::fillTopTaggingHistos(string suffix) {
   }
   for (auto& sr : CR2lVec) {
     if (!sr.PassesSelection(values_)) continue;
+    if (is_data() && !PassingHLTriggers(2)) continue;
     // Plot kinematics histograms
     fillTopTagHists(sr, suffix);
     if (is_fastsim_ && (checkMassPt(1200, 50) || checkMassPt(800, 400)))
@@ -1276,6 +1280,7 @@ void StopLooper::fillTopTaggingHistos(string suffix) {
   }
   for (auto& sr : CR0bVec) {
     if (!sr.PassesSelection(values_)) continue;
+    if (is_data() && !PassingHLTriggers()) continue;
     // Plot kinematics histograms
     fillTopTagHists(sr, suffix);
     if (is_fastsim_ && (checkMassPt(1200, 50) || checkMassPt(800, 400)))

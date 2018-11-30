@@ -579,7 +579,7 @@ void evtWgtInfo::calculateWeightsForEvent() {
     getTTbarSysPtSF( sf_ttbarSysPt, sf_ttbarSysPt_up, sf_ttbarSysPt_dn );
 
   // ISR Correction
-  if (apply_ISR_sf && samptype == ttbar)
+  if (apply_ISR_sf && (samptype == ttbar || samptype == fastsim))
     getISRnJetsWeight( sf_ISR, sf_ISR_up, sf_ISR_dn );
 
   // Pileup Reweighting
