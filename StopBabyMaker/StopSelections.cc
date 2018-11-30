@@ -179,8 +179,8 @@ bool isVetoTau(int ipf, LorentzVector lepp4_, int charge){
 bool isVetoTau_v2(int ipf, LorentzVector lepp4_, int charge){
   // if(taus_pf_p4().at(ipf).pt() < 20) return false;
   // if(fabs(taus_pf_p4().at(ipf).eta()) > 2.4) return false;
-  if(passTauID("decayModeFindingNewDMs", ipf) < 1) return false;
-  if(passTauID("byMediumIsolationMVArun2v1DBnewDMwLT", ipf) < 1) return false;
+  if(passTauID("decayModeFinding", ipf) < 1) return false;
+  if(passTauID("byMediumIsolationMVArun2v1DBoldDMwLT", ipf) < 1) return false;
   if(abs(charge) >= 99 || lepp4_.E() < 0.000001) return true; //If the lepton is a dummy, bypass the Delta-R and charge cuts
   if(ROOT::Math::VectorUtil::DeltaR(taus_pf_p4().at(ipf), lepp4_) < 0.4)  return false;
   if(taus_pf_charge().at(ipf) * charge > 0) return false;
