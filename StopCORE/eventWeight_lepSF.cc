@@ -108,12 +108,12 @@ void eventWeight_lepSF::setup( bool isFastsim, int inyear = 2017, TString filelo
     f_el_SF          = new TFile(filepath+"/ElectronScaleFactors_Run2017.root", "read");
     f_el_SF_tracking = new TFile(filepath+"/egammaEffi.txt_EGM2D_runBCDEF_passingRECO.root", "read");
 
-    h_el_SF_id_temp       = (TH2F*)f_el_SF->Get("Run2017_CutBasedMediumNoIso94X");
+    h_el_SF_id_temp       = (TH2F*)f_el_SF->Get("Run2017_CutBasedMediumNoIso94XV2");
     h_el_SF_iso_temp      = (TH2F*)f_el_SF->Get("Run2017_MVAVLooseTightIP2DMini");
     h_el_SF_tracking_temp = (TH2F*)f_el_SF_tracking->Get("EGamma_SF2D");
 
     // Grab veto el histos
-    h_el_SF_veto_id_temp  = (TH2F*)f_el_SF->Get("Run2017_CutBasedVetoNoIso94X");
+    h_el_SF_veto_id_temp  = (TH2F*)f_el_SF->Get("Run2017_CutBasedVetoNoIso94XV2");
     h_el_SF_veto_iso_temp = (TH2F*)f_el_SF->Get("Run2017_MVAVLooseTightIP2DMini2");
 
     // Fastsim/Fullsim el files

@@ -94,7 +94,7 @@ int main(int argc, char **argv){
   mylooper->skim_nvtx            = 1;
   mylooper->skim_met             = 100;
 
-  mylooper->skim_nGoodLep        = 0;
+  mylooper->skim_nGoodLep        = 1;
   mylooper->skim_goodLep_el_pt   = 20.0;
   mylooper->skim_goodLep_el_eta  = 1.4442;
   mylooper->skim_goodLep_mu_pt   = 20.0;
@@ -131,14 +131,14 @@ int main(int argc, char **argv){
   mylooper->skim_jet_ak8_pt    = 200.0;
   mylooper->skim_jet_ak8_eta   = 2.4;
 
-  mylooper->skim_nPhotons      = 1;
+  mylooper->skim_nPhotons      = 0;
   mylooper->skim_ph_pt         = 60.0;
   mylooper->skim_ph_eta        = 2.4;
 
   mylooper->filltaus        =  true;
   mylooper->filltracks      =  true;
   mylooper->fillZll         =  false;
-  mylooper->fillPhoton      =  true;
+  mylooper->fillPhoton      =  false;
   mylooper->fillMETfilt     =  true;
   mylooper->fill2ndlep      =  false;
   mylooper->fillExtraEvtVar =  false;
