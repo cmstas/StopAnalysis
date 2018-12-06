@@ -250,7 +250,7 @@ evtWgtInfo::evtWgtInfo() {
 
   // Utilty Var Constants
   year = 0;
-  lumi = 136.28;         // Legacy lumi of RunII
+  lumi = 137.42;         // Legacy lumi of RunII
   lumi_err = lumi*0.05;  // 5% uncertainty may be enough?
 
   // Initialize event weights and related variables
@@ -274,7 +274,7 @@ void evtWgtInfo::Setup(string samplestr, int inyear, bool applyUnc, bool useBTag
     lumi = 41.529;         // 2017 lumi
     lumi_err = lumi*0.023;
   } else if (year == 2018) {
-    lumi = 58.83;          // projected 2018 lumi
+    lumi = 59.97;          // projected 2018 lumi
     lumi_err = lumi*0.05;  // preliminary value
   }
 
@@ -1286,15 +1286,14 @@ void evtWgtInfo::getTauSFWeight( double &weight_tau, double &weight_tau_up, doub
     double sf_up = sf + sf_err;
     double sf_dn = sf - sf_err;
 
-    if ( eff>0.0 ) {
-      // If passes tau filter, means tau was lost
-      if ( babyAnalyzer.PassTauVeto() && babyAnalyzer.PassTrackVeto() ) {
+    if ( eff>0.0 && babyAnalyzer.PassTrackVeto() ) {
+      if ( babyAnalyzer.PassTauVeto() ) {
+        // If passes tau filter, means tau was lost
         weight_tau = (1.0-(eff*sf))/(1.0-eff);
         weight_tau_up = (1.0-(eff*sf_up))/(1.0-eff);
         weight_tau_dn = (1.0-(eff*sf_dn))/(1.0-eff);
-      }
-      // Else, tau was found
-      else if ( !babyAnalyzer.PassTauVeto() && babyAnalyzer.PassTrackVeto() ) {
+      } else {
+        // Else, tau was found
         weight_tau = sf;
         weight_tau_up = sf_up;
         weight_tau_dn = sf_dn;
