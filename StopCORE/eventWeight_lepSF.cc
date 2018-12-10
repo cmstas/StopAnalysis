@@ -155,14 +155,14 @@ void eventWeight_lepSF::setup( bool isFastsim, int inyear = 2017, TString filelo
     f_mu_veto_FS_Ip  = new TFile(filepath+"/sf_mu_mediumID_looseIP2D.root", "read"); // double unc for this
   }
   else if (year == 2017) {
-    // TODO: update the muon SFs
-    f_mu_SF_id       = new TFile(filepath+"/TnP_NUM_MediumID_DENOM_generalTracks_VAR_map_pt_eta.root", "read");
-    f_mu_SF_iso      = new TFile(filepath+"/TnP_NUM_MiniIsoTight_DENOM_MediumID_VAR_map_pt_eta.root", "read"); // double unc
+    // TODO: update the muon iso SFs, IP SFs, and fastsim SFs
+    f_mu_SF_id       = new TFile(filepath+"/RunBCDEF_SF_ID.root", "read");
+    f_mu_SF_iso      = new TFile(filepath+"/sf_mu_iso_susy_2017.root", "read"); // double unc
     f_mu_SF_ip       = new TFile(filepath+"/TnP_NUM_TightIP2D_DENOM_MediumID_VAR_map_pt_eta.root", "read"); // double unc
     // f_mu_SF_tracking = new TFile(filepath+"/Tracking_EfficienciesAndSF_BCDEFGH.root", "read");
 
-    f_mu_SF_veto_id  = new TFile(filepath+"/TnP_NUM_LooseID_DENOM_generalTracks_VAR_map_pt_eta.root", "read");
-    f_mu_SF_veto_iso = new TFile(filepath+"/TnP_NUM_MiniIsoTight_DENOM_LooseID_VAR_map_pt_eta.root", "read");
+    f_mu_SF_veto_id  = new TFile(filepath+"/RunBCDEF_SF_ID.root", "read");
+    f_mu_SF_veto_iso = new TFile(filepath+"/sf_mu_iso_susy_2017.root", "read");
     f_mu_SF_veto_ip  = new TFile(filepath+"/TnP_NUM_MediumIP2D_DENOM_LooseID_VAR_map_pt_eta.root", "read"); // double unc for this
 
     // Fastsim/Fullsim mu files
@@ -181,16 +181,16 @@ void eventWeight_lepSF::setup( bool isFastsim, int inyear = 2017, TString filelo
 
 
   // Grab selected mu histos
-  TH2F *h_mu_SF_id_temp  = (TH2F*)f_mu_SF_id->Get("SF");
-  TH2F *h_mu_SF_iso_temp = (TH2F*)f_mu_SF_iso->Get("SF");
-  TH2F *h_mu_SF_ip_temp  = (TH2F*)f_mu_SF_ip->Get("SF");
+  TH2F *h_mu_SF_id_temp  = (year == 2016)? (TH2F*)f_mu_SF_id->Get("SF")  : (TH2F*)f_mu_SF_id->Get("NUM_MediumID_DEN_genTracks_pt_abseta");
+  TH2F *h_mu_SF_iso_temp = (year == 2016)? (TH2F*)f_mu_SF_iso->Get("SF") : (TH2F*)f_mu_SF_iso->Get("TnP_MC_NUM_MiniIso02Cut_DEN_MediumID_PAR_pt_eta");
+  TH2F *h_mu_SF_ip_temp  = (year == 2016)? (TH2F*)f_mu_SF_ip->Get("SF")  : (TH2F*)f_mu_SF_ip->Get("SF");
   // Muon Tracking is no longer recommended
   // TGraphAsymmErrors *h_mu_SF_tracking_temp  = (TGraphAsymmErrors*)f_mu_SF_tracking->Get("ratio_eff_aeta_dr030e030_corr");
 
   // Grab veto mu histos
-  TH2F *h_mu_SF_veto_id_temp  = (TH2F*)f_mu_SF_veto_id->Get("SF");
-  TH2F *h_mu_SF_veto_iso_temp = (TH2F*)f_mu_SF_veto_iso->Get("SF");
-  TH2F *h_mu_SF_veto_ip_temp  = (TH2F*)f_mu_SF_veto_ip->Get("SF");
+  TH2F *h_mu_SF_veto_id_temp  = (year == 2016)? (TH2F*)f_mu_SF_veto_id->Get("SF")  : (TH2F*)f_mu_SF_veto_id->Get("NUM_LooseID_DEN_genTracks_pt_abseta");
+  TH2F *h_mu_SF_veto_iso_temp = (year == 2016)? (TH2F*)f_mu_SF_veto_iso->Get("SF") : (TH2F*)f_mu_SF_veto_iso->Get("TnP_MC_NUM_MiniIso02Cut_DEN_LooseID_PAR_pt_eta");
+  TH2F *h_mu_SF_veto_ip_temp  = (year == 2016)? (TH2F*)f_mu_SF_veto_ip->Get("SF")  : (TH2F*)f_mu_SF_veto_ip->Get("SF");
 
   // Grab fastsim/fullsim selected mu histos
   TH2F *h_mu_FS_ID_temp  = (TH2F*)f_mu_FS_ID->Get("histo2D");
