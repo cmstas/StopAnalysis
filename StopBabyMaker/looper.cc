@@ -305,7 +305,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
     isDataFromFileName = false;
     isSignalFromFileName = true;
     cout << ", running on SIGNAL, based on input file name." << endl;
-    if ((filestr.find("SMS") | filestr.find("mStop") | filestr.find("mLSP")) < std::string::npos)
+    if (filestr.find("mLSP") != std::string::npos)  // sample is probably fullsim if mLSP is fixed
       isSignalFromFileName = false;
   }
   else {

@@ -235,7 +235,8 @@ void LeptonTree::SetBranches(TTree* tree)
 
     tree->Branch(Form("%sp4"      , prefix_.c_str()) , "LorentzVector" , &p4      );
     tree->Branch(Form("%smcp4"    , prefix_.c_str()) , "LorentzVector" , &mcp4    );
-    tree->Branch(Form("%smc_motherid"            , prefix_.c_str()) , &mc_motherid); 
+    tree->Branch(Form("%smc_motherid" , prefix_.c_str()) , &mc_motherid);
+    tree->Branch(Form("%setaSC"       , prefix_.c_str()) , &etaSC);
 
     tree->Branch(Form("%sdphiMET"   , prefix_.c_str()) , &dphiMET);
     tree->Branch(Form("%sdphiMET_jup"   , prefix_.c_str()) , &dphiMET_jup);
@@ -261,7 +262,6 @@ void LeptonTree::SetBranches_electronID(TTree* tree)
     tree->Branch(Form("%sooEmooP"       , prefix_.c_str()) , &ooEmooP);
     tree->Branch(Form("%sexpectedMissingInnerHits"    , prefix_.c_str()) , &expectedMissingInnerHits);
     tree->Branch(Form("%sconversionVeto", prefix_.c_str()) , &conversionVeto);
-    tree->Branch(Form("%setaSC"         , prefix_.c_str()) , &etaSC);
     tree->Branch(Form("%sChiSqr"        , prefix_.c_str()) , &ChiSqr);
     tree->Branch(Form("%seoverpin"        , prefix_.c_str()) , &eoverpin        ); 
     tree->Branch(Form("%sis_lepid_loose_noiso" , prefix_.c_str()) , &is_lepid_loose_noiso);
