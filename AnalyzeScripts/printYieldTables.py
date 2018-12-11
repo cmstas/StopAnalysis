@@ -6,8 +6,8 @@ import sys
 from math import sqrt
 import ROOT as r
 import numpy as np
-from errors import *
-from pytable import Table
+from utilities.errors import *
+from utilities.pytable import Table
 
 def getYieldsFromTopoSRs(f, srNames, hname='metbins', suf=''):
     yields = []
@@ -145,10 +145,18 @@ if __name__ == '__main__':
 
     # printCutflowNumbers(f1, 'testCutflow', 'cutflow1')
 
-    f2 = r.TFile('../StopLooper/output/samp17_v13_tf/lostlepton.root')
+    f1 = r.TFile('../StopLooper/output/samp17_v13_tf/lostlepton_noMETextrp.root')
+    f2 = r.TFile('../StopLooper/output/samp17_v13_tf/lostlepton_wMETextrp.root')
 
     srNames = ['srA0', 'srA1', 'srA2', 'srB0', 'srC0','srD0', 'srE0', 'srE1', 'srE2', 'srE3', 'srF0', 'srG0', 'srG1', 'srG2', 'srG3', 'srH0',]
 
-    print '\n |----------------------------------- lost lepton ----------------------------------------'
+    print '\n ----------------------------------- lost lepton w/o MET extrapolation ---------------------------------------'
+    tab1 = printTableDataDriven(f1, srNames)
+    tab1.set_theme_latex()
+    tab1.print_pdf('lostlep_noMETextrp.pdf')
 
-    printTableDataDriven(f2, srNames)
+    print '\n ----------------------------------- lost lepton w/ MET extrapolation ----------------------------------------'
+    tab2 = printTableDataDriven(f2, srNames)
+    tab2.set_theme_latex()
+    tab2.print_pdf('lostlep_wMETextrp.pdf')
+

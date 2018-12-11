@@ -184,6 +184,8 @@ class Table():
         \end{document}
         """
         colstr = "|"+"c|"*len(self.get_column_names())
+        tstr = tstr.replace("\xc2\xb1","$\pm$")
+        tstr = tstr.replace("+-","$\pm$")
         os.system("mkdir -p {}".format(temp_folder_name))
         with open("{tmpname}/{name}.tex".format(tmpname=temp_folder_name,name=name),"w") as fh:
             fh.write(template%(colstr,tstr))
@@ -197,12 +199,12 @@ class Table():
             return "{name}.pdf".format(name=name)
         return ""
 
-    def print_pdf(self, **kwargs):
+    def print_pdf(self, name="table.pdf", doic=False, *args, **kwargs):
         if self.theme != "latex":
             raise Exception("Can't save themes other than latex to pdf")
         tstr = self.get_table(**kwargs)
-        fname = self.compile_latex(tstr)
-        os.system("which ic >& /dev/null && ic {fname} || echo Made {fname}".format(fname=fname))
+        fname = self.compile_latex(tstr, name=name.replace(".pdf",""))
+        if doic: os.system("which ic >& /dev/null && ic {fname} || echo Made {fname}".format(fname=fname))
 
     def set_column_names(self, cnames):
         self.colnames = cnames
@@ -379,7 +381,6 @@ if __name__ == "__main__":
                 ]:
             tab.add_row(row)
         tab.print_pdf(show_row_separators=False,show_alternating=False)
-
 
     else:
 
