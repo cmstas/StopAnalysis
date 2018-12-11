@@ -302,6 +302,7 @@ class evtWgtInfo {
 
   double getZSampleWeightFromCR3l( TString fname, bool apply=true );
   double getExtSampleWeightSummer16v2( TString sample, bool apply=true );
+  double getExtSampleWeightFall17v2( TString sample, bool apply=true );
   void setDefaultSystematics( int syst_set=0 );
   bool doingSystematic( systID systid );
   SampleType findSampleType( std::string samplestr);  // <-- todo: finish this function

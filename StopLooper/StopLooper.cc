@@ -292,6 +292,8 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
     // Extra file weight for extension dataset, should move these code to other places
     if (year_ == 2016 && samplever.find("v22") == 0)
       evtWgt.getExtSampleWeightSummer16v2(fname);
+    else if (year_ == 2017 && samplever.find("v29") == 0)
+      evtWgt.getExtSampleWeightFall17v2(fname);
 
     evtWgt.getZSampleWeightFromCR3l(fname);
 

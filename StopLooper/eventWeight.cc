@@ -2180,11 +2180,11 @@ void evtWgtInfo::setDefaultSystematics( int syst_set ) {
 
     // Set of (incomplete) systematics prepared for legacy analysis using 94X samples
     case 1:
-      apply_cr2lTrigger_sf = false;  // not available yet
+      apply_cr2lTrigger_sf = true;   // not available yet
       apply_bTag_sf        = true;
       apply_lep_sf         = true;   // available but not updated yet
       apply_vetoLep_sf     = true;   // same as above
-      apply_tau_sf         = false;  // same as above
+      apply_tau_sf         = true;   // same as above
       apply_topPt_sf       = false;
       apply_metRes_sf      = false;  // not developed for 94X yet
       apply_metTTbar_sf    = false;
@@ -2236,6 +2236,21 @@ double evtWgtInfo::getExtSampleWeightSummer16v2( TString fname, bool apply ) {
   sync16 = true; // if this function is called, must be running sync checks
 
   return result;
+}
+
+double evtWgtInfo::getExtSampleWeightFall17v2( TString fname, bool apply ) {
+
+  double sf = 1.0;
+  if (fname.Contains("JetsToLNu") && !fname.Contains("NuPt-200")) {
+    // Temporary fix for missing k-factor in the WNJets xsec
+    if      (fname.Contains("W1JetsToLNu")) sf = 1.238;
+    else if (fname.Contains("W2JetsToLNu")) sf = 1.231;
+    else if (fname.Contains("W3JetsToLNu")) sf = 1.231;
+    else if (fname.Contains("W4JetsToLNu")) sf = 1.144;
+  }
+
+  if (apply) sf_extra_file *= sf;
+  return sf;
 }
 
 //////////////////////////////////////////////////////////////////////
