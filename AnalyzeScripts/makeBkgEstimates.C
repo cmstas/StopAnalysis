@@ -126,6 +126,10 @@ void dataDrivenFromCR(TFile* fdata, TFile* fmc, TFile* fout, TString ddtype, TSt
           }
           hout_purityUp->Write();
           hout_purityDn->Write();
+
+          auto purityHist = (TH1D*) hist_MC_CR_pure->Clone("h_CRpurity");
+          purityHist->Divide(hist_MC_CR_pure, hist_MC_CR, 1, 1, "B");
+          purityHist->Write();
         }
       }
     }
@@ -155,6 +159,9 @@ void dataDrivenFromCR(TFile* fdata, TFile* fmc, TFile* fout, TString ddtype, TSt
     h_dataStats->Write();
     h_MCStats->Write();
 
+    hist_data_CR->Clone("h_datayields_CR")->Write();
+    hist_MC_CR->Clone("h_MCyields_CR")->Write();
+    hist_MC_SR->Clone("h_MCyields_SR")->Write();
   }
 }
 
@@ -200,11 +207,11 @@ void takeDirectlyFromMC(TFile* fin, TFile* fout, TString gentype) {
   }
 }
 
-int makeBkgEstimates(string input_dir="../StopLooper/output/temp14", string output_dir="../StopLooper/output/temp14") {
+int makeBkgEstimates(string input_dir="../StopLooper/output/temp14", string output_dir="../StopLooper/output/temp14", string suffix = "17") {
 
   // Set input files (global pointers)
-  TFile* fbkg = new TFile(Form("%s/allBkg_25ns.root",input_dir.c_str()));
-  TFile* fdata = new TFile(Form("%s/allData_25ns.root",input_dir.c_str()));
+  TFile* fbkg = new TFile(Form("%s/allBkg_%s.root",input_dir.c_str(),suffix.c_str()));
+  TFile* fdata = new TFile(Form("%s/allData_%s.root",input_dir.c_str(),suffix.c_str()));
 
   if (!fdata) {
     cout << "Couldn't find fdata!! Can't procceed, exiting!\n"; return -1;
