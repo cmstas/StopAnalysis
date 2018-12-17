@@ -8,71 +8,8 @@ import ROOT as r
 import numpy as np
 from utilities.errors import *
 from utilities.pytable import Table
+from utilities.yields_utils import *
 
-def getBinningFromTopoSRs(f, srNames, hname='metbins'):
-    allbins = []
-    for sr in srNames:
-        hist = f.Get(sr+'/h_'+hname)
-        bins = []
-        if not hist:
-            print "Can't find", sr+'/h_'+hname, "!!!";
-            allbins.append([0])
-        else:
-            for ibin in range(1, hist.GetNbinsX()+1):
-                cut_lower = str(int(hist.GetBinLowEdge(ibin)))
-                cut_upper = int(hist.GetBinLowEdge(ibin+1))
-                cut_upper = str(cut_upper) if cut_upper < 1200 else '+Inf'
-                bins.append([cut_lower, cut_upper])
-            allbins.append(bins)
-
-    return allbins
-
-def getYieldsFromTopoSRs(f, srNames, hname='metbins', suf=''):
-    yields = []
-    for sr in srNames:
-        hist = f.Get(sr+'/h_'+hname+suf)
-        if not hist:
-            yields.append(0)
-        else:
-            yields.append(float(hist.Integral()))
-    return yields
-
-def getYieldAndErrsFromTopoSRs(f, srNames, hname='metbins', suf=''):
-    yields = []
-    yerrs = []
-    for sr in srNames:
-        hist = f.Get(sr+'/h_'+hname+suf)
-        if not hist:
-            yields.append(0)
-            yerrs.append(0)
-        else:
-            yerr = r.Double()
-            yields.append(float(hist.IntegralAndError(0,-1,yerr)))
-            yerrs.append(float(yerr))
-
-    return yields, yerrs
-
-def getYieldEInTopoBins(f, srNames, hname='metbins'):
-    yields = []
-    for sr in srNames:
-        hist = f.Get(sr+'/h_'+hname)
-        if not hist:
-            print "Can't find", sr+'/h_'+hname, "!!!";
-            hist = f.Get(sr+'/h_metbins')
-            if not hist: print "This should not happen!"
-            yields.append([E(0,0)]*hist.GetNbinsX())
-            continue
-        topoylds = []
-        for ibin in range(1, hist.GetNbinsX()+1):
-            topoylds.append(E(hist.GetBinContent(ibin), hist.GetBinError(ibin)))
-        yields.append(topoylds)
-
-    return yields
-
-def StoBErr(s, b, se, be):
-    v = (s+2*b)**2 * se**2 + s**2 * be**2
-    v /= 4*(s+b)**3
-    return sqrt(v)
 
 def printTableDataDriven(f, srNames, crname=''):
     if crname != '' and crname[-1] != ' ': crname += ' '
@@ -87,12 +24,13 @@ def printTableDataDriven(f, srNames, crname=''):
 
     metrange = getBinningFromTopoSRs(f, srNames)
     tab.add_column('SR name', sum([[sr]*n for sr, n in zip(srNames, map(len, preds))], []))
+    tab.add_column('MET [GeV]', [m[0]+' -- '+m[1] for m in sum(metrange, [])])
     tab.add_column(crname+'MC SR', [y.round(2) for y in sum(yMC_SR,[])])
     tab.add_column(crname+'MC CR', [y.round(2) for y in sum(yMC_CR,[])])
-    tab.add_column(crname+'Purity', [y.round(2).val for y in sum(purity,[])])
+    tab.add_column(crname+'Purity', [y.round(2) for y in sum(purity,[])])
     tab.add_column(crname+'TF_{CR}^{SR}', [y.round(2).val for y in sum(alpha,[])])
     tab.add_column(crname+'data CR', [y.round(2) for y in sum(yld_CR,[])])
-    tab.add_column(crname+'CR data/MC', [(d/m).round(2) for d, m in zip(sum(yld_CR,[]), sum(yMC_CR,[]))])
+    tab.add_column(crname+'R_{CR}(data/MC)', [(d/m).round(2) for d, m in zip(sum(yld_CR,[]), sum(yMC_CR,[]))])
     tab.add_column(crname+'Prediction', [y.round(2) for y in sum(preds,[])])
 
     tab.print_table()
@@ -137,31 +75,83 @@ def printTableWithMETextrpInfo(f1, f2, srNames, crname=''):
     return tab
 
 
-if __name__ == '__main__':
+def makeBkgEstimateTablesLostLepton():
 
-    # os.system('mkdir -p plots')
-
-    r.gROOT.SetBatch(1)
-
-
-    # printCutflowNumbers(f1, 'testCutflow', 'cutflow1')
-
-    f1 = r.TFile('../StopLooper/output/samp17_v13_tf/lostlepton_noMETextrp.root')
-    f2 = r.TFile('../StopLooper/output/samp17_v13_tf/lostlepton_wMETextrp.root')
+    # f1 = r.TFile('../StopLooper/output/samp17_v13_tf/lostlepton.root')
+    # f2 = r.TFile('../StopLooper/output/samp17_v13_tf_v1/lostlepton_wMETextrp.root')
+    f1 = r.TFile('../StopLooper/output/comb1617_tf/lostlepton.root')
 
     srNames = ['srA0', 'srA1', 'srA2', 'srB0', 'srC0','srD0', 'srE0', 'srE1', 'srE2', 'srE3', 'srF0', 'srG0', 'srG1', 'srG2', 'srG3', 'srH0',]
 
     print '\n ----------------------------------- lost lepton w/o MET extrapolation ---------------------------------------'
     tab1 = printTableDataDriven(f1, srNames)
     tab1.set_theme_latex()
-    tab1.print_pdf('lostlep_noMETextrp.pdf')
+    tab1.print_pdf('lostlep1617_allSRs.pdf')
 
-    print '\n ----------------------------------- lost lepton w/ MET extrapolation ----------------------------------------'
-    tab2 = printTableDataDriven(f2, srNames)
+    # print '\n ----------------------------------- lost lepton w/ MET extrapolation ----------------------------------------'
+    # tab2 = printTableDataDriven(f2, srNames)
+    # tab2.set_theme_latex()
+    # tab2.print_pdf('lostlep_wMETextrp.pdf')
+
+    # print '\n ----------------------------------- lost lepton w/ MET extrapolation ----------------------------------------'
+    # tab3 = printTableWithMETextrpInfo(f1, f2, srNames)
+    # tab3.set_theme_latex()
+    # tab3.print_pdf('lostlep_METextrpInfo.pdf')
+
+    print '\n ----------------------------------- lost lepton separate by top tags ----------------------------------------'
+
+    srNames = ['srA0', 'srB0', 'srC0','srD0', 'srE0', 'srF0', 'srG0', 'srH0',]
+    tab0 = printTableDataDriven(f1, srNames)
+    tab0.set_theme_latex()
+    tab0.print_pdf('lostlep1617_inclTopTags.pdf')
+
+    srNames = ['srA1', 'srE1', 'srG1',]
+    tab1 = printTableDataDriven(f1, srNames)
+    tab1.set_theme_latex()
+    tab1.print_pdf('lostlep1617_noTopTags.pdf')
+
+    srNames = ['srA2', 'srE2', 'srG2',]
+    tab2 = printTableDataDriven(f1, srNames)
     tab2.set_theme_latex()
-    tab2.print_pdf('lostlep_wMETextrp.pdf')
+    tab2.print_pdf('lostlep1617_mergeTags.pdf')
 
-    print '\n ----------------------------------- lost lepton w/ MET extrapolation ----------------------------------------'
-    tab3 = printTableWithMETextrpInfo(f1, f2, srNames)
+    srNames = ['srE3', 'srG3',]
+    tab3 = printTableDataDriven(f1, srNames)
     tab3.set_theme_latex()
-    tab3.print_pdf('lostlep_METextrpInfo.pdf')
+    tab3.print_pdf('lostlep1617_tfresTags.pdf')
+
+    # f3 = r.TFile('../StopLooper/output/samp16_v14_tf_80X/lostlepton.root')
+
+    # print '\n ----------------------------------- lost lepton separate by top tags ----------------------------------------'
+
+    # srNames = ['srA0', 'srB0', 'srC0','srD0', 'srE0', 'srF0', 'srG0', 'srH0',]
+    # tab0 = printTableDataDriven(f3, srNames)
+    # tab0.set_theme_latex()
+    # tab0.print_pdf('lostlep16_inclTopTags.pdf')
+
+    # srNames = ['srA1', 'srE1', 'srG1',]
+    # tab1 = printTableDataDriven(f3, srNames)
+    # tab1.set_theme_latex()
+    # tab1.print_pdf('lostlep16_noTopTags.pdf')
+
+    # srNames = ['srA2', 'srE2', 'srG2',]
+    # tab2 = printTableDataDriven(f3, srNames)
+    # tab2.set_theme_latex()
+    # tab2.print_pdf('lostlep16_mergeTags.pdf')
+
+    # srNames = ['srE3', 'srG3',]
+    # tab3 = printTableDataDriven(f3, srNames)
+    # tab3.set_theme_latex()
+    # tab3.print_pdf('lostlep16_tfresTags.pdf')
+
+
+
+if __name__ == '__main__':
+
+    # os.system('mkdir -p plots')
+
+    r.gROOT.SetBatch(1)
+
+    makeBkgEstimateTablesLostLepton()
+
+    
