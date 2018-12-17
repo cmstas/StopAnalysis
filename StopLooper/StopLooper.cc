@@ -271,7 +271,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
     cout << "[looper] >> Running on sample: " << dsname << endl;
     cout << "[looper] >> Sample detected with year = " << year_ << " and version = " << samplever << endl;
 
-    is_fastsim_ = dsname.Contains("SMS") || fname.Contains("SMS") || fname.Contains("Signal");
+    is_fastsim_ = fname.Contains("SMS") || fname.Contains("Signal");
 
     // Get event weight histogram from baby
     TH3D* h_sig_counter = nullptr;
@@ -282,6 +282,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
     }
 
     // Setup the event weight calculator
+    evtWgt.verbose = true;
     if (year_ == 2016)
       evtWgt.setDefaultSystematics(0);  // systematic set for Moriond17 analysis
     else if (year_ >= 2017)
@@ -292,6 +293,8 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
     // Extra file weight for extension dataset, should move these code to other places
     if (year_ == 2016 && samplever.find("v22") == 0)
       evtWgt.getExtSampleWeightSummer16v2(fname);
+    else if (year_ == 2016 && samplever.find("Summer16v3") != string::npos)
+      evtWgt.getExtSampleWeightSummer16v3(fname);
     else if (year_ == 2017 && samplever.find("v29") == 0)
       evtWgt.getExtSampleWeightFall17v2(fname);
 
@@ -396,8 +399,8 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
         }
       }
 
-      // Only events nupt < 200 for WNJetsToLNu samples -- 80X only since NuPt-200 sample not available in 94X
-      if (dsname.BeginsWith("/W") && dsname.Contains("JetsToLNu") && dsname.Contains("80X") && !dsname.Contains("NuPt-200") && nupt() > 200) continue;
+      // Only consider events with nupt < 200 for the inclusive WNJetsToLNu samples
+      if (dsname.BeginsWith("/W") && dsname.Contains("JetsToLNu") && !dsname.Contains("NuPt-200") && nupt() > 200) continue;
 
       if (is_fastsim_) {
         if (fmod(mass_stop(), kSMSMassStep) > 2 || fmod(mass_lsp(), kSMSMassStep) > 2) continue;  // skip points in between the binning

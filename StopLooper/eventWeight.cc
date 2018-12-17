@@ -217,6 +217,7 @@ evtWgtInfo::evtWgtInfo() {
   is_data_    = false;
   is_fastsim_ = false;
   sync16      = false;
+  verbose     = false;
 
   // Initialize Switches for additional SFs
   apply_diLepTrigger_sf = false;
@@ -2121,17 +2122,20 @@ bool evtWgtInfo::doingSystematic( systID isyst ) {
 evtWgtInfo::SampleType evtWgtInfo::findSampleType( string samplestr ) {
   TString sample(samplestr);
 
-  if (sample.BeginsWith("data")) return data;
-  else if (sample.BeginsWith("ttbar") || sample.BeginsWith("TTJets")) return ttbar;
-  else if (sample.BeginsWith("t_") || sample.BeginsWith("ST_")) return singletop;
-  else if (sample.BeginsWith("ttW") || sample.BeginsWith("TTW")) return ttW;
-  else if (sample.BeginsWith("ttZ") || sample.BeginsWith("TTZ")) return ttZ;
-  else if (sample.BeginsWith("W") && sample.Contains("JetsToLNu")) return Wjets;
-  else if (sample.BeginsWith("WZ")) return WZ;
-  else if (sample.BeginsWith("SMS") || sample.BeginsWith("Signal") ) return fastsim;
+  SampleType samptype(unknown);
 
-  cout << "[eventWeight] >> Have not assigned sampletype for " << samplestr << endl;
-  return unknown;
+  if (sample.BeginsWith("data")) samptype = data;
+  else if (sample.BeginsWith("ttbar") || sample.BeginsWith("TTJets")) samptype = ttbar;
+  else if (sample.BeginsWith("t_") || sample.BeginsWith("ST_")) samptype = singletop;
+  else if (sample.BeginsWith("ttW") || sample.BeginsWith("TTW")) samptype = ttW;
+  else if (sample.BeginsWith("ttZ") || sample.BeginsWith("TTZ")) samptype = ttZ;
+  else if (sample.BeginsWith("W") && sample.Contains("Jets")) samptype = Wjets;
+  else if (sample.BeginsWith("WZ")) samptype = WZ;
+  else if (sample.BeginsWith("SMS") || sample.BeginsWith("Signal") ) samptype = fastsim;
+  else cout << "[eventWeight] >> Cannot assigned sampletype for " << samplestr << endl;
+
+  if (verbose) cout << "[eventWeight] >> The assigned sampletype based on " << samplestr << " is " << samptype << endl;
+  return samptype;
 }
 
 string evtWgtInfo::getLabel( systID isyst ) {
@@ -2236,6 +2240,28 @@ double evtWgtInfo::getExtSampleWeightSummer16v2( TString fname, bool apply ) {
   sync16 = true; // if this function is called, must be running sync checks
 
   return result;
+}
+
+double evtWgtInfo::getExtSampleWeightSummer16v3( TString fname, bool apply ) {
+  double sf = 1.0;
+
+  if (fname.Contains("TTJets_2lep_s16v3_ext1"))
+    sf = 24767666.0 / (24767666.0+6068369.0);
+  else if (fname.Contains("TTJets_2lep_s16v3_ext0"))
+    sf =  6068369.0 / (24767666.0+6068369.0);
+  else if (fname.Contains("TTJets_1lep_t_s16v3_ext1"))
+    sf = 49664175.0 / (49664175.0+11957043.0);
+  else if (fname.Contains("TTJets_1lep_t_s16v3_ext0"))
+    sf = 11957043.0 / (49664175.0+11957043.0);
+  else if (fname.Contains("TTJets_1lep_tbar_s16v3_ext1"))
+    sf = 48387865.0 / (48387865.0+11955887.0);
+  else if (fname.Contains("TTJets_1lep_tbar_s16v3_ext0"))
+    sf = 11955887.0 / (48387865.0+11955887.0);
+  // to be updated...
+
+  if (verbose) cout << "[eventWeight] >> The sample weight to be scaled by is: " << sf << endl;
+  if (apply) sf_extra_file *= sf;
+  return sf;
 }
 
 double evtWgtInfo::getExtSampleWeightFall17v2( TString fname, bool apply ) {

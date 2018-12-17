@@ -138,6 +138,7 @@ class evtWgtInfo {
 
   // Switch for Moriond17 scheme for sync studies
   bool sync16;
+  bool verbose;
 
   int    nEvents;
   double xsec;
@@ -302,6 +303,7 @@ class evtWgtInfo {
 
   double getZSampleWeightFromCR3l( TString fname, bool apply=true );
   double getExtSampleWeightSummer16v2( TString sample, bool apply=true );
+  double getExtSampleWeightSummer16v3( TString sample, bool apply=true );
   double getExtSampleWeightFall17v2( TString sample, bool apply=true );
   void setDefaultSystematics( int syst_set=0 );
   bool doingSystematic( systID systid );
