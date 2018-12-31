@@ -498,8 +498,8 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
   // Set scale1fb file
   //
   DatasetInfoFromFile df;
-  // This shall be an add-on to the default list and would overwrite any conflict
-  df.loadFromFile("scale1fbs.txt");
+  df.loadFromFile("./scale1fbs.txt");  // load the default list shared across snt (soft-linked to CORE)
+  df.loadFromFile("./scale1fbs_ext1.txt");  // load extra (private) samples and overwrite any conflict
 
   //
   // JEC files
