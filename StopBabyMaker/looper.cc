@@ -325,6 +325,8 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
       lepsf_filepath = "lepsf/analysis2016_36p46fb";
     } else if (gconf.year == 2017) {
       lepsf_filepath = "lepsf/analysis2017_94X";
+    } else if (gconf.year == 2018) {
+      lepsf_filepath = "lepsf/analysis2017_94X";  // TODO: to be updated
     }
     cout << ">>> Grabbing lepton scale factors from: " << lepsf_filepath << endl;
 
@@ -1168,12 +1170,12 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
 
         if ( nVetoLeptons > 0 ) {
           recoLep_pt.push_back( lep1.p4.Pt() );
-          recoLep_eta.push_back( lep1.p4.Eta() );  // TODO: use SC eta for electron
+          recoLep_eta.push_back( (abs(lep1.pdgid) == 11)? lep1.etaSC : lep1.p4.Eta() );
           recoLep_pdgid.push_back( lep1.pdgid );
           recoLep_isSel.push_back( nGoodLeptons > 0 );
           if ( nVetoLeptons > 1 ) {
             recoLep_pt.push_back( lep2.p4.Pt() );
-            recoLep_eta.push_back( lep2.p4.Eta() );
+            recoLep_eta.push_back( (abs(lep2.pdgid) == 11)? lep2.etaSC : lep2.p4.Eta() );
             recoLep_pdgid.push_back( lep2.pdgid );
             recoLep_isSel.push_back( nGoodLeptons > 1 );
           } // end if >=2 vetoLeptons
