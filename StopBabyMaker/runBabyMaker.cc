@@ -76,9 +76,11 @@ int main(int argc, char **argv){
   char *input = "sample_2017.dat";
   if(argc>5) input = argv[5];
 
-  bool isFastsim = false;
-  if(argc>6) isFastsim = atoi(argv[6]);
-  //isFastsim = true does not work, need to use = 1
+  // Use the last argument also control the type of skim
+  int sampletype(0);
+  if(argc>6) sampletype = atoi(argv[6]);
+  bool isFastsim = (sampletype == 1);
+  bool doPhotonSkim = (sampletype == 2);
 
   string topCandTreeName;
   if(argc>7) topCandTreeName = argv[7];
@@ -92,7 +94,7 @@ int main(int argc, char **argv){
   // Skim Parameters
   //
   mylooper->skim_nvtx            = 1;
-  mylooper->skim_met             = 100;
+  mylooper->skim_met             = 150;
 
   mylooper->skim_nGoodLep        = 1;
   mylooper->skim_goodLep_el_pt   = 20.0;
@@ -117,10 +119,9 @@ int main(int argc, char **argv){
   mylooper->analysis_jet_pt      = 30;
   mylooper->analysis_bjet_pt     = 30;
 
-  //temporarily set to false in order to take JECs from miniAOD directly for 2017 early data
   mylooper->applyJECfromFile    = true;  //THIS FLAG DECIDES NOW TOO IF JESUP/DOWN VALUES ARE CALCULATED
   mylooper->applyAK8JECfromFile = false; // not needed as DeepAK8 uses uncorrected jets
-  mylooper->JES_type            = 0;  //0 central, 1 up, -1 down; // not needed anymore
+  mylooper->JES_type            = 0;  //0 central, 1 up, -1 down <-- obsolete, not to be changed
 
   mylooper->applyBtagSFs       = true;
   mylooper->applyLeptonSFs     = true;
@@ -152,6 +153,13 @@ int main(int argc, char **argv){
   mylooper->fillElID        =  false;
   mylooper->fillIso         =  false;
   mylooper->fillLepSynch    =  false;
+
+  if (doPhotonSkim) {
+    mylooper->fillPhoton    = true;
+    mylooper->skim_nPhotons = 1;
+    mylooper->skim_nGoodLep = 0;
+    mylooper->skim_met      = 100;
+  }
 
   if (!topCandTreeName.empty()) {
     mylooper->runTopCandTreeMaker = true;
