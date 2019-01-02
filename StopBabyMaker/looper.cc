@@ -705,89 +705,138 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
         //note to get correct scale1fb you need to use in your looper xsec/nevt, where nevt you get via
         //histNEvts->GetBinContent(histNEvts->FindBin(mStop,mLSP));
 
-        //copy from Mia's code
-        float SMSpdf_weight_up = 1;
-        float SMSpdf_weight_down = 1;
-        float SMSsum_of_weights= 0;
-        float SMSaverage_of_weights= 0;
-        //error on pdf replicas
-        //fastsim has first genweights bin being ==1
-        StopEvt.ngenweights = genweights().size();
-        if(genweights().size()>111){ //fix segfault
-          for(int ipdf=10;ipdf<110;ipdf++){
-            SMSaverage_of_weights += cms3.genweights().at(ipdf);
-          }// average of weights
-          SMSaverage_of_weights =  SMSaverage_of_weights/100.;
-          for(int ipdf=10;ipdf<110;ipdf++){
-            SMSsum_of_weights += pow(cms3.genweights().at(ipdf)- SMSaverage_of_weights,2);
-          }//std of weights.
-          SMSpdf_weight_up = (SMSaverage_of_weights+sqrt(SMSsum_of_weights/99.));
-          SMSpdf_weight_down = (SMSaverage_of_weights-sqrt(SMSsum_of_weights/99.));
+        if (StopEvt.cms3tag.find("CMS4_V1") == 0) {
+          // The correctly yearly normalized gen_LHEweight branches are available since CMS4_V10-02-04
+          // note that the gen_LHEweight branches are already ratios wrt nominal
+          // Q: will the LHE tool still be valid on the fastsim samples?
+          StopEvt.pdf_up_weight      = gen_LHEweight_PDFVariation_Up();
+          StopEvt.pdf_down_weight    = gen_LHEweight_PDFVariation_Dn();
+          StopEvt.weight_Q2_up       = gen_LHEweight_QCDscale_muR2_muF2();
+          StopEvt.weight_Q2_down     = gen_LHEweight_QCDscale_muR0p5_muF0p5();
+          StopEvt.weight_alphas_up   = gen_LHEweight_AsMZ_Up();
+          StopEvt.weight_alphas_down = gen_LHEweight_AsMZ_Dn();
+          counterhist->Fill(1, genHEPMCweight()                    );
+          counterhist->Fill(2, gen_LHEweight_QCDscale_muR1_muF2()  );
+          counterhist->Fill(3, gen_LHEweight_QCDscale_muR1_muF0p5());
+          counterhist->Fill(4, gen_LHEweight_QCDscale_muR2_muF1()  );
+          counterhist->Fill(5, StopEvt.weight_Q2_up                );
+          counterhist->Fill(6, gen_LHEweight_QCDscale_muR2_muF0p5());
+          counterhist->Fill(7, gen_LHEweight_QCDscale_muR0p5_muF1());
+          counterhist->Fill(8, gen_LHEweight_QCDscale_muR0p5_muF2());
+          counterhist->Fill(9, StopEvt.weight_Q2_down              );
+          counterhist->Fill(10,StopEvt.pdf_up_weight               );
+          counterhist->Fill(11,StopEvt.pdf_down_weight             );
+          counterhist->Fill(12,StopEvt.weight_alphas_up            );
+          counterhist->Fill(13,StopEvt.weight_alphas_down          );
+        } else {
+          //copy from Mia's code
+          float SMSpdf_weight_up = 1;
+          float SMSpdf_weight_down = 1;
+          float SMSsum_of_weights= 0;
+          float SMSaverage_of_weights= 0;
+          //error on pdf replicas
+          //fastsim has first genweights bin being ==1
+          StopEvt.ngenweights = genweights().size();
+          if(genweights().size()>111){ //fix segfault
+            for(int ipdf=10;ipdf<110;ipdf++){
+              SMSaverage_of_weights += cms3.genweights().at(ipdf);
+            }// average of weights
+            SMSaverage_of_weights =  SMSaverage_of_weights/100.;
+            for(int ipdf=10;ipdf<110;ipdf++){
+              SMSsum_of_weights += pow(cms3.genweights().at(ipdf)- SMSaverage_of_weights,2);
+            }//std of weights.
+            SMSpdf_weight_up = (SMSaverage_of_weights+sqrt(SMSsum_of_weights/99.));
+            SMSpdf_weight_down = (SMSaverage_of_weights-sqrt(SMSsum_of_weights/99.));
 
-          double genw1inv = 1. / genweights()[1];  // inverse of the central gen weight 1
-          StopEvt.pdf_up_weight      = SMSpdf_weight_up   * genw1inv;
-          StopEvt.pdf_down_weight    = SMSpdf_weight_down * genw1inv;
-          StopEvt.weight_Q2_up       = genweights()[5]    * genw1inv;
-          StopEvt.weight_Q2_down     = genweights()[9]    * genw1inv;
-          StopEvt.weight_alphas_up   = genweights()[110]  * genw1inv;
-          StopEvt.weight_alphas_down = genweights()[111]  * genw1inv;
+            double genw1inv = 1. / genweights()[1];  // inverse of the central gen weight 1
+            StopEvt.pdf_up_weight      = SMSpdf_weight_up   * genw1inv;
+            StopEvt.pdf_down_weight    = SMSpdf_weight_down * genw1inv;
+            StopEvt.weight_Q2_up       = genweights()[5]    * genw1inv;
+            StopEvt.weight_Q2_down     = genweights()[9]    * genw1inv;
+            StopEvt.weight_alphas_up   = genweights()[110]  * genw1inv;
+            StopEvt.weight_alphas_down = genweights()[111]  * genw1inv;
 
-          counterhistSig->Fill(mStop,mLSP,1,genweights()[1]);
-          counterhistSig->Fill(mStop,mLSP,2,genweights()[2]*genw1inv);
-          counterhistSig->Fill(mStop,mLSP,3,genweights()[3]*genw1inv);
-          counterhistSig->Fill(mStop,mLSP,4,genweights()[4]*genw1inv);
-          counterhistSig->Fill(mStop,mLSP,5,StopEvt.weight_Q2_up);
-          counterhistSig->Fill(mStop,mLSP,6,genweights()[6]*genw1inv);
-          counterhistSig->Fill(mStop,mLSP,7,genweights()[7]*genw1inv);
-          counterhistSig->Fill(mStop,mLSP,8,genweights()[8]*genw1inv);
-          counterhistSig->Fill(mStop,mLSP,9,StopEvt.weight_Q2_down);
-          counterhistSig->Fill(mStop,mLSP,10,StopEvt.pdf_up_weight);
-          counterhistSig->Fill(mStop,mLSP,11,StopEvt.pdf_down_weight);
-          counterhistSig->Fill(mStop,mLSP,12,StopEvt.weight_alphas_up);   // α_s variation.
-          counterhistSig->Fill(mStop,mLSP,13,StopEvt.weight_alphas_down); // α_s variation.
+            counterhistSig->Fill(mStop,mLSP,1,genweights()[1]);
+            counterhistSig->Fill(mStop,mLSP,2,genweights()[2]*genw1inv);
+            counterhistSig->Fill(mStop,mLSP,3,genweights()[3]*genw1inv);
+            counterhistSig->Fill(mStop,mLSP,4,genweights()[4]*genw1inv);
+            counterhistSig->Fill(mStop,mLSP,5,StopEvt.weight_Q2_up);
+            counterhistSig->Fill(mStop,mLSP,6,genweights()[6]*genw1inv);
+            counterhistSig->Fill(mStop,mLSP,7,genweights()[7]*genw1inv);
+            counterhistSig->Fill(mStop,mLSP,8,genweights()[8]*genw1inv);
+            counterhistSig->Fill(mStop,mLSP,9,StopEvt.weight_Q2_down);
+            counterhistSig->Fill(mStop,mLSP,10,StopEvt.pdf_up_weight);
+            counterhistSig->Fill(mStop,mLSP,11,StopEvt.pdf_down_weight);
+            counterhistSig->Fill(mStop,mLSP,12,StopEvt.weight_alphas_up);
+            counterhistSig->Fill(mStop,mLSP,13,StopEvt.weight_alphas_down);
+          }
         }
       }// is signal
       else if(!evt_isRealData()){
-        // calculate sum of weights and save them in a hisogram.
-        float pdf_weight_up = 1;
-        float pdf_weight_down = 1;
-        float sum_of_weights= 0;
-        float average_of_weights= 0;
+        if (StopEvt.cms3tag.find("CMS4_V1") == 0) {
+          // The correctly yearly normalized gen_LHEweight branches are available since CMS4_V10-02-04
+          // note that the gen_LHEweight branches are already ratios wrt nominal
+          StopEvt.pdf_up_weight      = gen_LHEweight_PDFVariation_Up();
+          StopEvt.pdf_down_weight    = gen_LHEweight_PDFVariation_Dn();
+          StopEvt.weight_Q2_up       = gen_LHEweight_QCDscale_muR2_muF2();
+          StopEvt.weight_Q2_down     = gen_LHEweight_QCDscale_muR0p5_muF0p5();
+          StopEvt.weight_alphas_up   = gen_LHEweight_AsMZ_Up();
+          StopEvt.weight_alphas_down = gen_LHEweight_AsMZ_Dn();
+          counterhist->Fill(1, genHEPMCweight()                    );
+          counterhist->Fill(2, gen_LHEweight_QCDscale_muR1_muF2()  );
+          counterhist->Fill(3, gen_LHEweight_QCDscale_muR1_muF0p5());
+          counterhist->Fill(4, gen_LHEweight_QCDscale_muR2_muF1()  );
+          counterhist->Fill(5, StopEvt.weight_Q2_up                );
+          counterhist->Fill(6, gen_LHEweight_QCDscale_muR2_muF0p5());
+          counterhist->Fill(7, gen_LHEweight_QCDscale_muR0p5_muF1());
+          counterhist->Fill(8, gen_LHEweight_QCDscale_muR0p5_muF2());
+          counterhist->Fill(9, StopEvt.weight_Q2_down              );
+          counterhist->Fill(10,StopEvt.pdf_up_weight               );
+          counterhist->Fill(11,StopEvt.pdf_down_weight             );
+          counterhist->Fill(12,StopEvt.weight_alphas_up            );
+          counterhist->Fill(13,StopEvt.weight_alphas_down          );
+        } else {
+          // calculate sum of weights and save them in a hisogram.
+          float pdf_weight_up = 1;
+          float pdf_weight_down = 1;
+          float sum_of_weights= 0;
+          float average_of_weights= 0;
 
-        //error on pdf replicas
-        // StopEvt.ngenweights = genweights().size();
-        if(genweights().size()>110){
-          for(int ipdf=9;ipdf<109;ipdf++){
-            average_of_weights += cms3.genweights().at(ipdf);
-          }// average of weights
-          average_of_weights =  average_of_weights/100;
+          //error on pdf replicas
+          // StopEvt.ngenweights = genweights().size();
+          if(genweights().size()>110){
+            for(int ipdf=9;ipdf<109;ipdf++){
+              average_of_weights += cms3.genweights().at(ipdf);
+            }// average of weights
+            average_of_weights =  average_of_weights/100;
 
-          for(int ipdf=9;ipdf<109;ipdf++){
-            sum_of_weights += (cms3.genweights().at(ipdf)- average_of_weights)*(cms3.genweights().at(ipdf)-average_of_weights);
-          }//std of weights.
-          pdf_weight_up = (average_of_weights+sqrt(sum_of_weights/99));
-          pdf_weight_down = (average_of_weights-sqrt(sum_of_weights/99));
+            for(int ipdf=9;ipdf<109;ipdf++){
+              sum_of_weights += (cms3.genweights().at(ipdf)- average_of_weights)*(cms3.genweights().at(ipdf)-average_of_weights);
+            }//std of weights.
+            pdf_weight_up = (average_of_weights+sqrt(sum_of_weights/99));
+            pdf_weight_down = (average_of_weights-sqrt(sum_of_weights/99));
 
-          double genw0inv = 1. / genweights()[0];  // inverse of the central gen weight [0]
-          StopEvt.pdf_up_weight      = pdf_weight_up     * genw0inv;
-          StopEvt.pdf_down_weight    = pdf_weight_down   * genw0inv;
-          StopEvt.weight_Q2_up       = genweights()[4]   * genw0inv;
-          StopEvt.weight_Q2_down     = genweights()[8]   * genw0inv;
-          StopEvt.weight_alphas_up   = genweights()[109] * genw0inv;
-          StopEvt.weight_alphas_down = genweights()[110] * genw0inv;
-          counterhist->Fill(1,genweights()[0]);
-          counterhist->Fill(2,genweights()[1]*genw0inv);
-          counterhist->Fill(3,genweights()[2]*genw0inv);
-          counterhist->Fill(4,genweights()[3]*genw0inv);
-          counterhist->Fill(5,StopEvt.weight_Q2_up);
-          counterhist->Fill(6,genweights()[5]*genw0inv);
-          counterhist->Fill(7,genweights()[6]*genw0inv);
-          counterhist->Fill(8,genweights()[7]*genw0inv);
-          counterhist->Fill(9,StopEvt.weight_Q2_down);
-          counterhist->Fill(10,StopEvt.pdf_up_weight);
-          counterhist->Fill(11,StopEvt.pdf_down_weight);
-          counterhist->Fill(12,StopEvt.weight_alphas_up);   // α_s variation.
-          counterhist->Fill(13,StopEvt.weight_alphas_down); // α_s variation.
+            double genw0inv = 1. / genweights()[0];  // inverse of the central gen weight [0]
+            StopEvt.pdf_up_weight      = pdf_weight_up     * genw0inv;
+            StopEvt.pdf_down_weight    = pdf_weight_down   * genw0inv;
+            StopEvt.weight_Q2_up       = genweights()[4]   * genw0inv;
+            StopEvt.weight_Q2_down     = genweights()[8]   * genw0inv;
+            StopEvt.weight_alphas_up   = genweights()[109] * genw0inv;
+            StopEvt.weight_alphas_down = genweights()[110] * genw0inv;
+            counterhist->Fill(1,genweights()[0]);
+            counterhist->Fill(2,genweights()[1]*genw0inv);
+            counterhist->Fill(3,genweights()[2]*genw0inv);
+            counterhist->Fill(4,genweights()[3]*genw0inv);
+            counterhist->Fill(5,StopEvt.weight_Q2_up);
+            counterhist->Fill(6,genweights()[5]*genw0inv);
+            counterhist->Fill(7,genweights()[6]*genw0inv);
+            counterhist->Fill(8,genweights()[7]*genw0inv);
+            counterhist->Fill(9,StopEvt.weight_Q2_down);
+            counterhist->Fill(10,StopEvt.pdf_up_weight);
+            counterhist->Fill(11,StopEvt.pdf_down_weight);
+            counterhist->Fill(12,StopEvt.weight_alphas_up);
+            counterhist->Fill(13,StopEvt.weight_alphas_down);
+          }
         }
       }
 
