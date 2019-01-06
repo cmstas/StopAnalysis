@@ -824,6 +824,13 @@ void evtWgtInfo::getXSecWeight( double &xsec_val, double &weight_xsec_up, double
     // getSusyMasses(mStop,mLSP);
     xsec_val = h_sig_xsec->GetBinContent(h_sig_xsec->FindBin(mStop));
     xsec_err = h_sig_xsec->GetBinError(h_sig_xsec->FindBin(mStop));
+
+    //Adjust for branching ratio built in to TChi W->lnu and H->bb samples
+    if(isTChi){
+      xsec_val *= (0.324 * 0.584); //(pdg)
+      xsec_err *= (0.324 * 0.584); //(pdg)
+    }
+
   }
 
   weight_xsec_up = (xsec_val+xsec_err);
