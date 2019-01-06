@@ -1,0 +1,54 @@
+drop *
+
+#### event info ####
+keep run
+keep ls
+keep evt
+keep nvtxs
+keep pu_nvtxs
+keep year
+keep sampver
+keep mass_stop
+keep mass_lsp
+
+### met ###
+keep pfmet
+
+### leptons ###
+keep ngoodleps
+keep nvetoleps
+keep mt_met_lep
+
+### jets ###
+keep ngoodjets
+keep ak4_HT
+keep ak4pfjets*
+drop ak4pfjets_p4
+drop ak8pfjets_p4
+keep dphi_ak4pfjet_met
+
+### btags ###
+keep ngoodbtags
+keep nloosebtags
+keep ntightbtags
+keep ak8pfjets*
+drop ak4pfjets_leadbtag_p4
+drop ak4pfjets_leadMEDbjet_p4
+
+
+### isolated tracks ###
+keep isoTracks*
+drop isoTracks_p4
+keep Pass*
+
+### taus ###
+keep ngoodtaus
+keep tau_*
+drop tau_IDnames
+drop tau_leadtrack_p4
+drop tau_leadneutral_p4
+drop tau_p4
+drop tau_isocand_p4
+drop tau_sigcand_p4
+drop tau_ID
+

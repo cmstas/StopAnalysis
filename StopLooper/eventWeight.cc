@@ -2202,6 +2202,49 @@ void evtWgtInfo::setDefaultSystematics( int syst_set ) {
         apply_bTagFS_sf    = false;
       }
       break;
+
+    //Sanity test (remove btag SF)
+    case 2:
+      apply_cr2lTrigger_sf = false;  // not available yet
+      apply_bTag_sf        = false;
+      apply_lep_sf         = true;   // available but not updated yet
+      apply_vetoLep_sf     = true;   // same as above
+      apply_tau_sf         = false;  // same as above
+      apply_topPt_sf       = false;
+      apply_metRes_sf      = false;  // not developed for 94X yet
+      apply_metTTbar_sf    = false;
+      apply_ttbarSysPt_sf  = false;
+      apply_WbXsec_sf      = false;  // not dev
+      apply_ISR_sf         = false;  // not available yet
+      apply_pu_sf          = false;  // not available yet
+      apply_sample_sf      = false;  // no multiple sample available yet
+      if (is_fastsim_) {
+        apply_lepFS_sf     = false;  // no fast sim yet
+        apply_bTagFS_sf    = false;
+      }
+      break;
+
+    //Sanity test: lumi weight
+    case 3:
+      apply_cr2lTrigger_sf = false;  // not available yet
+      apply_bTag_sf        = false;
+      apply_lep_sf         = false;   // available but not updated yet
+      apply_vetoLep_sf     = false;   // same as above
+      apply_tau_sf         = false;  // same as above
+      apply_topPt_sf       = false;
+      apply_metRes_sf      = false;  // not developed for 94X yet
+      apply_metTTbar_sf    = false;
+      apply_ttbarSysPt_sf  = false;
+      apply_WbXsec_sf      = false;  // not dev
+      apply_ISR_sf         = false;  // not available yet
+      apply_pu_sf          = false;  // not available yet
+      apply_sample_sf      = false;  // no multiple sample available yet
+      if (is_fastsim_) {
+        apply_lepFS_sf     = false;  // no fast sim yet
+        apply_bTagFS_sf    = false;
+      }
+      break;
+
   }
 
 }

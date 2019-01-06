@@ -94,7 +94,7 @@ int main(int argc, char **argv){
   // Skim Parameters
   //
   mylooper->skim_nvtx            = 1;
-  mylooper->skim_met             = 150;
+  mylooper->skim_met             = 0;
 
   mylooper->skim_nGoodLep        = 1;
   mylooper->skim_goodLep_el_pt   = 20.0;
@@ -112,7 +112,7 @@ int main(int argc, char **argv){
   mylooper->skim_vetoLep_mu_pt   = 5.0;
   mylooper->skim_vetoLep_mu_eta  = 2.4;
 
-  mylooper->skim_nJets           = 2;
+  mylooper->skim_nJets           = 0;
   mylooper->skim_nBJets          = 0;
   mylooper->skim_jet_pt          = 30.0;
   mylooper->skim_jet_eta         = 2.4;
