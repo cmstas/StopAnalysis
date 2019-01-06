@@ -307,8 +307,14 @@ void evtWgtInfo::Setup(string samplestr, int inyear, bool applyUnc, bool useBTag
 
   // Get Signal XSection File
   if ( is_fastsim_ ) {
-    f_sig_xsec = new TFile("../StopCORE/inputs/signal_xsec/xsec_stop_13TeV.root","read");
-    h_sig_xsec = (TH1D*) f_sig_xsec->Get("stop");
+    if(!isTChi){
+      f_sig_xsec  = new TFile("../StopCORE/inputs/signal_xsec/xsec_stop_13TeV.root","read");
+      h_sig_xsec = (TH1D*) f_sig_xsec->Get("stop");
+    }
+    else{
+      f_sig_xsec  = new TFile("../StopCORE/inputs/signal_xsec/xsec_tchi_13TeV.root","read");
+      h_sig_xsec = (TH1D*) f_sig_xsec->Get("h_xsec_c1n2");
+    }
   }
 
   // Get SR trigger histos
@@ -812,8 +818,7 @@ void evtWgtInfo::getXSecWeight( double &xsec_val, double &weight_xsec_up, double
   xsec_val = 1.0;
   double xsec_err = 0.0;
 
-  //Temporary hack: For WH signal, this is set in baby correctly
-  if (true){//!is_fastsim_ ) {
+  if (!is_fastsim_ ) {
     xsec_val = babyAnalyzer.xsec();
   } else {
     // getSusyMasses(mStop,mLSP);
@@ -2131,7 +2136,7 @@ bool evtWgtInfo::doingSystematic( systID isyst ) {
 // Currently only in a test state
 evtWgtInfo::SampleType evtWgtInfo::findSampleType( string samplestr ) {
   TString sample(samplestr);
-
+  isTChi=false;
   SampleType samptype(unknown);
 
   if (sample.BeginsWith("data")) samptype = data;
@@ -2144,6 +2149,10 @@ evtWgtInfo::SampleType evtWgtInfo::findSampleType( string samplestr ) {
   else if (sample.BeginsWith("SMS") || sample.BeginsWith("Signal") ) samptype = fastsim;
   else cout << "[eventWeight] >> Cannot assigned sampletype for " << samplestr << endl;
 
+  if(sample.BeginsWith("SMS-TChi")) {
+    isTChi=true;
+    cout<<"This is a TChi WH sample"<<endl;
+  }
   if (verbose) cout << "[eventWeight] >> The assigned sampletype based on " << samplestr << " is " << samptype << endl;
   return samptype;
 }
