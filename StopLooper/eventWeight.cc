@@ -279,6 +279,9 @@ void evtWgtInfo::Setup(string samplestr, int inyear, bool applyUnc, bool useBTag
     lumi_err = lumi*0.05;  // preliminary value
   }
 
+  //Temporary hack for WH framework: normalize weights to 1.0 fb-1
+  lumi = 1.0;
+
   sf_extra_file = 1.0;  // reset file weight for each file
 
   // Get sample info from enum
@@ -287,6 +290,7 @@ void evtWgtInfo::Setup(string samplestr, int inyear, bool applyUnc, bool useBTag
   } else if ( samptype == fastsim ) {
     is_fastsim_ = true;
   }
+  cout<<" is_fastsim_ "<<is_fastsim_<<endl;
   is_bkg_ = !is_data_ && !is_fastsim_;
 
   // The event counter hists setup is postponed to the file loop
@@ -627,7 +631,7 @@ void evtWgtInfo::calculateWeightsForEvent() {
 
   // This is scale1fb*lumi = lumi*1000*xsec/nEvents
   evt_wgt *= sf_nominal;
-
+  //cout<<"nominal "<<evt_wgt<<endl;
   // Apply CR2l Trigger scale factor
   evt_wgt *= sf_cr2lTrigger;
   // Apply bTag scale factor
@@ -635,6 +639,8 @@ void evtWgtInfo::calculateWeightsForEvent() {
   // Apply lepton scale factor
   evt_wgt *= sf_lep * sf_vetoLep * sf_lepFS;
   // Apply tau sf
+ // cout<<"lep "<<evt_wgt<<endl;
+
   evt_wgt *= sf_tau;
   // Apply top pT sf
   evt_wgt *= sf_topPt;
@@ -644,6 +650,8 @@ void evtWgtInfo::calculateWeightsForEvent() {
   evt_wgt *= sf_metTTbar;
   // Apply ttbar system pT SF (will be 1 if not ttbar/tW 2l)
   evt_wgt *= sf_ttbarSysPt;
+  //cout<<"top "<<evt_wgt<<endl;
+
   // Apply ISR SF ( switched to ISRnjets )
   evt_wgt *= sf_ISR;
   // Apply Pileup Wgt
@@ -652,6 +660,7 @@ void evtWgtInfo::calculateWeightsForEvent() {
   evt_wgt *= sf_sample;
   // Apply any extra weight that was passed in
   evt_wgt *= sf_extra_file;
+  //cout<<"end "<<evt_wgt<<endl;
 
   //
   // Systematic Weights
@@ -803,7 +812,8 @@ void evtWgtInfo::getXSecWeight( double &xsec_val, double &weight_xsec_up, double
   xsec_val = 1.0;
   double xsec_err = 0.0;
 
-  if ( !is_fastsim_ ) {
+  //Temporary hack: For WH signal, this is set in baby correctly
+  if (true){//!is_fastsim_ ) {
     xsec_val = babyAnalyzer.xsec();
   } else {
     // getSusyMasses(mStop,mLSP);
@@ -2158,7 +2168,7 @@ void evtWgtInfo::setDefaultSystematics( int syst_set ) {
   switch (syst_set) {
     // Set of systematics used in the Moriond17 analysis
     case 0:
-      apply_cr2lTrigger_sf = true;  // only !=1 if pfmet!=pfmet_rl ie no weight for ==1lepton events in SR and CR0b
+      apply_cr2lTrigger_sf = false;  // only !=1 if pfmet!=pfmet_rl ie no weight for ==1lepton events in SR and CR0b
       apply_bTag_sf        = true;  // event weight, product of all jet wgts
       apply_lep_sf         = true;  // both lep1 and lep2 (if available) are multiplied together
       apply_vetoLep_sf     = true;  // this is actually the lost lepton sf, only !=1 if there is >=2 genLeptons and ==1 recoLeptons in the event
@@ -2184,7 +2194,7 @@ void evtWgtInfo::setDefaultSystematics( int syst_set ) {
 
     // Set of (incomplete) systematics prepared for legacy analysis using 94X samples
     case 1:
-      apply_cr2lTrigger_sf = true;   // not available yet
+      apply_cr2lTrigger_sf = false;   // not available yet
       apply_bTag_sf        = true;
       apply_lep_sf         = true;   // available but not updated yet
       apply_vetoLep_sf     = true;   // same as above
@@ -2203,13 +2213,39 @@ void evtWgtInfo::setDefaultSystematics( int syst_set ) {
       }
       break;
 
-    //Sanity test (remove btag SF)
+    //Sanity test (remove btag SF, 2016 samples)
     case 2:
+      apply_cr2lTrigger_sf = false;  // only !=1 if pfmet!=pfmet_rl ie no weight for ==1lepton events in SR and CR0b
+      apply_bTag_sf        = false;  // event weight, product of all jet wgts
+      apply_lep_sf         = true;  // both lep1 and lep2 (if available) are multiplied together
+      apply_vetoLep_sf     = true;  // this is actually the lost lepton sf, only !=1 if there is >=2 genLeptons and ==1 recoLeptons in the event
+      apply_tau_sf         = true;
+      apply_topPt_sf       = false; // true=sf, false=uncertainty
+      apply_metRes_sf      = true;
+      apply_metTTbar_sf    = false;
+      apply_ttbarSysPt_sf  = false; // true=sf, false=uncertainty, only !=1.0 for madgraph tt2l, tW2l
+      apply_WbXsec_sf      = true;
+      apply_ISR_sf         = true;  // only !=1.0 for signal
+      apply_pu_sf          = true;
+      apply_sample_sf      = true;
+      if (is_fastsim_) {
+        apply_lepFS_sf     = true;
+        apply_bTagFS_sf    = true;
+        apply_metRes_sf    = false;
+        apply_tau_sf       = false;
+        apply_WbXsec_sf    = false;
+        apply_vetoLep_sf   = false;  // <-- why??
+        apply_pu_sf        = false;  // <-- why?
+      }
+      break;  
+
+    //Sanity test (remove btag SF, 2017 samples)
+    case 3:
       apply_cr2lTrigger_sf = false;  // not available yet
       apply_bTag_sf        = false;
       apply_lep_sf         = true;   // available but not updated yet
       apply_vetoLep_sf     = true;   // same as above
-      apply_tau_sf         = false;  // same as above
+      apply_tau_sf         = true;  // same as above
       apply_topPt_sf       = false;
       apply_metRes_sf      = false;  // not developed for 94X yet
       apply_metTTbar_sf    = false;
@@ -2225,7 +2261,7 @@ void evtWgtInfo::setDefaultSystematics( int syst_set ) {
       break;
 
     //Sanity test: lumi weight
-    case 3:
+    case 4:
       apply_cr2lTrigger_sf = false;  // not available yet
       apply_bTag_sf        = false;
       apply_lep_sf         = false;   // available but not updated yet

@@ -293,6 +293,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
   //
   bool isDataFromFileName;
   bool isSignalFromFileName;
+  bool isTChiFromFileName = false;
   string outfilestr(output_name);
   string filestr(chain->GetFile()->GetName());
   cout<<"output name "<< output_name;
@@ -307,6 +308,8 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
     cout << ", running on SIGNAL, based on input file name." << endl;
     if (filestr.find("mLSP") != std::string::npos)  // sample is probably fullsim if mLSP is fixed
       isSignalFromFileName = false;
+    if (filestr.find("TChi") != std::string::npos)
+      isTChiFromFileName = true;
   }
   else {
     isDataFromFileName = false;
@@ -338,12 +341,17 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
   TH1D *hxsec;
   if(isSignalFromFileName){
     //fxsec = TFile::Open("xsec_stop_13TeV.root");
-    fxsec = new TFile("xsec_stop_13TeV.root","READ");
+    TString xsecFileName = "xsec_stop_13TeV.root";
+    if(isTChiFromFileName) xsecFileName = "xsec_tchi_13TeV.root";
+    fxsec = new TFile(xsecFileName,"READ");
     if(fxsec->IsZombie()) {
-      std::cout << "Somehow xsec_stop_13TeV.root is corrupted. Exit..." << std::endl;
+      std::cout << "Somehow xsec root file is corrupted. Exit..." << std::endl;
       exit(0);
     }
-    hxsec = (TH1D*)fxsec->Get("stop");
+    if(!isTChiFromFileName)
+      hxsec = (TH1D*)fxsec->Get("stop");
+    else
+      hxsec = (TH1D*)fxsec->Get("h_xsec_c1n2");
   }
   TFile *pileupfile;
   TH1D *hPU;
@@ -702,6 +710,13 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
         else if(genps_weight()<0) counterhistSig->Fill(mStop,mLSP,36,-1);
         StopEvt.xsec        = hxsec->GetBinContent(hxsec->FindBin(mStop));
         StopEvt.xsec_uncert = hxsec->GetBinError(  hxsec->FindBin(mStop));
+
+        //Adjust for branching ratio built in to TChi W->lnu and H->bb samples
+        if(isTChiFromFileName){
+          StopEvt.xsec *= (0.324 * 0.584); //(pdg)
+          StopEvt.xsec_uncert *= (0.324 * 0.584); //(pdg)
+        }
+
         //note to get correct scale1fb you need to use in your looper xsec/nevt, where nevt you get via
         //histNEvts->GetBinContent(histNEvts->FindBin(mStop,mLSP));
 

@@ -140,7 +140,7 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
 
 //  outfile_ = new TFile(output_name.Data(), "RECREATE") ;
 
-  float kLumi = 133.53;
+  float kLumi = 133.53;//Overwritten later.
   // Combined 2016 (35.922/fb), 2017 (41.529/fb) and 2018 (56.077/fb) json,
   const char* json_file = "../StopCORE/inputs/json_files/Cert_271036-325175_13TeV_Combined161718_JSON_snt.txt";
 
@@ -385,9 +385,13 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
 
     evtWgt.getZSampleWeightFromCR3l(fname);
 
-    if (year_ == 2016) kLumi = 35.867;
-    else if (year_ == 2017) kLumi = 41.96;
-    else if (year_ == 2018) kLumi = 70;
+    // if (year_ == 2016) kLumi = 35.867;
+    // else if (year_ == 2017) kLumi = 41.96;
+    // else if (year_ == 2018) kLumi = 70;
+
+
+    //WH framework: normalize weights always to 1 fb-1
+    kLumi=1.0;
 
     //dummy.cd();
     // Loop over Events in current file
@@ -430,11 +434,16 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
       w_lumi_scale1fbs = evtweight_ = kLumi * scale1fb();
 
       evtWgt.resetEvent();
-      evtWgt.setDefaultSystematics(2);
+      //Sanity test: turn off btag SF
+      if (year_ == 2016)
+        evtWgt.setDefaultSystematics(2);
+      else if (year_ >= 2017)
+        evtWgt.setDefaultSystematics(3);
       w_noBtagSF = evtWgt.getWeight(evtWgtInfo::systID(0), false);
 
+      //Sanity test: turn off ALL SF
       evtWgt.resetEvent();
-      evtWgt.setDefaultSystematics(3);
+      evtWgt.setDefaultSystematics(4);
       w_lumi_getWeight = evtWgt.getWeight(evtWgtInfo::systID(0), false);
 
 

@@ -82,6 +82,9 @@ int main(int argc, char **argv){
   bool isFastsim = (sampletype == 1);
   bool doPhotonSkim = (sampletype == 2);
 
+  cout<<"isFastsim "<<isFastsim<<endl;
+  cout<<"doPhotonSkim "<<doPhotonSkim<<endl;
+
   string topCandTreeName;
   if(argc>7) topCandTreeName = argv[7];
 

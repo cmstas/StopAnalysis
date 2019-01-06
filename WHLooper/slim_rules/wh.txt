@@ -10,6 +10,8 @@ keep year
 keep sampver
 keep mass_stop
 keep mass_lsp
+keep filt*
+keep xsec*
 
 ### met ###
 keep pfmet
