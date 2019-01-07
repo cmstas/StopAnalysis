@@ -320,7 +320,7 @@ void eventWeight_lepSF::setup( bool isFastsim, int inyear = 2017, TString filelo
     // Double unc. on veto muon ip sfs, since not for our exact wp
     for (int x=1; x<=(int)h_mu_SF_veto_ip->GetNbinsX(); x++) {
       for (int y=1; y<=(int)h_mu_SF_veto_ip->GetNbinsY(); y++) {
-        h_mu_SF_ip->SetBinError(x,y,h_mu_SF_veto_ip->GetBinError(x,y)*2.0);
+        h_mu_SF_veto_ip->SetBinError(x,y,h_mu_SF_veto_ip->GetBinError(x,y)*2.0);
       }
     }
     h_mu_SF_veto->Multiply(h_mu_SF_veto_ip);

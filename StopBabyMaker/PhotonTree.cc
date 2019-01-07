@@ -26,16 +26,15 @@ void PhotonTree::FillCommon ()
 {
    for(unsigned int idx = 0; idx < cms3.photons_p4().size(); idx++) {
     if (idx < 0) return;
-    if(cms3.photons_p4().at(idx).pt() < m_ph_pt_cut) continue;
-    if(fabs(cms3.photons_p4().at(idx).eta()) > m_ph_eta_cut) continue;
-    if ( !isLoosePhoton(idx,analysis_t::HAD,2) ) continue;//is wrong ID, but still a good preselection
+    if (cms3.photons_p4().at(idx).pt() < m_ph_pt_cut) continue;
+    if (fabs(cms3.photons_p4().at(idx).eta()) > m_ph_eta_cut) continue;
+    if (!photonID(idx, STOP_loose_v4)) continue;
     //general stuff
     p4.push_back(cms3.photons_p4().at(idx));
-    pt.push_back(cms3.photons_p4().at(idx).pt());
-    eta.push_back(cms3.photons_p4().at(idx).eta());
-    phi.push_back(cms3.photons_p4().at(idx).phi());
-    //mass.push_back(cms3.photons_mass().at(idx));
-    mass.push_back(cms3.photons_p4().at(idx).M());
+    // pt.push_back(cms3.photons_p4().at(idx).pt());
+    // eta.push_back(cms3.photons_p4().at(idx).eta());
+    // phi.push_back(cms3.photons_p4().at(idx).phi());
+    // mass.push_back(cms3.photons_p4().at(idx).M());
     //id variables
     sigmaIEtaEta_fill5x5.push_back(photons_full5x5_sigmaIEtaIEta().at(idx));
     hOverE.push_back(photons_full5x5_hOverEtowBC().at(idx));
@@ -47,6 +46,9 @@ void PhotonTree::FillCommon ()
     phiso.push_back(photons_recoPhotonIso().at(idx));
     overlapJetId.push_back(-1.);//this is a dummy and gets filled in looper.C
 
+    passLooseID.push_back(true);
+    passMediumID.push_back(photonID(idx, STOP_medium_v4));
+    passTightID.push_back(photonID(idx, STOP_tight_v4));
 
     //mc stuff
     //Some work for truth-matching (should be integrated in CMS3 as for the leptons
@@ -129,6 +131,10 @@ void PhotonTree::Reset()
     nhiso.clear();
     phiso.clear();
 
+    passLooseID.clear();
+    passMediumID.clear();
+    passTightID.clear();
+
     overlapJetId.clear();
 
     mcp4.clear();
@@ -147,16 +153,19 @@ void PhotonTree::SetBranches(TTree* tree)
     tree->Branch(Form("%snhiso"       , prefix_.c_str()) , &nhiso);
     tree->Branch(Form("%sphiso"       , prefix_.c_str()) , &phiso);
     //tree->Branch(Form("%sidCutBased"       , prefix_.c_str()) , &idCutBased);
+    tree->Branch(Form("%spassLooseID" , prefix_.c_str()) , &passLooseID);
+    tree->Branch(Form("%spassMediumID", prefix_.c_str()) , &passMediumID);
+    tree->Branch(Form("%spassTightID" , prefix_.c_str()) , &passTightID);
 
     tree->Branch(Form("%soverlapJetId"       , prefix_.c_str()) , &overlapJetId);
     
     tree->Branch(Form("%sp4"      , prefix_.c_str()) , &p4      );
     tree->Branch(Form("%smcp4"    , prefix_.c_str()) , &mcp4    );
 
-    tree->Branch(Form("%spt"	 , prefix_.c_str()) , &pt);
-    tree->Branch(Form("%seta"      , prefix_.c_str()) , &eta);
-    tree->Branch(Form("%sphi"      , prefix_.c_str()) , &phi);
-    tree->Branch(Form("%smass"      , prefix_.c_str()) , &mass);
+    // tree->Branch(Form("%spt"	 , prefix_.c_str()) , &pt);
+    // tree->Branch(Form("%seta"      , prefix_.c_str()) , &eta);
+    // tree->Branch(Form("%sphi"      , prefix_.c_str()) , &phi);
+    // tree->Branch(Form("%smass"      , prefix_.c_str()) , &mass);
     tree->Branch(Form("%smcMatchId"      , prefix_.c_str()) , &mcMatchId);
     tree->Branch(Form("%sgenIso04"      , prefix_.c_str()) , &genIso04);
     tree->Branch(Form("%sdrMinParton"      , prefix_.c_str()) , &drMinParton);

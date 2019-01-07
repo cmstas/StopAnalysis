@@ -47,6 +47,9 @@ public:
     vecd hOverE;
     vecd r9;
     //vecb idCutBased;//this one is useless
+    vecb passLooseID;
+    vecb passMediumID;
+    vecb passTightID;
    
     vecd chiso;
     vecd nhiso;
