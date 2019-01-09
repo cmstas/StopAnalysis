@@ -12,7 +12,8 @@ keep mass_stop
 keep mass_lsp
 keep filt*
 keep xsec*
-
+keep HLT*
+drop HLT_Photon*
 ### met ###
 keep pfmet
 
@@ -20,6 +21,10 @@ keep pfmet
 keep ngoodleps
 keep nvetoleps
 keep mt_met_lep
+keep lep1*
+keep lep2*
+drop lep1_p4
+drop lep2_p4
 
 ### jets ###
 keep ngoodjets

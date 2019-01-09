@@ -11,6 +11,8 @@ using namespace std;
 //1: float
 //2: vector<int>
 //3: vector<float>
+//4: bool
+
 void zip(TString slimFilename, TString whFilename){
 	TChain * t_wh = new TChain("t_wh");
 	t_wh->Add(whFilename);
@@ -44,19 +46,22 @@ void zip(TString slimFilename, TString whFilename){
 		}
 		//if it is not vector, assume is float, unless name begins with "n" (e.g. njets)
 		else if (this_branch_name.BeginsWith("n")) this_type=0;
+		//Goddamnit- hack for now..
+		else if(this_branch_name.EqualTo("pass") || this_branch_name.EqualTo("duplicate") || this_branch_name.EqualTo("goodrun")) this_type=4;
 		else this_type = 1;
 		branch_types.push_back(this_type);
 	}
 
 	vector<int *> int_values;
 	vector<float*> float_values;
+	vector<bool*> bool_values;
 	vector<vector<int> * > vint_values;
 	vector<vector<float> * > vfloat_values;
 
 
 	//initialize holders for vectors to avoid memory confusion
 	
-	for(int i =0; i<branches_to_add.size();i++){
+	for(uint i =0; i<branches_to_add.size();i++){
 		if (branch_types[i]==2){
 			vector<int> * this_vint = new vector<int>();
 			vint_values.push_back(this_vint);
@@ -72,10 +77,10 @@ void zip(TString slimFilename, TString whFilename){
 	vector<TBranch *> in_branches;
 	int vicounter=0;
 	int vfcounter=0;
-	for(int i =0; i<branches_to_add.size();i++){
+	for(uint i =0; i<branches_to_add.size();i++){
 		//define holders
 		//create branches
-		cout<<"Adding branch "<<branches_to_add[i]<<", type "<<branch_types[i]<<endl;
+		//cout<<"Adding branch "<<branches_to_add[i]<<", type "<<branch_types[i]<<endl;
 //		if(type == 0)
 		if (branch_types[i]==0){
 			int * this_int = new int();
@@ -100,6 +105,19 @@ void zip(TString slimFilename, TString whFilename){
 			slimTree->SetBranchAddress(branches_to_add[i],this_float,&out_branch);
 
 			float_values.push_back(this_float);
+			in_branches.push_back(in_branch);
+			out_branches.push_back(out_branch);
+		}	
+		else if (branch_types[i]==4){
+			bool * this_bool = new bool();
+
+			TBranch * in_branch = t_wh->GetBranch(branches_to_add[i]);
+			in_branch->SetAddress(this_bool);
+
+			TBranch * out_branch = slimTree->Branch(branches_to_add[i],this_bool,branches_to_add[i]+"/O");
+			slimTree->SetBranchAddress(branches_to_add[i],this_bool,&out_branch);
+
+			bool_values.push_back(this_bool);
 			in_branches.push_back(in_branch);
 			out_branches.push_back(out_branch);
 		}	
@@ -154,7 +172,7 @@ void zip(TString slimFilename, TString whFilename){
 
 		//for(int j=0;j< 4;j++) { cout<<vfloat_values[j]->size()<<endl; if(vfloat_values[j]->size()>0) cout<<vfloat_values[j]->at(0)<<endl;}
 		//cout<<vfloat_values[0]->at(0)<<endl;
-		for(int j=0;j<out_branches.size();j++){ out_branches[j]->Fill();}
+		for(uint j=0;j<out_branches.size();j++){ out_branches[j]->Fill();}
 	}
 	slimTree->Write();
 	slimFile.Close();

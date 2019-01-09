@@ -199,17 +199,29 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
 
 
     //Weight info
+    bool pass=true;
+    bool isgoodrun=true;
+    bool duplicate=false;
+
     float weight=0;
     float w_lumi=0;
     float w_lumi_scale1fbs=0;
     float w_lumi_getWeight=0;
     float w_noBtagSF=0;
 
+    TBranch * b_pass = extraTree->Branch("pass",&pass,"pass/O");
+    TBranch * b_isgoodrun = extraTree->Branch("goodrun",&isgoodrun,"isgoodrun/O");
+    TBranch * b_duplicate = extraTree->Branch("duplicate",&duplicate,"duplicate/O");
+
     TBranch * b_weight = extraTree->Branch("weight",&weight,"weight/F");
     TBranch * b_w_lumi = extraTree->Branch("w_lumi",&w_lumi,"w_lumi/F");
     TBranch * b_w_lumi_scale1fbs = extraTree->Branch("w_lumi_scale1fbs",&w_lumi_scale1fbs,"w_lumi_scale1fbs/F");
     TBranch * b_w_lumi_getWeight = extraTree->Branch("w_lumi_getWeight",&w_lumi_getWeight,"w_lumi_getWeight/F");
     TBranch * b_w_noBtagSF = extraTree->Branch("w_noBtagSF",&w_noBtagSF,"w_noBtagSF/F");
+
+    extraTree->SetBranchAddress("pass",&pass,&b_pass);
+    extraTree->SetBranchAddress("goodrun",&isgoodrun,&b_isgoodrun);
+    extraTree->SetBranchAddress("duplicate",&duplicate,&b_duplicate);
 
     extraTree->SetBranchAddress("weight",&weight,&b_weight);
     extraTree->SetBranchAddress("w_lumi",&w_lumi,&b_w_lumi);
@@ -398,7 +410,8 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
     if (nEventsTotal >= nEventsChain) continue;
     unsigned int nEventsTree = tree->GetEntriesFast();
 
-
+    //nEventsTree = 10;
+    cout<<"apply good run list "<<applyGoodRunList<<endl;
     for (unsigned int event = 0; event < nEventsTree; ++event) {
       // Read Tree
       if (nEventsTotal >= nEventsChain) continue;
@@ -406,12 +419,17 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
       babyAnalyzer.GetEntry(event);
       ++nEventsTotal;
 
+      isgoodrun=true;
+      duplicate=false;
       if ( is_data() ) {
-        if ( applyGoodRunList && !goodrun(run(), ls()) ) continue;
+        // cout<<"run, ls"<<run()<<" "<<ls()<<endl;
+        // cout<<"On good run? "<< goodrun(run(), ls())<<endl;
+        if ( applyGoodRunList && !goodrun(run(), ls()) ) isgoodrun=false;//continue;
         duplicate_removal::DorkyEventIdentifier id(run(), evt(), ls());
         if ( is_duplicate(id) ) {
           ++nDuplicates;
-          continue;
+          duplicate=true;
+         // continue;
         }
       }
 
@@ -606,39 +624,50 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
        
       }
 
-      extraTree->Fill();
+      
       // fillEfficiencyHistos(testVec[0], "filters");
+      pass=true;
+      if(is_data()) pass = isgoodrun && !duplicate;
+
+       // Require at least 1 good vertex
+      if (nvtxs() < 1) pass=false;
 
       // Apply met filters
-      if (doTopTagging) {
+      //if (doTopTagging) {
         // Recommended filters for the legacy analysis
-        switch (year_) {
-          case 2018:  // 2017 and 2018 uses the same set of filters
-          case 2017:
-            if ( !filt_ecalbadcalib() ) continue;
-          case 2016:
-            if ( !filt_goodvtx() ) continue;
-            if ( !is_fastsim_ && !filt_globalsupertighthalo2016() ) continue;
-            if ( !filt_hbhenoise() ) continue;
-            if ( !filt_hbheisonoise() )   continue;
-            if ( !filt_ecaltp() ) continue;
-            if ( !filt_badMuonFilter() ) continue;
-            if ( !filt_badChargedCandidateFilter() ) continue;
-            if ( is_data() && !filt_eebadsc() ) continue;
-        }
-      } else if (samplever.find("v24") == 0) {
-        // Filters used in Moriond17 study, keep for sync check
-        if ( !filt_met() ) continue;
-        if ( !filt_goodvtx() ) continue;
-        if ( firstGoodVtxIdx() == -1 ) continue;
-        if ( !filt_badMuonFilter() ) continue;
-        if ( !filt_badChargedCandidateFilter() ) continue;
-        if ( !filt_jetWithBadMuon() ) continue;
-        if ( !filt_pfovercalomet() ) continue;
-        if ( filt_duplicatemuons() ) continue; // Temporary, breaks for old 16 babies
-        if ( filt_badmuons() ) continue;
-        if ( !filt_nobadmuons() ) continue;
+      switch (year_) {
+        case 2018:  // 2017 and 2018 uses the same set of filters
+        case 2017:
+          if ( !filt_ecalbadcalib() ) pass=false;
+        case 2016:
+          if ( !filt_goodvtx() ) pass=false;
+          if ( !is_fastsim_ && !filt_globalsupertighthalo2016() ) pass=false;
+          if ( !filt_hbhenoise() ) pass=false;
+          if ( !filt_hbheisonoise() )   pass=false;
+          if ( !filt_ecaltp() ) pass=false;
+          if ( !filt_badMuonFilter() ) pass=false;
+          if ( !filt_badChargedCandidateFilter() ) pass=false;
+          if ( is_data() && !filt_eebadsc() ) pass=false;
       }
+
+      if (is_fastsim_) {
+        if ( !filt_fastsimjets() ) pass=false;
+      }
+      // } else if (samplever.find("v24") == 0) {
+      //   // Filters used in Moriond17 study, keep for sync check
+      //   if ( !filt_met() ) continue;
+      //   if ( !filt_goodvtx() ) continue;
+      //   if ( firstGoodVtxIdx() == -1 ) continue;
+      //   if ( !filt_badMuonFilter() ) continue;
+      //   if ( !filt_badChargedCandidateFilter() ) continue;
+      //   if ( !filt_jetWithBadMuon() ) continue;
+      //   if ( !filt_pfovercalomet() ) continue;
+      //   if ( filt_duplicatemuons() ) continue; // Temporary, breaks for old 16 babies
+      //   if ( filt_badmuons() ) continue;
+      //   if ( !filt_nobadmuons() ) continue;
+      // }
+
+      extraTree->Fill();
 
       // stop defined filters
       if (is_fastsim_) {
@@ -648,8 +677,7 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
         if ( !filt_jetWithBadMuon() ) continue; // there's a jup/jdown of this filter, but this alone should be enough
       }
 
-      // Require at least 1 good vertex
-      if (nvtxs() < 1) continue;
+     
 
       // For testing on only subset of mass points
       if (!runFullSignalScan && is_fastsim_) {
