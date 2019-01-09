@@ -41,6 +41,17 @@ vector<TString> loadFromSampleList(char *type, const char *filename, char *input
   return output;
 }
 
+TString parseArg(const TString& input, TString arg, const TString dfval="") {
+  if (input.Contains(arg)) {
+    if (!arg.EndsWith("=")) arg += "=";
+    int sidx = input.Index(arg) + arg.Sizeof();
+    int eidx = input.Index(",", sidx);
+    if (eidx < 0) eidx = input.Sizeof();
+    return input(sidx, eidx-sidx);
+  } else {
+    return dfval;
+  }
+}
 
 int main(int argc, char **argv){
 
@@ -82,8 +93,8 @@ int main(int argc, char **argv){
   bool isFastsim = (sampletype == 1);
   bool doPhotonSkim = (sampletype == 2);
 
-  string topCandTreeName;
-  if(argc>7) topCandTreeName = argv[7];
+  TString extrargs;
+  if(argc>7) extrargs = argv[7];
 
   //
   // Initialize looper
@@ -94,7 +105,7 @@ int main(int argc, char **argv){
   // Skim Parameters
   //
   mylooper->skim_nvtx            = 1;
-  mylooper->skim_met             = 150;
+  mylooper->skim_met             = 50;
 
   mylooper->skim_nGoodLep        = 1;
   mylooper->skim_goodLep_el_pt   = 20.0;
@@ -154,16 +165,29 @@ int main(int argc, char **argv){
   mylooper->fillIso         =  false;
   mylooper->fillLepSynch    =  false;
 
+  if (isFastsim)
+    cout << "[runBabyMaker] >> Fastsim switch on! Note that the looper will still determine it based on sample name." << endl;
+
   if (doPhotonSkim) {
+    cout << "[runBabyMaker] >> Doing photon skim for the sample!" << endl;
     mylooper->fillPhoton    = true;
     mylooper->skim_nPhotons = 1;
     mylooper->skim_nGoodLep = 0;
     mylooper->skim_met      = 100;
   }
 
-  if (!topCandTreeName.empty()) {
+  TString newskim_met = parseArg(extrargs, "skim_met");
+  if (newskim_met.IsFloat()) {
+    cout << "[runBabyMaker] >> Changing the skim_met to new value: " << newskim_met.Atof() << endl;
+    mylooper->skim_met = newskim_met.Atof();
+  }
+
+  TString topCandTreeName = parseArg(extrargs, "topcandTree");
+  if (!topCandTreeName.IsNull()) {
+    topCandTreeName = Form("%s%s.root", topCandTreeName.Data(), suffix);
+    cout << "[runBabyMaker] >> Will generate a separate topcand tree " << topCandTreeName << endl;
     mylooper->runTopCandTreeMaker = true;
-    mylooper->topcandTreeMaker = new TopCandTree("tree", Form("%s%s.root", topCandTreeName.c_str(), suffix), "ttbar");
+    mylooper->topcandTreeMaker = new TopCandTree("tree", topCandTreeName.Data(), "ttbar");
   }
 
   // Input sanitation
