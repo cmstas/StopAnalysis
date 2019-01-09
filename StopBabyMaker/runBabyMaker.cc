@@ -60,7 +60,7 @@ int main(int argc, char **argv){
   //
   //isFastsim = true does not work, need to use = 1
   if(argc<2){
-    cout << "[runBabyMaker] Function takes six arguments: ./runBabyMaker <sample_name> <nevents> <file_number> <outpath> <samplelist>/<filenames> <isFastSim>" << endl;
+    cout << "[runBabyMaker] Function takes six arguments: ./runBabyMaker <sample_name> <nevents> <file_number> <outpath> <samplelist>/<filenames> <isFastSim> [*optional*extrargs]" << endl;
     cout << "[runBabyMaker] Need to provide at least sample_name; nevents=-1 (-1=all events), file_number=-1 (-1=merged_ntuple_*.root), output=/nfs-7/userdata/stopRun2/, samplelist=sample_2017.dat, isFastSim=false by default" << endl;
     return 0;
   }

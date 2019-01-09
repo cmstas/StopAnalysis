@@ -84,10 +84,8 @@ void EventTree::FillCommon (const std::string &root_file_name)
     is_data = evt_isRealData();
     // the recommended met filters //
     if(!signal){
-      if(nvtxs>0) filt_met = true;
-      else filt_met = false;
-      // filt_met = filt_met*filt_globalTightHalo2016()*filt_ecalTP()*filt_eeBadSc()*filt_hbheNoise()*filt_hbheNoiseIso();
-      filt_met = filt_met && filt_globalTightHalo2016() && filt_ecalTP() && filt_eeBadSc() && filt_hbheNoise() && filt_hbheNoiseIso();
+      // filt_met = (nvtxs>0) && filt_globalTightHalo2016() && filt_ecalTP() && filt_eeBadSc() && filt_hbheNoise() && filt_hbheNoiseIso();
+      filt_met = passesMETfiltersRun2(is_data);
 
       if (gconf.cmssw_ver == 80) {
         filt_badMuonFilter = badMuonFilterV2(); //still some problems with MC
