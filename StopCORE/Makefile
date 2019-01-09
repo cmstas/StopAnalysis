@@ -37,8 +37,8 @@ TOOLSLIB = ../CORE/Tools/btagsf/BTagCalibrationStandalone.o
 # stopCORE.so: sysInfo.o eventWeight_bTagSF.o eventWeight_lepSF.o selectionInfo.o categoryInfo.o genClassyInfo.o sampleInfo.o stop_1l_babyAnalyzer.o
 # 	$(LD) $(LDFLAGS) $(SOFLAGS) -o stopCORE.so sysInfo.o eventWeight_bTagSF.o eventWeight_lepSF.o selectionInfo.o categoryInfo.o genClassyInfo.o sampleInfo.o stop_1l_babyAnalyzer.o $(GLIBS) -lGenVector -lEG $(CORELIB) $(STOPVARLIB) -Wl,-rpath,./
 
-stopCORE.so: StopTree.o eventWeight_bTagSF.o eventWeight_lepSF.o sampleInfo.o ResolvedTopMVA.o
-	$(LD) $(LDFLAGS) $(SOFLAGS) -o stopCORE.so StopTree.o ResolvedTopMVA.o eventWeight_bTagSF.o eventWeight_lepSF.o sampleInfo.o $(GLIBS) -lGenVector -lEG $(TOOLSLIB) -Wl,-rpath,./
+stopCORE.so: StopTree.o eventWeight.o eventWeight_bTagSF.o eventWeight_lepSF.o sampleInfo.o ResolvedTopMVA.o
+	$(LD) $(LDFLAGS) $(SOFLAGS) -o stopCORE.so StopTree.o eventWeight.o eventWeight_bTagSF.o eventWeight_lepSF.o ResolvedTopMVA.o sampleInfo.o $(GLIBS) -lGenVector -lEG $(TOOLSLIB) -Wl,-rpath,./
 
 sysInfo.o: sysInfo.h sysInfo.cc StopTree.h StopTree.cc eventWeight_lepSF.h eventWeight_lepSF.cc eventWeight_bTagSF.h eventWeight_bTagSF.cc
 	$(CXX) $(CXXFLAGS) -c sysInfo.cc

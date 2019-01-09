@@ -4,7 +4,7 @@
 #include "TFile.h"
 #include "TChain.h"
 #include "SR.h"
-#include "eventWeight.h"
+#include "../StopCORE/eventWeight.h"
 #include "../StopCORE/TopTagger/ResolvedTopMVA.h"
 
 class StopLooper {

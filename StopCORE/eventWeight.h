@@ -2,9 +2,9 @@
 #define EVENTWEIGHT_H
 
 // StopCORE
-#include "../StopCORE/eventWeight_bTagSF.h"
-#include "../StopCORE/eventWeight_lepSF.h"
-#include "../StopCORE/StopTree.h"
+#include "eventWeight_bTagSF.h"
+#include "eventWeight_lepSF.h"
+#include "StopTree.h"
 
 // ROOT
 #include "TFile.h"
