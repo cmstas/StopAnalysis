@@ -180,25 +180,56 @@ std::vector<SR> getStopCrosscheckRegionsEMu() {
   SR crbase;
 
   crbase.SetName("cremu_base");
-  crbase.SetVar("nlep", 1, 3);
+  crbase.SetVar("nvlep", 1, 3);
   crbase.SetVar("met", 50, fInf);
   crbase.SetVar("njet", 2, fInf);
+  crbase.SetMETBins({50, 100, 150, 200, 250, 350, 450, 600, 800, 1500});
   crbase.SetAllowDummyVars(1);
 
+  // The strict lepton selections are in the looper
+
   SR cr = crbase;
-  cr.SetName("cremu1");
-  cr.SetDetailName("geq0b_met50toInf");
-  crbase.SetVar("nbjet", 0, fInf);
+
+  cr.SetName("cremuA0");
+  cr.SetDetailName("ge2j_ge0b_met50toInf");
+  cr.SetVar("nbjet", 0, fInf);
   CRvec.emplace_back(cr);
 
-  cr.SetName("cremu2");
-  cr.SetDetailName("geq1b_met50toInf");
-  crbase.SetVar("nbjet", 1, fInf);
+  cr.SetName("cremuA1");
+  cr.SetDetailName("ge2j_ge1b_met50toInf");
+  cr.SetVar("nbjet", 1, fInf);
   CRvec.emplace_back(cr);
 
-  cr.SetName("cremu3");
-  cr.SetDetailName("geq2b_met50toInf");
-  crbase.SetVar("nbjet", 2, fInf);
+  cr.SetName("cremuA2");
+  cr.SetDetailName("ge2j_ge2b_met50toInf");
+  cr.SetVar("nbjet", 2, fInf);
+  CRvec.emplace_back(cr);
+
+  cr.SetName("cremuB0");
+  cr.SetDetailName("ge2j_0b_met50toInf");
+  cr.SetVar("nbjet", 0, 1);
+  CRvec.emplace_back(cr);
+
+  cr.SetName("cremuB1");
+  cr.SetDetailName("ge2j_1b_met50toInf");
+  cr.SetVar("nbjet", 1, 2);
+  CRvec.emplace_back(cr);
+
+  cr.SetVar("mt", 150, fInf);
+
+  cr.SetName("cremuC0");
+  cr.SetDetailName("ge2j_0b_met50toInf_mt150toInf");
+  cr.SetVar("nbjet", 0, 1);
+  CRvec.emplace_back(cr);
+
+  cr.SetName("cremuC1");
+  cr.SetDetailName("ge2j_1b_met50toInf_mt150toInf");
+  cr.SetVar("nbjet", 1, 2);
+  CRvec.emplace_back(cr);
+
+  cr.SetName("cremuC2");
+  cr.SetDetailName("ge2j_ge2b_met50toInf_mt150toInf");
+  cr.SetVar("nbjet", 2, fInf);
   CRvec.emplace_back(cr);
 
   return CRvec;
@@ -898,10 +929,10 @@ std::vector<SR> getStopSignalRegionsNewMETBinning() {
   // SRvec.emplace_back(sr);
 
 
-  // SR geq4j
+  // SR ge4j
 
   sr.SetName("srC0");
-  sr.SetDetailName("geq4j_tmodlt0_mlb0to175_met550");
+  sr.SetDetailName("ge4j_tmodlt0_mlb0to175_met550");
   sr.SetVar("njet", 4, fInf);
   sr.SetVar("tmod", -fInf, 0);
   sr.SetVar("mlb", 0, 175);
@@ -914,7 +945,7 @@ std::vector<SR> getStopSignalRegionsNewMETBinning() {
   SRvec.emplace_back(sr);
 
   // sr.SetName("srC1");
-  // sr.SetDetailName("geq4j_tmodlt0_mlb0to175_nottag");
+  // sr.SetDetailName("ge4j_tmodlt0_mlb0to175_nottag");
   // sr.SetVar("njet", 4, fInf);
   // sr.SetVar("tmod", -fInf, 0);
   // sr.SetVar("mlb", 0, 175);
@@ -926,7 +957,7 @@ std::vector<SR> getStopSignalRegionsNewMETBinning() {
   // SRvec.emplace_back(sr);
 
   // sr.SetName("srC2");
-  // sr.SetDetailName("geq4j_tmodlt0_mlb0to175_deepttag");
+  // sr.SetDetailName("ge4j_tmodlt0_mlb0to175_deepttag");
   // sr.SetVar("deepttag", wpDeepTop, 1);
   // sr.SetVar("resttag", -2, 1);
   // // sr.SetMETBins({250, 350, 450, 600, 1500});
@@ -934,7 +965,7 @@ std::vector<SR> getStopSignalRegionsNewMETBinning() {
   // SRvec.emplace_back(sr);
 
   // sr.SetName("srC3");
-  // sr.SetDetailName("geq4j_tmodlt0_mlb0to175_resttag");
+  // sr.SetDetailName("ge4j_tmodlt0_mlb0to175_resttag");
   // sr.SetVar("deepttag", -2, wpDeepTop);
   // sr.SetVar("resttag", wpResTop, 1);
   // // sr.SetMETBins({250, 350, 500, 1500});
@@ -944,7 +975,7 @@ std::vector<SR> getStopSignalRegionsNewMETBinning() {
 
 
   sr.SetName("srD0");
-  sr.SetDetailName("geq4j_tmodlt0_mlb175toInf");
+  sr.SetDetailName("ge4j_tmodlt0_mlb175toInf");
   sr.SetVar("njet", 4, fInf);
   sr.SetVar("tmod", -fInf, 0);
   sr.SetVar("mlb", 175, fInf);
@@ -955,7 +986,7 @@ std::vector<SR> getStopSignalRegionsNewMETBinning() {
 
 
   sr.SetName("srE0");
-  sr.SetDetailName("geq4j_tmod0to10_mlb0to175");
+  sr.SetDetailName("ge4j_tmod0to10_mlb0to175");
   sr.SetVar("njet", 4, fInf);
   sr.SetVar("tmod", 0, 10);
   sr.SetVar("mlb", 0, 175);
@@ -966,7 +997,7 @@ std::vector<SR> getStopSignalRegionsNewMETBinning() {
   SRvec.emplace_back(sr);
 
   sr.SetName("srE1");
-  sr.SetDetailName("geq4j_tmod0to10_mlb0to175_nottag");
+  sr.SetDetailName("ge4j_tmod0to10_mlb0to175_nottag");
   sr.SetVar("njet", 4, fInf);
   sr.SetVar("tmod", 0, 10);
   sr.SetVar("mlb", 0, 175);
@@ -977,7 +1008,7 @@ std::vector<SR> getStopSignalRegionsNewMETBinning() {
   SRvec.emplace_back(sr);
 
   sr.SetName("srE2");
-  sr.SetDetailName("geq4j_tmod0to10_mlb0to175_deepttag");
+  sr.SetDetailName("ge4j_tmod0to10_mlb0to175_deepttag");
   sr.SetVar("deepttag", wpDeepTop, 1);
   sr.SetVar("resttag", -2, 1);
   // sr.SetMETBins({250, 350, 450, 1500});
@@ -985,7 +1016,7 @@ std::vector<SR> getStopSignalRegionsNewMETBinning() {
   SRvec.emplace_back(sr);
 
   sr.SetName("srE3");
-  sr.SetDetailName("geq4j_tmod0to10_mlb0to175_resttag");
+  sr.SetDetailName("ge4j_tmod0to10_mlb0to175_resttag");
   sr.SetVar("deepttag", -2, wpDeepTop);
   sr.SetVar("resttag", wpResTop, 1);
   // sr.SetMETBins({250, 350, 450, 1500});
@@ -994,7 +1025,7 @@ std::vector<SR> getStopSignalRegionsNewMETBinning() {
 
 
   sr.SetName("srF0");
-  sr.SetDetailName("geq4j_tmod0to10_mlb175toInf");
+  sr.SetDetailName("ge4j_tmod0to10_mlb175toInf");
   sr.SetVar("njet", 4, fInf);
   sr.SetVar("tmod", 0, 10);
   sr.SetVar("mlb", 175, fInf);
@@ -1005,7 +1036,7 @@ std::vector<SR> getStopSignalRegionsNewMETBinning() {
 
 
   sr.SetName("srG0");
-  sr.SetDetailName("geq4j_tmod10toInf_mlb0to175");
+  sr.SetDetailName("ge4j_tmod10toInf_mlb0to175");
   sr.SetVar("njet", 4, fInf);
   sr.SetVar("tmod", 10, fInf);
   sr.SetVar("mlb", 0, 175);
@@ -1015,7 +1046,7 @@ std::vector<SR> getStopSignalRegionsNewMETBinning() {
   SRvec.emplace_back(sr);
 
   sr.SetName("srG1");
-  sr.SetDetailName("geq4j_tmod10toInf_mlb0to175_nottag");
+  sr.SetDetailName("ge4j_tmod10toInf_mlb0to175_nottag");
   sr.SetVar("njet", 4, fInf);
   sr.SetVar("tmod", 10, fInf);
   sr.SetVar("mlb", 0, 175);
@@ -1026,7 +1057,7 @@ std::vector<SR> getStopSignalRegionsNewMETBinning() {
   SRvec.emplace_back(sr);
 
   sr.SetName("srG2");
-  sr.SetDetailName("geq4j_tmod10toInf_mlb0to175_deepttag");
+  sr.SetDetailName("ge4j_tmod10toInf_mlb0to175_deepttag");
   sr.SetVar("deepttag", wpDeepTop, 1);
   sr.SetVar("resttag", -2, 1);
   // sr.SetMETBins({250, 450, 1500});
@@ -1034,7 +1065,7 @@ std::vector<SR> getStopSignalRegionsNewMETBinning() {
   SRvec.emplace_back(sr);
 
   sr.SetName("srG3");
-  sr.SetDetailName("geq4j_tmod10toInf_mlb0to175_resttag");
+  sr.SetDetailName("ge4j_tmod10toInf_mlb0to175_resttag");
   sr.SetVar("deepttag", -2, wpDeepTop);
   sr.SetVar("resttag", wpResTop, 1);
   // sr.SetMETBins({250, 350, 500, 1500});
@@ -1043,7 +1074,7 @@ std::vector<SR> getStopSignalRegionsNewMETBinning() {
 
 
   sr.SetName("srH0");
-  sr.SetDetailName("geq4j_tmod10toInf_mlb175toInf");
+  sr.SetDetailName("ge4j_tmod10toInf_mlb175toInf");
   sr.SetVar("njet", 4, fInf);
   sr.SetVar("tmod", 10, fInf);
   sr.SetVar("mlb", 175, fInf);
@@ -1057,7 +1088,7 @@ std::vector<SR> getStopSignalRegionsNewMETBinning() {
   // Compressed regions
   sr = srbase;
   sr.SetName("srI");
-  sr.SetDetailName("geq5j_lpt0to150_j1notb");
+  sr.SetDetailName("ge5j_lpt0to150_j1notb");
   // sr.RemoveVar("nbtag");
   sr.SetVar("mt", 150, fInf);
   sr.SetVar("njet", 5, fInf);
@@ -1072,7 +1103,7 @@ std::vector<SR> getStopSignalRegionsNewMETBinning() {
 
   // sr = srbase;
   // sr.SetName("srI2");
-  // sr.SetDetailName("geq2j_lpt0to150_j1notb");
+  // sr.SetDetailName("ge2j_lpt0to150_j1notb");
   // sr.RemoveVar("nbtag");
   // sr.SetVar("mt", 100, fInf);
   // sr.SetVar("njet", 4, fInf);
@@ -1088,7 +1119,7 @@ std::vector<SR> getStopSignalRegionsNewMETBinning() {
 
   // sr = srbase;
   // sr.SetName("srI3");
-  // sr.SetDetailName("geq2j_lpt0to150_j1notb");
+  // sr.SetDetailName("ge2j_lpt0to150_j1notb");
   // sr.RemoveVar("nbtag");
   // sr.SetVar("mt", 100, fInf);
   // sr.SetVar("njet", 4, fInf);
@@ -1104,7 +1135,7 @@ std::vector<SR> getStopSignalRegionsNewMETBinning() {
 
   // sr = srbase;
   // sr.SetName("srI4");
-  // sr.SetDetailName("geq2j_lpt0to150_j1notb");
+  // sr.SetDetailName("ge2j_lpt0to150_j1notb");
   // sr.RemoveVar("nbtag");
   // sr.SetVar("mt", 100, fInf);
   // sr.SetVar("njet", 4, fInf);
