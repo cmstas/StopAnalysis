@@ -33,7 +33,7 @@ class StopLooper {
   void fillHistosForSR(std::string suffix = "");
   void fillHistosForCR2l(std::string suffix = "");
   void fillHistosForCR0b(std::string suffix = "");
-  void fillHistosForCRemu(std::string suffix = "");
+  void fillHistosForCRemu(std::string suffix = "", int trigType = 0);
 
   // Helper functions
   bool PassingHLTriggers(const int type = 1);
