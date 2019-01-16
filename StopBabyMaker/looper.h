@@ -44,6 +44,7 @@ class babyMaker {
   // Variables for baby skim
   int skim_nvtx;
   float skim_met;
+  float skim_met_emuEvt;
 
   int   skim_nGoodLep;
   float skim_goodLep_el_pt;
