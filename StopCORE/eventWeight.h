@@ -90,6 +90,7 @@ class evtWgtInfo {
   bool add2ndLepToMet;
 
   enum SampleType {data, ttbar, Wjets, singletop, ttW, ttZ, WZ, diboson, fastsim, unknown=-1 } samptype;
+  enum SystSet {stop_Moriond17, stop_Run2, test_alloff};
 
   // Counter histograms stored in babies
   TH1D *h_bkg_counter;

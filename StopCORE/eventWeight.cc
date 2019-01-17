@@ -1733,9 +1733,9 @@ void evtWgtInfo::getTTbarSysPtSF( double &weight_ttbarSysPt, double &weight_ttba
   int jet1_idx = -1;
   double max_deepcsv = -99.9;
   for (int iJet=0; iJet<(int)babyAnalyzer.ak4pfjets_p4().size(); iJet++) {
-    if ( babyAnalyzer.ak4pfjets_CSV().at(iJet) > max_deepcsv ) {
+    if ( babyAnalyzer.ak4pfjets_deepCSV().at(iJet) > max_deepcsv ) {
       jet1_idx = iJet;
-      max_deepcsv  = babyAnalyzer.ak4pfjets_CSV().at(iJet);
+      max_deepcsv  = babyAnalyzer.ak4pfjets_deepCSV().at(iJet);
     }
   }
   if (jet1_idx>=0) system_LV += babyAnalyzer.ak4pfjets_p4().at(jet1_idx);
@@ -1745,9 +1745,9 @@ void evtWgtInfo::getTTbarSysPtSF( double &weight_ttbarSysPt, double &weight_ttba
   max_deepcsv = -99.9;
   for (int iJet=0; iJet<(int)babyAnalyzer.ak4pfjets_p4().size(); iJet++) {
     if ( iJet==jet1_idx ) continue;
-    if ( babyAnalyzer.ak4pfjets_CSV().at(iJet) > max_deepcsv ) {
+    if ( babyAnalyzer.ak4pfjets_deepCSV().at(iJet) > max_deepcsv ) {
       jet2_idx = iJet;
-      max_deepcsv = babyAnalyzer.ak4pfjets_CSV().at(iJet);
+      max_deepcsv = babyAnalyzer.ak4pfjets_deepCSV().at(iJet);
     }
   }
   if (jet2_idx>=0) system_LV += babyAnalyzer.ak4pfjets_p4().at(jet2_idx);
@@ -2157,7 +2157,7 @@ double evtWgtInfo::getWeight( systID isyst, bool is_cr2l ) {
 void evtWgtInfo::setDefaultSystematics( int syst_set ) {
   switch (syst_set) {
     // Set of systematics used in the Moriond17 analysis
-    case 0:
+    case stop_Moriond17:
       apply_cr2lTrigger_sf = true;  // only !=1 if pfmet!=pfmet_rl ie no weight for ==1lepton events in SR and CR0b
       apply_bTag_sf        = true;  // event weight, product of all jet wgts
       apply_lep_sf         = true;  // both lep1 and lep2 (if available) are multiplied together
@@ -2183,7 +2183,7 @@ void evtWgtInfo::setDefaultSystematics( int syst_set ) {
       break;
 
     // Set of (incomplete) systematics prepared for legacy analysis using 94X samples
-    case 1:
+    case stop_Run2:
       apply_cr2lTrigger_sf = true;   // not available yet
       apply_bTag_sf        = true;
       apply_lep_sf         = true;   // available but not updated yet
