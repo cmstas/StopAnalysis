@@ -297,7 +297,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
       evtWgt.getExtSampleWeightSummer16v2(fname);
     else if (year_ == 2016 && samplever.find("Summer16v3") != string::npos)
       evtWgt.getExtSampleWeightSummer16v3(fname);
-    else if (year_ == 2017 && samplever.find("v29") == 0)
+    else if (year_ == 2017)
       evtWgt.getExtSampleWeightFall17v2(fname);
 
     evtWgt.getZSampleWeightFromCR3l(fname);
@@ -1061,41 +1061,45 @@ void StopLooper::fillHistosForCRemu(string suf, int trigType) {
   LorentzVector met_p4( pfmet()*cos(pfmet_phi()), pfmet()*sin(pfmet_phi()), 0.0, pfmet() );
   system_p4 += met_p4;
 
-  values_["mtttbar"] = system_p4.M();
+  values_["mllbbmet"] = system_p4.M();
+  values_["mtttbar"] = system_p4.Mt();
   values_["ptttbar"] = system_p4.Pt();
 
   evtweight_ = evtWgt.getWeight(evtWgtInfo::systID::k_nominal);
 
   for (auto& cr : CRemuVec) {
     if ( cr.PassesSelection(values_) ) {
+      plot1d("h_metbins"+suf, values_["met"], evtweight_, cr.histMap, ";#slash{E}_{T} [GeV]", cr.GetNMETBins(), cr.GetMETBinsPtr());
 
       auto fillhists = [&] (string s) {
         plot1d("h_mt"+s,       values_["mt"]      , evtweight_, cr.histMap, ";M_{T} [GeV]"          , 10, 150, 650);
         plot1d("h_mt_h"+s,     values_["mt"]      , evtweight_, cr.histMap, ";M_{T} [GeV]"          , 12,  0, 600);
         plot1d("h_mt2w"+s,     values_["mt2w"]    , evtweight_, cr.histMap, ";MT2W [GeV]"           , 18,  50, 500);
-        plot1d("h_met"+s,      values_["met"]     , evtweight_, cr.histMap, ";#slash{E}_{T} [GeV]"  , 20, 250, 650);
-        plot1d("h_met_h"+s,    values_["met"]     , evtweight_, cr.histMap, ";#slash{E}_{T} [GeV]"  , 24,  50, 650);
+        plot1d("h_met"+s,      values_["met"]     , evtweight_, cr.histMap, ";#slash{E}_{T} [GeV]"  , 22, 250, 800);
+        plot1d("h_met_h"+s,    values_["met"]     , evtweight_, cr.histMap, ";#slash{E}_{T} [GeV]"  , 30,  50, 800);
         plot1d("h_metphi"+s,   values_["metphi"]  , evtweight_, cr.histMap, ";#phi(#slash{E}_{T})"  , 32, -3.2, 3.2);
-        plot1d("h_mll"+s,      values_["mll"]     , evtweight_, cr.histMap, ";M_{ll} [GeV]"         , 40,  0, 200);
+        plot1d("h_mll"+s,      values_["mll"]     , evtweight_, cr.histMap, ";M_{ll} [GeV]"         , 40,  0, 400);
         plot1d("h_ptll"+s,     values_["ptll"]    , evtweight_, cr.histMap, ";p_{T}(ll) [GeV]"      , 40,  0, 800);
         plot1d("h_lep1pt"+s,   values_["lep1pt"]  , evtweight_, cr.histMap, ";p_{T}(lepton) [GeV]"  , 24,  0, 600);
         plot1d("h_lep2pt"+s,   values_["lep2pt"]  , evtweight_, cr.histMap, ";p_{T}(lep2) [GeV]"    , 30,  0, 300);
-        plot1d("h_lep1eta"+s,  values_["lep1eta"] , evtweight_, cr.histMap, ";#eta(lepton)"         , 30, -3, 3);
-        plot1d("h_lep2eta"+s,  values_["lep2eta"] , evtweight_, cr.histMap, ";#eta(lep2)"           , 20, -3, 3);
+        plot1d("h_lep1eta"+s,  values_["lep1eta"] , evtweight_, cr.histMap, ";#eta(lepton)"         , 36, -2.4, 2.4);
+        plot1d("h_lep2eta"+s,  values_["lep2eta"] , evtweight_, cr.histMap, ";#eta(lep2)"           , 36, -2.4, 2.4);
         plot1d("h_nleps"+s,    values_["nlep"]    , evtweight_, cr.histMap, ";Number of leptons"    ,  5,  0, 5);
         plot1d("h_njets"+s,    values_["njet"]    , evtweight_, cr.histMap, ";Number of jets"       ,  8,  2, 10);
         plot1d("h_nbjets"+s,   values_["nbjet"]   , evtweight_, cr.histMap, ";nbtags"               ,  6,  0, 6);
         plot1d("h_tmod"+s,     values_["tmod"]    , evtweight_, cr.histMap, ";Modified topness"     , 30, -15, 15);
-        plot1d("h_mlepb"+s,    values_["mlb_0b"]  , evtweight_, cr.histMap, ";M_{#it{l}b} [GeV]" , 24,  0, 600);
+        plot1d("h_mlepb"+s,    values_["mlb_0b"]  , evtweight_, cr.histMap, ";M_{#it{l}b} [GeV]"    , 24,  0, 600);
         plot1d("h_dphijmet"+s, values_["dphijmet"], evtweight_, cr.histMap, ";#Delta#phi(jet,#slash{E}_{T})" , 33,  0, 3.3);
+        plot1d("h_nvtxs"+s,        nvtxs()        , evtweight_, cr.histMap, ";Number of vertices"   , 80,  1, 81);
 
-        plot1d("h_mtttbar"+s,  values_["mtttbar"] , evtweight_, cr.histMap, ";M_{T}(t#bar{t}) [GeV]", 40,  0, 400);
-        plot1d("h_ptttbar"+s,  values_["ptttbar"] , evtweight_, cr.histMap, ";p_{T}(t#bar{t}) [GeV]", 40,  0, 800);
+        plot1d("h_mllbbmet"+s, values_["mllbbmet"], evtweight_, cr.histMap, ";M_{llbbMET} [GeV]"    , 48, 150, 1350);
+        plot1d("h_mtttbar"+s,  values_["mtttbar"] , evtweight_, cr.histMap, ";M_{T}(t#bar{t}) [GeV]", 48, 150, 1350);
+        plot1d("h_ptttbar"+s,  values_["ptttbar"] , evtweight_, cr.histMap, ";p_{T}(t#bar{t}) [GeV]", 40,   0, 800);
 
         plot1d("h_jet1pt"+s,  values_["jet1pt"],  evtweight_, cr.histMap, ";p_{T}(jet1) [GeV]"  , 32,  0, 800);
         plot1d("h_jet2pt"+s,  values_["jet2pt"],  evtweight_, cr.histMap, ";p_{T}(jet2) [GeV]"  , 32,  0, 800);
-        plot1d("h_jet1eta"+s, values_["jet1eta"], evtweight_, cr.histMap, ";#eta(jet1) [GeV]"   , 30, -2.4, 2.4);
-        plot1d("h_jet2eta"+s, values_["jet2eta"], evtweight_, cr.histMap, ";#eta(jet2) [GeV]"   , 60, -2.4, 2.4);
+        plot1d("h_jet1eta"+s, values_["jet1eta"], evtweight_, cr.histMap, ";#eta(jet1) [GeV]"   , 36, -2.4, 2.4);
+        plot1d("h_jet2eta"+s, values_["jet2eta"], evtweight_, cr.histMap, ";#eta(jet2) [GeV]"   , 36, -2.4, 2.4);
 
         if (doTopTagging) {
           plot1d("h_nak8jets", ak8pfjets_deepdisc_top().size(), evtweight_, cr.histMap, ";Number of AK8 jets", 7, 0, 7);
@@ -1107,6 +1111,13 @@ void StopLooper::fillHistosForCRemu(string suf, int trigType) {
         const float leppt_bins[] = {0, 30, 40, 50, 75, 100, 125, 200};
         plot1d("h_lep1ptbins"+s, values_["lep1pt"], evtweight_, cr.histMap, ";p_{T}(lepton) [GeV]", 7, leppt_bins);
         plot1d("h_lep2ptbins"+s, values_["lep2pt"], evtweight_, cr.histMap, ";p_{T}(lep2) [GeV]"  , 7, leppt_bins);
+
+        const vector<float> ptbin1 = {0, 50, 100, 150, 200, 250, 350, 450, 600, 800};
+        plot1d("h_met_b1"+s, values_["met"], evtweight_, cr.histMap, ";#slash{E}_{T} [GeV]", ptbin1.size()-1, ptbin1.data());
+        plot1d("h_ptll_b1"+s, values_["ptll"], evtweight_, cr.histMap, ";p_{T}(ll) [GeV]", ptbin1.size()-1, ptbin1.data());
+        plot1d("h_jet1pt_b1"+s, values_["jet1pt"], evtweight_, cr.histMap, ";p_{T}(jet1) [GeV]", ptbin1.size()-1, ptbin1.data());
+        plot1d("h_ptttbar_b1"+s, values_["ptttbar"], evtweight_, cr.histMap, ";p_{T}(t#bar{t}) [GeV]", ptbin1.size()-1, ptbin1.data());
+
       };
       fillhists(suf);
       if (trigType == 1 && HLT_MuE())
