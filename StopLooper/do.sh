@@ -53,9 +53,8 @@ OUTDIR18=$OUTDIR
 
 # INDIR=/nfs-7/userdata/haweber/stopbabiesInteractive/2017_5p8fbinv
 # INDIR=/nfs-7/userdata/haweber/tupler_babies/merged/Stop_1l/v2017/output/
-# INDIR=/nfs-7/userdata/sicheng/stopbabies/skimmed_v29_13
-INDIR=/nfs-7/userdata/sicheng/stopbabies/merged_v29_13
-OUTDIR=output/samp17_v13_cremu
+INDIR=/nfs-7/userdata/sicheng/stopbabies/merged/data_v30_3
+OUTDIR=output/samp17_v30_cremu
 # OUTDIR=output/data17_jetht
 LOGDIR=$OUTDIR/logs
 
@@ -75,18 +74,18 @@ done
 # INDIR=/nfs-7/userdata/sicheng/stopbabies/merged_v25_4
 # INDIR=/nfs-7/userdata/sicheng/stopbabies/merged_v28_10
 # INDIR=/nfs-7/userdata/sicheng/stopbabies/skimmed_v29_13
+INDIR=/nfs-7/userdata/sicheng/stopbabies/merged/f17v2_v30_3
 # OUTDIR=output/testResTopJet20_12
 LOGDIR=${OUTDIR}/logs
 OUTDIR17=$OUTDIR
 
 declare -a Samples=()
-Samples+=( TTJets_2lep_madgraph_0 TTJets_2lep_madgraph_1 TTJets_2lep_madgraph_2 )
-Samples+=( TTJets_1lep_t_madgraph TTJets_1lep_tbar_madgraph )
-Samples+=( ST_tW_top ST_tW_antitop ST_schan ST_tchan )      # singleT
-Samples+=( W1JetsToLNu W2JetsToLNu W3JetsToLNu W4JetsToLNu)       # Vjets : Wjets + DY
-Samples+=( W1Jets_NuPt200 W2Jets_NuPt200 W3Jets_NuPt200 W4Jets_NuPt200)
+Samples+=( TTJets_2lep_f17v2_0 TTJets_2lep_f17v2_1 TTJets_2lep_f17v2_2 TTJets_2lep_f17v2_3 )
+Samples+=( TTJets_1lep_top TTJets_1lep_tbar )
+Samples+=( ST_tW_top ST_tW_tbar ST_schan )      # singleT (missing some)
+Samples+=( W1Jets W2Jets W3Jets W4Jets DYJetsToLL )       # Vjets : Wjets + DY
 Samples+=( TTZToLLNuNu TTWJetsToLNu )      # rare  : ttV 
-Samples+=( WZTo1L3Nu WZTo3LNu_amcnlo_newpmx WZTo2L2Q WWTo1L1Nu2Q WWTo2L2Nu )   # diboson
+Samples+=( WZTo1L3Nu WZTo3LNu WZTo2L2Q WWToLNuQQ WWTo2L2Nu )   # diboson
 
 mkdir -p ${OUTDIR}; mkdir -p ${LOGDIR}
 for SAMPLE in ${Samples[@]}; do
@@ -101,12 +100,12 @@ done
 # INDIR=/nfs-7/userdata/sicheng/stopbabies/skimmed_v29_13
 declare -a Samples=(T2tt_mStop850_mLSP100 T2tt_mStop650_mLSP350 T2tt_mStop1200_mLSP100)
 
-mkdir -p ${OUTDIR}; mkdir -p ${LOGDIR}
-for SAMPLE in ${Samples[@]}; do
-    # ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
-    echo ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} '>&' ${LOGDIR}/log_${SAMPLE}.txt
-    eval "nohup nice -n -10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
-done
+# mkdir -p ${OUTDIR}; mkdir -p ${LOGDIR}
+# for SAMPLE in ${Samples[@]}; do
+#     # ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
+#     echo ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} '>&' ${LOGDIR}/log_${SAMPLE}.txt
+#     eval "nohup nice -n -10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
+# done
 
 ########################
 # 2016 data
@@ -114,8 +113,8 @@ done
 # INDIR=/nfs-7/userdata/stopRun2/analysis2016_SUS-16-051_35p9fbinv/v24/output
 # INDIR=/nfs-7/userdata/sicheng/stopbabies/merged_v25_10
 # INDIR=/nfs-7/userdata/sicheng/stopbabies/skimmed_v29_14
-INDIR=/nfs-7/userdata/sicheng/stopbabies/merged_v29_14
-OUTDIR=output/samp16_v14_cremu
+INDIR=/nfs-7/userdata/sicheng/stopbabies/merged/data_v30_3
+OUTDIR=output/samp16_v30_cremu
 # OUTDIR=output/data16_jetht
 LOGDIR=${OUTDIR}/logs
 # cd ../StopCORE; cp stop_1l_babyAnalyzer.h.old stop_1l_babyAnalyzer.h; cp stop_1l_babyAnalyzer.cc.old stop_1l_babyAnalyzer.cc; mkc; cd -
@@ -148,18 +147,19 @@ done
 # INDIR=/nfs-7/userdata/sicheng/stopbabies/skimmed_v25_9
 # INDIR=/nfs-7/userdata/sicheng/stopbabies/skimmed_v29_11
 # INDIR=/nfs-7/userdata/sicheng/stopbabies/skimmed/s16v3_v29_14
-INDIR=/nfs-7/userdata/sicheng/stopbabies/merged/s16v3_v29_14
+INDIR=/nfs-7/userdata/sicheng/stopbabies/merged/s16v3_v30_3
 # OUTDIR=output/temp11_synctest
 # LOGDIR=$OUTDIR/logs
 OUTDIR16=$OUTDIR
 
 declare -a Samples=()
-Samples+=( TTJets_2lep_s16v3_ext1_0 TTJets_2lep_s16v3_ext1_1 TTJets_2lep_s16v3_ext0_1)
+Samples+=( TTJets_2lep_s16v3_ext0_1 TTJets_2lep_s16v3_ext1_0 TTJets_2lep_s16v3_ext1_1 TTJets_2lep_s16v3_ext1_2 )
 Samples+=( TTJets_1lep_t TTJets_1lep_tbar )
 Samples+=( ST_tW_top ST_tW_tbar ST_tchan )      # singleT
-Samples+=( W1Jets W2Jets W3Jets W4Jets)       # Vjets : Wjets + DY
-Samples+=( TTZToLLNuNu TTWJetsToLNu WZTo1L3Nu WWTo1L1Nu2Q)  # rare  : ttV + diboson
-Samples+=( WWTo2L2Nu WZTo1L1Nu2Q WZTo2L2Q WZTo3LNu_amcnlo TTWJetsToQQ TTZToQQ)      # rare : smaller contributions
+Samples+=( W1Jets W2Jets W3Jets W4Jets DYJets )       # Vjets : Wjets + DY
+Samples+=( TTZToLLNuNu TTWJetsToLNu WZTo1L3Nu WWTo1L1Nu2Q )  # rare  : ttV + diboson
+# Samples+=( WWTo2L2Nu WZTo1L1Nu2Q WZTo2L2Q WZTo3LNu_amcnlo TTWJetsToQQ TTZToQQ)      # rare : smaller contributions
+Samples+=( WZTo1L1Nu2Q WZTo2L2Q WZTo3LNu_amcnlo TTWJetsToQQ TTZToQQ )      # rare : smaller contributions
 
 mkdir -p ${OUTDIR}; mkdir -p ${LOGDIR}
 for SAMPLE in ${Samples[@]}; do
@@ -186,11 +186,11 @@ Samples+=( SMS_T2bW_80X_0 SMS_T2bW_80X_1 SMS_T2bW_80X_2 SMS_T2bW_80X_3 SMS_T2bW_
 Samples+=( SMS_T2bt_80X_0 SMS_T2bt_80X_1 SMS_T2bt_80X_2 SMS_T2bt_80X_3 )
 # Samples+=( Signal_T2tt Signal_T2bW Signal_T2tb )
 
-mkdir -p ${OUTDIR}; mkdir -p ${LOGDIR}
-for SAMPLE in ${Samples[@]}; do
-    echo ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} '>&' ${LOGDIR}/log_${SAMPLE}.txt
-    eval "nohup nice -n -10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
-done
+# mkdir -p ${OUTDIR}; mkdir -p ${LOGDIR}
+# for SAMPLE in ${Samples[@]}; do
+#     echo ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} '>&' ${LOGDIR}/log_${SAMPLE}.txt
+#     eval "nohup nice -n -10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
+# done
 
 # Monitor the running
 while : ; do
@@ -216,7 +216,7 @@ echo -e 'All looper jobs done!\a'
 pushd ${OUTDIR17}
 hadd -f ttbar_17.root    TTJets*.root > /dev/null
 hadd -f singleT_17.root  ST_*.root  > /dev/null
-hadd -f Vjets_17.root    W?Jets*.root > /dev/null
+hadd -f Vjets_17.root    W?Jets*.root DYJets*.root > /dev/null
 hadd -f rare_17.root     TTZ*.root TTW*.root WZ*.root WW*.root > /dev/null
 hadd -f allBkg_17.root   ttbar_17.root singleT_17.root Vjets_17.root rare_17.root > /dev/null
 hadd -f allData_17.root  data_2017*.root > /dev/null
@@ -225,7 +225,7 @@ popd > /dev/null
 pushd ${OUTDIR16}
 hadd -f ttbar_16.root    TTJets*.root > /dev/null
 hadd -f singleT_16.root  ST_*.root  > /dev/null
-hadd -f Vjets_16.root    W?Jets*.root > /dev/null
+hadd -f Vjets_16.root    W?Jets*.root DYJets*.root > /dev/null
 hadd -f rare_16.root     TTZ*.root TTW*.root WZ*.root WW*.root > /dev/null
 hadd -f allBkg_16.root   ttbar_16.root singleT_16.root Vjets_16.root rare_16.root > /dev/null
 hadd -f allData_16.root  data_2016*.root > /dev/null
@@ -235,7 +235,7 @@ hadd -f SMS_T2bt.root    SMS_T2bt_*.root > /dev/null
 popd > /dev/null
 
 # Make combined results
-OUTDIR1617=output/comb1617_cremu
+OUTDIR1617=output/comb1617_v30_cremu
 mkdir -p ${OUTDIR1617}
 cp ${OUTDIR16}/all*_16.root ${OUTDIR1617}
 cp ${OUTDIR17}/all*_17.root ${OUTDIR1617}

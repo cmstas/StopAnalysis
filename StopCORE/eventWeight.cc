@@ -4,8 +4,8 @@
 /// topPtWeight() copied from MCSelections.cc
 float topPtWeight(float pt_top, float pt_tbar) {
   if (pt_top < 0. || pt_tbar < 0.) return 1.;
-  float weight_top = exp(0.156 - 0.00137 * pt_top);
-  float weight_tbar = exp(0.156 - 0.00137 * pt_tbar);
+  float weight_top  = exp(0.0615 - 0.0005 * pt_top );
+  float weight_tbar = exp(0.0615 - 0.0005 * pt_tbar);
   return sqrt( weight_top * weight_tbar );
 }
 
@@ -1759,7 +1759,7 @@ void evtWgtInfo::getTTbarSysPtSF( double &weight_ttbarSysPt, double &weight_ttba
   // Get system Pt
   double system_pt = system_LV.Pt();
 
-  const vector<double> ptcats = {   0  , 50,  100,  150,  200,  250,  350,  450, };
+  const vector<double> ptcats = {   0,   50,  100,  150,  200,  250,  350,  450, };
   const vector<double> sfvals = {1.02, 0.99, 0.98, 0.95, 0.99, 1.01, 1.07, 1.09, };
   const vector<double> sferrs = {0.01, 0.01, 0.01, 0.01, 0.02, 0.02, 0.04, 0.05, };
 
@@ -2257,6 +2257,10 @@ double evtWgtInfo::getExtSampleWeightSummer16v3( TString fname, bool apply ) {
     sf = 48387865.0 / (48387865.0+11955887.0);
   else if (fname.Contains("TTJets_1lep_tbar_s16v3_ext0"))
     sf = 11955887.0 / (48387865.0+11955887.0);
+  else if (fname.Contains("DYJetsToLL_M50_s16v3_ext2"))
+    sf = 96531428.0 / (96531428.0+49748967.0);
+  else if (fname.Contains("DYJetsToLL_M50_s16v3_ext1"))
+    sf = 49748967.0 / (96531428.0+49748967.0);
   // to be updated...
 
   if (verbose) cout << "[eventWeight] >> The sample weight to be scaled by is: " << sf << endl;
@@ -2267,13 +2271,21 @@ double evtWgtInfo::getExtSampleWeightSummer16v3( TString fname, bool apply ) {
 double evtWgtInfo::getExtSampleWeightFall17v2( TString fname, bool apply ) {
 
   double sf = 1.0;
-  if (fname.Contains("JetsToLNu") && !fname.Contains("NuPt-200")) {
+  if (fname.Contains("_v29_") && fname.Contains("JetsToLNu") && !fname.Contains("NuPt-200")) {
     // Temporary fix for missing k-factor in the WNJets xsec
     if      (fname.Contains("W1JetsToLNu")) sf = 1.238;
     else if (fname.Contains("W2JetsToLNu")) sf = 1.231;
     else if (fname.Contains("W3JetsToLNu")) sf = 1.231;
     else if (fname.Contains("W4JetsToLNu")) sf = 1.144;
   }
+  if (fname.Contains("WWToLNuQQ_f17v2_ext1"))
+    sf = 9643134.0 / (9643134.0+8330285.0);
+  else if (fname.Contains("WWToLNuQQ_f17v2"))
+    sf = 8330285.0 / (9643134.0+8330285.0);
+  else if (fname.Contains("DYJetsToLL_M50_f17v2_ext1"))
+    sf = 49125561.0 / (49125561.0+48675378.0);
+  else if (fname.Contains("DYJetsToLL_M50_f17v2"))
+    sf = 48675378.0 / (49125561.0+48675378.0);
 
   if (apply) sf_extra_file *= sf;
   return sf;
