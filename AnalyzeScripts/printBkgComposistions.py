@@ -7,7 +7,8 @@ from math import sqrt
 import ROOT as r
 import numpy as np
 from errors import *
-from pytable import Table
+from utilities.errors import *
+from utilities.pytable import Table
 
 r.gROOT.SetBatch(1)
 # sys.path.insert(0,'/home/users/sicheng/tas/Software/dataMCplotMaker/')
@@ -28,7 +29,7 @@ def getYieldAndErrsFromTopoSRs(f, srNames, suf = ''):
     yields = []
     yerrs = []
     for sr in srNames:
-        hist = f.Get(sr+'/h_metbins'+suf+'_bTagEffLFUp')
+        hist = f.Get(sr+'/h_metbins'+suf)
         if not hist:
             yields.append(0)
             yerrs.append(0)
@@ -75,7 +76,40 @@ def quickStoBtable(y_org, ye_org, sy_org, sye_org, y_wtc, ye_wtc, sy_wtc, sye_wt
     stobe_wtc = [StoBErr(*x) for x in zip(sy_wtc, y_wtc, sye_wtc, sye_wtc)]
     printYieldAndErrTable2(srNames, stob_org, stob_wtc, stobe_org, stobe_wtc)
 
+def printCRemuYields(year='16'):
+    indir = '../StopLooper/output/samp'+year+'_v30_cremu/'
+    # samples = ['ttbar', 'singleT', 'Vjets', 'rare', 'allBkg', 'allData']
+    samples = ['tt2l', 'tt1l', 'singleT', 'Wjets', 'DYJets', 'rare', 'allBkg', 'allData']
+    ysuf = '_'+year
+    srNames = ['cremuA0', 'cremuA1', 'cremuA2',]
+
+    tab = Table()
+    tab.set_column_names(['srName']+srNames)
+    f = dict()
+    yldEs = dict()
+    for samp in samples:
+        
+        filestr = indir+samp+ysuf+'.root'
+        if not os.path.isfile(filestr): filestr = indir+samp+'.root'
+        f[samp] = r.TFile(filestr)
+        if not f[samp]: print '!!!'
+        ylds, errs = getYieldAndErrsFromTopoSRs(f[samp], srNames)
+        yldEs[samp] = [E(y,e) for y, e in zip(ylds, errs)]
+        if samp == 'allData': tab.add_line()
+        tab.add_row([samp] + [ye.round(2) for ye in yldEs[samp]])
+   
+    tab.add_row(['Data/MC'] + [(yd/yb).round(3) for yd, yb in zip(yldEs['allData'], yldEs['allBkg'])])
+
+    tab.print_table()
+    tab.set_theme_latex()
+    tab.print_pdf('CRemuYields_'+year+'_Jan20.pdf')
+
+
 if __name__ == '__main__':
+
+    printCRemuYields('16')
+    printCRemuYields('17')
+    exit()
 
     f1 = r.TFile('../StopLooper/output/temp14/allBkg_25ns.root')
     f2 = r.TFile('../StopLooper/output/temp14/Signal_T2tt.root')
