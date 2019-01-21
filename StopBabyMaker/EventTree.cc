@@ -330,6 +330,10 @@ void EventTree::Reset ()
     genweightsID.clear();
     weight_Q2_up = -9999.;
     weight_Q2_down = -9999.;
+    weight_muF_up = -9999.;
+    weight_muF_down = -9999.;
+    weight_muR_up = -9999.;
+    weight_muR_down = -9999.;
     weight_alphas_up = -9999.;
     weight_alphas_down = -9999.;
 

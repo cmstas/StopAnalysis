@@ -42,9 +42,9 @@ vector<TString> loadFromSampleList(char *type, const char *filename, char *input
 }
 
 TString parseArg(const TString& input, TString arg, const TString dfval="") {
+  if (!arg.EndsWith("=")) arg += "=";
   if (input.Contains(arg)) {
-    if (!arg.EndsWith("=")) arg += "=";
-    int sidx = input.Index(arg) + arg.Sizeof();
+    int sidx = input.Index(arg) + arg.Sizeof() - 1;
     int eidx = input.Index(",", sidx);
     if (eidx < 0) eidx = input.Sizeof();
     return input(sidx, eidx-sidx);
@@ -105,7 +105,8 @@ int main(int argc, char **argv){
   // Skim Parameters
   //
   mylooper->skim_nvtx            = 1;
-  mylooper->skim_met             = 50;
+  mylooper->skim_met             = 150;
+  mylooper->skim_met_emuEvt      = 50;
 
   mylooper->skim_nGoodLep        = 1;
   mylooper->skim_goodLep_el_pt   = 20.0;
@@ -180,6 +181,12 @@ int main(int argc, char **argv){
   if (newskim_met.IsFloat()) {
     cout << "[runBabyMaker] >> Changing the skim_met to new value: " << newskim_met.Atof() << endl;
     mylooper->skim_met = newskim_met.Atof();
+  }
+
+  TString emuskim_met = parseArg(extrargs, "skim_met_emuEvt");
+  if (emuskim_met.IsFloat()) {
+    cout << "[runBabyMaker] >> Changing the skim_met_emuEvt to new value: " << emuskim_met.Atof() << endl;
+    mylooper->skim_met_emuEvt = emuskim_met.Atof();
   }
 
   TString topCandTreeName = parseArg(extrargs, "topcandTree");

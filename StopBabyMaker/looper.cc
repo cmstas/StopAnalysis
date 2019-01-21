@@ -271,6 +271,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
   unsigned int nEvents_processed = 0;
   unsigned int nEvents_pass_skim_nVtx = 0;
   unsigned int nEvents_pass_skim_met = 0;
+  unsigned int nEvents_pass_skim_met_emuEvt = 0;
   unsigned int nEvents_pass_skim_nGoodLep = 0;
   unsigned int nEvents_pass_skim_nJets = 0;
   unsigned int nEvents_pass_skim_nBJets=0;
@@ -728,15 +729,19 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
           StopEvt.pdf_down_weight    = gen_LHEweight_PDFVariation_Dn();
           StopEvt.weight_Q2_up       = gen_LHEweight_QCDscale_muR2_muF2();
           StopEvt.weight_Q2_down     = gen_LHEweight_QCDscale_muR0p5_muF0p5();
+          StopEvt.weight_muF_up      = gen_LHEweight_QCDscale_muR1_muF2();
+          StopEvt.weight_muF_down    = gen_LHEweight_QCDscale_muR1_muF0p5();
+          StopEvt.weight_muR_up      = gen_LHEweight_QCDscale_muR2_muF1();
+          StopEvt.weight_muR_down    = gen_LHEweight_QCDscale_muR0p5_muF1();
           StopEvt.weight_alphas_up   = gen_LHEweight_AsMZ_Up();
           StopEvt.weight_alphas_down = gen_LHEweight_AsMZ_Dn();
           counterhist->Fill(1, genHEPMCweight()                    );
-          counterhist->Fill(2, gen_LHEweight_QCDscale_muR1_muF2()  );
-          counterhist->Fill(3, gen_LHEweight_QCDscale_muR1_muF0p5());
-          counterhist->Fill(4, gen_LHEweight_QCDscale_muR2_muF1()  );
+          counterhist->Fill(2, StopEvt.weight_muF_up               );
+          counterhist->Fill(3, StopEvt.weight_muF_down             );
+          counterhist->Fill(4, StopEvt.weight_muR_up               );
           counterhist->Fill(5, StopEvt.weight_Q2_up                );
           counterhist->Fill(6, gen_LHEweight_QCDscale_muR2_muF0p5());
-          counterhist->Fill(7, gen_LHEweight_QCDscale_muR0p5_muF1());
+          counterhist->Fill(7, StopEvt.weight_muR_down             );
           counterhist->Fill(8, gen_LHEweight_QCDscale_muR0p5_muF2());
           counterhist->Fill(9, StopEvt.weight_Q2_down              );
           counterhist->Fill(10,StopEvt.pdf_up_weight               );
@@ -795,15 +800,19 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
           StopEvt.pdf_down_weight    = gen_LHEweight_PDFVariation_Dn();
           StopEvt.weight_Q2_up       = gen_LHEweight_QCDscale_muR2_muF2();
           StopEvt.weight_Q2_down     = gen_LHEweight_QCDscale_muR0p5_muF0p5();
+          StopEvt.weight_muF_up      = gen_LHEweight_QCDscale_muR1_muF2();
+          StopEvt.weight_muF_down    = gen_LHEweight_QCDscale_muR1_muF0p5();
+          StopEvt.weight_muR_up      = gen_LHEweight_QCDscale_muR2_muF1();
+          StopEvt.weight_muR_down    = gen_LHEweight_QCDscale_muR0p5_muF1();
           StopEvt.weight_alphas_up   = gen_LHEweight_AsMZ_Up();
           StopEvt.weight_alphas_down = gen_LHEweight_AsMZ_Dn();
           counterhist->Fill(1, genHEPMCweight()                    );
-          counterhist->Fill(2, gen_LHEweight_QCDscale_muR1_muF2()  );
-          counterhist->Fill(3, gen_LHEweight_QCDscale_muR1_muF0p5());
-          counterhist->Fill(4, gen_LHEweight_QCDscale_muR2_muF1()  );
+          counterhist->Fill(2, StopEvt.weight_muF_up               );
+          counterhist->Fill(3, StopEvt.weight_muF_down             );
+          counterhist->Fill(4, StopEvt.weight_muR_up               );
           counterhist->Fill(5, StopEvt.weight_Q2_up                );
           counterhist->Fill(6, gen_LHEweight_QCDscale_muR2_muF0p5());
-          counterhist->Fill(7, gen_LHEweight_QCDscale_muR0p5_muF1());
+          counterhist->Fill(7, StopEvt.weight_muR_down             );
           counterhist->Fill(8, gen_LHEweight_QCDscale_muR0p5_muF2());
           counterhist->Fill(9, StopEvt.weight_Q2_down              );
           counterhist->Fill(10,StopEvt.pdf_up_weight               );
@@ -2396,9 +2405,10 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
       bool pass_skim_met_jup = (applyJECfromFile)? (StopEvt.pfmet_jup >= skim_met || StopEvt.pfmet_rl_jup >= skim_met) : false;
       bool pass_skim_met_jdown = (applyJECfromFile)? (StopEvt.pfmet_jdown >= skim_met || StopEvt.pfmet_rl_jdown >= skim_met) : false;
 
-      if (not ((StopEvt.pfmet >= skim_met || StopEvt.pfmet_rl >= skim_met) || pass_skim_met_jup || pass_skim_met_jdown || pass_skim_met_photon) ) continue;
+      if ( ((StopEvt.pfmet >= skim_met || StopEvt.pfmet_rl >= skim_met) || pass_skim_met_jup || pass_skim_met_jdown || pass_skim_met_photon) ) nEvents_pass_skim_met++;
+      else if ( (jets.ngoodjets > 1) && (nLooseLeptons >= 2) && (lep1.pdgid*lep2.pdgid == -143) && (StopEvt.pfmet >= skim_met_emuEvt) ) nEvents_pass_skim_met_emuEvt++;
+      else continue;
       //if(!(StopEvt.pfmet >= skim_met) && !(StopEvt.pfmet_rl >= skim_met) && !(StopEvt.pfmet_rl_jup >= skim_met) && !(StopEvt.pfmet_rl_jdown >= skim_met) && !(StopEvt.pfmet_jup >= skim_met) && !(StopEvt.pfmet_jdown >= skim_met) && !(StopEvt.pfmet_egclean >= skim_met) && !(StopEvt.pfmet_muegclean >= skim_met) && !(StopEvt.pfmet_muegcleanfix >= skim_met) && !(StopEvt.pfmet_uncorrcalomet >= skim_met) ) continue;
-      nEvents_pass_skim_met++;
       /////////////////////////////////////////////////////////
 
       //
@@ -2467,9 +2477,10 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
                                  );
           StopEvt.HLT_DiMu = ( passHLTTriggerPattern("HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8_v") ||
                                passHLTTriggerPattern("HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass8_v") );
-          StopEvt.HLT_MuE =    ( passHLTTriggerPattern("HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v") ||
-                                 passHLTTriggerPattern("HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v") ||
-                                 passHLTTriggerPattern("HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v") );
+          StopEvt.HLT_MuE  = ( passHLTTriggerPattern("HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v") ||
+                               passHLTTriggerPattern("HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v") ||
+                               passHLTTriggerPattern("HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v") ||
+                               passHLTTriggerPattern("HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v") );
           StopEvt.HLT_MET_MHT = ( passHLTTriggerPattern("HLT_PFMET120_PFMHT120_IDTight_v") ||
                                   passHLTTriggerPattern("HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v") ||
                                   passHLTTriggerPattern("HLT_PFMET100_PFMHT100_IDTight_PFHT60_v") ||
@@ -2510,9 +2521,10 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
                                  );
           StopEvt.HLT_DiMu = ( passHLTTriggerPattern("HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8_v") ||
                                passHLTTriggerPattern("HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass8_v") );
-          StopEvt.HLT_MuE =    ( passHLTTriggerPattern("HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v") ||
-                                 passHLTTriggerPattern("HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v") ||
-                                 passHLTTriggerPattern("HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v") );
+          StopEvt.HLT_MuE  = ( passHLTTriggerPattern("HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v") ||
+                               passHLTTriggerPattern("HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v") ||
+                               passHLTTriggerPattern("HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v") ||
+                               passHLTTriggerPattern("HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v") );
           StopEvt.HLT_MET_MHT = ( passHLTTriggerPattern("HLT_PFMET120_PFMHT120_IDTight_v") ||
                                   passHLTTriggerPattern("HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v") ||
                                   passHLTTriggerPattern("HLT_PFMET100_PFMHT100_IDTight_PFHT60_v") ||
@@ -2622,11 +2634,12 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
   cout << "-----------------------------" << endl;
   cout << "Events Processed                     " << nEvents_processed << endl;
   cout << "Events with " << skim_nvtx << " Good Vertex            " << nEvents_pass_skim_nVtx << endl;
-  cout << "Events with at least " << skim_nJets << " Good Jets     " << nEvents_pass_skim_nJets << endl;
-  cout << "Events with at least " << skim_nBJets << " Good BJets   " << nEvents_pass_skim_nBJets << endl;
+  cout << "Events with at least " << skim_nJets    << " Good Jets     " << nEvents_pass_skim_nJets << endl;
+  cout << "Events with at least " << skim_nBJets   << " Good BJets    " << nEvents_pass_skim_nBJets << endl;
   cout << "Events with at least " << skim_nGoodLep << " Good Lepton   " << nEvents_pass_skim_nGoodLep << endl;
-  cout << "Events passing 2nd Lep Veto " << apply2ndLepVeto << "    " << nEvents_pass_skim_2ndlepVeto << endl;
-  cout << "Events with MET > " << skim_met << " GeV             " << nEvents_pass_skim_met << endl;
+  cout << "Events passing 2nd Lep Veto " << apply2ndLepVeto << "        " << nEvents_pass_skim_2ndlepVeto << endl;
+  cout << "Events with MET > " << skim_met << " GeV            " << nEvents_pass_skim_met << endl;
+  cout << "Extra emu events with MET > " << skim_met_emuEvt << " GeV   " << nEvents_pass_skim_met_emuEvt << endl;
   cout << "-----------------------------" << endl;
   cout << "CPU  Time:   " << Form( "%.01f", bmark->GetCpuTime("benchmark")  ) << endl;
   cout << "Real Time:   " << Form( "%.01f", bmark->GetRealTime("benchmark") ) << endl;
