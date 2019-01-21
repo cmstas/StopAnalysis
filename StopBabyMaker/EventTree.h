@@ -213,6 +213,10 @@ public:
     vecs  genweightsID;
     float weight_Q2_up;
     float weight_Q2_down;
+    float weight_muF_up;
+    float weight_muF_down;
+    float weight_muR_up;
+    float weight_muR_down;
     float weight_alphas_up;
     float weight_alphas_down;
     float weight_btagsf;
