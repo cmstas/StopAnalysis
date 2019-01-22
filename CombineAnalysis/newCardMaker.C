@@ -40,6 +40,8 @@ const bool fakedata = true;
 const bool nobgsyst = false;
 // test without signal systematics?
 const bool nosigsyst = false;
+// temporary symbol to scale the 2016 signal to the run2 lumi
+const bool scalesig = true;
 
 bool verbose = true;  // automatic turned off if is signal scan
 
@@ -262,6 +264,12 @@ int makeCardForOneBin(TString dir, int mstop, int mlsp, int metbin, int bin, TSt
       sig = (sig1 + sig2) / 2;
     }
   }
+  if (scalesig) {
+    sig    *= (59.97+41.53+35.92) / 35.92;
+    sigerr *= (59.97+41.53+35.92) / 35.92;
+    sig1   *= (59.97+41.53+35.92) / 35.92;
+    sig2   *= (59.97+41.53+35.92) / 35.92;
+  }
 
   data = getYieldAndError(dataerr, fdata, hname, metbin);
   bg2l = getYieldAndError(bg2lerr, f2l, hname + "_dataStats", metbin);  // <-- look up for the errors
@@ -427,7 +435,7 @@ void makeCardsForPoint(TString signal, int mstop, int mlsp, TString outdir) {
 
 // -------------------------------------------------------------------------------------------------------------------
 // Make cards for a single mass point
-void newCardMaker(string signal = "T2tt", int mStop = 800, int mLSP = 400, string input_dir="../StopLooper/output/temp", string output_dir="datacards/temp") {
+void newCardMaker(string signal = "T2tt", int mStop = 800, int mLSP = 400, string input_dir="../StopLooper/output/temp", string output_dir="datacards/temp", string ysuf="25ns") {
   cout << "Making cards for single mass point: " << signal << endl;
   system(Form("mkdir -p %s", output_dir.c_str()));
 
@@ -441,8 +449,8 @@ void newCardMaker(string signal = "T2tt", int mStop = 800, int mLSP = 400, strin
   fsig_genmet = nullptr; // don't use switched genmet signal for now
   // fsig_genmet = new TFile(Form("%s/Signal_%s_gen.root",input_dir.c_str(), signal.substr(0,4).c_str()));
 
-  if (!fakedata) fdata = new TFile(Form("%s/allData_25ns.root",input_dir.c_str()));
-  else fdata = new TFile(Form("%s/allBkg_25ns.root",input_dir.c_str()));
+  if (!fakedata) fdata = new TFile(Form("%s/allData_%s.root", input_dir.c_str(), ysuf.c_str()));
+  else fdata = new TFile(Form("%s/allBkg_%s.root", input_dir.c_str(), ysuf.c_str()));
 
   if ( f2l->IsZombie() || f1l->IsZombie() ||  f1ltop->IsZombie() || fznunu->IsZombie() || fsig->IsZombie() || fdata->IsZombie() ) {
     std::cout << "Input file does not exist" << std::endl;
@@ -455,7 +463,7 @@ void newCardMaker(string signal = "T2tt", int mStop = 800, int mLSP = 400, strin
 
 // -------------------------------------------------------------------------------------------------------------------
 // Make cards for all signal mass points through scan
-int newCardMaker(string signal, string input_dir="../StopLooper/output/temp", string output_dir="datacards/scan_temp") {
+int newCardMaker(string signal, string input_dir="../StopLooper/output/temp", string output_dir="datacards/scan_temp", string ysuf="25ns") {
   cout << "Making cards for " << signal  << " scan!" << endl;
   system(Form("mkdir -p %s", output_dir.c_str()));
 
@@ -473,8 +481,8 @@ int newCardMaker(string signal, string input_dir="../StopLooper/output/temp", st
   fsig_genmet = nullptr; // don't use switched genmet signal for now
   // fsig_genmet = new TFile(Form("%s/Signal_%s_gen.root",input_dir.c_str(), signal.c_str()));
 
-  if (!fakedata) fdata = new TFile(Form("%s/allData_25ns.root",input_dir.c_str()));
-  else fdata = new TFile(Form("%s/allBkg_25ns.root",input_dir.c_str()));
+  if (!fakedata) fdata = new TFile(Form("%s/allData_%s.root", input_dir.c_str(), ysuf.c_str()));
+  else fdata = new TFile(Form("%s/allBkg_%s.root", input_dir.c_str(), ysuf.c_str()));
 
   if ( f2l->IsZombie() || f1l->IsZombie() ||  f1ltop->IsZombie() || fznunu->IsZombie() || fsig->IsZombie() || fdata->IsZombie() ) {
     std::cout << "Input file does not exist" << std::endl;

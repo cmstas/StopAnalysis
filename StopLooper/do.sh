@@ -53,8 +53,8 @@ OUTDIR18=$OUTDIR
 
 # INDIR=/nfs-7/userdata/haweber/stopbabiesInteractive/2017_5p8fbinv
 # INDIR=/nfs-7/userdata/haweber/tupler_babies/merged/Stop_1l/v2017/output/
-INDIR=/nfs-7/userdata/sicheng/stopbabies/merged/data_v30_3
-OUTDIR=output/samp17_v30_cremu
+INDIR=/nfs-7/userdata/sicheng/stopbabies/skimmed/data_v30_3
+OUTDIR=output/samp17_v30_a1
 # OUTDIR=output/data17_jetht
 LOGDIR=$OUTDIR/logs
 
@@ -74,7 +74,7 @@ done
 # INDIR=/nfs-7/userdata/sicheng/stopbabies/merged_v25_4
 # INDIR=/nfs-7/userdata/sicheng/stopbabies/merged_v28_10
 # INDIR=/nfs-7/userdata/sicheng/stopbabies/skimmed_v29_13
-INDIR=/nfs-7/userdata/sicheng/stopbabies/merged/f17v2_v30_3
+INDIR=/nfs-7/userdata/sicheng/stopbabies/skimmed/f17v2_v30_3
 # OUTDIR=output/testResTopJet20_12
 LOGDIR=${OUTDIR}/logs
 OUTDIR17=$OUTDIR
@@ -83,7 +83,7 @@ declare -a Samples=()
 Samples+=( TTJets_2lep_f17v2_0 TTJets_2lep_f17v2_1 TTJets_2lep_f17v2_2 TTJets_2lep_f17v2_3 )
 Samples+=( TTJets_1lep_top TTJets_1lep_tbar )
 Samples+=( ST_tW_top ST_tW_tbar ST_schan )      # singleT (missing some)
-Samples+=( W1Jets W2Jets W3Jets W4Jets DYJetsToLL )       # Vjets : Wjets + DY
+Samples+=( W1Jets W2Jets W3Jets W4Jets DYJets )       # Vjets : Wjets + DY
 Samples+=( TTZToLLNuNu TTWJetsToLNu )      # rare  : ttV 
 Samples+=( WZTo1L3Nu WZTo3LNu WZTo2L2Q WWToLNuQQ WWTo2L2Nu )   # diboson
 
@@ -112,9 +112,9 @@ declare -a Samples=(T2tt_mStop850_mLSP100 T2tt_mStop650_mLSP350 T2tt_mStop1200_m
 
 # INDIR=/nfs-7/userdata/stopRun2/analysis2016_SUS-16-051_35p9fbinv/v24/output
 # INDIR=/nfs-7/userdata/sicheng/stopbabies/merged_v25_10
-# INDIR=/nfs-7/userdata/sicheng/stopbabies/skimmed_v29_14
-INDIR=/nfs-7/userdata/sicheng/stopbabies/merged/data_v30_3
-OUTDIR=output/samp16_v30_cremu
+INDIR=/nfs-7/userdata/sicheng/stopbabies/skimmed_v29_14
+# INDIR=/nfs-7/userdata/sicheng/stopbabies/skimmed/data_v30_3
+OUTDIR=output/samp16_v30_a1
 # OUTDIR=output/data16_jetht
 LOGDIR=${OUTDIR}/logs
 # cd ../StopCORE; cp stop_1l_babyAnalyzer.h.old stop_1l_babyAnalyzer.h; cp stop_1l_babyAnalyzer.cc.old stop_1l_babyAnalyzer.cc; mkc; cd -
@@ -147,7 +147,7 @@ done
 # INDIR=/nfs-7/userdata/sicheng/stopbabies/skimmed_v25_9
 # INDIR=/nfs-7/userdata/sicheng/stopbabies/skimmed_v29_11
 # INDIR=/nfs-7/userdata/sicheng/stopbabies/skimmed/s16v3_v29_14
-INDIR=/nfs-7/userdata/sicheng/stopbabies/merged/s16v3_v30_3
+INDIR=/nfs-7/userdata/sicheng/stopbabies/skimmed/s16v3_v30_3
 # OUTDIR=output/temp11_synctest
 # LOGDIR=$OUTDIR/logs
 OUTDIR16=$OUTDIR
@@ -186,11 +186,11 @@ Samples+=( SMS_T2bW_80X_0 SMS_T2bW_80X_1 SMS_T2bW_80X_2 SMS_T2bW_80X_3 SMS_T2bW_
 Samples+=( SMS_T2bt_80X_0 SMS_T2bt_80X_1 SMS_T2bt_80X_2 SMS_T2bt_80X_3 )
 # Samples+=( Signal_T2tt Signal_T2bW Signal_T2tb )
 
-# mkdir -p ${OUTDIR}; mkdir -p ${LOGDIR}
-# for SAMPLE in ${Samples[@]}; do
-#     echo ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} '>&' ${LOGDIR}/log_${SAMPLE}.txt
-#     eval "nohup nice -n -10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
-# done
+mkdir -p ${OUTDIR}; mkdir -p ${LOGDIR}
+for SAMPLE in ${Samples[@]}; do
+    echo ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} '>&' ${LOGDIR}/log_${SAMPLE}.txt
+    eval "nohup nice -n -10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
+done
 
 # Monitor the running
 while : ; do
@@ -235,13 +235,15 @@ hadd -f SMS_T2bt.root    SMS_T2bt_*.root > /dev/null
 popd > /dev/null
 
 # Make combined results
-OUTDIR1617=output/comb1617_v30_cremu
-mkdir -p ${OUTDIR1617}
-cp ${OUTDIR16}/all*_16.root ${OUTDIR1617}
-cp ${OUTDIR17}/all*_17.root ${OUTDIR1617}
-pushd ${OUTDIR1617}
-hadd -f allData_1617.root allData_16.root allData_17.root > /dev/null
-hadd -f allBkg_1617.root  allBkg_16.root  allBkg_17.root  > /dev/null
+OUTDIRRUN2=output/comb1617_v30_a1
+mkdir -p ${OUTDIRRUN2}
+cp ${OUTDIR16}/*_16.root ${OUTDIRRUN2}
+cp ${OUTDIR17}/*_17.root ${OUTDIRRUN2}
+pushd ${OUTDIRRUN2}
+for isamp in *_17.root; do
+    jsamp=${isamp%_17.root}
+    hadd -f ${jsamp}_run2.root ${jsamp}_16.root $isamp > /dev/null
+done
 popd > /dev/null
 
 # # Local merge for the v25_9 babies

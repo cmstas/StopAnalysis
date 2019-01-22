@@ -1,6 +1,6 @@
 // -*- C++ -*-
 const bool useMetExtrapolation = true;
-const double extr_threshold = 3;  // minimum number of events in a bin to not need an MET extrapolation
+const double extr_threshold = 5;  // minimum number of events in a bin to not need an MET extrapolation
 const bool doCRPurityError = true;
 
 void dataDrivenFromCR(TFile* fdata, TFile* fmc, TFile* fout, TString ddtype, TString gentype) {
@@ -58,7 +58,7 @@ void dataDrivenFromCR(TFile* fdata, TFile* fmc, TFile* fout, TString ddtype, TSt
         if (ylds > extr_threshold) break;
       }
       if (extr_start_bin != lastbin) {
-        cout << "Doing MET extrapolation for  " << crname << "  from bin " << extr_start_bin << " to bin " << lastbin << " (last bin)!" << endl;
+        cout << "Doing MET extrapolation for  " << crname << "  from bin " << lastbin << " (last bin) to bin " << extr_start_bin << "!" << endl;
         combineYieldsInExtrBins(hist_data_CR);
       }
     }

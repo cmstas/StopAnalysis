@@ -71,10 +71,11 @@ if __name__ == "__main__":
     for combined in pool.imap_unordered(combine_cards, sigs):
         cards.append(combined)
 
-    # cards = os.listdir(combineddir)
-    # cards = filter(lambda x : '_1.txt' in x and '.log' not in x, cards)
-    # cards = [combineddir+'/'+c for c in cards]
-    # print cards
+    if not cards:
+        cards = os.listdir(combineddir)
+        cards = filter(lambda x : '.txt' in x and '.log' not in x, cards)
+        cards = [combineddir+'/'+c for c in cards]
+        # print cards
 
     os.system('mkdir -p '+limitdir)
     limits = []

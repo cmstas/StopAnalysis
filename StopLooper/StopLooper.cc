@@ -61,9 +61,11 @@ const bool runResTopMVA = false;
 // only produce yield histos
 const bool runYieldsOnly = false;
 // only running selected signal points to speed up
-const bool runFullSignalScan = false;
+const bool runFullSignalScan = true;
 // debug symbol, for printing exact event kinematics that passes
 const bool printPassedEvents = false;
+// temporary symbol to scale the 2017 data & MC to 2017+2018 lumi
+const bool scale2017 = true;
 
 // some global helper variables to be used in member functions
 int datayear = -1;
@@ -590,11 +592,11 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
         // values_["ntbtag"] = ntbtagCSV;
 
         // Filling histograms for SR
-        // fillHistosForSR(suffix);
+        fillHistosForSR(suffix);
 
-        // fillHistosForCR0b(suffix);
+        fillHistosForCR0b(suffix);
 
-        fillHistosForCRemu(suffix);
+        // fillHistosForCRemu(suffix);
 
         // Filling analysis variables with removed leptons, for CR2l
         values_["nlep_rl"] = (ngoodleps() == 1 && nvetoleps() >= 2 && lep2_p4().Pt() > 10)? 2 : ngoodleps();
@@ -622,7 +624,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
           values_["dphilmet_rl"] = lep1_dphiMET_rl_jdown();
           values_["tmod_rl"] = topnessMod_rl_jdown();
         }
-        // fillHistosForCR2l(suffix);
+        fillHistosForCR2l(suffix);
 
         // testCutFlowHistos(testVec[2]);
         // fillTopTaggingHistos(suffix);
@@ -715,6 +717,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
 void StopLooper::fillYieldHistos(SR& sr, float met, string suf, bool is_cr2l) {
 
   evtweight_ = evtWgt.getWeight(evtWgtInfo::systID(jestype_), is_cr2l);
+  if (scale2017 && year_ == 2017) evtweight_ *= (59.97+41.53) / 41.53;  // temporary to use the 2017 data/MC to pretend as for 2018 
 
   if (doNvtxReweight && (datayear == 2016 || datayear == 2018)) {
     if (nvtxs() < 100) evtweight_ *= nvtxscale_[nvtxs()];  // only scale for data

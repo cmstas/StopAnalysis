@@ -53,11 +53,11 @@ void copyYieldHist(TFile* fin, TFile* fout, TString gentype) {
   }
 }
 
-int fakeBkgEstimates(string input_dir="../StopLooper/output/temp_4bins/", string output_dir="") {
+int fakeBkgEstimates(string input_dir="../StopLooper/output/temp_4bins/", string output_dir="", string ysuf="25ns") {
   if (output_dir == "") output_dir = input_dir;
 
   // set input files (global pointers)
-  TFile* fallbkg = new TFile(Form("%s/allBkg_25ns.root",input_dir.c_str()));
+  TFile* fallbkg = new TFile(Form("%s/allBkg_%s.root", input_dir.c_str(), ysuf.c_str()));
   if (fallbkg->IsZombie()) return -1;
 
   TFile* f2l = new TFile(Form("%s/lostlepton.root",output_dir.c_str()), "RECREATE");
