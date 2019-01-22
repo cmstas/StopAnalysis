@@ -120,12 +120,20 @@ void makeSigYieldsComparisonHist() {
   const int type = 5;
   const int n_srbins = 39;
 
-  TFile* forg = new TFile("../StopLooper/output/samples2016/allBkg_25ns.root");
+  // TFile* forg = new TFile("../StopLooper/output/samples2016/allBkg_25ns.root");
   // TFile* fbkg = new TFile("../StopLooper/output/newbin1_120ifb/allBkg_25ns.root");
-  TFile* fbkg = new TFile("../StopLooper/output/newbin15_120ifb/allBkg_25ns.root");
+  // TFile* fbkg = new TFile("../StopLooper/output/newbin15_120ifb/allBkg_25ns.root");
+  TFile* forg = new TFile("../StopLooper/output/samp17_v13_tf/allBkg_17.root");
+  // TFile* forg = new TFile("../StopLooper/output/samp17_v13_tf/allData_17.root");
+  TFile* fbkg = new TFile("../StopLooper/output/samp17_v13_tf/allBkg_17.root");
+  // TFile* forg = new TFile("../StopLooper/output/samp16_v14_dilepInCR2l/allBkg_16.root");
+  // TFile* forg = new TFile("../StopLooper/output/samp16_v14_tf/allData_16.root");
+  // TFile* fbkg = new TFile("../StopLooper/output/samp16_v14_tf/allBkg_16.root");
+  // TFile* forg = new TFile("../StopLooper/output/comb1617_tf/allData_1617.root");
+  // TFile* fbkg = new TFile("../StopLooper/output/comb1617_tf/allBkg_1617.root");
 
-  TFile* fsig0 = new TFile("../StopLooper/output/temp14/Signal_T2tt.root");
-  TFile* fsig2 = new TFile("../StopLooper/output/newbin0_35p9ifb/SMS_T2tt.root");
+  TFile* fsig0 = new TFile("../StopLooper/output/samp17_v13_tf/T2tt_mStop1200_mLSP100.root");
+  TFile* fsig2 = new TFile("../StopLooper/output/samp17_v13_tf/T2tt_mStop650_mLSP350.root");
 
   // vector<string> dirs0 = {"srA", "srB", "srC", "srD", "srE", "srF", "srG", "srH", };
   vector<string> dirs0 = {"srC", "srD", "srE", "srF", "srG", "srH", };
@@ -133,9 +141,14 @@ void makeSigYieldsComparisonHist() {
   vector<string> dirs2 = {"srA2", "srB2", "srC2", "srD2", "srE2", "srF2", "srG2", "srH2",  };
   vector<string> dirs3 = {"srC3", "srD3", "srE3", "srF3", "srG3", "srH3",  };
   vector<string> genclasses = {"_1lepTop", "_1lepW", "_Znunu", "_2lep", };
-  // vector<string> dirs5 = {"srA0", "srA1", "srA2", "srB0", "srC0", "srD0", "srE0", "srE1", "srE2", "srE3", "srF0", "srG0", "srG1", "srG2", "srG3", "srH0",};
+
+  vector<string> dirs5 = {"srA0", "srA1", "srA2", "srB0", "srC0", "srD0", "srE0", "srE1", "srE2", "srE3", "srF0", "srG0", "srG1", "srG2", "srG3", "srH0",};
   // vector<string> dirs5 = {"cr2lA0", "cr2lA1", "cr2lA2", "cr2lB0", "cr2lC0", "cr2lD0", "cr2lE0", "cr2lE1", "cr2lE2", "cr2lE3", "cr2lF0", "cr2lG0", "cr2lG1", "cr2lG2", "cr2lG3", "cr2lH0",};
-  vector<string> dirs5 = {"cr0bA0", "cr0bA1", "cr0bA2", "cr0bB0", "cr0bC0", "cr0bD0", "cr0bE0", "cr0bE1", "cr0bE2", "cr0bE3", "cr0bF0", "cr0bG0", "cr0bG1", "cr0bG2", "cr0bG3", "cr0bH0",};
+  // vector<string> dirs5 = {"cr0bA0", "cr0bA1", "cr0bA2", "cr0bB0", "cr0bC0", "cr0bD0", "cr0bE0", "cr0bE1", "cr0bE2", "cr0bE3", "cr0bF0", "cr0bG0", "cr0bG1", "cr0bG2", "cr0bG3", "cr0bH0",};
+
+  TString savename = "sigYieldsCompareHist_2016.pdf";
+  // TString savename = "cr2lYieldsCompareHist_1617.pdf";
+  // TString savename = "cr0bYieldsCompareHist_2017.pdf";
 
   vector<string> dirsAll = dirs1;
   dirsAll.insert(dirsAll.end(), dirs2.begin(), dirs2.end());
@@ -144,7 +157,7 @@ void makeSigYieldsComparisonHist() {
 
   vector<Color_t> colors = {kRed-7, kSpring-5, kOrange-2, kAzure+7, kCyan-7, kMagenta-7, kTeal+6, kGray+2};
   THStack* hSR_stk = fillSRYieldsStackHist({fbkg}, dirsAll, colors, genclasses, n_srbins);
-  TH1D* hSR_org = fillSRYieldsPlot({fbkg}, dirsAll, "", n_srbins);
+  TH1D* hSR_org = fillSRYieldsPlot({forg}, dirsAll, "", n_srbins);
   hSR_org->SetName("h_SRyields_org");
   // hSR_org->Scale(120/35.9);
   hSR_org->SetTitle("");
@@ -157,8 +170,13 @@ void makeSigYieldsComparisonHist() {
   hRatio->Divide(hSR_mMT, hSR_org, 1, 1, "B");
   hSR_mMT->Scale(120/35.9);
 
-  TH1D* hSR_sig0 = fillSRYieldsPlot({fsig0}, dirs0, "_800_400", n_srbins);
-  TH1D* hSR_sig2 = fillSRYieldsPlot({fsig2}, dirs2, "_800_400", n_srbins);
+  // TH1D* hSR_sig0 = fillSRYieldsPlot({fsig0}, dirs0, "_800_400", n_srbins);
+  // TH1D* hSR_sig2 = fillSRYieldsPlot({fsig2}, dirs2, "_800_400", n_srbins);
+  TH1D* hSR_sig0 = fillSRYieldsPlot({fsig0}, dirsAll, "", n_srbins);
+  TH1D* hSR_sig2 = fillSRYieldsPlot({fsig2}, dirsAll, "", n_srbins);
+  hSR_sig0->Scale(0.001598);
+  hSR_sig2->Scale(0.107045);
+
   // TEfficiency* hRatio_sig = new TEfficiency(*hSR_sig2, *hSR_sig0);
   // hRatio_sig->SetName("h_ratio_sig");
   TH1D* hRatio_sig = (TH1D*) hSR_sig2->Clone("h_ratio_sig");
@@ -188,11 +206,12 @@ void makeSigYieldsComparisonHist() {
 
   mainPad->cd();
 
-  // hSR_org->SetLineColor(kOrange+1);
-  // hSR_org->SetFillColor(kOrange+1);
-  hSR_org->SetFillStyle(3002);
-  hSR_org->SetLineColorAlpha(kOrange+1, 0.3);
-  hSR_org->SetFillColorAlpha(kOrange+1, 0.7);
+  // hSR_org->SetFillStyle(3002);
+  // hSR_org->SetLineColorAlpha(kOrange+1, 0.3);
+  // hSR_org->SetFillColorAlpha(kOrange+1, 0.7);
+  hSR_org->SetMarkerStyle(20);
+  // hSR_org->SetLineColorAlpha(kOrange+1, 0.3);
+  // hSR_org->SetFillColorAlpha(kOrange+1, 0.7);
 
   hSR_org->GetXaxis()->SetLabelSize(0.048);
   if (type == 2) {
@@ -362,28 +381,28 @@ void makeSigYieldsComparisonHist() {
   hSR_org->GetYaxis()->SetTitleSize(0.06);
   hSR_org->GetYaxis()->SetRangeUser(0.1, 4000);
   hSR_org->Draw("hist");
+  // hSR_org->Draw("PE");
   // hSR_mMT->SetFillColor(kAzure+7);
   // hSR_mMT->Draw("axissame");
   hSR_stk->Draw("histsame");
   hSR_stk->Draw("axissame");
   // hSR_mMT->SetLineColor(kAzure-3);
   // hSR_mMT->Draw("histsame");
+  // hSR_org->Draw("PEsame");
 
-  hSR_sig0->SetLineStyle(2);
+  hSR_sig0->SetLineStyle(1);
   hSR_sig2->SetLineStyle(1);
   hSR_sig0->SetLineWidth(3);
   hSR_sig2->SetLineWidth(3);
-  hSR_sig0->Scale(120/35.9);
-  hSR_sig2->Scale(120/35.9);
-  hSR_sig0->SetLineColor(kGray+2);
+  hSR_sig0->SetLineColor(kMagenta);
   hSR_sig2->SetLineColor(kTeal);
 
   for (int i = 0; i < n_srbins; ++i) {
     hSR_sig0->SetBinError(i, 0);
     hSR_sig2->SetBinError(i, 0);
   }
-  // hSR_sig0->Draw("same");
-  // hSR_sig2->Draw("same");
+  hSR_sig0->Draw("same");
+  hSR_sig2->Draw("same");
 
   TLegend* leg = new TLegend(0.42, 0.74, 0.68, 0.89);
   leg->SetFillColor(0);
@@ -395,31 +414,40 @@ void makeSigYieldsComparisonHist() {
   leg->AddEntry(hSR_stk->GetHists()->At(1), "1lepW");
   leg->AddEntry(hSR_stk->GetHists()->At(2), "Z#rightarrow#nu#nu");
   leg->AddEntry(hSR_stk->GetHists()->At(3), "lostlep");
+  // leg->AddEntry(hSR_org, "Original");
 
   leg->Draw("same");
 
   // c0->SaveAs(Form("sigYieldsCompareHist_%s.pdf", "test"));
   // c0->SaveAs(Form("sigYieldsCompareHist_%s.png", "test"));
 
-  c0->SaveAs(Form("cr0bYieldsCompareHist_%s.pdf", "test"));
-  c0->SaveAs(Form("cr0bYieldsCompareHist_%s.png", "test"));
+  // c0->SaveAs(Form("cr2lYieldsCompareHist_%s.pdf", "test"));
+  // c0->SaveAs(Form("cr0bYieldsCompareHist_%s.pdf", "test"));
+
+  // c0->SaveAs(savename);
 
   TLegend* leg2 = new TLegend(0.68, 0.69, 0.84, 0.89);
+  // TLegend* leg2 = new TLegend(0.68, 0.81, 0.84, 0.89);
   leg2->SetFillColor(0);
   leg2->SetFillStyle(0);
   leg2->SetBorderSize(0);
   leg2->SetTextSize(0.042);
-  leg2->AddEntry(hSR_org, "Total background");
+  // leg2->AddEntry(hSR_org, "Total background");
+  // leg2->AddEntry(hSR_org, "data");
   if (type == 2) {
     leg2->AddEntry(hSR_sig0, "T2tt(1200,50) org");
     leg2->AddEntry(hSR_sig2, "T2tt(1200,50) mtag");
   } else if (type == 3) {
     leg2->AddEntry(hSR_sig0, "T2tt(800,400) org");
     leg2->AddEntry(hSR_sig2, "T2tt(800,400) rtag");
+  } else if (type == 5) {
+    leg2->AddEntry(hSR_sig0, "T2tt(1200,100)");
+    leg2->AddEntry(hSR_sig2, "T2tt(650,350)");
   }
 
   leg2 ->Draw("same");
 
+  c0->SaveAs(savename);
 
   ratioPad->cd();
   TH1D* h_axis_ratio = new TH1D("ratio_axis","", n_srbins, 0, n_srbins);
