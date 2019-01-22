@@ -8,14 +8,47 @@
 
 void compareControlRegions();
 void compareData161718();
+void compareDataMC_CRemu();
 
-void compare_data_17vs16()
+void compareDistributions()
 {
   cout << "Executing macro compareControlRegions()...\n";
   // compareControlRegions();
-  compareData161718();
+  // compareData161718();
+  compareDataMC_CRemu();
 
   return;
+}
+
+void compareDataMC_CRemu() {
+  auto fdata  = new TFile("../StopLooper/output/samp17_v30_t1/allData_17.root");
+  auto fttbar = new TFile("../StopLooper/output/samp17_v30_t1/ttbar_17.root");
+
+  auto h_nvtx_data  = (TH1F*) fdata->Get("cremuA0/h_nvtxs");
+  auto h_nvtx_ttbar = (TH1F*) fttbar->Get("cremuA0/h_nvtxs");
+
+  // h_nvtx_data->Scale(1./h_nvtx_data->Integral());
+  // h_nvtx_ttbar->Scale(1./h_nvtx_ttbar->Integral());
+  // auto h_rwgt = (TH1F*) h_nvtx_data->Clone();
+  // h_rwgt->Divide(h_nvtx_ttbar);
+  // TFile temp("nvtx_reweighting_all.root", "UPDATE");
+  // h_rwgt->Write("h_nvtxscale_cremu0_ttbar");
+  // temp.Close();
+
+  auto h_njetisr_data  = (TH1F*) fdata ->Get("cremuA0/h_njet_200nonb");
+  auto h_njetisr_ttbar = (TH1F*) fttbar->Get("cremuA0/h_njet_200nonb");
+
+  h_njetisr_data ->Scale(1./h_njetisr_data ->Integral());
+  h_njetisr_ttbar->Scale(1./h_njetisr_ttbar->Integral());
+  auto h_rwgt = (TH1F*) h_njetisr_data->Clone();
+  h_rwgt->Divide(h_njetisr_ttbar);
+  for (int i = 1; i < h_rwgt->GetNbinsX()+1; ++i) {
+    cout << __LINE__ << ": i= " << i << ", h_rwgt->GetBinContent(i)= " << h_rwgt->GetBinContent(i) << endl;
+  }
+
+  // TFile temp("nvtx_reweighting_all.root", "UPDATE");
+  // h_rwgt->Write("h_nvtxscale_cremu0_ttbar");
+  // temp.Close();
 }
 
 void compareData161718() {

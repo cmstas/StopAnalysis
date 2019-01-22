@@ -205,18 +205,18 @@ std::vector<SR> getStopCrosscheckRegionsEMu() {
   cr.SetVar("nbjet", 2, fInf);
   CRvec.emplace_back(cr);
 
+  cr.SetVar("mt", 0, 150);
   cr.SetName("cremuB0");
-  cr.SetDetailName("ge2j_0b_met50toInf");
-  cr.SetVar("nbjet", 0, 1);
+  cr.SetDetailName("ge2j_ge0b_met50toInf_mt0to150");
+  cr.SetVar("nbjet", 0, fInf);
   CRvec.emplace_back(cr);
 
   cr.SetName("cremuB1");
-  cr.SetDetailName("ge2j_1b_met50toInf");
-  cr.SetVar("nbjet", 1, 2);
+  cr.SetDetailName("ge2j_ge1b_met50toInf_mt0to150");
+  cr.SetVar("nbjet", 1, fInf);
   CRvec.emplace_back(cr);
 
   cr.SetVar("mt", 150, fInf);
-
   cr.SetName("cremuC0");
   cr.SetDetailName("ge2j_0b_met50toInf_mt150toInf");
   cr.SetVar("nbjet", 0, 1);
@@ -231,6 +231,59 @@ std::vector<SR> getStopCrosscheckRegionsEMu() {
   cr.SetDetailName("ge2j_ge2b_met50toInf_mt150toInf");
   cr.SetVar("nbjet", 2, fInf);
   CRvec.emplace_back(cr);
+
+  cr.SetVar("mt", 0, fInf);
+  cr.SetVar("tmod", 0, 10);
+
+  cr.SetName("cremuD0");
+  cr.SetDetailName("ge2j_0b_met50toInf_tmod0to10");
+  cr.SetVar("nbjet", 0, 1);
+  CRvec.emplace_back(cr);
+
+  cr.SetName("cremuD1");
+  cr.SetDetailName("ge2j_ge1b_met50toInf_tmod0to10");
+  cr.SetVar("nbjet", 1, fInf);
+  CRvec.emplace_back(cr);
+
+  cr.SetVar("tmod", 10, fInf);
+
+  cr.SetName("cremuE0");
+  cr.SetDetailName("ge2j_0b_met50toInf_tmod10toInf");
+  cr.SetVar("nbjet", 0, 1);
+  CRvec.emplace_back(cr);
+
+  cr.SetName("cremuE1");
+  cr.SetDetailName("ge2j_ge1b_met50toInf_tmod10toInf");
+  cr.SetVar("nbjet", 1, fInf);
+  CRvec.emplace_back(cr);
+
+  cr.SetVar("tmod", -fInf, fInf);
+  cr.SetVar("met", 50, 250);
+
+  cr.SetVar("nbjet", 0, 1);
+  cr.SetName("cremuF0");
+  cr.SetDetailName("ge2j_0b_met50to250");
+  cr.SetVar("nbjet", 0, 1);
+  CRvec.emplace_back(cr);
+
+  cr.SetName("cremuF1");
+  cr.SetDetailName("ge2j_ge1b_met50to250");
+  cr.SetVar("nbjet", 1, fInf);
+  CRvec.emplace_back(cr);
+
+  cr.SetVar("met", 250, fInf);
+
+  cr.SetVar("nbjet", 0, 1);
+  cr.SetName("cremuG0");
+  cr.SetDetailName("ge2j_0b_met250to500");
+  cr.SetVar("nbjet", 0, 1);
+  CRvec.emplace_back(cr);
+
+  cr.SetName("cremuG1");
+  cr.SetDetailName("ge2j_ge1b_met250to500");
+  cr.SetVar("nbjet", 1, fInf);
+  CRvec.emplace_back(cr);
+
 
   return CRvec;
 }

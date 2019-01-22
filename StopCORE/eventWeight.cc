@@ -314,8 +314,8 @@ void evtWgtInfo::Setup(string samplestr, int inyear, bool applyUnc, bool useBTag
       h_cr2lTrigger_sf_el = (TEfficiency*) f_cr2lTrigger_sf->Get("Efficiency_ge2l_metrl_el");
       h_cr2lTrigger_sf_mu = (TEfficiency*) f_cr2lTrigger_sf->Get("Efficiency_ge2l_metrl_mu");
     } else if (year == 2016) {
-        h_cr2lTrigger_sf_el = (TEfficiency*) f_cr2lTrigger_sf->Get("heff16_extb_trigeff_metrl_lep1pt_el");
-        h_cr2lTrigger_sf_mu = (TEfficiency*) f_cr2lTrigger_sf->Get("heff16_extb_trigeff_metrl_lep1pt_mu");
+      h_cr2lTrigger_sf_el = (TEfficiency*) f_cr2lTrigger_sf->Get("heff16_extb_trigeff_metrl_lep1pt_el");
+      h_cr2lTrigger_sf_mu = (TEfficiency*) f_cr2lTrigger_sf->Get("heff16_extb_trigeff_metrl_lep1pt_mu");
     } else if (year == 2017) {
       h_cr2lTrigger_sf_el = (TEfficiency*) f_cr2lTrigger_sf->Get("heff17_extb_trigeff_metrl_lep1pt_el");
       h_cr2lTrigger_sf_mu = (TEfficiency*) f_cr2lTrigger_sf->Get("heff17_extb_trigeff_metrl_lep1pt_mu");
@@ -664,6 +664,7 @@ void evtWgtInfo::calculateWeightsForEvent() {
       case k_nominal:
       case k_JESUp:
       case k_JESDown:
+        break;
       case k_diLepTriggerUp:
         sys_wgt *= (sf_diLepTrigger_up/sf_diLepTrigger); break;
       case k_diLepTriggerDown:
