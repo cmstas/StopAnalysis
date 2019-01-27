@@ -2203,6 +2203,26 @@ void evtWgtInfo::setDefaultSystematics( int syst_set ) {
         apply_bTagFS_sf    = false;
       }
       break;
+
+    case test_alloff:
+      apply_cr2lTrigger_sf = false;
+      apply_bTag_sf        = false;
+      apply_lep_sf         = false;
+      apply_vetoLep_sf     = false;
+      apply_tau_sf         = false;
+      apply_topPt_sf       = false;
+      apply_metRes_sf      = false;
+      apply_metTTbar_sf    = false;
+      apply_ttbarSysPt_sf  = false;
+      apply_WbXsec_sf      = false;
+      apply_ISR_sf         = false;
+      apply_pu_sf          = false;
+      apply_sample_sf      = false;
+      if (is_fastsim_) {
+        apply_lepFS_sf     = false;  // no fast sim yet
+        apply_bTagFS_sf    = false;
+      }
+      break;
   }
 
 }
