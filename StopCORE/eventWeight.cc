@@ -1,5 +1,7 @@
 #include "eventWeight.h"
 
+using namespace stop1l;
+
 // SNT CORE function
 /// topPtWeight() copied from MCSelections.cc
 float topPtWeight(float pt_top, float pt_tbar) {
@@ -2034,6 +2036,52 @@ void evtWgtInfo::getISRnJetsWeight( double &weight_ISR, double &weight_ISR_up, d
 
 }
 
+//////////////////////////////////////////////////////////////////////
+
+void evtWgtInfo::getISRnJetsWeight_local( double &weight_ISR, double &weight_ISR_up, double &weight_ISR_dn ) {
+
+  weight_ISR = 1.0;
+
+  // WARNING, normalization is not available, only to be used for shape comparison
+  int nisrjets = babyAnalyzer.NISRjets();
+
+  if (year == 2016) {
+    if      (nisrjets == 0) weight_ISR = 1.000;
+    else if (nisrjets == 1) weight_ISR = 0.920;
+    else if (nisrjets == 2) weight_ISR = 0.821;
+    else if (nisrjets == 3) weight_ISR = 0.715;
+    else if (nisrjets == 4) weight_ISR = 0.662;
+    else if (nisrjets == 5) weight_ISR = 0.561;
+    else if (nisrjets >= 6) weight_ISR = 0.511;
+  }
+  else if (year == 2017) {
+    if      (nisrjets == 0) weight_ISR = 1.0468;
+    else if (nisrjets == 1) weight_ISR = 0.9880;
+    else if (nisrjets == 2) weight_ISR = 0.9378;
+    else if (nisrjets == 3) weight_ISR = 0.8640;
+    else if (nisrjets == 4) weight_ISR = 0.8972;
+    else if (nisrjets == 5) weight_ISR = 0.8707;
+    else if (nisrjets >= 6) weight_ISR = 0.8128;
+  }
+
+  // Get the uncertainties of the ISR-njet weight base on the number of ISR jets matched
+  float isr_unc = 0.;
+  if (year >= 2016) {
+    // Moriond 2017 values
+    if      (nisrjets == 0) isr_unc = 0.000;
+    else if (nisrjets == 1) isr_unc = 0.040;
+    else if (nisrjets == 2) isr_unc = 0.090;
+    else if (nisrjets == 3) isr_unc = 0.143;
+    else if (nisrjets == 4) isr_unc = 0.170;
+    else if (nisrjets == 5) isr_unc = 0.221;
+    else if (nisrjets >= 6) isr_unc = 0.258;
+  }
+
+  weight_ISR_up = weight_ISR + isr_unc;
+  weight_ISR_dn = weight_ISR - isr_unc;
+}
+
+//////////////////////////////////////////////////////////////////////
 
 inline void evtWgtInfo::getPileupWeight( double &weight_pu, double &weight_pu_up, double &weight_pu_dn ) {
   weight_pu    = babyAnalyzer.weight_PU();

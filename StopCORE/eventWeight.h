@@ -300,6 +300,7 @@ class evtWgtInfo {
   void getQ2Weight( double &weight_q2_up, double &weight_q2_dn );
   void getISRWeight( double &weight_ISR, double &weight_ISR_up, double &weight_ISR_dn );
   void getISRnJetsWeight( double &weight_ISR, double &weight_ISR_up, double &weight_ISR_dn );
+  void getISRnJetsWeight_local( double &weight_ISR, double &weight_ISR_up, double &weight_ISR_dn );
   void getPileupWeight( double &weight_pu, double &weight_pu_up, double &weight_pu_dn );
 
   double getZSampleWeightFromCR3l( TString fname, bool apply=true );
