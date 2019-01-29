@@ -260,6 +260,9 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
     year_ = (doTopTagging)? year() : 2016;
     TString dsname = dataset();
 
+    // Temporary setup to use 2017 MC in place for 2018
+    if (output_dir.find("samp18") != string::npos) year_ = 2018;
+
     // Find the stopbaby versions automatically from file path
     if (int i = fname.Index("_v"); i >= 0) samplever = fname(i+1, 3); // ignore subversions
     else if (fname.Contains("v24")) samplever = "v24";
