@@ -1047,6 +1047,23 @@ void StopLooper::fillHistosForCRemu(string suf, int trigType) {
     plot1d("h_nvtxs_raw", nvtxs(), 1, testVec[0].histMap, ";Number of vertices", 100, 1, 101);
   }
 
+  // ttbar syst pt SF
+  if (evtWgt.samptype == evtWgtInfo::ttbar) {
+    const vector<float> ttbarSystPtbin = {0, 50,   100,    150,    200,    250,    350,    450,    600,    800,  10000, };
+    const vector<float> ttbarSystPtSFs = {1.040, 1.010, 0.9636, 0.9073, 0.8612, 0.8906, 0.8485, 0.8963, 0.8815, 0.6635, };
+
+    int ptcat = std::upper_bound(ttbarSystPtbin.begin(), ttbarSystPtbin.end(), system_p4.pt()) - ttbarSystPtbin.begin() - 1;
+    if (year_ == 2017) evtweight_ *= ttbarSystPtSFs[ptcat];
+  }
+
+  // ISR-njets reweighting
+  int n_isrjets = NISRjets();
+  if (evtWgt.samptype == evtWgtInfo::ttbar) {
+    double isr_weight(0.), isr_weight_up(0.), isr_weight_down(0.);
+    evtWgt.getISRnJetsWeight_local(isr_weight, isr_weight_up, isr_weight_down);
+    if (year_ == 2017) evtweight_ *= isr_weight;
+  }
+
   // L1-prefiring veto
   int necalobj = 0;
   for (auto jp4 : ak4pfjets_p4()) {
@@ -1072,12 +1089,6 @@ void StopLooper::fillHistosForCRemu(string suf, int trigType) {
     if (ak4pfjets_deepCSV().at(j) > 0.1522) continue;
     njets_pt200nonb++;
   }
-  // if (year_ == 2017 && evtWgt.samptype == evtWgtInfo::ttbar) {
-  //   if      (njets_pt200nonb == 0) evtweight_ *= 1.00425;
-  //   else if (njets_pt200nonb == 1) evtweight_ *= 0.945899;
-  //   else if (njets_pt200nonb == 2) evtweight_ *= 0.922746;
-  //   else if (njets_pt200nonb >= 3) evtweight_ *= 0.636941;
-  // }
 
   for (auto& cr : CRemuVec) {
     if ( cr.PassesSelection(values_) ) {
@@ -1127,6 +1138,14 @@ void StopLooper::fillHistosForCRemu(string suf, int trigType) {
           plot1d("h_deepttag"+s, values_["deepttag"], evtweight_, cr.histMap, ";deepAK8 top tag"     , 120, -0.1f, 1.1f);
         }
 
+        if (evtWgt.samptype == evtWgtInfo::ttbar) {
+          plot1d("h_nisrmatch"+s, n_isrjets, 1, cr.histMap, ";N-ISR gen-matched",  5,  0, 5);
+          if (values_["nbjet"] == 2) {
+            plot1d("h_diff_nisr"+s, values_["njet"]-n_isrjets-2, 1, cr.histMap, ";#Delta(N-ISR beyond 2b, N-ISR gen)",  7,  -3, 4);
+            plot1d("h_nisrmatch_2b"+s, n_isrjets, 1, cr.histMap, ";N-ISR gen-matched",  5,  0, 5);
+          }
+        }
+
         if (is_bkg_) {
           int ngenjet_ecal = 0;
           int ngenjet30_ecal = 0;
@@ -1165,7 +1184,7 @@ void StopLooper::fillHistosForCRemu(string suf, int trigType) {
           }
         }
 
-        const vector<float> ptbin1 = {0, 50, 100, 150, 200, 250, 350, 450, 600, 800};
+        const vector<float> ptbin1 = {0, 50, 100, 150, 200, 250, 350, 450, 600, 800, 1500};
         plot1d("h_met_b1"+s, values_["met"], evtweight_, cr.histMap, ";#slash{E}_{T} [GeV]", ptbin1.size()-1, ptbin1.data());
         plot1d("h_ptll_b1"+s, values_["ptll"], evtweight_, cr.histMap, ";p_{T}(ll) [GeV]", ptbin1.size()-1, ptbin1.data());
         plot1d("h_jet1pt_b1"+s, values_["jet1pt"], evtweight_, cr.histMap, ";p_{T}(jet1) [GeV]", ptbin1.size()-1, ptbin1.data());
