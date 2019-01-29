@@ -322,9 +322,8 @@ void evtWgtInfo::Setup(string samplestr, int inyear, bool applyUnc, bool useBTag
       h_cr2lTrigger_sf_el = (TEfficiency*) f_cr2lTrigger_sf->Get("heff17_extb_trigeff_metrl_lep1pt_el");
       h_cr2lTrigger_sf_mu = (TEfficiency*) f_cr2lTrigger_sf->Get("heff17_extb_trigeff_metrl_lep1pt_mu");
     } else if (year == 2018) {
-      // TODO: to update this when 2018 JetHT data is available
-      h_cr2lTrigger_sf_el = (TEfficiency*) f_cr2lTrigger_sf->Get("heff17_trigeff_metrl_lep1pt_el");
-      h_cr2lTrigger_sf_mu = (TEfficiency*) f_cr2lTrigger_sf->Get("heff17_trigeff_metrl_lep1pt_mu");
+      h_cr2lTrigger_sf_el = (TEfficiency*) f_cr2lTrigger_sf->Get("heff18_extb_trigeff_metrl_lep1pt_el");
+      h_cr2lTrigger_sf_mu = (TEfficiency*) f_cr2lTrigger_sf->Get("heff18_extb_trigeff_metrl_lep1pt_mu");
     }
     if (!h_cr2lTrigger_sf_mu || !h_cr2lTrigger_sf_el) {
       cout << "[eventWeight::Setup] >> Cannot find histogram for cr2lTrigger!! Turning it off!!" << endl;

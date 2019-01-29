@@ -75,11 +75,23 @@ if __name__ == "__main__":
     osreff16_el = fold.Get("Efficiency_ge1l_el")
     osreff16_mu = fold.Get("Efficiency_ge1l_mu")
 
-    fn17 = r.TFile("../StopLooper/output/data17_jetht/data_jetht_2017_addAK8ToBase.root")
+    # fn17 = r.TFile("../StopLooper/output/data17_jetht/data_jetht_2017_addAK8ToBase.root")
+    # effn17_mu = getTEfficiency(fn17, "trigeff_metrl_lep1pt_mu", "17_extb")
+    # effn17_el = getTEfficiency(fn17, "trigeff_metrl_lep1pt_el", "17_extb")
+
+    # fn16 = r.TFile("../StopLooper/output/data16_jetht/data_jetht_2016_addAK8ToBase.root")
+    # effn16_mu = getTEfficiency(fn16, "trigeff_metrl_lep1pt_mu", "16_extb")
+    # effn16_el = getTEfficiency(fn16, "trigeff_metrl_lep1pt_el", "16_extb")
+
+    fn18 = r.TFile("../StopLooper/output/jetht_v30/data_2018.root")
+    effn18_mu = getTEfficiency(fn18, "trigeff_metrl_lep1pt_mu", "18_extb")
+    effn18_el = getTEfficiency(fn18, "trigeff_metrl_lep1pt_el", "18_extb")
+
+    fn17 = r.TFile("../StopLooper/output/jetht_v30/data_2017.root")
     effn17_mu = getTEfficiency(fn17, "trigeff_metrl_lep1pt_mu", "17_extb")
     effn17_el = getTEfficiency(fn17, "trigeff_metrl_lep1pt_el", "17_extb")
 
-    fn16 = r.TFile("../StopLooper/output/data16_jetht/data_jetht_2016_addAK8ToBase.root")
+    fn16 = r.TFile("../StopLooper/output/jetht_v30/data_2016.root")
     effn16_mu = getTEfficiency(fn16, "trigeff_metrl_lep1pt_mu", "16_extb")
     effn16_el = getTEfficiency(fn16, "trigeff_metrl_lep1pt_el", "16_extb")
 
@@ -105,6 +117,8 @@ if __name__ == "__main__":
     effn16_el.Write()
     effn17_mu.Write()
     effn17_el.Write()
+    effn18_mu.Write()
+    effn18_el.Write()
 
     effd16_mu.Write()
     effd16_el.Write()
@@ -154,6 +168,8 @@ if __name__ == "__main__":
     printEfficiency(c1, oeff16_el,   "hoeff16_el")
     printEfficiency(c1, eff17_mu,    "heff17_mu")
     printEfficiency(c1, eff17_el,    "heff17_el")
+    printEfficiency(c1, effn18_mu,   "heffn18_mu")
+    printEfficiency(c1, effn18_el,   "heffn18_el")
     printEfficiency(c1, effn17_mu,   "heffn17_mu")
     printEfficiency(c1, effn17_el,   "heffn17_el")
     printEfficiency(c1, effn16_mu,   "heffn16_mu")
