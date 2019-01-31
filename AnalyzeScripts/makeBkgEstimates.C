@@ -2,6 +2,7 @@
 const bool useMetExtrapolation = true;
 const double extr_threshold = 5;  // minimum number of events in a bin to not need an MET extrapolation
 const bool doCRPurityError = true;
+const double extr_TFcap = 0.6;  // maximum value for the transfer factor to not do MET extrapolation
 
 void dataDrivenFromCR(TFile* fdata, TFile* fmc, TFile* fout, TString ddtype, TString gentype) {
   // Additional hists to consider: dataStats, MCstats, impurity
@@ -51,11 +52,11 @@ void dataDrivenFromCR(TFile* fdata, TFile* fmc, TFile* fout, TString ddtype, TSt
     };
 
     if (useMetExtrapolation) {
-      double err = 0;
-      double ylds = 0;
+      double yldCR(0.0), err(0.0);
       for (; extr_start_bin > 1; --extr_start_bin) {
-        ylds = hist_MC_CR->IntegralAndError(extr_start_bin, -1, err);
-        if (ylds > extr_threshold) break;
+        yldCR = hist_MC_CR->IntegralAndError(extr_start_bin, -1, err);
+        double TFval = hist_MC_SR->GetBinContent(extr_start_bin) / yldCR;
+        if (yldCR > extr_threshold && (TFval < extr_TFcap)) break;
       }
       if (extr_start_bin != lastbin) {
         cout << "Doing MET extrapolation for  " << crname << "  from bin " << lastbin << " (last bin) to bin " << extr_start_bin << "!" << endl;
