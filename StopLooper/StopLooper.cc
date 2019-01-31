@@ -47,7 +47,7 @@ const bool applyBtagSFfromFiles = false; // default false
 // turn on to apply lepton sf to central value - reread from files
 const bool applyLeptonSFfromFiles = false; // default false
 // turn on to enable plots of metbins with systematic variations applied. will only do variations for applied weights
-const bool doSystVariations = false;
+const bool doSystVariations = true;
 // turn on to enable plots of metbins with different gen classifications
 const bool doGenClassification = true;
 // turn on to apply Nvtx reweighting to MC / data2016
@@ -61,7 +61,7 @@ const bool runResTopMVA = false;
 // only produce yield histos
 const bool runYieldsOnly = false;
 // only running selected signal points to speed up
-const bool runFullSignalScan = false;
+const bool runFullSignalScan = true;
 // debug symbol, for printing exact event kinematics that passes
 const bool printPassedEvents = false;
 
@@ -977,7 +977,8 @@ void StopLooper::fillHistosForCR0b(string suf) {
       plot1d("h_jet1eta"+s, values_["jet1eta"], evtweight_, cr.histMap, ";#eta(jet1) [GeV]"   , 30,  -3,  3);
       plot1d("h_jet2eta"+s, values_["jet2eta"], evtweight_, cr.histMap, ";#eta(jet2) [GeV]"   , 60,  -3,  3);
       // Temporary test for low dphijmet excess
-      plot1d("h_dphij1j2"+s, fabs(ak4pfjets_p4().at(0).phi()-ak4pfjets_p4().at(1).phi()), evtweight_, cr.histMap, ";#Delta#phi(j1,j2)" , 33,  0, 3.3);
+      if (jestype_ == 0)
+        plot1d("h_dphij1j2"+s, fabs(ak4pfjets_p4().at(0).phi()-ak4pfjets_p4().at(1).phi()), evtweight_, cr.histMap, ";#Delta#phi(j1,j2)" , 33,  0, 3.3);
     };
     fillKineHists(suf);
 
@@ -996,6 +997,8 @@ void StopLooper::fillHistosForCR0b(string suf) {
 }
 
 void StopLooper::fillHistosForCRemu(string suf, int trigType) {
+
+  if (jestype_ != 0) return;
 
   // Trigger requirements and go to the plateau region
   // if (is_data()) {
