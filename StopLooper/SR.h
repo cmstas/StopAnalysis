@@ -25,6 +25,7 @@ public:
   void SetName(std::string sr_name);
   void SetDetailName(std::string detail_name);
   void SetVar(std::string var_name, float lower_bound, float upper_bound);
+  void SetVar(int ivar, float lower_bound, float upper_bound);
   void SetMETBins(std::vector<float> met_bins);
   void SetAllowDummyVars(int val);
 
@@ -32,19 +33,26 @@ public:
   std::string GetDetailName() const;
   unsigned int GetYield() const;
   float GetLowerBound(std::string var_name) const;
+  float GetLowerBound(int ivar) const;
   float GetUpperBound(std::string var_name) const;
+  float GetUpperBound(int ivar) const;
   unsigned int GetNumberOfVariables() const;
+  unsigned int GetNumberOfCuts() const;
   std::vector<std::string> GetListOfVariables() const;
+  std::vector<int> GetListOfVariableIndicies() const;
   int GetNMETBins();
   float* GetMETBinsPtr();
 
-  bool PassesSelection(std::map<std::string, float> values);
+  bool PassesSelection(const std::map<std::string,float>& values);
+  bool PassesSelection(const std::vector<float>& values);
   bool VarExists(std::string var_name) const;
+  bool VarExists(int ivar) const;
   void RemoveVar(std::string var_name);
+  void RemoveVar(int ivar);
   void Clear();
 
   // Function for debug
-  bool PassesSelectionPrintFirstFail(std::map<std::string, float> values);
+  bool PassesSelectionPrintFirstFail(const std::map<std::string,float>& values);
 
   // used for plotting
   std::map<std::string, TH1*> histMap;
@@ -55,6 +63,7 @@ private:
   std::string srname_;
   std::string detailname_;
   std::map<std::string,std::pair<float,float>> cuts_;
+  std::vector<std::pair<float,float>> vcuts_;
   std::vector<std::string> defaultplots_;
   std::vector<float> metbins_;
   int kAllowDummyVars_;

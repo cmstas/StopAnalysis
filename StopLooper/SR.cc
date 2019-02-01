@@ -7,6 +7,7 @@
 #include "SR.h"
 
 using namespace std;
+const pair<float,float> kemptycut{0,0};
 
 void SR::SetName(string sr_name) {
   srname_ = sr_name;
@@ -18,6 +19,11 @@ void SR::SetDetailName(string detail_name) {
 
 void SR::SetVar(string var_name, float lower_bound, float upper_bound) {
   cuts_[var_name] = pair<float,float>(lower_bound, upper_bound);
+}
+
+void SR::SetVar(int ivar, float lower_bound, float upper_bound) {
+  if (ivar >= (int)vcuts_.size()) vcuts_.resize(ivar+1, kemptycut);
+  vcuts_[ivar] = pair<float,float>(lower_bound, upper_bound);
 }
 
 void SR::SetMETBins(std::vector<float> met_bins) {
@@ -56,6 +62,14 @@ unsigned int SR::GetNumberOfVariables() const {
   return cuts_.size();
 }
 
+unsigned int SR::GetNumberOfCuts() const {
+  unsigned int ncut = vcuts_.size();
+  for (const auto& ipair : vcuts_) {
+    if (ipair == kemptycut) ncut--;
+  }
+  return ncut;
+}
+
 vector<string> SR::GetListOfVariables() const {
   vector<string> vars;
   for (auto it = cuts_.begin(); it != cuts_.end(); ++it) {
@@ -72,23 +86,44 @@ int SR::GetNMETBins() {
   return metbins_.size() - 1;
 }
 
-bool SR::PassesSelection(map<string, float> values) {
+bool SR::PassesSelection(const vector<float>& values) {
+  if ((kAllowDummyVars_ == 0 && GetNumberOfCuts() != values.size()) ||
+      (kAllowDummyVars_ == 1 && GetNumberOfCuts()  > values.size())) {
+    cout << "Number of variables to cut on != number of variables in signal region. Passed " << values.size() << ", expected " << GetNumberOfVariables() << endl;
+    throw invalid_argument(srname_ + ": Number of variables to cut on != number of variables in signal region");
+  }
+  for (size_t icut = 0; icut < vcuts_.size(); icut++) {
+    float value = values[icut];
+    if (!kAllowDummyVars_ && isnan(value)) {
+      throw invalid_argument("The " + to_string(icut) + "th cut variable is not found in values");
+    }
+    float cut_lower = vcuts_[icut].first;
+    float cut_upper = vcuts_[icut].second;
+    if (value <  cut_lower) return false;
+    if (value >= cut_upper) return false;
+  }
+  ++yield_;
+  return true;
+}
+
+bool SR::PassesSelection(const map<string, float>& values) {
   const float ep = 0.000001;
   if ((kAllowDummyVars_ == 0 && GetNumberOfVariables() != values.size()) ||
       (kAllowDummyVars_ == 1 && GetNumberOfVariables()  > values.size())) {
     cout << "Number of variables to cut on != number of variables in signal region. Passed " << values.size() << ", expected " << GetNumberOfVariables() << endl;
     throw invalid_argument(srname_ + ": Number of variables to cut on != number of variables in signal region");
   }
-  for (auto it = cuts_.begin(); it != cuts_.end(); it++) {
-    if (values.find(it->first) != values.end()) { //check that we actually have bounds set for this variable
-      float value = values[it->first];
-      float cut_lower = (it->second).first;
-      float cut_upper = (it->second).second;
+  for (auto cit = cuts_.begin(); cit != cuts_.end(); cit++) {
+    const auto vit = values.find(cit->first);
+    if (vit != values.end()) { //check that we actually have bounds set for this variable
+      float value = vit->second;
+      float cut_lower = (cit->second).first;
+      float cut_upper = (cit->second).second;
       if (value < cut_lower) return false;
       if (( abs(cut_upper + 1.0) > ep ) && (value >= cut_upper)) return false;
     }
     else if (!kAllowDummyVars_) {
-      throw invalid_argument("Cut variable " + it->first + " not found in values");
+      throw invalid_argument("Cut variable " + cit->first + " not found in values");
     }
   }
   ++yield_;
@@ -98,7 +133,7 @@ bool SR::PassesSelection(map<string, float> values) {
 int debug_print_count_SR_cc = 0;
 const int k_debug_print_limit_SR_cc = 100;
 
-bool SR::PassesSelectionPrintFirstFail(map<string, float> values) {
+bool SR::PassesSelectionPrintFirstFail(const map<string,float>& values) {
   const float ep = 0.000001;
   if ((kAllowDummyVars_ == 0 && GetNumberOfVariables() != values.size()) ||
       (kAllowDummyVars_ == 1 && GetNumberOfVariables()  > values.size())) {
@@ -106,8 +141,9 @@ bool SR::PassesSelectionPrintFirstFail(map<string, float> values) {
     throw invalid_argument(srname_ + ": Number of variables to cut on != number of variables in signal region");
   }
   for (auto it = cuts_.begin(); it != cuts_.end(); it++) {
-    if (values.find(it->first) != values.end()) { //check that we actually have bounds set for this variable
-      float value = values[it->first];
+    const auto vit = values.find(it->first);
+    if (vit != values.end()) { //check that we actually have bounds set for this variable
+      float value = vit->second;
       float cut_lower = (it->second).first;
       float cut_upper = (it->second).second;
       // if (value < cut_lower) return false;
@@ -135,9 +171,18 @@ bool SR::VarExists(std::string var_name) const {
   return cuts_.count(var_name);
 }
 
+bool SR::VarExists(int ivar) const {
+  return (size_t(ivar) < vcuts_.size()) && (vcuts_[ivar] != kemptycut);
+}
+
 void SR::RemoveVar(string var_name) {
   if (cuts_.find(var_name) != cuts_.end()) cuts_.erase(var_name);
   else cerr << "WARNING: Variable " << var_name << " is not present in " << srname_ << ". Cannot remove!" << endl;
+}
+
+void SR::RemoveVar(int ivar) {
+  if (size_t(ivar) < vcuts_.size()) vcuts_[ivar] = kemptycut;
+  else cerr << "WARNING: The " << ivar << "th variable is not present in " << srname_ << ". Cannot remove!" << endl;
 }
 
 void SR::Clear() {
