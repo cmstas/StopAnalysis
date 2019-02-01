@@ -7,6 +7,7 @@
 #include "SR.h"
 
 using namespace std;
+
 const pair<float,float> kemptycut{0,0};
 
 void SR::SetName(string sr_name) {
@@ -58,6 +59,18 @@ float SR::GetUpperBound(string var_name) const {
   return (cuts_.at(var_name)).second;
 }
 
+float SR::GetLowerBound(int ivar) const {
+  if (!VarExists(ivar))
+    throw invalid_argument("Variable " + to_string(ivar) + " not defined in SR " + srname_ + " ! Cannot get lower bound!");
+  return vcuts_[ivar].first;
+}
+
+float SR::GetUpperBound(int ivar) const {
+  if (!VarExists(ivar))
+    throw invalid_argument("Variable " + to_string(ivar) + " not defined in SR " + srname_ + " ! Cannot get upper bound!");
+  return vcuts_[ivar].second;
+}
+
 unsigned int SR::GetNumberOfVariables() const {
   return cuts_.size();
 }
@@ -93,6 +106,7 @@ bool SR::PassesSelection(const vector<float>& values) {
     throw invalid_argument(srname_ + ": Number of variables to cut on != number of variables in signal region");
   }
   for (size_t icut = 0; icut < vcuts_.size(); icut++) {
+    if (vcuts_[icut] == kemptycut) continue;
     float value = values[icut];
     if (!kAllowDummyVars_ && isnan(value)) {
       throw invalid_argument("The " + to_string(icut) + "th cut variable is not found in values");
@@ -183,6 +197,13 @@ void SR::RemoveVar(string var_name) {
 void SR::RemoveVar(int ivar) {
   if (size_t(ivar) < vcuts_.size()) vcuts_[ivar] = kemptycut;
   else cerr << "WARNING: The " << ivar << "th variable is not present in " << srname_ << ". Cannot remove!" << endl;
+}
+
+void SR::ReplaceVar(int ivar_old, int ivar_new) {
+  if (!VarExists(ivar_old))
+    throw invalid_argument("Variable " + to_string(ivar_old) + " not found in values. Cannot replace!");
+  SetVar(ivar_new, GetLowerBound(ivar_old), GetUpperBound(ivar_old));
+  RemoveVar(ivar_old);
 }
 
 void SR::Clear() {

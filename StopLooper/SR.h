@@ -33,8 +33,8 @@ public:
   std::string GetDetailName() const;
   unsigned int GetYield() const;
   float GetLowerBound(std::string var_name) const;
-  float GetLowerBound(int ivar) const;
   float GetUpperBound(std::string var_name) const;
+  float GetLowerBound(int ivar) const;
   float GetUpperBound(int ivar) const;
   unsigned int GetNumberOfVariables() const;
   unsigned int GetNumberOfCuts() const;
@@ -49,6 +49,8 @@ public:
   bool VarExists(int ivar) const;
   void RemoveVar(std::string var_name);
   void RemoveVar(int ivar);
+  void ReplaceVar(std::string var_old, std::string var_new);
+  void ReplaceVar(int ivar_old, int ivar_new);
   void Clear();
 
   // Function for debug
