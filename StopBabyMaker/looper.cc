@@ -359,14 +359,14 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
   TH1D *hPUup;
   TH1D *hPUdown;
   if(!isDataFromFileName){
-    pileupfile = new TFile("puWeights_2016data_36p6fbinv.root","READ");
+    pileupfile = new TFile("puWeights_Run2.root","READ");
     if(pileupfile->IsZombie()) {
-      std::cout << "Somehow puWeights_2016data_36p6fbinv.root is corrupted. Exit..." << std::endl;
+      std::cout << "The pileup weight file puWeights_Run2.root is corrupted. Exit..." << std::endl;
       exit(0);
     }
-    hPU     = (TH1D*)pileupfile->Get("puWeight");
-    hPUup   = (TH1D*)pileupfile->Get("puWeightUp");
-    hPUdown = (TH1D*)pileupfile->Get("puWeightDown");
+    hPU     = (TH1D*)pileupfile->Get(Form("puWeight%d", gconf.year));
+    hPUup   = (TH1D*)pileupfile->Get(Form("puWeight%dUp", gconf.year));
+    hPUdown = (TH1D*)pileupfile->Get(Form("puWeight%dDown", gconf.year));
   }
 
   TH1D* counterhist = new TH1D( "h_counter", "h_counter", 50, 0.5,50.5);
