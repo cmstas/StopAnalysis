@@ -237,6 +237,7 @@ evtWgtInfo::evtWgtInfo() {
   apply_WbXsec_sf       = false;
   apply_ISR_sf          = false;
   apply_pu_sf           = false;
+  apply_pu_sf_fromFile  = false;
   apply_sample_sf       = false;
   apply_genweights_unc  = true;
 
@@ -346,11 +347,16 @@ void evtWgtInfo::Setup(string samplestr, int inyear, bool applyUnc, bool useBTag
   }
 
   // Get pileup wgt histo
-  if ( !is_data_ && apply_pu_sf) {
-    f_pu = new TFile("../StopCORE/inputs/pileup/pileup_wgts.root", "read");
-    h_pu_wgt = (TH1D*) f_pu->Get("h_pileup_wgt");
-    h_pu_wgt_up = (TH1D*) f_pu->Get("h_pileup_wgt_up");
-    h_pu_wgt_dn = (TH1D*) f_pu->Get("h_pileup_wgt_down");
+  if ( !is_data_ && apply_pu_sf_fromFile) {
+    f_pu = new TFile("../StopCORE/inputs/pileup/puWeights_Run2.root", "read");
+    h_pu_wgt    = (TH1D*) f_pu->Get(Form("puWeight%d", year));
+    h_pu_wgt_up = (TH1D*) f_pu->Get(Form("puWeight%dUp", year));
+    h_pu_wgt_dn = (TH1D*) f_pu->Get(Form("puWeight%dDown", year));
+    if (!h_pu_wgt || !h_pu_wgt_up || !h_pu_wgt_dn) {
+      cout << "[eventWeight::Setup] >> Cannot find histogram for puWeights!! Turning it off!!" << endl;
+      apply_pu_sf_fromFile = false;
+      apply_pu_sf = true;
+    }
   }
 
   // Get lep reco histo
@@ -585,7 +591,9 @@ void evtWgtInfo::calculateWeightsForEvent() {
     getISRnJetsWeight( sf_ISR, sf_ISR_up, sf_ISR_dn );
 
   // Pileup Reweighting
-  if (apply_pu_sf) {
+  if (apply_pu_sf_fromFile) {
+    getPileupWeight_fromFile( sf_pu, sf_pu_up, sf_pu_dn );
+  } else if (apply_pu_sf) {
     getPileupWeight( sf_pu, sf_pu_up, sf_pu_dn );
   }
 
@@ -2088,6 +2096,13 @@ inline void evtWgtInfo::getPileupWeight( double &weight_pu, double &weight_pu_up
   weight_pu_dn = babyAnalyzer.weight_PUdown();
 }
 
+void evtWgtInfo::getPileupWeight_fromFile( double &weight_pu, double &weight_pu_up, double &weight_pu_dn ) {
+  int ibin = h_pu_wgt->FindBin(babyAnalyzer.pu_ntrue());
+  weight_pu    = h_pu_wgt   ->GetBinContent(ibin);
+  weight_pu_up = h_pu_wgt_up->GetBinContent(ibin);
+  weight_pu_dn = h_pu_wgt_dn->GetBinContent(ibin);
+}
+
 //////////////////////////////////////////////////////////////////////
 
 bool evtWgtInfo::doingSystematic( systID isyst ) {
@@ -2148,7 +2163,7 @@ bool evtWgtInfo::doingSystematic( systID isyst ) {
       return apply_genweights_unc;  // <-- deduced from bkgEstimate_diLepton.C
     case k_lumiUp:
     case k_lumiDown:
-      return false;  // <-- No need ot include this in the looper
+      return false;  // <-- No need to include this in the looper
     case k_ISRUp:
     case k_ISRDown:
       return apply_ISR_sf;
@@ -2157,7 +2172,7 @@ bool evtWgtInfo::doingSystematic( systID isyst ) {
       return false;  // <-- todo: look this up
     case k_puUp:
     case k_puDown:
-      return apply_pu_sf;
+      return apply_pu_sf || apply_pu_sf_fromFile;
     case k_tauSFUp:
     case k_tauSFDown:
       return apply_tau_sf;
@@ -2243,7 +2258,8 @@ void evtWgtInfo::setDefaultSystematics( int syst_set ) {
       apply_ttbarSysPt_sf  = false;
       apply_WbXsec_sf      = false;  // not dev
       apply_ISR_sf         = false;  // not available yet
-      apply_pu_sf          = false;  // not available yet
+      apply_pu_sf          = false;  // not available in baby yet
+      apply_pu_sf_fromFile = true;
       apply_sample_sf      = false;  // no multiple sample available yet
       if (is_fastsim_) {
         apply_lepFS_sf     = false;  // no fast sim yet

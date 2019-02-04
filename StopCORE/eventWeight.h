@@ -229,6 +229,7 @@ class evtWgtInfo {
   double sf_ISR_dn;
 
   bool apply_pu_sf;
+  bool apply_pu_sf_fromFile;
   double sf_pu;
   double sf_pu_up;
   double sf_pu_dn;
@@ -302,6 +303,7 @@ class evtWgtInfo {
   void getISRnJetsWeight( double &weight_ISR, double &weight_ISR_up, double &weight_ISR_dn );
   void getISRnJetsWeight_local( double &weight_ISR, double &weight_ISR_up, double &weight_ISR_dn );
   void getPileupWeight( double &weight_pu, double &weight_pu_up, double &weight_pu_dn );
+  void getPileupWeight_fromFile( double &weight_pu, double &weight_pu_up, double &weight_pu_dn );
 
   double getZSampleWeightFromCR3l( TString fname, bool apply=true );
   double getExtSampleWeightSummer16v2( TString sample, bool apply=true );
