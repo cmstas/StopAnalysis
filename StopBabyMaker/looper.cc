@@ -341,8 +341,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
   TFile *fxsec;
   TH1D *hxsec;
   if(isSignalFromFileName){
-    //fxsec = TFile::Open("xsec_stop_13TeV.root");
-    TString xsecFileName = "xsec_stop_13TeV.root";
+    TString xsecFileName = "xsec_susy_13TeV_run2.root";
     if(isTChiFromFileName) xsecFileName = "xsec_tchi_13TeV.root";
     fxsec = new TFile(xsecFileName,"READ");
     if(fxsec->IsZombie()) {
@@ -350,7 +349,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
       exit(0);
     }
     if(!isTChiFromFileName)
-      hxsec = (TH1D*)fxsec->Get("stop");
+      hxsec = (TH1D*)fxsec->Get("h_xsec_stop");
     else
       hxsec = (TH1D*)fxsec->Get("h_xsec_c1n2");
   }
@@ -547,6 +546,11 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
     else if (filestr.find("2017D") != std::string::npos) jecVer = gconf.jecEraD;
     else if (filestr.find("2017E") != std::string::npos) jecVer = gconf.jecEraE;
     else if (filestr.find("2017F") != std::string::npos) jecVer = gconf.jecEraF;
+
+    else if (filestr.find("2018A") != std::string::npos) jecVer = gconf.jecEraA;
+    else if (filestr.find("2018B") != std::string::npos) jecVer = gconf.jecEraB;
+    else if (filestr.find("2018C") != std::string::npos) jecVer = gconf.jecEraC;
+    else if (filestr.find("2018D") != std::string::npos) jecVer = gconf.jecEraD;
     else {
       cout << "[babyMaker::looper] Cannot read from filestr the data era, may not be applying the correct JEC!\n";
     }
