@@ -1,9 +1,11 @@
-indir=../StopLooper/output/samp16_v14_tf
-outdir=scan_samp16_v14_tf
+bvsuf=v30_s3
 ysuf=16
 
+indir=../StopLooper/output/samp${ysuf}_$bvsuf
+outdir=scan_samp${ysuf}_$bvsuf
+
 # root -b -q fakeBkgEstimates.C"(\"$indir\",\"$indir\",\"$ysuf\")" || return $?
-# root -b -q ../AnalyzeScripts/makeBkgEstimates.C"(\"$indir\",\"$indir\",\"$ysuf\")" || return $?
+root -b -q ../AnalyzeScripts/makeBkgEstimates.C"(\"$indir\",\"$indir\",\"$ysuf\")" || return $?
 
 # sigscan=std_T2tt
 # root -b -q newCardMaker.C"(\"${sigscan:4}\",\"$indir\",\"datacards/$outdir\",\"$ysuf\")" || return $?
@@ -24,22 +26,30 @@ ysuf=16
 # root -b -q Make2DLimitHistos.C"(\"${sigscan}\", \"limits/$outdir\")"
 # echo -e "Limits for $sigscan in $outdir is done!\\a"
 
-# indir=../StopLooper/output/samp17_v13_tf
-# outdir=scan_samp17_v13_tf
-# ysuf=17
-# root -b -q ../AnalyzeScripts/makeBkgEstimates.C"(\"$indir\",\"$indir\",\"$ysuf\")" || return $?
+ysuf=17
+indir=../StopLooper/output/samp${ysuf}_$bvsuf
+outdir=scan_samp${ysuf}_$bvsuf
 
-indir=../StopLooper/output/comb1617_v30_a1
-outdir=scan_run2_a1
-ysuf=run2
 root -b -q ../AnalyzeScripts/makeBkgEstimates.C"(\"$indir\",\"$indir\",\"$ysuf\")" || return $?
 
-sigscan=std_T2tt
-root -b -q newCardMaker.C"(\"${sigscan:4}\",\"$indir\",\"datacards/$outdir\",\"$ysuf\")" || return $?
-python locallimits.py "datacards/$outdir" ${sigscan}
-root -b -q Make2DLimitHistos.C"(\"${sigscan}\", \"limits/$outdir\")"
-echo -e "Limits for $sigscan in $outdir is done!\\a"
-mv limits/$outdir/histo limits/$outdir/histo_v30_a1
+ysuf=18
+indir=../StopLooper/output/samp${ysuf}_$bvsuf
+outdir=scan_samp${ysuf}_$bvsuf
+
+root -b -q ../AnalyzeScripts/makeBkgEstimates.C"(\"$indir\",\"$indir\",\"$ysuf\")" || return $?
+
+ysuf=run2
+indir=../StopLooper/output/combRun2_$bvsuf
+outdir=scan_samp${ysuf}_$bvsuf
+
+root -b -q ../AnalyzeScripts/makeBkgEstimates.C"(\"$indir\",\"$indir\",\"$ysuf\")" || return $?
+
+# sigscan=std_T2tt
+# root -b -q newCardMaker.C"(\"${sigscan:4}\",\"$indir\",\"datacards/$outdir\",\"$ysuf\")" || return $?
+# python locallimits.py "datacards/$outdir" ${sigscan}
+# root -b -q Make2DLimitHistos.C"(\"${sigscan}\", \"limits/$outdir\")"
+# echo -e "Limits for $sigscan in $outdir is done!\\a"
+# mv limits/$outdir/histo limits/$outdir/histo_v30_a1
 
 unset indir
 unset outdir

@@ -9,23 +9,28 @@
 void compareControlRegions();
 void compareData161718();
 void compareDataMC_CRemu();
+void compareSRvsCR();
 
 void compareDistributions()
 {
   cout << "Executing macro compareControlRegions()...\n";
   // compareControlRegions();
   // compareData161718();
-  compareDataMC_CRemu();
+  // compareDataMC_CRemu();
+  compareSRvsCR();
 
   return;
 }
 
 void compareDataMC_CRemu() {
-  auto fdata  = new TFile("../StopLooper/output/samp17_v30_t1/allData_17.root");
-  auto fttbar = new TFile("../StopLooper/output/samp17_v30_t1/ttbar_17.root");
+  auto fdata  = new TFile("../StopLooper/output/samp17_v30_isrrwgtd2/allData_17.root");
+  auto fttbar = new TFile("../StopLooper/output/samp17_v30_isrrwgtd2/ttbar_17.root");
 
-  auto h_nvtx_data  = (TH1F*) fdata->Get("cremuA0/h_nvtxs");
-  auto h_nvtx_ttbar = (TH1F*) fttbar->Get("cremuA0/h_nvtxs");
+  // auto fdata  = new TFile("../StopLooper/output/samp16_v30_cremu3/allData_16.root");
+  // auto fttbar = new TFile("../StopLooper/output/samp16_v30_cremu3/ttbar_16.root");
+
+  // auto h_nvtx_data  = (TH1F*) fdata ->Get("cremuA0/h_nvtxs");
+  // auto h_nvtx_ttbar = (TH1F*) fttbar->Get("cremuA0/h_nvtxs");
 
   // h_nvtx_data->Scale(1./h_nvtx_data->Integral());
   // h_nvtx_ttbar->Scale(1./h_nvtx_ttbar->Integral());
@@ -35,13 +40,19 @@ void compareDataMC_CRemu() {
   // h_rwgt->Write("h_nvtxscale_cremu0_ttbar");
   // temp.Close();
 
-  auto h_njetisr_data  = (TH1F*) fdata ->Get("cremuA0/h_njet_200nonb");
-  auto h_njetisr_ttbar = (TH1F*) fttbar->Get("cremuA0/h_njet_200nonb");
+  // auto h_shape_data  = (TH1F*) fdata ->Get("cremuA0/h_njet_200nonb");
+  // auto h_shape_ttbar = (TH1F*) fttbar->Get("cremuA0/h_njet_200nonb");
 
-  h_njetisr_data ->Scale(1./h_njetisr_data ->Integral());
-  h_njetisr_ttbar->Scale(1./h_njetisr_ttbar->Integral());
-  auto h_rwgt = (TH1F*) h_njetisr_data->Clone();
-  h_rwgt->Divide(h_njetisr_ttbar);
+  auto h_shape_data  = (TH1F*) fdata ->Get("cremuA0/h_ptttbar_b1");
+  auto h_shape_ttbar = (TH1F*) fttbar->Get("cremuA0/h_ptttbar_b1");
+
+  // auto h_shape_data  = (TH1F*) fdata ->Get("cremuA2/h_njets");
+  // auto h_shape_ttbar = (TH1F*) fttbar->Get("cremuA2/h_njets");
+  h_shape_data ->Scale(1./h_shape_data ->Integral());
+  h_shape_ttbar->Scale(1./h_shape_ttbar->Integral());
+  auto h_rwgt = (TH1F*) h_shape_data->Clone();
+  h_rwgt->Divide(h_shape_ttbar);
+
   for (int i = 1; i < h_rwgt->GetNbinsX()+1; ++i) {
     cout << __LINE__ << ": i= " << i << ", h_rwgt->GetBinContent(i)= " << h_rwgt->GetBinContent(i) << endl;
   }
@@ -212,9 +223,14 @@ void compareControlRegions() {
   // auto ifile_old = new TFile("../StopLooper/output/temp3/data_2016dilep.root");
 
   // auto ifile_new = new TFile("../StopLooper/output/data2017_rwgtd/data_2017F.root");
-  auto ifile_new = new TFile("../StopLooper/output/data2017_rwgtd/all_data_2017.root");
-  auto ifile_old = new TFile("../StopLooper/output/data2016/data_2016all.root");
+  // auto ifile_new = new TFile("../StopLooper/output/data2017_rwgtd/all_data_2017.root");
+  // auto ifile_old = new TFile("../StopLooper/output/data2016/data_2016all.root");
 
+  // auto ifile_new = new TFile("../StopLooper/output/samp17_v30_cremu2/allData_17.root");
+  // auto ifile_old = new TFile("../StopLooper/output/samp16_v30_cremu2/allData_16.root");
+
+  auto ifile_new = new TFile("../StopLooper/output/samp18_v30_cremu3/data_2018D.root");
+  auto ifile_old = new TFile("../StopLooper/output/samp17_v30_cremu2/allData_17.root");
 
   // // For nvtx reweighting purpose
   // vector<string> Dirs = {"testCutflow"};
@@ -233,8 +249,11 @@ void compareControlRegions() {
   // vector<string> Hists = {"h_metbins", "h_mt", "h_njets", "h_nbjets", "h_tmod", "h_mlepb"};
   // vector<string> Hists = {"h_met", "h_njets", "h_mt", "h_tmod", "h_nvtxs", "h_mlepb", "h_lep1pt", "h_dphijmet"};
 
-  vector<string> Dirs = {"cr0bbase"};
+  // vector<string> Dirs = {"cr0bbase"};
   vector<string> Hists = {"h_met"};
+
+  vector<string> Dirs = {"cremuA1"};
+  // vector<string> Hists = {"h_met_h", "h_tmod", "h_rltmod", "h_lep1pt", "h_njets", "h_nbjets", "h_mt_h", "h_ptttbar", "h_mtttbar"};
 
   // vector<string> Dirs = {"cr2ltest3", "cr2ltest1", "cr2ltest4", "cr2lbase"};
   // // vector<string> Hists = {"h_metbins", "h_rlmetbins", "h_njets", "h_nbjets", "h_tmod", "h_mlepb"};
@@ -248,10 +267,10 @@ void compareControlRegions() {
   for (auto dirstr : Dirs) {
     for (auto hn : Hists) {
       // for (string suf : {"", "_e", "_mu", "_barrele", "_endcape"}) {
-      for (string suf : {"", "_e", "_mu"}) {
+      // for (string suf : {"", "_e", "_mu"}) {
       // for (string suf : {"", "_ee", "_mumu", "_hltmet", "_hltmu", "_hltel"}) {
       // for (string suf : {"", "_ee", "_mumu", "_emu"}) {
-      // for (string suf : {""}) {
+      for (string suf : {""}) {
       // for (string suf : {"_passHLT"}) {
         string hstr = hn + suf;
         vector<Color_t> vcolor;
@@ -294,12 +313,15 @@ void compareControlRegions() {
         // Try to use the dataMCplotMaker
         string optstr = "--darkColorLines --topYaxisTitle Entries --type Preliminary --outOfFrame";
         string xlabel = " --xAxisOverride " + string(hnew->GetXaxis()->GetTitle());
-        string oname = " --outputName plots/" + dirstr + "_" + hstr + "_compare.png";
+        string oname = " --outputName plots/" + dirstr + "_" + hstr + "_17vs18D.pdf";
         if (hn.find("h_n") != string::npos || hn.find("phi") != string::npos || !TString(hnew->GetXaxis()->GetTitle()).Contains("[GeV]"))
           optstr += " --noDivisionLabel";
-        optstr += " --topYaxisTitle Ratio  --dataName 2017 data (42.0 fb^{-1}, scaled to 35.9 fb^{-1})";
-        optstr += " --legendRight -0.5 --legendUp 0.12 --overrideLumi 13 TeV";
-        dataMCplotMaker(hnew, {hold}, {"2016 data (35.9 fb^{-1})"}, "", "", optstr+xlabel+oname, {}, {}, vcolor);
+        // optstr += " --topYaxisTitle Ratio  --dataName 2017 data (42.0 fb^{-1}, scaled to 35.9 fb^{-1})";
+        optstr += " --topYaxisTitle Ratio  --dataName 2018D data (31.9 fb^{-1})";
+        // optstr += " --legendRight -0.5 --legendUp 0.12 --overrideLumi 13 TeV";
+        optstr += " --legendRight -0.5 --legendUp 0.12 ";
+        // dataMCplotMaker(hnew, {hold}, {"2016 data (35.9 fb^{-1})"}, "", "", optstr+xlabel+oname, {}, {}, vcolor);
+        dataMCplotMaker(hnew, {hold}, {"2017 data (42.0 fb^{-1})"}, "", "", optstr+xlabel+oname, {}, {}, vcolor);
 
         // // Produce nvtx reweighting files, only do it once with the loosest Dir and only h_nvtxs in Hists
         // hnew->Scale(1./hnew->Integral());
@@ -316,4 +338,114 @@ void compareControlRegions() {
       }
     }
   }
+}
+
+void compareSRvsCR() {
+
+  map<string,TFile*> files;
+  files["data_18"] = new TFile("../StopLooper/output/combRun2_v30_s1/allData_18.root");
+  files["data_17"] = new TFile("../StopLooper/output/combRun2_v30_s1/allData_17.root");
+  files["data_16"] = new TFile("../StopLooper/output/combRun2_v30_s1/allData_16.root");
+
+  files["mc_17"] = new TFile("../StopLooper/output/combRun2_v30_s1/allBkg_17.root");
+  files["mc_16"] = new TFile("../StopLooper/output/combRun2_v30_s1/allBkg_16.root");
+
+  files["dat2_16"] = new TFile("../StopLooper/output/samp16_v14_t1/allData_16.root");
+  files["mc2_16"]  = new TFile("../StopLooper/output/samp16_v14_t1/allBkg_16.root");
+
+  map<string,TH1*> hists;
+
+  // // For nvtx reweighting purpose
+  vector<string> Hists = {"h_rltmod"};
+  string srdstr = "cr2lsbmet";
+
+  for (auto f : files) {
+    auto fname = f.first;
+    auto file = f.second;
+    for (auto hn : Hists) {
+      for (string suf : {""}) {
+        string hstr = hn + suf;
+        vector<Color_t> vcolor;
+        if (suf == "") vcolor.push_back(kAzure+7);
+        else if (suf == "_mu" || suf == "_mumu") vcolor.push_back(kOrange+2);
+        else if (suf == "_e" || suf == "_ee") vcolor.push_back(kCyan-7);
+
+        // string crdstr = srdstr;
+        // crdstr.replace(0, 2, "cr2l");
+        string crdstr = "cr2lbase";
+
+        string crhstr = hstr;
+        // crhstr.insert(2, "rl");
+        cout << __LINE__ << ": crdstr= " << crdstr << ", crhstr= " << crhstr << endl;
+        auto hnew = (TH1F*) file->Get((srdstr+"/"+hstr).c_str());
+        if (!hnew) { cout << "Can't find " << srdstr+"/"+hstr << endl; continue; }
+        auto hold = (TH1F*) file->Get((crdstr+"/"+crhstr).c_str());
+        if (!hold) { cout << "Can't find " << crdstr+"/"+crhstr << endl; continue; }
+
+        hold->Scale(hnew->Integral(0,-1) / hold->Integral(0,-1));
+
+        hists[fname] = (TH1F*)hnew->Clone(fname.c_str());
+        auto temp = (TH1F*)hold->Clone((fname+"_rl").c_str());
+        hists[fname]->Rebin(4);
+        temp->Rebin(4);
+        hists[fname]->Divide(temp);
+        // float scale = hnew->Integral(0,-1)/hold->Integral(0,-1);
+
+        // Try to use the dataMCplotMaker
+        string optstr = "--darkColorLines --topYaxisTitle Entries --type Preliminary --outOfFrame";
+        string xlabel = " --xAxisOverride " + string(hnew->GetXaxis()->GetTitle());
+        // string oname = " --outputName plots/" + srdstr + "_" + hstr + "_SRSBvsCRSB_"+fname+".pdf";
+        string oname = " --outputName plots/" + srdstr + "_" + hstr + "_CRSBvsCRbase_"+fname+".pdf";
+        if (hn.find("h_n") != string::npos || hn.find("phi") != string::npos || !TString(hnew->GetXaxis()->GetTitle()).Contains("[GeV]"))
+          optstr += " --noDivisionLabel";
+        optstr += " --topYaxisTitle Ratio  --dataName MET sideband of CR2l";
+        optstr += " --legendRight -0.5 --legendUp 0.12 ";
+        dataMCplotMaker(hnew, {hold}, {"CR2lbase"}, "", "", optstr+xlabel+oname, {}, {}, vcolor);
+
+      }
+    }
+  }
+
+  TCanvas c1("c1", "c1", 900, 400);
+  for (auto h : hists) {
+    h.second->SetLineWidth(2);
+    h.second->GetYaxis()->SetRangeUser(0,2);
+    if (h.first.find("dat") == 0) {
+      h.second->SetMarkerStyle(20);
+      h.second->SetLineColor(kBlack);
+    } else if (h.first.find("mc") == 0) {
+      h.second->SetMarkerStyle(33);
+      h.second->SetMarkerSize(2);
+      h.second->SetMarkerColor(kRed-4);
+      h.second->SetLineColor(kRed-4);
+    }
+  }
+
+  TLegend leg(0.72,0.66,0.92,0.86);
+
+  hists["data_16"]->Draw();
+  hists["mc_16"]->Draw("same");
+  c1.SaveAs("plots/h_tmod_CRSBvsCRbaseRatio_dataMC_16_rb4.pdf");
+
+  hists["dat2_16"]->Draw();
+  hists["mc2_16"]->Draw("same");
+  c1.SaveAs("plots/h_tmod_CRSBvsCRbaseRatio_datMC2_16_rb4.pdf");
+
+  hists["data_17"]->Draw();
+  hists["mc_17"]->Draw("same");
+  c1.SaveAs("plots/h_tmod_CRSBvsCRbaseRatio_dataMC_17_rb4.pdf");
+
+  hists["data_18"]->Draw();
+  hists["mc_17"]->Draw("same");
+  c1.SaveAs("plots/h_tmod_CRSBvsCRbaseRatio_dataMC_18_rb4.pdf");
+
+  hists["dat2_16"]->SetLineColor(kGreen-3);
+  hists["dat2_16"]->Draw();
+  hists["data_17"]->Draw("same");
+  hists["data_18"]->SetLineColor(kOrange-3);
+  hists["data_18"]->Draw("same");
+  leg.Clear(); leg.AddEntry(hists["dat2_16"], "data_16"); leg.AddEntry(hists["data_17"], "data_17"); leg.AddEntry(hists["data_18"], "data_18"); leg.Draw();
+  c1.SaveAs("plots/h_tmod_CRSBvsCRbaseRatio_dataRun2_rb4.pdf");
+
+
 }
