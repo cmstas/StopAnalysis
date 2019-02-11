@@ -186,7 +186,8 @@ class Table():
         colstr = "|"+"c|"*len(self.get_column_names())
         tstr = tstr.replace("\xc2\xb1","$\pm$")
         tstr = tstr.replace("+-","$\pm$")
-        tstr = tstr.replace("Inf","$\infty$")
+        tstr = tstr.replace("Inf","$+\infty$")
+        tstr = tstr.replace("%","$\%$")
         os.system("mkdir -p {}".format(temp_folder_name))
         with open("{tmpname}/{name}.tex".format(tmpname=temp_folder_name,name=name),"w") as fh:
             fh.write(template%(colstr,tstr))

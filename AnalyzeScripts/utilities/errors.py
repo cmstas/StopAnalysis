@@ -82,6 +82,14 @@ class E:
             sep = u"\u00B1".encode("utf-8")
         return "%s %s %s" % (str(self.val), sep, str(self.err))
 
+    def pct_rep(self,ndec=1):
+        use_ascii = False
+        if use_ascii:
+            sep = "+-"
+        else:
+            sep = u"\u00B1".encode("utf-8")
+        return "(%s %s %s)%%" % (str(round(self.val*100,ndec)), sep, str(round(self.err*100,ndec)))
+
     __str__ = rep
 
     __repr__ = rep

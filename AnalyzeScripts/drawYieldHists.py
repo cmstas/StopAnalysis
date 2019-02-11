@@ -213,6 +213,9 @@ def drawSRyieldHistBlind(f1, srNames, suf=''):
     h_ratio = getSRHistFromYieldE(rat_MC, 'hrat_dataMC_CR', '', lcolor=r.kGray+3)
     drawSRyieldHist(h_ratio, xlabels, 'noleg', 'lostlep'+suf+'_CRratio.pdf', 'PE', True, [0, 2], 1)
 
+    h_purity = getSRHistFromYieldE(purity, 'h_CRpurity', '', lcolor=r.kGray+2)
+    drawSRyieldHist(h_purity, xlabels, 'noleg', 'lostlep'+suf+'_CRpurity.pdf', 'PE', True, [0, 1.2], 1)
+
 
 def drawBkgCompositionStack(srNames):
 
@@ -242,15 +245,20 @@ if __name__ == '__main__':
 
     r.gROOT.SetBatch(1)
 
-    # f17 = r.TFile('../StopLooper/output/samp17_v13_tf/lostlepton.root')
-    # f16 = r.TFile('../StopLooper/output/samp16_v14_tf/lostlepton.root')
-    # f1617 = r.TFile('../StopLooper/output/comb1617_tf/lostlepton.root')
+    bvsuf = 'v30_s1'
 
-    # srNames = ['srA0', 'srA1', 'srA2', 'srB0', 'srC0','srD0', 'srE0', 'srE1', 'srE2', 'srE3', 'srF0', 'srG0', 'srG1', 'srG2', 'srG3', 'srH0',]
-    srNames = ['srI',]
+    f18 = r.TFile('../StopLooper/output/samp18_'+bvsuf+'/lostlepton.root')
+    f17 = r.TFile('../StopLooper/output/samp17_'+bvsuf+'/lostlepton.root')
+    f16 = r.TFile('../StopLooper/output/samp16_'+bvsuf+'/lostlepton.root')
+    frun2 = r.TFile('../StopLooper/output/combRun2_'+bvsuf+'/lostlepton.root')
 
+    srNames = ['srA0', 'srA1', 'srA2', 'srB0', 'srC0','srD0', 'srE0', 'srE1', 'srE2', 'srE3', 'srF0', 'srG0', 'srG1', 'srG2', 'srG3', 'srH0',]
+    # srNames = ['srI',]
+
+    # drawSRyieldHistBlind(f18, srNames, '18')
     # drawSRyieldHistBlind(f17, srNames, '17')
     # drawSRyieldHistBlind(f16, srNames, '16')
-    # drawSRyieldHistBlind(f1617, srNames, '1617')
+    drawSRyieldHistBlind(frun2, srNames, 'run2')
 
-    drawBkgCompositionStack(srNames)
+    # srNames = ['srI',]
+    # drawBkgCompositionStack(srNames)

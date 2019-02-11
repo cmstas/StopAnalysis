@@ -25,7 +25,7 @@ def getBinningFromTopoSRs(f, srNames, hname='metbins'):
             for ibin in range(1, hist.GetNbinsX()+1):
                 cut_lower = str(int(hist.GetBinLowEdge(ibin)))
                 cut_upper = int(hist.GetBinLowEdge(ibin+1))
-                cut_upper = str(cut_upper) if cut_upper < 1200 else '+Inf'
+                cut_upper = str(cut_upper) if cut_upper < 1200 else 'Inf'
                 bins.append([cut_lower, cut_upper])
             allbins.append(bins)
 
