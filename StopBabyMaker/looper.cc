@@ -297,7 +297,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
   bool isTChiFromFileName = false;
   string outfilestr(output_name);
   string filestr(chain->GetFile()->GetName());
-  cout<<"output name "<< output_name;
+  cout << "[looper] >> The utput name will be " << output_name << ".root";
   if (filestr.find("data") != std::string::npos) {
     isDataFromFileName = true;
     isSignalFromFileName = false;
@@ -2643,7 +2643,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
   cout << "Events with at least " << skim_nJets    << " Good Jets     " << nEvents_pass_skim_nJets << endl;
   cout << "Events with at least " << skim_nBJets   << " Good BJets    " << nEvents_pass_skim_nBJets << endl;
   cout << "Events with at least " << skim_nGoodLep << " Good Lepton   " << nEvents_pass_skim_nGoodLep << endl;
-  cout << "Events passing 2nd Lep Veto " << apply2ndLepVeto << "        " << nEvents_pass_skim_2ndlepVeto << endl;
+  cout << "Events with apply2ndLepVeto=" << apply2ndLepVeto << "    " << nEvents_pass_skim_2ndlepVeto << endl;
   cout << "Events with MET > " << skim_met << " GeV            " << nEvents_pass_skim_met << endl;
   cout << "Extra emu events with MET > " << skim_met_emuEvt << " GeV   " << nEvents_pass_skim_met_emuEvt << endl;
   cout << "-----------------------------" << endl;

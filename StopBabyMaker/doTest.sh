@@ -27,7 +27,7 @@
 ./runBabyMaker stopbaby 1000 3 ./ /hadoop/cms/store/group/snt/run2_mc2017/TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_CMS4_V10-02-05/merged_ntuple_19.root 0 skim_met_emuEvt=150,skim_met=150
 ./runBabyMaker stopbaby 1000 3 ./ /hadoop/cms/store/group/snt/run2_mc2017/SMS-T2tt_mStop-1200to2000_TuneCP2_13TeV-madgraphMLM-pythia8_RunIIFall17MiniAODv2-PUFall17Fast_94X_mc2017_realistic_v15-v1_MINIAODSIM_CMS4_V10-02-05/merged_ntuple_4.root 1
 ./runBabyMaker stopbaby 1000 3 ./ /hadoop/cms/store/group/snt/run2_data2017/SingleMuon_Run2017F-31Mar2018-v1_MINIAOD_CMS4_V10-02-05/merged_ntuple_1.root 0
-./runBabyMaker stopbaby 1000 3 ./ /hadoop/cms/store/group/snt/run2_data2017/SinglePhoton_Run2017E-31Mar2018-v1_MINIAOD_CMS4_V10-02-05/merged_ntuple_1.root 2
+./runBabyMaker stopbaby 1000 3 ./ /hadoop/cms/store/group/snt/run2_data2017/SinglePhoton_Run2017E-31Mar2018-v1_MINIAOD_CMS4_V10-02-05/merged_ntuple_1.root 2 skim_nGoodLep=0
 ./runBabyMaker stopbaby 1000 3 ./ /hadoop/cms/store/group/snt/run2_data2017/SingleMuon_Run2017F-09May2018-v1_MINIAOD_CMS4_V10-02-04/merged_ntuple_2.root 0
 ./runBabyMaker stopbaby 1000 3 ./ /hadoop/cms/store/group/snt/run2_data2016_94x/SingleMuon_Run2016G-17Jul2018-v1_MINIAOD_CMS4_V10-02-04/merged_ntuple_1.root 0
 ./runBabyMaker stopbaby 1000 3 ./ /hadoop/cms/store/group/snt/run2_mc2016_94x/TTJets_DiLept_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3_ext1-v2_MINIAODSIM_CMS4_V09-04-17/merged_ntuple_19.root 0
