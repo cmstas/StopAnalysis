@@ -791,7 +791,7 @@ void StopLooper::fillHistosForSR(string suf) {
 
     if (runYieldsOnly) continue;
     // And only procceed to make plots for the base and sideband region
-    if ((sr.GetName().find("base") & sr.GetName().find("sbmet")) == string::npos) continue;
+    if ((sr.GetName().find("base") & sr.GetName().find("sb")) == string::npos) continue;
 
     // Plot kinematics histograms
     auto fillKineHists = [&](string s) {
@@ -838,7 +838,7 @@ void StopLooper::fillHistosForSR(string suf) {
 
     // // Re-using fillKineHists with different suffix for extra/checking categories
     // if ( abs(lep1_pdgid()) == 11 )
-    //   fillKineHists(suf+"_e");
+    //   fillKineHists(suf+"_el");
     // else if ( abs(lep1_pdgid()) == 13 )
     //   fillKineHists(suf+"_mu");
 
@@ -1217,6 +1217,26 @@ void StopLooper::fillHistosForCRemu(string suf, int trigType) {
       //   fillhists(suf+"_mu");
       // else if (abs(lep1_pdgid()) == 11)
       //   fillhists(suf+"_el");
+
+      // if (is_bkg_ && suf == "") {
+      //   const vector<evtWgtInfo::systID> systs_to_draw = {evtWgtInfo::k_ISRUp, evtWgtInfo::k_ISRDown};
+      //   for (auto syst : systs_to_draw) {
+      //     if (!evtWgt.doingSystematic(syst)) continue;
+      //     evtweight_ = evtWgt.getWeight(syst);
+      //     fillhists("_"+evtWgt.getLabel(syst));
+      //   }
+      // }
+      // if (is_bkg_ && year_ >= 2017) {
+      //   double ISRwgt(1.0), ISRup(1.0), ISRdn(1.0);
+      //   evtWgt.getISRnJetsWeight_local(ISRwgt, ISRup, ISRdn);
+      //   evtweight_ *= ISRwgt;
+      //   fillhists("_ISRUncUp");
+      //   fillhists("_ISRUncDn");
+      //   evtweight_ *= ISRup/ISRwgt;
+      //   fillhists("_ISRUp");
+      //   evtweight_ *= ISRdn/ISRup;
+      //   fillhists("_ISRDn");
+      // }
 
       if (trigType == 1) {
         const vector<float> lptbins = {0, 30, 40, 50, 75, 100, 125, 200};

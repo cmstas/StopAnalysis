@@ -1319,9 +1319,46 @@ std::vector<SR> getStopSignalRegionsRun2() {
   // Test region at MET sideband for top taggers
   sr = srbase;
   sr.SetName("srsbmet");  // MET sideband
+  sr.SetDetailName("ge2j_met150to250");
   sr.SetVar(met, 150, 250);
   sr.SetVar(passlep1pt, 1, 2);
   sr.SetMETBins({150, 200, 250});
+  SRvec.emplace_back(sr);
+
+  sr.SetName("srsbmet2");  // MET sideband
+  sr.SetDetailName("ge4j_met150to250_mt0toInf");
+  sr.SetVar(met, 150, 250);
+  sr.SetVar(mt, 0, fInf);
+  sr.SetVar(njet, 4, fInf);
+  sr.SetVar(passlep1pt, 1, 2);
+  sr.SetMETBins({150, 200, 250});
+  SRvec.emplace_back(sr);
+
+  sr.SetName("srsbmet2m");  // MET sideband
+  sr.SetDetailName("ge4j_met150to250_mt0toInf_deepttag");
+  sr.SetVar(deepttag, wpDeepTop, 1);
+  SRvec.emplace_back(sr);
+  sr.RemoveVar(deepttag);
+
+  sr.SetName("srsbmet2r");  // MET sideband
+  sr.SetDetailName("ge4j_met150to250_mt0toInf_resttag");
+  sr.SetVar(bdtttag, wpResTop, 1);
+  SRvec.emplace_back(sr);
+  sr.RemoveVar(bdtttag);
+
+  sr.SetName("srsbmet3");  // MET sideband
+  sr.SetDetailName("2to3j_met150to250_mt0toInf");
+  sr.SetVar(njet, 3, fInf);
+  sr.SetVar(mt, 100, 250);
+  SRvec.emplace_back(sr);
+
+  sr.SetName("srsbmt");  // MT sideband
+  sr.SetDetailName("ge4j_met150toInf_mt0to150");
+  sr.SetVar(met, 150, fInf);
+  sr.SetVar(mt, 0, 150);
+  sr.SetVar(njet, 2, fInf);
+  sr.SetVar(passlep1pt, 1, 2);
+  sr.SetMETBins({150, 200, 250, 300, 400, 500, 800, 1500});
   SRvec.emplace_back(sr);
 
   sr = srbase;
