@@ -550,7 +550,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
           values_[nbjet] = jup_ngoodbtags();  // nbtag30();
           values_[nbtag]  = jup_nanalysisbtags();
           values_[dphijmet] = mindphi_met_j1_j2_jup();
-          values_[dphilmet] = fabs(lep1_p4().phi() - pfmet_phi_jup());
+          values_[dphilmet] = deltaPhi(lep1_p4().phi(), pfmet_phi_jup());
           values_[j1passbtag] = (jup_ngoodjets() > 0)? jup_ak4pfjets_passMEDbtag().at(0) : 0;
 
           values_[jet1pt] = (jup_ngoodjets() > 0)? jup_ak4pfjets_p4().at(0).pt() : 0;
@@ -575,7 +575,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
           values_[nbjet] = jdown_ngoodbtags();  // nbtag30();
           values_[ntbtag] = jdown_ntightbtags();
           values_[dphijmet] = mindphi_met_j1_j2_jdown();
-          values_[dphilmet] = fabs(lep1_p4().phi() - pfmet_phi_jdown());
+          values_[dphilmet] = deltaPhi(lep1_p4().phi(), pfmet_phi_jdown());
           values_[j1passbtag] = (jdown_ngoodjets() > 0)? jdown_ak4pfjets_passMEDbtag().at(0) : 0;
 
           values_[jet1pt] = (jdown_ngoodjets() > 0)? jdown_ak4pfjets_p4().at(0).pt() : 0;
@@ -836,6 +836,19 @@ void StopLooper::fillHistosForSR(string suf) {
     if (is_fastsim_ && suf == "" && (checkMassPt(1200, 50) || checkMassPt(800, 400)))
       fillKineHists("_"+to_string((int)mass_stop())+"_"+to_string((int)mass_lsp()) + suf);
 
+    auto fillExtraHists = [&](string s) {
+      plot1d("h_met_s"+s, values_[met], evtweight_, sr.histMap, ";#slash{E}_{T} [GeV]" , 40, 50, 250);
+      plot1d("h_mt_s"+s, values_[mt], evtweight_, sr.histMap, ";#slash{E}_{T} [GeV]" , 40, 0, 400);
+      // MT components
+      plot1d("h_dphilmet"+s, values_[dphilmet], evtweight_, sr.histMap, ";#Delta#phi(l,MET)", 32, 0, 3.2);
+      plot1d("h_lep1phi"+s, lep1_p4().phi(), evtweight_, sr.histMap, ";#phi(lep1)", 32, 0, 3.2);
+      float Wphi = atan2((lep1_p4().py()+values_[met]*sin(values_[metphi])), (lep1_p4().px()+values_[met]*cos(values_[metphi])));
+      plot1d("h_dphiWlep"+s, deltaPhi(Wphi, lep1_p4().phi()), evtweight_, sr.histMap, ";#Delta#phi(W,lep)", 32, 0, 3.2);
+      plot1d("h_dphiWmet"+s, deltaPhi(Wphi, values_[metphi]), evtweight_, sr.histMap, ";#Delta#phi(W,MET)", 32, 0, 3.2);
+    };
+    if (sr.GetName().find("sb") != string::npos)
+      fillExtraHists(suf);
+
     // // Re-using fillKineHists with different suffix for extra/checking categories
     // if ( abs(lep1_pdgid()) == 11 )
     //   fillKineHists(suf+"_el");
@@ -990,6 +1003,19 @@ void StopLooper::fillHistosForCR0b(string suf) {
     };
     fillKineHists(suf);
 
+    auto fillExtraHists = [&](string s) {
+      plot1d("h_met_s"+s, values_[met], evtweight_, cr.histMap, ";#slash{E}_{T} [GeV]" , 40, 50, 250);
+      plot1d("h_mt_s"+s, values_[mt], evtweight_, cr.histMap, ";#slash{E}_{T} [GeV]" , 40, 0, 400);
+      // MT components
+      plot1d("h_dphilmet"+s, values_[dphilmet], evtweight_, cr.histMap, ";#Delta#phi(l,MET)", 32, 0, 3.2);
+      plot1d("h_lep1phi"+s, lep1_p4().phi(), evtweight_, cr.histMap, ";#phi(lep1)", 32, 0, 3.2);
+      float Wphi = atan2((lep1_p4().py()+values_[met]*sin(values_[metphi])), (lep1_p4().px()+values_[met]*cos(values_[metphi])));
+      plot1d("h_dphiWlep"+s, deltaPhi(Wphi, lep1_p4().phi()), evtweight_, cr.histMap, ";#Delta#phi(W,lep)", 32, 0, 3.2);
+      plot1d("h_dphiWmet"+s, deltaPhi(Wphi, values_[metphi]), evtweight_, cr.histMap, ";#Delta#phi(W,MET)", 32, 0, 3.2);
+    };
+    if (cr.GetName().find("sb") != string::npos)
+      fillExtraHists(suf);
+
     // if ( abs(lep1_pdgid()) == 11 ) {
     //   fillKineHists(suf+"_e");
     // } else if ( abs(lep1_pdgid()) == 13 ) {
@@ -1066,7 +1092,7 @@ void StopLooper::fillHistosForCRemu(string suf, int trigType) {
     const vector<float> ttbarSystPtbin = {0, 50,   100,    150,    200,    250,    350,    450,    600,    800,  10000, };
     const vector<float> ttbarSystPtSFs = {1.040, 1.010, 0.9636, 0.9073, 0.8612, 0.8906, 0.8485, 0.8963, 0.8815, 0.6635, };
 
-    int ptcat = std::upper_bound(ttbarSystPtbin.begin(), ttbarSystPtbin.end(), system_p4.pt()) - ttbarSystPtbin.begin() - 1;
+    // int ptcat = std::upper_bound(ttbarSystPtbin.begin(), ttbarSystPtbin.end(), system_p4.pt()) - ttbarSystPtbin.begin() - 1;
     // if (year_ == 2017) evtweight_ *= ttbarSystPtSFs[ptcat];
   }
 
@@ -1393,6 +1419,7 @@ void StopLooper::fillTopTaggingHistos(string suffix) {
   }
 
   // values_[Wak8pt] = (iak8_W < 0)? 0 : ak8pfjets_p4().at(iak8_W).pt();
+  if (pass_deeptop_tag && iak8_top && iak8_W);  // just to avoid the unused-variable warning at compile time
 
   auto fillTopTagHists = [&](SR& sr, string s) {
     plot1d("h_binttag", lead_bindisc_top, evtweight_, sr.histMap, ";deepAK8 binarized top disc", 120, -0.1f, 1.1f);
@@ -1897,3 +1924,4 @@ void StopLooper::testTopTaggingEffficiency(SR& sr) {
       plot1d("hnum_fakep5_pt", lead_disc, evtweight_, sr.histMap, ";fakecand pt", 110, 0, 1100);
   }
 }
+                                                                         

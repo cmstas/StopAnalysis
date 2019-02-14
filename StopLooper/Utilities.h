@@ -39,6 +39,12 @@ inline void moveXOverFlowToLastBin3D(TH3* hist) {
   }
 }
 
+inline float deltaPhi(float phi1, float phi2) {
+  float dphi = fabs(phi1 - phi2);
+  if (dphi > TMath::Pi()) dphi = TMath::TwoPi() - dphi;
+  return dphi;
+}
+
 // Old functions that enforce float for ranges to be consistent with xval for floating point errors
 void plot1D(string name, float xval, double weight, std::map<string, TH1*> &allhistos, string title, int numbinsx, float xmin, float xmax)
 {
