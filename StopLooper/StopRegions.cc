@@ -1311,10 +1311,15 @@ std::vector<SR> getStopSignalRegionsRun2() {
   srbase.SetVar(dphijmet, 0.8, 3.1416);
   srbase.SetMETBins({0, 250, 350, 450, 550, 650, 800, 1500});
 
-  SR sr;
+  SR sr = srbase;
   std::vector<SR> SRvec;
 
   SRvec.emplace_back(srbase);
+
+  // The actual base region that is the sum of all SRs
+  sr.SetName("srincl0");
+  sr.SetVar(njettmod, 1, 2);
+  SRvec.emplace_back(sr);
 
   // Test region at MET sideband for top taggers
   sr = srbase;

@@ -166,7 +166,7 @@ bool StopLooper::PassingHLTriggers(const int type) {
       case 2018:
       default:
         return ( HLT_MET_MHT() || (HLT_SingleEl() && (abs(lep1_pdgid())==11 || abs(lep2_pdgid())==11)) ||
-                  (HLT_SingleMu() && (abs(lep1_pdgid())==13 || abs(lep2_pdgid())==13)) );
+                 (HLT_SingleMu() && (abs(lep1_pdgid())==13 || abs(lep2_pdgid())==13)) );
     }
   } else if (type == 3) {
     int dilepid = abs(lep1_pdgid()*lep2_pdgid());
@@ -594,6 +594,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
         }
         /// should do the same job as nanalysisbtags
         values_[nbtag] = (values_[mlb] > 175)? values_[ntbtag] : values_[nbjet];
+        values_[njettmod] = (values_[njet] >= 4 || values_[tmod] >= 10);
 
         // // Uncomment following lines if want to use CSV instead
         // values_[nbtag] = (values_[mlb] > 175)? ntbtagCSV : nbtagCSV;
@@ -1070,8 +1071,8 @@ void StopLooper::fillHistosForCRemu(string suf, int trigType) {
   vector<size_t> jetidx( ak4pfjets_p4().size() );
   std::iota(jetidx.begin(), jetidx.end(), 0);
   std::sort(jetidx.begin(), jetidx.end(), [&](size_t i, size_t j) {
-      return ak4pfjets_deepCSV().at(i) > ak4pfjets_deepCSV().at(j);
-    });
+    return ak4pfjets_deepCSV().at(i) > ak4pfjets_deepCSV().at(j);
+  });
   system_p4 += ak4pfjets_p4().at(jetidx.at(0)) + ak4pfjets_p4().at(jetidx.at(1));
 
   LorentzVector met_p4( pfmet()*cos(pfmet_phi()), pfmet()*sin(pfmet_phi()), 0.0, pfmet() );
@@ -1924,4 +1925,3 @@ void StopLooper::testTopTaggingEffficiency(SR& sr) {
       plot1d("hnum_fakep5_pt", lead_disc, evtweight_, sr.histMap, ";fakecand pt", 110, 0, 1100);
   }
 }
-                                                                         

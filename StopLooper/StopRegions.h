@@ -7,7 +7,7 @@
 
 // ivar:         0,        1,        2,        3,        4,        5,        6,        7,        8,        9,
 enum Vars {    met,       mt,     nlep,    nvlep, passvetos,    njet,    nbjet,    nbtag,   ntbtag,      mlb,
-              tmod, dphijmet, deepttag,  resttag,   bdtttag,  tfttag,
+              tmod, dphijmet, deepttag,  resttag,   bdtttag,  tfttag, njettmod,
             met_rl,    mt_rl,  tmod_rl,  nlep_rl, dphijmet_rl, mt2_ll,     mll,   mlb_0b,
             lep1pt,   lep2pt,  lep1eta,  lep2eta,   jet1pt,   jet2pt,  jet1eta,  jet2eta,
             j1passbtag, dphilmet, dphilmet_rl, shapecut, passlep1pt, metphi,
