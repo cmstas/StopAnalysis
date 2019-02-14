@@ -33,6 +33,7 @@ class eventWeight_lepSF{
   // Fullsim Electron file
   TFile *f_el_SF = nullptr;
   TFile *f_el_SF_tracking = nullptr;
+  TFile *f_el_SF_trklowpt = nullptr;
 
   // Fullsim Muon files
   TFile *f_mu_SF_id = nullptr;
@@ -70,6 +71,7 @@ class eventWeight_lepSF{
 
   // Final scale factor histograms for tracking
   TH2F *h_el_SF_tracking = nullptr;
+  TH2F *h_el_SF_trklowpt = nullptr;
   // TH1D *h_mu_SF_tracking = nullptr;
 
   // Final scale factor histograms for fastim/fullsim for selected leptons
@@ -96,6 +98,8 @@ class eventWeight_lepSF{
   float xmax_h_el_SF_tracking;
   float ymin_h_el_SF_tracking;
   float ymax_h_el_SF_tracking;
+  float ymin_h_el_SF_trklowpt;
+  float ymax_h_el_SF_trklowpt;
   float xmin_h_mu_SF;
   float xmax_h_mu_SF;
   float ymin_h_mu_SF;
