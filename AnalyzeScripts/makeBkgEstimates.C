@@ -1,8 +1,9 @@
 // -*- C++ -*-
-const bool useMetExtrapolation = true;
-const double extr_threshold = 5;  // minimum number of events in a bin to not need an MET extrapolation
-const bool doCRPurityError = true;
-const double extr_TFcap = 0.6;  // maximum value for the transfer factor to not do MET extrapolation
+bool useMetExtrapolation = true;
+double extr_threshold = 5;  // minimum number of events in a bin to not need an MET extrapolation
+bool doCRPurityError = true;
+double extr_TFcap = 0.6;  // maximum value for the transfer factor to not do MET extrapolation
+double maxFractionForMC = 0.10;  // minimum value for bkg fraction in SR to do extrapolation, else take from MC
 
 void dataDrivenFromCR(TFile* fdata, TFile* fmc, TFile* fout, TString ddtype, TString gentype) {
   // Additional hists to consider: dataStats, MCstats, impurity
@@ -208,7 +209,42 @@ void takeDirectlyFromMC(TFile* fin, TFile* fout, TString gentype) {
   }
 }
 
-int makeBkgEstimates(string input_dir="../StopLooper/output/temp14", string output_dir="../StopLooper/output/temp14", string suffix = "17") {
+// Helper functions to set argument
+inline TString parseArg(const TString& input, TString arg, const TString dfval="") {
+  if (!arg.EndsWith("=")) arg += "=";
+  if (input.Contains(arg)) {
+    int sidx = input.Index(arg) + arg.Sizeof() - 1;
+    int eidx = input.Index(",", sidx);
+    if (eidx < 0) eidx = input.Sizeof();
+    return input(sidx, eidx-sidx);
+  } else {
+    return dfval;
+  }
+}
+
+inline void parseAndSet_d(const TString& input, TString arg, double& value) {
+  TString newskim_arg = parseArg(input, arg);
+  if (newskim_arg.IsFloat()) {
+    value = newskim_arg.Atof();
+  }
+}
+
+inline void parseAndSet_b(const TString& input, TString arg, bool& value) {
+  TString newval = parseArg(input, arg);
+  if (!newval.IsNull()) {
+    if (newval.IsBin()) value = newval.Atoi();
+    else if (newval == "true") value = true;
+    else if (newval == "false") value = false;
+  }
+}
+
+int makeBkgEstimates(string input_dir="../StopLooper/output/temp14", string output_dir="../StopLooper/output/temp14", string suffix="17", TString extrargs="") {
+  // First parse extra argument
+  parseAndSet_b(extrargs, "useMetExtrapolation" , useMetExtrapolation);
+  parseAndSet_b(extrargs, "doCRPurityError"     , doCRPurityError);
+  parseAndSet_d(extrargs, "extr_threshold"      , extr_threshold);
+  parseAndSet_d(extrargs, "extr_TFcap"          , extr_TFcap);
+  parseAndSet_d(extrargs, "maxFractionForMC"    , maxFractionForMC);
 
   // Set input files (global pointers)
   TFile* fbkg = new TFile(Form("%s/allBkg_%s.root",input_dir.c_str(),suffix.c_str()));

@@ -5,7 +5,7 @@ indir=../StopLooper/output/samp${ysuf}_$bvsuf
 outdir=scan_samp${ysuf}_$bvsuf
 
 # root -b -q fakeBkgEstimates.C"(\"$indir\",\"$indir\",\"$ysuf\")" || return $?
-root -b -q ../AnalyzeScripts/makeBkgEstimates.C"(\"$indir\",\"$indir\",\"$ysuf\")" || return $?
+root -b -q ../AnalyzeScripts/makeBkgEstimates.C"(\"$indir\",\"$indir\",\"$ysuf\", \"extr_threshold=1.25\")" || return $?
 
 # sigscan=std_T2tt
 # root -b -q newCardMaker.C"(\"${sigscan:4}\",\"$indir\",\"datacards/$outdir\",\"$ysuf\")" || return $?
@@ -30,13 +30,13 @@ ysuf=17
 indir=../StopLooper/output/samp${ysuf}_$bvsuf
 outdir=scan_samp${ysuf}_$bvsuf
 
-root -b -q ../AnalyzeScripts/makeBkgEstimates.C"(\"$indir\",\"$indir\",\"$ysuf\")" || return $?
+root -b -q ../AnalyzeScripts/makeBkgEstimates.C"(\"$indir\",\"$indir\",\"$ysuf\", \"extr_threshold=1.5\")" || return $?
 
 ysuf=18
 indir=../StopLooper/output/samp${ysuf}_$bvsuf
 outdir=scan_samp${ysuf}_$bvsuf
 
-root -b -q ../AnalyzeScripts/makeBkgEstimates.C"(\"$indir\",\"$indir\",\"$ysuf\")" || return $?
+root -b -q ../AnalyzeScripts/makeBkgEstimates.C"(\"$indir\",\"$indir\",\"$ysuf\", \"extr_threshold=2.2\")" || return $?
 
 ysuf=run2
 indir=../StopLooper/output/combRun2_$bvsuf
