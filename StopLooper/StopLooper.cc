@@ -301,6 +301,9 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
       evtWgt.setDefaultSystematics(0);  // systematic set for Moriond17 analysis
     else if (year_ >= 2017)
       evtWgt.setDefaultSystematics(1);  // systematic set for 94X
+
+    // evtWgt.setDefaultSystematics(evtWgtInfo::test_alloff);  // for test purpose
+
     evtWgt.Setup(samplestr, year_, doSystVariations, applyBtagSFfromFiles, applyLeptonSFfromFiles);
 
     evtWgt.getCounterHistogramFromBaby(&file);
@@ -1088,13 +1091,33 @@ void StopLooper::fillHistosForCRemu(string suf, int trigType) {
     plot1d("h_nvtxs_raw", nvtxs(), 1, testVec[0].histMap, ";Number of vertices", 100, 1, 101);
   }
 
-  // ttbar syst pt SF
-  if (evtWgt.samptype == evtWgtInfo::ttbar) {
-    const vector<float> ttbarSystPtbin = {0, 50,   100,    150,    200,    250,    350,    450,    600,    800,  10000, };
-    const vector<float> ttbarSystPtSFs = {1.040, 1.010, 0.9636, 0.9073, 0.8612, 0.8906, 0.8485, 0.8963, 0.8815, 0.6635, };
+  // The pt-binning mainly for ttbar system pt stuff
+  const vector<float> ptbin1 = {0, 50, 100, 150, 200, 250, 350, 450, 600, 800, 1500};
 
+  // ttbar syst pt SF
+  const vector<float> ttbarSystPtbin = {0, 50,   100,    150,    200,    250,    350,    450,    600,    800,  10000, };
+  const vector<float> ttbarSystPtSFs = {1.040, 1.010, 0.9636, 0.9073, 0.8612, 0.8906, 0.8485, 0.8963, 0.8815, 0.6635, };
+  if (evtWgt.samptype == evtWgtInfo::ttbar) {
     // int ptcat = std::upper_bound(ttbarSystPtbin.begin(), ttbarSystPtbin.end(), system_p4.pt()) - ttbarSystPtbin.begin() - 1;
     // if (year_ == 2017) evtweight_ *= ttbarSystPtSFs[ptcat];
+
+    // const vector<float> sf16to17_ttsys = { 0.9543, 0.9951, 1.031, 1.067, 1.120, 1.227, 1.336, 1.421, 1.594, 1.676};
+    // if (year_ == 2016) evtweight_ *= sf16to17_ttsys[ptcat];
+  }
+
+  // ttbar syst pt SF from gen
+  const vector<float> genttbarSystPtSFs = {1.038, 0.9360, 0.9671, 0.9774, 1.025, 1.066, 1.147, 1.192, 1.351, 1.532, };
+  if (year_ == 2016 && evtWgt.samptype == evtWgtInfo::ttbar) {
+    LorentzVector ttbar_sys(0,0,0,0);
+    int ntop = 0;
+    for (size_t q = 0; q < genqs_id().size(); ++q) {
+      if (abs(genqs_id()[q]) == 6 && genqs_isLastCopy().at(q)) {
+        ttbar_sys += genqs_p4().at(q);
+        if (++ntop == 2) break;
+      }
+    }
+    // int ptcat = std::upper_bound(ttbarSystPtbin.begin(), ttbarSystPtbin.end(), ttbar_sys.pt()) - ttbarSystPtbin.begin() - 1;
+    // evtweight_ *= genttbarSystPtSFs.at(ptcat);
   }
 
   // ISR-njets reweighting
@@ -1179,15 +1202,41 @@ void StopLooper::fillHistosForCRemu(string suf, int trigType) {
           plot1d("h_deepttag"+s, values_[deepttag], evtweight_, cr.histMap, ";deepAK8 top tag"     , 120, -0.1f, 1.1f);
         }
 
-        if (evtWgt.samptype == evtWgtInfo::ttbar) {
-          plot1d("h_nisrmatch"+s, n_isrjets, 1, cr.histMap, ";N-ISR gen-matched",  5,  0, 5);
-          if (values_[nbjet] == 2) {
-            plot1d("h_diff_nisr"+s, values_[njet]-n_isrjets-2, 1, cr.histMap, ";#Delta(N-ISR beyond 2b, N-ISR gen)",  7,  -3, 4);
-            plot1d("h_nisrmatch_2b"+s, n_isrjets, 1, cr.histMap, ";N-ISR gen-matched",  5,  0, 5);
+        plot1d("h_met_b1"+s, values_[met], evtweight_, cr.histMap, ";#slash{E}_{T} [GeV]", ptbin1.size()-1, ptbin1.data());
+        plot1d("h_ptll_b1"+s, values_[ptll], evtweight_, cr.histMap, ";p_{T}(ll) [GeV]", ptbin1.size()-1, ptbin1.data());
+        plot1d("h_jet1pt_b1"+s, values_[jet1pt], evtweight_, cr.histMap, ";p_{T}(jet1) [GeV]", ptbin1.size()-1, ptbin1.data());
+        plot1d("h_ptttbar_b1"+s, values_[ptttbar], evtweight_, cr.histMap, ";p_{T}(t#bar{t}) [GeV]", ptbin1.size()-1, ptbin1.data());
+        plot1d("h_etattbar"+s, system_p4.eta(), evtweight_, cr.histMap, ";#eta(gen-t#bar{t}) [GeV]", 40, -3, 3);
+
+      };
+      fillhists(suf);
+      // if (abs(lep1_pdgid()) == 13)
+      //   fillhists(suf+"_mu");
+      // else if (abs(lep1_pdgid()) == 11)
+      //   fillhists(suf+"_el");
+
+      auto fillExtraHists = [&](int plotset = -1, string s = "") {
+        // Study the NISR for ttbar
+        if (plotset | 1<<0) {
+          for (size_t j=0; j < ak4pfjets_p4().size(); ++j) {
+            if (ak4pfjets_p4()[j].pt() < 200) continue;
+            if (ak4pfjets_deepCSV().at(j) > 0.1522) continue;
+            plot1d("h_jetpt_200nonb"+s, ak4pfjets_p4()[j].pt(), evtweight_, cr.histMap, ";p_{T}(non-b) [GeV]", 40, 200, 1000);
+          }
+          plot1d("h_njet_200nonb"+s, njets_pt200nonb, evtweight_, cr.histMap, ";N_{jets} (non-b) [GeV]", 5, 0, 5);
+
+          // Plot the gen-NISR for ttbar
+          if (evtWgt.samptype == evtWgtInfo::ttbar) {
+            plot1d("h_nisrmatch"+s, n_isrjets, evtweight_, cr.histMap, ";N-ISR gen-matched",  7,  0, 7);
+            if (values_[nbjet] == 2) {
+              plot1d("h_diff_nisr"+s, values_[njet]-n_isrjets-2, evtweight_, cr.histMap, ";#Delta(N-ISR beyond 2b, N-ISR gen)",  7,  -3, 4);
+              plot1d("h_nisrmatch_2b"+s, n_isrjets, evtweight_, cr.histMap, ";N-ISR gen-matched",  7,  0, 7);
+            }
           }
         }
 
-        if (is_bkg_) {
+        // Study the effect by L1 pre-firing in the emu region
+        if (is_bkg_ && (plotset | 1<<1)) {
           int ngenjet_ecal = 0;
           int ngenjet30_ecal = 0;
           float leadpt_ecaljet = 0;
@@ -1198,7 +1247,7 @@ void StopLooper::fillHistosForCRemu(string suf, int trigType) {
             if (jp4.pt() > leadpt_ecaljet) leadpt_ecaljet = jp4.pt();
             plot1d("h_ecaljetpt"+s, jp4.pt(),  evtweight_, cr.histMap, ";p_{T}(ecal jet) [GeV]"  , 32,  0, 800);
             if (values_[tmod] > 11) {
-              plot1d("h_ecaljetpt_tmod11"+s, jp4.pt(),  evtweight_, cr.histMap, ";p_{T}(ecal jet) [GeV]"  , 32,  0, 800);
+              plot1d("h_ecaljetpt_tmod11"+s, jp4.pt(), evtweight_, cr.histMap, ";p_{T}(ecal jet) [GeV]"  , 32,  0, 800);
             }
           }
 
@@ -1225,25 +1274,27 @@ void StopLooper::fillHistosForCRemu(string suf, int trigType) {
           }
         }
 
-        const vector<float> ptbin1 = {0, 50, 100, 150, 200, 250, 350, 450, 600, 800, 1500};
-        plot1d("h_met_b1"+s, values_[met], evtweight_, cr.histMap, ";#slash{E}_{T} [GeV]", ptbin1.size()-1, ptbin1.data());
-        plot1d("h_ptll_b1"+s, values_[ptll], evtweight_, cr.histMap, ";p_{T}(ll) [GeV]", ptbin1.size()-1, ptbin1.data());
-        plot1d("h_jet1pt_b1"+s, values_[jet1pt], evtweight_, cr.histMap, ";p_{T}(jet1) [GeV]", ptbin1.size()-1, ptbin1.data());
-        plot1d("h_ptttbar_b1"+s, values_[ptttbar], evtweight_, cr.histMap, ";p_{T}(t#bar{t}) [GeV]", ptbin1.size()-1, ptbin1.data());
+        // Plot gen ttbar-system-pt of the MC samples
+        if (is_bkg_ && (plotset | 1<<2)) {
+          LorentzVector ttbar_sys(0,0,0,0);
+          int ntop = 0;
+          for (size_t q = 0; q < genqs_id().size(); ++q) {
+            if (abs(genqs_id()[q]) == 6 && genqs_isLastCopy().at(q)) {
+              ttbar_sys += genqs_p4().at(q);
+              if (++ntop == 2) break;
+            }
+          }
+          plot1d("h_genttbar_p"+s, ttbar_sys.P(), evtweight_, cr.histMap, ";p(gen-t#bar{t}) [GeV]", 56, 0, 1400);
+          plot1d("h_genttbar_M"+s, ttbar_sys.M(), evtweight_, cr.histMap, ";M(gen-t#bar{t}) [GeV]", 40, 300, 1100);
+          plot1d("h_genttbar_pt"+s, ttbar_sys.pt(), evtweight_, cr.histMap, ";p_{T}(gen-t#bar{t}) [GeV]", 40, 0, 1000);
+          plot1d("h_genttbar_mt"+s, ttbar_sys.Mt(), evtweight_, cr.histMap, ";M_{T}(gen-t#bar{t}) [GeV]", 40, 300, 1100);
 
-        for (size_t j=0; j < ak4pfjets_p4().size(); ++j) {
-          if (ak4pfjets_p4()[j].pt() < 200) continue;
-          if (ak4pfjets_deepCSV().at(j) > 0.1522) continue;
-          plot1d("h_jetpt_200nonb"+s, ak4pfjets_p4()[j].pt(), evtweight_, cr.histMap, ";p_{T}(non-b) [GeV]", 40, 200, 1000);
+          plot1d("h_genttbar_eta"+s, ttbar_sys.eta(), evtweight_, cr.histMap, ";#eta(gen-t#bar{t}) [GeV]", 40, -3, 3);
+          plot1d("h_genttbar_ptb1"+s, ttbar_sys.pt(), evtweight_, cr.histMap, ";p_{T}(gen-t#bar{t}) [GeV]", ptbin1.size()-1, ptbin1.data());
         }
-        plot1d("h_njet_200nonb"+s, njets_pt200nonb, evtweight_, cr.histMap, ";N_{jets} (non-b) [GeV]", 5, 0, 5);
-
       };
-      fillhists(suf);
-      // if (abs(lep1_pdgid()) == 13)
-      //   fillhists(suf+"_mu");
-      // else if (abs(lep1_pdgid()) == 11)
-      //   fillhists(suf+"_el");
+      if (suf == "")
+        fillExtraHists(0b101);
 
       // if (is_bkg_ && suf == "") {
       //   const vector<evtWgtInfo::systID> systs_to_draw = {evtWgtInfo::k_ISRUp, evtWgtInfo::k_ISRDown};
