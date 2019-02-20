@@ -1045,12 +1045,10 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
       //save met here because of JEC
       if(applyJECfromFile){
         int useCleanedMET = 0;
-        if (gconf.year == 2017) {
+        if (gconf.year == 2017 && !thisFile.Contains("09May2018")) {
           useCleanedMET = 2;
-          if (!thisFile.Contains("09May2018")) {
-            StopEvt.pfmet_original = evt_old_pfmet_raw();
-            StopEvt.pfmet_original_phi = evt_old_pfmetPhi_raw();
-          }
+          StopEvt.pfmet_original = evt_old_pfmet_raw();
+          StopEvt.pfmet_original_phi = evt_old_pfmetPhi_raw();
         }
         pair<float,float> newmet;
         pair<float,float> newmet_jup;
@@ -2647,7 +2645,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
   cout << "Events with at least " << skim_nJets    << " Good Jets     " << nEvents_pass_skim_nJets << endl;
   cout << "Events with at least " << skim_nBJets   << " Good BJets    " << nEvents_pass_skim_nBJets << endl;
   cout << "Events with at least " << skim_nGoodLep << " Good Lepton   " << nEvents_pass_skim_nGoodLep << endl;
-  cout << "Events with apply2ndLepVeto=" << apply2ndLepVeto << "    " << nEvents_pass_skim_2ndlepVeto << endl;
+  cout << "Events with apply2ndLepVeto=" << boolalpha << apply2ndLepVeto << "    " << nEvents_pass_skim_2ndlepVeto << endl;
   cout << "Events with MET > " << skim_met << " GeV            " << nEvents_pass_skim_met << endl;
   cout << "Extra emu events with MET > " << skim_met_emuEvt << " GeV   " << nEvents_pass_skim_met_emuEvt << endl;
   cout << "-----------------------------" << endl;
