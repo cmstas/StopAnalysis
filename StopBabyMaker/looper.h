@@ -84,6 +84,7 @@ class babyMaker {
   bool applyLeptonSFs;
   bool applyVetoLeptonSFs;
   bool apply2ndLepVeto;
+  bool applyMETRecipeV2;
 
   bool filltaus;
   bool filltracks;

@@ -1045,10 +1045,12 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
       //save met here because of JEC
       if(applyJECfromFile){
         int useCleanedMET = 0;
-        if (gconf.year == 2017 && !thisFile.Contains("09May2018")) {
+        if (applyMETRecipeV2 && gconf.year == 2017) {
           useCleanedMET = 2;
-          StopEvt.pfmet_original = evt_old_pfmet_raw();
-          StopEvt.pfmet_original_phi = evt_old_pfmetPhi_raw();
+          if (!thisFile.Contains("09May2018")) {
+            StopEvt.pfmet_original = evt_old_pfmet_raw();
+            StopEvt.pfmet_original_phi = evt_old_pfmetPhi_raw();
+          }
         }
         pair<float,float> newmet;
         pair<float,float> newmet_jup;
