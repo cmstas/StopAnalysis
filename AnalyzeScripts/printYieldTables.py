@@ -28,7 +28,7 @@ def printTableDataDriven(f, srNames, crname=''):
     tab.add_column(crname+'MC SR', [y.round(2) for y in sum(yMC_SR,[])])
     tab.add_column(crname+'MC CR', [y.round(2) for y in sum(yMC_CR,[])])
     tab.add_column(crname+'Purity', [y.round(2) for y in sum(purity,[])])
-    tab.add_column(crname+'TF_{CR}^{SR}', [y.round(2).val for y in sum(alpha,[])])
+    tab.add_column(crname+'TF_{CR}^{SR}', [y.round(2) for y in sum(alpha,[])])
     tab.add_column(crname+'data CR', [y.round(2) for y in sum(yld_CR,[])])
     tab.add_column(crname+'R_{CR}(data/MC)', [(d/m).round(2) for d, m in zip(sum(yld_CR,[]), sum(yMC_CR,[]))])
     tab.add_column(crname+'Prediction', [y.round(2) for y in sum(preds,[])])
@@ -73,6 +73,60 @@ def printTableWithMETextrpInfo(f1, f2, srNames, crname=''):
     tab.print_table()
 
     return tab
+
+
+def makeTFComparisonTable():
+    f1 = r.TFile('../StopLooper/output/samp16_v30_s3/lostlepton.root')
+    f2 = r.TFile('../StopLooper/output/samp16_v30_ISRoff/lostlepton.root')
+
+    f1 = r.TFile('../StopLooper/output/samp17_v30_ISRon/lostlepton.root')
+    f2 = r.TFile('../StopLooper/output/samp17_v30_s3/lostlepton.root')
+
+    f1 = r.TFile('lostlepton16.root')
+    f2 = r.TFile('lostlepton17.root')
+
+    suf1 = '16'
+    suf2 = '17'
+
+    srNames = ['srA0', 'srA1', 'srA2', 'srB', 'srC','srD', 'srE0', 'srE1', 'srE2', 'srE3', 'srF', 'srG0', 'srG1', 'srG2', 'srG3', 'srH',]
+
+    tab = Table()
+    preds1  = getYieldEInTopoBins(f1, srNames, 'metbins')
+    alpha1  = getYieldEInTopoBins(f1, srNames, 'alphaHist')
+    purity1 = getYieldEInTopoBins(f1, srNames, 'CRpurity')
+    yMC_SR1 = getYieldEInTopoBins(f1, srNames, 'MCyields_SR')
+    yMC_CR1 = getYieldEInTopoBins(f1, srNames, 'MCyields_CR')
+    yld_CR1 = getYieldEInTopoBins(f1, srNames, 'datayields_CR')
+
+    preds2  = getYieldEInTopoBins(f2, srNames, 'metbins')
+    alpha2  = getYieldEInTopoBins(f2, srNames, 'alphaHist')
+    purity2 = getYieldEInTopoBins(f2, srNames, 'CRpurity')
+    yMC_SR2 = getYieldEInTopoBins(f2, srNames, 'MCyields_SR')
+    yMC_CR2 = getYieldEInTopoBins(f2, srNames, 'MCyields_CR')
+    yld_CR2 = getYieldEInTopoBins(f2, srNames, 'datayields_CR')
+
+    metrange = getBinningFromTopoSRs(f1, srNames)
+    tab.add_column('SR name', sum([[sr]*n for sr, n in zip(srNames, map(len, preds1))], []))
+    tab.add_column('MET [GeV]', [m[0]+' -- '+m[1] for m in sum(metrange, [])])
+    tab.add_column('MC SR '+suf1, [y.round(2) for y in sum(yMC_SR1,[])])
+    tab.add_column('MC CR '+suf1, [y.round(2) for y in sum(yMC_CR1,[])])
+    tab.add_column('MC SR '+suf2, [y.round(2) for y in sum(yMC_SR2,[])])
+    tab.add_column('MC CR '+suf2, [y.round(2) for y in sum(yMC_CR2,[])])
+    tab.add_column('TF_{CR}^{SR} '+suf1, [y.round(2) for y in sum(alpha1,[])])
+    tab.add_column('TF_{CR}^{SR} '+suf2, [y.round(2) for y in sum(alpha2,[])])
+    tab.add_column('Diff(TF_{{0}}/TF_{{1}})'.format(suf1,suf2), [((y1-y2)/y1).round(2).pct_rep() if y1.val > 0 else 0 for y1, y2 in zip(sum(alpha1,[]), sum(alpha2,[]))])
+
+    tab.add_column('data CR '+suf1, [y.round(2) for y in sum(yld_CR1,[])])
+    tab.add_column('data CR '+suf2, [y.round(2) for y in sum(yld_CR2,[])])
+    # tab.add_column('R_{CR}(data/MC)', [(d/m).round(2) for d, m in zip(sum(yld_CR,[]), sum(yMC_CR,[]))])
+    tab.add_column('Pred '+suf1, [y.round(2) for y in sum(preds1,[])])
+    tab.add_column('Pred '+suf1+' \\times 42/36', [(y*(42.0/35.9)).round(2) for y in sum(preds1,[])])
+    tab.add_column('Pred '+suf2, [y.round(2) for y in sum(preds2,[])])
+    tab.add_column('Diff(Pred_{{0}}/Pred_{{1}})'.format(suf1,suf2), [((y1*(42.0/35.9)-y2)/y2).round(2).pct_rep() if y2.val > 0 else 0 for y1, y2 in zip(sum(preds1,[]), sum(preds2,[]))])
+
+    tab.print_table()
+    tab.set_theme_latex()
+    tab.print_pdf('compareTF_lostlep_16vs17_more.pdf')
 
 
 def makeBkgEstimateTablesLostLepton():
@@ -165,7 +219,19 @@ def makeBkgCompositionTable():
 
     tab.print_table()
     tab.set_theme_latex()
-    tab.print_pdf('bkgComposition_run2.pdf')
+    tab.print_pdf('bkgCompositionFraction_run2.pdf')
+
+    tab2 = Table()
+    tab2.add_column('SR name', sum([[sr]*n for sr, n in zip(srNames, map(len, preds_tot))], []))
+    tab2.add_column('MET [GeV]', [m[0]+' -- '+m[1] for m in sum(metrange, [])])
+    for bkg in bkgs:
+        preds_bkg = getYieldEInTopoBins(f1, srNames, 'metbins_'+bkg)
+        tab2.add_column(bkg, [y.round(2) for y in sum(preds_bkg,[])])
+    tab2.add_column('Total', [y.round(2) for y in sum(preds_tot,[])])
+    tab2.print_table()
+    tab2.set_theme_latex()
+    tab2.print_pdf('bkgCompositionYields_run2.pdf')
+
 
 def makeBkgEstimationTableWJets():
     f1 = r.TFile('../StopLooper/output/combRun2_v30_s3/allBkg_run2.root')
@@ -198,9 +264,10 @@ if __name__ == '__main__':
 
     r.gROOT.SetBatch(1)
 
-    makeBkgEstimateTablesLostLepton()
+    # makeBkgEstimateTablesLostLepton()
 
     # makeBkgCompositionTable()
-    
+
     # makeBkgEstimationTableWJets()
 
+    makeTFComparisonTable()

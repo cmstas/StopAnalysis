@@ -16,15 +16,18 @@ void compareDistributions()
   cout << "Executing macro compareControlRegions()...\n";
   // compareControlRegions();
   // compareData161718();
-  // compareDataMC_CRemu();
-  compareSRvsCR();
+  compareDataMC_CRemu();
+  // compareSRvsCR();
 
   return;
 }
 
 void compareDataMC_CRemu() {
-  auto fdata  = new TFile("../StopLooper/output/samp17_v30_isrrwgtd2/allData_17.root");
-  auto fttbar = new TFile("../StopLooper/output/samp17_v30_isrrwgtd2/ttbar_17.root");
+  // auto fdata  = new TFile("../StopLooper/output/samp17_v30_isrrwgtd2/allData_17.root");
+  // auto fttbar = new TFile("../StopLooper/output/samp17_v30_isrrwgtd2/ttbar_17.root");
+
+  auto fdata  = new TFile("../StopLooper/output/samp17_v30_cremu4/ttbar_17_unscaled.root");
+  auto fttbar = new TFile("../StopLooper/output/samp17_v30_cremu4/ttbar_16_unscaled.root");
 
   // auto fdata  = new TFile("../StopLooper/output/samp16_v30_cremu3/allData_16.root");
   // auto fttbar = new TFile("../StopLooper/output/samp16_v30_cremu3/ttbar_16.root");
@@ -43,8 +46,11 @@ void compareDataMC_CRemu() {
   // auto h_shape_data  = (TH1F*) fdata ->Get("cremuA0/h_njet_200nonb");
   // auto h_shape_ttbar = (TH1F*) fttbar->Get("cremuA0/h_njet_200nonb");
 
-  auto h_shape_data  = (TH1F*) fdata ->Get("cremuA0/h_ptttbar_b1");
-  auto h_shape_ttbar = (TH1F*) fttbar->Get("cremuA0/h_ptttbar_b1");
+  // auto h_shape_data  = (TH1F*) fdata ->Get("cremuA0/h_ptttbar_b1");
+  // auto h_shape_ttbar = (TH1F*) fttbar->Get("cremuA0/h_ptttbar_b1");
+
+  auto h_shape_data  = (TH1F*) fdata ->Get("cremuA1/h_genttbar_ptb1");
+  auto h_shape_ttbar = (TH1F*) fttbar->Get("cremuA1/h_genttbar_ptb1");
 
   // auto h_shape_data  = (TH1F*) fdata ->Get("cremuA2/h_njets");
   // auto h_shape_ttbar = (TH1F*) fttbar->Get("cremuA2/h_njets");

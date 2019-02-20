@@ -4,7 +4,7 @@ import ROOT
 import pyRootPlotMaker.pyRootPlotMaker as ppm
 import MT2PlotUtils as utils
 
-def MT2PlotMaker(rootdir, samples, data, dirname, plots, output_dir=".", exts=["pdf"], tag="", scaleMC=True, suffix = None, systset=None, lumi=None, ratioType=0):
+def MT2PlotMaker(rootdir, samples, data, dirname, plots, output_dir=".", exts=["pdf"], tag="", scaleMC=True, suffix = None, datatitle = 'data', systset=None, lumi=None, ratioType=0):
     ''' 
     rootdir contains output of MT2Looper, samples are names of the .root files,
     data is the name of the data file, dirname is the directory within the root file
@@ -129,7 +129,6 @@ def MT2PlotMaker(rootdir, samples, data, dirname, plots, output_dir=".", exts=["
                 systs[i][ibin] = max(syst_up[ibin], syst_dn[ibin])
 
     ## get data histograms
-    datatitle = 'data'
     if data==None:
         h_data = [None for i in plots]
     else:
@@ -172,10 +171,12 @@ def MT2PlotMaker(rootdir, samples, data, dirname, plots, output_dir=".", exts=["
         unit = utils.GetUnit(vn)
         subtitles = utils.GetSubtitles(dirname)
         if h_data[i]!=None:
-            if scaleMC:
-                subLegText = ["MC scaled by {datamcsf}","# Data events: {ndata}"]
-            else:
+            if not scaleMC:
                 subLegText = ["# Data events: {ndata}"]
+            elif type(scaleMC) == float:
+                subLegText = ["MC scaled by {}".format(scaleMC),"# Data events: {ndata}"]
+            else:
+                subLegText = ["MC scaled by {datamcsf}","# Data events: {ndata}"]
         else:
             subLegText = None
         # subLegText = None
