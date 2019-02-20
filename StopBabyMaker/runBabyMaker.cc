@@ -77,12 +77,8 @@ int main(int argc, char **argv){
   char* dirpath = ".";
   if(argc>4) dirpath = argv[4];
 
-  //const char* filename = (ifile == -1 ? "*postprocess.root" : Form("%spostprocess.root"));
   const char* filename = (ifile == -1 ? "merged_ntuple_*.root" : Form("merged_ntuple_%i.root", ifile));
-  //const char* filename = "ntuple_TTJets_HT-1200to2500_new.root";
   // cout << "[runBabyMaker] The output file will be: " << filename << endl;
-
-  const char* suffix = ifile == -1 ? "" : Form("_%i", ifile);
 
   char *input = "sample_2017.dat";
   if(argc>5) input = argv[5];
@@ -173,25 +169,63 @@ int main(int argc, char **argv){
     cout << "[runBabyMaker] >> Doing photon skim for the sample!" << endl;
     mylooper->fillPhoton    = true;
     mylooper->skim_nPhotons = 1;
-    mylooper->skim_nGoodLep = 0;
     mylooper->skim_met      = 100;
   }
 
-  TString newskim_met = parseArg(extrargs, "skim_met");
-  if (newskim_met.IsFloat()) {
-    cout << "[runBabyMaker] >> Changing the skim_met to new value: " << newskim_met.Atof() << endl;
-    mylooper->skim_met = newskim_met.Atof();
-  }
+  TString suffix;
 
-  TString emuskim_met = parseArg(extrargs, "skim_met_emuEvt");
-  if (emuskim_met.IsFloat()) {
-    cout << "[runBabyMaker] >> Changing the skim_met_emuEvt to new value: " << emuskim_met.Atof() << endl;
-    mylooper->skim_met_emuEvt = emuskim_met.Atof();
-  }
+  // Parse any extra argument given to reset the skims from their default values
+  auto parseAndSet_f = [&](TString arg, float& value) {
+    TString newskim_arg = parseArg(extrargs, arg);
+    if (newskim_arg.IsFloat()) {
+      value = newskim_arg.Atof();
+      cout << "[runBabyMaker] >> Changing " << arg << " to new value: " << value << endl;
+      // suffix += "_" + arg.ReplaceAll("skim_","").ReplaceAll("_","") + newskim_arg;
+    }
+  };
+  parseAndSet_f("skim_met"         , mylooper->skim_met);
+  parseAndSet_f("skim_met_emuEvt"  , mylooper->skim_met_emuEvt);
+  parseAndSet_f("skim_ph_pt"       , mylooper->skim_ph_pt);
+  parseAndSet_f("skim_ph_eta"      , mylooper->skim_ph_eta);
+  parseAndSet_f("skim_jet_ak8_pt"  , mylooper->skim_jet_ak8_pt);
+  parseAndSet_f("analysis_bjet_pt" , mylooper->analysis_bjet_pt);
 
+  // Int version of the parse and reset function
+  auto parseAndSet_i = [&](TString arg, int& value) {
+    TString newskim_arg = parseArg(extrargs, arg);
+    if (newskim_arg.IsFloat()) {
+      value = newskim_arg.Atoi();
+      cout << "[runBabyMaker] >> Changing " << arg << " to new value: " << value << endl;
+      // suffix += "_" + newskim_arg + arg.ReplaceAll("skim_n","");
+    }
+  };
+  parseAndSet_i("skim_nGoodLep"    , mylooper->skim_nGoodLep);
+  parseAndSet_i("skim_nJets"       , mylooper->skim_nJets);
+  parseAndSet_i("skim_nBJets"      , mylooper->skim_nBJets);
+
+  // Bool version of the parse and reset function
+  auto parseAndSet_b = [&](TString arg, bool& value) {
+    TString newval = parseArg(extrargs, arg);
+    if (!newval.IsNull()) {
+      if (newval.IsBin()) value = newval.Atoi();
+      else if (newval == "true") value = true;
+      else if (newval == "false") value = false;
+      else return; // change nothing is the input is not valid...
+      cout << "[runBabyMaker] >> Changing the " << arg << " to new value: " << boolalpha << value << endl;
+      // if (value) suffix += "_do" + arg;
+      // else suffix += "_not" + arg;
+    }
+  };
+  parseAndSet_b("applyJECfromFile" , mylooper->applyJECfromFile);
+  parseAndSet_b("fillPhoton"       , mylooper->fillPhoton);
+  parseAndSet_b("fillZll"          , mylooper->fillZll);
+
+  if (ifile != -1) suffix += Form("_%i", ifile);
+
+  // If an output name for the topcand-tree is specified, also produce that with the baby
   TString topCandTreeName = parseArg(extrargs, "topcandTree");
   if (!topCandTreeName.IsNull()) {
-    topCandTreeName = Form("%s%s.root", topCandTreeName.Data(), suffix);
+    topCandTreeName = Form("%s%s.root", topCandTreeName.Data(), suffix.Data());
     cout << "[runBabyMaker] >> Will generate a separate topcand tree " << topCandTreeName << endl;
     mylooper->runTopCandTreeMaker = true;
     mylooper->topcandTreeMaker = new TopCandTree("tree", topCandTreeName.Data(), "ttbar");
@@ -262,7 +296,7 @@ int main(int argc, char **argv){
   }
 
   // Run Looper
-  mylooper->looper(sample, Form("%s%s", argv[1], suffix), nevents, dirpath);
+  mylooper->looper(sample, Form("%s%s", argv[1], suffix.Data()), nevents, dirpath);
 
   return 0;
 }

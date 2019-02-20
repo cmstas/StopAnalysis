@@ -297,7 +297,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
   bool isTChiFromFileName = false;
   string outfilestr(output_name);
   string filestr(chain->GetFile()->GetName());
-  cout<<"output name "<< output_name;
+  cout << "[looper] >> The utput name will be " << output_name << ".root";
   if (filestr.find("data") != std::string::npos) {
     isDataFromFileName = true;
     isSignalFromFileName = false;
@@ -325,12 +325,14 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
   const double matched_dr = 0.1;  // match DR between genlep and recolep
   if( (applyLeptonSFs || applyVetoLeptonSFs) && !isDataFromFileName){
     TString lepsf_filepath;
-    if (gconf.year == 2016) {
+    if (gconf.year == 2016 && gconf.cmssw_ver == 80) {
       lepsf_filepath = "lepsf/analysis2016_36p46fb";
+    } else if (gconf.year == 2016) {
+      lepsf_filepath = "lepsf/analysisRun2_2016";
     } else if (gconf.year == 2017) {
-      lepsf_filepath = "lepsf/analysis2017_94X";
+      lepsf_filepath = "lepsf/analysisRun2_2017";
     } else if (gconf.year == 2018) {
-      lepsf_filepath = "lepsf/analysis2017_94X";  // TODO: to be updated
+      lepsf_filepath = "lepsf/analysisRun2_2018";
     }
     cout << ">>> Grabbing lepton scale factors from: " << lepsf_filepath << endl;
 
@@ -1043,7 +1045,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
       //save met here because of JEC
       if(applyJECfromFile){
         int useCleanedMET = 0;
-        if (gconf.year == 2017) {
+        if (gconf.year == 2017 && !thisFile.Contains("09May2018")) {
           useCleanedMET = 2;
           StopEvt.pfmet_original = evt_old_pfmet_raw();
           StopEvt.pfmet_original_phi = evt_old_pfmetPhi_raw();
@@ -1086,7 +1088,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
         StopEvt.pfmet_phi_jup = evt_pfmetPhi_JetResUp();
         StopEvt.pfmet_jdown = evt_pfmet_JetResDown();
         StopEvt.pfmet_phi_jdown = evt_pfmetPhi_JetResDown();
-        if (gconf.year == 2017) {
+        if (gconf.year == 2017 && !thisFile.Contains("09May2018")) {
           StopEvt.pfmet_original = evt_old_pfmet_raw();
           StopEvt.pfmet_original_phi = evt_old_pfmetPhi_raw();
         }
@@ -2487,6 +2489,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
                                passHLTTriggerPattern("HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v") );
           StopEvt.HLT_MET_MHT = ( passHLTTriggerPattern("HLT_PFMET120_PFMHT120_IDTight_v") ||
                                   passHLTTriggerPattern("HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v") ||
+                                  passHLTTriggerPattern("HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60_v") ||
                                   passHLTTriggerPattern("HLT_PFMET100_PFMHT100_IDTight_PFHT60_v") ||
                                   passHLTTriggerPattern("HLT_PFMET120_PFMHT120_IDTight_PFHT60_v") );
           StopEvt.HLT_MET110_MHT110 = ( passHLTTriggerPattern("HLT_PFMET110_PFMHT110_IDTight_v") ||
@@ -2531,6 +2534,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
                                passHLTTriggerPattern("HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v") );
           StopEvt.HLT_MET_MHT = ( passHLTTriggerPattern("HLT_PFMET120_PFMHT120_IDTight_v") ||
                                   passHLTTriggerPattern("HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v") ||
+                                  passHLTTriggerPattern("HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60_v") ||
                                   passHLTTriggerPattern("HLT_PFMET100_PFMHT100_IDTight_PFHT60_v") ||
                                   passHLTTriggerPattern("HLT_PFMET120_PFMHT120_IDTight_PFHT60_v") );
           StopEvt.HLT_MET110_MHT110 = ( passHLTTriggerPattern("HLT_PFMET110_PFMHT110_IDTight_v") ||
@@ -2641,7 +2645,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
   cout << "Events with at least " << skim_nJets    << " Good Jets     " << nEvents_pass_skim_nJets << endl;
   cout << "Events with at least " << skim_nBJets   << " Good BJets    " << nEvents_pass_skim_nBJets << endl;
   cout << "Events with at least " << skim_nGoodLep << " Good Lepton   " << nEvents_pass_skim_nGoodLep << endl;
-  cout << "Events passing 2nd Lep Veto " << apply2ndLepVeto << "        " << nEvents_pass_skim_2ndlepVeto << endl;
+  cout << "Events with apply2ndLepVeto=" << boolalpha << apply2ndLepVeto << "    " << nEvents_pass_skim_2ndlepVeto << endl;
   cout << "Events with MET > " << skim_met << " GeV            " << nEvents_pass_skim_met << endl;
   cout << "Extra emu events with MET > " << skim_met_emuEvt << " GeV   " << nEvents_pass_skim_met_emuEvt << endl;
   cout << "-----------------------------" << endl;

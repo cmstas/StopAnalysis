@@ -69,13 +69,14 @@ void eventWeight_lepSF::setup( bool isFastsim, int inyear = 2017, TString filelo
   TH2F *h_el_SF_id_temp;
   TH2F *h_el_SF_iso_temp;
   TH2F *h_el_SF_tracking_temp;
+  TH2F *h_el_SF_trklowpt_temp;
   TH2F *h_el_SF_veto_id_temp;
   TH2F *h_el_SF_veto_iso_temp;
   TH2F *h_el_FS_ID_temp;
   TH2F *h_el_FS_Iso_temp;
   TH2F *h_el_veto_FS_ID_temp;
   TH2F *h_el_veto_FS_Iso_temp;
-  if (year == 2016) {
+  if (year == 16) {
     f_el_SF          = new TFile(filepath+"/scaleFactors.root", "read");
     f_el_SF_tracking = new TFile(filepath+"/egammaEffi.txt_EGM2D.root", "read");
 
@@ -103,14 +104,47 @@ void eventWeight_lepSF::setup( bool isFastsim, int inyear = 2017, TString filelo
     h_el_veto_FS_ID_temp  = (TH2F*)f_el_veto_FS_ID->Get("histo2D");
     h_el_veto_FS_Iso_temp = (TH2F*)f_el_veto_FS_Iso->Get("histo2D");
   }
-  else if (year >= 2017) {
+  else if (year == 2016) {
+    // From Twiki: https://twiki.cern.ch/twiki/bin/view/CMS/SUSLeptonSF#Electrons_AN1
+    f_el_SF           = new TFile(filepath+"/ElectronScaleFactors_Run2016.root", "read");
+    f_el_SF_tracking = new TFile(filepath+"/EGM2D_BtoH_GT20GeV_RecoSF_Legacy2016.root", "read");
+    f_el_SF_trklowpt = new TFile(filepath+"/EGM2D_BtoH_low_RecoSF_Legacy2016.root", "read");
+
+    h_el_SF_id_temp        = (TH2F*)f_el_SF->Get("Run2016_CutBasedMediumNoIso94XV2");
+    h_el_SF_iso_temp       = (TH2F*)f_el_SF->Get("Run2016_Mini");
+    h_el_SF_tracking_temp = (TH2F*)f_el_SF_tracking->Get("EGamma_SF2D");
+    h_el_SF_trklowpt_temp = (TH2F*)f_el_SF_trklowpt->Get("EGamma_SF2D");
+
+    // Grab veto el histos
+    h_el_SF_veto_id_temp  = (TH2F*)f_el_SF->Get("Run2016_CutBasedVetoNoIso94XV2");
+    h_el_SF_veto_iso_temp = (TH2F*)f_el_SF->Get("Run2016_Mini2");
+
+    // Fastsim/Fullsim el files
+    // TODO: to be updated use Morion16 files for now
+    f_el_FS_ID  = new TFile(filepath+"/sf_el_mediumCB.root", "read");
+    f_el_FS_Iso = new TFile(filepath+"/sf_el_mini01.root", "read");
+
+    f_el_veto_FS_ID  = new TFile(filepath+"/sf_el_vetoCB.root", "read");
+    f_el_veto_FS_Iso = new TFile(filepath+"/sf_el_mini02.root", "read");
+
+    // Grab fastsim/fullsim selected el histos
+    h_el_FS_ID_temp  = (TH2F*)f_el_FS_ID->Get("histo2D");
+    h_el_FS_Iso_temp = (TH2F*)f_el_FS_Iso->Get("histo2D");
+
+    // Grab fastsim/fullsim veto el histos
+    h_el_veto_FS_ID_temp  = (TH2F*)f_el_veto_FS_ID->Get("histo2D");
+    h_el_veto_FS_Iso_temp = (TH2F*)f_el_veto_FS_Iso->Get("histo2D");
+  }
+  else if (year == 2017) {
     // From Twiki: https://twiki.cern.ch/twiki/bin/view/CMS/SUSLeptonSF#Electrons_AN1
     f_el_SF          = new TFile(filepath+"/ElectronScaleFactors_Run2017.root", "read");
     f_el_SF_tracking = new TFile(filepath+"/egammaEffi.txt_EGM2D_runBCDEF_passingRECO.root", "read");
+    f_el_SF_trklowpt = new TFile(filepath+"/egammaEffi.txt_EGM2D_runBCDEF_passingRECO_lowEt.root", "read");
 
     h_el_SF_id_temp       = (TH2F*)f_el_SF->Get("Run2017_CutBasedMediumNoIso94XV2");
     h_el_SF_iso_temp      = (TH2F*)f_el_SF->Get("Run2017_MVAVLooseTightIP2DMini");
     h_el_SF_tracking_temp = (TH2F*)f_el_SF_tracking->Get("EGamma_SF2D");
+    h_el_SF_trklowpt_temp = (TH2F*)f_el_SF_trklowpt->Get("EGamma_SF2D");
 
     // Grab veto el histos
     h_el_SF_veto_id_temp  = (TH2F*)f_el_SF->Get("Run2017_CutBasedVetoNoIso94XV2");
@@ -118,6 +152,37 @@ void eventWeight_lepSF::setup( bool isFastsim, int inyear = 2017, TString filelo
 
     // Fastsim/Fullsim el files
     // TODO: update for 2017 <-- no fastsim sample for 2017, use 2016 files for now
+    f_el_FS_ID  = new TFile(filepath+"/sf_el_mediumCB.root", "read");
+    f_el_FS_Iso = new TFile(filepath+"/sf_el_mini01.root", "read");
+
+    f_el_veto_FS_ID  = new TFile(filepath+"/sf_el_vetoCB.root", "read");
+    f_el_veto_FS_Iso = new TFile(filepath+"/sf_el_mini02.root", "read");
+
+    // Grab fastsim/fullsim selected el histos
+    h_el_FS_ID_temp  = (TH2F*)f_el_FS_ID->Get("histo2D");
+    h_el_FS_Iso_temp = (TH2F*)f_el_FS_Iso->Get("histo2D");
+
+    // Grab fastsim/fullsim veto el histos
+    h_el_veto_FS_ID_temp  = (TH2F*)f_el_veto_FS_ID->Get("histo2D");
+    h_el_veto_FS_Iso_temp = (TH2F*)f_el_veto_FS_Iso->Get("histo2D");
+  }
+  else if (year == 2018) {
+    // From Twiki: https://twiki.cern.ch/twiki/bin/view/CMS/SUSLeptonSF#Electrons_AN1
+    f_el_SF          = new TFile(filepath+"/ElectronScaleFactors_Run2018.root", "read");
+    f_el_SF_tracking = new TFile(filepath+"/egammaEffi.txt_EGM2D.root", "read");
+    f_el_SF_trklowpt = new TFile(filepath+"/egammaEffi.txt_EGM2D_low.root", "read");
+
+    h_el_SF_id_temp       = (TH2F*)f_el_SF->Get("Run2018_CutBasedMediumNoIso94XV2");
+    h_el_SF_iso_temp      = (TH2F*)f_el_SF->Get("Run2018_Mini");
+    h_el_SF_tracking_temp = (TH2F*)f_el_SF_tracking->Get("EGamma_SF2D");
+    h_el_SF_trklowpt_temp = (TH2F*)f_el_SF_tracking->Get("EGamma_SF2D");
+
+    // Grab veto el histos
+    h_el_SF_veto_id_temp  = (TH2F*)f_el_SF->Get("Run2018_CutBasedVetoNoIso94XV2");
+    h_el_SF_veto_iso_temp = (TH2F*)f_el_SF->Get("Run2018_Mini2");
+
+    // Fastsim/Fullsim el files
+    // TODO: to be updated, no fastsim sample for 2018 in time, will use 2017 fastsim so 2017 files
     f_el_FS_ID  = new TFile(filepath+"/sf_el_mediumCB.root", "read");
     f_el_FS_Iso = new TFile(filepath+"/sf_el_mini01.root", "read");
 
@@ -154,13 +219,31 @@ void eventWeight_lepSF::setup( bool isFastsim, int inyear = 2017, TString filelo
     f_mu_veto_FS_Iso = new TFile(filepath+"/sf_mu_looseID_mini02.root", "read");
     f_mu_veto_FS_Ip  = new TFile(filepath+"/sf_mu_mediumID_looseIP2D.root", "read"); // double unc for this
   }
-  else if (year >= 2017) {
+  else if (year == 2017) {
     f_mu_SF_id       = new TFile(filepath+"/RunBCDEF_SF_ID.root", "read");
     f_mu_SF_iso      = new TFile(filepath+"/sf_mu_iso_susy_2017.root", "read"); // double unc
     f_mu_SF_ip       = nullptr;  // included in the ID SF as MediumPromptID
-    // f_mu_SF_tracking = new TFile(filepath+"/Tracking_EfficienciesAndSF_BCDEFGH.root", "read");
 
     f_mu_SF_veto_id  = new TFile(filepath+"/RunBCDEF_SF_ID.root", "read");
+    f_mu_SF_veto_iso = new TFile(filepath+"/sf_mu_iso_susy_2017.root", "read");
+    f_mu_SF_veto_ip  = nullptr;  // nothing available, not applying
+
+    // Fastsim/Fullsim mu files
+    // TODO: update the muon fastsim SFs
+    f_mu_FS_ID  = new TFile(filepath+"/sf_mu_mediumID.root", "read"); // double unc for this
+    f_mu_FS_Iso = new TFile(filepath+"/sf_mu_mediumID_mini02.root", "read"); // double unc for this
+    f_mu_FS_Ip  = new TFile(filepath+"/sf_mu_mediumID_tightIP2D.root", "read"); // double unc for this
+
+    f_mu_veto_FS_ID  = new TFile(filepath+"/sf_mu_looseID.root", "read");
+    f_mu_veto_FS_Iso = new TFile(filepath+"/sf_mu_looseID_mini02.root", "read");
+    f_mu_veto_FS_Ip  = new TFile(filepath+"/sf_mu_mediumID_looseIP2D.root", "read"); // double unc for this
+  }
+  else if (year == 2018) {
+    f_mu_SF_id       = new TFile(filepath+"/RunABCD_SF_ID.root", "read");
+    f_mu_SF_iso      = new TFile(filepath+"/sf_mu_iso_susy_2017.root", "read"); // TODO: to be updated
+    f_mu_SF_ip       = nullptr;  // included in the ID SF as MediumPromptID
+
+    f_mu_SF_veto_id  = new TFile(filepath+"/RunABCD_SF_ID.root", "read");
     f_mu_SF_veto_iso = new TFile(filepath+"/sf_mu_iso_susy_2017.root", "read");
     f_mu_SF_veto_ip  = nullptr;  // nothing available, not applying
 
@@ -242,8 +325,11 @@ void eventWeight_lepSF::setup( bool isFastsim, int inyear = 2017, TString filelo
   h_el_SF_tracking = (TH2F*)h_el_SF_tracking_temp->Clone("h_el_SF_tracking");
   xmin_h_el_SF_tracking = h_el_SF_tracking->GetXaxis()->GetBinLowEdge(1)+ferr;
   xmax_h_el_SF_tracking = h_el_SF_tracking->GetXaxis()->GetBinLowEdge(h_el_SF_tracking->GetNbinsX()+1)-ferr;
-  ymin_h_el_SF_tracking = h_el_SF_tracking->GetYaxis()->GetBinLowEdge(1)+ferr;
+  ymin_h_el_SF_tracking = h_el_SF_tracking->GetYaxis()->GetBinLowEdge(1);
   ymax_h_el_SF_tracking = h_el_SF_tracking->GetYaxis()->GetBinLowEdge(h_el_SF_tracking->GetNbinsY()+1)-ferr;
+  h_el_SF_trklowpt = (TH2F*)h_el_SF_trklowpt_temp->Clone("h_el_SF_trklowpt");
+  ymin_h_el_SF_trklowpt = h_el_SF_trklowpt->GetYaxis()->GetBinLowEdge(1)+ferr;
+  ymax_h_el_SF_trklowpt = h_el_SF_trklowpt->GetYaxis()->GetBinLowEdge(h_el_SF_trklowpt->GetNbinsY()+1)-ferr;
 
   // Get final fullsim, veto el, sfs
   TH2F *h_el_SF_veto_id  = (TH2F*)h_el_SF_veto_id_temp->Clone("h_el_SF_veto_id");
@@ -514,11 +600,19 @@ void eventWeight_lepSF::getLepWeight(vector<float> recoLep_pt, vector<float> rec
         }
       }
 
-      binX = h_el_SF_tracking->GetXaxis()->FindBin( std::max( std::min(xmax_h_el_SF_tracking, recoLep_eta[iLep]), xmin_h_el_SF_tracking) );
-      binY = h_el_SF_tracking->GetYaxis()->FindBin( std::max( std::min(ymax_h_el_SF_tracking, recoLep_pt[iLep]),  ymin_h_el_SF_tracking) );
-      weight_lepSF *= h_el_SF_tracking->GetBinContent( binX, binY );
-      weight_lepSF_Up *= ( h_el_SF_tracking->GetBinContent(binX,binY) + h_el_SF_tracking->GetBinError(binX,binY) );
-      weight_lepSF_Dn *= ( h_el_SF_tracking->GetBinContent(binX,binY) - h_el_SF_tracking->GetBinError(binX,binY) );
+      if (recoLep_pt[iLep] >= ymin_h_el_SF_tracking) {
+        binX = h_el_SF_tracking->GetXaxis()->FindBin( std::max( std::min(xmax_h_el_SF_tracking, recoLep_eta[iLep]), xmin_h_el_SF_tracking) );
+        binY = h_el_SF_tracking->GetYaxis()->FindBin( std::max( std::min(ymax_h_el_SF_tracking, recoLep_pt[iLep]),  ymin_h_el_SF_tracking) );
+        weight_lepSF *= h_el_SF_tracking->GetBinContent( binX, binY );
+        weight_lepSF_Up *= ( h_el_SF_tracking->GetBinContent(binX,binY) + h_el_SF_tracking->GetBinError(binX,binY) );
+        weight_lepSF_Dn *= ( h_el_SF_tracking->GetBinContent(binX,binY) - h_el_SF_tracking->GetBinError(binX,binY) );
+      } else {
+        binX = h_el_SF_trklowpt->GetXaxis()->FindBin( std::max( std::min(xmax_h_el_SF_tracking, recoLep_eta[iLep]), xmin_h_el_SF_tracking) );
+        binY = h_el_SF_trklowpt->GetYaxis()->FindBin( std::max( std::min(ymax_h_el_SF_trklowpt, recoLep_pt[iLep]),  ymin_h_el_SF_trklowpt) );
+        weight_lepSF *= h_el_SF_trklowpt->GetBinContent( binX, binY );
+        weight_lepSF_Up *= ( h_el_SF_trklowpt->GetBinContent(binX,binY) + h_el_SF_trklowpt->GetBinError(binX,binY) );
+        weight_lepSF_Dn *= ( h_el_SF_trklowpt->GetBinContent(binX,binY) - h_el_SF_trklowpt->GetBinError(binX,binY) );
+      }
     } // end if lep if el
     else if (abs(recoLep_pdgid[iLep]) == 13) {
 
