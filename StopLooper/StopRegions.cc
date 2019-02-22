@@ -1311,14 +1311,16 @@ std::vector<SR> getStopSignalRegionsRun2() {
   srbase.SetVar(dphijmet, 0.8, 3.1416);
   srbase.SetMETBins({0, 250, 350, 450, 550, 650, 800, 1500});
 
-  SR sr = srbase;
+  SR sr;
   std::vector<SR> SRvec;
 
   SRvec.emplace_back(srbase);
 
   // The actual base region that is the sum of all SRs
+  sr = srbase;
   sr.SetName("srincl0");
   sr.SetVar(njettmod, 1, 2);
+  sr.ReplaceVar(nbjet, nbtag);
   SRvec.emplace_back(sr);
 
   // Test region at MET sideband for top taggers
@@ -1366,9 +1368,9 @@ std::vector<SR> getStopSignalRegionsRun2() {
   sr.SetMETBins({150, 200, 250, 300, 400, 500, 800, 1500});
   SRvec.emplace_back(sr);
 
+  // Start of nominal signal regions
   sr = srbase;
-  sr.SetVar(nbtag, 1, fInf);
-  sr.RemoveVar(nbjet);
+  sr.ReplaceVar(nbjet, nbtag);
 
   // SR 2-3j
 
@@ -1522,7 +1524,7 @@ std::vector<SR> getStopSignalRegionsRun2() {
 
   // SRvec.clear();  // TEMPORARY!!
 
-  // Compressed regions
+  // Compressed (corridor) region
   sr = srbase;
   sr.SetName("srI");
   sr.SetDetailName("ge5j_lpt0to150_j1notb");
@@ -1530,11 +1532,11 @@ std::vector<SR> getStopSignalRegionsRun2() {
   sr.SetVar(mt, 150, fInf);
   sr.SetVar(njet, 5, fInf);
   sr.SetVar(nbjet, 1, fInf);
-  sr.SetVar(lep1pt, 0, 150);
-  sr.SetVar(dphilmet, 0, 2.0);
+  // sr.SetVar(lep1pt, 0, 150);
+  // sr.SetVar(dphilmet, 0, 2.0);
+  sr.SetVar(passlmetcor, 1, 2); // shape cut on lep1pt & dphilmet
   sr.SetVar(dphijmet, 0.5, 3.1416);
   sr.SetVar(j1passbtag, 0, 1);  // Require j1 not b-tagged
-  // sr.SetMETBins({250, 350, 450, 550, 1500});
   sr.SetMETBins({250, 350, 450, 550, 700, 1500});
   SRvec.emplace_back(sr);
 
@@ -1578,6 +1580,7 @@ std::vector<SR> getStopControlRegionsDileptonRun2() {
     cr.ReplaceVar(tmod, tmod_rl);
     cr.RemoveVar(passvetos);
     if (cr.VarExists(dphilmet)) cr.ReplaceVar(dphilmet, dphilmet_rl);
+    if (cr.VarExists(passlmetcor)) cr.ReplaceVar(passlmetcor, passlmet_rl);
     cr.SetVar(nvlep, 2, fInf);
     cr.SetVar(nlep_rl, 2, fInf);
     cr.SetVar(mt2_ll, 0, 100);  // to avoid overlap with the stop-2l SR
