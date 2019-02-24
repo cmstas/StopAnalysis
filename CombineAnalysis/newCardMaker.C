@@ -440,12 +440,12 @@ void newCardMaker(string signal = "T2tt", int mStop = 800, int mLSP = 400, strin
   system(Form("mkdir -p %s", output_dir.c_str()));
 
   // set input files (global pointers)
-  fsig = new TFile(Form("%s/SMS_%s.root",input_dir.c_str(), signal.substr(0,4).c_str()));
+  fsig = new TFile(Form("%s/SMS_%s_%s.root",input_dir.c_str(), signal.substr(0,4).c_str(), yusf.c_str()));
   // fsig = new TFile(Form("%s/Signal_%s.root",input_dir.c_str(), signal.substr(0,4).c_str()));
-  f2l = new TFile(Form("%s/lostlepton.root",input_dir.c_str()));
-  f1l = new TFile(Form("%s/1lepFromW.root",input_dir.c_str()));
-  f1ltop = new TFile(Form("%s/1lepFromTop.root",input_dir.c_str()));
-  fznunu = new TFile(Form("%s/ZToNuNu.root",input_dir.c_str()));
+  f2l = new TFile(Form("%s/lostlepton_%s.root",input_dir.c_str(), ysuf.c_str()));
+  f1l = new TFile(Form("%s/1lepFromW_%s.root",input_dir.c_str(), ysuf.c_str()));
+  f1ltop = new TFile(Form("%s/1lepFromTop_%s.root",input_dir.c_str(), ysuf.c_str()));
+  fznunu = new TFile(Form("%s/ZToNuNu_%s.root",input_dir.c_str(), ysuf.c_str()));
   fsig_genmet = nullptr; // don't use switched genmet signal for now
   // fsig_genmet = new TFile(Form("%s/Signal_%s_gen.root",input_dir.c_str(), signal.substr(0,4).c_str()));
 
@@ -472,12 +472,12 @@ int newCardMaker(string signal, string input_dir="../StopLooper/output/temp", st
   bmark->Start("benchmark");
 
   // set input files (global pointers)
-  fsig = new TFile(Form("%s/SMS_%s.root",input_dir.c_str(), signal.c_str()));
+  fsig = new TFile(Form("%s/SMS_%s_%s.root",input_dir.c_str(), signal.c_str(), ysuf.c_str()));
   // fsig = new TFile(Form("%s/Signal_%s.root",input_dir.c_str(), signal.c_str()));
-  f2l = new TFile(Form("%s/lostlepton.root",input_dir.c_str()));
-  f1l = new TFile(Form("%s/1lepFromW.root",input_dir.c_str()));
-  f1ltop = new TFile(Form("%s/1lepFromTop.root",input_dir.c_str()));
-  fznunu = new TFile(Form("%s/ZToNuNu.root",input_dir.c_str()));
+  f2l = new TFile(Form("%s/lostlepton_%s.root",input_dir.c_str(), ysuf.c_str()));
+  f1l = new TFile(Form("%s/1lepFromW_%s.root",input_dir.c_str(), ysuf.c_str()));
+  f1ltop = new TFile(Form("%s/1lepFromTop_%s.root",input_dir.c_str(), ysuf.c_str()));
+  fznunu = new TFile(Form("%s/ZToNuNu_%s.root",input_dir.c_str(), ysuf.c_str()));
   fsig_genmet = nullptr; // don't use switched genmet signal for now
   // fsig_genmet = new TFile(Form("%s/Signal_%s_gen.root",input_dir.c_str(), signal.c_str()));
 

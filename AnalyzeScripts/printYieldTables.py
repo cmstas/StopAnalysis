@@ -204,6 +204,43 @@ def makeBkgEstimateTablesLostLepton():
     # tab3.print_pdf('lostlep16_tfresTags.pdf')
 
 
+def makeMETExtrInfoTable():
+    srNames = ['srA0', 'srA1', 'srA2', 'srB', 'srC','srD', 'srE0', 'srE1', 'srE2', 'srE3', 'srF', 'srG0', 'srG1', 'srG2', 'srG3', 'srH',]
+    # srNames = ['srA0', 'srA1', 'srB', 'srC', ]
+
+    f1 = r.TFile('../StopLooper/output/combRun2_v30_s3/lostlepton_run2.root')
+    f2 = r.TFile('../CombineAnalysis/lostlepton_run2.root')
+
+    alpha1  = getYieldEInTopoBins(f1, srNames, 'alphaHist')
+    alpha2  = getYieldEInTopoBins(f2, srNames, 'alphaHist')
+    yMC_CR1 = getYieldEInTopoBins(f1, srNames, 'MCyields_CR')
+    yMC_CR2 = getYieldEInTopoBins(f2, srNames, 'MCyields_CR')
+    yld_CR1 = getYieldEInTopoBins(f1, srNames, 'datayields_CR')
+    yld_CR2 = getYieldEInTopoBins(f2, srNames, 'datayields_CR')
+
+    xrtsrs, metbin = zip(*[ (sr, [ i for i, y in enumerate(y2) if y not in y1]) for sr, y1, y2 in zip(srNames, alpha1, alpha2) if y1[-1] != y2[-1] ])
+    alpha3  = [ [ y for i, y in enumerate(y2) if y not in y1] for sr, y1, y2 in zip(srNames, alpha1, alpha2) if y1[-1] != y2[-1] ]
+    yMC_CR3 = [ [ y for i, y in enumerate(y2) if y not in y1] for sr, y1, y2 in zip(srNames, yMC_CR1, yMC_CR2) if y1[-1] != y2[-1] ]
+    yld_CR3 = [ [ y for i, y in enumerate(y2) if y not in y1] for sr, y1, y2 in zip(srNames, yld_CR1, yld_CR2) if y1[-1] != y2[-1] ]
+
+
+    metrange = getBinningFromTopoSRs(f1, xrtsrs)
+    metrange = [ [rng for i, rng in enumerate(rngs) if i in ibins ] for rngs, ibins in zip(metrange, metbin)]
+
+    tab = Table()
+    tab.add_column('SR name', sum([[sr]*n for sr, n in zip(xrtsrs, map(len, alpha3))], []))
+    # tab.add_column('metbin', sum(metbin, []))
+    tab.add_column('MET [GeV]', [m[0]+' -- '+m[1] for m in sum(metrange, [])])
+    tab.add_column('M^{CR} Expected', [y.round(3) for y in sum(yMC_CR3, [])])
+    # print len(sum(yMC_CR3, [])), len(sum(yld_CR3, []))
+    # tab.add_column('N^{CR} Observed', [y.round(3) for y in sum(yld_CR3, [])])
+    tab.add_column('Transfer Factor', [y.round(3) for y in sum(alpha3, [])])
+
+    # tab.print_table()
+    tab.set_theme_latex()
+    tab.print_table()
+
+
 def makeBkgCompositionTable():
     f1 = r.TFile('../StopLooper/output/combRun2_v30_s3/allBkg_run2.root')
 
@@ -273,5 +310,6 @@ if __name__ == '__main__':
 
     # makeBkgEstimationTableWJets()
 
-    makeTFComparisonTable()
+    # makeTFComparisonTable()
 
+    makeMETExtrInfoTable()

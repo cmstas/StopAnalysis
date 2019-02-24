@@ -61,6 +61,7 @@ void dataDrivenFromCR(TFile* fdata, TFile* fmc, TFile* fout, TString ddtype, TSt
       }
       if (extr_start_bin != lastbin) {
         cout << "Doing MET extrapolation for  " << crname << "  from bin " << lastbin << " (last bin) to bin " << extr_start_bin << "!" << endl;
+        hist_data_CR->Clone("h_datayields_CR_raw")->Write();
         combineYieldsInExtrBins(hist_data_CR);
       }
     }
@@ -87,8 +88,10 @@ void dataDrivenFromCR(TFile* fdata, TFile* fmc, TFile* fout, TString ddtype, TSt
         hist_MC_SR = (TH1D*) fmc->Get(hname_MC_SR)->Clone(hnameSR);
       }
 
-      if (useMetExtrapolation && extr_start_bin != lastbin)
+      if (useMetExtrapolation && extr_start_bin != lastbin) {
+        hist_MC_CR->Clone("h_MCyields_CR_raw")->Write();
         combineYieldsInExtrBins(hist_MC_CR);
+      }
 
       auto alphaHist = (TH1D*) hist_MC_SR->Clone(hname+"_alpha");
       alphaHist->Divide(hist_MC_CR);
@@ -255,10 +258,10 @@ int makeBkgEstimates(string input_dir="../StopLooper/output/temp14", string outp
   }
 
   // Create output files
-  TFile* f2l = new TFile(Form("%s/lostlepton.root",output_dir.c_str()), "RECREATE");
-  TFile* f1l = new TFile(Form("%s/1lepFromW.root",output_dir.c_str()), "RECREATE");
-  TFile* f1ltop = new TFile(Form("%s/1lepFromTop.root",output_dir.c_str()), "RECREATE");
-  TFile* fznunu = new TFile(Form("%s/ZToNuNu.root",output_dir.c_str()), "RECREATE");
+  TFile* f2l = new TFile(Form("%s/lostlepton_%s.root",output_dir.c_str(), suffix.c_str()), "RECREATE");
+  TFile* f1l = new TFile(Form("%s/1lepFromW_%s.root",output_dir.c_str(), suffix.c_str()), "RECREATE");
+  TFile* f1ltop = new TFile(Form("%s/1lepFromTop_%s.root",output_dir.c_str(), suffix.c_str()), "RECREATE");
+  TFile* fznunu = new TFile(Form("%s/ZToNuNu_%s.root",output_dir.c_str(), suffix.c_str()), "RECREATE");
 
   dataDrivenFromCR(fdata, fbkg, f2l, "cr2l", "_2lep");
   dataDrivenFromCR(fdata, fbkg, f1l, "cr0b", "_1lepW");

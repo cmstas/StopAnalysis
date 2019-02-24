@@ -60,6 +60,13 @@ class E:
     def __neg__(self):
         return E(-1.*self.val, self.err)
 
+    def __eq__(self, other):
+        other_val, other_err = self.get_val(other)
+        return self.val == other_val and self.err == other_err
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
     def get_val(self, other):
         other_val, other_err = other, 0.0
         if type(other)==type(self):
