@@ -79,6 +79,10 @@ try:
             foundBad = True
             print "[RSR] found bad event %i" % i
             break
+    h = f1.Get("h_counter")
+    if not h:
+       foundBad = True
+       print "[RSR] Cannot find counter hist in file!"
 except Exception as ex:
     msg = traceback.format_exc()
     print "Encounter error during SweepRoot:"
