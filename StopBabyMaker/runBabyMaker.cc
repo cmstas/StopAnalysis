@@ -101,7 +101,7 @@ int main(int argc, char **argv){
   // Skim Parameters
   //
   mylooper->skim_nvtx            = 1;
-  mylooper->skim_met             = 150;
+  mylooper->skim_met             = 125;
   mylooper->skim_met_emuEvt      = 50;
 
   mylooper->skim_nGoodLep        = 1;
