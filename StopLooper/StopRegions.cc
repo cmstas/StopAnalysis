@@ -1368,6 +1368,15 @@ std::vector<SR> getStopSignalRegionsRun2() {
   sr.SetMETBins({150, 200, 250, 300, 400, 500, 800, 1500});
   SRvec.emplace_back(sr);
 
+  sr.SetName("srsbfull");  // fullband
+  sr.SetDetailName("ge4j_met150toInf_mt0toInf");
+  sr.SetVar(met, 150, fInf);
+  sr.SetVar(mt, 0, fInf);
+  sr.SetVar(njet, 2, fInf);
+  sr.SetVar(passlep1pt, 1, 2);
+  sr.SetMETBins({150, 200, 250, 300, 400, 500, 800, 1500});
+  SRvec.emplace_back(sr);
+
   // Start of nominal signal regions
   sr = srbase;
   sr.ReplaceVar(nbjet, nbtag);

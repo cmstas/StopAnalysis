@@ -8,7 +8,13 @@ def GetColor(sample):
     # if 'rare'    in sample: return 877  # kViolet-3
     if 'rare'    in sample: return 614  # kMagenta-2
 
-    return 866                  # for everything else
+    if 'data'    in sample: return 14   # Gray
+    if 'lostlep' in sample: return 866  # kAzure+6
+    if 'FromW'   in sample: return 796  # kOrange-4
+    if 'FromTop' in sample: return 625  # kRed-7
+    if 'ZToNuNu' in sample: return 613  # kMagenta-3
+
+    return 870 # for everything else
 
 def GetCRName(cr):
     names = {"crrlbase": "Removed Lepton CR",
