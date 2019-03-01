@@ -698,19 +698,26 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
       //This must come before any continue affecting signal scans
       if(isSignalFromFileName){
         //get stop and lsp mass from sparms
-        for(unsigned int nsparm = 0; nsparm<sparm_names().size(); ++nsparm){
-          //if(sparm_names().at(nsparm).Contains("mGluino")) StopEvt.mass_stop = sparm_values().at(nsparm);//dummy for testing as only T1's exist
-          if(sparm_names().at(nsparm).Contains("mStop") ) StopEvt.mass_stop     = sparm_values().at(nsparm);
-          if(sparm_names().at(nsparm).Contains("mCharg")) StopEvt.mass_chargino = sparm_values().at(nsparm);
-          if(sparm_names().at(nsparm).Contains("mLSP")  ) StopEvt.mass_lsp      = sparm_values().at(nsparm);
-          if(sparm_names().at(nsparm).Contains("mGl")   ) StopEvt.mass_gluino   = sparm_values().at(nsparm);
+        if (gconf.cmssw_ver >= 94) {  // the sparm_names no longer exists after this
+          if (sparm_values().size() < 2) cout << "[looper] ERROR: Sample is determined fastsim but not having 2 sparm values!!\n";
+          StopEvt.mass_stop = sparm_values().at(0);
+          StopEvt.mass_lsp  = sparm_values().at(1);
+          if (isTChiFromFileName) StopEvt.mass_chargino = sparm_values().at(0);
+        } else {
+          for(unsigned int nsparm = 0; nsparm<sparm_names().size(); ++nsparm){
+            //if(sparm_names().at(nsparm).Contains("mGluino")) StopEvt.mass_stop = sparm_values().at(nsparm);//dummy for testing as only T1's exist
+            if(sparm_names().at(nsparm).Contains("mStop") ) StopEvt.mass_stop     = sparm_values().at(nsparm);
+            if(sparm_names().at(nsparm).Contains("mCharg")) StopEvt.mass_chargino = sparm_values().at(nsparm);
+            if(sparm_names().at(nsparm).Contains("mLSP")  ) StopEvt.mass_lsp      = sparm_values().at(nsparm);
+            if(sparm_names().at(nsparm).Contains("mGl")   ) StopEvt.mass_gluino   = sparm_values().at(nsparm);
+          }
         }
 	//this is a stupid way of doing stuff, but it should be more stable
 	mStop = StopEvt.mass_stop;
 	if(     StopEvt.mass_stop<0&&StopEvt.mass_gluino>0)   mStop = StopEvt.mass_gluino;
 	else if(StopEvt.mass_stop<0&&StopEvt.mass_chargino>0) mStop = StopEvt.mass_chargino;
 	mLSP = StopEvt.mass_lsp;
-        //std::cout << "Got signal mass point mStop " << mStop << " mLSP " << mLSP << std::endl;
+        if (mStop < 0 || mLSP < 0) cout << "[looper] WARNING: Not getting valid signal mass points!! mStop = " << mStop << ", mLSP = " << mLSP << endl;
         if(genps_weight()>0)      histNEvts->Fill(mStop,mLSP,1);
         else if(genps_weight()<0) histNEvts->Fill(mStop,mLSP,-1);
         if(genps_weight()>0)      counterhistSig->Fill(mStop,mLSP,36,1);
