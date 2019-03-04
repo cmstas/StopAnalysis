@@ -243,7 +243,12 @@ inline void parseAndSet_b(const TString& input, TString arg, bool& value) {
 
 int makeBkgEstimates(string input_dir="../StopLooper/output/temp14", string output_dir="../StopLooper/output/temp14", string suffix="17", TString extrargs="") {
   // First parse extra argument
-  parseAndSet_b(extrargs, "useMetExtrapolation" , useMetExtrapolation);
+  bool MetExtrFor2l = true;
+  bool MetExtrFor0b = false;
+
+  // parseAndSet_b(extrargs, "useMetExtrapolation" , useMetExtrapolation);
+  parseAndSet_b(extrargs, "MetExtrFor2l"        , MetExtrFor2l);
+  parseAndSet_b(extrargs, "MetExtrFor0b"        , MetExtrFor0b);
   parseAndSet_b(extrargs, "doCRPurityError"     , doCRPurityError);
   parseAndSet_d(extrargs, "extr_threshold"      , extr_threshold);
   parseAndSet_d(extrargs, "extr_TFcap"          , extr_TFcap);
@@ -263,7 +268,9 @@ int makeBkgEstimates(string input_dir="../StopLooper/output/temp14", string outp
   TFile* f1ltop = new TFile(Form("%s/1lepFromTop_%s.root",output_dir.c_str(), suffix.c_str()), "RECREATE");
   TFile* fznunu = new TFile(Form("%s/ZToNuNu_%s.root",output_dir.c_str(), suffix.c_str()), "RECREATE");
 
+  useMetExtrapolation=MetExtrFor2l;
   dataDrivenFromCR(fdata, fbkg, f2l, "cr2l", "_2lep");
+  useMetExtrapolation=MetExtrFor0b;
   dataDrivenFromCR(fdata, fbkg, f1l, "cr0b", "_1lepW");
 
   takeDirectlyFromMC(fbkg, f1ltop, "_1lepTop");

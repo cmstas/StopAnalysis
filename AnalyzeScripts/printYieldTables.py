@@ -76,20 +76,23 @@ def printTableWithMETextrpInfo(f1, f2, srNames, crname=''):
 
 
 def makeTFComparisonTable():
-    f1 = r.TFile('../StopLooper/output/samp16_v30_s3/lostlepton.root')
-    f2 = r.TFile('../StopLooper/output/samp16_v30_ISRoff/lostlepton.root')
+    # f1 = r.TFile('../StopLooper/output/samp16_v30_s3/lostlepton.root')
+    # f2 = r.TFile('../StopLooper/output/samp16_v30_ISRoff/lostlepton.root')
 
-    f1 = r.TFile('../StopLooper/output/samp17_v30_ISRon/lostlepton.root')
-    f2 = r.TFile('../StopLooper/output/samp17_v30_s3/lostlepton.root')
+    # f1 = r.TFile('../StopLooper/output/samp17_v30_ISRon/lostlepton.root')
+    # f2 = r.TFile('../StopLooper/output/samp17_v30_s3/lostlepton.root')
 
-    f1 = r.TFile('lostlepton16.root')
-    f2 = r.TFile('lostlepton17.root')
+    # f1 = r.TFile('lostlepton16.root')
+    # f2 = r.TFile('lostlepton_17.root')
 
-    f1 = r.TFile('../StopLooper/output/samp16_v30_s3/lostlepton.root')
-    f2 = r.TFile('../StopLooper/output/samp16_v30_genttscaled/lostlepton.root')
+    f1 = r.TFile('../StopLooper/output/samp17_v37_m4/1lepFromW_17.root')
+    f2 = r.TFile('../StopLooper/output/samp17_v30_m4/1lepFromW_17.root')
 
-    suf1 = '1'
-    suf2 = '2'
+    # f1 = r.TFile('../StopLooper/output/samp16_v30_s3/lostlepton.root')
+    # f2 = r.TFile('../StopLooper/output/samp16_v30_genttscaled/lostlepton.root')
+
+    suf1 = 'v0'
+    suf2 = 'v2'
 
     srNames = ['srA0', 'srA1', 'srA2', 'srB', 'srC','srD', 'srE0', 'srE1', 'srE2', 'srE3', 'srF', 'srG0', 'srG1', 'srG2', 'srG3', 'srH',]
 
@@ -112,24 +115,25 @@ def makeTFComparisonTable():
     tab.add_column('SR name', sum([[sr]*n for sr, n in zip(srNames, map(len, preds1))], []))
     tab.add_column('MET [GeV]', [m[0]+' -- '+m[1] for m in sum(metrange, [])])
     tab.add_column('MC SR '+suf1, [(1*y).round(2) for y in sum(yMC_SR1,[])])
-    tab.add_column('MC CR '+suf1, [(1*y).round(2) for y in sum(yMC_CR1,[])])
     tab.add_column('MC SR '+suf2, [(1*y).round(2) for y in sum(yMC_SR2,[])])
+    tab.add_column('MC CR '+suf1, [(1*y).round(2) for y in sum(yMC_CR1,[])])
     tab.add_column('MC CR '+suf2, [(1*y).round(2) for y in sum(yMC_CR2,[])])
-    tab.add_column('TF_{CR}^{SR} '+suf1, [(1*y).round(2) for y in sum(alpha1,[])])
-    tab.add_column('TF_{CR}^{SR} '+suf2, [(1*y).round(2) for y in sum(alpha2,[])])
-    tab.add_column('Diff(TF_{{{0}}}/TF_{{{1}}})'.format(suf1,suf2), [((y1-y2)/y1).round(2).pct_rep() if y1.val > 0 else 0 for y1, y2 in zip(sum(alpha1,[]), sum(alpha2,[]))])
+    # tab.add_column('TF_{CR}^{SR} '+suf1, [(1*y).round(2) for y in sum(alpha1,[])])
+    # tab.add_column('TF_{CR}^{SR} '+suf2, [(1*y).round(2) for y in sum(alpha2,[])])
+    # tab.add_column('Diff(TF_{{{0}}}/TF_{{{1}}})'.format(suf1,suf2), [((y1-y2)/y1).round(2).pct_rep() if y1.val > 0 else 0 for y1, y2 in zip(sum(alpha1,[]), sum(alpha2,[]))])
 
     tab.add_column('data CR '+suf1, [(1*y).round(2) for y in sum(yld_CR1,[])])
     tab.add_column('data CR '+suf2, [(1*y).round(2) for y in sum(yld_CR2,[])])
-    # tab.add_column('R_{CR}(data/MC)', [(d/m).round(2) for d, m in zip(sum(yld_CR,[]), sum(yMC_CR,[]))])
-    tab.add_column('Pred '+suf1, [(1*y).round(2) for y in sum(preds1,[])])
-    tab.add_column('Pred '+suf1+' \\times 42/36', [(y*(42.0/35.9)).round(2) for y in sum(preds1,[])])
-    tab.add_column('Pred '+suf2, [(1*y).round(2) for y in sum(preds2,[])])
-    tab.add_column('Diff(Pred_{{0}}/Pred_{{1}})'.format(suf1,suf2), [((y1*(42.0/35.9)-y2)/y2).round(2).pct_rep() if y2.val > 0 else 0 for y1, y2 in zip(sum(preds1,[]), sum(preds2,[]))])
+    tab.add_column('R_{CR}(data/MC) '+suf1, [(d/m).round(2) for d, m in zip(sum(yld_CR1,[]), sum(yMC_CR1,[]))])
+    tab.add_column('R_{CR}(data/MC) '+suf2, [(d/m).round(2) for d, m in zip(sum(yld_CR2,[]), sum(yMC_CR2,[]))])
+    # tab.add_column('Pred '+suf1, [(1*y).round(2) for y in sum(preds1,[])])
+    # tab.add_column('Pred '+suf1+' \\times 42/36', [(y*(42.0/35.9)).round(2) for y in sum(preds1,[])])
+    # tab.add_column('Pred '+suf2, [(1*y).round(2) for y in sum(preds2,[])])
+    # tab.add_column('Diff(Pred_{{0}}/Pred_{{1}})'.format(suf1,suf2), [((y1*(42.0/35.9)-y2)/y2).round(2).pct_rep() if y2.val > 0 else 0 for y1, y2 in zip(sum(preds1,[]), sum(preds2,[]))])
 
     tab.print_table()
     tab.set_theme_latex()
-    tab.print_pdf('compareTF_lostlep_16_genttptscale.pdf')
+    tab.print_pdf('compareCR0b_METv0vsv2.pdf')
 
 
 def makeBkgEstimateTablesLostLepton():
@@ -310,6 +314,6 @@ if __name__ == '__main__':
 
     # makeBkgEstimationTableWJets()
 
-    # makeTFComparisonTable()
+    makeTFComparisonTable()
 
-    makeMETExtrInfoTable()
+    # makeMETExtrInfoTable()
