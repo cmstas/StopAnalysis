@@ -305,9 +305,9 @@ void evtWgtInfo::Setup(string samplestr, int inyear, bool applyUnc, bool useBTag
   }
 
   // Get Signal XSection File
-  if ( is_fastsim_ ) {
-    f_sig_xsec = new TFile("../StopCORE/inputs/signal_xsec/xsec_stop_13TeV.root","read");
-    h_sig_xsec = (TH1D*) f_sig_xsec->Get("stop");
+  if ( is_fastsim_ && susy_xsec_fromfile ) {
+    f_sig_xsec = new TFile("../CORE/Tools/susyxsecs/xsec_susy_13tev_run2.root","read");
+    h_sig_xsec = (TH1D*) f_sig_xsec->Get("h_xsec_stop");
   }
 
   // Get SR trigger histos
@@ -801,7 +801,7 @@ void evtWgtInfo::getSusyMasses( int &mStop, int &mLSP ) {
 
 void evtWgtInfo::getNEvents( int &nEvts ) {
   if ( is_fastsim_ ) {
-    nEvts = (int) h_sig_counter_nEvents->GetBinContent(h_sig_counter->FindBin(mStop,mLSP));
+    nEvts = (int) h_sig_counter_nEvents->GetBinContent(h_sig_counter_nEvents->FindBin(mStop,mLSP));
   } else {
     nEvts = h_bkg_counter->GetBinContent(22);
   }
@@ -813,12 +813,12 @@ void evtWgtInfo::getXSecWeight( double &xsec_val, double &weight_xsec_up, double
   xsec_val = 1.0;
   double xsec_err = 0.0;
 
-  if ( !is_fastsim_ ) {
-    xsec_val = babyAnalyzer.xsec();
-  } else {
-    // getSusyMasses(mStop,mLSP);
+  if ( is_fastsim_ && susy_xsec_fromfile ) {
     xsec_val = h_sig_xsec->GetBinContent(h_sig_xsec->FindBin(mStop));
     xsec_err = h_sig_xsec->GetBinError(h_sig_xsec->FindBin(mStop));
+  } else {
+    xsec_val = babyAnalyzer.xsec();
+    xsec_err = babyAnalyzer.xsec_uncert();
   }
 
   weight_xsec_up = (xsec_val+xsec_err);

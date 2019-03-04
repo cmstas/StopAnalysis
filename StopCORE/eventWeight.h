@@ -140,6 +140,7 @@ class evtWgtInfo {
   // Switch for Moriond17 scheme for sync studies
   bool sync16;
   bool verbose;
+  bool susy_xsec_fromfile;
 
   int    nEvents;
   double xsec;
