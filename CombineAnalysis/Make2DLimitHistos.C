@@ -59,18 +59,19 @@ inline TString MakeOutputDir(TString dir){
 void Make2DLimitHistos(TString signaltype="std_T2tt", TString indir="limits", bool prefit=true){
 
   TH1D *hxsec;
-  TFile *fxsec = new TFile("xsec_stop_13TeV.root","READ");
+  // TFile *fxsec = new TFile("xsec_stop_13TeV.root","READ");
+  TFile *fxsec = new TFile("../CORE/Tools/susyxsecs/xsec_susy_13tev_run2.root","READ");
   if(fxsec->IsZombie()) {
-    std::cout << "Somehow xsec_stop_13TeV.root is corrupted. Exit..." << std::endl;
+    std::cout << "Somehow xsec_susy_13tev_run2 is corrupted. Exit..." << std::endl;
     exit(0);
   }
-  hxsec = (TH1D*)fxsec->Get("stop");
+  hxsec = (TH1D*)fxsec->Get("h_xsec_stop");
   
   int mStopLow  = 150;
-  int mStopHigh = 1250;
+  int mStopHigh = 2000;
   int mStopStep = 25;
   int mLSPLow   = 0;
-  int mLSPHigh  = 750;
+  int mLSPHigh  = 1150;
   int mLSPStep  = 25;
   int nbinsx = (mStopHigh - mStopLow)/mStopStep;
   int nbinsy = (mLSPHigh - mLSPLow)/mLSPStep;
@@ -187,6 +188,10 @@ void Make2DLimitHistos(TString signaltype="std_T2tt", TString indir="limits", bo
       //so flimit exists
       flimit->cd();
       TTree *tlimit = (TTree*)flimit->Get("limit");
+      if (!tlimit) {
+        cout << "Limit tree is broken in " << signalname << " -- skipping!\n";
+        continue;
+      }
       double value = -1.0;
       tlimit->SetBranchAddress("limit", &value);
       

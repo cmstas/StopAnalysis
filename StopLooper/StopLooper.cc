@@ -72,8 +72,8 @@ string samplever;
 const float fInf = std::numeric_limits<float>::max();
 
 const float kSMSMassStep = 25;
-const vector<float> mStopBins = []() { vector<float> bins; for (float i = 150; i < 1350; i += kSMSMassStep) bins.push_back(i); return bins; } ();
-const vector<float> mLSPBins  = []() { vector<float> bins; for (float i =   0; i <  750; i += kSMSMassStep) bins.push_back(i); return bins; } ();
+const vector<float> mStopBins = []() { vector<float> bins; for (float i = 150; i < 2150; i += kSMSMassStep) bins.push_back(i); return bins; } ();
+const vector<float> mLSPBins  = []() { vector<float> bins; for (float i =   0; i < 1450; i += kSMSMassStep) bins.push_back(i); return bins; } ();
 
 std::ofstream ofile;
 
@@ -288,12 +288,8 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
     is_bkg_ = (!is_data() && !is_fastsim_);
 
     // Get event weight histogram from baby
-    TH3D* h_sig_counter = nullptr;
     TH2D* h_sig_counter_nEvents = nullptr;
-    if (is_fastsim_) {
-      h_sig_counter = (TH3D*) file.Get("h_counterSMS");
-      h_sig_counter_nEvents = (TH2D*) file.Get("histNEvts");
-    }
+    if (is_fastsim_) h_sig_counter_nEvents = (TH2D*) file.Get("histNEvts");
 
     // Setup the event weight calculator
     evtWgt.verbose = true;
@@ -417,8 +413,15 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
       if (dsname.BeginsWith("/W") && dsname.Contains("JetsToLNu") && !dsname.Contains("NuPt-200") && nupt() > 200) continue;
 
       if (is_fastsim_) {
-        if (fmod(mass_stop(), kSMSMassStep) > 2 || fmod(mass_lsp(), kSMSMassStep) > 2) continue;  // skip points in between the binning
-        plot2d("h2d_signal_masspts", mass_stop(), mass_lsp() , evtweight_, SRVec.at(0).histMap, ";M_{stop} [GeV]; M_{lsp} [GeV]", 96, 100, 1300, 64, 0, 800);
+        if (fmod(mass_stop(), kSMSMassStep) > 2 || fmod(mass_lsp(), kSMSMassStep) > 2) {
+          // cout << "Running over signal point with mstop = " << mass_stop() << ", and mLSP = " << mass_lsp() << " that is in between the steps!\n";
+          continue;  // skip points in between the binning
+        }
+        plot2d("h2d_signal_masspts", mass_stop(), mass_lsp(), 1, SRVec.at(0).histMap, ";M_{stop} [GeV]; M_{lsp} [GeV]", 160, 100, 2100, 120, 0, 1500);
+        // Signal events with xsec weighted
+        int nEventsPoint = h_sig_counter_nEvents->GetBinContent(h_sig_counter_nEvents->FindBin(mass_stop(), mass_lsp()));
+        evtweight_ = kLumi * xsec() * 1000 / nEventsPoint;
+        plot2d("h2d_sigpts_xsecwgtd", mass_stop(), mass_lsp(), evtweight_, SRVec.at(0).histMap, ";M_{stop} [GeV]; M_{lsp} [GeV]", 160, 100, 2100, 120, 0, 1500);
       }
 
       ++nPassedTotal;
@@ -427,14 +430,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
       evtWgt.resetEvent(); // full event weights only get calculated if the event get selected for a SR
 
       // Simple weight with scale1fb only
-      if (!is_data()) {
-        if (is_fastsim_) {
-          int nEventsSample = h_sig_counter_nEvents->GetBinContent(h_sig_counter->FindBin(mass_stop(), mass_lsp()));
-          evtweight_ = kLumi * xsec() * 1000 / nEventsSample;
-        } else {
-          evtweight_ = kLumi * scale1fb();
-        }
-      }
+      if (is_bkg_) evtweight_ = kLumi * scale1fb();
 
       // Plot nvtxs on the base selection of stopbaby for reweighting purpose
       plot1d("h_nvtxs", nvtxs(), 1, testVec[0].histMap, ";Number of vertices", 100, 1, 101);
@@ -799,8 +795,8 @@ void StopLooper::fillHistosForSR(string suf) {
     fillYieldHistos(sr, values_[met], suf);
 
     if (runYieldsOnly) continue;
-    // And only procceed to make plots for the base and sideband region
-    if ((sr.GetName().find("base") & sr.GetName().find("sb")) == string::npos) continue;
+    // Skip histogram ploting for individul signal regions
+    if (sr.GetName().at(2) >= 'A' && sr.GetName().at(2) <= 'H') continue;
 
     // Plot kinematics histograms
     auto fillKineHists = [&](string s) {
@@ -888,7 +884,7 @@ void StopLooper::fillHistosForCR2l(string suf) {
     fillYieldHistos(cr, values_[met_rl], suf, true);
 
     if (runYieldsOnly) continue;
-    if ((cr.GetName().find("base") & cr.GetName().find("sb")) == string::npos) continue;
+    if (cr.GetName().at(4) >= 'A' && cr.GetName().at(4) <= 'H') continue;
 
     auto fillKineHists = [&] (string s) {
       plot1d("h_finemet"+s,    values_[met]         , evtweight_, cr.histMap, ";#slash{E}_{T} [GeV]"           , 80,  0, 800);
@@ -973,7 +969,7 @@ void StopLooper::fillHistosForCR0b(string suf) {
     fillYieldHistos(cr, values_[met], suf);
 
     if (runYieldsOnly) continue;
-    if ((cr.GetName().find("base") & cr.GetName().find("sb")) == string::npos) continue;
+    if (cr.GetName().at(4) >= 'A' && cr.GetName().at(4) <= 'H') continue;
 
     auto fillKineHists = [&] (string s) {
       plot1d("h_mt"+s,       values_[mt]      , evtweight_, cr.histMap, ";M_{T} [GeV]"          , 12, 150, 600);

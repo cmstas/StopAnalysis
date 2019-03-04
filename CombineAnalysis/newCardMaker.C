@@ -415,8 +415,7 @@ void makeCardsForPoint(TString signal, int mstop, int mlsp, TString outdir) {
   string skip = "srbase";
   for (auto k : *listOfDirs) {
     TString dir = k->GetName();
-    if (dir == "srJ") break;
-    if (strncmp (dir, skip.c_str(), skip.length()) == 0) continue;
+    if (dir[2] < 'A' || dir[2] > 'I') continue;
     if (strncmp (dir, keep.c_str(), keep.length()) == 0) { // it is a signal region
       TString hname = dir + "/h_metbins"; // for met binning information, empty hist for signal output
       // cout << "Looking at hname  " << hname << endl;
@@ -440,7 +439,7 @@ void newCardMaker(string signal = "T2tt", int mStop = 800, int mLSP = 400, strin
   system(Form("mkdir -p %s", output_dir.c_str()));
 
   // set input files (global pointers)
-  fsig = new TFile(Form("%s/SMS_%s_%s.root",input_dir.c_str(), signal.substr(0,4).c_str(), yusf.c_str()));
+  fsig = new TFile(Form("%s/SMS_%s_%s.root",input_dir.c_str(), signal.substr(0,4).c_str(), ysuf.c_str()));
   // fsig = new TFile(Form("%s/Signal_%s.root",input_dir.c_str(), signal.substr(0,4).c_str()));
   f2l = new TFile(Form("%s/lostlepton_%s.root",input_dir.c_str(), ysuf.c_str()));
   f1l = new TFile(Form("%s/1lepFromW_%s.root",input_dir.c_str(), ysuf.c_str()));
@@ -498,8 +497,8 @@ int newCardMaker(string signal, string input_dir="../StopLooper/output/temp", st
     return -1;
   }
 
-  for (int im1 = 150; im1 <= 1250; im1 += 25) {
-    for (int im2 = 0; im2 <= 750; im2 += 25) {
+  for (int im1 = 150; im1 <= 2000; im1 += 25) {
+    for (int im2 = 0; im2 <= 1150; im2 += 25) {
       // if (im1 < 900 && im2 < 400) continue;
       // if (im1 - im2 < 400) continue;
       if (hpoints->GetBinContent(hpoints->FindBin(im1, im2)) == 0) continue;

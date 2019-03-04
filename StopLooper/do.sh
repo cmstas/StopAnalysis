@@ -81,7 +81,7 @@ Samples+=( WZTo3LNu ZZTo2L2Nu )   # diboson
 ########################
 # 2018 Signal <-- use f17v2_ext1 until a18 ones come out
 
-INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/f17v2_v30_7
+INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/f17v2_v30_8
 # declare -a Samples=(T2tt_mStop850_mLSP100 T2tt_mStop650_mLSP350 T2tt_mStop1200_mLSP100)
 declare -a Samples=()
 Samples+=( SMS_T2tt_mStop1200to2000_f17v2_ext1_0 SMS_T2tt_mStop1200to2000_f17v2_ext1_1 SMS_T2tt_mStop1200to2000_f17v2_ext1_2 )
@@ -89,10 +89,12 @@ Samples+=( SMS_T2tt_mStop1200to2000_f17v2_ext1_3 SMS_T2tt_mStop1200to2000_f17v2_
 Samples+=( SMS_T2tt_mStop400to1200_f17v2_ext1_0 SMS_T2tt_mStop400to1200_f17v2_ext1_1 SMS_T2tt_mStop400to1200_f17v2_ext1_2 )
 Samples+=( SMS_T2tt_mStop400to1200_f17v2_ext1_3 SMS_T2tt_mStop400to1200_f17v2_ext1_4 SMS_T2tt_mStop400to1200_f17v2_ext1_5 )
 Samples+=( SMS_T2tt_mStop400to1200_f17v2_ext1_6 SMS_T2tt_mStop400to1200_f17v2_ext1_7 SMS_T2tt_mStop400to1200_f17v2_ext1_8 )
+Samples+=( SMS_T2tt_mStop400to1200_f17v2_ext1_9 )
 Samples+=( SMS_T2tt_mStop350to400_f17v2_ext1_0 SMS_T2tt_mStop350to400_f17v2_ext1_1 SMS_T2tt_mStop350to400_f17v2_ext1_2 )
 Samples+=( SMS_T2tt_mStop350to400_f17v2_ext1_3 SMS_T2tt_mStop350to400_f17v2_ext1_4 SMS_T2tt_mStop350to400_f17v2_ext1_5 )
+Samples+=( SMS_T2tt_mStop350to400_f17v2_ext1_6 )
 Samples+=( SMS_T2tt_mStop250to350_f17v2_ext1_0 SMS_T2tt_mStop250to350_f17v2_ext1_1 SMS_T2tt_mStop250to350_f17v2_ext1_2 )
-Samples+=( SMS_T2tt_mStop250to350_f17v2_ext1_3 SMS_T2tt_mStop250to350_f17v2_ext1_4 )
+Samples+=( SMS_T2tt_mStop250to350_f17v2_ext1_3 SMS_T2tt_mStop250to350_f17v2_ext1_4 SMS_T2tt_mStop250to350_f17v2_ext1_5 )
 Samples+=( SMS_T2tt_mStop150to250_f17v2_ext1_0 SMS_T2tt_mStop150to250_f17v2_ext1_1 SMS_T2tt_mStop150to250_f17v2_ext1_2 )
 
 [[ $run18sig == 1 ]] && runLooperJobs
@@ -138,22 +140,18 @@ Samples+=( WZTo1L3Nu WZTo3LNu WZTo2L2Q WWToLNuQQ WWTo2L2Nu )   # diboson
 ########################
 # 2017 Signal
 
-INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/f17v2_v30_7
+INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/f17v2_v30_8
 # declare -a Samples=(T2tt_mStop850_mLSP100 T2tt_mStop650_mLSP350 T2tt_mStop1200_mLSP100)
 declare -a Samples=()
 Samples+=( SMS_T2tt_mStop1200to2000_f17v2_ext0_0 SMS_T2tt_mStop1200to2000_f17v2_ext0_1 SMS_T2tt_mStop1200to2000_f17v2_ext0_2 )
 Samples+=( SMS_T2tt_mStop400to1200_f17v2_ext0_0 SMS_T2tt_mStop400to1200_f17v2_ext0_1 SMS_T2tt_mStop400to1200_f17v2_ext0_2 )
-Samples+=( SMS_T2tt_mStop400to1200_f17v2_ext0_3 SMS_T2tt_mStop400to1200_f17v2_ext0_4 SMS_T2tt_mStop400to1200_f17v2_ext0_5 )
-Samples+=( SMS_T2tt_mStop350to400_f17v2_ext0_0 SMS_T2tt_mStop350to400_f17v2_ext0_1 )
-Samples+=( SMS_T2tt_mStop350to400_f17v2_ext0_2 SMS_T2tt_mStop350to400_f17v2_ext0_3 )
-Samples+=( SMS_T2tt_mStop250to350_f17v2_ext0_0 SMS_T2tt_mStop250to350_f17v2_ext0_1 SMS_T2tt_mStop250to350_f17v2_ext0_2 )
+Samples+=( SMS_T2tt_mStop400to1200_f17v2_ext0_3 SMS_T2tt_mStop400to1200_f17v2_ext0_4 )
+Samples+=( SMS_T2tt_mStop400to1200_f17v2_ext0_5 SMS_T2tt_mStop400to1200_f17v2_ext0_6 )
+Samples+=( SMS_T2tt_mStop350to400_f17v2_ext0_0 SMS_T2tt_mStop350to400_f17v2_ext0_1 SMS_T2tt_mStop350to400_f17v2_ext0_2 )
+Samples+=( SMS_T2tt_mStop350to400_f17v2_ext0_3 SMS_T2tt_mStop350to400_f17v2_ext0_4 )
+Samples+=( SMS_T2tt_mStop250to350_f17v2_ext0_0 SMS_T2tt_mStop250to350_f17v2_ext0_1 )
+Samples+=( SMS_T2tt_mStop250to350_f17v2_ext0_2 SMS_T2tt_mStop250to350_f17v2_ext0_3 )
 Samples+=( SMS_T2tt_mStop150to250_f17v2_ext0_0 SMS_T2tt_mStop150to250_f17v2_ext0_1 )
-# Samples+=( SMS_T2tt_mStop1200to2000_f17v2_0 SMS_T2tt_mStop1200to2000_f17v2_1 SMS_T2tt_mStop1200to2000_f17v2_2 )
-# Samples+=( SMS_T2tt_mStop400to1200_f17v2_0 SMS_T2tt_mStop400to1200_f17v2_1 SMS_T2tt_mStop400to1200_f17v2_2 )
-# Samples+=( SMS_T2tt_mStop400to1200_f17v2_3 SMS_T2tt_mStop400to1200_f17v2_4 SMS_T2tt_mStop400to1200_f17v2_5 )
-# Samples+=( SMS_T2tt_mStop350to400_f17v2_0 SMS_T2tt_mStop350to400_f17v2_1 SMS_T2tt_mStop350to400_f17v2_2 SMS_T2tt_mStop350to400_f17v2_3 )
-# Samples+=( SMS_T2tt_mStop250to350_f17v2_0 SMS_T2tt_mStop250to350_f17v2_1 SMS_T2tt_mStop250to350_f17v2_2 )
-# Samples+=( SMS_T2tt_mStop150to250_f17v2_0 SMS_T2tt_mStop150to250_f17v2_1)
 
 [[ $run17sig == 1 ]] && runLooperJobs
 
@@ -211,7 +209,7 @@ Samples+=( WWTo2L2Nu WZTo1L1Nu2Q WZTo2L2Q WZTo3LNu_amcnlo TTWJetsToQQ TTZToQQ)  
 ########################
 # 2016 signal
 
-INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/s16v3_v30_4
+INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/s16v3_v30_8
 # INDIR=/nfs-7/userdata/stopRun2/analysis2016_SUS-16-051_35p9fbinv/v22/skim
 # INDIR=/nfs-7/userdata/stopRun2/analysis2016_SUS-16-051_35p9fbinv/v22_usegenMET/skim
 # OUTDIR=output/temp12
@@ -220,10 +218,12 @@ INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/s16v3_v30_4
 declare -a Samples=()
 Samples+=( SMS_T2tt_mStop1200to2000_s16v3_0 SMS_T2tt_mStop1200to2000_s16v3_1 SMS_T2tt_mStop1200to2000_s16v3_2 )
 Samples+=( SMS_T2tt_mStop400to1200_s16v3_0 SMS_T2tt_mStop400to1200_s16v3_1 SMS_T2tt_mStop400to1200_s16v3_2 )
-Samples+=( SMS_T2tt_mStop400to1200_s16v3_3 SMS_T2tt_mStop400to1200_s16v3_4 SMS_T2tt_mStop400to1200_s16v3_5 )
-Samples+=( SMS_T2tt_mStop350to400_s16v3_0 SMS_T2tt_mStop350to400_s16v3_1 ) 
-Samples+=( SMS_T2tt_mStop350to400_s16v3_2 SMS_T2tt_mStop350to400_s16v3_3 )
-Samples+=( SMS_T2tt_mStop250to350_s16v3_0 SMS_T2tt_mStop250to350_s16v3_1 SMS_T2tt_mStop250to350_s16v3_2 )
+Samples+=( SMS_T2tt_mStop400to1200_s16v3_3 SMS_T2tt_mStop400to1200_s16v3_4 )
+Samples+=( SMS_T2tt_mStop400to1200_s16v3_5 SMS_T2tt_mStop400to1200_s16v3_6 )
+Samples+=( SMS_T2tt_mStop350to400_s16v3_0 SMS_T2tt_mStop350to400_s16v3_1 SMS_T2tt_mStop350to400_s16v3_2 )
+Samples+=( SMS_T2tt_mStop350to400_s16v3_3 SMS_T2tt_mStop350to400_s16v3_4)
+Samples+=( SMS_T2tt_mStop250to350_s16v3_0 SMS_T2tt_mStop250to350_s16v3_1 )
+Samples+=( SMS_T2tt_mStop250to350_s16v3_2 SMS_T2tt_mStop250to350_s16v3_3 )
 Samples+=( SMS_T2tt_mStop150to250_s16v3_0 SMS_T2tt_mStop150to250_s16v3_1)
 # Samples+=( SMS_T2tt_400to1200_80X_0 SMS_T2tt_400to1200_80X_1 SMS_T2tt_400to1200_80X_2 )
 # Samples+=( SMS_T2tt_400to1200_80X_3 SMS_T2tt_400to1200_80X_4 )
@@ -301,6 +301,7 @@ if [ ! ${OUTDIRRUN2} == "" ]; then
     cp ${OUTDIR17}/*_17.root ${OUTDIRRUN2}
     cp ${OUTDIR18}/*_18.root ${OUTDIRRUN2}
     pushd ${OUTDIRRUN2}
+    rm 1lepFrom*.root ZToNuNu_*.root lostlepton_*.root
     for isamp in *_17.root; do
         jsamp=${isamp%_17.root}
         hadd -f ${jsamp}_run2.root ${jsamp}_16.root $isamp ${jsamp}_18.root > /dev/null
