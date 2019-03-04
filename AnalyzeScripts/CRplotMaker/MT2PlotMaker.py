@@ -4,7 +4,8 @@ import ROOT
 import pyRootPlotMaker.pyRootPlotMaker as ppm
 import MT2PlotUtils as utils
 
-def MT2PlotMaker(rootdir, samples, data, dirname, plots, output_dir=".", exts=["pdf"], tag="", scaleMC=True, suffix = None, datatitle = 'data', systset=None, lumi=None, ratioType=0):
+def MT2PlotMaker(rootdir, samples, data, dirname, plots, output_dir=".", exts=["pdf"], tag="", scaleMC=True, suffix = None, 
+                 datatitle = 'data', systset=None, lumi=None, ratioType=0, signame=None, sig_points=None):
     ''' 
     rootdir contains output of MT2Looper, samples are names of the .root files,
     data is the name of the data file, dirname is the directory within the root file
@@ -81,6 +82,7 @@ def MT2PlotMaker(rootdir, samples, data, dirname, plots, output_dir=".", exts=["
         fid.Close()
 
     # deal with nonexistent histograms <-- 
+    skipList = []
     for i in range(len(plots)):
         firstGood = -1
         for isamp in range(len(samples)):
@@ -88,7 +90,10 @@ def MT2PlotMaker(rootdir, samples, data, dirname, plots, output_dir=".", exts=["
                 firstGood = isamp
                 break
         if firstGood==-1:
-            raise RuntimeError("all background histograms are empty for {0}/h_{1}!".format(dirname,plots[i][0]))
+            # raise RuntimeError("all background histograms are empty for {0}/h_{1}!".format(dirname,plots[i][0]))
+            print "Error: all background histograms are empty for {0}/h_{1}! Skipping!".format(dirname,plots[i][0])
+            skipList.append(i)
+            continue
         for isamp in range(len(samples)):
             if h_bkg_vecs[i][isamp] == None:
                 h_bkg_vecs[i][isamp] = h_bkg_vecs[i][firstGood].Clone()
@@ -134,7 +139,8 @@ def MT2PlotMaker(rootdir, samples, data, dirname, plots, output_dir=".", exts=["
     else:
         data_file = os.path.join(rootdir, data+".root")
         fid = ROOT.TFile(data_file)
-        for pl in plots:
+        for i, pl in enumerate(plots):
+            if i in skipList: continue
             vn = pl[0]
             # if suffix != None:
             #     vn += suffix
@@ -147,12 +153,33 @@ def MT2PlotMaker(rootdir, samples, data, dirname, plots, output_dir=".", exts=["
                 h_data[-1].Add(fid.Get(dirnames[idir]+"/h_"+vn))
         fid.Close()
 
+    ## get signal histograms
+    h_sig_vec = [[] for i in plots]
+    sig_names = [[] for i in plots]
+    if sig_points is not None:
+        sig_file = os.path.join(rootdir, signame+".root")
+        fid = ROOT.TFile(sig_file)
+        for i, pl in enumerate(plots):
+            if i in skipList: continue
+            for spt in sig_points:
+                vn = pl[0]+'_'+spt
+                h_sig_vec[i].append( fid.Get(dirnames[0]+"/h_"+vn) )
+                sig_names[i].append( "T2tt_"+spt)
+                if type(h_sig_vec[i][-1])==type(ROOT.TObject()):
+                    raise Exception("No {0}/h_{1} histogram for {2}!".format(dirname, vn, signame))
+                h_sig_vec[i][-1].SetDirectory(0)
+                # handle the case with more than one directory
+                for idir in range(1, len(dirnames)):
+                    h_sig_vec[i][-1].Add(fid.Get(dirnames[idir]+"/h_"+vn))
+        fid.Close()
+
     # make the output directory if it doesn't exist
     if not os.path.isdir(os.path.join(output_dir,dirname+tag)):
         os.makedirs(os.path.join(output_dir,dirname+tag))
 
     # make all of the plots
     for i in range(len(plots)):
+        if i in skipList: continue
         vn = plots[i][0]
         if suffix != None: vn += suffix
         userMin,userMax = None,None
@@ -189,7 +216,8 @@ def MT2PlotMaker(rootdir, samples, data, dirname, plots, output_dir=".", exts=["
                            scaleMCtoData=scaleMC, xAxisUnit=unit, userMin=userMin, userMax=userMax, doSort=False, customColors=colors,
                            markerSize=markerSize, titleSize=0.035, subtitleSize=0.033, legCoords=(0.60,0.70,0.87,0.895),
                            subLegText=subLegText, subLegTextSize=0.036, doBkgError=True, doOverflow=doOverflow, cmsTextSize=0.04,
-                           convertToPoisson=False, drawZeros=False, drawSystematicBand=drawSystematicBand, systematics=systs[i], ratioType=ratioType)
+                           convertToPoisson=False, drawZeros=False, drawSystematicBand=drawSystematicBand, systematics=systs[i], 
+                           h_sig_vec=h_sig_vec[i], sig_names=sig_names[i], ratioType=ratioType)
 
 
 

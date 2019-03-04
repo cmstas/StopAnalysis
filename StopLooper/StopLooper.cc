@@ -75,6 +75,9 @@ const float kSMSMassStep = 25;
 const vector<float> mStopBins = []() { vector<float> bins; for (float i = 150; i < 2150; i += kSMSMassStep) bins.push_back(i); return bins; } ();
 const vector<float> mLSPBins  = []() { vector<float> bins; for (float i =   0; i < 1450; i += kSMSMassStep) bins.push_back(i); return bins; } ();
 
+// Helper function to pick out signal events
+auto checkMassPt = [&](double mstop, double mlsp) { return (mass_stop() == mstop) && (mass_lsp() == mlsp); };
+
 std::ofstream ofile;
 
 void StopLooper::SetSignalRegions() {
@@ -383,7 +386,6 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
 
       // For testing on only subset of mass points
       if (!runFullSignalScan && is_fastsim_) {
-        // auto checkMassPt = [&](double mstop, double mlsp) { return (mass_stop() == mstop) && (mass_lsp() == mlsp); };
         // if (!checkMassPt(800,400)  && !checkMassPt(1200,50)  && !checkMassPt(400,100) &&
         //     !checkMassPt(1100,300) && !checkMassPt(1100,500) && !checkMassPt(900,600)) continue;
         if (dsname.Contains("T2tt")) {
@@ -840,9 +842,8 @@ void StopLooper::fillHistosForSR(string suf) {
     };
 
     if (suf == "") fillKineHists(suf);
-    auto checkMassPt = [&](double mstop, double mlsp) { return (mass_stop() == mstop) && (mass_lsp() == mlsp); };
-    if (is_fastsim_ && suf == "" && (checkMassPt(1200, 50) || checkMassPt(800, 400)))
-      fillKineHists("_"+to_string((int)mass_stop())+"_"+to_string((int)mass_lsp()) + suf);
+    if (is_fastsim_ && suf == "" && (checkMassPt(1200, 50) || checkMassPt(800, 400) || checkMassPt(800, 675)))
+      fillKineHists(Form("_%.0f_%.0f%s", mass_stop(), mass_lsp(), suf.c_str()));
 
     auto fillExtraHists = [&](string s) {
       plot1d("h_met_s"+s, values_[met], evtweight_, sr.histMap, ";#slash{E}_{T} [GeV]" , 40, 50, 250);
@@ -905,6 +906,7 @@ void StopLooper::fillHistosForCR2l(string suf) {
       plot1d("h_rlmt"+s,       values_[mt_rl]       , evtweight_, cr.histMap, ";M_{T} (removed lepton) [GeV]"  , 10,  150, 600);
       plot1d("h_rltmod"+s,     values_[tmod_rl]     , evtweight_, cr.histMap, ";Modified topness"              , 25, -10, 15);
       plot1d("h_rldphijmet"+s, values_[dphijmet_rl] , evtweight_, cr.histMap, ";#Delta#phi(jet,(#slash{E}+l_{2}))" , 33, 0.8, 3.3);
+      plot1d("h_rldphilmet"+s, values_[dphilmet_rl] , evtweight_, cr.histMap, ";#Delta#phi(l,MET(rl))"         , 32,   0, 3.2);
 
       if (doTopTagging) {
         plot1d("h_nak8jets"+s, values_[nak8jets] , evtweight_, cr.histMap, ";Number of AK8 jets"   , 7, 0, 7);
@@ -920,6 +922,7 @@ void StopLooper::fillHistosForCR2l(string suf) {
         plot1d("h_rlmet_h"+s,  values_[met_rl]   , evtweight_, cr.histMap, ";#slash{E}_{T} (with removed lepton) [GeV]" , 24, 50, 650);
         plot1d("h_rlmt_h"+s,   values_[mt_rl]    , evtweight_, cr.histMap, ";M_{T} (with removed lepton) [GeV]" , 12, 0, 600);
         plot1d("h_nbtags"+s,   values_[nbjet]    , evtweight_, cr.histMap, ";Number of b-tagged jets"       ,  5,  0, 5);
+        plot1d("h_dphilmet"+s, values_[dphilmet] , evtweight_, cr.histMap, ";#Delta#phi(l,MET)"             , 32,   0, 3.2);
       }
 
       plot1d("h_jet1pt"+s,  values_[jet1pt],  evtweight_, cr.histMap, ";p_{T}(jet1) [GeV]"  , 32,  0, 800);
@@ -930,6 +933,8 @@ void StopLooper::fillHistosForCR2l(string suf) {
       // Luminosity test at Z peak
     };
     if (suf == "") fillKineHists(suf);
+    if (is_fastsim_ && suf == "" && (checkMassPt(1200, 50) || checkMassPt(800, 400) || checkMassPt(800, 675)))
+      fillKineHists(Form("_%.0f_%.0f%s", mass_stop(), mass_lsp(), suf.c_str()));
 
     auto fillExtraZHists = [&] (string s) {
       plot1d("h_mll"+s,   values_[mll], evtweight_, cr.histMap, ";M_{#it{ll}} [GeV]" , 120, 0, 240 );
@@ -1013,6 +1018,8 @@ void StopLooper::fillHistosForCR0b(string suf) {
         plot1d("h_dphij1j2"+s, fabs(ak4pfjets_p4().at(0).phi()-ak4pfjets_p4().at(1).phi()), evtweight_, cr.histMap, ";#Delta#phi(j1,j2)" , 33,  0, 3.3);
     };
     fillKineHists(suf);
+    if (is_fastsim_ && suf == "" && (checkMassPt(1200, 50) || checkMassPt(800, 400) || checkMassPt(800, 675)))
+      fillKineHists(Form("_%.0f_%.0f%s", mass_stop(), mass_lsp(), suf.c_str()));
 
     auto fillExtraHists = [&](string s) {
       plot1d("h_met_s"+s, values_[met], evtweight_, cr.histMap, ";#slash{E}_{T} [GeV]" , 40, 50, 250);
