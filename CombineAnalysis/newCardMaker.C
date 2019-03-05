@@ -425,6 +425,7 @@ void makeCardsForPoint(TString signal, int mstop, int mlsp, TString outdir) {
       for (int ibin = 1; ibin <= n_metbins; ++ibin, ++nbintot) {
         // Make a separate card for each met bin.
         TString anName = (dir.Contains("srI"))? "compressed" : "std";
+        if (dir == "srI" && nbintot > 10) nbintot = 1;  // temporary solution to recount for corridor
         TString cardname = outdir + Form("/datacard_%s_%s_%d_%d_bin%d.txt", anName.Data(), signal.Data(), mstop, mlsp, nbintot);
         makeCardForOneBin(dir, mstop, mlsp, ibin, nbintot, cardname);
       }

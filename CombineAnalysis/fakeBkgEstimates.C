@@ -60,10 +60,10 @@ int fakeBkgEstimates(string input_dir="../StopLooper/output/temp_4bins/", string
   TFile* fallbkg = new TFile(Form("%s/allBkg_%s.root", input_dir.c_str(), ysuf.c_str()));
   if (fallbkg->IsZombie()) return -1;
 
-  TFile* f2l = new TFile(Form("%s/lostlepton.root",output_dir.c_str()), "RECREATE");
-  TFile* f1l = new TFile(Form("%s/1lepFromW.root",output_dir.c_str()), "RECREATE");
-  TFile* f1ltop = new TFile(Form("%s/1lepFromTop.root",output_dir.c_str()), "RECREATE");
-  TFile* fznunu = new TFile(Form("%s/ZToNuNu.root",output_dir.c_str()), "RECREATE");
+  TFile* f2l = new TFile(Form("%s/lostlepton_%s.root",output_dir.c_str(), ysuf.c_str()), "RECREATE");
+  TFile* f1l = new TFile(Form("%s/1lepFromW_%s.root",output_dir.c_str(), ysuf.c_str()), "RECREATE");
+  TFile* f1ltop = new TFile(Form("%s/1lepFromTop_%s.root",output_dir.c_str(), ysuf.c_str()), "RECREATE");
+  TFile* fznunu = new TFile(Form("%s/ZToNuNu_%s.root",output_dir.c_str(), ysuf.c_str()), "RECREATE");
 
   copyYieldHist(fallbkg, f2l, "_2lep");
   copyYieldHist(fallbkg, f1l, "_1lepW");
