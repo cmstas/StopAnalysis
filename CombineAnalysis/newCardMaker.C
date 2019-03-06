@@ -41,7 +41,7 @@ const bool nobgsyst = false;
 // test without signal systematics?
 const bool nosigsyst = false;
 // temporary symbol to scale the 2016 signal to the run2 lumi
-const bool scalesig = true;
+const bool scalesig = false;
 
 bool verbose = true;  // automatic turned off if is signal scan
 
@@ -144,60 +144,114 @@ int getUncertainties(double& errup, double& errdn, double origyield, TFile* file
   return 1;
 }
 
-int addCorrelatedUnc(std::ostringstream *fLogStream, string name, double* d, double* u, int bin, string unctype){
-  bool isgmN = (unctype.find("gmN") != string::npos);
-  bool allneg = true;
-  for (unsigned int i = 0; i<maxnprocess; ++i) {
-    if (d[i] >= 0 && d[i] != 1)
-      allneg = false; // check if there is at least one good uncertainty
-    if (isgmN && u[i] < 0)
-      return 0; // all defined u's have to be >=0
+//helper function for addCorrelatedUnc:check if there is at least one good uncertainty
+bool checkIfPos(double *d){
+  for(unsigned int i = 0; i<maxnprocess; ++i){
+    if(d[i]>=0&&d[i]!=1) return true;
   }
-  if (allneg) return 0;
+  return false;
+}
+void resetArray(double *a){
+  for(unsigned int i = 0; i<maxnprocess; ++i) a[i] = -1;
+}
+//helper function to make one line in datacard for correlated uncertainties
+//please note, that the arrays d,u get reset with default values of -1
+int addCorrelatedUnc(std::ostringstream *fLogStream, string name, double *d, double *u, int bin, string unctype){
+  if(unctype.find(string("gmN")) != string::npos){
+    for(unsigned int i = 0; i<maxnprocess; ++i){
+      if(u[i]<0) {
+        resetArray(d);
+        resetArray(u);
+        return 0;//all defined u's have to be >=0
+      }
+    }
+  }
+  if(!checkIfPos(d)) {
+    resetArray(d);
+    resetArray(u);
+    return 0;
+  }
+  bool allfalse = true;
+  for(int i = 0; i<maxnprocess; ++i){
+    if(unctype.find(string("gmN")) != string::npos) allfalse = false;
+    else if(d[i]>=0&&u[i] <0) allfalse = false;
+    else if(fabs(d[i])<10e-10&&fabs(u[i])<10e-10) ;
+    else if(fabs(d[i]-1.)<10e-10&&fabs(u[i]-1.)<10e-10) ;
+    else if(d[i]>=0&&u[i]>=0) allfalse = false;
+  }
+  if(allfalse) {
+    resetArray(d);
+    resetArray(u);
+    return 0;
+  }
+  *fLogStream << " " << setw(15) << name;
+  if(bin>0) *fLogStream << bin;
+  *fLogStream << "    " << unctype << " ";
+  bool isgmN = false;
+  if(unctype.find(string("gmN")) != string::npos) {
+    *fLogStream << int(d[0]) << " ";
+    isgmN = true;
+  }
 
-  if (bin > 0) name += to_string(bin);
-  *fLogStream << " " << left << setw(20) << name;
-  *fLogStream << " "  << setw(6) << unctype << " ";
-  if (isgmN) *fLogStream << int(d[0]) << " ";
-
-  for (int i = 0; i < maxnprocess; ++i) {
-    if (isgmN)                 *fLogStream << u[i] << " ";
-    else if (d[i]>=0&&u[i] <0) *fLogStream << d[i] << " ";
-    else if (d[i]==0&&u[i]==0) *fLogStream << "- ";
-    else if (d[i]==1&&u[i]==1) *fLogStream << "- ";
-    else if (d[i]>=0&&u[i]>=0) *fLogStream << d[i] << "/" << u[i] << " ";
-    else                       *fLogStream << "- ";
+  for(int i = 0; i<maxnprocess; ++i){
+    if(isgmN)                 *fLogStream << u[i] << " ";
+    else if(fabs(d[i])<10e-10&&fabs(u[i])<10e-10) *fLogStream << "- ";
+    else if(fabs(d[i]-1.)<10e-10&&fabs(u[i]-1.)<10e-10) *fLogStream << "- ";
+    else if(d[i]>=0&&u[i] <0) {
+      if(d[i]>=1) *fLogStream << d[i] << " ";
+      else        *fLogStream << 2.-d[i] << " ";
+    }
+    else if(u[i]>=0&&u[i]==d[i]) {
+      if(u[i]>=1) *fLogStream << u[i] << " ";
+      else        *fLogStream << 2.-u[i] << " ";
+    }
+    else if(d[i]>=0&&u[i]>=0) {
+      if(d[i]>=1&&u[i]>=1)     *fLogStream << TMath::Min(1.999,d[i]) << "/" << TMath::Min(1.999,u[i]) << " ";
+      else if(d[i]>=1&&u[i]<1) *fLogStream << TMath::Min(1.999,d[i]) << "/" << TMath::Max(0.001,1./(2.-u[i])) << " ";
+      else if(d[i]<1&&u[i]>=1) *fLogStream << TMath::Max(0.001,1./(2.-d[i])) << "/" << TMath::Min(1.999,u[i]) << " ";
+      else                     *fLogStream << TMath::Max(0.001,1./(2.-d[i])) << "/" << TMath::Max(0.001,1./(2.-u[i])) << " ";
+    }
+    else                      *fLogStream << "- ";
   }
   *fLogStream << endl;
-
-  for (unsigned int i = 0; i<maxnprocess; ++i) {
-    u[i] = -1;
-    d[i] = -1;
-  }
+  resetArray(d);
+  resetArray(u);
   return 1;
 }
 
+//helper function to make one line in datacard for uncorrelated uncertainties
 int addOneUnc(std::ostringstream *fLogStream, string name, double d, double u, int process, int bin, string unctype){
-  if (d<0) return 0;
-  if (d>0&&u==0) cout << name << " " << d << " " << u << endl;//return;
-  if (d==0&&u==0) return 0;
-  if (d==1&&u==1) return 0;
-  if (d==1&&u<0) return 0;
-  if (unctype.find(string("gmN")) != string::npos && u<0) return 0;
-
-  if (bin > 0) name += to_string(bin);
-  *fLogStream << " " << left << setw(20) << name;
+  if(fabs(d)<10e-10) return 0;
+  //if(d>0&&u==0) cout << name << " " << d << " " << u << endl;//return;
+  if(fabs(d)<10e-10&&fabs(u)<10e-10) return 0;
+  if(fabs(d-1.)<10e-10&&fabs(u-1.)<10e-10) return 0;
+  if(fabs(d-1.)<10e-10&&u<0) return 0;
+  if(unctype.find(string("gmN")) != string::npos && u<0) return 0;
+  *fLogStream << " " << setw(15) << name;
+  if(bin>0) *fLogStream << bin;
   *fLogStream << " " << setw(6) << unctype << " ";
-  if (unctype.find(string("gmN")) != string::npos) {
+  if(unctype.find(string("gmN")) != string::npos) {
     *fLogStream << int(d) << " ";
     d = -1;
   }
-  for (int i = 0; i<process; ++i) *fLogStream << "- ";
-  if (d==0) { d = 0.001; }
-  if (d<0)      *fLogStream << u << " ";//gmN
-  else if (u<0) *fLogStream << d << " ";//only one uncertainty
-  else         *fLogStream << d << "/" << u << " ";
-  for (int i = process + 1; i<maxnprocess; ++i) *fLogStream << "- ";
+  for(int i = 0; i<process; ++i) *fLogStream << "- ";
+  if(d==0){ d = 2.0; }
+  if(d<0)      *fLogStream << u << " ";//gmN
+  else if(u<0){
+    if(d>=1) *fLogStream << d << " ";//only one uncertainty
+    else     *fLogStream << 2.-d << " ";//only one uncertainty
+  }
+  else if(u==d){
+    if(d>=1) *fLogStream << d << " ";//only one uncertainty
+    else     *fLogStream << 2.-d << " ";//only one uncertainty
+  }
+  else {
+    if(d>=1&&u>=1)     *fLogStream << TMath::Min(1.999,d) << "/" << TMath::Min(1.999,u) << " ";
+    else if(d>=1&&u<1) *fLogStream << TMath::Min(1.999,d) << "/" << TMath::Max(0.001,1./(2.-u)) << " ";
+    else if(d<1&&u>=1) *fLogStream << TMath::Max(0.001,1./(2.-d)) << "/" << TMath::Min(1.999,u) << " ";
+    else               *fLogStream << TMath::Max(0.001,1./(2.-d)) << "/" << TMath::Max(0.001,1./(2.-u)) << " ";
+  }
+  for(int i = process + 1; i<maxnprocess; ++i) *fLogStream << "- ";
   *fLogStream << endl;
   return 1;
 }
@@ -311,7 +365,8 @@ int makeCardForOneBin(TString dir, int mstop, int mlsp, int metbin, int bin, TSt
 
   if (!nosigsyst && sig > 0) {
     // vector<string> systNamesCard = {"PUSyst", "BLFSyst", "BHFSyst", "JESSyst", "ISRSyst", "LEffSyst", "LEffFSSyst", "BFSSyst", "MuRFSyst"};
-    vector<string> systNames_sig = {"pileup", "bTagEffLF", "bTagEffHF", "jes", "ISR", "lepSF", "lepFSSF", "bTagFSEff"}; //  "q2" <-- fix this
+    // vector<string> systNames_sig = {"pileup", "bTagEffLF", "bTagEffHF", "jes", "ISR", "lepSF", "lepFSSF", "bTagFSEff"}; //  "q2" <-- fix this
+    vector<string> systNames_sig = {"bTagEffLF", "bTagEffHF", "jes", "lepSF", }; //  temporary as most ones aren't available
     for (string syst : systNames_sig) {
       double systUp, systDn;
       getUncertainties(systUp, systDn, osig, fsig, hname_sig+"_"+syst.c_str(), metbin, mstop, mlsp);
@@ -336,10 +391,13 @@ int makeCardForOneBin(TString dir, int mstop, int mlsp, int metbin, int bin, TSt
 
   if (!nobgsyst) {
     // common systematic uncertainties
-    vector<string> systNames_corr = {"bTagEffHF", "bTagEffLF", "lepSF", "pdf", "q2", "jes", "ISR", "pileup", "alphas"};
+    // vector<string> systNames_corr = {"bTagEffHF", "bTagEffLF", "lepSF", "pdf", "q2", "jes", "ISR", "pileup", "alphas"};
+    vector<string> systNames_corr = {"bTagEffHF", "bTagEffLF", "lepSF", "pdf", "q2", "jes", "pileup", "alphas"}; // temporary
     // individual systematic uncertainties for different backgrounds
-    vector<string> systNames_bg2l = {"metRes", "ttbarSysPt", "tauSF"};
-    vector<string> systNames_bg1l = {"metRes", "CRpurity", "WbXsec"};
+    // vector<string> systNames_bg2l = {"metRes", "ttbarSysPt", "tauSF"};
+    // vector<string> systNames_bg1l = {"metRes", "CRpurity", "WbXsec"};
+    vector<string> systNames_bg2l = {"tauSF"};     // temporary
+    vector<string> systNames_bg1l = {"CRpurity",}; // temporary
     vector<string> systNames_bgZnunu;
 
     double dnerr[] = {triggerrDn, -1, -1, triggerrDn, triggerrDn }; // obviously(?) need to swap CR2l sf
