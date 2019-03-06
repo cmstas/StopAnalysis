@@ -1,6 +1,6 @@
 // -*- C++ -*-
 // This is a header file generated with the command:
-// makeCMS3ClassFiles("/home/users/sicheng/working/StopAnalysis/StopBabyMaker/stopbaby_92.root", "t", "StopTree", "stop1l", "babyAnalyzer")
+// makeCMS3ClassFiles("/home/users/sicheng/working/StopAnalysis/StopBabyMaker/stopbaby_3.root", "t", "StopTree", "stop1l", "babyAnalyzer")
 
 #ifndef StopTree_H
 #define StopTree_H
@@ -412,6 +412,15 @@ class StopTree {
   float    weight_ISRnjets_DN_;
   TBranch *weight_ISRnjets_DN_branch;
   bool     weight_ISRnjets_DN_isLoaded;
+  float    weight_L1prefire_;
+  TBranch *weight_L1prefire_branch;
+  bool     weight_L1prefire_isLoaded;
+  float    weight_L1prefire_UP_;
+  TBranch *weight_L1prefire_UP_branch;
+  bool     weight_L1prefire_UP_isLoaded;
+  float    weight_L1prefire_DN_;
+  TBranch *weight_L1prefire_DN_branch;
+  bool     weight_L1prefire_DN_isLoaded;
   int      NISRjets_;
   TBranch *NISRjets_branch;
   bool     NISRjets_isLoaded;
@@ -595,6 +604,9 @@ class StopTree {
   int      lep1_mc_motherid_;
   TBranch *lep1_mc_motherid_branch;
   bool     lep1_mc_motherid_isLoaded;
+  float    lep1_etaSC_;
+  TBranch *lep1_etaSC_branch;
+  bool     lep1_etaSC_isLoaded;
   float    lep1_dphiMET_;
   TBranch *lep1_dphiMET_branch;
   bool     lep1_dphiMET_isLoaded;
@@ -646,6 +658,9 @@ class StopTree {
   int      lep2_mc_motherid_;
   TBranch *lep2_mc_motherid_branch;
   bool     lep2_mc_motherid_isLoaded;
+  float    lep2_etaSC_;
+  TBranch *lep2_etaSC_branch;
+  bool     lep2_etaSC_isLoaded;
   float    lep2_dphiMET_;
   TBranch *lep2_dphiMET_branch;
   bool     lep2_dphiMET_isLoaded;
@@ -682,6 +697,15 @@ class StopTree {
   vector<float> *ph_phiso_;
   TBranch *ph_phiso_branch;
   bool     ph_phiso_isLoaded;
+  vector<bool> *ph_passLooseID_;
+  TBranch *ph_passLooseID_branch;
+  bool     ph_passLooseID_isLoaded;
+  vector<bool> *ph_passMediumID_;
+  TBranch *ph_passMediumID_branch;
+  bool     ph_passMediumID_isLoaded;
+  vector<bool> *ph_passTightID_;
+  TBranch *ph_passTightID_branch;
+  bool     ph_passTightID_isLoaded;
   vector<int> *ph_overlapJetId_;
   TBranch *ph_overlapJetId_branch;
   bool     ph_overlapJetId_isLoaded;
@@ -691,18 +715,6 @@ class StopTree {
   vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > *ph_mcp4_;
   TBranch *ph_mcp4_branch;
   bool     ph_mcp4_isLoaded;
-  vector<float> *ph_pt_;
-  TBranch *ph_pt_branch;
-  bool     ph_pt_isLoaded;
-  vector<float> *ph_eta_;
-  TBranch *ph_eta_branch;
-  bool     ph_eta_isLoaded;
-  vector<float> *ph_phi_;
-  TBranch *ph_phi_branch;
-  bool     ph_phi_isLoaded;
-  vector<float> *ph_mass_;
-  TBranch *ph_mass_branch;
-  bool     ph_mass_isLoaded;
   vector<int> *ph_mcMatchId_;
   TBranch *ph_mcMatchId_branch;
   bool     ph_mcMatchId_isLoaded;
@@ -1908,6 +1920,9 @@ void LoadAllBranches();
   const float &weight_ISRnjets();
   const float &weight_ISRnjets_UP();
   const float &weight_ISRnjets_DN();
+  const float &weight_L1prefire();
+  const float &weight_L1prefire_UP();
+  const float &weight_L1prefire_DN();
   const int &NISRjets();
   const int &NnonISRjets();
   const vector<string> &sparms_names();
@@ -1969,6 +1984,7 @@ void LoadAllBranches();
   const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &lep1_p4();
   const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &lep1_mcp4();
   const int &lep1_mc_motherid();
+  const float &lep1_etaSC();
   const float &lep1_dphiMET();
   const float &lep1_dphiMET_jup();
   const float &lep1_dphiMET_jdown();
@@ -1986,6 +2002,7 @@ void LoadAllBranches();
   const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &lep2_p4();
   const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &lep2_mcp4();
   const int &lep2_mc_motherid();
+  const float &lep2_etaSC();
   const float &lep2_dphiMET();
   const float &lep2_dphiMET_jup();
   const float &lep2_dphiMET_jdown();
@@ -1998,13 +2015,12 @@ void LoadAllBranches();
   const vector<float> &ph_chiso();
   const vector<float> &ph_nhiso();
   const vector<float> &ph_phiso();
+  const vector<bool> &ph_passLooseID();
+  const vector<bool> &ph_passMediumID();
+  const vector<bool> &ph_passTightID();
   const vector<int> &ph_overlapJetId();
   const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &ph_p4();
   const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &ph_mcp4();
-  const vector<float> &ph_pt();
-  const vector<float> &ph_eta();
-  const vector<float> &ph_phi();
-  const vector<float> &ph_mass();
   const vector<int> &ph_mcMatchId();
   const vector<float> &ph_genIso04();
   const vector<float> &ph_drMinParton();
@@ -2501,6 +2517,9 @@ namespace stop1l {
   const float &weight_ISRnjets();
   const float &weight_ISRnjets_UP();
   const float &weight_ISRnjets_DN();
+  const float &weight_L1prefire();
+  const float &weight_L1prefire_UP();
+  const float &weight_L1prefire_DN();
   const int &NISRjets();
   const int &NnonISRjets();
   const vector<string> &sparms_names();
@@ -2562,6 +2581,7 @@ namespace stop1l {
   const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &lep1_p4();
   const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &lep1_mcp4();
   const int &lep1_mc_motherid();
+  const float &lep1_etaSC();
   const float &lep1_dphiMET();
   const float &lep1_dphiMET_jup();
   const float &lep1_dphiMET_jdown();
@@ -2579,6 +2599,7 @@ namespace stop1l {
   const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &lep2_p4();
   const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &lep2_mcp4();
   const int &lep2_mc_motherid();
+  const float &lep2_etaSC();
   const float &lep2_dphiMET();
   const float &lep2_dphiMET_jup();
   const float &lep2_dphiMET_jdown();
@@ -2591,13 +2612,12 @@ namespace stop1l {
   const vector<float> &ph_chiso();
   const vector<float> &ph_nhiso();
   const vector<float> &ph_phiso();
+  const vector<bool> &ph_passLooseID();
+  const vector<bool> &ph_passMediumID();
+  const vector<bool> &ph_passTightID();
   const vector<int> &ph_overlapJetId();
   const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &ph_p4();
   const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &ph_mcp4();
-  const vector<float> &ph_pt();
-  const vector<float> &ph_eta();
-  const vector<float> &ph_phi();
-  const vector<float> &ph_mass();
   const vector<int> &ph_mcMatchId();
   const vector<float> &ph_genIso04();
   const vector<float> &ph_drMinParton();

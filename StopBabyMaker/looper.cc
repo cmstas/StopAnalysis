@@ -1483,15 +1483,20 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
         StopEvt.filt_jetWithBadMuon_jdown = !isbadmuonjet;
       }
 
+      StopEvt.weight_L1prefire    = 1;
+      StopEvt.weight_L1prefire_UP = 1;
+      StopEvt.weight_L1prefire_DN = 1;
       if (!evt_isRealData()){
+        if (gconf.year == 2016 || gconf.year == 2017)
+          std::tie(StopEvt.weight_L1prefire, StopEvt.weight_L1prefire_UP, StopEvt.weight_L1prefire_DN) = getPrefireInfo(gconf.year);
+
         // Input should have pt > 30, |eta| < 2.4, PF Loose ID, leptons removed
         int NISRjets = get_nisrMatch(jets.ak4pfjets_p4);
+        float unc_ISRnjets = get_isrUnc(NISRjets, gconf.year);
 
         StopEvt.weight_ISRnjets = get_isrWeight(NISRjets, gconf.year);
-        float unc_ISRnjets = get_isrUnc(NISRjets, gconf.year);
         StopEvt.weight_ISRnjets_UP = StopEvt.weight_ISRnjets + unc_ISRnjets;
         StopEvt.weight_ISRnjets_DN = StopEvt.weight_ISRnjets - unc_ISRnjets;
-
         StopEvt.NISRjets = NISRjets;
         StopEvt.NnonISRjets = jets.ngoodjets - NISRjets;
 

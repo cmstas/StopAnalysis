@@ -365,6 +365,12 @@ void StopTree::Init(TTree *tree) {
   if (weight_ISRnjets_UP_branch) weight_ISRnjets_UP_branch->SetAddress(&weight_ISRnjets_UP_);
   weight_ISRnjets_DN_branch = tree->GetBranch("weight_ISRnjets_DN");
   if (weight_ISRnjets_DN_branch) weight_ISRnjets_DN_branch->SetAddress(&weight_ISRnjets_DN_);
+  weight_L1prefire_branch = tree->GetBranch("weight_L1prefire");
+  if (weight_L1prefire_branch) weight_L1prefire_branch->SetAddress(&weight_L1prefire_);
+  weight_L1prefire_UP_branch = tree->GetBranch("weight_L1prefire_UP");
+  if (weight_L1prefire_UP_branch) weight_L1prefire_UP_branch->SetAddress(&weight_L1prefire_UP_);
+  weight_L1prefire_DN_branch = tree->GetBranch("weight_L1prefire_DN");
+  if (weight_L1prefire_DN_branch) weight_L1prefire_DN_branch->SetAddress(&weight_L1prefire_DN_);
   NISRjets_branch = tree->GetBranch("NISRjets");
   if (NISRjets_branch) NISRjets_branch->SetAddress(&NISRjets_);
   NnonISRjets_branch = tree->GetBranch("NnonISRjets");
@@ -483,6 +489,8 @@ void StopTree::Init(TTree *tree) {
   if (lep1_passVeto_branch) lep1_passVeto_branch->SetAddress(&lep1_passVeto_);
   lep1_mc_motherid_branch = tree->GetBranch("lep1_mc_motherid");
   if (lep1_mc_motherid_branch) lep1_mc_motherid_branch->SetAddress(&lep1_mc_motherid_);
+  lep1_etaSC_branch = tree->GetBranch("lep1_etaSC");
+  if (lep1_etaSC_branch) lep1_etaSC_branch->SetAddress(&lep1_etaSC_);
   lep1_dphiMET_branch = tree->GetBranch("lep1_dphiMET");
   if (lep1_dphiMET_branch) lep1_dphiMET_branch->SetAddress(&lep1_dphiMET_);
   lep1_dphiMET_jup_branch = tree->GetBranch("lep1_dphiMET_jup");
@@ -513,6 +521,8 @@ void StopTree::Init(TTree *tree) {
   if (lep2_passVeto_branch) lep2_passVeto_branch->SetAddress(&lep2_passVeto_);
   lep2_mc_motherid_branch = tree->GetBranch("lep2_mc_motherid");
   if (lep2_mc_motherid_branch) lep2_mc_motherid_branch->SetAddress(&lep2_mc_motherid_);
+  lep2_etaSC_branch = tree->GetBranch("lep2_etaSC");
+  if (lep2_etaSC_branch) lep2_etaSC_branch->SetAddress(&lep2_etaSC_);
   lep2_dphiMET_branch = tree->GetBranch("lep2_dphiMET");
   if (lep2_dphiMET_branch) lep2_dphiMET_branch->SetAddress(&lep2_dphiMET_);
   lep2_dphiMET_jup_branch = tree->GetBranch("lep2_dphiMET_jup");
@@ -537,16 +547,14 @@ void StopTree::Init(TTree *tree) {
   if (ph_nhiso_branch) ph_nhiso_branch->SetAddress(&ph_nhiso_);
   ph_phiso_branch = tree->GetBranch("ph_phiso");
   if (ph_phiso_branch) ph_phiso_branch->SetAddress(&ph_phiso_);
+  ph_passLooseID_branch = tree->GetBranch("ph_passLooseID");
+  if (ph_passLooseID_branch) ph_passLooseID_branch->SetAddress(&ph_passLooseID_);
+  ph_passMediumID_branch = tree->GetBranch("ph_passMediumID");
+  if (ph_passMediumID_branch) ph_passMediumID_branch->SetAddress(&ph_passMediumID_);
+  ph_passTightID_branch = tree->GetBranch("ph_passTightID");
+  if (ph_passTightID_branch) ph_passTightID_branch->SetAddress(&ph_passTightID_);
   ph_overlapJetId_branch = tree->GetBranch("ph_overlapJetId");
   if (ph_overlapJetId_branch) ph_overlapJetId_branch->SetAddress(&ph_overlapJetId_);
-  ph_pt_branch = tree->GetBranch("ph_pt");
-  if (ph_pt_branch) ph_pt_branch->SetAddress(&ph_pt_);
-  ph_eta_branch = tree->GetBranch("ph_eta");
-  if (ph_eta_branch) ph_eta_branch->SetAddress(&ph_eta_);
-  ph_phi_branch = tree->GetBranch("ph_phi");
-  if (ph_phi_branch) ph_phi_branch->SetAddress(&ph_phi_);
-  ph_mass_branch = tree->GetBranch("ph_mass");
-  if (ph_mass_branch) ph_mass_branch->SetAddress(&ph_mass_);
   ph_mcMatchId_branch = tree->GetBranch("ph_mcMatchId");
   if (ph_mcMatchId_branch) ph_mcMatchId_branch->SetAddress(&ph_mcMatchId_);
   ph_genIso04_branch = tree->GetBranch("ph_genIso04");
@@ -1310,6 +1318,9 @@ void StopTree::GetEntry(unsigned int idx) {
   weight_ISRnjets_isLoaded = false;
   weight_ISRnjets_UP_isLoaded = false;
   weight_ISRnjets_DN_isLoaded = false;
+  weight_L1prefire_isLoaded = false;
+  weight_L1prefire_UP_isLoaded = false;
+  weight_L1prefire_DN_isLoaded = false;
   NISRjets_isLoaded = false;
   NnonISRjets_isLoaded = false;
   sparms_names_isLoaded = false;
@@ -1371,6 +1382,7 @@ void StopTree::GetEntry(unsigned int idx) {
   lep1_p4_isLoaded = false;
   lep1_mcp4_isLoaded = false;
   lep1_mc_motherid_isLoaded = false;
+  lep1_etaSC_isLoaded = false;
   lep1_dphiMET_isLoaded = false;
   lep1_dphiMET_jup_isLoaded = false;
   lep1_dphiMET_jdown_isLoaded = false;
@@ -1388,6 +1400,7 @@ void StopTree::GetEntry(unsigned int idx) {
   lep2_p4_isLoaded = false;
   lep2_mcp4_isLoaded = false;
   lep2_mc_motherid_isLoaded = false;
+  lep2_etaSC_isLoaded = false;
   lep2_dphiMET_isLoaded = false;
   lep2_dphiMET_jup_isLoaded = false;
   lep2_dphiMET_jdown_isLoaded = false;
@@ -1400,13 +1413,12 @@ void StopTree::GetEntry(unsigned int idx) {
   ph_chiso_isLoaded = false;
   ph_nhiso_isLoaded = false;
   ph_phiso_isLoaded = false;
+  ph_passLooseID_isLoaded = false;
+  ph_passMediumID_isLoaded = false;
+  ph_passTightID_isLoaded = false;
   ph_overlapJetId_isLoaded = false;
   ph_p4_isLoaded = false;
   ph_mcp4_isLoaded = false;
-  ph_pt_isLoaded = false;
-  ph_eta_isLoaded = false;
-  ph_phi_isLoaded = false;
-  ph_mass_isLoaded = false;
   ph_mcMatchId_isLoaded = false;
   ph_genIso04_isLoaded = false;
   ph_drMinParton_isLoaded = false;
@@ -1898,6 +1910,9 @@ void StopTree::LoadAllBranches() {
   if (weight_ISRnjets_branch != 0) weight_ISRnjets();
   if (weight_ISRnjets_UP_branch != 0) weight_ISRnjets_UP();
   if (weight_ISRnjets_DN_branch != 0) weight_ISRnjets_DN();
+  if (weight_L1prefire_branch != 0) weight_L1prefire();
+  if (weight_L1prefire_UP_branch != 0) weight_L1prefire_UP();
+  if (weight_L1prefire_DN_branch != 0) weight_L1prefire_DN();
   if (NISRjets_branch != 0) NISRjets();
   if (NnonISRjets_branch != 0) NnonISRjets();
   if (sparms_names_branch != 0) sparms_names();
@@ -1959,6 +1974,7 @@ void StopTree::LoadAllBranches() {
   if (lep1_p4_branch != 0) lep1_p4();
   if (lep1_mcp4_branch != 0) lep1_mcp4();
   if (lep1_mc_motherid_branch != 0) lep1_mc_motherid();
+  if (lep1_etaSC_branch != 0) lep1_etaSC();
   if (lep1_dphiMET_branch != 0) lep1_dphiMET();
   if (lep1_dphiMET_jup_branch != 0) lep1_dphiMET_jup();
   if (lep1_dphiMET_jdown_branch != 0) lep1_dphiMET_jdown();
@@ -1976,6 +1992,7 @@ void StopTree::LoadAllBranches() {
   if (lep2_p4_branch != 0) lep2_p4();
   if (lep2_mcp4_branch != 0) lep2_mcp4();
   if (lep2_mc_motherid_branch != 0) lep2_mc_motherid();
+  if (lep2_etaSC_branch != 0) lep2_etaSC();
   if (lep2_dphiMET_branch != 0) lep2_dphiMET();
   if (lep2_dphiMET_jup_branch != 0) lep2_dphiMET_jup();
   if (lep2_dphiMET_jdown_branch != 0) lep2_dphiMET_jdown();
@@ -1988,13 +2005,12 @@ void StopTree::LoadAllBranches() {
   if (ph_chiso_branch != 0) ph_chiso();
   if (ph_nhiso_branch != 0) ph_nhiso();
   if (ph_phiso_branch != 0) ph_phiso();
+  if (ph_passLooseID_branch != 0) ph_passLooseID();
+  if (ph_passMediumID_branch != 0) ph_passMediumID();
+  if (ph_passTightID_branch != 0) ph_passTightID();
   if (ph_overlapJetId_branch != 0) ph_overlapJetId();
   if (ph_p4_branch != 0) ph_p4();
   if (ph_mcp4_branch != 0) ph_mcp4();
-  if (ph_pt_branch != 0) ph_pt();
-  if (ph_eta_branch != 0) ph_eta();
-  if (ph_phi_branch != 0) ph_phi();
-  if (ph_mass_branch != 0) ph_mass();
   if (ph_mcMatchId_branch != 0) ph_mcMatchId();
   if (ph_genIso04_branch != 0) ph_genIso04();
   if (ph_drMinParton_branch != 0) ph_drMinParton();
@@ -4044,6 +4060,45 @@ const float &StopTree::weight_ISRnjets_DN() {
   return weight_ISRnjets_DN_;
 }
 
+const float &StopTree::weight_L1prefire() {
+  if (not weight_L1prefire_isLoaded) {
+    if (weight_L1prefire_branch != 0) {
+      weight_L1prefire_branch->GetEntry(index);
+    } else {
+      printf("branch weight_L1prefire_branch does not exist!\n");
+      exit(1);
+    }
+    weight_L1prefire_isLoaded = true;
+  }
+  return weight_L1prefire_;
+}
+
+const float &StopTree::weight_L1prefire_UP() {
+  if (not weight_L1prefire_UP_isLoaded) {
+    if (weight_L1prefire_UP_branch != 0) {
+      weight_L1prefire_UP_branch->GetEntry(index);
+    } else {
+      printf("branch weight_L1prefire_UP_branch does not exist!\n");
+      exit(1);
+    }
+    weight_L1prefire_UP_isLoaded = true;
+  }
+  return weight_L1prefire_UP_;
+}
+
+const float &StopTree::weight_L1prefire_DN() {
+  if (not weight_L1prefire_DN_isLoaded) {
+    if (weight_L1prefire_DN_branch != 0) {
+      weight_L1prefire_DN_branch->GetEntry(index);
+    } else {
+      printf("branch weight_L1prefire_DN_branch does not exist!\n");
+      exit(1);
+    }
+    weight_L1prefire_DN_isLoaded = true;
+  }
+  return weight_L1prefire_DN_;
+}
+
 const int &StopTree::NISRjets() {
   if (not NISRjets_isLoaded) {
     if (NISRjets_branch != 0) {
@@ -4837,6 +4892,19 @@ const int &StopTree::lep1_mc_motherid() {
   return lep1_mc_motherid_;
 }
 
+const float &StopTree::lep1_etaSC() {
+  if (not lep1_etaSC_isLoaded) {
+    if (lep1_etaSC_branch != 0) {
+      lep1_etaSC_branch->GetEntry(index);
+    } else {
+      printf("branch lep1_etaSC_branch does not exist!\n");
+      exit(1);
+    }
+    lep1_etaSC_isLoaded = true;
+  }
+  return lep1_etaSC_;
+}
+
 const float &StopTree::lep1_dphiMET() {
   if (not lep1_dphiMET_isLoaded) {
     if (lep1_dphiMET_branch != 0) {
@@ -5058,6 +5126,19 @@ const int &StopTree::lep2_mc_motherid() {
   return lep2_mc_motherid_;
 }
 
+const float &StopTree::lep2_etaSC() {
+  if (not lep2_etaSC_isLoaded) {
+    if (lep2_etaSC_branch != 0) {
+      lep2_etaSC_branch->GetEntry(index);
+    } else {
+      printf("branch lep2_etaSC_branch does not exist!\n");
+      exit(1);
+    }
+    lep2_etaSC_isLoaded = true;
+  }
+  return lep2_etaSC_;
+}
+
 const float &StopTree::lep2_dphiMET() {
   if (not lep2_dphiMET_isLoaded) {
     if (lep2_dphiMET_branch != 0) {
@@ -5214,6 +5295,45 @@ const vector<float> &StopTree::ph_phiso() {
   return *ph_phiso_;
 }
 
+const vector<bool> &StopTree::ph_passLooseID() {
+  if (not ph_passLooseID_isLoaded) {
+    if (ph_passLooseID_branch != 0) {
+      ph_passLooseID_branch->GetEntry(index);
+    } else {
+      printf("branch ph_passLooseID_branch does not exist!\n");
+      exit(1);
+    }
+    ph_passLooseID_isLoaded = true;
+  }
+  return *ph_passLooseID_;
+}
+
+const vector<bool> &StopTree::ph_passMediumID() {
+  if (not ph_passMediumID_isLoaded) {
+    if (ph_passMediumID_branch != 0) {
+      ph_passMediumID_branch->GetEntry(index);
+    } else {
+      printf("branch ph_passMediumID_branch does not exist!\n");
+      exit(1);
+    }
+    ph_passMediumID_isLoaded = true;
+  }
+  return *ph_passMediumID_;
+}
+
+const vector<bool> &StopTree::ph_passTightID() {
+  if (not ph_passTightID_isLoaded) {
+    if (ph_passTightID_branch != 0) {
+      ph_passTightID_branch->GetEntry(index);
+    } else {
+      printf("branch ph_passTightID_branch does not exist!\n");
+      exit(1);
+    }
+    ph_passTightID_isLoaded = true;
+  }
+  return *ph_passTightID_;
+}
+
 const vector<int> &StopTree::ph_overlapJetId() {
   if (not ph_overlapJetId_isLoaded) {
     if (ph_overlapJetId_branch != 0) {
@@ -5251,58 +5371,6 @@ const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &StopTre
     ph_mcp4_isLoaded = true;
   }
   return *ph_mcp4_;
-}
-
-const vector<float> &StopTree::ph_pt() {
-  if (not ph_pt_isLoaded) {
-    if (ph_pt_branch != 0) {
-      ph_pt_branch->GetEntry(index);
-    } else {
-      printf("branch ph_pt_branch does not exist!\n");
-      exit(1);
-    }
-    ph_pt_isLoaded = true;
-  }
-  return *ph_pt_;
-}
-
-const vector<float> &StopTree::ph_eta() {
-  if (not ph_eta_isLoaded) {
-    if (ph_eta_branch != 0) {
-      ph_eta_branch->GetEntry(index);
-    } else {
-      printf("branch ph_eta_branch does not exist!\n");
-      exit(1);
-    }
-    ph_eta_isLoaded = true;
-  }
-  return *ph_eta_;
-}
-
-const vector<float> &StopTree::ph_phi() {
-  if (not ph_phi_isLoaded) {
-    if (ph_phi_branch != 0) {
-      ph_phi_branch->GetEntry(index);
-    } else {
-      printf("branch ph_phi_branch does not exist!\n");
-      exit(1);
-    }
-    ph_phi_isLoaded = true;
-  }
-  return *ph_phi_;
-}
-
-const vector<float> &StopTree::ph_mass() {
-  if (not ph_mass_isLoaded) {
-    if (ph_mass_branch != 0) {
-      ph_mass_branch->GetEntry(index);
-    } else {
-      printf("branch ph_mass_branch does not exist!\n");
-      exit(1);
-    }
-    ph_mass_isLoaded = true;
-  }
-  return *ph_mass_;
 }
 
 const vector<int> &StopTree::ph_mcMatchId() {
@@ -10099,6 +10167,9 @@ const float &weight_PUdown() { return babyAnalyzer.weight_PUdown(); }
 const float &weight_ISRnjets() { return babyAnalyzer.weight_ISRnjets(); }
 const float &weight_ISRnjets_UP() { return babyAnalyzer.weight_ISRnjets_UP(); }
 const float &weight_ISRnjets_DN() { return babyAnalyzer.weight_ISRnjets_DN(); }
+const float &weight_L1prefire() { return babyAnalyzer.weight_L1prefire(); }
+const float &weight_L1prefire_UP() { return babyAnalyzer.weight_L1prefire_UP(); }
+const float &weight_L1prefire_DN() { return babyAnalyzer.weight_L1prefire_DN(); }
 const int &NISRjets() { return babyAnalyzer.NISRjets(); }
 const int &NnonISRjets() { return babyAnalyzer.NnonISRjets(); }
 const vector<string> &sparms_names() { return babyAnalyzer.sparms_names(); }
@@ -10160,6 +10231,7 @@ const bool &lep1_passVeto() { return babyAnalyzer.lep1_passVeto(); }
 const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &lep1_p4() { return babyAnalyzer.lep1_p4(); }
 const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &lep1_mcp4() { return babyAnalyzer.lep1_mcp4(); }
 const int &lep1_mc_motherid() { return babyAnalyzer.lep1_mc_motherid(); }
+const float &lep1_etaSC() { return babyAnalyzer.lep1_etaSC(); }
 const float &lep1_dphiMET() { return babyAnalyzer.lep1_dphiMET(); }
 const float &lep1_dphiMET_jup() { return babyAnalyzer.lep1_dphiMET_jup(); }
 const float &lep1_dphiMET_jdown() { return babyAnalyzer.lep1_dphiMET_jdown(); }
@@ -10177,6 +10249,7 @@ const bool &lep2_passVeto() { return babyAnalyzer.lep2_passVeto(); }
 const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &lep2_p4() { return babyAnalyzer.lep2_p4(); }
 const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &lep2_mcp4() { return babyAnalyzer.lep2_mcp4(); }
 const int &lep2_mc_motherid() { return babyAnalyzer.lep2_mc_motherid(); }
+const float &lep2_etaSC() { return babyAnalyzer.lep2_etaSC(); }
 const float &lep2_dphiMET() { return babyAnalyzer.lep2_dphiMET(); }
 const float &lep2_dphiMET_jup() { return babyAnalyzer.lep2_dphiMET_jup(); }
 const float &lep2_dphiMET_jdown() { return babyAnalyzer.lep2_dphiMET_jdown(); }
@@ -10189,13 +10262,12 @@ const vector<float> &ph_r9() { return babyAnalyzer.ph_r9(); }
 const vector<float> &ph_chiso() { return babyAnalyzer.ph_chiso(); }
 const vector<float> &ph_nhiso() { return babyAnalyzer.ph_nhiso(); }
 const vector<float> &ph_phiso() { return babyAnalyzer.ph_phiso(); }
+const vector<bool> &ph_passLooseID() { return babyAnalyzer.ph_passLooseID(); }
+const vector<bool> &ph_passMediumID() { return babyAnalyzer.ph_passMediumID(); }
+const vector<bool> &ph_passTightID() { return babyAnalyzer.ph_passTightID(); }
 const vector<int> &ph_overlapJetId() { return babyAnalyzer.ph_overlapJetId(); }
 const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &ph_p4() { return babyAnalyzer.ph_p4(); }
 const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &ph_mcp4() { return babyAnalyzer.ph_mcp4(); }
-const vector<float> &ph_pt() { return babyAnalyzer.ph_pt(); }
-const vector<float> &ph_eta() { return babyAnalyzer.ph_eta(); }
-const vector<float> &ph_phi() { return babyAnalyzer.ph_phi(); }
-const vector<float> &ph_mass() { return babyAnalyzer.ph_mass(); }
 const vector<int> &ph_mcMatchId() { return babyAnalyzer.ph_mcMatchId(); }
 const vector<float> &ph_genIso04() { return babyAnalyzer.ph_genIso04(); }
 const vector<float> &ph_drMinParton() { return babyAnalyzer.ph_drMinParton(); }
