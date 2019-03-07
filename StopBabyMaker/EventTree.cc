@@ -384,6 +384,9 @@ void EventTree::Reset ()
     weight_ISRnjets     = -9999;
     weight_ISRnjets_UP  = -9999;
     weight_ISRnjets_DN  = -9999;
+    weight_L1prefire    = -9999;
+    weight_L1prefire_UP = -9999;
+    weight_L1prefire_DN = -9999;
     NISRjets            = -9999;
     NnonISRjets         = -9999;
 
@@ -721,6 +724,9 @@ void EventTree::SetBranches (TTree* tree)
     tree->Branch("weight_ISRnjets", &weight_ISRnjets);
     tree->Branch("weight_ISRnjets_UP", &weight_ISRnjets_UP);
     tree->Branch("weight_ISRnjets_DN", &weight_ISRnjets_DN);
+    tree->Branch("weight_L1prefire", &weight_L1prefire);
+    tree->Branch("weight_L1prefire_UP", &weight_L1prefire_UP);
+    tree->Branch("weight_L1prefire_DN", &weight_L1prefire_DN);
     tree->Branch("NISRjets", &NISRjets);
     tree->Branch("NnonISRjets", &NnonISRjets);
     tree->Branch("sparms_names", &sparms_names);

@@ -244,6 +244,9 @@ public:
     float weight_ISRnjets;
     float weight_ISRnjets_UP;
     float weight_ISRnjets_DN;
+    float weight_L1prefire;
+    float weight_L1prefire_UP;
+    float weight_L1prefire_DN;
     float weight_analysisbtagsf;//medium if Mlb<175, tight if Mlb>175
     float weight_analysisbtagsf_heavy_UP;
     float weight_analysisbtagsf_light_UP;

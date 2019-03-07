@@ -101,7 +101,7 @@ int main(int argc, char **argv){
   // Skim Parameters
   //
   mylooper->skim_nvtx            = 1;
-  mylooper->skim_met             = 150;
+  mylooper->skim_met             = 125;
   mylooper->skim_met_emuEvt      = 50;
 
   mylooper->skim_nGoodLep        = 1;
@@ -129,7 +129,8 @@ int main(int argc, char **argv){
 
   mylooper->applyJECfromFile    = true;  //THIS FLAG DECIDES NOW TOO IF JESUP/DOWN VALUES ARE CALCULATED
   mylooper->applyAK8JECfromFile = false; // not needed as DeepAK8 uses uncorrected jets
-  mylooper->JES_type            = 0;  //0 central, 1 up, -1 down <-- obsolete, not to be changed
+  mylooper->JES_type            = 0;     // 0 central, 1 up, -1 down <-- obsolete, not to be changed
+  mylooper->applyMETRecipeV2    = true;  // Do MET recipe V2 for 2017 data & MC, when applyJECfromFile
 
   mylooper->applyBtagSFs       = true;
   mylooper->applyLeptonSFs     = true;
@@ -217,6 +218,7 @@ int main(int argc, char **argv){
     }
   };
   parseAndSet_b("applyJECfromFile" , mylooper->applyJECfromFile);
+  parseAndSet_b("applyMETRecipeV2" , mylooper->applyMETRecipeV2);
   parseAndSet_b("fillPhoton"       , mylooper->fillPhoton);
   parseAndSet_b("fillZll"          , mylooper->fillZll);
 
@@ -256,13 +258,13 @@ int main(int argc, char **argv){
     char hostname_cstr[64];
     gethostname(hostname_cstr, 64);
     TString hostname(hostname_cstr);
-    cout << ">>> Hostname is " << hostname << endl;
+    cout << "[runBabyMaker] >> Hostname is " << hostname << endl;
     bool useXrootd = !hostname.Contains("t2.ucsd.edu");
     if (!useXrootd) {  // one last check in case /hadoop is still not mounted
       ifstream hadoopdir("/hadoop/cms");
       useXrootd = (!hadoopdir.good());
     }
-    if (useXrootd) cout << ">>> Using xrootd for the input files." << endl;
+    if (useXrootd) cout << "[runBabyMaker] >> Using xrootd for the input files." << endl;
 
     vector<TString> vecInFiles;
     TString infiles(input);
@@ -276,7 +278,7 @@ int main(int argc, char **argv){
     for (TString file : vecInFiles) {
       if (useXrootd && file.Contains("/hadoop"))
         file.ReplaceAll("/hadoop/cms", "root://cmsxrootd.fnal.gov/");
-      cout << "Add sample " << file << " to files to be processed." << endl;
+      cout << "[runBabyMaker] >> Add sample " << file << " to files to be processed." << endl;
       sample->Add(file);
     }
   } else {
@@ -289,7 +291,7 @@ int main(int argc, char **argv){
         fileexists = infile.good();
       }
       if(fileexists){
-        cout << "Add sample " << samplelist[i] << " to files to be processed." << endl;
+        cout << "[runBabyMaker] >> Add sample " << samplelist[i] << " to files to be processed." << endl;
         sample->Add(samplelist[i].Data());
       }
     }

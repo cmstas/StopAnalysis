@@ -698,19 +698,26 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
       //This must come before any continue affecting signal scans
       if(isSignalFromFileName){
         //get stop and lsp mass from sparms
-        for(unsigned int nsparm = 0; nsparm<sparm_names().size(); ++nsparm){
-          //if(sparm_names().at(nsparm).Contains("mGluino")) StopEvt.mass_stop = sparm_values().at(nsparm);//dummy for testing as only T1's exist
-          if(sparm_names().at(nsparm).Contains("mStop") ) StopEvt.mass_stop     = sparm_values().at(nsparm);
-          if(sparm_names().at(nsparm).Contains("mCharg")) StopEvt.mass_chargino = sparm_values().at(nsparm);
-          if(sparm_names().at(nsparm).Contains("mLSP")  ) StopEvt.mass_lsp      = sparm_values().at(nsparm);
-          if(sparm_names().at(nsparm).Contains("mGl")   ) StopEvt.mass_gluino   = sparm_values().at(nsparm);
+        if (gconf.cmssw_ver >= 94) {  // the sparm_names no longer exists after this
+          if (sparm_values().size() < 2) cout << "[looper] ERROR: Sample is determined fastsim but not having 2 sparm values!!\n";
+          StopEvt.mass_stop = sparm_values().at(0);
+          StopEvt.mass_lsp  = sparm_values().at(1);
+          if (isTChiFromFileName) StopEvt.mass_chargino = sparm_values().at(0);
+        } else {
+          for(unsigned int nsparm = 0; nsparm<sparm_names().size(); ++nsparm){
+            //if(sparm_names().at(nsparm).Contains("mGluino")) StopEvt.mass_stop = sparm_values().at(nsparm);//dummy for testing as only T1's exist
+            if(sparm_names().at(nsparm).Contains("mStop") ) StopEvt.mass_stop     = sparm_values().at(nsparm);
+            if(sparm_names().at(nsparm).Contains("mCharg")) StopEvt.mass_chargino = sparm_values().at(nsparm);
+            if(sparm_names().at(nsparm).Contains("mLSP")  ) StopEvt.mass_lsp      = sparm_values().at(nsparm);
+            if(sparm_names().at(nsparm).Contains("mGl")   ) StopEvt.mass_gluino   = sparm_values().at(nsparm);
+          }
         }
 	//this is a stupid way of doing stuff, but it should be more stable
 	mStop = StopEvt.mass_stop;
 	if(     StopEvt.mass_stop<0&&StopEvt.mass_gluino>0)   mStop = StopEvt.mass_gluino;
 	else if(StopEvt.mass_stop<0&&StopEvt.mass_chargino>0) mStop = StopEvt.mass_chargino;
 	mLSP = StopEvt.mass_lsp;
-        //std::cout << "Got signal mass point mStop " << mStop << " mLSP " << mLSP << std::endl;
+        if (mStop < 0 || mLSP < 0) cout << "[looper] WARNING: Not getting valid signal mass points!! mStop = " << mStop << ", mLSP = " << mLSP << endl;
         if(genps_weight()>0)      histNEvts->Fill(mStop,mLSP,1);
         else if(genps_weight()<0) histNEvts->Fill(mStop,mLSP,-1);
         if(genps_weight()>0)      counterhistSig->Fill(mStop,mLSP,36,1);
@@ -1045,10 +1052,12 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
       //save met here because of JEC
       if(applyJECfromFile){
         int useCleanedMET = 0;
-        if (gconf.year == 2017 && !thisFile.Contains("09May2018")) {
+        if (applyMETRecipeV2 && gconf.year == 2017) {
           useCleanedMET = 2;
-          StopEvt.pfmet_original = evt_old_pfmet_raw();
-          StopEvt.pfmet_original_phi = evt_old_pfmetPhi_raw();
+          if (!thisFile.Contains("09May2018")) {
+            StopEvt.pfmet_original = evt_old_pfmet_raw();
+            StopEvt.pfmet_original_phi = evt_old_pfmetPhi_raw();
+          }
         }
         pair<float,float> newmet;
         pair<float,float> newmet_jup;
@@ -1474,15 +1483,20 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
         StopEvt.filt_jetWithBadMuon_jdown = !isbadmuonjet;
       }
 
+      StopEvt.weight_L1prefire    = 1;
+      StopEvt.weight_L1prefire_UP = 1;
+      StopEvt.weight_L1prefire_DN = 1;
       if (!evt_isRealData()){
+        if (gconf.year == 2016 || gconf.year == 2017)
+          std::tie(StopEvt.weight_L1prefire, StopEvt.weight_L1prefire_UP, StopEvt.weight_L1prefire_DN) = getPrefireInfo(gconf.year);
+
         // Input should have pt > 30, |eta| < 2.4, PF Loose ID, leptons removed
         int NISRjets = get_nisrMatch(jets.ak4pfjets_p4);
+        float unc_ISRnjets = get_isrUnc(NISRjets, gconf.year);
 
         StopEvt.weight_ISRnjets = get_isrWeight(NISRjets, gconf.year);
-        float unc_ISRnjets = get_isrUnc(NISRjets, gconf.year);
         StopEvt.weight_ISRnjets_UP = StopEvt.weight_ISRnjets + unc_ISRnjets;
         StopEvt.weight_ISRnjets_DN = StopEvt.weight_ISRnjets - unc_ISRnjets;
-
         StopEvt.NISRjets = NISRjets;
         StopEvt.NnonISRjets = jets.ngoodjets - NISRjets;
 
