@@ -141,15 +141,14 @@ def makeBkgEstimateTablesLostLepton():
     # f1 = r.TFile('../StopLooper/output/samp17_v13_tf/lostlepton.root')
     # f2 = r.TFile('../StopLooper/output/samp17_v13_tf_v1/lostlepton_wMETextrp.root')
     # f1 = r.TFile('../StopLooper/output/comb1617_tf/lostlepton.root')
-    f1 = r.TFile('../StopLooper/output/combRun2_v30_s3/lostlepton.root')
+    f1 = r.TFile('../StopLooper/output/combRun2_v37_c5/lostlepton_run2.root')
 
-    # srNames = ['srA0', 'srA1', 'srA2', 'srB0', 'srC0','srD0', 'srE0', 'srE1', 'srE2', 'srE3', 'srF0', 'srG0', 'srG1', 'srG2', 'srG3', 'srH0',]
     srNames = ['srA0', 'srA1', 'srA2', 'srB', 'srC','srD', 'srE0', 'srE1', 'srE2', 'srE3', 'srF', 'srG0', 'srG1', 'srG2', 'srG3', 'srH',]
 
-    print '\n ----------------------------------- lost lepton w/o MET extrapolation ---------------------------------------'
-    tab1 = printTableDataDriven(f1, srNames)
-    tab1.set_theme_latex()
-    tab1.print_pdf('lostlepRun2_allSRs.pdf')
+    # print '\n ----------------------------------- lost lepton w/o MET extrapolation ---------------------------------------'
+    # tab1 = printTableDataDriven(f1, srNames)
+    # tab1.set_theme_latex()
+    # tab1.print_pdf('lostlepRun2_allSRs.pdf')
 
     # print '\n ----------------------------------- lost lepton w/ MET extrapolation ----------------------------------------'
     # tab2 = printTableDataDriven(f2, srNames)
@@ -163,49 +162,68 @@ def makeBkgEstimateTablesLostLepton():
 
     print '\n ----------------------------------- lost lepton separate by top tags ----------------------------------------'
 
+    # srNames = ['srA0', 'srB', 'srC','srD', 'srE0', 'srF', 'srG0', 'srH',]
+    # tab0 = printTableDataDriven(f1, srNames)
+    # tab0.set_theme_latex()
+    # tab0.print_pdf('lostlepRun2_inclTopTags.pdf')
+
+    # srNames = ['srA1', 'srE1', 'srG1',]
+    # tab1 = printTableDataDriven(f1, srNames)
+    # tab1.set_theme_latex()
+    # tab1.print_pdf('lostlepRun2_noTopTags.pdf')
+
+    # srNames = ['srA2', 'srE2', 'srG2',]
+    # tab2 = printTableDataDriven(f1, srNames)
+    # tab2.set_theme_latex()
+    # tab2.print_pdf('lostlepRun2_mergeTags.pdf')
+
+    # srNames = ['srE3', 'srG3',]
+    # tab3 = printTableDataDriven(f1, srNames)
+    # tab3.set_theme_latex()
+    # tab3.print_pdf('lostlepRun2_tfresTags.pdf')
+
+    srNames = ['srI',]
+    tab4 = printTableDataDriven(f1, srNames)
+    tab4.set_theme_latex()
+    tab4.print_pdf('lostlepRun2_corridor5.pdf')
+
+
+def makeBkgEstimateTables1LepFromW():
+    f1 = r.TFile('../StopLooper/output/combRun2_v37_s5/1lepFromW_run2.root')
+
+    srNames = ['srA0', 'srA1', 'srA2', 'srB', 'srC','srD', 'srE0', 'srE1', 'srE2', 'srE3', 'srF', 'srG0', 'srG1', 'srG2', 'srG3', 'srH',]
+
+    print '\n ----------------------------------- lost lepton w/o MET extrapolation ---------------------------------------'
+    tab1 = printTableDataDriven(f1, srNames)
+    tab1.set_theme_latex()
+    tab1.print_pdf('1lepWRun2_allSRs.pdf')
+
+    print '\n ----------------------------------- lost lepton separate by top tags ----------------------------------------'
+
     srNames = ['srA0', 'srB', 'srC','srD', 'srE0', 'srF', 'srG0', 'srH',]
     tab0 = printTableDataDriven(f1, srNames)
     tab0.set_theme_latex()
-    tab0.print_pdf('lostlepRun2_inclTopTags.pdf')
+    tab0.print_pdf('1lepWRun2_inclTopTags.pdf')
 
     srNames = ['srA1', 'srE1', 'srG1',]
     tab1 = printTableDataDriven(f1, srNames)
     tab1.set_theme_latex()
-    tab1.print_pdf('lostlepRun2_noTopTags.pdf')
+    tab1.print_pdf('1lepWRun2_noTopTags.pdf')
 
     srNames = ['srA2', 'srE2', 'srG2',]
     tab2 = printTableDataDriven(f1, srNames)
     tab2.set_theme_latex()
-    tab2.print_pdf('lostlepRun2_mergeTags.pdf')
+    tab2.print_pdf('1lepWRun2_mergeTags.pdf')
 
     srNames = ['srE3', 'srG3',]
     tab3 = printTableDataDriven(f1, srNames)
     tab3.set_theme_latex()
-    tab3.print_pdf('lostlepRun2_tfresTags.pdf')
+    tab3.print_pdf('1lepWRun2_tfresTags.pdf')
 
-    # f3 = r.TFile('../StopLooper/output/samp16_v14_tf_80X/lostlepton.root')
-
-    # print '\n ----------------------------------- lost lepton separate by top tags ----------------------------------------'
-
-    # srNames = ['srA0', 'srB0', 'srC0','srD0', 'srE0', 'srF0', 'srG0', 'srH0',]
-    # tab0 = printTableDataDriven(f3, srNames)
-    # tab0.set_theme_latex()
-    # tab0.print_pdf('lostlep16_inclTopTags.pdf')
-
-    # srNames = ['srA1', 'srE1', 'srG1',]
-    # tab1 = printTableDataDriven(f3, srNames)
-    # tab1.set_theme_latex()
-    # tab1.print_pdf('lostlep16_noTopTags.pdf')
-
-    # srNames = ['srA2', 'srE2', 'srG2',]
-    # tab2 = printTableDataDriven(f3, srNames)
-    # tab2.set_theme_latex()
-    # tab2.print_pdf('lostlep16_mergeTags.pdf')
-
-    # srNames = ['srE3', 'srG3',]
-    # tab3 = printTableDataDriven(f3, srNames)
-    # tab3.set_theme_latex()
-    # tab3.print_pdf('lostlep16_tfresTags.pdf')
+    srNames = ['srI',]
+    tab4 = printTableDataDriven(f1, srNames)
+    tab4.set_theme_latex()
+    tab4.print_pdf('1lepWRun2_corridor.pdf')
 
 
 def makeMETExtrInfoTable():
@@ -245,10 +263,8 @@ def makeMETExtrInfoTable():
     tab.print_table()
 
 
-def makeBkgCompositionTable():
-    f1 = r.TFile('../StopLooper/output/combRun2_v30_s3/allBkg_run2.root')
+def makeBkgCompositionTable(f1, srNames, savename='run2'):
 
-    srNames = ['srA0', 'srA1', 'srA2', 'srB', 'srC','srD', 'srE0', 'srE1', 'srE2', 'srE3', 'srF', 'srG0', 'srG1', 'srG2', 'srG3', 'srH',]
     bkgs = ['2lep', '1lepW', '1lepTop', 'Znunu']
 
     preds_tot = getYieldEInTopoBins(f1, srNames, 'metbins')
@@ -263,7 +279,7 @@ def makeBkgCompositionTable():
 
     tab.print_table()
     tab.set_theme_latex()
-    tab.print_pdf('bkgCompositionFraction_run2.pdf')
+    tab.print_pdf('bkgCompositionFraction_'+savename+'.pdf')
 
     tab2 = Table()
     tab2.add_column('SR name', sum([[sr]*n for sr, n in zip(srNames, map(len, preds_tot))], []))
@@ -274,7 +290,7 @@ def makeBkgCompositionTable():
     tab2.add_column('Total', [y.round(2) for y in sum(preds_tot,[])])
     tab2.print_table()
     tab2.set_theme_latex()
-    tab2.print_pdf('bkgCompositionYields_run2.pdf')
+    tab2.print_pdf('bkgCompositionYields_'+savename+'.pdf')
 
 
 def makeBkgEstimationTableWJets():
@@ -308,12 +324,20 @@ if __name__ == '__main__':
 
     r.gROOT.SetBatch(1)
 
-    # makeBkgEstimateTablesLostLepton()
+    # f1 = r.TFile('../StopLooper/output/combRun2_v37_s5/allBkg_run2.root')
+    # srNames = ['srA0', 'srA1', 'srA2', 'srB', 'srC','srD', 'srE0', 'srE1', 'srE2', 'srE3', 'srF', 'srG0', 'srG1', 'srG2', 'srG3', 'srH',]
 
-    # makeBkgCompositionTable()
+    # makeBkgCompositionTable(f1, srNames,  'run2_std')
+    # makeBkgCompositionTable(f1, ['srI',], 'run2_cor')
+
+    makeBkgEstimateTablesLostLepton()
+    # makeBkgEstimateTables1LepFromW()
+
+    f1 = r.TFile('../StopLooper/output/combRun2_v37_c5/allBkg_run2.root')
+    makeBkgCompositionTable(f1, ['srI',], 'run2_cor5')
 
     # makeBkgEstimationTableWJets()
 
-    makeTFComparisonTable()
+    # makeTFComparisonTable()
 
     # makeMETExtrInfoTable()

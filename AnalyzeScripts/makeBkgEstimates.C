@@ -2,7 +2,7 @@
 bool useMetExtrapolation = true;
 double extr_threshold = 5;  // minimum number of events in a bin to not need an MET extrapolation
 bool doCRPurityError = true;
-double extr_TFcap = 0.6;  // maximum value for the transfer factor to not do MET extrapolation
+double extr_TFcap = 1.2;  // maximum value for the transfer factor to not do MET extrapolation
 double maxFractionForMC = 0.10;  // minimum value for bkg fraction in SR to do extrapolation, else take from MC
 
 void dataDrivenFromCR(TFile* fdata, TFile* fmc, TFile* fout, TString ddtype, TString gentype) {
@@ -89,7 +89,6 @@ void dataDrivenFromCR(TFile* fdata, TFile* fmc, TFile* fout, TString ddtype, TSt
       }
 
       if (useMetExtrapolation && extr_start_bin != lastbin) {
-        hist_MC_CR->Clone("h_MCyields_CR_raw")->Write();
         combineYieldsInExtrBins(hist_MC_CR);
       }
 
