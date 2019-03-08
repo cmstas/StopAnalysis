@@ -56,6 +56,8 @@ const bool doNvtxReweight = false;
 const bool doTopTagging = true;
 // turn on to apply json file to data
 const bool applyGoodRunList = true;
+// veto 2018 events with an electron land in the HEM region
+const bool doHEMElectronVeto = false;
 // re-run resolved top MVA locally
 const bool runResTopMVA = false;
 // only produce yield histos
@@ -301,6 +303,9 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
     else if (year_ >= 2017)
       evtWgt.setDefaultSystematics(1);  // systematic set for 94X
 
+    // evtWgt.apply_L1prefire_sf = false;
+    evtWgt.apply_HEMveto_sf = doHEMElectronVeto;
+
     // evtWgt.setDefaultSystematics(evtWgtInfo::test_alloff);  // for test purpose
 
     evtWgt.Setup(samplestr, year_, doSystVariations, applyBtagSFfromFiles, applyLeptonSFfromFiles);
@@ -393,7 +398,8 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
           // if (mass_lsp() < 400 && mass_stop() < 1000) continue;
           // if (massdiff < 200 || massdiff > 400) continue;
           // if (massdiff < 200 || massdiff > 400 || mass_lsp() < 400) continue;
-          if (massdiff < 600 || mass_stop() < 1000) continue;
+          // if (massdiff < 600 || mass_stop() < 1000) continue;
+          if (massdiff < 300 || massdiff > 450) continue;
           plot2d("h2d_T2tt_masspts", mass_stop(), mass_lsp(), 1, SRVec.at(0).histMap, ";M_{stop} [GeV]; M_{lsp} [GeV]", 100, 300, 1300, 80, 0, 800);
         } else if (dsname.Contains("T2bW")) {
           float massdiff = mass_stop() - mass_lsp();
@@ -471,6 +477,12 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
         for (auto disc : tftops_disc()) {
           if (disc > lead_tftopdisc) lead_tftopdisc = disc;
         }
+      }
+
+      // HEM issue for 2018, that excess of electron happens at -4.7 < eta < -1.4, -1.6 < phi < -0.8
+      if (doHEMElectronVeto && year_ == 2018 && is_data() && run() >= 319077) {
+        if (abs(lep2_pdgid()) == 11 && lep2_p4().eta() < -1.4 && lep2_p4().phi() > -1.6 && lep2_p4().phi() < -0.8)
+          continue; // veto the events
       }
 
       // Filling the variables for analysis
@@ -739,14 +751,14 @@ void StopLooper::fillYieldHistos(SR& sr, float met, string suf, bool is_cr2l) {
     if (nvtxs() < 100) evtweight_ *= nvtxscale_[nvtxs()];  // only scale for data
   }
 
-  auto fillhists = [&](string s) {
-    if (is_fastsim_) {
+  auto fillhists = [&](string s, bool fill3D = true) {
+    if (is_fastsim_ && fill3D) {
       plot3d("hSMS_metbins"+s+suf, met, mass_stop(), mass_lsp(), evtweight_, sr.histMap, ";E^{miss}_{T} [GeV];M_{stop};M_{LSP}",
              sr.GetNMETBins(), sr.GetMETBinsPtr(), mStopBins.size()-1, mStopBins.data(), mLSPBins.size()-1, mLSPBins.data());
     } else {
       plot1d("h_metbins"+s+suf, met, evtweight_, sr.histMap, (sr.GetDetailName()+";E^{miss}_{T} [GeV]").c_str() , sr.GetNMETBins(), sr.GetMETBinsPtr());
     }
-    if (doSystVariations && (is_bkg_ || is_fastsim_) && jestype_ == 0) {
+    if (doSystVariations && (is_bkg_ || (is_fastsim_)) && fill3D && jestype_ == 0) {
       // Only run once when JES type == 0. JES variation dealt with above. No need for signals?
       for (int isyst = 3; isyst < evtWgtInfo::k_nSyst; ++isyst) {
         auto syst = (evtWgtInfo::systID) isyst;
@@ -761,9 +773,10 @@ void StopLooper::fillYieldHistos(SR& sr, float met, string suf, bool is_cr2l) {
     }
   };
   fillhists("");
+  if (is_fastsim_ && checkMassPt(1200, 50)) fillhists("_1200_50", false);
+  if (is_fastsim_ && checkMassPt(800, 400)) fillhists("_800_400", false);
   if (doGenClassification && is_bkg_) {
     // Only fill gen classification for background events, used for background estimation
-    // fillhists("_allclass");
     if (isZtoNuNu()) fillhists("_Znunu");
     else if (is2lep()) fillhists("_2lep");
     else if (is1lepFromW()) fillhists("_1lepW");
@@ -803,7 +816,7 @@ void StopLooper::fillHistosForSR(string suf) {
     // Plot kinematics histograms
     auto fillKineHists = [&](string s) {
       // Simple plot function plot1d to add extra plots anywhere in the code, is great for quick checks
-      plot1d("h_mt"+s,       values_[mt]      , evtweight_, sr.histMap, ";M_{T} [GeV]"                   , 12,  150, 600);
+      plot1d("h_mt"+s,       values_[mt]      , evtweight_, sr.histMap, ";M_{T} [GeV]"                   , 20,  150, 650);
       plot1d("h_met"+s,      values_[met]     , evtweight_, sr.histMap, ";#slash{E}_{T} [GeV]"           , 24,  250, 850);
       plot1d("h_metphi"+s,   values_[metphi]  , evtweight_, sr.histMap, ";#phi(#slash{E}_{T})"           , 34, -3.4, 3.4);
       plot1d("h_lep1pt"+s,   values_[lep1pt]  , evtweight_, sr.histMap, ";p_{T}(lepton) [GeV]"           , 24,    0, 600);
@@ -829,7 +842,7 @@ void StopLooper::fillHistosForSR(string suf) {
       // if ( (HLT_SingleEl() && abs(lep1_pdgid()) == 11 && values_[lep1pt] < 45) || (HLT_SingleMu() && abs(lep1_pdgid()) == 13 && values_[lep1pt] < 40) || (HLT_MET_MHT() && pfmet() > 250) ) {
       if (true) {
         plot1d("h_mt_h"+s,       values_[mt]       , evtweight_, sr.histMap, ";M_{T} [GeV]"                   , 24,   0, 600);
-        plot1d("h_met_h"+s,      values_[met]      , evtweight_, sr.histMap, ";#slash{E}_{T} [GeV]"           , 30,  50, 850);
+        plot1d("h_met_h"+s,      values_[met]      , evtweight_, sr.histMap, ";#slash{E}_{T} [GeV]"           , 32,  50, 850);
         plot1d("h_nbtags"+s,     values_[nbjet]    , evtweight_, sr.histMap, ";Number of b-tagged jets"       ,  5,   0,   5);
         plot1d("h_dphijmet_h"+s, values_[dphijmet] , evtweight_, sr.histMap, ";#Delta#phi(jet,#slash{E}_{T})" , 33, 0.0, 3.3);
         plot1d("h_dphilmet"+s,   values_[dphilmet] , evtweight_, sr.histMap, ";#Delta#phi(l,MET)"             , 32,   0, 3.2);
@@ -889,7 +902,7 @@ void StopLooper::fillHistosForCR2l(string suf) {
 
     auto fillKineHists = [&] (string s) {
       plot1d("h_finemet"+s,    values_[met]         , evtweight_, cr.histMap, ";#slash{E}_{T} [GeV]"           , 80,  0, 800);
-      plot1d("h_met"+s,        values_[met]         , evtweight_, cr.histMap, ";#slash{E}_{T} [GeV]"           , 24, 50, 650);
+      plot1d("h_met"+s,        values_[met]         , evtweight_, cr.histMap, ";#slash{E}_{T} [GeV]"           , 24, 50, 850);
       plot1d("h_metphi"+s,     values_[metphi]      , evtweight_, cr.histMap, ";#phi(#slash{E}_{T})"           , 40,  -4, 4);
       plot1d("h_mt"+s,         values_[mt]          , evtweight_, cr.histMap, ";M_{T} [GeV]"                   , 24,  0, 600);
       plot1d("h_tmod"+s,       values_[tmod]        , evtweight_, cr.histMap, ";Modified topness"              , 25, -10, 15);
@@ -902,8 +915,8 @@ void StopLooper::fillHistosForCR2l(string suf) {
       plot1d("h_mlepb"+s,      values_[mlb]         , evtweight_, cr.histMap, ";M_{#it{l}b} [GeV]"             , 24,  0, 600);
       plot1d("h_dphijmet"+s,   values_[dphijmet]    , evtweight_, cr.histMap, ";#Delta#phi(jet,#slash{E}_{T})" , 33,  0, 3.3);
       plot1d("h_nvtxs"+s,      values_[nvtx]        , evtweight_, cr.histMap, ";Number of vertices"            , 70,  1, 71);
-      plot1d("h_rlmet"+s,      values_[met_rl]      , evtweight_, cr.histMap, ";(#slash{E}+l_{2})_{T} [GeV]"   , 20, 250, 650);
-      plot1d("h_rlmt"+s,       values_[mt_rl]       , evtweight_, cr.histMap, ";M_{T} (removed lepton) [GeV]"  , 10,  150, 600);
+      plot1d("h_rlmet"+s,      values_[met_rl]      , evtweight_, cr.histMap, ";(#slash{E}+l_{2})_{T} [GeV]"   , 24, 250, 850);
+      plot1d("h_rlmt"+s,       values_[mt_rl]       , evtweight_, cr.histMap, ";M_{T} (removed lepton) [GeV]"  , 20,  150, 650);
       plot1d("h_rltmod"+s,     values_[tmod_rl]     , evtweight_, cr.histMap, ";Modified topness"              , 25, -10, 15);
       plot1d("h_rldphijmet"+s, values_[dphijmet_rl] , evtweight_, cr.histMap, ";#Delta#phi(jet,(#slash{E}+l_{2}))" , 33, 0.8, 3.3);
       plot1d("h_rldphilmet"+s, values_[dphilmet_rl] , evtweight_, cr.histMap, ";#Delta#phi(l,MET(rl))"         , 32,   0, 3.2);
@@ -919,8 +932,8 @@ void StopLooper::fillHistosForCR2l(string suf) {
 
       // if ( (HLT_SingleEl() && abs(lep1_pdgid()) == 11 && values_[lep1pt] < 45) || (HLT_SingleMu() && abs(lep1_pdgid()) == 13 && values_[lep1pt] < 40) || (HLT_MET_MHT() && pfmet() > 250) ) {
       if (true) {
-        plot1d("h_rlmet_h"+s,  values_[met_rl]   , evtweight_, cr.histMap, ";#slash{E}_{T} (with removed lepton) [GeV]" , 24, 50, 650);
-        plot1d("h_rlmt_h"+s,   values_[mt_rl]    , evtweight_, cr.histMap, ";M_{T} (with removed lepton) [GeV]" , 12, 0, 600);
+        plot1d("h_rlmet_h"+s,  values_[met_rl]   , evtweight_, cr.histMap, ";#slash{E}_{T} (with removed lepton) [GeV]" , 32, 50, 850);
+        plot1d("h_rlmt_h"+s,   values_[mt_rl]    , evtweight_, cr.histMap, ";M_{T} (with removed lepton) [GeV]" , 26, 0, 650);
         plot1d("h_nbtags"+s,   values_[nbjet]    , evtweight_, cr.histMap, ";Number of b-tagged jets"       ,  5,  0, 5);
         plot1d("h_dphilmet"+s, values_[dphilmet] , evtweight_, cr.histMap, ";#Delta#phi(l,MET)"             , 32,   0, 3.2);
       }
@@ -950,6 +963,21 @@ void StopLooper::fillHistosForCR2l(string suf) {
     if (suf == "" && lep1_pdgid() == -lep2_pdgid())
       fillExtraZHists(suf);
 
+    auto fillExtraLep2Hists = [&] (string s) {
+      plot1d("h_lep2pt"+s,   lep2_p4().pt()  , evtweight_, cr.histMap, ";p_{T}(lep2) [GeV]" , 24,     0,  600);
+      plot1d("h_lep2eta"+s,  lep2_p4().eta() , evtweight_, cr.histMap, ";#eta(lep2)"        , 50,  -2.5,  2.5);
+      plot1d("h_lep2phi"+s,  lep2_p4().phi() , evtweight_, cr.histMap, ";#phi(lep2)"        , 63, -3.15, 3.15);
+      // HEM happening at -4.7 < eta < -1.4, -1.6 < phi < -0.8
+      plot2d("h2d_lep2phi_eta"+s, lep2_p4().eta(), lep2_p4().phi(), evtweight_, cr.histMap, ";#eta(lep2);#phi(lep2)" , 24, -2.4, 2.4, 32, -3.2, 3.2);
+    };
+    if (suf == "" && year_ == 2018 && abs(lep2_pdgid()) == 11) {
+      fillExtraLep2Hists("_el");
+      if (is_data() &&  run() < 319077)
+        fillExtraLep2Hists("_el_preHEM");
+      else if (is_data() && run() >= 319077)
+        fillExtraLep2Hists("_el_posHEM");
+    }
+
     // if ( HLT_SingleMu() ) fillKineHists(suf+"_hltmu");
     // if ( HLT_SingleEl() ) fillKineHists(suf+"_hltel");
     // if ( HLT_MET_MHT() )  fillKineHists(suf+"_hltmet");
@@ -977,8 +1005,8 @@ void StopLooper::fillHistosForCR0b(string suf) {
     if (cr.GetName().at(4) >= 'A' && cr.GetName().at(4) <= 'H') continue;
 
     auto fillKineHists = [&] (string s) {
-      plot1d("h_mt"+s,       values_[mt]      , evtweight_, cr.histMap, ";M_{T} [GeV]"          , 12, 150, 600);
-      plot1d("h_met"+s,      values_[met]     , evtweight_, cr.histMap, ";#slash{E}_{T} [GeV]"  , 24, 250, 650);
+      plot1d("h_mt"+s,       values_[mt]      , evtweight_, cr.histMap, ";M_{T} [GeV]"          , 20, 150, 650);
+      plot1d("h_met"+s,      values_[met]     , evtweight_, cr.histMap, ";#slash{E}_{T} [GeV]"  , 24, 250, 850);
       plot1d("h_metphi"+s,   values_[metphi]  , evtweight_, cr.histMap, ";#phi(#slash{E}_{T})"  , 34, -3.4, 3.4);
       plot1d("h_lep1pt"+s,   values_[lep1pt]  , evtweight_, cr.histMap, ";p_{T}(lepton) [GeV]"  , 24,  0, 600);
       plot1d("h_lep1eta"+s,  values_[lep1eta] , evtweight_, cr.histMap, ";#eta(lepton)"         , 30, -3, 3);
@@ -1003,7 +1031,7 @@ void StopLooper::fillHistosForCR0b(string suf) {
       // if ( (HLT_SingleEl() && abs(lep1_pdgid()) == 11 && values_[lep1pt] < 45) || (HLT_SingleMu() && abs(lep1_pdgid()) == 13 && values_[lep1pt] < 40) || (HLT_MET_MHT() && pfmet() > 250) ) {
       if (true) {
         plot1d("h_mt_h"+s,       values_[mt]       , evtweight_, cr.histMap, ";M_{T} [GeV]"                   , 24,   0, 600);
-        plot1d("h_met_h"+s,      values_[met]      , evtweight_, cr.histMap, ";#slash{E}_{T} [GeV]"           , 24,  50, 650);
+        plot1d("h_met_h"+s,      values_[met]      , evtweight_, cr.histMap, ";#slash{E}_{T} [GeV]"           , 32,  50, 850);
         plot1d("h_nbtags"+s,     values_[nbjet]    , evtweight_, cr.histMap, ";Number of b-tagged jets"       ,  5,   0,   5);
         plot1d("h_dphijmet_h"+s, values_[dphijmet] , evtweight_, cr.histMap, ";#Delta#phi(jet,#slash{E}_{T})" , 33, 0.0, 3.3);
         plot1d("h_dphilmet"+s,   values_[dphilmet] , evtweight_, cr.histMap, ";#Delta#phi(l,MET)"             , 32,   0, 3.2);
