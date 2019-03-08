@@ -247,6 +247,7 @@ evtWgtInfo::evtWgtInfo() {
   apply_pu_sf           = false;
   apply_pu_sf_fromFile  = false;
   apply_L1prefire_sf    = false;
+  apply_HEMveto_sf      = false;
   apply_sample_sf       = false;
   apply_genweights_unc  = true;
 
@@ -269,6 +270,7 @@ evtWgtInfo::evtWgtInfo() {
   // Initialize event weights and related variables
   initializeWeights();
   sf_extra_file = 1.0;
+  sf_extra_event = 1.0;
 
 }
 
@@ -287,8 +289,8 @@ void evtWgtInfo::Setup(string samplestr, int inyear, bool applyUnc, bool useBTag
     lumi = 41.529;         // 2017 lumi
     lumi_err = lumi*0.023;
   } else if (year == 2018) {
-    lumi = 59.97;          // projected 2018 lumi
-    lumi_err = lumi*0.05;  // preliminary value
+    lumi = 59.613;          // projected 2018 lumi
+    lumi_err = lumi*0.025;  // preliminary value
   }
 
   sf_extra_file = 1.0;  // reset file weight for each file
@@ -530,6 +532,7 @@ void evtWgtInfo::initializeWeights() {
   sf_L1prefire_dn = 1.0;
 
   sf_sample = 1.0;
+  sf_extra_event = 1.0;
 
   for (int iSys=0; iSys<k_nSyst; iSys++) sys_wgts[iSys]=1.0;
   for (int iSys=0; iSys<k_nSyst; iSys++) sys_wgts_corridor[iSys]=1.0;
@@ -615,6 +618,11 @@ void evtWgtInfo::calculateWeightsForEvent() {
     getL1PrefireWeight( sf_L1prefire, sf_L1prefire_up, sf_L1prefire_dn );
   }
 
+  // HEM weight for 2018
+  if (apply_HEMveto_sf && year == 2018) {
+    getHEMElectronVetoWeight( sf_extra_event );
+  }
+
   // Lumi Variation
   getLumi( sf_lumi, sf_lumi_up, sf_lumi_dn );
 
@@ -681,6 +689,8 @@ void evtWgtInfo::calculateWeightsForEvent() {
   evt_wgt *= sf_sample;
   // Apply any extra weight that was passed in
   evt_wgt *= sf_extra_file;
+  // Apply any extra weight for the event
+  evt_wgt *= sf_extra_event;
 
   //
   // Systematic Weights
@@ -2127,10 +2137,17 @@ void evtWgtInfo::getPileupWeight_fromFile( double &weight_pu, double &weight_pu_
   weight_pu_dn = h_pu_wgt_dn->GetBinContent(ibin);
 }
 
-void evtWgtInfo::getL1PrefireWeight( double &weight_L1Prefire, double &weight_L1Prefire_up, double &weight_L1Prefire_dn ) {
+inline void evtWgtInfo::getL1PrefireWeight( double &weight_L1Prefire, double &weight_L1Prefire_up, double &weight_L1Prefire_dn ) {
   weight_L1Prefire    = babyAnalyzer.weight_L1prefire();
   weight_L1Prefire_up = babyAnalyzer.weight_L1prefire_UP();
   weight_L1Prefire_dn = babyAnalyzer.weight_L1prefire_DN();
+}
+
+inline void evtWgtInfo::getHEMElectronVetoWeight( double &weight_HEMveto ) {
+  weight_HEMveto = 1.0;
+  if (year != 2018) return;
+  if (abs(lep2_pdgid()) == 11 && lep2_p4().eta() < -1.4 && lep2_p4().phi() > -1.6 && lep2_p4().phi() < -0.8)
+    weight_HEMveto = 20.99/59.61;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -2283,7 +2300,7 @@ void evtWgtInfo::setDefaultSystematics( int syst_set ) {
       apply_cr2lTrigger_sf = true;   // not available yet
       apply_bTag_sf        = true;
       apply_lep_sf         = true;   // available but not updated yet
-      apply_vetoLep_sf     = true;   // same as above
+      apply_vetoLep_sf     = true;
       apply_tau_sf         = true;   // same as above
       apply_topPt_sf       = false;
       apply_metRes_sf      = false;  // not developed for 94X yet
@@ -2294,6 +2311,7 @@ void evtWgtInfo::setDefaultSystematics( int syst_set ) {
       apply_pu_sf          = false;  // not available in baby yet
       apply_pu_sf_fromFile = true;
       apply_L1prefire_sf   = true;
+      apply_HEMveto_sf     = true;
       apply_sample_sf      = false;  // no multiple sample available yet
       if (is_fastsim_) {
         apply_lepFS_sf     = false;  // no fast sim yet

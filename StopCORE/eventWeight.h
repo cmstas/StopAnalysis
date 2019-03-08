@@ -273,7 +273,10 @@ class evtWgtInfo {
   double sf_L1prefire_up;
   double sf_L1prefire_dn;
 
-  double sf_extra_file;  // special weight that only initialized at constructor
+  bool apply_HEMveto_sf;
+
+  double sf_extra_file;  // special weight that is set for all events in a sample
+  double sf_extra_event; // special weight that has to be associate with spcific event
 
   evtWgtInfo();
   void Setup(std::string sample, int year = 0, bool applyUnc=true, bool useBTagUtils=false, bool useLepSFUtils=false);
@@ -313,6 +316,7 @@ class evtWgtInfo {
   void getPileupWeight( double &weight_pu, double &weight_pu_up, double &weight_pu_dn );
   void getPileupWeight_fromFile( double &weight_pu, double &weight_pu_up, double &weight_pu_dn );
   void getL1PrefireWeight( double &weight_L1prefire, double &weight_L1prefire_up, double &weight_L1prefire_dn );
+  void getHEMElectronVetoWeight( double &weight_HEMveto );
 
   double getZSampleWeightFromCR3l( TString fname, bool apply=true );
   double getExtSampleWeightSummer16v2( TString sample, bool apply=true );
