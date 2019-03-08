@@ -1323,6 +1323,38 @@ std::vector<SR> getStopSignalRegionsRun2() {
   sr.ReplaceVar(nbjet, nbtag);
   SRvec.emplace_back(sr);
 
+  // Inclusive for A+B
+  sr.SetName("srincl1");
+  sr.SetVar(njet, 2, 4);
+  SRvec.emplace_back(sr);
+
+  // Inclusive for C+D
+  sr.SetName("srincl2");
+  sr.SetVar(njet, 4, fInf);
+  sr.SetVar(tmod, -fInf, 0);
+  SRvec.emplace_back(sr);
+
+  // Inclusive for E+F
+  sr.SetName("srincl3");
+  sr.SetVar(tmod, 0, 10);
+  SRvec.emplace_back(sr);
+
+  // Inclusive for G+H
+  sr.SetName("srincl4");
+  sr.SetVar(tmod, 10, fInf);
+  SRvec.emplace_back(sr);
+
+  // Inclusive for E+G
+  sr.SetName("srincl5");
+  sr.SetVar(tmod, 0, fInf);
+  sr.SetVar(mlb, 0, 175);
+  SRvec.emplace_back(sr);
+
+  // Inclusive for F+H
+  sr.SetName("srincl6");
+  sr.SetVar(mlb, 175, fInf);
+  SRvec.emplace_back(sr);
+
   // Test region at MET sideband for top taggers
   sr = srbase;
   sr.SetName("srsbmet");  // MET sideband
@@ -1544,9 +1576,11 @@ std::vector<SR> getStopSignalRegionsRun2() {
   // sr.SetVar(lep1pt, 0, 150);
   // sr.SetVar(dphilmet, 0, 2.0);
   sr.SetVar(passlmetcor, 1, 2); // shape cut on lep1pt & dphilmet
+  // sr.SetVar(nsbtag, 1, fInf);
   sr.SetVar(dphijmet, 0.5, 3.1416);
   sr.SetVar(j1passbtag, 0, 1);  // Require j1 not b-tagged
-  sr.SetMETBins({250, 350, 450, 550, 700, 1500});
+  sr.SetMETBins({250, 350, 450, 550, 750, 1500});
+  // sr.SetMETBins({250, 350, 450, 550, 1500});
   SRvec.emplace_back(sr);
 
   return SRvec;
@@ -1568,6 +1602,8 @@ std::vector<SR> getStopControlRegionsNoBTagsRun2() {
     }
     if (cr.GetLowerBound(tmod) < 10)
       cr.SetVar(nbjet, 0, 1);
+    if (cr.VarExists(tfttag)) cr.RemoveVar(tfttag);
+    if (cr.VarExists(deepttag)) cr.RemoveVar(deepttag);
     cr.ReplaceVar(mlb, mlb_0b);
     CRvec.emplace_back(cr);
   }
@@ -1587,6 +1623,101 @@ std::vector<SR> getStopControlRegionsDileptonRun2() {
     cr.ReplaceVar(dphijmet, dphijmet_rl);
     cr.ReplaceVar(nlep, nlep_rl);
     cr.ReplaceVar(tmod, tmod_rl);
+    cr.RemoveVar(passvetos);
+    if (cr.VarExists(dphilmet)) cr.ReplaceVar(dphilmet, dphilmet_rl);
+    if (cr.VarExists(passlmetcor)) cr.ReplaceVar(passlmetcor, passlmet_rl);
+    cr.SetVar(nvlep, 2, fInf);
+    cr.SetVar(nlep_rl, 2, fInf);
+    cr.SetVar(mt2_ll, 0, 100);  // to avoid overlap with the stop-2l SR
+    CRvec.emplace_back(cr);
+  }
+
+  return CRvec;
+}
+
+std::vector<SR> getStopSignalRegionsCorridorRun2() {
+
+  SR srbase;
+  srbase.SetAllowDummyVars(1);
+  srbase.SetName("srbasecor");
+  srbase.SetVar(mt, 150, fInf);
+  srbase.SetVar(met, 250, fInf);
+  srbase.SetVar(nlep, 1, 2);
+  srbase.SetVar(nvlep, 1, 2);
+  srbase.SetVar(passvetos, 1, 2);
+  srbase.SetVar(njet, 5, fInf);
+  srbase.SetVar(nbjet, 0, fInf);
+  srbase.SetVar(dphijmet, 0.5, 3.1416);
+  srbase.SetMETBins({0, 250, 350, 450, 550, 650, 800, 1500});
+
+  std::vector<SR> SRvec;
+  SRvec.emplace_back(srbase);
+
+  SR sr;
+  sr = srbase;
+  sr.SetName("srI");
+  sr.SetDetailName("ge5j_lpt0to150_j1notb");
+  sr.SetVar(njet, 5, fInf);
+  sr.SetVar(nbjet, 1, fInf);
+  // sr.SetVar(nsbtag, 1, fInf);
+  sr.SetVar(passlmetcor, 1, 2); // shape cut on lep1pt & dphilmet
+  sr.SetVar(dphijmet, 0.5, 3.1416);
+  sr.SetVar(j1passbtag, 0, 1);  // Require j1 not b-tagged
+  sr.SetMETBins({250, 350, 450, 550, 750, 1500});
+  SRvec.emplace_back(sr);
+
+  sr = srbase;
+  sr.SetName("srJ");
+  sr.SetDetailName("ge5j_ge1sb_passlmetcor_j1notb");
+  sr.SetAllowDummyVars(1);
+  sr.SetVar(passvetos, 1, 2);
+  // sr.SetVar(nbjet, 1, fInf);
+  sr.SetVar(nsbtag, 1, fInf);
+  sr.SetVar(passlmetcor, 1, 2); // shape cut on lep1pt & dphilmet
+  sr.SetVar(dphijmet, 0.5, 3.1416);
+  sr.SetVar(j1passbtag, 0, 1);  // Require j1 not b-tagged
+  sr.SetMETBins({250, 350, 450, 550, 1500});
+  SRvec.emplace_back(sr);
+
+  return SRvec;
+}
+
+std::vector<SR> getStopControlRegionsNoBTagsCorridorRun2() {
+  std::vector<SR> CRvec;
+  std::vector<SR> SRvec = getStopSignalRegionsCorridorRun2();
+
+  for (SR cr : SRvec) {
+    cr.SetName(cr.GetName().replace(0, 2, "cr0b"));
+    cr.SetAllowDummyVars(1);
+    if (cr.VarExists(nbjet))  cr.RemoveVar(nbjet);
+    if (cr.VarExists(ntbtag)) cr.RemoveVar(ntbtag);
+    if (cr.VarExists(nsbtag)) cr.SetVar(nsbtag, 0, 1);
+    // if (cr.GetName().find("base") != std::string::npos || cr.GetName().find("cr0bI") == 0) {
+    // } else {
+    //   cr.SetVar(nbtag, 0, 1);
+    // }
+    // if (cr.GetLowerBound(tmod) < 10)
+    //   cr.SetVar(nbjet, 0, 1);
+    cr.SetVar(nbjet, 0, 1);
+    if (cr.VarExists(mlb)) cr.ReplaceVar(mlb, mlb_0b);
+    CRvec.emplace_back(cr);
+  }
+
+  return CRvec;
+}
+
+std::vector<SR> getStopControlRegionsDileptonCorridorRun2() {
+  std::vector<SR> CRvec;
+  std::vector<SR> SRvec = getStopSignalRegionsCorridorRun2();
+
+  for (SR cr : SRvec) {
+    cr.SetName(cr.GetName().replace(0, 2, "cr2l"));
+    cr.SetAllowDummyVars(1);
+    cr.ReplaceVar(met, met_rl);
+    cr.ReplaceVar(mt, mt_rl);
+    cr.ReplaceVar(dphijmet, dphijmet_rl);
+    cr.ReplaceVar(nlep, nlep_rl);
+    // cr.ReplaceVar(tmod, tmod_rl);
     cr.RemoveVar(passvetos);
     if (cr.VarExists(dphilmet)) cr.ReplaceVar(dphilmet, dphilmet_rl);
     if (cr.VarExists(passlmetcor)) cr.ReplaceVar(passlmetcor, passlmet_rl);
