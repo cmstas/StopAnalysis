@@ -203,9 +203,17 @@ evtWgtInfo::Util::Util( systID systematic ) {
       label       = "tauSFDn";
       title       = "Tau Efficiency SF, Down";
       break;
+    case( k_L1prefireUp ):
+      label       = "L1prefireUp";
+      title       = "L1 prefiring, Up";
+      break;
+    case( k_L1prefireDown ):
+      label       = "L1prefireDn";
+      title       = "L1 prefiring, Down";
+      break;
     default:
       std::cout << "[eventWeight] >> Could not find systematic info from systematic enum provided!" << std::endl;
-      label        = "NO SYSTEMATIC INFO FOUND FROM ENUM PROVIDED";
+      label        = "UNKNOWN";
       title        = "NO SYSTEMATIC INFO FOUND FROM ENUM PROVIDED";
       break;
   } // end systematic switch
@@ -238,6 +246,7 @@ evtWgtInfo::evtWgtInfo() {
   apply_ISR_sf          = false;
   apply_pu_sf           = false;
   apply_pu_sf_fromFile  = false;
+  apply_L1prefire_sf    = false;
   apply_sample_sf       = false;
   apply_genweights_unc  = true;
 
@@ -516,6 +525,10 @@ void evtWgtInfo::initializeWeights() {
   sf_xsec_up = 1.0;
   sf_xsec_dn = 1.0;
 
+  sf_L1prefire = 1.0;
+  sf_L1prefire_up = 1.0;
+  sf_L1prefire_dn = 1.0;
+
   sf_sample = 1.0;
 
   for (int iSys=0; iSys<k_nSyst; iSys++) sys_wgts[iSys]=1.0;
@@ -597,6 +610,11 @@ void evtWgtInfo::calculateWeightsForEvent() {
     getPileupWeight( sf_pu, sf_pu_up, sf_pu_dn );
   }
 
+  // L1 un-prefiring probability for 2016 and 2017
+  if (apply_L1prefire_sf && (year == 2016 || year == 2017 )) {
+    getL1PrefireWeight( sf_L1prefire, sf_L1prefire_up, sf_L1prefire_dn );
+  }
+
   // Lumi Variation
   getLumi( sf_lumi, sf_lumi_up, sf_lumi_dn );
 
@@ -657,6 +675,8 @@ void evtWgtInfo::calculateWeightsForEvent() {
   evt_wgt *= sf_ISR;
   // Apply Pileup Wgt
   evt_wgt *= sf_pu;
+  // Apply L1 non-prefiring Weight
+  evt_wgt *= sf_L1prefire;
   // Apply sample weight (for WJets stitching)
   evt_wgt *= sf_sample;
   // Apply any extra weight that was passed in
@@ -762,6 +782,10 @@ void evtWgtInfo::calculateWeightsForEvent() {
         sys_wgt *= (sf_pu_up/sf_pu); break;
       case k_puDown:
         sys_wgt *= (sf_pu_dn/sf_pu); break;
+      case k_L1prefireUp:
+        sys_wgt *= (sf_L1prefire_up/sf_L1prefire); break;
+      case k_L1prefireDown:
+        sys_wgt *= (sf_L1prefire_dn/sf_L1prefire); break;
     }
 
     // Corridor regions use alternate MET resolution weights
@@ -2103,6 +2127,12 @@ void evtWgtInfo::getPileupWeight_fromFile( double &weight_pu, double &weight_pu_
   weight_pu_dn = h_pu_wgt_dn->GetBinContent(ibin);
 }
 
+void evtWgtInfo::getL1PrefireWeight( double &weight_L1Prefire, double &weight_L1Prefire_up, double &weight_L1Prefire_dn ) {
+  weight_L1Prefire    = babyAnalyzer.weight_L1prefire();
+  weight_L1Prefire_up = babyAnalyzer.weight_L1prefire_UP();
+  weight_L1Prefire_dn = babyAnalyzer.weight_L1prefire_DN();
+}
+
 //////////////////////////////////////////////////////////////////////
 
 bool evtWgtInfo::doingSystematic( systID isyst ) {
@@ -2176,6 +2206,9 @@ bool evtWgtInfo::doingSystematic( systID isyst ) {
     case k_tauSFUp:
     case k_tauSFDown:
       return apply_tau_sf;
+    case k_L1prefireUp:
+    case k_L1prefireDown:
+      return apply_L1prefire_sf;
     default:
       return false;
   }
@@ -2260,6 +2293,7 @@ void evtWgtInfo::setDefaultSystematics( int syst_set ) {
       apply_ISR_sf         = false;  // not available yet
       apply_pu_sf          = false;  // not available in baby yet
       apply_pu_sf_fromFile = true;
+      apply_L1prefire_sf   = true;
       apply_sample_sf      = false;  // no multiple sample available yet
       if (is_fastsim_) {
         apply_lepFS_sf     = false;  // no fast sim yet
