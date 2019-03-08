@@ -60,7 +60,7 @@ void Make2DLimitHistos(TString signaltype="std_T2tt", TString indir="limits", bo
 
   TH1D *hxsec;
   // TFile *fxsec = new TFile("xsec_stop_13TeV.root","READ");
-  TFile *fxsec = new TFile("../CORE/Tools/susyxsecs/xsec_susy_13tev_run2.root","READ");
+  TFile *fxsec = new TFile("xsec_susy_13TeV_run2.root","READ");
   if(fxsec->IsZombie()) {
     std::cout << "Somehow xsec_susy_13tev_run2 is corrupted. Exit..." << std::endl;
     exit(0);
