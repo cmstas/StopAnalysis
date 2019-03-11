@@ -10,6 +10,29 @@ from utilities.errors import *
 from utilities.yields_utils import *
 
 
+def GetPoissonRatioGraph(h_mc, h_data, g_ratio, drawZeros=True, useMCErr=True):
+    alpha = 1-0.6827
+    for i in range(1,h_mc.GetNbinsX()+1):
+        x = h_mc.GetBinCenter(i)
+        mcy = h_mc.GetBinContent(i)
+        datay = h_data.GetBinContent(i)
+        if mcy==0 or (datay==0 and not drawZeros):
+            continue
+        mcerr = h_mc.GetBinError(i)
+        if not useMCErr:
+            mcerr = 0
+        dataerrup = r.Math.gamma_quantile_c(alpha/2, datay+1, 1) - datay
+        dataerrdown = 0 if datay==0 else (datay-r.Math.gamma_quantile(alpha/2, datay, 1))
+
+        ratio = datay/mcy
+        rerrup = r.TMath.Sqrt((dataerrup/mcy)**2 + (mcerr*datay/mcy**2)**2)
+        rerrdown = r.TMath.Sqrt((dataerrdown/mcy)**2 + (mcerr*datay/mcy**2)**2)
+
+        xerr = h_mc.GetBinWidth(i)/2
+        thisPoint = g_ratio.GetN()
+        g_ratio.SetPoint(thisPoint, x, ratio)
+        g_ratio.SetPointError(thisPoint, xerr, xerr, rerrdown, rerrup)
+
 def getLabelsTemporary(srNames):
 
     std_labels = [
@@ -54,19 +77,57 @@ def getLabelsTemporary(srNames):
         "H:[500,+#infty]",
     ]
 
+    cr0b_labels = [
+        "A0:[600,750]",
+        "A0:[750,+#infty]",
+        "A1:[350,450]",
+        "A1:[450,600]",
+        "A2:[250,600]",
+        "B:[250,450]",
+        "B:[450,700]",
+        "B:[700,+#infty]",
+        "C:[350,450]",
+        "C:[450,550]",
+        "C:[550,650]",
+        "C:[650,800]",
+        "C:[800,+#infty]",
+        "D:[250,350]",
+        "D:[350,450]",
+        "D:[450,600]",
+        "D:[600,+#infty]",
+        "E0:[450,600]",
+        "E0:[600,+#infty]",
+        "E1:[250,350]",
+        "E1:[350,450]",
+        "F:[250,350]",
+        "F:[350,450]",
+        "F:[450,+#infty]",
+        "G0:[450,550]",
+        "G0:[550,750]",
+        "G0:[750,+#infty]",
+        "G1:[250,350]",
+        "G1:[350,450]",
+        "H:[250,500]",
+        "H:[500,+#infty]",
+    ]
+
     cor_labels = [
         'I:[250,350]',
         'I:[350,450]',
         'I:[450,550]',
-        # 'I:[550,750]',
-        # 'I:[750,+#infty]',
-        'I:[550,+#infty]',
+        'I:[550,750]',
+        'I:[750,+#infty]',
+        # 'I:[550,+#infty]',
     ]
 
     if len(srNames) == 17:
         return std_labels+cor_labels
     elif len(srNames) == 16:
         return std_labels
+    elif len(srNames) == 13:
+        return cr0b_labels+cor_labels
+    elif len(srNames) == 12:
+        return cr0b_labels
     elif len(srNames) == 1 and srNames[0][-1] == 'I':
         return cor_labels
 
@@ -148,10 +209,8 @@ def drawSRyieldHist(hist, xlabels, hleg=None, savename='sigYieldHist.pdf', drawo
 
     c0.SaveAs(savename)
 
-def drawSRyieldStack(hstk, xlabels, legitems=None, savename='sigYieldHist.pdf', drawops='hist', linear=False, hline=None, hdata=None, hsig=None):
-
-    width = max(len(xlabels)*40, 1200)
-    c0 = r.TCanvas('c0', 'c0', width, 800) # todo: adjustable canvas width later
+def drawSRyieldStack(hstk, xlabels, legitems=None, savename='sigYieldHist.pdf', drawops='hist', linear=False, hline=None, 
+                     hdata=None, hsigs=None, ytitle='N Events', noRatio=False, noBkgError=False):
 
     r.gStyle.SetOptStat('')
     r.gStyle.SetPadGridX(0)
@@ -160,8 +219,16 @@ def drawSRyieldStack(hstk, xlabels, legitems=None, savename='sigYieldHist.pdf', 
     r.gStyle.SetPadTickY(1)
     r.gStyle.SetFrameBorderMode(0)
 
+    width = max(len(xlabels)*40, 1200) if noRatio else max(len(xlabels)*40, 1600)
+    c0 = r.TCanvas('c0', 'c0', width, 800) # todo: adjustable canvas width later
     mainPad = r.TPad('1', '1', 0.0, 0.05, 1.0, 1.0)
     ratioPad = r.TPad('2', '2', 0.0, 0.0, 1.0, 0.23)
+
+    if not hdata: noRatio = True
+    if not noRatio:
+        c0 = r.TCanvas('c0', 'c0', width, 1200)
+        mainPad = r.TPad('1', '1', 0.0, 0.20, 1.0, 1.0)
+        ratioPad = r.TPad('2', '2', 0.0, 0.02, 1.0, 0.23)
 
     r.SetOwnership(c0, False)
     r.SetOwnership(mainPad, False)
@@ -176,7 +243,7 @@ def drawSRyieldStack(hstk, xlabels, legitems=None, savename='sigYieldHist.pdf', 
     ratioPad.SetTopMargin(0.05)
     ratioPad.SetLeftMargin(0.10)
     ratioPad.SetRightMargin(0.05)
-
+    if not noRatio: ratioPad.Draw()
     mainPad.cd()
 
     if hstk.GetHists().GetSize() < 1:
@@ -192,26 +259,84 @@ def drawSRyieldStack(hstk, xlabels, legitems=None, savename='sigYieldHist.pdf', 
         htot.GetXaxis().SetBinLabel(i+1, lab)
 
     htot.GetXaxis().LabelsOption('v')
-    htot.GetYaxis().SetTitle('N Events')
+    htot.GetYaxis().SetTitle(ytitle)
     htot.GetYaxis().SetTitleOffset(0.5)
     htot.GetYaxis().SetTitleSize(0.06)
-    htot.GetYaxis().SetRangeUser(0.1, 2000)
+    htot.GetYaxis().SetRangeUser(0.1, 5000)
     # htot.GetYaxis().SetRangeUser(0.0001, 10)
 
     htot.Draw(drawops)
     hstk.Draw('histsame')
     htot.Draw('axissame');
 
+    if not noBkgError:
+        h_err = htot.Clone('h_err')
+        h_err.SetFillStyle(3244)
+        h_err.SetFillColor(r.kGray+2)
+        h_err.Draw("E2same")
+
+    if hdata != None:
+        hdata.SetMarkerStyle(20)
+        hdata.SetMarkerSize(1.2)
+        hdata.SetLineWidth(2)
+        hdata.Draw('PEsame')
+
+    if type(hsigs) == list:
+        sig_colors = [  r.kTeal, r.kPink, r.kCyan, r.kGray+2,]
+        for i, hsig in enumerate(hsigs):
+            hsig.SetLineStyle(2);
+            hsig.SetLineWidth(2);
+            hsig.SetLineColor(sig_colors[i]);
+            hsig.Draw('same')
+
     if type(legitems) == list:
-        leg = r.TLegend(0.58, 0.78, 0.78, 0.89)
+        leg = r.TLegend(0.58, 0.76, 0.76, 0.89)
         if width < 1000:
             # leg = r.TLegend(0.65, 0.64, 0.91, 0.89)
             leg = r.TLegend(0.58, 0.78, 0.89, 0.89)
         if len(legitems) > 2: 
             leg.SetNColumns(2)
-        for i in range(len(legitems)):
-            leg.AddEntry(hstk.GetHists().At(i), legitems[i])
+        if hdata != None:
+            leg = r.TLegend(0.52, 0.76, 0.82, 0.89)
+            leg.SetNColumns(3)
+        for i in range(len(legitems)-1, -1, -1):
+            leg.AddEntry(hstk.GetHists().At(i), legitems[i], 'lf')
+            if hdata != None and i == len(legitems)-2:
+                leg.AddEntry(hdata, 'data', 'lp')
+
         leg.Draw()
+
+    ratioPad.cd()
+    if not noRatio:
+        h_axis_ratio = r.TH1D('ratio_axis','', htot.GetNbinsX(), 0, htot.GetNbinsX())
+        h_axis_ratio.GetYaxis().SetTitleOffset(0.18)
+        h_axis_ratio.GetYaxis().SetTitleSize(0.22)
+        h_axis_ratio.GetYaxis().SetNdivisions(4)
+        h_axis_ratio.GetYaxis().SetLabelSize(0.15)
+        h_axis_ratio.GetYaxis().SetRangeUser(0, 2)
+        h_axis_ratio.GetYaxis().SetTitle('Ratios  ')
+        h_axis_ratio.GetYaxis().SetTitleOffset(0.5)
+        h_axis_ratio.GetXaxis().SetTickLength(0.07)
+        h_axis_ratio.GetXaxis().SetTitleSize(0.)
+        h_axis_ratio.GetXaxis().SetLabelSize(0.)
+        h_axis_ratio.Draw('axis')
+
+        hRatio = hdata.Clone('h_ratio')
+        # hRatio.Divide(hdata, htot, 1, 1, 'B')
+        hRatio.Divide(htot)
+        ratioGraph = r.TGraphAsymmErrors()
+        GetPoissonRatioGraph(htot,hdata,ratioGraph)
+        ratioGraph.SetMarkerStyle(20)
+        ratioGraph.SetMarkerSize(1.6)
+        ratioGraph.SetMarkerColor(r.kGray+3)
+        ratioGraph.SetLineColor(r.kGray+3)
+        ratioGraph.SetLineWidth(2)
+        ratioGraph.Draw('PZsame')
+
+        line = r.TF1('line1', '1', 0, len(xlabels)+1)
+        line.SetLineStyle(2)
+        line.SetLineColor(r.kGray+2)
+        line.Draw('same')
 
     c0.SaveAs(savename)
     c0.Clear()
@@ -242,7 +367,7 @@ def drawBkgEstimateHists(f1, srNames, suf=''):
     drawSRyieldHist(h_purity, xlabels, 'noleg', 'lostlep'+suf+'_CRpurity.pdf', 'PE', True, [0, 1.2], 1)
 
 
-def drawBkgCompositionStack(srNames=None, savename='bkgCompostion_std.pdf'):
+def drawBkgCompositionStack(indir, srNames=None, savename='bkgCompostion_std.pdf', plotData=False):
 
     # -------------------------------------------------------
     # Draw test bkg composition / expected yields hists
@@ -250,7 +375,7 @@ def drawBkgCompositionStack(srNames=None, savename='bkgCompostion_std.pdf'):
         srNames = ['srA0', 'srA1', 'srA2', 'srB', 'srC','srD', 'srE0', 'srE1', 'srE2', 'srE3', 'srF', 'srG0', 'srG1', 'srG2', 'srG3', 'srH',]
 
     # f_bkg = r.TFile('../StopLooper/output/combRun2_v37_s5/allBkg_run2.root')
-    f_bkg = r.TFile('../StopLooper/output/combRun2_v37_c6/allBkg_run2.root')
+    f_bkg = r.TFile(indir+'/allBkg_run2.root','read')
 
     y_all  = [ y.round(2) for y in sum(getYieldEInTopoBins(f_bkg, srNames, 'metbins'), []) ]
 
@@ -259,26 +384,41 @@ def drawBkgCompositionStack(srNames=None, savename='bkgCompostion_std.pdf'):
     y_1lW  = [ y.round(2) for y in sum(getYieldEInTopoBins(f_bkg, srNames, 'metbins_1lepW'), []) ]
     y_Zinv = [ y.round(2) for y in sum(getYieldEInTopoBins(f_bkg, srNames, 'metbins_Znunu'), []) ]
 
-    h_2lep = getSRHistFromYieldE(y_2lep, 'h_SRyields_y_2lep', '', fcolor=r.kAzure+7)
-    h_1lW  = getSRHistFromYieldE(y_1lW , 'h_SRyields_y_1lW' , '', fcolor=r.kOrange-2)
-    h_1lt  = getSRHistFromYieldE(y_1lt , 'h_SRyields_y_1lt' , '', fcolor=r.kRed-7)
-    h_Zinv = getSRHistFromYieldE(y_Zinv, 'h_SRyields_y_Zinv', '', fcolor=r.kMagenta-3)
+    h_2lep = getSRHistFromYieldE(y_2lep, 'h_SRyields_2lep', '', fcolor=r.kAzure+7)
+    h_1lW  = getSRHistFromYieldE(y_1lW , 'h_SRyields_1lW' , '', fcolor=r.kOrange-2)
+    h_1lt  = getSRHistFromYieldE(y_1lt , 'h_SRyields_1lt' , '', fcolor=r.kRed-7)
+    h_Zinv = getSRHistFromYieldE(y_Zinv, 'h_SRyields_Zinv', '', fcolor=r.kMagenta-3)
 
-    legname = ['1lepTop', 'Zinv', '1lepW', '2lep']
     hstk = r.THStack('hs1', '')
-    hstk.Add(h_1lt)
-    hstk.Add(h_Zinv)
     if 'cr0b' in srNames[0]:
         legname = ['1lepTop', 'Zinv', '2lep', '1lepW']
+        hstk.Add(h_1lt)
+        hstk.Add(h_Zinv)
         hstk.Add(h_2lep)
         hstk.Add(h_1lW)
+    elif 'cr2l' in srNames[0]:
+        legname = ['Zinv', '1lepW', '1lepTop', '2lep']
+        hstk.Add(h_Zinv)
+        hstk.Add(h_1lW)
+        hstk.Add(h_1lt)
+        hstk.Add(h_2lep)
     else:
+        legname = ['1lepTop', 'Zinv', '1lepW', '2lep']
+        hstk.Add(h_1lt)
+        hstk.Add(h_Zinv)
         hstk.Add(h_1lW)
         hstk.Add(h_2lep)
 
     xlabels = getLabelsTemporary(srNames)
 
-    drawSRyieldStack(hstk, xlabels, legname, savename, 'hist')
+    if plotData:
+        f_data = r.TFile(indir+'/allData_run2.root','read')
+        y_data  = [ y.round(2) for y in sum(getYieldEInTopoBins(f_data, srNames, 'metbins'), []) ]
+        h_data = getSRHistFromYieldE(y_data, 'h_SRyields_data', '', fcolor=r.kBlack)
+
+        drawSRyieldStack(hstk, xlabels, legname, savename, 'hist', hdata=h_data)
+    else:
+        drawSRyieldStack(hstk, xlabels, legname, savename, 'hist')
 
     f_bkg.Close()
 
@@ -403,14 +543,15 @@ if __name__ == '__main__':
 
     r.gROOT.SetBatch(1)
 
-    # bvsuf = 'v37_s4'
+    bvsuf = 'v39_m1'
+    indir = '../StopLooper/output/combRun2_'+bvsuf
 
     # f18 = r.TFile('../StopLooper/output/samp18_'+bvsuf+'/lostlepton_18.root')
     # f17 = r.TFile('../StopLooper/output/samp17_'+bvsuf+'/lostlepton_17.root')
     # f16 = r.TFile('../StopLooper/output/samp16_'+bvsuf+'/lostlepton_16.root')
     # frun2 = r.TFile('../StopLooper/output/combRun2_'+bvsuf+'/lostlepton_run2.root')
 
-    srNames = ['srA0', 'srA1', 'srA2', 'srB', 'srC','srD', 'srE0', 'srE1', 'srE2', 'srE3', 'srF', 'srG0', 'srG1', 'srG2', 'srG3', 'srH', 'srI',]
+    srNames = ['srA0', 'srA1', 'srA2', 'srB', 'srC', 'srD', 'srE0', 'srE1', 'srE2', 'srE3', 'srF', 'srG0', 'srG1', 'srG2', 'srG3', 'srH', 'srI',]
     # srNames = ['srI',]
 
     # drawBkgEstimateHists(f18, srNames, '18')
@@ -418,12 +559,19 @@ if __name__ == '__main__':
     # drawBkgEstimateHists(f16, srNames, '16')
     # drawBkgEstimateHists(frun2, srNames, 'run2')
 
-    # drawBkgCompositionStack(srNames, 'bkgCompostion_all.pdf')
+    # drawBkgCompositionStack(indir, srNames, 'bkgCompostion_all.pdf')
+
+    crNames = [ sr.replace('sr', 'cr2l') for sr in srNames ]
+    drawBkgCompositionStack(indir, crNames, 'CR2lYields_all.pdf', plotData=True)
+
+    srNames = ['srA0', 'srA1', 'srA2', 'srB', 'srC', 'srD', 'srE0', 'srE1', 'srF', 'srG0', 'srG1', 'srH', 'srI',]
+    crNames = [ sr.replace('sr', 'cr0b') for sr in srNames ]
+    drawBkgCompositionStack(indir, crNames, 'CR0bYields_all.pdf', plotData=True)
 
     # drawBkgCompositionStack(['srI',], 'bkgCompostion_cor6.pdf')
     # drawBkgCompositionStack(['cr2lI'], 'CR2lCompostion_cor6.pdf')
     # drawBkgCompositionStack(['cr0bI'], 'CR0bCompostion_cor6.pdf')
 
-    drawL1prefireEffect()
+    # drawL1prefireEffect()
 
 

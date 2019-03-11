@@ -136,12 +136,13 @@ def makeTFComparisonTable():
     tab.print_pdf('compareCR0b_METv0vsv2.pdf')
 
 
-def makeBkgEstimateTablesLostLepton():
+def makeBkgEstimateTablesLostLepton(indir):
 
     # f1 = r.TFile('../StopLooper/output/samp17_v13_tf/lostlepton.root')
     # f2 = r.TFile('../StopLooper/output/samp17_v13_tf_v1/lostlepton_wMETextrp.root')
     # f1 = r.TFile('../StopLooper/output/comb1617_tf/lostlepton.root')
-    f1 = r.TFile('../StopLooper/output/combRun2_v37_c5/lostlepton_run2.root')
+    # f1 = r.TFile('../StopLooper/output/combRun2_v37_c5/lostlepton_run2.root')
+    f1 = r.TFile(indir+'/lostlepton_run2.root')
 
     srNames = ['srA0', 'srA1', 'srA2', 'srB', 'srC','srD', 'srE0', 'srE1', 'srE2', 'srE3', 'srF', 'srG0', 'srG1', 'srG2', 'srG3', 'srH',]
 
@@ -162,43 +163,45 @@ def makeBkgEstimateTablesLostLepton():
 
     print '\n ----------------------------------- lost lepton separate by top tags ----------------------------------------'
 
-    # srNames = ['srA0', 'srB', 'srC','srD', 'srE0', 'srF', 'srG0', 'srH',]
-    # tab0 = printTableDataDriven(f1, srNames)
-    # tab0.set_theme_latex()
-    # tab0.print_pdf('lostlepRun2_inclTopTags.pdf')
+    srNames = ['srA0', 'srB', 'srC','srD', 'srE0', 'srF', 'srG0', 'srH',]
+    tab0 = printTableDataDriven(f1, srNames)
+    tab0.set_theme_latex()
+    tab0.print_pdf('lostlepRun2_inclTopTags.pdf')
 
-    # srNames = ['srA1', 'srE1', 'srG1',]
-    # tab1 = printTableDataDriven(f1, srNames)
-    # tab1.set_theme_latex()
-    # tab1.print_pdf('lostlepRun2_noTopTags.pdf')
+    srNames = ['srA1', 'srE1', 'srG1',]
+    tab1 = printTableDataDriven(f1, srNames)
+    tab1.set_theme_latex()
+    tab1.print_pdf('lostlepRun2_noTopTags.pdf')
 
-    # srNames = ['srA2', 'srE2', 'srG2',]
-    # tab2 = printTableDataDriven(f1, srNames)
-    # tab2.set_theme_latex()
-    # tab2.print_pdf('lostlepRun2_mergeTags.pdf')
+    srNames = ['srA2', 'srE2', 'srG2',]
+    tab2 = printTableDataDriven(f1, srNames)
+    tab2.set_theme_latex()
+    tab2.print_pdf('lostlepRun2_mergeTags.pdf')
 
-    # srNames = ['srE3', 'srG3',]
-    # tab3 = printTableDataDriven(f1, srNames)
-    # tab3.set_theme_latex()
-    # tab3.print_pdf('lostlepRun2_tfresTags.pdf')
+    srNames = ['srE3', 'srG3',]
+    tab3 = printTableDataDriven(f1, srNames)
+    tab3.set_theme_latex()
+    tab3.print_pdf('lostlepRun2_tfresTags.pdf')
 
+    print '\n ----------------------------------- lost lepton for corridor ----------------------------------------'
     srNames = ['srI',]
     tab4 = printTableDataDriven(f1, srNames)
     tab4.set_theme_latex()
     tab4.print_pdf('lostlepRun2_corridor5.pdf')
 
 
-def makeBkgEstimateTables1LepFromW():
-    f1 = r.TFile('../StopLooper/output/combRun2_v37_s5/1lepFromW_run2.root')
+def makeBkgEstimateTables1LepFromW(indir):
+    # f1 = r.TFile('../StopLooper/output/combRun2_v37_s5/1lepFromW_run2.root')
+    f1 = r.TFile(indir+'/1lepFromW_run2.root')
 
     srNames = ['srA0', 'srA1', 'srA2', 'srB', 'srC','srD', 'srE0', 'srE1', 'srE2', 'srE3', 'srF', 'srG0', 'srG1', 'srG2', 'srG3', 'srH',]
 
-    print '\n ----------------------------------- lost lepton w/o MET extrapolation ---------------------------------------'
+    print '\n ----------------------------------- W+jets w/o MET extrapolation ---------------------------------------'
     tab1 = printTableDataDriven(f1, srNames)
     tab1.set_theme_latex()
     tab1.print_pdf('1lepWRun2_allSRs.pdf')
 
-    print '\n ----------------------------------- lost lepton separate by top tags ----------------------------------------'
+    print '\n ----------------------------------- W+jets separate by top tags ----------------------------------------'
 
     srNames = ['srA0', 'srB', 'srC','srD', 'srE0', 'srF', 'srG0', 'srH',]
     tab0 = printTableDataDriven(f1, srNames)
@@ -220,6 +223,24 @@ def makeBkgEstimateTables1LepFromW():
     tab3.set_theme_latex()
     tab3.print_pdf('1lepWRun2_tfresTags.pdf')
 
+    print '\n ----------------------------------- W+jets separate by Inclusive CR ----------------------------------------'
+
+    srNames = ['srA1', 'srA2',]
+    tab1 = printTableDataDriven(f1, srNames)
+    tab1.set_theme_latex()
+    tab1.print_pdf('1lepWRun2_srA.pdf')
+
+    srNames = ['srE1', 'srE2', 'srE3',]
+    tab2 = printTableDataDriven(f1, srNames)
+    tab2.set_theme_latex()
+    tab2.print_pdf('1lepWRun2_srE.pdf')
+
+    srNames = ['srG1', 'srG2', 'srG3',]
+    tab3 = printTableDataDriven(f1, srNames)
+    tab3.set_theme_latex()
+    tab3.print_pdf('1lepWRun2_srG.pdf')
+
+    print '\n ----------------------------------- W+jets for corridor ----------------------------------------'
     srNames = ['srI',]
     tab4 = printTableDataDriven(f1, srNames)
     tab4.set_theme_latex()
@@ -324,17 +345,19 @@ if __name__ == '__main__':
 
     r.gROOT.SetBatch(1)
 
-    # f1 = r.TFile('../StopLooper/output/combRun2_v37_s5/allBkg_run2.root')
+    # f1 = r.TFile('../StopLooper/output/combRun2_v39_s1/allBkg_run2.root')
     # srNames = ['srA0', 'srA1', 'srA2', 'srB', 'srC','srD', 'srE0', 'srE1', 'srE2', 'srE3', 'srF', 'srG0', 'srG1', 'srG2', 'srG3', 'srH',]
 
     # makeBkgCompositionTable(f1, srNames,  'run2_std')
     # makeBkgCompositionTable(f1, ['srI',], 'run2_cor')
 
-    makeBkgEstimateTablesLostLepton()
-    # makeBkgEstimateTables1LepFromW()
+    indir = '../StopLooper/output/combRun2_v39_m1'
 
-    f1 = r.TFile('../StopLooper/output/combRun2_v37_c5/allBkg_run2.root')
-    makeBkgCompositionTable(f1, ['srI',], 'run2_cor5')
+    makeBkgEstimateTablesLostLepton(indir)
+    makeBkgEstimateTables1LepFromW(indir)
+
+    # f1 = r.TFile('../StopLooper/output/combRun2_v37_c5/allBkg_run2.root')
+    # makeBkgCompositionTable(f1, ['srI',], 'run2_cor5')
 
     # makeBkgEstimationTableWJets()
 
