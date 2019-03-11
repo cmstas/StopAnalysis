@@ -1602,8 +1602,10 @@ std::vector<SR> getStopControlRegionsNoBTagsRun2() {
     }
     if (cr.GetLowerBound(tmod) < 10)
       cr.SetVar(nbjet, 0, 1);
-    if (cr.VarExists(tfttag)) cr.RemoveVar(tfttag);
-    if (cr.VarExists(deepttag)) cr.RemoveVar(deepttag);
+    if (cr.VarExists(tfttag) && cr.VarExists(deepttag)) {
+      cr.RemoveVar(deepttag);
+      cr.RemoveVar(tfttag);
+    }
     cr.ReplaceVar(mlb, mlb_0b);
     CRvec.emplace_back(cr);
   }
