@@ -57,7 +57,7 @@ const bool doTopTagging = true;
 // turn on to apply json file to data
 const bool applyGoodRunList = true;
 // veto 2018 events with an electron land in the HEM region
-const bool doHEMElectronVeto = false;
+const bool doHEMElectronVeto = true;
 // re-run resolved top MVA locally
 const bool runResTopMVA = false;
 // only produce yield histos
@@ -1345,17 +1345,19 @@ void StopLooper::fillHistosForCRemu(string suf, int trigType) {
       //     fillhists("_"+evtWgt.getLabel(syst));
       //   }
       // }
-      // if (is_bkg_ && year_ >= 2017) {
-      //   double ISRwgt(1.0), ISRup(1.0), ISRdn(1.0);
-      //   evtWgt.getISRnJetsWeight_local(ISRwgt, ISRup, ISRdn);
-      //   evtweight_ *= ISRwgt;
-      //   fillhists("_ISRUncUp");
-      //   fillhists("_ISRUncDn");
-      //   evtweight_ *= ISRup/ISRwgt;
-      //   fillhists("_ISRUp");
-      //   evtweight_ *= ISRdn/ISRup;
-      //   fillhists("_ISRDn");
-      // }
+      if (is_bkg_ && year_ == 2016) {
+        double ISRwgt(1.0), ISRup(1.0), ISRdn(1.0);
+        evtWgt.getISRnJetsWeight_local(ISRwgt, ISRup, ISRdn);
+        plot1d("h_ptttbar_b1_ISRUp", values_[ptttbar], evtweight_*ISRup/ISRwgt, cr.histMap, ";p_{T}(t#bar{t}) [GeV]", ptbin1.size()-1, ptbin1.data());
+        plot1d("h_ptttbar_b1_ISRDn", values_[ptttbar], evtweight_*ISRdn/ISRwgt, cr.histMap, ";p_{T}(t#bar{t}) [GeV]", ptbin1.size()-1, ptbin1.data());
+        // evtweight_ *= ISRwgt;
+        // fillhists("_ISRUncUp");
+        // fillhists("_ISRUncDn");
+        // evtweight_ *= ISRup/ISRwgt;
+        // fillhists("_ISRUp");
+        // evtweight_ *= ISRdn/ISRup;
+        // fillhists("_ISRDn");
+      }
 
       if (trigType == 1) {
         const vector<float> lptbins = {0, 30, 40, 50, 75, 100, 125, 200};

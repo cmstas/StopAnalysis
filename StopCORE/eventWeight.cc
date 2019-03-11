@@ -264,7 +264,7 @@ evtWgtInfo::evtWgtInfo() {
 
   // Utilty Var Constants
   year = 0;
-  lumi = 137.42;         // Legacy lumi of RunII
+  lumi = 137.16;         // Legacy lumi of RunII
   lumi_err = lumi*0.05;  // 5% uncertainty may be enough?
 
   // Initialize event weights and related variables
@@ -289,7 +289,7 @@ void evtWgtInfo::Setup(string samplestr, int inyear, bool applyUnc, bool useBTag
     lumi = 41.529;         // 2017 lumi
     lumi_err = lumi*0.023;
   } else if (year == 2018) {
-    lumi = 59.613;          // projected 2018 lumi
+    lumi = 59.710;          // projected 2018 lumi
     lumi_err = lumi*0.025;  // preliminary value
   }
 
@@ -2147,7 +2147,7 @@ inline void evtWgtInfo::getHEMElectronVetoWeight( double &weight_HEMveto ) {
   weight_HEMveto = 1.0;
   if (year != 2018) return;
   if (abs(lep2_pdgid()) == 11 && lep2_p4().eta() < -1.4 && lep2_p4().phi() > -1.6 && lep2_p4().phi() < -0.8)
-    weight_HEMveto = 20.99/59.61;
+    weight_HEMveto = 21.025/59.710;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -2343,14 +2343,18 @@ void evtWgtInfo::setDefaultSystematics( int syst_set ) {
 }
 
 double evtWgtInfo::getZSampleWeightFromCR3l( TString fname, bool apply ) {
-  double sf_3l = 1.0;
+  // TTV measurement from CMS: https://arxiv.org/pdf/1711.02547.pdf
+  double sf_xsec = 1.0;
   if (fname.Contains("TTZ"))
-    sf_3l = 1.14;
+    sf_xsec = 1.17;
+  else if (fname.Contains("TTW"))
+    sf_xsec = 1.23;
+  // WZ measurement from CMS: https://arxiv.org/pdf/1901.03428.pdf
   else if (fname.Contains("WZ"))
-    sf_3l = 1.21;
+    sf_xsec = 1.21;
 
-  if (apply) sf_extra_file *= sf_3l;
-  return sf_3l;
+  if (apply) sf_extra_file *= sf_xsec;
+  return sf_xsec;
 }
 
 double evtWgtInfo::getExtSampleWeightSummer16v2( TString fname, bool apply ) {
