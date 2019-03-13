@@ -319,6 +319,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
   }
 
   gconf.GetConfigsFromDatasetName(filestr);
+  bool isFall17FastExt1 = (filestr.find("Fall17Fast") != string::npos && filestr.find("_ext1-v1") != string::npos);
 
   // Setup lepton SF histos
   eventWeight_lepSF lepsf;
@@ -334,9 +335,11 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
     } else if (gconf.year == 2018) {
       lepsf_filepath = "lepsf/analysisRun2_2018";
     }
-    cout << ">>> Grabbing lepton scale factors from: " << lepsf_filepath << endl;
 
-    lepsf.setup(isSignalFromFileName, gconf.year, lepsf_filepath);
+    if (isFall17FastExt1)
+      lepsf.setup(isSignalFromFileName, 2018, "lepsf/analysisRun2_2018");
+    else
+      lepsf.setup(isSignalFromFileName, gconf.year, lepsf_filepath);
   } // end if applying lepton SFs
 
 
