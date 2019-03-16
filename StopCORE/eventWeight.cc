@@ -850,6 +850,7 @@ void evtWgtInfo::getXSecWeight( double &xsec_val, double &weight_xsec_up, double
   if ( is_fastsim_ && susy_xsec_fromfile ) {
     xsec_val = h_sig_xsec->GetBinContent(h_sig_xsec->FindBin(mStop));
     xsec_err = h_sig_xsec->GetBinError(h_sig_xsec->FindBin(mStop));
+    // xsec_val = h_sig_xsec->GetBinContent(h_sig_xsec->FindBin(1300));
   } else {
     xsec_val = babyAnalyzer.xsec();
     xsec_err = babyAnalyzer.xsec_uncert();
@@ -2343,15 +2344,19 @@ void evtWgtInfo::setDefaultSystematics( int syst_set ) {
 }
 
 double evtWgtInfo::getZSampleWeightFromCR3l( TString fname, bool apply ) {
-  // TTV measurement from CMS: https://arxiv.org/pdf/1711.02547.pdf
+  // TTV measurement from CMS: https://arxiv.org/abs/1711.02547
   double sf_xsec = 1.0;
   if (fname.Contains("TTZ"))
     sf_xsec = 1.17;
   else if (fname.Contains("TTW"))
     sf_xsec = 1.23;
-  // WZ measurement from CMS: https://arxiv.org/pdf/1901.03428.pdf
-  else if (fname.Contains("WZ"))
-    sf_xsec = 1.21;
+  // WZ measurement from CMS: https://arxiv.org/abs/1901.03428
+  // For WZ -> 1l 3nu: 48.09*0.327*0.200 = 3.145, SNT uses 3.058
+  else if (fname.Contains("WZTo1L3Nu"))
+    sf_xsec = 1.03;
+  // For WZ -> 3l 1nu: Unknown since sample may have included Wgamma, use values from SS
+  else if (fname.Contains("WZTo3LNu"))
+    sf_xsec = 1.07;
 
   if (apply) sf_extra_file *= sf_xsec;
   return sf_xsec;

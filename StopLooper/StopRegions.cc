@@ -1,8 +1,8 @@
 #include "StopRegions.h"
 
 const float fInf = std::numeric_limits<float>::max();
-const float wpResTop = 0.9;
-const float wpDeepTop = 0.4;
+const float wpResTop = 0.85;
+const float wpDeepTop = 0.30;
 
 
 std::vector<SR> getStopControlRegionsNoBTags(std::vector<SR>&& SRvec) {
@@ -1350,10 +1350,42 @@ std::vector<SR> getStopSignalRegionsRun2() {
   sr.SetVar(mlb, 0, 175);
   SRvec.emplace_back(sr);
 
+  // Inclusive for E+G, low MET
+  sr.SetName("srincl5L");
+  sr.SetVar(met, 250, 450);
+  SRvec.emplace_back(sr);
+  sr.SetVar(met, 250, fInf);
+
+  // Inclusive for E+G, low MET + not merge tagged
+  sr.SetName("srincl5LR");
+  sr.SetVar(met, 250, 450);
+  sr.SetVar(deepttag, -2, wpDeepTop);
+  SRvec.emplace_back(sr);
+  sr.SetVar(met, 250, fInf);
+  sr.RemoveVar(deepttag);
+
   // Inclusive for F+H
   sr.SetName("srincl6");
   sr.SetVar(mlb, 175, fInf);
   SRvec.emplace_back(sr);
+
+  // Inclusive for A+E+G, low MET, (deepAK8 tags)
+  sr.SetName("srincl7L");
+  sr.SetVar(njettmod, 1, 2);
+  sr.SetVar(njet, 2, fInf);
+  sr.SetVar(mlb, 0, 175);
+  sr.SetVar(tmod, 0, fInf);
+  sr.SetVar(met, 250, 450);
+  SRvec.emplace_back(sr);
+
+  // Inclusive for A, low MET, (deepAK8 tags)
+  sr.SetName("srinclA");
+  sr.SetVar(njet, 2, 4);
+  sr.SetVar(mlb, 0, 175);
+  sr.SetVar(tmod, 10, fInf);
+  sr.SetVar(met, 250, 600);
+  SRvec.emplace_back(sr);
+
 
   // Test region at MET sideband for top taggers
   sr = srbase;
@@ -1602,10 +1634,7 @@ std::vector<SR> getStopControlRegionsNoBTagsRun2() {
     }
     if (cr.GetLowerBound(tmod) < 10)
       cr.SetVar(nbjet, 0, 1);
-    if (cr.VarExists(tfttag) && cr.VarExists(deepttag)) {
-      cr.RemoveVar(deepttag);
-      cr.RemoveVar(tfttag);
-    }
+    if (cr.VarExists(tfttag)) cr.RemoveVar(tfttag);
     cr.ReplaceVar(mlb, mlb_0b);
     CRvec.emplace_back(cr);
   }

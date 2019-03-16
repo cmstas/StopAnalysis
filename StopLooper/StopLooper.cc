@@ -63,7 +63,7 @@ const bool runResTopMVA = false;
 // only produce yield histos
 const bool runYieldsOnly = false;
 // only running selected signal points to speed up
-const bool runFullSignalScan = true;
+const bool runFullSignalScan = false;
 // debug symbol, for printing exact event kinematics that passes
 const bool printPassedEvents = false;
 
@@ -227,6 +227,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
     if (datayear == 2018) scaletype = "18to17";
     else if (datayear == 2016) scaletype = "16to17";
     else if (samplestr.find("TTJets") == 0 && samplestr.find("f17v2") != string::npos) scaletype = "cremu0_ttbar";
+    // else if (samplestr.find("data_2017F_09May") != string::npos) scaletype = "FToBtoE";
     TH1F* h_nvtxscale = (TH1F*) f_purw.Get("h_nvtxscale_"+scaletype);
     if (!h_nvtxscale) throw invalid_argument("No nvtx reweighting hist found for " + scaletype);
     if (verbose) cout << "Doing nvtx reweighting! Scaling " << scaletype << ". The scale factors are:" << endl;
@@ -281,13 +282,14 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
     else cout << "[looper] >> Cannot find the sample version!" << endl;
 
     // Attach the MiniAOD version from dsname
-    if (dsname.Contains("RunIIFall17MiniAODv2")) samplever += ":Fall17v2";
+    if      (dsname.Contains("RunIIAutumn18MiniAOD"))   samplever += ":Autumn18v1";
+    else if (dsname.Contains("RunIIFall17MiniAODv2"))   samplever += ":Fall17v2";
     else if (dsname.Contains("RunIISummer16MiniAODv2")) samplever += ":Summer16v2";
     else if (dsname.Contains("RunIISummer16MiniAODv3")) samplever += ":Summer16v3";
     else if (dsname.Contains("RunIISpring16MiniAODv2")) samplever += ":Spring16v2";
 
-    cout << "[looper] >> Running on sample: " << dsname << endl;
-    cout << "[looper] >> Sample detected with year = " << year_ << " and version = " << samplever << endl;
+    cout << "[StopLooper] >> Running on sample: " << dsname << endl;
+    cout << "[StopLooper] >> Sample detected with year = " << year_ << " and version = " << samplever << endl;
 
     is_fastsim_ = fname.Contains("SMS") || fname.Contains("Signal");
     is_bkg_ = (!is_data() && !is_fastsim_);
@@ -305,6 +307,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
 
     // evtWgt.apply_L1prefire_sf = false;
     evtWgt.apply_HEMveto_sf = doHEMElectronVeto;
+    // evtWgt.susy_xsec_fromfile = true;
 
     // evtWgt.setDefaultSystematics(evtWgtInfo::test_alloff);  // for test purpose
 
@@ -392,14 +395,17 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
       // For testing on only subset of mass points
       if (!runFullSignalScan && is_fastsim_) {
         // if (!checkMassPt(800,400)  && !checkMassPt(1200,50)  && !checkMassPt(400,100) &&
-        //     !checkMassPt(1100,300) && !checkMassPt(1100,500) && !checkMassPt(900,600)) continue;
+        //     !checkMassPt(1100,300) && !checkMassPt(1100,500) && !checkMassPt(900,600) &&
+        //     !checkMassPt(1200,200) && !checkMassPt(1200,400) && !checkMassPt(1200,600)) continue;
         if (dsname.Contains("T2tt")) {
           float massdiff = mass_stop() - mass_lsp();
           // if (mass_lsp() < 400 && mass_stop() < 1000) continue;
           // if (massdiff < 200 || massdiff > 400) continue;
           // if (massdiff < 200 || massdiff > 400 || mass_lsp() < 400) continue;
           // if (massdiff < 600 || mass_stop() < 1000) continue;
-          if (massdiff < 300 || massdiff > 450) continue;
+          // if (massdiff < 300 || mass_stop() < 800 || mass_stop() > 1300 || mass_lsp() > 750 || mass_lsp() < 500) continue;
+          // if (massdiff < 300 || massdiff > 500) continue;
+          if (massdiff < 600) continue;
           plot2d("h2d_T2tt_masspts", mass_stop(), mass_lsp(), 1, SRVec.at(0).histMap, ";M_{stop} [GeV]; M_{lsp} [GeV]", 100, 300, 1300, 80, 0, 800);
         } else if (dsname.Contains("T2bW")) {
           float massdiff = mass_stop() - mass_lsp();
@@ -443,7 +449,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
       // Plot nvtxs on the base selection of stopbaby for reweighting purpose
       plot1d("h_nvtxs", nvtxs(), 1, testVec[0].histMap, ";Number of vertices", 100, 1, 101);
 
-      if (doNvtxReweight && (datayear == 2016 || datayear == 2018)) {
+      if (doNvtxReweight) {
         if (nvtxs() < 100) evtweight_ = nvtxscale_[nvtxs()];  // only scale for data
         plot1d("h_nvtxs_rwtd", nvtxs(), evtweight_, testVec[0].histMap, ";Number of vertices", 100, 1, 101);
       }
@@ -747,7 +753,7 @@ void StopLooper::fillYieldHistos(SR& sr, float met, string suf, bool is_cr2l) {
 
   evtweight_ = evtWgt.getWeight(evtWgtInfo::systID(jestype_), is_cr2l);
 
-  if (doNvtxReweight && (datayear == 2016 || datayear == 2018)) {
+  if (doNvtxReweight) {
     if (nvtxs() < 100) evtweight_ *= nvtxscale_[nvtxs()];  // only scale for data
   }
 
