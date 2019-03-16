@@ -45,6 +45,14 @@ inline float deltaPhi(float phi1, float phi2) {
   return dphi;
 }
 
+inline float min2deltaPhi(float phi0, float phi1, float phi2) {
+  return std::min(deltaPhi(phi0, phi1), deltaPhi(phi0, phi2));
+}
+
+inline float calculateMT(double Et1, double phi1, double Et2, double phi2){
+  return sqrt(2*Et1*Et2*(1.0 - cos(phi1-phi2)));
+}
+
 // Old functions that enforce float for ranges to be consistent with xval for floating point errors
 void plot1D(string name, float xval, double weight, std::map<string, TH1*> &allhistos, string title, int numbinsx, float xmin, float xmax)
 {
