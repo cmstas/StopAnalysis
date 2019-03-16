@@ -37,14 +37,20 @@ TOOLSLIB = ../CORE/Tools/btagsf/BTagCalibrationStandalone.o
 # stopCORE.so: sysInfo.o eventWeight_bTagSF.o eventWeight_lepSF.o selectionInfo.o categoryInfo.o genClassyInfo.o sampleInfo.o stop_1l_babyAnalyzer.o
 # 	$(LD) $(LDFLAGS) $(SOFLAGS) -o stopCORE.so sysInfo.o eventWeight_bTagSF.o eventWeight_lepSF.o selectionInfo.o categoryInfo.o genClassyInfo.o sampleInfo.o stop_1l_babyAnalyzer.o $(GLIBS) -lGenVector -lEG $(CORELIB) $(STOPVARLIB) -Wl,-rpath,./
 
-stopCORE.so: StopTree.o eventWeight.o eventWeight_bTagSF.o eventWeight_lepSF.o sampleInfo.o ResolvedTopMVA.o
-	$(LD) $(LDFLAGS) $(SOFLAGS) -o stopCORE.so StopTree.o eventWeight.o eventWeight_bTagSF.o eventWeight_lepSF.o ResolvedTopMVA.o sampleInfo.o $(GLIBS) -lGenVector -lEG $(TOOLSLIB) -Wl,-rpath,./
+stopCORE.so: StopTree.o eventWeight.o eventWeight_bTagSF.o eventWeight_lepSF.o sampleInfo.o ResolvedTopMVA.o METCorrectionHandler.o METObject.o
+	$(LD) $(LDFLAGS) $(SOFLAGS) -o stopCORE.so StopTree.o eventWeight.o eventWeight_bTagSF.o eventWeight_lepSF.o ResolvedTopMVA.o sampleInfo.o METCorrectionHandler.o METObject.o $(GLIBS) -lGenVector -lEG $(TOOLSLIB) -Wl,-rpath,./
 
 sysInfo.o: sysInfo.h sysInfo.cc StopTree.h StopTree.cc eventWeight_lepSF.h eventWeight_lepSF.cc eventWeight_bTagSF.h eventWeight_bTagSF.cc
 	$(CXX) $(CXXFLAGS) -c sysInfo.cc
 
 ResolvedTopMVA.o: TopTagger/ResolvedTopMVA.h TopTagger/ResolvedTopMVA.cc TopTagger/TMVAReader.h
 	$(CXX) $(CXXFLAGS) -c TopTagger/ResolvedTopMVA.cc
+
+METCorrectionHandler.o: METC/METCorrectionHandler.h METC/METCorrectionHandler.cc
+	$(CXX) $(CXXFLAGS) -c METC/METCorrectionHandler.cc
+
+METObject.o: METC/METObject.h METC/METObject.cc
+	$(CXX) $(CXXFLAGS) -c METC/METObject.cc
 
 %.o: 	%.cc %.h
 	$(QUIET) echo "Compiling $<"; \
