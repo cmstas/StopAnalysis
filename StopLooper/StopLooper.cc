@@ -49,6 +49,8 @@ const bool applyBtagSFfromFiles = false; // default false
 const bool applyLeptonSFfromFiles = false; // default false
 // turn on to apply json file to data
 const bool applyGoodRunList = true;
+// apply the MET resolution correction to the MET variables, required running
+const bool applyMETResCorrection = false;
 // turn on to enable plots of metbins with systematic variations applied. will only do variations for applied weights
 const bool doSystVariations = true;
 // turn on to enable plots of metbins with different gen classifications
@@ -61,8 +63,8 @@ const bool doTopTagging = true;
 const bool doHEMElectronVeto = true;
 // re-run resolved top MVA locally
 const bool runResTopMVA = false;
-// run the MET resolution correction
-const bool runMETResCorrection = true;
+// run the MET resolution correction (and store in separate branches)
+const bool runMETResCorrection = false;
 // only produce yield histos
 const bool runYieldsOnly = false;
 // only running selected signal points to speed up
@@ -314,6 +316,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
     // evtWgt.apply_L1prefire_sf = false;
     evtWgt.apply_HEMveto_sf = doHEMElectronVeto;
     // evtWgt.susy_xsec_fromfile = true;
+    // evtWgt.apply_pu_sf_fromFile = true;
 
     // evtWgt.setDefaultSystematics(evtWgtInfo::test_alloff);  // for test purpose
 
@@ -336,6 +339,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
 
     if (!is_data() && runMETResCorrection) // setup MET resolution stuff
       metCorrector.setup(year_, to_string(year_), "../StopCORE/METC/METSFs");
+      // metCorrector.setup(year_, "2017F-09May2018", "../StopCORE/METC/METSFs");
 
     dummy.cd();
     // Loop over Events in current file
@@ -518,8 +522,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
         metobj.extras.phi_JECup = pfmet_phi_jup();
         metobj.extras.phi_JECdn = pfmet_phi_jdown();
 
-        metCorrector.correctMET(genmet(), genmet_phi(), &metobj, is_fastsim_); // Last flag is for fast sim., but there are no separate factors, so it doesn’t matter
-        // if (static int i=1; i++<100) cout << __LINE__ << ": pfmet()= " << pfmet() << ", metobj.extras.met= " << metobj.extras.met << endl;
+        metCorrector.correctMET(genmet(), genmet_phi(), &metobj, is_fastsim_); // Last flag is for fast sim., but there are no separate factors, so it doesn't matter
       }
 
       // Filling the variables for analysis
@@ -656,6 +659,13 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
           values_[mt_rs] = calculateMT(lep1_p4().pt(), lep1_p4().phi(), metobj.extras.met, metobj.extras.phi);
           values_[dphilmet_rs] = deltaPhi(lep1_p4().phi(), metobj.extras.phi);
           values_[dphijmet_rs] = (ngoodjets() > 1)? min2deltaPhi(metobj.extras.phi, ak4pfjets_p4().at(0).phi(), ak4pfjets_p4().at(1).phi()) : -9;
+          if (applyMETResCorrection) {
+            values_[met] = values_[met_rs];
+            values_[metphi] = values_[metphi_rs];
+            values_[mt] = values_[mt_rs];
+            values_[dphilmet] = values_[dphilmet_rs];
+            values_[dphijmet] = values_[dphijmet_rs];
+          }
         } else {
           values_[met_rs] = values_[met];
           values_[metphi_rs] = values_[metphi];
@@ -701,6 +711,16 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
           values_[tmod_rl] = topnessMod_rl_jdown();
         }
         values_[passlmet_rl] = (values_[lep1pt] < 50) || (values_[lep1pt] < (250 - 100*values_[dphilmet_rl]));
+
+        if (!is_data() && runMETResCorrection && applyMETResCorrection && values_[nlep_rl] > 1) {
+          LorentzVector newmet(metobj.extras.met*cos(metobj.extras.phi), metobj.extras.met*sin(metobj.extras.phi), 0, metobj.extras.met);
+          newmet += lep2_p4();
+          values_[met_rl] = newmet.pt();
+          values_[metphi_rl] = newmet.phi();
+          values_[mt_rl] = calculateMT(lep1_p4().pt(), lep1_p4().phi(), values_[met_rl], values_[metphi_rl]);
+          values_[dphilmet_rl] = deltaPhi(lep1_p4().phi(), values_[metphi_rl]);
+          values_[dphijmet_rl] = (ngoodjets() > 1)? min2deltaPhi(values_[metphi_rl], ak4pfjets_p4().at(0).phi(), ak4pfjets_p4().at(1).phi()) : -9;
+        }
 
         fillHistosForCRemu(suffix);
 
@@ -911,7 +931,7 @@ void StopLooper::fillHistosForSR(string suf) {
 
     auto fillExtraHists = [&](string s) {
       plot1d("h_met_s"+s, values_[met], evtweight_, sr.histMap, ";#slash{E}_{T} [GeV]" , 40, 50, 250);
-      plot1d("h_mt_s"+s, values_[mt], evtweight_, sr.histMap, ";#slash{E}_{T} [GeV]" , 40, 0, 400);
+      plot1d("h_mt_s"+s, values_[mt], evtweight_, sr.histMap, ";M_{T} [GeV]" , 40, 0, 400);
       // MT components
       plot1d("h_lep1phi"+s, lep1_p4().phi(), evtweight_, sr.histMap, ";#phi(lep1)", 32, 0, 3.2);
       float Wphi = atan2((lep1_p4().py()+values_[met]*sin(values_[metphi])), (lep1_p4().px()+values_[met]*cos(values_[metphi])));
@@ -920,7 +940,7 @@ void StopLooper::fillHistosForSR(string suf) {
 
       plot1d("h_met_rs"+s,      values_[met_rs]      , evtweight_, sr.histMap, ";#slash{E}_{T} [GeV]"           , 32,  50, 850);
       plot1d("h_metphi_rs"+s,   values_[metphi_rs]   , evtweight_, sr.histMap, ";#phi(#slash{E}_{T})"           , 34, -3.4, 3.4);
-      plot1d("h_mt_rs"+s,       values_[mt_rs]       , evtweight_, sr.histMap, ";#slash{E}_{T} [GeV]"           , 40, 0, 400);
+      plot1d("h_mt_rs"+s,       values_[mt_rs]       , evtweight_, sr.histMap, ";M_{T} [GeV]"                   , 40, 0, 400);
       plot1d("h_dphijmet_rs"+s, values_[dphijmet_rs] , evtweight_, sr.histMap, ";#Delta#phi(jet,#slash{E}_{T})" , 25,  0.8, 3.3);
       plot1d("h_dphilmet_rs"+s, values_[dphilmet_rs] , evtweight_, sr.histMap, ";#Delta#phi(l,MET)"             , 32,   0, 3.2);
     };
@@ -1094,6 +1114,14 @@ void StopLooper::fillHistosForCR0b(string suf) {
         plot1d("h_dphilmet"+s,   values_[dphilmet] , evtweight_, cr.histMap, ";#Delta#phi(l,MET)"             , 32,   0, 3.2);
       }
 
+      if (runMETResCorrection) {
+        plot1d("h_met_rs"+s,      values_[met_rs]      , evtweight_, cr.histMap, ";#slash{E}_{T} [GeV]"           , 32,  50, 850);
+        plot1d("h_metphi_rs"+s,   values_[metphi_rs]   , evtweight_, cr.histMap, ";#phi(#slash{E}_{T})"           , 34, -3.4, 3.4);
+        plot1d("h_mt_rs"+s,       values_[mt_rs]       , evtweight_, cr.histMap, ";M_{T} [GeV]"                   , 40, 0, 400);
+        plot1d("h_dphijmet_rs"+s, values_[dphijmet_rs] , evtweight_, cr.histMap, ";#Delta#phi(jet,#slash{E}_{T})" , 25,  0.8, 3.3);
+        plot1d("h_dphilmet_rs"+s, values_[dphilmet_rs] , evtweight_, cr.histMap, ";#Delta#phi(l,MET)"             , 32,   0, 3.2);
+      }
+
       plot1d("h_jet1pt"+s,  values_[jet1pt],  evtweight_, cr.histMap, ";p_{T}(jet1) [GeV]"  , 32,  0, 800);
       plot1d("h_jet2pt"+s,  values_[jet2pt],  evtweight_, cr.histMap, ";p_{T}(jet2) [GeV]"  , 32,  0, 800);
       plot1d("h_jet1eta"+s, values_[jet1eta], evtweight_, cr.histMap, ";#eta(jet1) [GeV]"   , 30,  -3,  3);
@@ -1108,18 +1136,13 @@ void StopLooper::fillHistosForCR0b(string suf) {
 
     auto fillExtraHists = [&](string s) {
       plot1d("h_met_s"+s, values_[met], evtweight_, cr.histMap, ";#slash{E}_{T} [GeV]" , 40, 50, 250);
-      plot1d("h_mt_s"+s, values_[mt], evtweight_, cr.histMap, ";#slash{E}_{T} [GeV]" , 40, 0, 400);
+      plot1d("h_mt_s"+s, values_[mt], evtweight_, cr.histMap, ";M_{T} [GeV]" , 40, 0, 400);
       // MT components
       plot1d("h_lep1phi"+s, lep1_p4().phi(), evtweight_, cr.histMap, ";#phi(lep1)", 32, 0, 3.2);
       float Wphi = atan2((lep1_p4().py()+values_[met]*sin(values_[metphi])), (lep1_p4().px()+values_[met]*cos(values_[metphi])));
       plot1d("h_dphiWlep"+s, deltaPhi(Wphi, lep1_p4().phi()), evtweight_, cr.histMap, ";#Delta#phi(W,lep)", 32, 0, 3.2);
       plot1d("h_dphiWmet"+s, deltaPhi(Wphi, values_[metphi]), evtweight_, cr.histMap, ";#Delta#phi(W,MET)", 32, 0, 3.2);
 
-      plot1d("h_met_rs"+s,      values_[met_rs]      , evtweight_, cr.histMap, ";#slash{E}_{T} [GeV]"           , 32,  50, 850);
-      plot1d("h_metphi_rs"+s,   values_[metphi_rs]   , evtweight_, cr.histMap, ";#phi(#slash{E}_{T})"           , 34, -3.4, 3.4);
-      plot1d("h_mt_rs"+s,       values_[mt_rs]       , evtweight_, cr.histMap, ";#slash{E}_{T} [GeV]"           , 40, 0, 400);
-      plot1d("h_dphijmet_rs"+s, values_[dphijmet_rs] , evtweight_, cr.histMap, ";#Delta#phi(jet,#slash{E}_{T})" , 25,  0.8, 3.3);
-      plot1d("h_dphilmet_rs"+s, values_[dphilmet_rs] , evtweight_, cr.histMap, ";#Delta#phi(l,MET)"             , 32,   0, 3.2);
     };
     if (cr.GetName().find("sb") != string::npos)
       fillExtraHists(suf);
@@ -1183,6 +1206,8 @@ void StopLooper::fillHistosForCRemu(string suf, int trigType) {
   system_p4 += ak4pfjets_p4().at(jetidx.at(0)) + ak4pfjets_p4().at(jetidx.at(1));
 
   LorentzVector met_p4( pfmet()*cos(pfmet_phi()), pfmet()*sin(pfmet_phi()), 0.0, pfmet() );
+  if (runMETResCorrection && applyMETResCorrection)
+    met_p4 = LorentzVector( values_[met_rs]*cos(values_[metphi_rs]), values_[met_rs]*sin(values_[metphi_rs]), 0.0, values_[met_rs]);
   system_p4 += met_p4;
 
   values_[mllbbmet] = system_p4.M();
@@ -1290,6 +1315,7 @@ void StopLooper::fillHistosForCRemu(string suf, int trigType) {
         plot1d("h_rlmt"+s,       values_[mt_rl]      , evtweight_, cr.histMap, ";M_{T} (removed lepton) [GeV]"  , 10,  150, 600);
         plot1d("h_rltmod"+s,     values_[tmod_rl]    , evtweight_, cr.histMap, ";Modified topness"              , 20, -10, 15);
         plot1d("h_rldphijmet"+s, values_[dphijmet_rl], evtweight_, cr.histMap, ";#Delta#phi(jet,(#slash{E}+l_{2}))" , 33,  0, 3.3);
+        plot1d("h_rldphilmet"+s, values_[dphilmet_rl], evtweight_, cr.histMap, ";#Delta#phi(l,MET(rl))"         , 32,   0, 3.2);
 
         plot1d("h_topness"+s,  topness()           , evtweight_, cr.histMap, ";topness"              , 30, -15, 15);
         plot1d("h_metorg"+s,   pfmet_original()    , evtweight_, cr.histMap, ";#slash{E}_{T} [GeV]"  , 22, 250, 800);

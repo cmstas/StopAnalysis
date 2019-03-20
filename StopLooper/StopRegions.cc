@@ -1405,18 +1405,6 @@ std::vector<SR> getStopSignalRegionsRun2() {
   sr.SetMETBins({150, 200, 250});
   SRvec.emplace_back(sr);
 
-  sr.SetName("srsbmet2m");  // MET sideband
-  sr.SetDetailName("ge4j_met150to250_mt0toInf_deepttag");
-  sr.SetVar(deepttag, wpDeepTop, 1);
-  SRvec.emplace_back(sr);
-  sr.RemoveVar(deepttag);
-
-  sr.SetName("srsbmet2r");  // MET sideband
-  sr.SetDetailName("ge4j_met150to250_mt0toInf_resttag");
-  sr.SetVar(bdtttag, wpResTop, 1);
-  SRvec.emplace_back(sr);
-  sr.RemoveVar(bdtttag);
-
   sr.SetName("srsbmet3");  // MET sideband
   sr.SetDetailName("2to3j_met150to250_mt0toInf");
   sr.SetVar(njet, 3, fInf);
@@ -1439,6 +1427,13 @@ std::vector<SR> getStopSignalRegionsRun2() {
   sr.SetVar(njet, 2, fInf);
   sr.SetVar(passlep1pt, 1, 2);
   sr.SetMETBins({150, 200, 250, 300, 400, 500, 800, 1500});
+  SRvec.emplace_back(sr);
+
+  sr.SetName("srsbfmt");
+  sr.SetDetailName("ge2j_met250toInf_mt0toInf");
+  sr.SetVar(njet, 2, fInf);
+  sr.SetVar(met, 250, fInf);
+  sr.SetVar(mt, 0, fInf);
   SRvec.emplace_back(sr);
 
   // Start of nominal signal regions
