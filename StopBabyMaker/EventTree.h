@@ -80,6 +80,8 @@ public:
     float topness_lep2;
     float topnessMod_lep2;
     float MT2_ll;
+    float MT2_had;
+    float MT2_had_genmet;
 
     float MT2W_rl;
     float topnessMod_rl;
@@ -91,9 +93,11 @@ public:
     float MT2W_jup;
     float topnessMod_jup;
     float MT2_ll_jup;
+    float MT2_had_jup;
     float MT2W_jdown;
     float topnessMod_jdown;
     float MT2_ll_jdown;
+    float MT2_had_jdown;
 
     float MT2_lb_b;
     float MT2_lb_b_lep2;
@@ -114,6 +118,13 @@ public:
     float Mlb_lead_bdiscr_lep2;
     float Mjjj;
     float Mjjj_lep2;
+
+    float mht_pt;
+    float mht_pt_jup;
+    float mht_pt_jdown;
+    float mht_phi;
+    float mht_phi_jup;
+    float mht_phi_jdown;
 
     float pfmet;
     float pfmet_phi;

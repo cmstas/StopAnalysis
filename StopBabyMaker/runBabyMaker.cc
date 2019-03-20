@@ -151,7 +151,7 @@ int main(int argc, char **argv){
   mylooper->fillPhoton      =  false;
   mylooper->fillMETfilt     =  true;
   mylooper->fill2ndlep      =  false;
-  mylooper->fillExtraEvtVar =  false;
+  mylooper->fillExtraEvtVar =  true;  // just for the special branch
 
   mylooper->fillAK8         =  true;
   mylooper->fillTopTag      =  true;
@@ -221,6 +221,7 @@ int main(int argc, char **argv){
   parseAndSet_b("applyMETRecipeV2" , mylooper->applyMETRecipeV2);
   parseAndSet_b("fillPhoton"       , mylooper->fillPhoton);
   parseAndSet_b("fillZll"          , mylooper->fillZll);
+  parseAndSet_b("fillExtraEvtVar"  , mylooper->fillExtraEvtVar);
 
   if (ifile != -1) suffix += Form("_%i", ifile);
 

@@ -15,7 +15,6 @@
 #include "TTreeCache.h"
 #include "TGraphAsymmErrors.h"
 
-#include "CMS3.h"
 #include "MCSelections.h"
 #include "StopSelections.h"
 #include "TriggerSelections.h"
@@ -29,6 +28,7 @@
 //#include "btagsf/BTagCalibrationStandalone.h"
 
 // CORE
+#include "CMS3.h"
 #include "Config.h"
 #include "PhotonSelections.h"
 #include "MuonSelections.h"
@@ -43,6 +43,8 @@
 #include "utils.h"
 #include "dorky/dorky.h"
 #include "datasetinfo/getDatasetInfo.h"
+#include "hemJet.h"
+#include "MT2/MT2.h"
 
 
 typedef ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > LorentzVector;
@@ -1743,6 +1745,62 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
         StopEvt.MT2_ll_jdown = CalcMT2_(StopEvt.pfmet_jdown,StopEvt.pfmet_phi_jdown,lep1.p4,lep2.p4,false,0);
       }
 
+      // MT2(had) <-- same as used in the all hadronic MT2 analysis
+      if(fillExtraEvtVar){
+        vector<LorentzVector> p4sForHems = jets.ak4pfjets_p4;
+        vector<LorentzVector> p4sForHemsUP = jets_jup.ak4pfjets_p4;
+        vector<LorentzVector> p4sForHemsDN = jets_jdown.ak4pfjets_p4;
+        if(nVetoLeptons>0){
+          p4sForHems.push_back(lep1.p4);
+          p4sForHemsUP.push_back(lep1.p4);
+          p4sForHemsDN.push_back(lep1.p4);
+        }
+        if(nVetoLeptons>1){
+          p4sForHems.push_back(lep2.p4);
+          p4sForHemsUP.push_back(lep2.p4);
+          p4sForHemsDN.push_back(lep2.p4);
+        } // stop at 2 since jets aren't removed with additional lepton overlap
+        sort(p4sForHems.begin(), p4sForHems.end(), sortP4byPt());
+        sort(p4sForHemsUP.begin(), p4sForHemsUP.end(), sortP4byPt());
+        sort(p4sForHemsDN.begin(), p4sForHemsDN.end(), sortP4byPt());
+
+        // compute HT, MHT using same objects as MT2 inputs
+        LorentzVector sumMhtp4 = LorentzVector(0,0,0,0);
+        LorentzVector sumMhtp4UP = LorentzVector(0,0,0,0);
+        LorentzVector sumMhtp4DN = LorentzVector(0,0,0,0);
+        for (size_t ip4 = 0; ip4 < p4sForHems.size(); ++ip4) {
+          sumMhtp4 -= p4sForHems.at(ip4);
+        }
+        for (size_t ip4 = 0; ip4 < p4sForHemsUP.size(); ++ip4) {
+          sumMhtp4UP -= p4sForHemsUP.at(ip4);
+        }
+        for (size_t ip4 = 0; ip4 < p4sForHemsDN.size(); ++ip4) {
+          sumMhtp4DN -= p4sForHemsDN.at(ip4);
+        }
+        StopEvt.mht_pt  = sumMhtp4.pt();
+        StopEvt.mht_phi = sumMhtp4.phi();
+        StopEvt.mht_pt_jup  = sumMhtp4UP.pt();
+        StopEvt.mht_phi_jup = sumMhtp4UP.phi();
+        StopEvt.mht_pt_jdown  = sumMhtp4DN.pt();
+        StopEvt.mht_phi_jdown = sumMhtp4DN.phi();
+
+        // compute the hadronic MT2(s)
+        if(p4sForHems.size() > 1){
+          //Hemispheres used in MT2 calculation
+          vector<LorentzVector> hemJets = getHemJets(p4sForHems);
+          StopEvt.MT2_had = HemMT2(StopEvt.pfmet, StopEvt.pfmet_phi, hemJets.at(0), hemJets.at(1));
+          if (!isDataFromFileName) StopEvt.MT2_had_genmet = HemMT2(StopEvt.genmet, StopEvt.genmet_phi, hemJets.at(0), hemJets.at(1));
+        }
+        if(p4sForHemsUP.size() > 1){
+          vector<LorentzVector> hemJetsUP = getHemJets(p4sForHemsUP);
+          StopEvt.MT2_had_jup = HemMT2(StopEvt.pfmet_jup, StopEvt.pfmet_phi_jup, hemJetsUP.at(0), hemJetsUP.at(1));
+        }
+        if(p4sForHemsDN.size() > 1){
+          vector<LorentzVector> hemJetsDN = getHemJets(p4sForHemsDN);
+          StopEvt.MT2_had_jdown = HemMT2(StopEvt.pfmet_jdown, StopEvt.pfmet_phi_jdown, hemJetsDN.at(0), hemJetsDN.at(1));
+        }
+      }
+
       if(jets.ngoodjets>1){
 
         // DR(lep, leadB) with medium discriminator
@@ -1871,10 +1929,10 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
         }
         if(nVetoLeptons>0) StopEvt.Mlb_lead_bdiscr = (jets.ak4pfjets_p4.at(jetIndexSortedBdisc[0])+lep1.p4).M();
         if(nVetoLeptons>1) StopEvt.Mlb_lead_bdiscr_lep2 = (jets.ak4pfjets_p4.at(jetIndexSortedBdisc[0])+lep2.p4).M();
-        if(rankmaxDPhi.size()>=3) {
+        if(fillExtraEvtVar && rankmaxDPhi.size()>=3) {
           StopEvt.Mjjj = (jets.ak4pfjets_p4.at(rankmaxDPhi[0].second)+jets.ak4pfjets_p4.at(rankmaxDPhi[1].second)+jets.ak4pfjets_p4.at(rankmaxDPhi[2].second)).M();
         }
-        if(rankmaxDPhi_lep2.size()>=3) {
+        if(fillExtraEvtVar && rankmaxDPhi_lep2.size()>=3) {
           StopEvt.Mjjj_lep2 = (jets.ak4pfjets_p4.at(rankmaxDPhi_lep2[0].second)+jets.ak4pfjets_p4.at(rankmaxDPhi_lep2[1].second)+jets.ak4pfjets_p4.at(rankmaxDPhi_lep2[2].second)).M();
           //StopEvt.Mjjj_lep2 = (jets.ak4pfjets_p4.at(jb21)+jets.ak4pfjets_p4.at(jb22)+jets.ak4pfjets_p4.at(jb23)).M();
         }
