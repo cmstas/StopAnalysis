@@ -61,7 +61,7 @@ def getYieldEInTopoBins(f, srNames, hname='metbins'):
     for sr in srNames:
         hist = f.Get(sr+'/h_'+hname)
         if not hist:
-            print "Can't find", sr+'/h_'+hname, "!!!";
+            print "Can't find", sr+'/h_'+hname, "!! Returning 0s";
             hist = f.Get(sr+'/h_metbins')
             if not hist: print "This should not happen!"
             yields.append([E(0,0)]*hist.GetNbinsX())

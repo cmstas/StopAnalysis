@@ -21,9 +21,15 @@ def MT2PlotMaker(rootdir, samples, data, dirname, plots, output_dir=".", exts=["
 
     if lumi==None:
         if 'samp16' in rootdir: lumi = 35.9
-        if 'samp17' in rootdir: lumi = 42.0
-        if 'samp18' in rootdir: lumi = 42.0
-        if 'Run2'   in rootdir: lumi = 137.4
+        if 'samp17' in rootdir: lumi = 41.5
+        if 'samp18' in rootdir: lumi = 59.7
+        if 'Run2'   in rootdir: lumi = 137.1
+
+    if lumi==None:
+        if  '16'  in data: lumi = 35.9
+        if  '17'  in data: lumi = 41.5
+        if  '18'  in data: lumi = 59.7
+        if 'run2' in data: lumi = 137.1
 
     ## deal with suffixes
     # crdybaseInclLowPtOF means that we should take the plots in crdybaseIncl that end in LowPt
@@ -193,9 +199,11 @@ def MT2PlotMaker(rootdir, samples, data, dirname, plots, output_dir=".", exts=["
             doOverflow = plots[i][5]
         markerSize=0.8
         title = utils.GetCRName(dirname)
-        # title = None
-        xAxisTitle = utils.GetVarName(vn)
-        unit = utils.GetUnit(vn)
+        xAxisTitle = h_bkg_vecs[i][0].GetXaxis().GetTitle()
+        unit = None
+        if xAxisTitle == "":
+            xAxisTitle = utils.GetVarName(vn)
+            unit = utils.GetUnit(vn)
         subtitles = utils.GetSubtitles(dirname)
         if h_data[i]!=None:
             if not scaleMC:

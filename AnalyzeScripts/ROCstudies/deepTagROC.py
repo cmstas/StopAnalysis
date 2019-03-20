@@ -59,6 +59,8 @@ def StoNErr(s, b, se, be):
     v /= 4*(s+b)**3
     return sqrt(v)
 
+def getStoN(s, b):
+    return s / sqrt(s + b + (0.1*s)**2 + (0.1*b)**2)
 
 def getROCSigVBkg(f1, f2, sr, hname="h_deepttag", starval=[]):
     hgood = f1.Get(sr+'/'+hname)
@@ -125,7 +127,8 @@ def getStoNSigVBkg(f1, f2, sr, hname="h_deepttag", norm_sig=34.03, norm_bkg=825.
     lst_sigerr *= norm_sig
     lst_bkgerr *= norm_bkg
 
-    lst_StoN = np.array([lst_sigyld[i] / sqrt(lst_sigyld[i]+lst_bkgyld[i]) for i in range(len(lst_sigyld)) if lst_sigyld[i] > 0], dtype=float)
+    # lst_StoN = np.array([lst_sigyld[i] / sqrt(lst_sigyld[i]+lst_bkgyld[i]) for i in range(len(lst_sigyld)) if lst_sigyld[i] > 0], dtype=float)
+    lst_StoN = np.array([getStoN(lst_sigyld[i],lst_bkgyld[i]) for i in range(len(lst_sigyld)) if lst_sigyld[i] > 0], dtype=float)
     lst_StoNerr = np.array([StoNErr(lst_sigyld[i],lst_bkgyld[i],lst_sigerr[i],lst_bkgerr[i]) for i in range(len(lst_sigyld)) if lst_sigyld[i] > 0], dtype=float)
 
     gston = r.TGraphErrors(lst_disc.size, lst_disc, lst_StoN, r.nullptr, lst_StoNerr)
@@ -144,63 +147,78 @@ if __name__ == "__main__":
 
     r.gROOT.SetBatch(1)
 
-    f1 = r.TFile("../../StopLooper/output/samp17_s9/SMS_T2tt_dMgt600.root")
-    f2 = r.TFile("../../StopLooper/output/samp17_s9/allBkg_17.root")
+    # f1 = r.TFile("../../StopLooper/output/samp17_s9/SMS_T2tt_dMgt600.root")
+    # f2 = r.TFile("../../StopLooper/output/samp17_s9/allBkg_17.root")
     # f3 = r.TFile("../../StopLooper/output/temp11/SMS_T2bW.root")
+    # f1 = r.TFile("../../StopLooper/output/combRun2_v39_s1/SMS_T2tt_dM300to500_1xs_run2.root")
+    # f1 = r.TFile("../../StopLooper/output/combRun2_v39_s1/SMS_T2tt_dMgt600_run2.root")
+    # f2 = r.TFile("../../StopLooper/output/combRun2_v39_s1/allBkg_run2.root")
+    # f1 = r.TFile("../../StopLooper/output/combRun2_v39_m30_r85/SMS_T2tt_dM600_1xs_run2.root")
+    f1 = r.TFile("../../StopLooper/output/combRun2_v39_m30_r85/SMS_T2tt_dM300to500_1xs_run2.root")
+    f2 = r.TFile("../../StopLooper/output/combRun2_v39_m30_r85/allBkg_run2.root")
+
+    suf = "dm400_1xs"
+    sr = "srincl7L"
 
     c1 = r.TCanvas("c1", "c1", 800, 600)
 
-    groc = getROCSigVBkg(f1, f2, "srbase", "h_deepttag", starval=[0.4, 0.6])
+    groc = getROCSigVBkg(f1, f2, sr, "h_deepttag", starval=[0.4, 0.6])
     groc.SetLineColor(r.kAzure)
     groc.SetLineWidth(3)
     groc.Draw()
-    # c1.Print("roc_deepdisc_top.pdf")
+    # c1.Print("roc_deepdisc_top_"+suf+".pdf")
 
-    grocb = getROCSigVBkg(f1, f2, "srbase", "h_binttag")
-    grocb.SetLineWidth(3)
-    grocb.SetLineColor(r.kTeal)
-    grocb.Draw("same")
+    # grocb = getROCSigVBkg(f1, f2, sr, "h_binttag")
+    # grocb.SetLineWidth(3)
+    # grocb.SetLineColor(r.kTeal)
+    # grocb.Draw("same")
 
-    leg = r.TLegend(0.2, 0.64, 0.38, 0.8)
-    leg.AddEntry(groc, "raw disc")
-    leg.AddEntry(grocb, "binerized")
-    leg.Draw()
+    # leg = r.TLegend(0.2, 0.64, 0.38, 0.8)
+    # leg.AddEntry(groc, "raw disc")
+    # leg.AddEntry(grocb, "binerized")
+    # leg.Draw()
 
-    c1.Print("roc_rawvsbin_top_base_dm600.pdf")
+    # c1.Print("roc_rawvsbin_top_base_"+suf+".pdf")
 
     # fxra = r.TFile("temp.root")
     # gak4 = fxra.Get("roc_ltc_dm600")
     # gak4.SetLineColor(r.kCyan)
     # gak4.Draw("same")
 
-    # c1.Print("roc_mvr_dm600.pdf")
+    # c1.Print("roc_mvr_"+suf+".pdf")
 
     c1.Clear()
 
-    gstob = getStoNSigVBkg(f1, f2, "srbase", "h_deepttag")
+    gstob = getStoNSigVBkg(f1, f2, sr, "h_bdtttag")
     gstob.Draw()
-    c1.Print("stob_raw_top_base_dm600.pdf")
+    c1.Print("stob_bdttop_"+sr+"_"+suf+".pdf")
 
     c1.Clear()
 
-    gstob = getStoNSigVBkg(f1, f2, "srbase", "h_binttag")
+    gstob = getStoNSigVBkg(f1, f2, sr, "h_deepttag")
     gstob.Draw()
-    c1.Print("stob_bin_top_base_dm600.pdf")
+    c1.Print("stob_deeptop_"+sr+"_"+suf+".pdf")
+
+    c1.Clear()
+
+    gstob = getStoNSigVBkg(f1, f2, sr, "h_tfttag")
+    gstob.Draw()
+    c1.Print("stob_tftop_"+sr+"_"+suf+".pdf")
 
     exit()
     c1.Clear()
 
-    grocw = getROCSigVBkg(f1, f2, "srbase", "h_deepWtag", starval=[0.3,])
+    grocw = getROCSigVBkg(f1, f2, sr, "h_deepWtag", starval=[0.3,])
     grocw.Draw()
-    # c1.Print("roc_deepdisc_W_base.pdf")
+    # c1.Print("roc_deepdisc_W_"+sr+".pdf")
 
     # S/sqrt(S+B) curves with errors
     c1.Clear()
 
-    gstob = getStoNSigVBkg(f1, f2, "srbase", "h_deepWtag")
+    gstob = getStoNSigVBkg(f1, f2, sr, "h_deepWtag")
     gstob.Draw()
 
-    # c1.Print("stob_deepdisc_W_base.pdf")
+    # c1.Print("stob_deepdisc_W_"+sr+".pdf")
 
     # Comined ROC curves with tmod, resolved tagger, chi2, etc
     c1.Clear()

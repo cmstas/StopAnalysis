@@ -68,6 +68,11 @@ if __name__ == "__main__":
     sreff16_mu = getTEfficiency(f16, "trigeff_met_lep1pt_mu", "16")
     sreff16_el = getTEfficiency(f16, "trigeff_met_lep1pt_el", "16")
 
+    f18 = r.TFile("../StopLooper/output/data18_jetht_v37/allData_18.root")
+    sreff18 = getTEfficiency(f18, "trigeff_met_lep1pt", "18")
+    sreff18_mu = getTEfficiency(f18, "trigeff_met_lep1pt_mu", "18")
+    sreff18_el = getTEfficiency(f18, "trigeff_met_lep1pt_el", "18")
+
     # move efficiencies from old file to a single combined file
     fold = r.TFile("../StopCORE/inputs/trigger/TriggerEff_2016.root")
     oeff16_el = fold.Get("Efficiency_ge2l_metrl_el")
@@ -125,6 +130,10 @@ if __name__ == "__main__":
     effd17_mu.Write()
     effd17_el.Write()
 
+    sreff18.Write()
+    sreff18_mu.Write()
+    sreff18_el.Write()
+
     sreff17.Write()
     sreff17_mu.Write()
     sreff17_el.Write()
@@ -178,6 +187,8 @@ if __name__ == "__main__":
     printEfficiency(c1, effd17_el,   "heffd17_el")
     printEfficiency(c1, effd16_mu,   "heffd16_mu")
     printEfficiency(c1, effd16_el,   "heffd16_el")
+    printEfficiency(c1, sreff18_mu,  "hsreff18_mu")
+    printEfficiency(c1, sreff18_el,  "hsreff18_el")
     printEfficiency(c1, sreff17_mu,  "hsreff17_mu")
     printEfficiency(c1, sreff17_el,  "hsreff17_el")
     printEfficiency(c1, sreff16_mu,  "hsreff16_mu")

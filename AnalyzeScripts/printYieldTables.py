@@ -85,16 +85,23 @@ def makeTFComparisonTable():
     # f1 = r.TFile('lostlepton16.root')
     # f2 = r.TFile('lostlepton_17.root')
 
-    f1 = r.TFile('../StopLooper/output/samp17_v37_m4/1lepFromW_17.root')
-    f2 = r.TFile('../StopLooper/output/samp17_v30_m4/1lepFromW_17.root')
+    # f1 = r.TFile('../StopLooper/output/samp17_v37_m4/1lepFromW_17.root')
+    # f2 = r.TFile('../StopLooper/output/samp17_v30_m4/1lepFromW_17.root')
+
+    # f1 = r.TFile('../StopLooper/output/samp17_v39_mrs0/lostlepton_17.root')
+    # f2 = r.TFile('../StopLooper/output/samp17_v39_mrs2/lostlepton_17.root')
+
+    f1 = r.TFile('../StopLooper/output/samp17_v39_mrs0/1lepFromW_17.root')
+    f2 = r.TFile('../StopLooper/output/samp17_v39_mrs2/1lepFromW_17.root')
 
     # f1 = r.TFile('../StopLooper/output/samp16_v30_s3/lostlepton.root')
     # f2 = r.TFile('../StopLooper/output/samp16_v30_genttscaled/lostlepton.root')
 
-    suf1 = 'v0'
-    suf2 = 'v2'
+    suf1 = 'mrsOff'
+    suf2 = 'mrsOn'
 
-    srNames = ['srA0', 'srA1', 'srA2', 'srB', 'srC','srD', 'srE0', 'srE1', 'srE2', 'srE3', 'srF', 'srG0', 'srG1', 'srG2', 'srG3', 'srH',]
+    # srNames = ['srA0', 'srA1', 'srA2', 'srB', 'srC','srD', 'srE0', 'srE1', 'srE2', 'srE3', 'srF', 'srG0', 'srG1', 'srG2', 'srG3', 'srH', 'srI']
+    srNames = ['srA0', 'srA1', 'srA2', 'srB', 'srC', 'srD', 'srE0', 'srF', 'srG0', 'srH', 'srI']
 
     tab = Table()
     preds1  = getYieldEInTopoBins(f1, srNames, 'metbins')
@@ -118,14 +125,15 @@ def makeTFComparisonTable():
     tab.add_column('MC SR '+suf2, [(1*y).round(2) for y in sum(yMC_SR2,[])])
     tab.add_column('MC CR '+suf1, [(1*y).round(2) for y in sum(yMC_CR1,[])])
     tab.add_column('MC CR '+suf2, [(1*y).round(2) for y in sum(yMC_CR2,[])])
-    # tab.add_column('TF_{CR}^{SR} '+suf1, [(1*y).round(2) for y in sum(alpha1,[])])
-    # tab.add_column('TF_{CR}^{SR} '+suf2, [(1*y).round(2) for y in sum(alpha2,[])])
-    # tab.add_column('Diff(TF_{{{0}}}/TF_{{{1}}})'.format(suf1,suf2), [((y1-y2)/y1).round(2).pct_rep() if y1.val > 0 else 0 for y1, y2 in zip(sum(alpha1,[]), sum(alpha2,[]))])
+    tab.add_column('TF_{CR}^{SR} '+suf1, [(1*y).round(3) for y in sum(alpha1,[])])
+    tab.add_column('TF_{CR}^{SR} '+suf2, [(1*y).round(3) for y in sum(alpha2,[])])
+    tab.add_column('Diff(TF_{{{0}}}/TF_{{{1}}})'.format(suf1,suf2), [((y1-y2)/y1).round(2).pct_rep() if y1.val > 0 else 0 for y1, y2 in zip(sum(alpha1,[]), sum(alpha2,[]))])
 
-    tab.add_column('data CR '+suf1, [(1*y).round(2) for y in sum(yld_CR1,[])])
-    tab.add_column('data CR '+suf2, [(1*y).round(2) for y in sum(yld_CR2,[])])
-    tab.add_column('R_{CR}(data/MC) '+suf1, [(d/m).round(2) for d, m in zip(sum(yld_CR1,[]), sum(yMC_CR1,[]))])
-    tab.add_column('R_{CR}(data/MC) '+suf2, [(d/m).round(2) for d, m in zip(sum(yld_CR2,[]), sum(yMC_CR2,[]))])
+    tab.add_column('data CR ', [(1*y).round(2) for y in sum(yld_CR1,[])])
+    # tab.add_column('data CR '+suf1, [(1*y).round(2) for y in sum(yld_CR1,[])])
+    # tab.add_column('data CR '+suf2, [(1*y).round(2) for y in sum(yld_CR2,[])])
+    # tab.add_column('R_{CR}(data/MC) '+suf1, [(d/m).round(2) for d, m in zip(sum(yld_CR1,[]), sum(yMC_CR1,[]))])
+    # tab.add_column('R_{CR}(data/MC) '+suf2, [(d/m).round(2) for d, m in zip(sum(yld_CR2,[]), sum(yMC_CR2,[]))])
     # tab.add_column('Pred '+suf1, [(1*y).round(2) for y in sum(preds1,[])])
     # tab.add_column('Pred '+suf1+' \\times 42/36', [(y*(42.0/35.9)).round(2) for y in sum(preds1,[])])
     # tab.add_column('Pred '+suf2, [(1*y).round(2) for y in sum(preds2,[])])
@@ -133,7 +141,7 @@ def makeTFComparisonTable():
 
     tab.print_table()
     tab.set_theme_latex()
-    tab.print_pdf('compareCR0b_METv0vsv2.pdf')
+    tab.print_pdf('compareCR0b_MRSOffvsOn.pdf')
 
 
 def makeBkgEstimateTablesLostLepton(indir):
@@ -248,11 +256,11 @@ def makeBkgEstimateTables1LepFromW(indir):
 
 
 def makeMETExtrInfoTable():
-    srNames = ['srA0', 'srA1', 'srA2', 'srB', 'srC','srD', 'srE0', 'srE1', 'srE2', 'srE3', 'srF', 'srG0', 'srG1', 'srG2', 'srG3', 'srH',]
+    srNames = ['srA0', 'srA1', 'srA2', 'srB', 'srC','srD', 'srE0', 'srE1', 'srE2', 'srE3', 'srF', 'srG0', 'srG1', 'srG2', 'srG3', 'srH', ]
     # srNames = ['srA0', 'srA1', 'srB', 'srC', ]
 
-    f1 = r.TFile('../StopLooper/output/combRun2_v30_s3/lostlepton_run2.root')
-    f2 = r.TFile('../CombineAnalysis/lostlepton_run2.root')
+    f1 = r.TFile('../StopLooper/output/combRun2_v39_s2/lostlepton_run2.root')
+    f2 = r.TFile('./lostlepton_run2.root')
 
     alpha1  = getYieldEInTopoBins(f1, srNames, 'alphaHist')
     alpha2  = getYieldEInTopoBins(f2, srNames, 'alphaHist')
@@ -282,6 +290,7 @@ def makeMETExtrInfoTable():
     # tab.print_table()
     tab.set_theme_latex()
     tab.print_table()
+    tab.print_pdf('lostlep_METextrBins.pdf')
 
 
 def makeBkgCompositionTable(f1, srNames, savename='run2'):
@@ -339,28 +348,56 @@ def makeBkgEstimationTableWJets():
     tab.set_theme_latex()
     tab.print_pdf('WJetsEstimation_pre1_run2.pdf')
 
+
+def makeSystUncertaintyMaxTable(indir, srNames, bkgType='lostlep'):
+
+    if bkgType == 'lostlep':
+        f1 = r.TFile(indir+'/lostlepton_run2.root')
+    elif bkgType == '1lepW':
+        f1 = r.TFile(indir+'/1lepFromW_run2.root')
+
+    preds = sum(getYieldEInTopoBins(f1, srNames, 'metbins'), [])
+
+    tab = Table()
+
+    systs = ['jes', 'bTagEffHF', 'bTagEffLF', 'lepSF', 'alphas', 'q2', 'tauSF', 'pdf', 'pileup', 'cr2lTriggerSF',]
+    for sys in systs:
+        y_sysUp = sum(getYieldEInTopoBins(f1, srNames, 'metbins_'+sys+'Up'), [])
+        y_sysDn = sum(getYieldEInTopoBins(f1, srNames, 'metbins_'+sys+'Dn'), [])
+        maxErrUp = [ 0 if cen.val < 0.0001 else round(abs(2*(sup.val-cen.val)/(sup.val+cen.val)), 3) for sup, cen in zip(y_sysUp, preds) ]
+        maxErrDn = [ 0 if cen.val < 0.0001 else round(abs(2*(sdn.val-cen.val)/(sdn.val+cen.val)), 3) for sdn, cen in zip(y_sysDn, preds) ]
+        maxErr = [ max(meu, med) for meu, med in zip(maxErrUp, maxErrDn) ]
+
+        print sys, round(100*min(maxErr),1), '-', round(100*max(maxErr), 1)
+        # print sys, maxErrUp
+        # print sys, sum(maxErr, 0) / len(maxErr)
+
+
 if __name__ == '__main__':
 
     # os.system('mkdir -p plots')
 
     r.gROOT.SetBatch(1)
 
-    # f1 = r.TFile('../StopLooper/output/combRun2_v39_s1/allBkg_run2.root')
-    # srNames = ['srA0', 'srA1', 'srA2', 'srB', 'srC','srD', 'srE0', 'srE1', 'srE2', 'srE3', 'srF', 'srG0', 'srG1', 'srG2', 'srG3', 'srH',]
+    f1 = r.TFile('../StopLooper/output/combRun2_v39_m1/allBkg_run2.root')
+    srNames = ['srA0', 'srA1', 'srA2', 'srB', 'srC','srD', 'srE0', 'srE1', 'srE2', 'srE3', 'srF', 'srG0', 'srG1', 'srG2', 'srG3', 'srH', 'srI']
 
-    # makeBkgCompositionTable(f1, srNames,  'run2_std')
+    # makeBkgCompositionTable(f1, srNames,  'run2_all')
     # makeBkgCompositionTable(f1, ['srI',], 'run2_cor')
 
-    indir = '../StopLooper/output/combRun2_v39_m1'
+    indir = '../StopLooper/output/combRun2_v39_s2'
 
-    makeBkgEstimateTablesLostLepton(indir)
-    makeBkgEstimateTables1LepFromW(indir)
+    # makeBkgEstimateTablesLostLepton(indir)
+    # makeBkgEstimateTables1LepFromW(indir)
 
     # f1 = r.TFile('../StopLooper/output/combRun2_v37_c5/allBkg_run2.root')
     # makeBkgCompositionTable(f1, ['srI',], 'run2_cor5')
 
+    srNames = ['srA0', 'srA1', 'srA2', 'srB', 'srC','srD', 'srE0', 'srE1', 'srE2', 'srE3', 'srF', 'srG0', 'srG1', 'srG2', 'srG3', 'srH']
+    # makeSystUncertaintyMaxTable(indir, srNames)
+
     # makeBkgEstimationTableWJets()
 
-    # makeTFComparisonTable()
+    makeTFComparisonTable()
 
     # makeMETExtrInfoTable()

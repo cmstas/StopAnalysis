@@ -8,7 +8,8 @@ ROOT.gROOT.SetBatch(1)
 from MT2PlotMaker import *
 
 exts = ['pdf']
-bkgnames = ['ttbar', 'Vjets', 'singleT', 'rare']
+# bkgnames = ['ttbar', 'Vjets', 'singleT', 'rare']
+bkgnames = ['tt2l', 'Vjets', 'tt1l', 'singleT', 'rare']
 
 base_plots = [
     ("met",True,None,None),
@@ -20,6 +21,7 @@ base_plots = [
     ("tmod",True,None,None),
     ("mlepb",True,None,None),
     ("dphijmet",True,None,None),
+    ("dphilmet",True,None,None),
     ("nvtxs",False,None,None),
 
     ("nsbtags",True,None,None),
@@ -76,7 +78,9 @@ emu_plots = [
     ("mll",True,None,None),
     ("ptll",True,None,None),
 
-    ("topness",True,None,None),
+    ("njets",True,None,None),
+    ("nbjets",True,None,None),
+    # ("topness",True,None,None),
 
     # ("metorg",True,None,None),
     # ("jetpt_200nonb",True,None,None),
@@ -86,6 +90,30 @@ emu_plots = [
     ("ptttbar",True,None,None),
     ("ptttbar_b1",True,None,None),
 
+]
+
+sb_plots = [
+    ("met_h",True,None,None),
+    ("met_s",True,(150, 250),None),
+    ("mt_s",True,None,None),
+    ("metphi",True,None,None),
+    ("dphijmet",True,None,None),
+    ("dphilmet",True,None,None),
+    ("njets",True,None,None),
+    ("nbjets",True,None,None),
+    ("lep1pt",True,None,None),
+    ("lep1eta",True,None,None),
+    ("lep1phi",True,None,None),
+    ("dphiWlep",True,None,None),
+    ("dphiWmet",True,None,None),
+    ("nvtxs",False,None,None),
+    ("tmod",True,None,None),
+
+    ("met_rs",True,None,None),
+    ("mt_rs",True,None,None),
+    ("metphi_rs",True,None,None),
+    ("dphijmet_rs",True,None,None),
+    ("dphilmet_rs",True,None,None),
 ]
 
 def addsuff(plotset, suf):
@@ -99,14 +127,17 @@ def addsuff(plotset, suf):
 def makeCRbasePlotsRun2():
 
     exts = ['pdf']
-    bkgnames = ['ttbar', 'Vjets', 'singleT', 'rare']
-    bkgrar0b = ['Vjets', 'ttbar', 'singleT', 'rare']
+    # bkgnames = ['ttbar', 'Vjets', 'singleT', 'rare']
+    # bkgrar0b = ['Vjets', 'ttbar', 'singleT', 'rare']
 
-    srNames = ['cr2lbase', 'cr0bbase']
-    # srNames = ['cr0bbase']
+    # srNames = ['cr2lbase', 'cr0bbase']
+    srNames = ['cr0bbase']
+    # srNames = ['cr0bsbfull']
     # srNames = ['cr2lI', 'cr0bI']
 
-    bvsuf = 'v39_s1'
+    base_plots.append(("met_h",True,None,None))
+
+    bvsuf = 'v39_m4'
 
     # 2016 parameters
     input_dir = '../../StopLooper/output/samp16_'+bvsuf
@@ -120,15 +151,16 @@ def makeCRbasePlotsRun2():
         MT2PlotMaker(input_dir, bkg_rearr, dataname, sr, plot_set, output_dir, exts)
 
     # 2017 parameters
-    input_dir = '../../StopLooper/output/samp17_'+bvsuf
+    # input_dir = '../../StopLooper/output/samp17_'+bvsuf
+    input_dir = '../../StopLooper/output/samp17_v39_mrs1'
     output_dir = 'plots17_'+bvsuf
     bkg_set = [fn+'_17' for fn in bkgnames]
     dataname = 'allData_17'
 
-    for sr in srNames:
-        plot_set = base_plots+rl_plots if ('cr2l' in sr) else base_plots
-        bkg_rearr = [bkg_set[1], bkg_set[0]] + bkg_set[2:] if 'cr0b' in sr else bkg_set
-        MT2PlotMaker(input_dir, bkg_rearr, dataname, sr, plot_set, output_dir, exts)
+    # for sr in srNames:
+    #     plot_set = base_plots+rl_plots if ('cr2l' in sr) else base_plots
+    #     bkg_rearr = [bkg_set[1], bkg_set[0]] + bkg_set[2:] if 'cr0b' in sr else bkg_set
+    #     MT2PlotMaker(input_dir, bkg_rearr, dataname, sr, plot_set, output_dir, exts)
 
     # 2018 parameters
     input_dir = '../../StopLooper/output/samp18_'+bvsuf
@@ -136,10 +168,10 @@ def makeCRbasePlotsRun2():
     bkg_set = [fn+'_18' for fn in bkgnames]
     dataname = 'allData_18'
 
-    # for sr in srNames:
-    #     plot_set = base_plots+rl_plots if ('cr2l' in sr) else base_plots
-    #     bkg_rearr = [bkg_set[1], bkg_set[0]] + bkg_set[2:] if 'cr0b' in sr else bkg_set
-    #     MT2PlotMaker(input_dir, bkg_rearr, dataname, sr, plot_set, output_dir, exts)
+    for sr in srNames:
+        plot_set = base_plots+rl_plots if ('cr2l' in sr) else base_plots
+        bkg_rearr = [bkg_set[1], bkg_set[0]] + bkg_set[2:] if 'cr0b' in sr else bkg_set
+        MT2PlotMaker(input_dir, bkg_rearr, dataname, sr, plot_set, output_dir, exts)
 
     # Combined dataset parameters
     input_dir = '../../StopLooper/output/combRun2_'+bvsuf
@@ -151,8 +183,8 @@ def makeCRbasePlotsRun2():
     # for sr in srNames:
     #     plot_set = base_plots+rl_plots if ('cr2l' in sr) else base_plots
     #     bkg_rearr = [bkg_set[1], bkg_set[0]] + bkg_set[2:] if 'cr0b' in sr else bkg_set
-    #     # MT2PlotMaker(input_dir, bkg_rearr, dataname, sr, plot_set, output_dir, exts)
-    #     MT2PlotMaker(input_dir, bkg_rearr, dataname, sr, plot_set, output_dir, exts, signame=signame, sig_points=['800_675',])
+    #     MT2PlotMaker(input_dir, bkg_rearr, dataname, sr, plot_set, output_dir, exts)
+    #     # MT2PlotMaker(input_dir, bkg_rearr, dataname, sr, plot_set, output_dir, exts, signame=signame, sig_points=['800_675',])
 
     # srNames = ['cr2lbase', 'cr0bbase', 'srsbmet', 'cr2lsbmet']
 
@@ -179,47 +211,42 @@ def makeCRemuPlots():
     #     MT2PlotMaker(input_dir, bkg_rearr, dataname, sr, plot_set, output_dir, exts, scaleMC=True)
     #     # MT2PlotMaker(input_dir, bkg_rearr, dataname, sr, plot_set, output_dir, exts, scaleMC=True, suffix='_jesDn')
 
+    bkgnames = ['ttbar', 'singleT', 'Vjets', 'rare']
 
-    input_dir = '../../StopLooper/output/samp16_v30_s3'
-    output_dir = 'plots16_v30_s3'
+    bvsuf = 'v39_m1'
+    # srNames = ['cremuA0', 'cremuA1']
+    srNames = ['cremuA0']
+    # plot_set = [("ptttbar",True,None,None), ("ptttbar_b1",True,None,None)]
+    plot_set = emu_plots
+
+    input_dir = '../../StopLooper/output/samp16_'+bvsuf
+    output_dir = 'plots16_'+bvsuf
     bkg_set = [fn+'_16' for fn in bkgnames]
     dataname = 'allData_16'
-    srNames = ['cremuA0', 'cremuA1']
 
-    # for sr in srNames:
-    #     plot_set = [("ptttbar",True,None,None), ("ptttbar_b1",True,None,None)]
-    #     bkg_rearr = [bkg_set[1], bkg_set[0]] + bkg_set[2:] if 'cr0b' in sr else bkg_set
-    #     MT2PlotMaker(input_dir, bkg_rearr, dataname, sr, plot_set, output_dir, exts, systset=['ISR'])
+    for sr in srNames:
+        MT2PlotMaker(input_dir, bkg_set, dataname, sr, plot_set, output_dir, exts, ratioType=1)
+        # MT2PlotMaker(input_dir, bkg_set, dataname, sr, plot_set, output_dir, exts, systset=['ISR'])
 
-    input_dir = '../../StopLooper/output/samp17_v30_s3'
-    output_dir = 'plots17_v30_s3'
+    input_dir = '../../StopLooper/output/samp17_'+bvsuf
+    output_dir = 'plots17_'+bvsuf
     bkg_set = [fn+'_17' for fn in bkgnames]
     dataname = 'allData_17'
-    srNames = ['cremuA0', 'cremuA1']
 
-    # for sr in srNames:
-    #     plot_set = [("ptttbar",True,None,None), ("ptttbar_b1",True,None,None)]
-    #     bkg_rearr = [bkg_set[1], bkg_set[0]] + bkg_set[2:] if 'cr0b' in sr else bkg_set
-    #     MT2PlotMaker(input_dir, bkg_rearr, dataname, sr, plot_set, output_dir, exts, systset=['ISR'])
+    for sr in srNames:
+        MT2PlotMaker(input_dir, bkg_set, dataname, sr, plot_set, output_dir, exts, ratioType=1)
+        # MT2PlotMaker(input_dir, bkg_set, dataname, sr, plot_set, output_dir, exts, systset=['ISR'])
 
+    bvsuf = 'v37_m1'
+    input_dir = '../../StopLooper/output/samp18_'+bvsuf
+    output_dir = 'plots18_'+bvsuf
+    bkg_set = [fn+'_18' for fn in bkgnames]
+    dataname = 'allData_18'
 
-sb_plots = [
-    ("met_h",True,None,None),
-    ("met_s",True,(150, 250),None),
-    ("mt_s",True,None,None),
-    ("metphi",True,None,None),
-    ("dphijmet",True,None,None),
-    ("dphilmet",True,None,None),
-    ("njets",True,None,None),
-    ("nbjets",True,None,None),
-    ("lep1pt",True,None,None),
-    ("lep1eta",True,None,None),
-    ("lep1phi",True,None,None),
-    ("dphiWlep",True,None,None),
-    ("dphiWmet",True,None,None),
-    ("nvtxs",False,None,None),
-    ("tmod",True,None,None),
-]
+    for sr in srNames:
+        MT2PlotMaker(input_dir, bkg_set, dataname, sr, plot_set, output_dir, exts, ratioType=1)
+        # MT2PlotMaker(input_dir, bkg_set, dataname, sr, plot_set, output_dir, exts, systset=['ISR'])
+
 
 # # # # # # # # # # # # # # # # # # # # # # # # #
 # Study for the 2017 samples with MET recipe v2
@@ -258,6 +285,12 @@ def makePlotsvMETandErra():
     #     os.system('rm -r {0}/09MayFvsBtoE_metv0_{1}; mv {0}/{1} {0}/09MayFvsBtoE_metv0_{1}'.format(output_dir, sr))
 
     # bkg_set = ['data_2017BtoE_METv2',]
+    # dataname = 'data_2017F_09May_METv2_purwgtd'
+    # for sr in srNames:
+    #     MT2PlotMaker(input_dir, bkg_set, dataname, sr, plot_set, output_dir, exts, ratioType=1, datatitle=dataname)
+    #     os.system('rm -r {0}/09MayFvsBtoE_metv2_purw_{1}; mv {0}/{1} {0}/09MayFvsBtoE_metv2_purw_{1}'.format(output_dir, sr))
+
+    # bkg_set = ['data_2017BtoE_METv2',]
     # dataname = 'data_2017F_09May_METv2'
     # for sr in srNames:
     #     MT2PlotMaker(input_dir, bkg_set, dataname, sr, plot_set, output_dir, exts, ratioType=1, datatitle=dataname)
@@ -287,17 +320,29 @@ def makePlotsvMETandErra():
     #     MT2PlotMaker(input_dir, bkg_set, dataname, sr, plot_set, output_dir, exts, ratioType=1, datatitle=dataname)
     #     os.system('rm -r {0}/BtoE_metv0vsv2_{1}; mv {0}/{1} {0}/BtoE_metv0vsv2_{1}'.format(output_dir, sr))
 
-    input_dir = '../../StopLooper/output/samp17_v37_m3'
-    output_dir = 'plots_samp17_v37'
-    bkg_set = ['Vjets_17', 'ttbar_17', 'singleT_17', 'rare_17']
+    # input_dir = '../../StopLooper/output/samp17_v37_m6'
+    input_dir = '../../StopLooper/output/samp17_v39_mrs2'
+    output_dir = 'plots_samp17_v39'
+    # input_dir = '../../StopLooper/output/samp18_v39_m4'
+    # output_dir = 'plots18_v39_m4'
+    # bkg_set = ['Vjets_17', 'ttbar_17', 'singleT_17', 'rare_17']
     # bkg_set = ['ttbar_17', 'Vjets_17', 'singleT_17', 'rare_17']
-    dataname = 'allData_17'
-    # dataname = 'data_2017F_31Mar'
-    srNames = ['cr0bsbmet2','cr0bsbmt','cr0bsbfull']
+    # bkg_set = ['tt1l_17', 'tt2l_17', 'Vjets_17', 'singleT_17', 'rare_17']
+    bkg_set = ['Vjets_17', 'tt1l_17', 'tt2l_17', 'singleT_17', 'rare_17']
+    # dataname = 'allData_09May_17'
+    dataname = 'allData_31Mar_17'
+    # dataname = 'data_2017F_09May'
+    # srNames = ['cr0bsbmet2','cr0bsbmt','cr0bsbfull']
+    # plot_set = [("mt_s",True,None,None), ("dphilmet",True,None,None), ("mt_rs",True,None,None), ("dphilmet_rs",True,None,None),("nvtxs",False,None,None),]
+    plot_set = [("mt_s",True,None,None), ("dphilmet",True,None,None), ]
+    # plot_set = [("rlmt_h",True,None,None), ("rldphilmet",True,None,None),]
+    srNames = ['cr0bsbfmt']
     # srNames = ['srsbmet2']
     for sr in srNames:
         MT2PlotMaker(input_dir, bkg_set, dataname, sr, plot_set, output_dir, exts, ratioType=1, datatitle=dataname)
-        os.system('rm -r {0}/{1}_v37; mv {0}/{1} {0}/{1}_v37'.format(output_dir, sr))
+        os.system('rm -r {0}/{1}_v39mrs2; mv {0}/{1} {0}/{1}_v39mrs2'.format(output_dir, sr))
+        # os.system('rm -r {0}/{1}_mrsF3_31Mar; mv {0}/{1} {0}/{1}_mrsF3_31Mar'.format(output_dir, sr))
+        # os.system('rm -r {0}/{1}_v37m6; mv {0}/{1} {0}/{1}_v37m6'.format(output_dir, sr))
 
 
 def makePlots17vs18():
@@ -323,7 +368,7 @@ def makePlots17vs18():
     # MT2PlotMaker(input_dir, bkg_set, dataname, 'srsbmet3', sb_plots, output_dir, exts, ratioType=1, scaleMC=0.49)
 
 
-def makeComparisomPlotsSystScaling():
+def makeComparisomPlotsForSysts():
     input_dir = '../../StopLooper/output/combRun2_v37_m3'
 
     srNames = ['cremuA0', 'cremuA1']
@@ -369,6 +414,20 @@ def makeComparisomPlotsSystScaling():
     #     MT2PlotMaker(input_dir, bkg_set, dataname, sr, emu_plots+gen_plots, output_dir, exts, ratioType=1, datatitle=dataname)
     #     os.system("rm -r {0}/ttbar_{1}_s16v16; mv {0}/{1} {0}/ttbar_{1}_s16v16".format(output_dir, sr))
 
+    input_dir = '../../StopLooper/output/comb17_v39_mrs'
+    output_dir = 'plots17_v39_METResOnvsOff'
+    bkg_set = ['allBkg_17_mrs0',]
+    dataname = 'allBkg_17_mrs2'
+    srNames = [ 'srsbfmt']
+    # plot_set = sb_plots
+    # plot_set = [("mt_h",True,None,None),]
+    srNames = ['srbase',]
+    plot_set = base_plots+rl_plots
+
+    # for sr in srNames:
+    #     MT2PlotMaker(input_dir, bkg_set, dataname, sr, plot_set, output_dir, exts, ratioType=0, scaleMC=False, datatitle='allBkg 17 w/ METRes corr.')
+    #     os.system("rm -r {0}/{1}_mrsOnvsOff; mv {0}/{1} {0}/{1}_mrsOnvsOff".format(output_dir, sr))
+
 
 if __name__ == '__main__':
 
@@ -378,3 +437,4 @@ if __name__ == '__main__':
 
     # makeCRemuPlots()
 
+    # makeComparisomPlotsForSysts()

@@ -2,7 +2,7 @@
 bool useMetExtrapolation = true;
 double extr_threshold = 5;  // minimum number of events in a bin to not need an MET extrapolation
 bool doCRPurityError = true;
-double extr_TFcap = 1.2;  // maximum value for the transfer factor to not do MET extrapolation
+double extr_TFcap = 10;  // maximum value for the transfer factor to not do MET extrapolation
 double maxFractionForMC = 0.10;  // minimum value for bkg fraction in SR to do extrapolation, else take from MC
 
 void dataDrivenFromCR(TFile* fdata, TFile* fmc, TFile* fout, TString ddtype, TString gentype) {
@@ -243,7 +243,7 @@ inline void parseAndSet_b(const TString& input, TString arg, bool& value) {
 int makeBkgEstimates(string input_dir="../StopLooper/output/temp14", string output_dir="../StopLooper/output/temp14", string suffix="17", TString extrargs="") {
   // First parse extra argument
   bool MetExtrFor2l = true;
-  bool MetExtrFor0b = false;
+  bool MetExtrFor0b = true;
 
   // parseAndSet_b(extrargs, "useMetExtrapolation" , useMetExtrapolation);
   parseAndSet_b(extrargs, "MetExtrFor2l"        , MetExtrFor2l);

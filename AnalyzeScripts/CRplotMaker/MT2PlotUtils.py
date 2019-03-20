@@ -8,6 +8,9 @@ def GetColor(sample):
     # if 'rare'    in sample: return 877  # kViolet-3
     if 'rare'    in sample: return 614  # kMagenta-2
 
+    if 'tt2l'    in sample: return 866  # kAzure+6
+    if 'tt1l'    in sample: return 861  # kAzure+1
+
     if 'data'    in sample: return 14   # Gray
     if 'lostlep' in sample: return 866  # kAzure+6
     if 'FromW'   in sample: return 796  # kOrange-4
@@ -45,28 +48,38 @@ def GetCRName(cr):
     return names.get(cr,cr)
 
 def GetSampleName(sample):
-    names = {"wjets_ht": "W+Jets",
-             "2015wjets_ht": "W+Jets",
-             "wjets_incl": "W+Jets",
-             "dyjetsll_ht": "Z(#font[12]{ll})+Jets",
-             "2015dyjetsll_ht": "Z(#font[12]{ll})+Jets",
-             "dyjetsll_incl": "Z(#font[12]{ll})+Jets",
-             "zinv_ht": "Z(#nu#nu)+Jets",
-             "2015zinv_ht": "Z(#nu#nu)+Jets",
-             "top": "Top",
-             "ww": "WW",
-             "gjets_ht": "Prompt #gamma",
-             "2015gjets_ht": "Prompt #gamma",
-             "gjets_dr0p05_ht": "Prompt #gamma",
-             "fakephoton": "Fake #gamma",
-             "fragphoton": "Frag. #gamma",
-             "qcd_ht": "QCD",
-             "2015qcd_ht": "QCD",
-             "lostlepFromCRs": "Lost Lepton",
-             }
+    names = {
+        # "dyjetsll_ht": "Z(#font[12]{ll})+Jets",
+        # "2015dyjetsll_ht": "Z(#font[12]{ll})+Jets",
+        # "zinv_ht": "Z(#nu#nu)+Jets",
+        # "2015zinv_ht": "Z(#nu#nu)+Jets",
+        # "top": "Top",
+        # "ww": "WW",
+        "lostlepFromCRs": "Lost Lepton",
+        "lostlep": "Lost Lepton",
+        "tt2l" : "t#bar{t}#rightarrow2 #font[12]{l}" ,
+        "tt1l" : "t#bar{t}#rightarrow1 #font[12]{l}" ,
+        "ttbar" : "t#bar{t}+Jets" ,
+        "Vjets": "V+Jets",
+        "singleT": "single top",
+        "rare": "t#bar{t}V+VV",
+        "TTZToLLNuNu": "t#bar{t}Z(#font[12]{#nu#nu})+Jets",
+        "_16" : " 16" ,
+        "_17" : " 17" ,
+        "_18" : " 18" ,
+        # "allData" : "allData" ,
+        # "allBkg " : "allBkg" ,
+        "_mrs0" : " no METRes corr." ,
+        "_mrs2" : " w/ METRes corr." ,
+    }
 
     # use the above name if defined, otherwise use sample itself
-    return names.get(sample,sample)
+    for k, v in names.items():
+        if k in sample:
+            sample = sample.replace(k, v)
+
+    # return names.get(sample,sample)
+    return sample
 
 def GetVarName(var):
     names = {"ht": "H_{T}",
@@ -110,21 +123,34 @@ def GetSubtitles(dirname):
     # if dirname=="crqcdbaseJ":
     #     return ["p_{T}(jet1) > 250 GeV", "N(jet) = 2"]
 
-    subtitle = ["E_{T}^{miss} > 250 GeV", "M_{T} > 150 GeV", "#geq 2j, #geq 1b"]
-
+    met = "E_{T}^{miss}"
+    mt  = "M_{T}"
     if "cr2l" in dirname:
-        subtitle = ["E_{T}^{miss} (rl) > 250 GeV", "M_{T} > 150 GeV", "#geq 2j, #geq 1b"]
+        met = "E_{T}^{miss}(rl)"
+        mt  = "M_{T}(rl)"
+
+    subtitle = [met+" > 250 GeV", mt+" > 150 GeV", "#geq 2j, #geq 1b"]
+
     if "cr0b" in dirname:
         subtitle[2] = "#geq 2j, == 0b"
     if "cremu" in dirname:
-        subtitle = ["E_{T}^{miss} > 50 GeV", "M(e#mu) > 20 GeV", "#geq 2j, #geq 0b"]
+        subtitle = [met+" > 50 GeV", "M(e#mu) > 20 GeV", "#geq 2j, #geq 0b"]
         if   "A1" in dirname: subtitle[2] = "#geq 2j, #geq 1b"
         elif "A2" in dirname: subtitle[2] = "#geq 2j, #geq 2b"
         elif "B0" in dirname: subtitle[2] = "#geq 2j, 0b"
         elif "B1" in dirname: subtitle[2] = "#geq 2j, 1b"
-            
-    if "sbmet" in dirname:
-        subtitle[0] = "150 GeV < E_{T}^{miss} < 250 GeV"
+    if "sbmet"  in dirname:
+        subtitle[0] = "150 GeV < "+met+" < 250 GeV"
+        if "sbmet2" in dirname:
+            subtitle[1] = mt+" > 0 GeV"
+            subtitle[2] = "#geq 4j, #geq 1b"
+    if "sbmt" in dirname:
+        subtitle[1] = "0 GeV < "+mt+" < 150 GeV"
+    if "sbfmt" in dirname:
+        subtitle[1] = mt+" > 0 GeV"
+    if "sbfull" in dirname:
+        subtitle[0] = met+" > 150 GeV"
+        subtitle[1] = mt+" > 0 GeV"
 
     return subtitle
 
@@ -133,5 +159,3 @@ def Rebin(h_bkg_vec, h_data, r):
         h.Rebin(r)
     if h_data!=None:
         h_data.Rebin(r)
-
-
