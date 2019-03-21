@@ -90,7 +90,7 @@ void EventTree::FillCommon (const std::string &root_file_name)
       if (gconf.cmssw_ver == 80) {
         filt_badMuonFilter = badMuonFilterV2(); //still some problems with MC
         filt_badChargedCandidateFilter = badChargedCandidateFilterV2();
-      } else if (gconf.cmssw_ver == 94) {
+      } else if (gconf.cmssw_ver >= 94) {
         filt_badMuonFilter = filt_BadPFMuonFilter();
         filt_badChargedCandidateFilter = filt_BadChargedCandidateFilter();
       }
@@ -110,8 +110,8 @@ void EventTree::FillCommon (const std::string &root_file_name)
       filt_trkPOG_tms = filt_trkPOG_toomanystripclus53X();
       filt_hbhenoise = filt_hbheNoise(); // hbheNoiseFilter_25ns();
       filt_hbheisonoise = filt_hbheNoiseIso();//hbheIsoNoiseFilter();
-      if (gconf.cmssw_ver == 94)
-        filt_ecalbadcalib = filt_ecalBadCalibFilter();  // new in 94X
+      if (gconf.cmssw_ver >= 94)
+        filt_ecalbadcalib = filt_ecalBadCalibFilterUpdate();  // new in 94X, updated version ran over MiniAOD
     }
     
     if (!is_data)
