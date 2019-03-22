@@ -61,6 +61,8 @@ const bool doNvtxReweight = false;
 const bool doTopTagging = true;
 // veto 2018 events with an electron land in the HEM region
 const bool doHEMElectronVeto = true;
+// veto 2018 events with an AK4 jet land in the HEM region
+const bool doHEMJetVeto = true;
 // re-run resolved top MVA locally
 const bool runResTopMVA = false;
 // run the MET resolution correction (and store in separate branches)
@@ -98,8 +100,13 @@ void StopLooper::SetSignalRegions() {
   // CR2lVec = getStopControlRegionsDileptonNewMETBinning();
 
   SRVec = getStopSignalRegionsRun2();
-  CR0bVec = getStopControlRegionsNoBTagsRun2();
-  CR2lVec = getStopControlRegionsDileptonRun2();
+
+  // Adding the inclusive regions
+  auto inclSRvec = getStopInclusiveRegionsRun2();
+  SRVec.insert(SRVec.begin()+1, inclSRvec.begin(), inclSRvec.end());
+
+  CR0bVec = getStopControlRegionsNoBTagsRun2(SRVec);
+  CR2lVec = getStopControlRegionsDileptonRun2(SRVec);
 
   // SRVec = getStopInclusiveRegionsTopological();
   // CR0bVec = getStopInclusiveControlRegionsNoBTags();
@@ -314,7 +321,8 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
       evtWgt.setDefaultSystematics(1);  // systematic set for 94X
 
     // evtWgt.apply_L1prefire_sf = false;
-    evtWgt.apply_HEMveto_sf = doHEMElectronVeto;
+    evtWgt.apply_HEMveto_el_sf = doHEMElectronVeto;
+    evtWgt.apply_HEMveto_jet_sf = doHEMJetVeto;
     // evtWgt.susy_xsec_fromfile = true;
     // evtWgt.apply_pu_sf_fromFile = true;
 
@@ -365,7 +373,8 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
 
       // Apply met filters
       if (samplever.find("v3") == 0) {
-        if ( !filt_met() ) continue;  // use the CORE function passesMETfiltersRun2()
+        // if ( !filt_met() ) continue;  // use the CORE function passesMETfiltersRun2()
+        if ( is_data() && !filt_met() ) continue;  // to test effect on MC
       } else if (doTopTagging) {
         // Recommended filters for the legacy analysis
         if ( !filt_goodvtx() ) continue;
@@ -502,6 +511,15 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
       if (doHEMElectronVeto && year_ == 2018 && is_data() && run() >= 319077) {
         if (abs(lep2_pdgid()) == 11 && lep2_p4().eta() < -1.4 && lep2_p4().phi() > -1.6 && lep2_p4().phi() < -0.8)
           continue; // veto the events
+      }
+
+      if (doHEMJetVeto && year_ == 2018 && is_data() && run() >= 319077) {
+        bool hasHEMjet = false;
+        for (auto jet : ak4pfjets_p4()) {  // the jets are cleaned with leptons already
+          if (jet.eta() < -1.4 && jet.phi() > -1.6 && jet.phi() < -0.8)
+            hasHEMjet = true;
+        }
+        if (hasHEMjet) continue;
       }
 
       // MET resolution stuff: recalculate MET using METObject
@@ -944,7 +962,7 @@ void StopLooper::fillHistosForSR(string suf) {
       plot1d("h_dphijmet_rs"+s, values_[dphijmet_rs] , evtweight_, sr.histMap, ";#Delta#phi(jet,#slash{E}_{T})" , 25,  0.8, 3.3);
       plot1d("h_dphilmet_rs"+s, values_[dphilmet_rs] , evtweight_, sr.histMap, ";#Delta#phi(l,MET)"             , 32,   0, 3.2);
     };
-    if (sr.GetName().find("sb") != string::npos)
+    if (sr.GetName().find("sb") != string::npos && suf == "")
       fillExtraHists(suf);
 
     // // Re-using fillKineHists with different suffix for extra/checking categories
@@ -1144,13 +1162,15 @@ void StopLooper::fillHistosForCR0b(string suf) {
       plot1d("h_dphiWmet"+s, deltaPhi(Wphi, values_[metphi]), evtweight_, cr.histMap, ";#Delta#phi(W,MET)", 32, 0, 3.2);
 
     };
-    if (cr.GetName().find("sb") != string::npos)
+    if (cr.GetName().find("sb") != string::npos && suf == "")
       fillExtraHists(suf);
 
     // if ( abs(lep1_pdgid()) == 11 ) {
-    //   fillKineHists(suf+"_e");
+    //   fillKineHists(suf+"_el");
+    //   fillExtraHists(suf+"_el");
     // } else if ( abs(lep1_pdgid()) == 13 ) {
     //   fillKineHists(suf+"_mu");
+    //   fillExtraHists(suf+"_mu");
     // }
 
     // if (HLT_SingleMu() || HLT_SingleEl())

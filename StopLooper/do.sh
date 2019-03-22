@@ -16,10 +16,10 @@ skimtype=skimmed
 
 OUTDIR18=$OUTDIR
 
-OUTDIR18=output/samp18_v39_s4
-OUTDIR17=output/samp17_v39_s4
-OUTDIR16=output/samp16_v39_s4
-OUTDIRRUN2=output/combRun2_v39_s4
+OUTDIR18=output/samp18_v39_s5
+OUTDIR17=output/samp17_v39_s5
+OUTDIR16=output/samp16_v39_s5
+OUTDIRRUN2=output/combRun2_v39_s5
 
 run18dat=1
 run18bkg=1
@@ -40,14 +40,14 @@ function runLooperJobs {
     for SAMPLE in ${Samples[@]}; do
         # ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
         echo ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} '>&' ${LOGDIR}/log_${SAMPLE}.txt
-        eval "nohup nice -n -10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
+        eval "nohup nice -n 1 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
     done
 }
 
 ########################
 # 2018 Data
 
-INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/data_v30_7
+INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/data_v30_10
 OUTDIR=$OUTDIR18
 # INDIR=/nfs-7/userdata/sicheng/stopbabies/merged/data_v30_3/jetht
 # OUTDIR=output/jetht_v30
@@ -118,6 +118,7 @@ LOGDIR=$OUTDIR/logs
 
 # declare -a Samples=(data_2017F)
 declare -a Samples=(data_2017B data_2017C data_2017D data_2017E data_2017F_09May)
+# declare -a Samples=(data_2017B data_2017C data_2017D data_2017E data_2017F_09May data_2017F_31Mar)
 
 [[ $run17dat == 1 ]] && runLooperJobs
 
@@ -135,8 +136,8 @@ LOGDIR=${OUTDIR}/logs
 declare -a Samples=()
 Samples+=( TTJets_2lep_f17v2_0 TTJets_2lep_f17v2_1 TTJets_2lep_f17v2_2 TTJets_2lep_f17v2_3 TTJets_2lep_f17v2_4 )
 Samples+=( TTJets_1lep_top TTJets_1lep_tbar )
-Samples+=( ST_tW_top ST_tW_tbar ST_schan ST_tchan )   # singleT
 Samples+=( W1Jets W2Jets W3Jets W4Jets DYJets )       # Vjets : Wjets + DY
+Samples+=( ST_tW_top ST_tW_tbar ST_schan ST_tchan )   # singleT
 Samples+=( TTZToLLNuNu TTWJetsToLNu TTWJetsToQQ TTZToQQ TTZToLL_M1to10 ) # rare  : ttV
 Samples+=( WZTo1L3Nu WZTo3LNu WZTo2L2Q WZTo1L1Nu2Q WWToLNuQQ WWTo2L2Nu TTWZ ZZ )   # diboson
 
@@ -278,6 +279,8 @@ echo -e 'All looper jobs done!\a'
 
 # Local merge for the v29_11+ babies
 pushd ${OUTDIR18}
+[[ $run18bkg == 1 ]] && hadd -f tt2l_18.root     TTJets_2lep*.root > /dev/null
+[[ $run18bkg == 1 ]] && hadd -f tt1l_18.root     TTJets_1lep*.root > /dev/null
 [[ $run18bkg == 1 ]] && hadd -f ttbar_18.root    TTJets*.root > /dev/null
 [[ $run18bkg == 1 ]] && hadd -f singleT_18.root  ST_*.root  > /dev/null
 [[ $run18bkg == 1 ]] && hadd -f Vjets_18.root    W?Jets*.root DYJets*.root > /dev/null
@@ -290,6 +293,8 @@ popd > /dev/null
 
 # Local merge for the v29_11+ babies
 pushd ${OUTDIR17}
+[[ $run17bkg == 1 ]] && hadd -f tt2l_17.root     TTJets_2lep*.root > /dev/null
+[[ $run17bkg == 1 ]] && hadd -f tt1l_17.root     TTJets_1lep*.root > /dev/null
 [[ $run17bkg == 1 ]] && hadd -f ttbar_17.root    TTJets*.root > /dev/null
 [[ $run17bkg == 1 ]] && hadd -f singleT_17.root  ST_*.root  > /dev/null
 [[ $run17bkg == 1 ]] && hadd -f Vjets_17.root    W?Jets*.root DYJets*.root > /dev/null
@@ -303,6 +308,8 @@ pushd ${OUTDIR17}
 popd > /dev/null
 
 pushd ${OUTDIR16}
+[[ $run16bkg == 1 ]] && hadd -f tt2l_16.root     TTJets_2lep*.root > /dev/null
+[[ $run16bkg == 1 ]] && hadd -f tt1l_16.root     TTJets_1lep*.root > /dev/null
 [[ $run16bkg == 1 ]] && hadd -f ttbar_16.root    TTJets*.root > /dev/null
 [[ $run16bkg == 1 ]] && hadd -f singleT_16.root  ST_*.root  > /dev/null
 [[ $run16bkg == 1 ]] && hadd -f Vjets_16.root    W?Jets*.root DYJets*.root > /dev/null

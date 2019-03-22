@@ -247,7 +247,8 @@ evtWgtInfo::evtWgtInfo() {
   apply_pu_sf           = false;
   apply_pu_sf_fromFile  = false;
   apply_L1prefire_sf    = false;
-  apply_HEMveto_sf      = false;
+  apply_HEMveto_el_sf   = false;
+  apply_HEMveto_jet_sf  = false;
   apply_sample_sf       = false;
   apply_genweights_unc  = true;
 
@@ -289,7 +290,7 @@ void evtWgtInfo::Setup(string samplestr, int inyear, bool applyUnc, bool useBTag
     lumi = 41.529;         // 2017 lumi
     lumi_err = lumi*0.023;
   } else if (year == 2018) {
-    lumi = 59.710;          // projected 2018 lumi
+    lumi = 59.740;          // projected 2018 lumi
     lumi_err = lumi*0.025;  // preliminary value
   }
 
@@ -619,8 +620,11 @@ void evtWgtInfo::calculateWeightsForEvent() {
   }
 
   // HEM weight for 2018
-  if (apply_HEMveto_sf && year == 2018) {
+  if (apply_HEMveto_el_sf && year == 2018) {
     getHEMElectronVetoWeight( sf_extra_event );
+  }
+  if (apply_HEMveto_jet_sf && year == 2018) {
+    getHEMJetVetoWeight( sf_extra_event );
   }
 
   // Lumi Variation
@@ -2148,7 +2152,18 @@ inline void evtWgtInfo::getHEMElectronVetoWeight( double &weight_HEMveto ) {
   weight_HEMveto = 1.0;
   if (year != 2018) return;
   if (abs(lep2_pdgid()) == 11 && lep2_p4().eta() < -1.4 && lep2_p4().phi() > -1.6 && lep2_p4().phi() < -0.8)
-    weight_HEMveto = 21.025/59.710;
+    weight_HEMveto = 21.078/59.741;
+}
+
+inline void evtWgtInfo::getHEMJetVetoWeight( double &weight_HEMveto ) {
+  if (year != 2018) return;
+  bool hasHEMjet = false;
+  for (auto jet : ak4pfjets_p4()) {  // the jets are cleaned with leptons already
+    if (jet.eta() < -1.4 && jet.phi() > -1.6 && jet.phi() < -0.8) {
+      hasHEMjet = true; break;
+    }
+  }
+  if (hasHEMjet) weight_HEMveto = 21.078/59.741;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -2312,7 +2327,8 @@ void evtWgtInfo::setDefaultSystematics( int syst_set ) {
       apply_pu_sf          = false;  // not available in baby yet
       apply_pu_sf_fromFile = true;
       apply_L1prefire_sf   = true;
-      apply_HEMveto_sf     = true;
+      apply_HEMveto_el_sf  = true;
+      apply_HEMveto_jet_sf = true;
       apply_sample_sf      = false;  // no multiple sample available yet
       if (is_fastsim_) {
         apply_lepFS_sf     = false;  // no fast sim yet

@@ -291,11 +291,12 @@ float METCorrectionHandler::getIntegratedLuminosity(TString const& period){
   else if (period == "2017E") return 9.314581018;
   else if (period == "2017F") return 13.540062029;
   // Using brilcalc lumi --normtag /cvmfs/cms-bril.cern.ch/cms-lumi-pog/Normtags/normtag_PREAPPROVED.json -u /fb -i /afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions18/13TeV/PromptReco/Cert_314472-325175_13TeV_PromptReco_Collisions18_JSON.txt
-  else if (period == "2018") return 59.709428875;
-  else if (period == "2018A") return 13.977900815;
-  else if (period == "2018B") return 7.063759976;
-  else if (period == "2018C") return 6.920186210;
+  else if (period == "2018") return 59.740565209;
+  else if (period == "2018A") return 14.027614284;
+  else if (period == "2018B") return 7.066552173;
+  else if (period == "2018C") return 6.898816878;
   else if (period == "2018D") return 31.747581874;
+  else if (period == "2018_HEM") return 38.662770627;
   else{
     cerr << "METCorrectionHandler::getIntegratedLuminosity(" << period << "): Period is not defined." << endl;
     assert(0);
