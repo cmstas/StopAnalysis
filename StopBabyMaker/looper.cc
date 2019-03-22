@@ -297,7 +297,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
   bool isTChiFromFileName = false;
   string outfilestr(output_name);
   string filestr(chain->GetFile()->GetName());
-  cout << "[looper] >> The utput name will be " << output_name << ".root";
+  cout << "[looper] >> The output name will be " << output_name << ".root";
   if (filestr.find("data") != std::string::npos) {
     isDataFromFileName = true;
     isSignalFromFileName = false;
