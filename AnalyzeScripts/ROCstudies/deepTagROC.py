@@ -60,7 +60,7 @@ def StoNErr(s, b, se, be):
     return sqrt(v)
 
 def getStoN(s, b):
-    return s / sqrt(s + b + (0.1*s)**2 + (0.1*b)**2)
+    return s / sqrt(s + b + (0.3*s)**2 + (0.3*b)**2)
 
 def getROCSigVBkg(f1, f2, sr, hname="h_deepttag", starval=[]):
     hgood = f1.Get(sr+'/'+hname)
@@ -153,11 +153,11 @@ if __name__ == "__main__":
     # f1 = r.TFile("../../StopLooper/output/combRun2_v39_s1/SMS_T2tt_dM300to500_1xs_run2.root")
     # f1 = r.TFile("../../StopLooper/output/combRun2_v39_s1/SMS_T2tt_dMgt600_run2.root")
     # f2 = r.TFile("../../StopLooper/output/combRun2_v39_s1/allBkg_run2.root")
-    # f1 = r.TFile("../../StopLooper/output/combRun2_v39_m30_r85/SMS_T2tt_dM600_1xs_run2.root")
-    f1 = r.TFile("../../StopLooper/output/combRun2_v39_m30_r85/SMS_T2tt_dM300to500_1xs_run2.root")
+    f1 = r.TFile("../../StopLooper/output/combRun2_v39_m30_r85/SMS_T2tt_dM600_1xs_run2.root")
+    # f1 = r.TFile("../../StopLooper/output/combRun2_v39_m30_r85/SMS_T2tt_dM300to500_1xs_run2.root")
     f2 = r.TFile("../../StopLooper/output/combRun2_v39_m30_r85/allBkg_run2.root")
 
-    suf = "dm400_1xs"
+    suf = "dm600_1xs_3s3b"
     sr = "srincl7L"
 
     c1 = r.TCanvas("c1", "c1", 800, 600)
@@ -191,7 +191,7 @@ if __name__ == "__main__":
 
     gstob = getStoNSigVBkg(f1, f2, sr, "h_bdtttag")
     gstob.Draw()
-    c1.Print("stob_bdttop_"+sr+"_"+suf+".pdf")
+    # c1.Print("stob_bdttop_"+sr+"_"+suf+".pdf")
 
     c1.Clear()
 
@@ -203,7 +203,7 @@ if __name__ == "__main__":
 
     gstob = getStoNSigVBkg(f1, f2, sr, "h_tfttag")
     gstob.Draw()
-    c1.Print("stob_tftop_"+sr+"_"+suf+".pdf")
+    # c1.Print("stob_tftop_"+sr+"_"+suf+".pdf")
 
     exit()
     c1.Clear()

@@ -10,14 +10,16 @@ void compareControlRegions();
 void compareData161718();
 void compareDataMC_CRemu();
 void compareSRvsCR();
+void compareDiffSuffix();
 
 void compareDistributions()
 {
   cout << "Executing macro compareControlRegions()...\n";
   // compareControlRegions();
   // compareData161718();
-  compareDataMC_CRemu();
+  // compareDataMC_CRemu();
   // compareSRvsCR();
+  compareDiffSuffix();
 
   return;
 }
@@ -66,6 +68,64 @@ void compareDataMC_CRemu() {
   // TFile temp("nvtx_reweighting_all.root", "UPDATE");
   // h_rwgt->Write("h_nvtxscale_cremu0_ttbar");
   // temp.Close();
+}
+
+void compareDiffSuffix() {
+  auto ifile_new = new TFile("../StopLooper/output/samp18_v39_m5_hemcheck/allData_18.root");
+  // auto ifile_new = new TFile("../StopLooper/output/samp18_v39_m5_hemveto/allData_18.root");
+  auto ifile_old = ifile_new;
+
+  // vector<string> Dirs = {"cr2lbase", "cr0bbase"};
+  // vector<string> Hists = {"h_met", "h_tmod"};
+  // vector<string> Hists = {"h_met", "h_mt", "h_metphi"};
+
+  vector<string> Dirs = {"cr0bsbfmt"};
+  vector<string> Hists = {"h_met_h", "h_mt_h", "h_metphi", "h_dphilmet"};
+  // vector<string> Hists = {"h_nvtxs"};
+
+  // string numsuf = "_posHEM";
+  // string densuf = "_preHEM";
+
+  string numsuf = "_wHEMjet";
+  string densuf = "_noHEMjet";
+
+  for (auto dirstr : Dirs) {
+    for (auto hn : Hists) {
+        string hstr = hn;
+        vector<Color_t> vcolor;
+        vcolor.push_back(14);
+        // if (suf == "_mu" || suf == "_mumu") vcolor.push_back(kOrange+2);
+        // else if (suf == "_e" || suf == "_ee") vcolor.push_back(kCyan-7);
+
+        auto hnum = (TH1F*) ifile_new->Get((dirstr+"/"+hstr+numsuf).c_str());
+        auto hden = (TH1F*) ifile_old->Get((dirstr+"/"+hstr+densuf).c_str());
+
+        if (!hnum) { cout << "Cannot find hist: " << dirstr+"/"+hstr+numsuf << " !!\n"; continue; }
+        if (!hden) { cout << "Cannot find hist: " << dirstr+"/"+hstr+densuf << " !!\n"; continue; }
+
+        hnum->Rebin(4);
+        hden->Rebin(4);
+
+        float scale = hnum->Integral()/hden->Integral();
+        // hden->Scale(38.66/21.08);
+        hden->Scale(scale);
+
+        string oname = " --outputName plots/" + dirstr + "_" + hstr + "_wHEMjetvsNoHEMjet.pdf";
+        // string oname = " --outputName plots/" + dirstr + "_" + hstr + "_PosHEMvsPreHEM.pdf";
+        string optstr = "--darkColorLines --topYaxisTitle Entries --type Preliminary --outOfFrame";
+        string xlabel = " --xAxisOverride " + string(hnum->GetXaxis()->GetTitle());
+        if (hn.find("h_n") != string::npos || hn.find("phi") != string::npos || !TString(hnum->GetXaxis()->GetTitle()).Contains("[GeV]"))
+          optstr += " --noDivisionLabel";
+        // optstr += " --topYaxisTitle Ratio --dataName 2018 data (14.4 fb^{-1}, scaled to 42.0 fb^{-1})";
+        // optstr += " --topYaxisTitle Ratio --dataName 2017 data PromptReco (42.0 fb^{-1})";
+        optstr += " --legendRight -0.5 --legendUp 0.12 ";
+        // optstr += " --topYaxisTitle Ratio --dataName post-HEM (38.7 fb^{-1})";
+        // dataMCplotMaker(hnum, {hden}, {"pre-HEM (21.1 fb^{-1} x 1.83)"}, "", "", optstr+xlabel+oname, {}, {}, vcolor);
+        optstr += " --topYaxisTitle Ratio --dataName pos-HEM w/ HEM jet)";
+        dataMCplotMaker(hnum, {hden}, {"pos-HEM no HEM jet x "+to_string(scale)}, "", "", optstr+xlabel+oname, {}, {}, vcolor);
+    }
+  }
+
 }
 
 void compareData161718() {

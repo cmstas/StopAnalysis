@@ -109,11 +109,11 @@ sb_plots = [
     ("nvtxs",False,None,None),
     ("tmod",True,None,None),
 
-    ("met_rs",True,None,None),
-    ("mt_rs",True,None,None),
-    ("metphi_rs",True,None,None),
-    ("dphijmet_rs",True,None,None),
-    ("dphilmet_rs",True,None,None),
+    # ("met_rs",True,None,None),
+    # ("mt_rs",True,None,None),
+    # ("metphi_rs",True,None,None),
+    # ("dphijmet_rs",True,None,None),
+    # ("dphilmet_rs",True,None,None),
 ]
 
 def addsuff(plotset, suf):
@@ -131,29 +131,32 @@ def makeCRbasePlotsRun2():
     # bkgrar0b = ['Vjets', 'ttbar', 'singleT', 'rare']
 
     # srNames = ['cr2lbase', 'cr0bbase']
-    srNames = ['cr0bbase']
+    # srNames = ['cr0bbase']
+    srNames = ['cr0bsbfmt']
     # srNames = ['cr0bsbfull']
     # srNames = ['cr2lI', 'cr0bI']
 
-    base_plots.append(("met_h",True,None,None))
+    # base_plots.append(("met_h",True,None,None))
+    base_plots = [("met_h",True,None,None), ("mt_s",True,None,None), ("lep1pt",True,None,None), ("dphilmet",True,None,None)]
+    # base_plots = addsuff(base_plots, '_mu')
 
-    bvsuf = 'v39_m4'
+    bvsuf = 'v39_m5'
 
     # 2016 parameters
     input_dir = '../../StopLooper/output/samp16_'+bvsuf
-    output_dir = 'plots16_'+bvsuf
+    output_dir = 'plots16_temp_'+bvsuf
     bkg_set = [fn+'_16' for fn in bkgnames]
     dataname = 'allData_16'
 
-    for sr in srNames:
-        plot_set = base_plots+rl_plots if ('cr2l' in sr) else base_plots
-        bkg_rearr = [bkg_set[1], bkg_set[0]] + bkg_set[2:] if 'cr0b' in sr else bkg_set
-        MT2PlotMaker(input_dir, bkg_rearr, dataname, sr, plot_set, output_dir, exts)
+    # for sr in srNames:
+    #     plot_set = base_plots+rl_plots if ('cr2l' in sr) else base_plots
+    #     bkg_rearr = [bkg_set[1], bkg_set[0]] + bkg_set[2:] if 'cr0b' in sr else bkg_set
+    #     MT2PlotMaker(input_dir, bkg_rearr, dataname, sr, plot_set, output_dir, exts)
 
     # 2017 parameters
-    # input_dir = '../../StopLooper/output/samp17_'+bvsuf
-    input_dir = '../../StopLooper/output/samp17_v39_mrs1'
-    output_dir = 'plots17_'+bvsuf
+    input_dir = '../../StopLooper/output/samp17_'+bvsuf
+    # input_dir = '../../StopLooper/output/samp17_v39_mrs2'
+    output_dir = 'plots17_temp_'+bvsuf
     bkg_set = [fn+'_17' for fn in bkgnames]
     dataname = 'allData_17'
 
@@ -164,7 +167,7 @@ def makeCRbasePlotsRun2():
 
     # 2018 parameters
     input_dir = '../../StopLooper/output/samp18_'+bvsuf
-    output_dir = 'plots18_'+bvsuf
+    output_dir = 'plots18_temp_'+bvsuf
     bkg_set = [fn+'_18' for fn in bkgnames]
     dataname = 'allData_18'
 
@@ -334,13 +337,16 @@ def makePlotsvMETandErra():
     # dataname = 'data_2017F_09May'
     # srNames = ['cr0bsbmet2','cr0bsbmt','cr0bsbfull']
     # plot_set = [("mt_s",True,None,None), ("dphilmet",True,None,None), ("mt_rs",True,None,None), ("dphilmet_rs",True,None,None),("nvtxs",False,None,None),]
-    plot_set = [("mt_s",True,None,None), ("dphilmet",True,None,None), ]
+    # plot_set = [("mt_s",True,None,None), ("dphilmet",True,None,None), ]
     # plot_set = [("rlmt_h",True,None,None), ("rldphilmet",True,None,None),]
+    # plot_set = base_plots
     srNames = ['cr0bsbfmt']
+    # srNames = ['cr0bbase']
     # srNames = ['srsbmet2']
     for sr in srNames:
-        MT2PlotMaker(input_dir, bkg_set, dataname, sr, plot_set, output_dir, exts, ratioType=1, datatitle=dataname)
-        os.system('rm -r {0}/{1}_v39mrs2; mv {0}/{1} {0}/{1}_v39mrs2'.format(output_dir, sr))
+        MT2PlotMaker(input_dir, bkg_set, dataname, sr, plot_set, output_dir, exts, datatitle=dataname, scaleMC=1.0)
+        # MT2PlotMaker(input_dir, bkg_set, dataname, sr, plot_set, output_dir, exts, datatitle=dataname)
+        os.system('rm -r {0}/{1}_v39mrs2_s1; mv {0}/{1} {0}/{1}_v39mrs2_s1'.format(output_dir, sr))
         # os.system('rm -r {0}/{1}_mrsF3_31Mar; mv {0}/{1} {0}/{1}_mrsF3_31Mar'.format(output_dir, sr))
         # os.system('rm -r {0}/{1}_v37m6; mv {0}/{1} {0}/{1}_v37m6'.format(output_dir, sr))
 
@@ -431,9 +437,9 @@ def makeComparisomPlotsForSysts():
 
 if __name__ == '__main__':
 
-    # makeCRbasePlotsRun2()
+    makeCRbasePlotsRun2()
 
-    makePlotsvMETandErra()
+    # makePlotsvMETandErra()
 
     # makeCRemuPlots()
 

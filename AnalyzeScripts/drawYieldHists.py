@@ -504,6 +504,45 @@ def drawBkgCompositionStackCorr():
 
     drawSRyieldStack(hstk, xlabels, ['ttW', 'ttZ'], 'bkgCompostion_ttV.pdf', 'hist', True)
 
+def drawHEMVetoEffect():
+
+    srNames = ['srA0', 'srA1', 'srA2', 'srB', 'srC','srD', 'srE0', 'srE1', 'srE2', 'srE3', 'srF', 'srG0', 'srG1', 'srG2', 'srG3', 'srH', 'srI',]
+
+    f_bkg_w = r.TFile('../StopLooper/output/samp18_v39_s5_hemrwtd/allBkg_18.root')
+    f_bkg_n = r.TFile('../StopLooper/output/samp18_v39_s5/allBkg_18.root')
+
+    f_sig_w = r.TFile('../StopLooper/output/samp18_v39_s5_hemrwtd/SMS_T2tt_18.root')
+    f_sig_n = r.TFile('../StopLooper/output/samp18_v39_s5/SMS_T2tt_18.root')
+
+    y_bkg_w = [ y for y in sum(getYieldEInTopoBins(f_bkg_w, srNames, 'metbins'), []) ]
+    y_bkg_n = [ y for y in sum(getYieldEInTopoBins(f_bkg_n, srNames, 'metbins'), []) ]
+
+    y_sig1_w = [ y for y in sum(getYieldEInTopoBins(f_sig_w, srNames, 'metbins_1200_50'), []) ]
+    y_sig1_n = [ y for y in sum(getYieldEInTopoBins(f_sig_n, srNames, 'metbins_1200_50'), []) ]
+
+    y_sig2_w = [ y for y in sum(getYieldEInTopoBins(f_sig_w, srNames, 'metbins_800_400'), []) ]
+    y_sig2_n = [ y for y in sum(getYieldEInTopoBins(f_sig_n, srNames, 'metbins_800_400'), []) ]
+
+    rat_bkg  = [ get_efficiency(n,d) for n, d in zip(y_bkg_w, y_bkg_n) ]
+    rat_sig1 = [ get_efficiency(n,d) for n, d in zip(y_sig1_w, y_sig1_n) ]
+    rat_sig2 = [ get_efficiency(n,d) for n, d in zip(y_sig2_w, y_sig2_n) ]
+
+    xlabels = getLabelsTemporary(srNames)
+    # xlabels = srNames
+    hrat_bkg  = getSRHistFromYieldE(rat_bkg, 'h_SRyields_HEMjetVeto_bkg', '')
+    hrat_sig1 = getSRHistFromYieldE(rat_sig1,'h_SRyields_HEMjetVeto_1200_50', '')
+    hrat_sig2 = getSRHistFromYieldE(rat_sig2,'h_SRyields_HEMjetVeto_800_400', '')
+    hrat_bkg.SetLineWidth(2)
+    hrat_sig1.SetLineWidth(2)
+    hrat_sig2.SetLineWidth(2)
+
+    drawSRyieldHist(hrat_bkg,  xlabels, 'noleg', 'HEMVetos_allbkg_18.pdf', 'PE', True, [0.6, 1.1], 1, '')
+    drawSRyieldHist(hrat_sig1, xlabels, 'noleg', 'HEMVetos_T2tt_1200_50_18.pdf', 'PE', True, [0.6, 1.1], 1, '')
+    drawSRyieldHist(hrat_sig2, xlabels, 'noleg', 'HEMVetos_T2tt_800_400_18.pdf', 'PE', True, [0.6, 1.1], 1, '')
+
+    # y_bkg_w = [ y.round(3) for y in sum(getYieldEInTopoBins(f_bkg_w, srNames, 'metbins'), []) ]
+    # y_bkg_n = [ y.round(3) for y in sum(getYieldEInTopoBins(f_bkg_n, srNames, 'metbins'), []) ]
+
 def drawL1prefireEffect():
 
     srNames = ['srA0', 'srA1', 'srA2', 'srB', 'srC','srD', 'srE0', 'srE1', 'srE2', 'srE3', 'srF', 'srG0', 'srG1', 'srG2', 'srG3', 'srH', 'srI',]
@@ -539,9 +578,9 @@ def drawL1prefireEffect():
     hrat_sig1.SetLineWidth(2)
     hrat_sig2.SetLineWidth(2)
 
-    drawSRyieldHist(hrat_bkg,  xlabels, 'noleg', 'L1prefire_allbkg_17.pdf', 'PE', True, [0.6, 1.1], 1)
-    drawSRyieldHist(hrat_sig1, xlabels, 'noleg', 'L1prefire_T2tt_1200_50_17.pdf', 'PE', True, [0.6, 1.1], 1)
-    drawSRyieldHist(hrat_sig2, xlabels, 'noleg', 'L1prefire_T2tt_800_400_17.pdf', 'PE', True, [0.6, 1.1], 1)
+    drawSRyieldHist(hrat_bkg,  xlabels, 'noleg', 'L1prefire_allbkg_17.pdf', 'PE', True, [0.6, 1.1], 1, '')
+    drawSRyieldHist(hrat_sig1, xlabels, 'noleg', 'L1prefire_T2tt_1200_50_17.pdf', 'PE', True, [0.6, 1.1], 1, '')
+    drawSRyieldHist(hrat_sig2, xlabels, 'noleg', 'L1prefire_T2tt_800_400_17.pdf', 'PE', True, [0.6, 1.1], 1, '')
 
     # y_bkg_w = [ y.round(3) for y in sum(getYieldEInTopoBins(f_bkg_w, srNames, 'metbins'), []) ]
     # y_bkg_n = [ y.round(3) for y in sum(getYieldEInTopoBins(f_bkg_n, srNames, 'metbins'), []) ]
@@ -616,4 +655,5 @@ if __name__ == '__main__':
     # drawBkgCompositionStack(['cr0bI'], 'CR0bCompostion_cor6.pdf')
 
     # drawL1prefireEffect()
+    drawHEMVetoEffect()
 
