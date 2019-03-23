@@ -46,11 +46,11 @@ sysInfo.o: sysInfo.h sysInfo.cc StopTree.h StopTree.cc eventWeight_lepSF.h event
 ResolvedTopMVA.o: TopTagger/ResolvedTopMVA.h TopTagger/ResolvedTopMVA.cc TopTagger/TMVAReader.h
 	$(CXX) $(CXXFLAGS) -c TopTagger/ResolvedTopMVA.cc
 
-METCorrectionHandler.o: METC/METCorrectionHandler.h METC/METCorrectionHandler.cc
-	$(CXX) $(CXXFLAGS) -c METC/METCorrectionHandler.cc
+METCorrectionHandler.o: METCorr/METCorrectionHandler.h METCorr/METCorrectionHandler.cc
+	$(CXX) $(CXXFLAGS) -c METCorr/METCorrectionHandler.cc
 
-METObject.o: METC/METObject.h METC/METObject.cc
-	$(CXX) $(CXXFLAGS) -c METC/METObject.cc
+METObject.o: METCorr/METObject.h METCorr/METObject.cc
+	$(CXX) $(CXXFLAGS) -c METCorr/METObject.cc
 
 %.o: 	%.cc %.h
 	$(QUIET) echo "Compiling $<"; \

@@ -131,6 +131,7 @@ int main(int argc, char **argv){
   mylooper->applyAK8JECfromFile = false; // not needed as DeepAK8 uses uncorrected jets
   mylooper->JES_type            = 0;     // 0 central, 1 up, -1 down <-- obsolete, not to be changed
   mylooper->applyMETRecipeV2    = true;  // Do MET recipe V2 for 2017 data & MC, when applyJECfromFile
+  mylooper->applyMETResCorr     = true;  // Scaling the (pfmet - genmet) vector per era
 
   mylooper->applyBtagSFs       = true;
   mylooper->applyLeptonSFs     = true;
@@ -219,8 +220,10 @@ int main(int argc, char **argv){
   };
   parseAndSet_b("applyJECfromFile" , mylooper->applyJECfromFile);
   parseAndSet_b("applyMETRecipeV2" , mylooper->applyMETRecipeV2);
+  parseAndSet_b("applyMETResCorr"  , mylooper->applyMETResCorr);
   parseAndSet_b("fillPhoton"       , mylooper->fillPhoton);
   parseAndSet_b("fillZll"          , mylooper->fillZll);
+  parseAndSet_b("fillExtraEvtVar"  , mylooper->fillExtraEvtVar);
 
   if (ifile != -1) suffix += Form("_%i", ifile);
 

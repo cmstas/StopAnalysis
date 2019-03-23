@@ -49,8 +49,8 @@ endif
 # Make rules
 #
 
-runBabyMaker: runBabyMaker.o looper.o EventTree.o LeptonTree.o JetTree.o ResolvedTopMVA.o IsoTracksTree.o TauTree.o GenParticleTree.o PhotonTree.o StopSelections.o LinkDef_out.so $(CORELIB) $(STOPVARLIB) libTopTagger.so eventWeight_lepSF.o TopCandTree.o
-	$(LD) $(LDFLAGS) -o runBabyMaker runBabyMaker.o looper.o EventTree.o ResolvedTopMVA.o JetTree.o LeptonTree.o eventWeight_lepSF.o PhotonTree.o IsoTracksTree.o TauTree.o GenParticleTree.o StopSelections.o TopCandTree.o libTopTagger.so $(LIBS) $(GLIBS) -lGenVector -lEG -lTMVA $(CORELIB) $(STOPVARLIB) LinkDef_out.so -Wl,-rpath,./
+runBabyMaker: runBabyMaker.o looper.o EventTree.o LeptonTree.o JetTree.o ResolvedTopMVA.o IsoTracksTree.o TauTree.o GenParticleTree.o PhotonTree.o StopSelections.o LinkDef_out.so $(CORELIB) $(STOPVARLIB) libTopTagger.so eventWeight_lepSF.o TopCandTree.o METCorrectionHandler.o METObject.o
+	$(LD) $(LDFLAGS) -o runBabyMaker runBabyMaker.o looper.o EventTree.o ResolvedTopMVA.o JetTree.o LeptonTree.o eventWeight_lepSF.o PhotonTree.o IsoTracksTree.o TauTree.o GenParticleTree.o StopSelections.o TopCandTree.o METCorrectionHandler.o METObject.o libTopTagger.so $(LIBS) $(GLIBS) -lGenVector -lEG -lTMVA $(CORELIB) $(STOPVARLIB) LinkDef_out.so -Wl,-rpath,./
 
 $(CORESOURCE):
 	cd $(COREPATH) && $(MAKE) -j16 && cd ..
@@ -73,10 +73,6 @@ EventTree.o: EventTree.cc EventTree.h StopSelections.h
 
 LeptonTree.o: LeptonTree.cc LeptonTree.h StopSelections.h
 	$(CXX) $(CXXFLAGS) -c LeptonTree.cc
-
-eventWeight_lepSF.o: ../StopCORE/eventWeight_lepSF.cc ../StopCORE/eventWeight_lepSF.h
-	cd ../StopCORE/ && $(MAKE) -j4 && cd -; \
-	cp ../StopCORE/eventWeight_lepSF.o  .
 
 PhotonTree.o: PhotonTree.cc PhotonTree.h StopSelections.h
 	$(CXX) $(CXXFLAGS) -c PhotonTree.cc
@@ -101,6 +97,15 @@ GenParticleTree.o: GenParticleTree.cc GenParticleTree.h
 
 StopSelections.o: StopSelections.cc StopSelections.h
 	$(CXX) $(CXXFLAGS) -c StopSelections.cc
+
+eventWeight_lepSF.o: ../StopCORE/eventWeight_lepSF.cc ../StopCORE/eventWeight_lepSF.h
+	cd ../StopCORE/ && $(MAKE) -j4 && cd -; cp ../StopCORE/eventWeight_lepSF.o .
+
+METCorrectionHandler.o: ../StopCORE/METCorr/METCorrectionHandler.h ../StopCORE/METCorr/METCorrectionHandler.cc
+	cd ../StopCORE/ && $(MAKE) -j4 && cd -; cp ../StopCORE/METCorrectionHandler.o .
+
+METObject.o: ../StopCORE/METCorr/METObject.h ../StopCORE/METCorr/METObject.cc
+	cd ../StopCORE/ && $(MAKE) -j4 && cd -; cp ../StopCORE/METObject.o .
 
 LinkDef_out.so: LinkDef.h
 	@rootcling -v -f LinkDef.cc -c -p Math/Vector4D.h LinkDef.h

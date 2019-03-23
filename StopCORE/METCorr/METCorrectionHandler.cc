@@ -14,9 +14,7 @@ using namespace std;
 
 METCorrectionHandler::METCorrectionHandler() :
   applyCorrection(false)
-{
-  setup();
-}
+{}
 
 METCorrectionHandler::~METCorrectionHandler(){ this->reset(); }
 

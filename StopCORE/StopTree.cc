@@ -143,26 +143,30 @@ void StopTree::Init(TTree *tree) {
   if (pfmet_rl_jdown_branch) pfmet_rl_jdown_branch->SetAddress(&pfmet_rl_jdown_);
   pfmet_phi_rl_jdown_branch = tree->GetBranch("pfmet_phi_rl_jdown");
   if (pfmet_phi_rl_jdown_branch) pfmet_phi_rl_jdown_branch->SetAddress(&pfmet_phi_rl_jdown_);
-  pfmet_egclean_branch = tree->GetBranch("pfmet_egclean");
-  if (pfmet_egclean_branch) pfmet_egclean_branch->SetAddress(&pfmet_egclean_);
-  pfmet_egclean_phi_branch = tree->GetBranch("pfmet_egclean_phi");
-  if (pfmet_egclean_phi_branch) pfmet_egclean_phi_branch->SetAddress(&pfmet_egclean_phi_);
-  pfmet_muegclean_branch = tree->GetBranch("pfmet_muegclean");
-  if (pfmet_muegclean_branch) pfmet_muegclean_branch->SetAddress(&pfmet_muegclean_);
-  pfmet_muegclean_phi_branch = tree->GetBranch("pfmet_muegclean_phi");
-  if (pfmet_muegclean_phi_branch) pfmet_muegclean_phi_branch->SetAddress(&pfmet_muegclean_phi_);
-  pfmet_muegcleanfix_branch = tree->GetBranch("pfmet_muegcleanfix");
-  if (pfmet_muegcleanfix_branch) pfmet_muegcleanfix_branch->SetAddress(&pfmet_muegcleanfix_);
-  pfmet_muegcleanfix_phi_branch = tree->GetBranch("pfmet_muegcleanfix_phi");
-  if (pfmet_muegcleanfix_phi_branch) pfmet_muegcleanfix_phi_branch->SetAddress(&pfmet_muegcleanfix_phi_);
   pfmet_uncorr_branch = tree->GetBranch("pfmet_uncorr");
   if (pfmet_uncorr_branch) pfmet_uncorr_branch->SetAddress(&pfmet_uncorr_);
   pfmet_uncorr_phi_branch = tree->GetBranch("pfmet_uncorr_phi");
   if (pfmet_uncorr_phi_branch) pfmet_uncorr_phi_branch->SetAddress(&pfmet_uncorr_phi_);
+  pfmet_uncorr_jup_branch = tree->GetBranch("pfmet_uncorr_jup");
+  if (pfmet_uncorr_jup_branch) pfmet_uncorr_jup_branch->SetAddress(&pfmet_uncorr_jup_);
+  pfmet_uncorr_phi_jup_branch = tree->GetBranch("pfmet_uncorr_phi_jup");
+  if (pfmet_uncorr_phi_jup_branch) pfmet_uncorr_phi_jup_branch->SetAddress(&pfmet_uncorr_phi_jup_);
+  pfmet_uncorr_jdown_branch = tree->GetBranch("pfmet_uncorr_jdown");
+  if (pfmet_uncorr_jdown_branch) pfmet_uncorr_jdown_branch->SetAddress(&pfmet_uncorr_jdown_);
+  pfmet_uncorr_phi_jdown_branch = tree->GetBranch("pfmet_uncorr_phi_jdown");
+  if (pfmet_uncorr_phi_jdown_branch) pfmet_uncorr_phi_jdown_branch->SetAddress(&pfmet_uncorr_phi_jdown_);
   pfmet_original_branch = tree->GetBranch("pfmet_original");
   if (pfmet_original_branch) pfmet_original_branch->SetAddress(&pfmet_original_);
   pfmet_original_phi_branch = tree->GetBranch("pfmet_original_phi");
   if (pfmet_original_phi_branch) pfmet_original_phi_branch->SetAddress(&pfmet_original_phi_);
+  pfmet_resup_branch = tree->GetBranch("pfmet_resup");
+  if (pfmet_resup_branch) pfmet_resup_branch->SetAddress(&pfmet_resup_);
+  pfmet_phi_resup_branch = tree->GetBranch("pfmet_phi_resup");
+  if (pfmet_phi_resup_branch) pfmet_phi_resup_branch->SetAddress(&pfmet_phi_resup_);
+  pfmet_resdown_branch = tree->GetBranch("pfmet_resdown");
+  if (pfmet_resdown_branch) pfmet_resdown_branch->SetAddress(&pfmet_resdown_);
+  pfmet_phi_resdown_branch = tree->GetBranch("pfmet_phi_resdown");
+  if (pfmet_phi_resdown_branch) pfmet_phi_resdown_branch->SetAddress(&pfmet_phi_resdown_);
   scale1fb_branch = tree->GetBranch("scale1fb");
   if (scale1fb_branch) scale1fb_branch->SetAddress(&scale1fb_);
   xsec_branch = tree->GetBranch("xsec");
@@ -1207,16 +1211,18 @@ void StopTree::GetEntry(unsigned int idx) {
   pfmet_phi_rl_jup_isLoaded = false;
   pfmet_rl_jdown_isLoaded = false;
   pfmet_phi_rl_jdown_isLoaded = false;
-  pfmet_egclean_isLoaded = false;
-  pfmet_egclean_phi_isLoaded = false;
-  pfmet_muegclean_isLoaded = false;
-  pfmet_muegclean_phi_isLoaded = false;
-  pfmet_muegcleanfix_isLoaded = false;
-  pfmet_muegcleanfix_phi_isLoaded = false;
   pfmet_uncorr_isLoaded = false;
   pfmet_uncorr_phi_isLoaded = false;
+  pfmet_uncorr_jup_isLoaded = false;
+  pfmet_uncorr_phi_jup_isLoaded = false;
+  pfmet_uncorr_jdown_isLoaded = false;
+  pfmet_uncorr_phi_jdown_isLoaded = false;
   pfmet_original_isLoaded = false;
   pfmet_original_phi_isLoaded = false;
+  pfmet_resup_isLoaded = false;
+  pfmet_phi_resup_isLoaded = false;
+  pfmet_resdown_isLoaded = false;
+  pfmet_phi_resdown_isLoaded = false;
   scale1fb_isLoaded = false;
   xsec_isLoaded = false;
   xsec_uncert_isLoaded = false;
@@ -1799,16 +1805,18 @@ void StopTree::LoadAllBranches() {
   if (pfmet_phi_rl_jup_branch != 0) pfmet_phi_rl_jup();
   if (pfmet_rl_jdown_branch != 0) pfmet_rl_jdown();
   if (pfmet_phi_rl_jdown_branch != 0) pfmet_phi_rl_jdown();
-  if (pfmet_egclean_branch != 0) pfmet_egclean();
-  if (pfmet_egclean_phi_branch != 0) pfmet_egclean_phi();
-  if (pfmet_muegclean_branch != 0) pfmet_muegclean();
-  if (pfmet_muegclean_phi_branch != 0) pfmet_muegclean_phi();
-  if (pfmet_muegcleanfix_branch != 0) pfmet_muegcleanfix();
-  if (pfmet_muegcleanfix_phi_branch != 0) pfmet_muegcleanfix_phi();
   if (pfmet_uncorr_branch != 0) pfmet_uncorr();
   if (pfmet_uncorr_phi_branch != 0) pfmet_uncorr_phi();
+  if (pfmet_uncorr_jup_branch != 0) pfmet_uncorr_jup();
+  if (pfmet_uncorr_phi_jup_branch != 0) pfmet_uncorr_phi_jup();
+  if (pfmet_uncorr_jdown_branch != 0) pfmet_uncorr_jdown();
+  if (pfmet_uncorr_phi_jdown_branch != 0) pfmet_uncorr_phi_jdown();
   if (pfmet_original_branch != 0) pfmet_original();
   if (pfmet_original_phi_branch != 0) pfmet_original_phi();
+  if (pfmet_resup_branch != 0) pfmet_resup();
+  if (pfmet_phi_resup_branch != 0) pfmet_phi_resup();
+  if (pfmet_resdown_branch != 0) pfmet_resdown();
+  if (pfmet_phi_resdown_branch != 0) pfmet_phi_resdown();
   if (scale1fb_branch != 0) scale1fb();
   if (xsec_branch != 0) xsec();
   if (xsec_uncert_branch != 0) xsec_uncert();
@@ -2617,84 +2625,6 @@ const float &StopTree::pfmet_phi_rl_jdown() {
   return pfmet_phi_rl_jdown_;
 }
 
-const float &StopTree::pfmet_egclean() {
-  if (not pfmet_egclean_isLoaded) {
-    if (pfmet_egclean_branch != 0) {
-      pfmet_egclean_branch->GetEntry(index);
-    } else {
-      printf("branch pfmet_egclean_branch does not exist!\n");
-      exit(1);
-    }
-    pfmet_egclean_isLoaded = true;
-  }
-  return pfmet_egclean_;
-}
-
-const float &StopTree::pfmet_egclean_phi() {
-  if (not pfmet_egclean_phi_isLoaded) {
-    if (pfmet_egclean_phi_branch != 0) {
-      pfmet_egclean_phi_branch->GetEntry(index);
-    } else {
-      printf("branch pfmet_egclean_phi_branch does not exist!\n");
-      exit(1);
-    }
-    pfmet_egclean_phi_isLoaded = true;
-  }
-  return pfmet_egclean_phi_;
-}
-
-const float &StopTree::pfmet_muegclean() {
-  if (not pfmet_muegclean_isLoaded) {
-    if (pfmet_muegclean_branch != 0) {
-      pfmet_muegclean_branch->GetEntry(index);
-    } else {
-      printf("branch pfmet_muegclean_branch does not exist!\n");
-      exit(1);
-    }
-    pfmet_muegclean_isLoaded = true;
-  }
-  return pfmet_muegclean_;
-}
-
-const float &StopTree::pfmet_muegclean_phi() {
-  if (not pfmet_muegclean_phi_isLoaded) {
-    if (pfmet_muegclean_phi_branch != 0) {
-      pfmet_muegclean_phi_branch->GetEntry(index);
-    } else {
-      printf("branch pfmet_muegclean_phi_branch does not exist!\n");
-      exit(1);
-    }
-    pfmet_muegclean_phi_isLoaded = true;
-  }
-  return pfmet_muegclean_phi_;
-}
-
-const float &StopTree::pfmet_muegcleanfix() {
-  if (not pfmet_muegcleanfix_isLoaded) {
-    if (pfmet_muegcleanfix_branch != 0) {
-      pfmet_muegcleanfix_branch->GetEntry(index);
-    } else {
-      printf("branch pfmet_muegcleanfix_branch does not exist!\n");
-      exit(1);
-    }
-    pfmet_muegcleanfix_isLoaded = true;
-  }
-  return pfmet_muegcleanfix_;
-}
-
-const float &StopTree::pfmet_muegcleanfix_phi() {
-  if (not pfmet_muegcleanfix_phi_isLoaded) {
-    if (pfmet_muegcleanfix_phi_branch != 0) {
-      pfmet_muegcleanfix_phi_branch->GetEntry(index);
-    } else {
-      printf("branch pfmet_muegcleanfix_phi_branch does not exist!\n");
-      exit(1);
-    }
-    pfmet_muegcleanfix_phi_isLoaded = true;
-  }
-  return pfmet_muegcleanfix_phi_;
-}
-
 const float &StopTree::pfmet_uncorr() {
   if (not pfmet_uncorr_isLoaded) {
     if (pfmet_uncorr_branch != 0) {
@@ -2721,6 +2651,58 @@ const float &StopTree::pfmet_uncorr_phi() {
   return pfmet_uncorr_phi_;
 }
 
+const float &StopTree::pfmet_uncorr_jup() {
+  if (not pfmet_uncorr_jup_isLoaded) {
+    if (pfmet_uncorr_jup_branch != 0) {
+      pfmet_uncorr_jup_branch->GetEntry(index);
+    } else {
+      printf("branch pfmet_uncorr_jup_branch does not exist!\n");
+      exit(1);
+    }
+    pfmet_uncorr_jup_isLoaded = true;
+  }
+  return pfmet_uncorr_jup_;
+}
+
+const float &StopTree::pfmet_uncorr_phi_jup() {
+  if (not pfmet_uncorr_phi_jup_isLoaded) {
+    if (pfmet_uncorr_phi_jup_branch != 0) {
+      pfmet_uncorr_phi_jup_branch->GetEntry(index);
+    } else {
+      printf("branch pfmet_uncorr_phi_jup_branch does not exist!\n");
+      exit(1);
+    }
+    pfmet_uncorr_phi_jup_isLoaded = true;
+  }
+  return pfmet_uncorr_phi_jup_;
+}
+
+const float &StopTree::pfmet_uncorr_jdown() {
+  if (not pfmet_uncorr_jdown_isLoaded) {
+    if (pfmet_uncorr_jdown_branch != 0) {
+      pfmet_uncorr_jdown_branch->GetEntry(index);
+    } else {
+      printf("branch pfmet_uncorr_jdown_branch does not exist!\n");
+      exit(1);
+    }
+    pfmet_uncorr_jdown_isLoaded = true;
+  }
+  return pfmet_uncorr_jdown_;
+}
+
+const float &StopTree::pfmet_uncorr_phi_jdown() {
+  if (not pfmet_uncorr_phi_jdown_isLoaded) {
+    if (pfmet_uncorr_phi_jdown_branch != 0) {
+      pfmet_uncorr_phi_jdown_branch->GetEntry(index);
+    } else {
+      printf("branch pfmet_uncorr_phi_jdown_branch does not exist!\n");
+      exit(1);
+    }
+    pfmet_uncorr_phi_jdown_isLoaded = true;
+  }
+  return pfmet_uncorr_phi_jdown_;
+}
+
 const float &StopTree::pfmet_original() {
   if (not pfmet_original_isLoaded) {
     if (pfmet_original_branch != 0) {
@@ -2745,6 +2727,58 @@ const float &StopTree::pfmet_original_phi() {
     pfmet_original_phi_isLoaded = true;
   }
   return pfmet_original_phi_;
+}
+
+const float &StopTree::pfmet_resup() {
+  if (not pfmet_resup_isLoaded) {
+    if (pfmet_resup_branch != 0) {
+      pfmet_resup_branch->GetEntry(index);
+    } else {
+      printf("branch pfmet_resup_branch does not exist!\n");
+      exit(1);
+    }
+    pfmet_resup_isLoaded = true;
+  }
+  return pfmet_resup_;
+}
+
+const float &StopTree::pfmet_phi_resup() {
+  if (not pfmet_phi_resup_isLoaded) {
+    if (pfmet_phi_resup_branch != 0) {
+      pfmet_phi_resup_branch->GetEntry(index);
+    } else {
+      printf("branch pfmet_phi_resup_branch does not exist!\n");
+      exit(1);
+    }
+    pfmet_phi_resup_isLoaded = true;
+  }
+  return pfmet_phi_resup_;
+}
+
+const float &StopTree::pfmet_resdown() {
+  if (not pfmet_resdown_isLoaded) {
+    if (pfmet_resdown_branch != 0) {
+      pfmet_resdown_branch->GetEntry(index);
+    } else {
+      printf("branch pfmet_resdown_branch does not exist!\n");
+      exit(1);
+    }
+    pfmet_resdown_isLoaded = true;
+  }
+  return pfmet_resdown_;
+}
+
+const float &StopTree::pfmet_phi_resdown() {
+  if (not pfmet_phi_resdown_isLoaded) {
+    if (pfmet_phi_resdown_branch != 0) {
+      pfmet_phi_resdown_branch->GetEntry(index);
+    } else {
+      printf("branch pfmet_phi_resdown_branch does not exist!\n");
+      exit(1);
+    }
+    pfmet_phi_resdown_isLoaded = true;
+  }
+  return pfmet_phi_resdown_;
 }
 
 const float &StopTree::scale1fb() {
@@ -10056,16 +10090,18 @@ const float &pfmet_rl_jup() { return babyAnalyzer.pfmet_rl_jup(); }
 const float &pfmet_phi_rl_jup() { return babyAnalyzer.pfmet_phi_rl_jup(); }
 const float &pfmet_rl_jdown() { return babyAnalyzer.pfmet_rl_jdown(); }
 const float &pfmet_phi_rl_jdown() { return babyAnalyzer.pfmet_phi_rl_jdown(); }
-const float &pfmet_egclean() { return babyAnalyzer.pfmet_egclean(); }
-const float &pfmet_egclean_phi() { return babyAnalyzer.pfmet_egclean_phi(); }
-const float &pfmet_muegclean() { return babyAnalyzer.pfmet_muegclean(); }
-const float &pfmet_muegclean_phi() { return babyAnalyzer.pfmet_muegclean_phi(); }
-const float &pfmet_muegcleanfix() { return babyAnalyzer.pfmet_muegcleanfix(); }
-const float &pfmet_muegcleanfix_phi() { return babyAnalyzer.pfmet_muegcleanfix_phi(); }
 const float &pfmet_uncorr() { return babyAnalyzer.pfmet_uncorr(); }
 const float &pfmet_uncorr_phi() { return babyAnalyzer.pfmet_uncorr_phi(); }
+const float &pfmet_uncorr_jup() { return babyAnalyzer.pfmet_uncorr_jup(); }
+const float &pfmet_uncorr_phi_jup() { return babyAnalyzer.pfmet_uncorr_phi_jup(); }
+const float &pfmet_uncorr_jdown() { return babyAnalyzer.pfmet_uncorr_jdown(); }
+const float &pfmet_uncorr_phi_jdown() { return babyAnalyzer.pfmet_uncorr_phi_jdown(); }
 const float &pfmet_original() { return babyAnalyzer.pfmet_original(); }
 const float &pfmet_original_phi() { return babyAnalyzer.pfmet_original_phi(); }
+const float &pfmet_resup() { return babyAnalyzer.pfmet_resup(); }
+const float &pfmet_phi_resup() { return babyAnalyzer.pfmet_phi_resup(); }
+const float &pfmet_resdown() { return babyAnalyzer.pfmet_resdown(); }
+const float &pfmet_phi_resdown() { return babyAnalyzer.pfmet_phi_resdown(); }
 const float &scale1fb() { return babyAnalyzer.scale1fb(); }
 const float &xsec() { return babyAnalyzer.xsec(); }
 const float &xsec_uncert() { return babyAnalyzer.xsec_uncert(); }

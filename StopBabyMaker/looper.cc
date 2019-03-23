@@ -26,7 +26,6 @@
 #include "stop_variables/topness.h"
 #include "stop_variables/MT2_implementations.h"
 #include "JetCorrector.h"
-//#include "btagsf/BTagCalibrationStandalone.h"
 
 // CORE
 #include "Config.h"
@@ -342,6 +341,11 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
       lepsf.setup(isSignalFromFileName, gconf.year, lepsf_filepath);
   } // end if applying lepton SFs
 
+  // Setup the MET resolution correction handler
+  METCorrectionHandler metCorrector;
+  if(applyMETResCorr){
+    metCorrector.setup(gconf.year, to_string(gconf.year), "metsf");
+  }
 
   TFile *fxsec;
   TH1D *hxsec;
@@ -572,7 +576,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
   jetcorr_filenames_pfL1FastJetL2L3.push_back("jecfiles/"+jecVer+"/"+jecVer+"_L1FastJet_AK4PFchs.txt");
   jetcorr_filenames_pfL1FastJetL2L3.push_back("jecfiles/"+jecVer+"/"+jecVer+"_L2Relative_AK4PFchs.txt");
   jetcorr_filenames_pfL1FastJetL2L3.push_back("jecfiles/"+jecVer+"/"+jecVer+"_L3Absolute_AK4PFchs.txt");
-  if (!isSignalFromFileName)
+  if (isDataFromFileName)
     jetcorr_filenames_pfL1FastJetL2L3.push_back("jecfiles/"+jecVer+"/"+jecVer+"_L2L3Residual_AK4PFchs.txt");
   jetcorr_uncertainty_filename = "jecfiles/"+jecVer+"/"+jecVer+"_Uncertainty_AK4PFchs.txt";
 
@@ -1111,6 +1115,45 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
           StopEvt.pfmet_original_phi = evt_pfmetPhi();
         }
       }
+
+      if(applyMETResCorr){
+        StopEvt.pfmet_uncorr = StopEvt.pfmet;
+        StopEvt.pfmet_uncorr_phi = StopEvt.pfmet_phi;
+        StopEvt.pfmet_uncorr_jup = StopEvt.pfmet_jup;
+        StopEvt.pfmet_uncorr_phi_jup = StopEvt.pfmet_phi_jup;
+        StopEvt.pfmet_uncorr_jdown = StopEvt.pfmet_jdown;
+        StopEvt.pfmet_uncorr_phi_jdown = StopEvt.pfmet_phi_jdown;
+
+        METObject metobj;
+        metobj.extras.met
+            = metobj.extras.met_METup = metobj.extras.met_METdn
+            = metobj.extras.met_JERup = metobj.extras.met_JERdn
+            = metobj.extras.met_PUup = metobj.extras.met_PUdn
+            = StopEvt.pfmet;
+        metobj.extras.met_JECup = StopEvt.pfmet_jup;
+        metobj.extras.met_JECdn = StopEvt.pfmet_jdown;
+        metobj.extras.phi
+            = metobj.extras.phi_METup = metobj.extras.phi_METdn
+            = metobj.extras.phi_JERup = metobj.extras.phi_JERdn
+            = metobj.extras.phi_PUup = metobj.extras.phi_PUdn
+            = StopEvt.pfmet_phi;
+        metobj.extras.phi_JECup = StopEvt.pfmet_phi_jup;
+        metobj.extras.phi_JECdn = StopEvt.pfmet_phi_jdown;
+
+        metCorrector.correctMET(StopEvt.genmet, StopEvt.genmet_phi, &metobj, isFastsim); // Last flag is for fast sim., but there are no separate factors, so it doesn't matter
+        
+        StopEvt.pfmet = metobj.extras.met;
+        StopEvt.pfmet_phi = metobj.extras.phi;
+        StopEvt.pfmet_jup = metobj.extras.met_JECup;
+        StopEvt.pfmet_phi_jup = metobj.extras.phi_JECup;
+        StopEvt.pfmet_jdown = metobj.extras.met_JECdn;
+        StopEvt.pfmet_phi_jdown = metobj.extras.phi_JECdn;
+        StopEvt.pfmet_resup = metobj.extras.met_METup;
+        StopEvt.pfmet_phi_resup = metobj.extras.phi_METup;
+        StopEvt.pfmet_resdown = metobj.extras.met_METdn;
+        StopEvt.pfmet_phi_resdown = metobj.extras.phi_METdn;
+      }
+
       if(evt_isRealData() && thisFile.Contains("03Feb2017")){
         StopEvt.pfmet_egclean = evt_egclean_pfmet();
         StopEvt.pfmet_egclean_phi = evt_egclean_pfmetPhi();

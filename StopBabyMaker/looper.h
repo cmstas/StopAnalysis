@@ -17,6 +17,7 @@
 #include "TChain.h"
 #include "Math/LorentzVector.h"
 #include "ResTopTagger/TopCandTree.h"
+#include "../StopCORE/METCorr/METCorrectionHandler.h"
 
 // typedefs
 typedef ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > LorentzVector;
@@ -85,6 +86,7 @@ class babyMaker {
   bool applyVetoLeptonSFs;
   bool apply2ndLepVeto;
   bool applyMETRecipeV2;
+  bool applyMETResCorr;
 
   bool filltaus;
   bool filltracks;

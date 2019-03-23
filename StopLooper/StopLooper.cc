@@ -30,7 +30,7 @@
 #include "../StopCORE/StopTree.h"
 #include "../StopCORE/TopTagger/ResolvedTopMVA.h"
 // #include "../StopCORE/stop_variables/metratio.cc"
-#include "../StopCORE/METC/METCorrectionHandler.h"
+#include "../StopCORE/METCorr/METCorrectionHandler.h"
 
 #include "SR.h"
 #include "StopRegions.h"
@@ -346,8 +346,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
     else if (year_ == 2018) kLumi = 70;
 
     if (!is_data() && runMETResCorrection) // setup MET resolution stuff
-      metCorrector.setup(year_, to_string(year_), "../StopCORE/METC/METSFs");
-      // metCorrector.setup(year_, "2017F-09May2018", "../StopCORE/METC/METSFs");
+      metCorrector.setup(year_, to_string(year_), "../StopCORE/METCorr/METSFs");
 
     dummy.cd();
     // Loop over Events in current file
