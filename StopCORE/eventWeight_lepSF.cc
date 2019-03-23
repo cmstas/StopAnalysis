@@ -58,7 +58,7 @@ void eventWeight_lepSF::setup( bool isFastsim, int inyear = 2017, TString filelo
   ymin_h_mu_vetoLepEff = 1.0;
   ymax_h_mu_vetoLepEff = 1.0;
 
-  cout << "[eventWeight_lepSF] Loading lepton scale factors..." << endl;
+  cout << "[eventWeight_lepSF] Loading lepton scale factors with year " << inyear << " from " << fileloc << endl;
 
   // filepath = "../StopCORE/inputs/lepsf/";
   // if (year == 2016) filepath += "Moriond17";
@@ -151,20 +151,15 @@ void eventWeight_lepSF::setup( bool isFastsim, int inyear = 2017, TString filelo
     h_el_SF_veto_iso_temp = (TH2F*)f_el_SF->Get("Run2017_MVAVLooseTightIP2DMini2");
 
     // Fastsim/Fullsim el files
-    // TODO: update for 2017 <-- no fastsim sample for 2017, use 2016 files for now
-    f_el_FS_ID  = new TFile(filepath+"/sf_el_mediumCB.root", "read");
-    f_el_FS_Iso = new TFile(filepath+"/sf_el_mini01.root", "read");
-
-    f_el_veto_FS_ID  = new TFile(filepath+"/sf_el_vetoCB.root", "read");
-    f_el_veto_FS_Iso = new TFile(filepath+"/sf_el_mini02.root", "read");
+    f_el_FS_ID  = new TFile(filepath+"/detailed_ele_full_fast_sf_17.root", "read");
 
     // Grab fastsim/fullsim selected el histos
-    h_el_FS_ID_temp  = (TH2F*)f_el_FS_ID->Get("histo2D");
-    h_el_FS_Iso_temp = (TH2F*)f_el_FS_Iso->Get("histo2D");
+    h_el_FS_ID_temp  = (TH2F*)f_el_FS_ID->Get("CutBasedMediumNoIso94XV2_sf");
+    h_el_FS_Iso_temp = (TH2F*)f_el_FS_ID->Get("MVAVLooseTightIP2DMini_sf");
 
     // Grab fastsim/fullsim veto el histos
-    h_el_veto_FS_ID_temp  = (TH2F*)f_el_veto_FS_ID->Get("histo2D");
-    h_el_veto_FS_Iso_temp = (TH2F*)f_el_veto_FS_Iso->Get("histo2D");
+    h_el_veto_FS_ID_temp  = (TH2F*)f_el_FS_ID->Get("CutBasedVetoNoIso94XV2_sf");
+    h_el_veto_FS_Iso_temp = (TH2F*)f_el_FS_ID->Get("MVAVLooseTightIP2DMini2_sf");
   }
   else if (year == 2018) {
     // From Twiki: https://twiki.cern.ch/twiki/bin/view/CMS/SUSLeptonSF#Electrons_AN1
@@ -182,20 +177,15 @@ void eventWeight_lepSF::setup( bool isFastsim, int inyear = 2017, TString filelo
     h_el_SF_veto_iso_temp = (TH2F*)f_el_SF->Get("Run2018_Mini2");
 
     // Fastsim/Fullsim el files
-    // TODO: to be updated, no fastsim sample for 2018 in time, will use 2017 fastsim so 2017 files
-    f_el_FS_ID  = new TFile(filepath+"/sf_el_mediumCB.root", "read");
-    f_el_FS_Iso = new TFile(filepath+"/sf_el_mini01.root", "read");
-
-    f_el_veto_FS_ID  = new TFile(filepath+"/sf_el_vetoCB.root", "read");
-    f_el_veto_FS_Iso = new TFile(filepath+"/sf_el_mini02.root", "read");
+    f_el_FS_ID  = new TFile(filepath+"/detailed_ele_full_fast_sf_18.root", "read");
 
     // Grab fastsim/fullsim selected el histos
-    h_el_FS_ID_temp  = (TH2F*)f_el_FS_ID->Get("histo2D");
-    h_el_FS_Iso_temp = (TH2F*)f_el_FS_Iso->Get("histo2D");
+    h_el_FS_ID_temp  = (TH2F*)f_el_FS_ID->Get("CutBasedMediumNoIso94XV2_sf");
+    h_el_FS_Iso_temp = (TH2F*)f_el_FS_ID->Get("MVAVLooseTightIP2DMini_sf");
 
     // Grab fastsim/fullsim veto el histos
-    h_el_veto_FS_ID_temp  = (TH2F*)f_el_veto_FS_ID->Get("histo2D");
-    h_el_veto_FS_Iso_temp = (TH2F*)f_el_veto_FS_Iso->Get("histo2D");
+    h_el_veto_FS_ID_temp  = (TH2F*)f_el_FS_ID->Get("CutBasedVetoNoIso94XV2_sf");
+    h_el_veto_FS_Iso_temp = (TH2F*)f_el_FS_ID->Get("MVAVLooseTightIP2DMini2_sf");
   }
 
   // Muon files

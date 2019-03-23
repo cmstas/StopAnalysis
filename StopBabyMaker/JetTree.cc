@@ -109,7 +109,7 @@ void JetTree::InitBtagSFTool(bool isFastsim_) {
     //h_btag_eff_b = h_btag_eff_b_;
     //h_btag_eff_c = h_btag_eff_c_;
     //h_btag_eff_udsg = h_btag_eff_udsg_;
-    std::cout << "loaded btag SFs" << std::endl;
+    std::cout << "loaded btag SFs: " << gconf.fn_btagSF_DeepCSV << ((isFastsim)? " and "+gconf.fn_btagSF_FS_DeepCSV : "") << std::endl;
     return;
 }
 
