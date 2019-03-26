@@ -2327,17 +2327,17 @@ void evtWgtInfo::setDefaultSystematics( int syst_set ) {
       apply_lep_sf         = true;
       apply_vetoLep_sf     = true;
       apply_tau_sf         = true;
-      apply_topPt_sf       = false;
+      apply_topPt_sf       = false;  // false=uncertainty, but not to be used
       apply_metRes_sf      = false;  // not controlled here anymore
       apply_metTTbar_sf    = false;
-      apply_ttbarSysPt_sf  = false;
-      apply_WbXsec_sf      = false;  // not dev
-      apply_ISR_sf         = false;  // not available yet
+      apply_ttbarSysPt_sf  = false;  // false=uncertainty, need to be updated
+      apply_WbXsec_sf      = true;   // to be verified?
+      apply_ISR_sf         = true;   // 2017 & 2018 to be updated
       apply_pu_sf          = false;  // not available in baby yet
       apply_pu_sf_fromFile = true;
       apply_L1prefire_sf   = true;
-      apply_HEMveto_el_sf  = true;
-      apply_HEMveto_jet_sf = true;
+      apply_HEMveto_el_sf  = true;   // scale down 2018 event with HEM electron
+      apply_HEMveto_jet_sf = true;   // scale down 2018 event with HEM jet
       apply_sample_sf      = false;  // no multiple sample available yet
       if (is_fastsim_) {
         apply_lepFS_sf     = false;  // no fast sim yet
