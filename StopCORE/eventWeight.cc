@@ -604,8 +604,12 @@ void evtWgtInfo::calculateWeightsForEvent() {
     getTTbarSysPtSF( sf_ttbarSysPt, sf_ttbarSysPt_up, sf_ttbarSysPt_dn );
 
   // ISR Correction
-  if (apply_ISR_sf && (samptype == ttbar || samptype == fastsim))
-    getISRnJetsWeight( sf_ISR, sf_ISR_up, sf_ISR_dn );
+  if (apply_ISR_sf && (samptype == ttbar || samptype == fastsim)) {
+    if (year == 2016)
+      getISRnJetsWeight( sf_ISR, sf_ISR_up, sf_ISR_dn );
+    else
+      getISRnJetsWeight_local( sf_ISR, sf_ISR_up, sf_ISR_dn );
+  }
 
   // Pileup Reweighting
   if (apply_pu_sf_fromFile) {
@@ -2112,7 +2116,7 @@ void evtWgtInfo::getISRnJetsWeight_local( double &weight_ISR, double &weight_ISR
 
   // Get the uncertainties of the ISR-njet weight base on the number of ISR jets matched
   float isr_unc = 0.;
-  if (year >= 2016) {
+  if (year == 2016) {
     // Moriond 2017 values
     if      (nisrjets == 0) isr_unc = 0.000;
     else if (nisrjets == 1) isr_unc = 0.040;
@@ -2121,6 +2125,11 @@ void evtWgtInfo::getISRnJetsWeight_local( double &weight_ISR, double &weight_ISR
     else if (nisrjets == 4) isr_unc = 0.170;
     else if (nisrjets == 5) isr_unc = 0.221;
     else if (nisrjets >= 6) isr_unc = 0.258;
+  }
+  // To take the distance as the uncertainty for 2017 and 2018
+  else if (year == 2017 || year == 2018) {
+    isr_unc = fabs(1.0 - weight_ISR);
+    weight_ISR = 1.0;
   }
 
   weight_ISR_up = weight_ISR + isr_unc;
@@ -2313,13 +2322,13 @@ void evtWgtInfo::setDefaultSystematics( int syst_set ) {
 
     // Set of (incomplete) systematics prepared for legacy analysis using 94X samples
     case stop_Run2:
-      apply_cr2lTrigger_sf = true;   // not available yet
+      apply_cr2lTrigger_sf = true;
       apply_bTag_sf        = true;
-      apply_lep_sf         = true;   // available but not updated yet
+      apply_lep_sf         = true;
       apply_vetoLep_sf     = true;
-      apply_tau_sf         = true;   // same as above
+      apply_tau_sf         = true;
       apply_topPt_sf       = false;
-      apply_metRes_sf      = false;  // not developed for 94X yet
+      apply_metRes_sf      = false;  // not controlled here anymore
       apply_metTTbar_sf    = false;
       apply_ttbarSysPt_sf  = false;
       apply_WbXsec_sf      = false;  // not dev
