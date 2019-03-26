@@ -70,7 +70,7 @@ const bool runMETResCorrection = false;
 // only produce yield histos
 const bool runYieldsOnly = true;
 // only running selected signal points to speed up
-const bool runFullSignalScan = false;
+const bool runFullSignalScan = true;
 // debug symbol, for printing exact event kinematics that passes
 const bool printPassedEvents = false;
 

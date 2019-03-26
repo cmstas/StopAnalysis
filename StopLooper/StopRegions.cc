@@ -1,8 +1,8 @@
 #include "StopRegions.h"
 
 const float fInf = std::numeric_limits<float>::max();
-const float wpResTop = 0.93;
-const float wpDeepTop = 0.60;
+const float wpResTop = 0.95;
+const float wpDeepTop = 0.40;
 
 
 std::vector<SR> getStopControlRegionsNoBTags(std::vector<SR>&& SRvec) {
@@ -1327,6 +1327,7 @@ std::vector<SR> getStopSignalRegionsRun2() {
   sr.SetVar(njet, 2, 4);
   sr.SetVar(tmod, 10, fInf);
   sr.SetVar(mlb, 0, 175);
+  sr.SetVar(met, 600, fInf);
   sr.SetMETBins({600, 750, 1500});
   SRvec.emplace_back(sr);
 
@@ -1336,12 +1337,14 @@ std::vector<SR> getStopSignalRegionsRun2() {
   sr.SetVar(tmod, 10, fInf);
   sr.SetVar(mlb, 0, 175);
   sr.SetVar(deepttag, -1, wpDeepTop);
+  sr.SetVar(met, 350, 600);
   sr.SetMETBins({350, 450, 600});
   SRvec.emplace_back(sr);
 
   sr.SetName("srA2");
   sr.SetDetailName("2to3j_tmod10toInf_mlb0to175_deepttag");
   sr.SetVar(deepttag, wpDeepTop, 1);
+  sr.SetVar(met, 250, 600);
   sr.SetMETBins({250, 600});
   SRvec.emplace_back(sr);
 
@@ -1352,6 +1355,7 @@ std::vector<SR> getStopSignalRegionsRun2() {
   sr.SetVar(tmod, 10, fInf);
   sr.SetVar(mlb, 175, fInf);
   sr.SetVar(deepttag, -1, 1);
+  sr.SetVar(met, 250, fInf);
   sr.SetMETBins({250, 450, 700, 1500});
   SRvec.emplace_back(sr);
 
@@ -1364,6 +1368,7 @@ std::vector<SR> getStopSignalRegionsRun2() {
   sr.SetVar(mlb, 0, 175);
   sr.SetVar(deepttag, -2, 1);
   sr.SetVar(tfttag, -2, 1);
+  sr.SetVar(met, 350, fInf);
   sr.SetMETBins({350, 450, 550, 650, 800, 1500});
   SRvec.emplace_back(sr);
 
@@ -1375,6 +1380,7 @@ std::vector<SR> getStopSignalRegionsRun2() {
   sr.SetVar(mlb, 175, fInf);
   sr.SetVar(deepttag, -2, 1);
   sr.SetVar(tfttag, -2, 1);
+  sr.SetVar(met, 250, fInf);
   sr.SetMETBins({250, 350, 450, 600, 1500});
   SRvec.emplace_back(sr);
 
@@ -1386,6 +1392,7 @@ std::vector<SR> getStopSignalRegionsRun2() {
   sr.SetVar(mlb, 0, 175);
   sr.SetVar(deepttag, -2, 1);
   sr.SetVar(tfttag, -2, 1);
+  sr.SetVar(met, 450, fInf);
   sr.SetMETBins({450, 600, 1500});
   SRvec.emplace_back(sr);
 
@@ -1396,6 +1403,7 @@ std::vector<SR> getStopSignalRegionsRun2() {
   sr.SetVar(mlb, 0, 175);
   sr.SetVar(deepttag, -2, wpDeepTop);
   sr.SetVar(tfttag, -2, wpResTop);
+  sr.SetVar(met, 250, 450);
   sr.SetMETBins({250, 350, 450});
   SRvec.emplace_back(sr);
 
@@ -1403,6 +1411,7 @@ std::vector<SR> getStopSignalRegionsRun2() {
   sr.SetDetailName("ge4j_tmod0to10_mlb0to175_deepttag");
   sr.SetVar(deepttag, wpDeepTop, 1);
   sr.SetVar(tfttag, -2, 1);
+  sr.SetVar(met, 250, 450);
   sr.SetMETBins({250, 350, 450});
   SRvec.emplace_back(sr);
 
@@ -1410,6 +1419,7 @@ std::vector<SR> getStopSignalRegionsRun2() {
   sr.SetDetailName("ge4j_tmod0to10_mlb0to175_tfttag");
   sr.SetVar(deepttag, -2, wpDeepTop);
   sr.SetVar(tfttag, wpResTop, 1);
+  sr.SetVar(met, 250, 450);
   sr.SetMETBins({250, 350, 450});
   SRvec.emplace_back(sr);
 
@@ -1421,6 +1431,7 @@ std::vector<SR> getStopSignalRegionsRun2() {
   sr.SetVar(mlb, 175, fInf);
   sr.SetVar(deepttag, -2, 1);
   sr.SetVar(tfttag, -2, 1);
+  sr.SetVar(met, 250, fInf);
   sr.SetMETBins({250, 350, 450, 1500});
   SRvec.emplace_back(sr);
 
@@ -1432,6 +1443,7 @@ std::vector<SR> getStopSignalRegionsRun2() {
   sr.SetVar(mlb, 0, 175);
   sr.SetVar(deepttag, -2, 1);
   sr.SetVar(tfttag, -2, 1);
+  sr.SetVar(met, 450, fInf);
   sr.SetMETBins({450, 550, 750, 1500});
   SRvec.emplace_back(sr);
 
@@ -1442,6 +1454,7 @@ std::vector<SR> getStopSignalRegionsRun2() {
   sr.SetVar(mlb, 0, 175);
   sr.SetVar(deepttag, -2, wpDeepTop);
   sr.SetVar(tfttag, -2, wpResTop);
+  sr.SetVar(met, 250, 450);
   sr.SetMETBins({250, 350, 450});
   SRvec.emplace_back(sr);
 
@@ -1449,6 +1462,7 @@ std::vector<SR> getStopSignalRegionsRun2() {
   sr.SetDetailName("ge4j_tmod10toInf_mlb0to175_deepttag");
   sr.SetVar(deepttag, wpDeepTop, 1);
   sr.SetVar(tfttag, -2, 1);
+  sr.SetVar(met, 250, 450);
   sr.SetMETBins({250, 350, 450});
   SRvec.emplace_back(sr);
 
@@ -1456,6 +1470,7 @@ std::vector<SR> getStopSignalRegionsRun2() {
   sr.SetDetailName("ge4j_tmod10toInf_mlb0to175_tfttag");
   sr.SetVar(deepttag, -2, wpDeepTop);
   sr.SetVar(tfttag, wpResTop, 1);
+  sr.SetVar(met, 250, 450);
   sr.SetMETBins({250, 350, 450});
   SRvec.emplace_back(sr);
 
@@ -1467,6 +1482,7 @@ std::vector<SR> getStopSignalRegionsRun2() {
   sr.SetVar(mlb, 175, fInf);
   sr.SetVar(deepttag, -2, 1);
   sr.SetVar(tfttag, -2, 1);
+  sr.SetVar(met, 250, fInf);
   sr.SetMETBins({250, 500, 1500});
   SRvec.emplace_back(sr);
 
@@ -1560,7 +1576,7 @@ std::vector<SR> getStopInclusiveRegionsRun2() {
   SR sr;
   std::vector<SR> SRvec;
 
-  // SRvec.emplace_back(srbase);
+  SRvec.emplace_back(srbase);
 
   // The actual base region that is the sum of all SRs
   sr = srbase;
@@ -1657,9 +1673,9 @@ std::vector<SR> getStopInclusiveRegionsRun2() {
   sr.SetVar(mt, 100, 250);
   SRvec.emplace_back(sr);
 
+  sr = srbase;
   sr.SetName("srsbmt");  // MT sideband
   sr.SetDetailName("ge4j_met150toInf_mt0to150");
-  sr.SetVar(met, 150, fInf);
   sr.SetVar(mt, 0, 150);
   sr.SetVar(njet, 2, fInf);
   sr.SetVar(passlep1pt, 1, 2);
@@ -1668,7 +1684,7 @@ std::vector<SR> getStopInclusiveRegionsRun2() {
 
   sr.SetName("srsbmt2");  // MT sideband
   sr.SetDetailName("ge4j_met150toInf_mt0to150");
-  sr.SetVar(met, 250, fInf);
+  sr.SetVar(met, 150, fInf);
   sr.SetMETBins({250, 300, 400, 500, 800, 1500});
   SRvec.emplace_back(sr);
 
@@ -1678,7 +1694,9 @@ std::vector<SR> getStopInclusiveRegionsRun2() {
   sr.SetVar(mlb, 175, fInf);
   sr.SetMETBins({250, 300, 400, 500, 800, 1500});
   SRvec.emplace_back(sr);
+  sr.SetVar(mlb, 0, fInf);
 
+  sr = srbase;
   sr.SetName("srsbfull");  // fullband
   sr.SetDetailName("ge4j_met150toInf_mt0toInf");
   sr.SetVar(met, 150, fInf);
@@ -1695,6 +1713,17 @@ std::vector<SR> getStopInclusiveRegionsRun2() {
   sr.SetVar(mt, 0, fInf);
   SRvec.emplace_back(sr);
 
+  sr.SetName("srsbfmt2");
+  sr.SetDetailName("ge2j_met250toInf_mt0toInf");
+  sr.RemoveVar(passvetos);
+  SRvec.emplace_back(sr);
+
+  sr.SetName("srsbfmt4");
+  sr.SetDetailName("ge4j_met250toInf_mt0toInf");
+  sr.SetVar(njet, 4, fInf);
+  sr.SetVar(passvetos, 1, 2);
+  SRvec.emplace_back(sr);
+
   return SRvec;
 }
 
@@ -1709,12 +1738,12 @@ std::vector<SR> getStopSignalRegionsCorridorRun2() {
   srbase.SetVar(nvlep, 1, 2);
   srbase.SetVar(passvetos, 1, 2);
   srbase.SetVar(njet, 5, fInf);
-  srbase.SetVar(nbjet, 0, fInf);
+  // srbase.SetVar(nbjet, 0, fInf);
   srbase.SetVar(dphijmet, 0.5, 3.1416);
   srbase.SetMETBins({0, 250, 350, 450, 550, 650, 800, 1500});
 
   std::vector<SR> SRvec;
-  SRvec.emplace_back(srbase);
+  // SRvec.emplace_back(srbase);
 
   SR sr;
   sr = srbase;
@@ -1732,8 +1761,7 @@ std::vector<SR> getStopSignalRegionsCorridorRun2() {
   sr = srbase;
   sr.SetName("srJ");
   sr.SetDetailName("ge5j_ge1sb_passlmetcor_j1notb");
-  sr.SetAllowDummyVars(1);
-  sr.SetVar(passvetos, 1, 2);
+  sr.SetVar(njet, 5, fInf);
   // sr.SetVar(nbjet, 1, fInf);
   sr.SetVar(nsbtag, 1, fInf);
   sr.SetVar(passlmetcor, 1, 2); // shape cut on lep1pt & dphilmet

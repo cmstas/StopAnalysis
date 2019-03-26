@@ -15,7 +15,9 @@
 // Histogram manipulation
 inline void moveOverFlowToLastBin1D(TH1* hist) {
   int nbin = hist->GetNbinsX();
+  if (hist->GetBinLowEdge(nbin+1) < 1499.9) return;  // only when the last bin is the infinity bin
   if (hist->GetBinContent(nbin+1) > 0) {
+    cout << "Moving the overflow for hist: " << hist->GetTitle() << " to its last bin!" << endl;
     double err = 0;
     hist->SetBinContent(nbin, hist->IntegralAndError(nbin, -1, err));
     hist->SetBinError(nbin, err);
@@ -26,6 +28,7 @@ inline void moveOverFlowToLastBin1D(TH1* hist) {
 
 inline void moveXOverFlowToLastBin3D(TH3* hist) {
   int nbinx = hist->GetNbinsX();
+  if (hist->GetXaxis()->GetBinLowEdge(nbinx+1) < 1499.9) return; // only when the last bin is infinity
   for (int ibiny = 0; ibiny < hist->GetNbinsY(); ++ibiny) {
     for (int ibinz = 0; ibinz < hist->GetNbinsZ(); ++ibinz) {
       if (hist->GetBinContent(nbinx+1, ibiny, ibinz) <= 0) continue;
