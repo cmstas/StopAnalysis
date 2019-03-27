@@ -4,14 +4,14 @@ import ROOT
 import pyRootPlotMaker.pyRootPlotMaker as ppm
 import MT2PlotUtils as utils
 
-def MT2PlotMaker(rootdir, samples, data, dirname, plots, output_dir=".", exts=["pdf"], tag="", scaleMC=True, suffix = None, 
-                 datatitle = 'data', systset=None, lumi=None, ratioType=0, signame=None, sig_points=None):
-    ''' 
+def MT2PlotMaker(rootdir, samples, data, dirname, plots, output_dir=".", exts=["pdf"], tag="", scaleMC=True, suffix = None,
+                 datatitle = 'data', systset=None, lumi=None, ratioType=0, signame=None, sig_points=None, gencats=None):
+    '''
     rootdir contains output of MT2Looper, samples are names of the .root files,
     data is the name of the data file, dirname is the directory within the root file
     to extract plots from, plots are a list of plot definitions from MT2PlotDefs
     exts is a list of file extensions to produce
-    note that dirname can be a '+' separated string of directories to add together 
+    note that dirname can be a '+' separated string of directories to add together
     '''
 
     h_bkg_vecs = [[] for x in plots]
@@ -19,17 +19,23 @@ def MT2PlotMaker(rootdir, samples, data, dirname, plots, output_dir=".", exts=["
 
     dirnames = [s.strip() for s in dirname.split("+")]
 
+    dogencat = False
+    ncats = len(samples)
+    if type(gencats) == list and ncats == 1:
+        ncats = len(gencats)
+        dogencat = True
+
     if lumi==None:
         if 'samp16' in rootdir: lumi = 35.9
         if 'samp17' in rootdir: lumi = 41.5
         if 'samp18' in rootdir: lumi = 59.7
-        if 'Run2'   in rootdir: lumi = 137.1
+        if 'Run2'   in rootdir: lumi = 137.2
 
     if lumi==None:
         if  '16'  in data: lumi = 35.9
         if  '17'  in data: lumi = 41.5
         if  '18'  in data: lumi = 59.7
-        if 'run2' in data: lumi = 137.1
+        if 'run2' in data: lumi = 137.2
 
     ## deal with suffixes
     # crdybaseInclLowPtOF means that we should take the plots in crdybaseIncl that end in LowPt
@@ -44,7 +50,7 @@ def MT2PlotMaker(rootdir, samples, data, dirname, plots, output_dir=".", exts=["
         systs = [[] for x in plots]
         h_bkg_vecs_syst_up = [[[] for s in systset] for p in plots ]
         h_bkg_vecs_syst_dn = [[[] for s in systset] for p in plots ]
-           
+
     #     nbins = h_mt2bins_data.GetNbinsX()
     #     systs = [0 for i in range(nbins)]
     #     ## get systematic in first bin
@@ -58,15 +64,18 @@ def MT2PlotMaker(rootdir, samples, data, dirname, plots, output_dir=".", exts=["
 
 
     ## get background histograms
-    for isamp in range(len(samples)):
+    for icat in range(ncats):
         # get the root file for the given sample. This assumes that frag/fake photons come from qcd_ht.root
-        fn = os.path.join(rootdir, samples[isamp]+".root")
+        if dogencat:
+            fn = os.path.join(rootdir, samples[0]+".root")
+        else:
+            fn = os.path.join(rootdir, samples[icat]+".root")
         fid = ROOT.TFile(fn)
 
         for iplot in range(len(plots)):
             vn = plots[iplot][0]
+            if dogencat: vn += '_'+gencats[icat]
             if suffix != None: vn += suffix
-
             h_bkg_vecs[iplot].append( fid.Get(dirnames[0]+"/h_"+vn) )
 
             # histogram won't exist if there are no events. Replace it with None, handle later
@@ -87,39 +96,39 @@ def MT2PlotMaker(rootdir, samples, data, dirname, plots, output_dir=".", exts=["
 
         fid.Close()
 
-    # deal with nonexistent histograms <-- 
+    # deal with nonexistent histograms <--
     skipList = []
     for i in range(len(plots)):
         firstGood = -1
-        for isamp in range(len(samples)):
-            if h_bkg_vecs[i][isamp] != None:
-                firstGood = isamp
+        for icat in range(ncats):
+            if h_bkg_vecs[i][icat] != None:
+                firstGood = icat
                 break
         if firstGood==-1:
             # raise RuntimeError("all background histograms are empty for {0}/h_{1}!".format(dirname,plots[i][0]))
             print "Error: all background histograms are empty for {0}/h_{1}! Skipping!".format(dirname,plots[i][0])
             skipList.append(i)
             continue
-        for isamp in range(len(samples)):
-            if h_bkg_vecs[i][isamp] == None:
-                h_bkg_vecs[i][isamp] = h_bkg_vecs[i][firstGood].Clone()
-                h_bkg_vecs[i][isamp].Reset()
+        for icat in range(ncats):
+            if h_bkg_vecs[i][icat] == None:
+                h_bkg_vecs[i][icat] = h_bkg_vecs[i][firstGood].Clone()
+                h_bkg_vecs[i][icat].Reset()
         if drawSystematicBand:
             h_bkg_tot = h_bkg_vecs[i][firstGood].Clone()
             syst_up = [0.0] * h_bkg_tot.GetNbinsX()
             syst_dn = [0.0] * h_bkg_tot.GetNbinsX()
-            for isamp in range(len(samples)):
-                if isamp != firstGood and h_bkg_vecs[i][isamp] != None:
-                    h_bkg_tot.Add(h_bkg_vecs[i][isamp])
+            for icat in range(ncats):
+                if icat != firstGood and h_bkg_vecs[i][icat] != None:
+                    h_bkg_tot.Add(h_bkg_vecs[i][icat])
             for isys, sys in enumerate(systset):
                 h_bkg_tot_syst_up = h_bkg_vecs_syst_up[i][isys][firstGood].Clone()
                 h_bkg_tot_syst_dn = h_bkg_vecs_syst_dn[i][isys][firstGood].Clone()
-                for isamp in range(len(samples)):
-                    if isamp == firstGood: continue
-                    if h_bkg_vecs_syst_up[i][isys][isamp] != None:
-                        h_bkg_tot_syst_up.Add(h_bkg_vecs_syst_up[i][isys][isamp])
-                    if h_bkg_vecs_syst_dn[i][isys][isamp] != None:
-                        h_bkg_tot_syst_dn.Add(h_bkg_vecs_syst_dn[i][isys][isamp])
+                for icat in range(ncats):
+                    if icat == firstGood: continue
+                    if h_bkg_vecs_syst_up[i][isys][icat] != None:
+                        h_bkg_tot_syst_up.Add(h_bkg_vecs_syst_up[i][isys][icat])
+                    if h_bkg_vecs_syst_dn[i][isys][icat] != None:
+                        h_bkg_tot_syst_dn.Add(h_bkg_vecs_syst_dn[i][isys][icat])
                 h_bkg_tot_syst_up.Scale(h_bkg_tot.Integral()/h_bkg_tot_syst_up.Integral())
                 h_bkg_tot_syst_dn.Scale(h_bkg_tot.Integral()/h_bkg_tot_syst_dn.Integral())
                 h_bkg_tot_syst_up.Divide(h_bkg_tot)
@@ -215,8 +224,13 @@ def MT2PlotMaker(rootdir, samples, data, dirname, plots, output_dir=".", exts=["
         else:
             subLegText = None
         # subLegText = None
-        sns = [utils.GetSampleName(s) for s in samples]
-        colors = [utils.GetColor(s) for s in samples]
+        if dogencat:
+            sns = [utils.GetSampleName(s) for s in gencats]
+            colors = [utils.GetColor(s) for s in gencats]
+        else:
+            sns = [utils.GetSampleName(s) for s in samples]
+            colors = [utils.GetColor(s) for s in samples]
+
         for ext in exts:
             saveAs = os.path.join(output_dir,dirname+tag,"{0}_{1}.{2}".format(dirname,vn,ext))
             ppm.plotDataMC(h_bkg_vecs[i], sns, h_data[i], doPause=False, xAxisTitle=xAxisTitle, lumi=lumi, lumiUnit='fb',
@@ -224,8 +238,5 @@ def MT2PlotMaker(rootdir, samples, data, dirname, plots, output_dir=".", exts=["
                            scaleMCtoData=scaleMC, xAxisUnit=unit, userMin=userMin, userMax=userMax, doSort=False, customColors=colors,
                            markerSize=markerSize, titleSize=0.035, subtitleSize=0.033, legCoords=(0.60,0.70,0.87,0.895),
                            subLegText=subLegText, subLegTextSize=0.036, doBkgError=True, doOverflow=doOverflow, cmsTextSize=0.04,
-                           convertToPoisson=False, drawZeros=False, drawSystematicBand=drawSystematicBand, systematics=systs[i], 
+                           convertToPoisson=False, drawZeros=False, drawSystematicBand=drawSystematicBand, systematics=systs[i],
                            h_sig_vec=h_sig_vec[i], sig_names=sig_names[i], ratioType=ratioType)
-
-
-

@@ -17,31 +17,19 @@ def GetColor(sample):
     if 'FromTop' in sample: return 625  # kRed-7
     if 'ZToNuNu' in sample: return 613  # kMagenta-3
 
+    if "2lep"    in sample: return 866  # kAzure+6
+    if "1lepW"   in sample: return 796  # kOrange-4
+    if "1lepTop" in sample: return 625  # kRed-7
+    if "Znunu"   in sample: return 872  # kViolet-8
+
     return 870 # for everything else
 
 def GetCRName(cr):
     names = {"crrlbase": "Removed Lepton CR",
-             "crrlbaseJ": "Removed Lepton CR",
-             "crrlbaseIncl": "Removed Lepton CR",
-             "crgjbase": "#gamma+jets CR",
-             "crgjbaseJ": "#gamma+jets CR",
-             "crgjbaseIncl": "#gamma+jets CR",
-             "crdybase": "Z #rightarrow #font[12]{l}^{#plus}#font[12]{l}^{#minus} CR",
-             "crdybaseJ": "Z #rightarrow #font[12]{l}^{#plus}#font[12]{l}^{#minus} CR",
-             "crdybaseIncl": "Z #rightarrow #font[12]{l}^{#plus}#font[12]{l}^{#minus} CR",
-             "crdybaseInclLowPt": "#font[12]{l}^{#plus}#font[12]{l}^{#minus} CR",
-             "crslbase": "Single Lepton CR",
-             "crslbaseJ": "Single Lepton CR",
-             "crslbaseVL": "Single Lepton CR",
-             "crslbaseL": "Single Lepton CR",
-             "crslbaseM": "Single Lepton CR",
-             "crslbaseH": "Single Lepton CR",
-             "crslbaseUH": "Single Lepton CR",
-             "crslwjets": "Single Lepton CR (wjets)",
-             "crslttbar": "Single Lepton CR (ttbar)",
-             "crslelbase": "Single Lepton CR (els)",
-             "crslmubase": "Single Lepton CR (mus)",
-             "crqcdbaseJ": "QCD Monojet CR",
+             "cr2lbase" : "Dilepton CR",
+             "cr0bbase" : "0 b-tag CR",
+             "cr2lincl1" : "Dilepton CR 2-3j",
+             "cr2lincl4J" : "Dilepton CR #geq 4j",
              }
 
     # use the above name if defined, otherwise use cr itself
@@ -53,8 +41,6 @@ def GetSampleName(sample):
         # "2015dyjetsll_ht": "Z(#font[12]{ll})+Jets",
         # "zinv_ht": "Z(#nu#nu)+Jets",
         # "2015zinv_ht": "Z(#nu#nu)+Jets",
-        # "top": "Top",
-        # "ww": "WW",
         "lostlepFromCRs": "Lost Lepton",
         "lostlep": "Lost Lepton",
         "tt2l" : "t#bar{t}#rightarrow2 #font[12]{l}" ,
@@ -67,10 +53,15 @@ def GetSampleName(sample):
         "_16" : " 16" ,
         "_17" : " 17" ,
         "_18" : " 18" ,
+        "_run2" : "" ,
         # "allData" : "allData" ,
         # "allBkg " : "allBkg" ,
         "_mrs0" : " no METRes corr." ,
         "_mrs2" : " w/ METRes corr." ,
+        "2lep" : "t#bar{t}/tW#rightarrow2 #font[12]{l}",
+        "1lepW" : "1#font[12]{l} from W",
+        "1lepTop" : "1#font[12]{l} from top",
+        "Znunu" : "Z#rightarrow #nu#nu",
     }
 
     # use the above name if defined, otherwise use sample itself
@@ -85,6 +76,7 @@ def GetVarName(var):
     names = {"ht": "H_{T}",
              "met": "#slash{E}_{T}",
              "mt2": "M_{T2}",
+             "mt" : "M_{T}",
              "metbins": "#slash{E}_{T}",
              "mt2bins": "M_{T2}",
              "nJet30": "N(jet)",
@@ -101,7 +93,7 @@ def GetVarName(var):
              "zllmass": "m_{#font[12]{ll}}",
              "gammaPt": "P_{T}(#gamma)",
              "gammaEta": "#eta(#gamma)",
-             "J1pt": "Subleading jet p_{T}",
+             "jet1pt": "Leading jet p_{T}",
              }
 
     if "SigmaIetaIeta" in var:
@@ -132,7 +124,7 @@ def GetSubtitles(dirname):
     subtitle = [met+" > 250 GeV", mt+" > 150 GeV", "#geq 2j, #geq 1b"]
 
     if "cr0b" in dirname:
-        subtitle[2] = "#geq 2j, == 0b"
+        subtitle[2] = "#geq 2j, = 0b"
     if "cremu" in dirname:
         subtitle = [met+" > 50 GeV", "M(e#mu) > 20 GeV", "#geq 2j, #geq 0b"]
         if   "A1" in dirname: subtitle[2] = "#geq 2j, #geq 1b"
@@ -151,6 +143,10 @@ def GetSubtitles(dirname):
     if "sbfull" in dirname:
         subtitle[0] = met+" > 150 GeV"
         subtitle[1] = mt+" > 0 GeV"
+    if "incl1" in dirname:
+        subtitle[2] = "2-3j, #geq 1b"
+    if "incl4J" in dirname:
+        subtitle[2] = "#geq 4j, #geq 1b"
 
     return subtitle
 
