@@ -68,7 +68,7 @@ const bool runResTopMVA = false;
 // run the MET resolution correction (and store in separate branches)
 const bool runMETResCorrection = false;
 // only produce yield histos
-const bool runYieldsOnly = true;
+const bool runYieldsOnly = false;
 // only running selected signal points to speed up
 const bool runFullSignalScan = true;
 // debug symbol, for printing exact event kinematics that passes
@@ -957,8 +957,8 @@ void StopLooper::fillHistosForSR(string suf) {
         plot1d("h_nak8jets"+s, values_[nak8jets], evtweight_, sr.histMap, ";Number of AK8 jets"   , 7, 0, 7);
         plot1d("h_resttag"+s,  values_[resttag] , evtweight_, sr.histMap, ";resolved top tag"     , 110, -1.1f, 1.1f);
         plot1d("h_bdtttag"+s,  values_[bdtttag] , evtweight_, sr.histMap, ";BDT resolved top tag" , 110, -1.1f, 1.1f);
-        plot1d("h_tfttag"+s,   values_[tfttag]  , evtweight_, sr.histMap, ";TF resolved top tag"  , 120, -0.1f, 1.1f);
-        plot1d("h_deepttag"+s, values_[deepttag], evtweight_, sr.histMap, ";deepAK8 top tag"      , 120, -0.1f, 1.1f);
+        plot1d("h_tfttag"+s,   values_[tfttag]  , evtweight_, sr.histMap, ";Leading DeepResolved top tag", 120, -0.1f, 1.1f);
+        plot1d("h_deepttag"+s, values_[deepttag], evtweight_, sr.histMap, ";Leading DeepAK8 top tag"     , 120, -0.1f, 1.1f);
         plot1d("h_nsbtags"+s,  values_[nsbtag]  , evtweight_, sr.histMap, ";Number of soft b-tagged jets",  5,  0, 5);
       }
 
@@ -980,6 +980,15 @@ void StopLooper::fillHistosForSR(string suf) {
     if (suf == "") fillKineHists(suf);
     if (is_fastsim_ && suf == "" && (checkMassPt(1200, 50) || checkMassPt(800, 400) || checkMassPt(800, 675)))
       fillKineHists(Form("_%.0f_%.0f%s", mass_stop(), mass_lsp(), suf.c_str()));
+
+    // Separate contribution by gen classification for background events
+    if (doGenClassification && is_bkg_ && suf == "") {
+      if (isZtoNuNu()) fillKineHists("_Znunu");
+      else if (is2lep()) fillKineHists("_2lep");
+      else if (is1lepFromW()) fillKineHists("_1lepW");
+      else if (is1lepFromTop()) fillKineHists("_1lepTop");
+      else fillKineHists("_unclass");  // either unclassified 1lep or 0lep, or something else unknown, shouldn't have (m)any
+    }
 
     auto fillExtraHists = [&](string s) {
       plot1d("h_met_s"+s, values_[met], evtweight_, sr.histMap, ";#slash{E}_{T} [GeV]" , 40, 50, 250);
@@ -1044,7 +1053,7 @@ void StopLooper::fillHistosForCR2l(string suf) {
       plot1d("h_mlepb"+s,      values_[mlb]         , evtweight_, cr.histMap, ";M_{#it{l}b} [GeV]"             , 24,  0, 600);
       plot1d("h_dphijmet"+s,   values_[dphijmet]    , evtweight_, cr.histMap, ";#Delta#phi(jet,#slash{E}_{T})" , 33,  0, 3.3);
       plot1d("h_nvtxs"+s,      values_[nvtx]        , evtweight_, cr.histMap, ";Number of vertices"            , 70,  1, 71);
-      plot1d("h_rlmet"+s,      values_[met_rl]      , evtweight_, cr.histMap, ";(#slash{E}+l_{2})_{T} [GeV]"   , 24, 250, 850);
+      plot1d("h_rlmet"+s,      values_[met_rl]      , evtweight_, cr.histMap, ";#slash{E}_{T} (removed lepton) [GeV]" , 24, 250, 850);
       plot1d("h_rlmt"+s,       values_[mt_rl]       , evtweight_, cr.histMap, ";M_{T} (removed lepton) [GeV]"  , 20,  150, 650);
       plot1d("h_rltmod"+s,     values_[tmod_rl]     , evtweight_, cr.histMap, ";Modified topness"              , 25, -10, 15);
       plot1d("h_rldphijmet"+s, values_[dphijmet_rl] , evtweight_, cr.histMap, ";#Delta#phi(jet,(#slash{E}+l_{2}))" , 33, 0.8, 3.3);
@@ -1054,15 +1063,15 @@ void StopLooper::fillHistosForCR2l(string suf) {
         plot1d("h_nak8jets"+s, values_[nak8jets] , evtweight_, cr.histMap, ";Number of AK8 jets"   , 7, 0, 7);
         plot1d("h_resttag"+s,  values_[resttag]  , evtweight_, cr.histMap, ";resolved top tag"     , 110, -1.1f, 1.1f);
         plot1d("h_bdtttag"+s,  values_[bdtttag]  , evtweight_, cr.histMap, ";BDT resolved top tag" , 110, -1.1f, 1.1f);
-        plot1d("h_tfttag"+s,   values_[tfttag]   , evtweight_, cr.histMap, ";TF resolved top tag"  , 120, -0.1f, 1.1f);
-        plot1d("h_deepttag"+s, values_[deepttag] , evtweight_, cr.histMap, ";deepAK8 top tag"      , 120, -0.1f, 1.1f);
+        plot1d("h_tfttag"+s,   values_[tfttag]   , evtweight_, cr.histMap, ";Leading DeepResolved top tag", 120, -0.1f, 1.1f);
+        plot1d("h_deepttag"+s, values_[deepttag] , evtweight_, cr.histMap, ";Leading DeepAK8 top tag"     , 120, -0.1f, 1.1f);
         plot1d("h_nsbtags"+s,  values_[nsbtag]   , evtweight_, cr.histMap, ";Number of soft b-tagged jets"  ,  5,  0, 5);
       }
 
       // if ( (HLT_SingleEl() && abs(lep1_pdgid()) == 11 && values_[lep1pt] < 45) || (HLT_SingleMu() && abs(lep1_pdgid()) == 13 && values_[lep1pt] < 40) || (HLT_MET_MHT() && pfmet() > 250) ) {
       if (true) {
-        plot1d("h_rlmet_h"+s,  values_[met_rl]   , evtweight_, cr.histMap, ";#slash{E}_{T} (with removed lepton) [GeV]" , 32, 50, 850);
-        plot1d("h_rlmt_h"+s,   values_[mt_rl]    , evtweight_, cr.histMap, ";M_{T} (with removed lepton) [GeV]" , 26, 0, 650);
+        plot1d("h_rlmet_h"+s,  values_[met_rl]   , evtweight_, cr.histMap, ";#slash{E}_{T} (removed lepton) [GeV]" , 32, 50, 850);
+        plot1d("h_rlmt_h"+s,   values_[mt_rl]    , evtweight_, cr.histMap, ";M_{T} (removed lepton) [GeV]"  , 26, 0, 650);
         plot1d("h_nbtags"+s,   values_[nbjet]    , evtweight_, cr.histMap, ";Number of b-tagged jets"       ,  5,  0, 5);
         plot1d("h_dphilmet"+s, values_[dphilmet] , evtweight_, cr.histMap, ";#Delta#phi(l,MET)"             , 32,   0, 3.2);
       }
@@ -1077,6 +1086,15 @@ void StopLooper::fillHistosForCR2l(string suf) {
     if (suf == "") fillKineHists(suf);
     if (is_fastsim_ && suf == "" && (checkMassPt(1200, 50) || checkMassPt(800, 400) || checkMassPt(800, 675)))
       fillKineHists(Form("_%.0f_%.0f%s", mass_stop(), mass_lsp(), suf.c_str()));
+
+    // Separate contribution by gen classification for background events
+    if (doGenClassification && is_bkg_ && suf == "") {
+      if (isZtoNuNu()) fillKineHists("_Znunu");
+      else if (is2lep()) fillKineHists("_2lep");
+      else if (is1lepFromW()) fillKineHists("_1lepW");
+      else if (is1lepFromTop()) fillKineHists("_1lepTop");
+      else fillKineHists("_unclass");  // either unclassified 1lep or 0lep, or something else unknown, shouldn't have (m)any
+    }
 
     auto fillExtraZHists = [&] (string s) {
       plot1d("h_mll"+s,   values_[mll], evtweight_, cr.histMap, ";M_{#it{ll}} [GeV]" , 120, 0, 240 );
@@ -1152,8 +1170,8 @@ void StopLooper::fillHistosForCR0b(string suf) {
         plot1d("h_nak8jets"+s, values_[nak8jets], evtweight_, cr.histMap, ";Number of AK8 jets"   , 7, 0, 7);
         plot1d("h_resttag"+s,  values_[resttag] , evtweight_, cr.histMap, ";resolved top tag"     , 110, -1.1f, 1.1f);
         plot1d("h_bdtttag"+s,  values_[bdtttag] , evtweight_, cr.histMap, ";BDT resolved top tag" , 110, -1.1f, 1.1f);
-        plot1d("h_tfttag"+s,   values_[tfttag]  , evtweight_, cr.histMap, ";TF resolved top tag"  , 120, -0.1f, 1.1f);
-        plot1d("h_deepttag"+s, values_[deepttag], evtweight_, cr.histMap, ";deepAK8 top tag"      , 120, -0.1f, 1.1f);
+        plot1d("h_tfttag"+s,   values_[tfttag]  , evtweight_, cr.histMap, ";Leading DeepResolved top tag", 120, -0.1f, 1.1f);
+        plot1d("h_deepttag"+s, values_[deepttag], evtweight_, cr.histMap, ";Leading DeepAK8 top tag"     , 120, -0.1f, 1.1f);
         plot1d("h_nsbtags"+s,  values_[nsbtag]  , evtweight_, cr.histMap, ";Number of soft b-tagged jets",  5,  0, 5);
       }
 
@@ -1185,6 +1203,15 @@ void StopLooper::fillHistosForCR0b(string suf) {
     if (suf == "") fillKineHists(suf);
     if (is_fastsim_ && suf == "" && (checkMassPt(1200, 50) || checkMassPt(800, 400) || checkMassPt(800, 675)))
       fillKineHists(Form("_%.0f_%.0f%s", mass_stop(), mass_lsp(), suf.c_str()));
+
+    // Separate contribution by gen classification for background events
+    if (doGenClassification && is_bkg_ && suf == "") {
+      if (isZtoNuNu()) fillKineHists("_Znunu");
+      else if (is2lep()) fillKineHists("_2lep");
+      else if (is1lepFromW()) fillKineHists("_1lepW");
+      else if (is1lepFromTop()) fillKineHists("_1lepTop");
+      else fillKineHists("_unclass");  // either unclassified 1lep or 0lep, or something else unknown, shouldn't have (m)any
+    }
 
     auto fillExtraHists = [&](string s) {
       plot1d("h_met_s"+s, values_[met], evtweight_, cr.histMap, ";#slash{E}_{T} [GeV]" , 40, 50, 250);
@@ -1396,6 +1423,15 @@ void StopLooper::fillHistosForCRemu(string suf, int trigType) {
       //   fillhists(suf+"_mu");
       // else if (abs(lep1_pdgid()) == 11)
       //   fillhists(suf+"_el");
+
+      // Separate contribution by gen classification for background events
+      if (doGenClassification && is_bkg_ && suf == "") {
+        if (isZtoNuNu()) fillhists("_Znunu");
+        else if (is2lep()) fillhists("_2lep");
+        else if (is1lepFromW()) fillhists("_1lepW");
+        else if (is1lepFromTop()) fillhists("_1lepTop");
+        else fillhists("_unclass");  // either unclassified 1lep or 0lep, or something else unknown, shouldn't have (m)any
+      }
 
       auto fillExtraHists = [&](int plotset = -1, string s = "") {
         // Study the NISR for ttbar

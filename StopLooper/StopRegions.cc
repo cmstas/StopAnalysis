@@ -1616,6 +1616,12 @@ std::vector<SR> getStopInclusiveRegionsRun2() {
   sr.SetVar(tmod, 10, fInf);
   SRvec.emplace_back(sr);
 
+  // Inclusive for C-H (geq 4j )
+  sr.SetName("srincl4J");
+  sr.SetVar(tmod, -fInf, fInf);
+  sr.SetVar(njet, 4, fInf);
+  SRvec.emplace_back(sr);
+
   // Inclusive for E+G
   sr.SetName("srincl5");
   sr.SetVar(tmod, 0, fInf);
