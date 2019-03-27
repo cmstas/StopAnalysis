@@ -68,7 +68,7 @@ const bool runResTopMVA = false;
 // run the MET resolution correction (and store in separate branches)
 const bool runMETResCorrection = false;
 // only produce yield histos
-const bool runYieldsOnly = true;
+const bool runYieldsOnly = false;
 // only running selected signal points to speed up
 const bool runFullSignalScan = true;
 // debug symbol, for printing exact event kinematics that passes
@@ -102,9 +102,9 @@ void StopLooper::SetSignalRegions() {
   SRVec = getStopSignalRegionsRun2();
   // SRVec = getStopInclusiveRegionsRun2();
 
-  // // Adding the inclusive regions
-  // auto inclSRvec = getStopInclusiveRegionsRun2();
-  // SRVec.insert(SRVec.begin()+1, inclSRvec.begin()+1, inclSRvec.end());
+  // Adding the inclusive regions
+  auto inclSRvec = getStopInclusiveRegionsRun2();
+  SRVec.insert(SRVec.begin()+1, inclSRvec.begin()+1, inclSRvec.end());
 
   CR0bVec = getStopControlRegionsNoBTagsRun2(SRVec);
   CR2lVec = getStopControlRegionsDileptonRun2(SRVec);

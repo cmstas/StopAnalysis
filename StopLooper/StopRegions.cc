@@ -1492,23 +1492,30 @@ std::vector<SR> getStopSignalRegionsRun2() {
   sr = srbase;
   sr.SetName("srI");
   sr.SetDetailName("ge5j_lpt0to150_j1notb");
-  // sr.RemoveVar("nbtag");
-  sr.SetVar(mt, 150, fInf);
   sr.SetVar(njet, 5, fInf);
   sr.SetVar(nbjet, 1, fInf);
   // sr.SetVar(lep1pt, 0, 150);
   // sr.SetVar(dphilmet, 0, 2.0);
   sr.SetVar(passlmetcor, 1, 2); // shape cut on lep1pt & dphilmet
-  // sr.SetVar(nsbtag, 1, fInf);
   sr.SetVar(dphijmet, 0.5, 3.1416);
   sr.SetVar(j1passbtag, 0, 1);  // Require j1 not b-tagged
   sr.SetMETBins({250, 350, 450, 550, 750, 1500});
-  // sr.SetMETBins({250, 350, 450, 550, 1500});
+  SRvec.emplace_back(sr);
+
+  sr = srbase;
+  sr.SetName("srJ");
+  sr.SetDetailName("ge5j_ge1sb_passlmetcor_j1notb");
+  sr.SetVar(njet, 5, fInf);
+  // sr.SetVar(nbjet, 1, fInf);
+  sr.SetVar(nsbtag, 1, fInf);
+  sr.SetVar(passlmetcor, 1, 2); // shape cut on lep1pt & dphilmet
+  sr.SetVar(dphijmet, 0.5, 3.1416);
+  sr.SetVar(j1passbtag, 0, 1);  // Require j1 not b-tagged
+  sr.SetMETBins({250, 350, 450, 550, 1500});
   SRvec.emplace_back(sr);
 
   return SRvec;
 }
-
 
 std::vector<SR> getStopControlRegionsNoBTagsRun2(const std::vector<SR>& SRvec = getStopSignalRegionsRun2()) {
   std::vector<SR> CRvec;
@@ -1516,17 +1523,20 @@ std::vector<SR> getStopControlRegionsNoBTagsRun2(const std::vector<SR>& SRvec = 
   for (SR cr : SRvec) {
     cr.SetName(cr.GetName().replace(0, 2, "cr0b"));
     cr.SetAllowDummyVars(1);
-    if (cr.VarExists(nbjet)) cr.RemoveVar(nbjet);
     if (cr.VarExists(ntbtag)) cr.RemoveVar(ntbtag);
-    if (cr.GetName().find("base") != std::string::npos || cr.GetName().find("cr0bI") == 0) {
+    if (cr.VarExists(nbjet)) {
       cr.SetVar(nbjet, 0, 1);
-    } else {
+    } else if (cr.VarExists(nbtag)) {
       cr.SetVar(nbtag, 0, 1);
     }
     if (cr.GetLowerBound(tmod) < 10)
       cr.SetVar(nbjet, 0, 1);
-    if (cr.VarExists(tfttag)) cr.RemoveVar(tfttag);
-    cr.ReplaceVar(mlb, mlb_0b);
+
+    if (cr.VarExists(tfttag))   cr.RemoveVar(tfttag);
+    if (cr.VarExists(deepttag)) cr.RemoveVar(deepttag);
+
+    if (cr.VarExists(nsbtag)) cr.SetVar(nsbtag, 0, 1);
+    if (cr.VarExists(mlb)) cr.ReplaceVar(mlb, mlb_0b);
     CRvec.emplace_back(cr);
   }
 
@@ -1783,12 +1793,6 @@ std::vector<SR> getStopControlRegionsNoBTagsCorridorRun2() {
     if (cr.VarExists(nbjet))  cr.RemoveVar(nbjet);
     if (cr.VarExists(ntbtag)) cr.RemoveVar(ntbtag);
     if (cr.VarExists(nsbtag)) cr.SetVar(nsbtag, 0, 1);
-    // if (cr.GetName().find("base") != std::string::npos || cr.GetName().find("cr0bI") == 0) {
-    // } else {
-    //   cr.SetVar(nbtag, 0, 1);
-    // }
-    // if (cr.GetLowerBound(tmod) < 10)
-    //   cr.SetVar(nbjet, 0, 1);
     cr.SetVar(nbjet, 0, 1);
     if (cr.VarExists(mlb)) cr.ReplaceVar(mlb, mlb_0b);
     CRvec.emplace_back(cr);
