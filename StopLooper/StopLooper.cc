@@ -68,7 +68,7 @@ const bool runResTopMVA = false;
 // run the MET resolution correction (and store in separate branches)
 const bool runMETResCorrection = false;
 // only produce yield histos
-const bool runYieldsOnly = false;
+const bool runYieldsOnly = true;
 // only running selected signal points to speed up
 const bool runFullSignalScan = true;
 // debug symbol, for printing exact event kinematics that passes
@@ -874,14 +874,14 @@ void StopLooper::fillYieldHistos(SR& sr, float met, string suf, bool is_cr2l) {
     if (nvtxs() < 100) evtweight_ *= nvtxscale_[nvtxs()];  // only scale for data
   }
 
-  auto fillhists = [&](string s, bool fill1dsig = false) {
-    if (is_fastsim_)
+  auto fillhists = [&](string s, bool fill3D = true) {
+    if (is_fastsim_ && fill3D)
       plot3d("hSMS_metbins"+s+suf, met, mass_stop(), mass_lsp(), evtweight_, sr.histMap, ";E^{miss}_{T} [GeV];M_{stop};M_{LSP}",
              sr.GetNMETBins(), sr.GetMETBinsPtr(), mStopBins.size()-1, mStopBins.data(), mLSPBins.size()-1, mLSPBins.data());
-    if (!is_fastsim_ || fill1dsig)
+    else
       plot1d("h_metbins"+s+suf, met, evtweight_, sr.histMap, (sr.GetDetailName()+";E^{miss}_{T} [GeV]").c_str() , sr.GetNMETBins(), sr.GetMETBinsPtr());
 
-    if (doSystVariations && (is_bkg_ || (is_fastsim_)) && suf == "") {
+    if (doSystVariations && (is_bkg_ || (is_fastsim_ && fill3D)) && suf == "") {
       // Only run once when filling for nominal. JES or METRes variation dealt with above. No need for signals?
       for (int isyst = 3; isyst < evtWgtInfo::k_nSyst; ++isyst) {
         auto syst = (evtWgtInfo::systID) isyst;
@@ -896,8 +896,8 @@ void StopLooper::fillYieldHistos(SR& sr, float met, string suf, bool is_cr2l) {
     }
   };
   fillhists("");
-  if (is_fastsim_ && checkMassPt(1200, 50)) fillhists("_1200_50", true);
-  if (is_fastsim_ && checkMassPt(800, 400)) fillhists("_800_400", true);
+  if (is_fastsim_ && suf == "" && checkMassPt(1200, 50)) fillhists("_1200_50", false);
+  if (is_fastsim_ && suf == "" && checkMassPt(800, 400)) fillhists("_800_400", false);
   if (doGenClassification && is_bkg_) {
     // Only fill gen classification for background events, used for background estimation
     if (isZtoNuNu()) fillhists("_Znunu");
