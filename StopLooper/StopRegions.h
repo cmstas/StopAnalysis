@@ -11,7 +11,7 @@ enum Vars {       met,        mt,         nlep,       nvlep,   passvetos,       
                met_rl,     mt_rl,      tmod_rl,     nlep_rl, dphijmet_rl,     mt2_ll,        mll,     mlb_0b,
            j1passbtag,  dphilmet,  dphilmet_rl, passlmetcor, passlmet_rl,     nsbtag,
                metphi,    lep1pt,       lep2pt,     lep1eta,     lep2eta,     jet1pt,     jet2pt,    jet1eta,    jet2eta,
-             nvtx, ht, nak8jets, chi2, binttag, leadbpt, mllbbmet, mtttbar, ptttbar, ptll, passlep1pt,
+             nvtx, ht, nak8jets, chi2, binttag, leadbpt, mllbbmet, mtttbar, ptttbar, ptll, ptbb, passlep1pt,
                met_rs, metphi_rs, mt_rs, dphijmet_rs, dphilmet_rs, metphi_rl,
                 nvars };
 // vector<std::string> varnames_ = { "met",};

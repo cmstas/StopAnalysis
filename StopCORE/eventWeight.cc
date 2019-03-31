@@ -265,7 +265,7 @@ evtWgtInfo::evtWgtInfo() {
 
   // Utilty Var Constants
   year = 0;
-  lumi = 137.16;         // Legacy lumi of RunII
+  lumi = 137.19;         // Legacy lumi of RunII
   lumi_err = lumi*0.05;  // 5% uncertainty may be enough?
 
   // Initialize event weights and related variables
@@ -2340,8 +2340,8 @@ void evtWgtInfo::setDefaultSystematics( int syst_set ) {
       apply_HEMveto_jet_sf = true;   // scale down 2018 event with HEM jet
       apply_sample_sf      = false;  // no multiple sample available yet
       if (is_fastsim_) {
-        apply_lepFS_sf     = false;  // no fast sim yet
-        apply_bTagFS_sf    = false;
+        apply_lepFS_sf     = true;   // updated on and after v31
+        apply_bTagFS_sf    = true;
       }
       break;
 

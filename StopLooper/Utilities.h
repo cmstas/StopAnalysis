@@ -17,7 +17,7 @@ inline void moveOverFlowToLastBin1D(TH1* hist) {
   int nbin = hist->GetNbinsX();
   if (hist->GetBinLowEdge(nbin+1) < 1499.9) return;  // only when the last bin is the infinity bin
   if (hist->GetBinContent(nbin+1) > 0) {
-    cout << "Moving the overflow for hist: " << hist->GetTitle() << " to its last bin!" << endl;
+    // cout << "Moving the overflow for hist: " << hist->GetTitle() << " to its last bin!" << endl;
     double err = 0;
     hist->SetBinContent(nbin, hist->IntegralAndError(nbin, -1, err));
     hist->SetBinError(nbin, err);

@@ -66,7 +66,7 @@ const bool doHEMJetVeto = true;
 // re-run resolved top MVA locally
 const bool runResTopMVA = false;
 // run the MET resolution correction (and store in separate branches)
-const bool runMETResCorrection = false;
+const bool runMETResCorrection = true;
 // only produce yield histos
 const bool runYieldsOnly = false;
 // only running selected signal points to speed up
@@ -622,6 +622,12 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
             values_[mt] = calculateMT(lep1_p4().pt(), lep1_p4().phi(), values_[met], values_[metphi]);
             values_[dphilmet] = deltaPhi(lep1_p4().phi(), values_[metphi]);
             values_[dphijmet] = (ngoodjets() > 1)? min2deltaPhi(values_[metphi], ak4pfjets_p4().at(0).phi(), ak4pfjets_p4().at(1).phi()) : -9;
+          } else if (runMETResCorrection) {
+            values_[met] = metobj.extras.met_METup;
+            values_[metphi] = metobj.extras.phi_METup;
+            values_[mt] = calculateMT(lep1_p4().pt(), lep1_p4().phi(), values_[met], values_[metphi]);
+            values_[dphilmet] = deltaPhi(lep1_p4().phi(), values_[metphi]);
+            values_[dphijmet] = (ngoodjets() > 1)? min2deltaPhi(values_[metphi], ak4pfjets_p4().at(0).phi(), ak4pfjets_p4().at(1).phi()) : -9;
           }
 
           suffix = "_metResUp";
@@ -630,6 +636,12 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
           if (year_ == 2017) {  // temporary as only 2017 is available
             values_[met] = pfmet_resdown();
             values_[metphi] = pfmet_phi_resdown();
+            values_[mt] = calculateMT(lep1_p4().pt(), lep1_p4().phi(), values_[met], values_[metphi]);
+            values_[dphilmet] = deltaPhi(lep1_p4().phi(), values_[metphi]);
+            values_[dphijmet] = (ngoodjets() > 1)? min2deltaPhi(values_[metphi], ak4pfjets_p4().at(0).phi(), ak4pfjets_p4().at(1).phi()) : -9;
+          } else if (runMETResCorrection) {
+            values_[met] = metobj.extras.met_METdn;
+            values_[metphi] = metobj.extras.phi_METdn;
             values_[mt] = calculateMT(lep1_p4().pt(), lep1_p4().phi(), values_[met], values_[metphi]);
             values_[dphilmet] = deltaPhi(lep1_p4().phi(), values_[metphi]);
             values_[dphijmet] = (ngoodjets() > 1)? min2deltaPhi(values_[metphi], ak4pfjets_p4().at(0).phi(), ak4pfjets_p4().at(1).phi()) : -9;
@@ -1247,8 +1259,7 @@ void StopLooper::fillHistosForCRemu(string suf, int trigType) {
   if (jestype_ != 0) return;
 
   // Trigger requirements and go to the plateau region
-  // if (is_data()) {
-  if (true) {
+  if (is_data()) {
     if ( trigType == 0 && !HLT_MuE() ) return;
     else if ( trigType == 1 && (!HLT_MET_MHT() || pfmet() < 250) ) return;
   }
@@ -1285,8 +1296,10 @@ void StopLooper::fillHistosForCRemu(string suf, int trigType) {
     return ak4pfjets_deepCSV().at(i) > ak4pfjets_deepCSV().at(j);
   });
   system_p4 += ak4pfjets_p4().at(jetidx.at(0)) + ak4pfjets_p4().at(jetidx.at(1));
+  values_[ptbb] = (ak4pfjets_p4().at(jetidx.at(0)) + ak4pfjets_p4().at(jetidx.at(1))).pt();
 
-  LorentzVector met_p4( pfmet()*cos(pfmet_phi()), pfmet()*sin(pfmet_phi()), 0.0, pfmet() );
+  // LorentzVector met_p4( pfmet()*cos(pfmet_phi()), pfmet()*sin(pfmet_phi()), 0.0, pfmet() );
+  LorentzVector met_p4( values_[met]*cos(values_[metphi]), values_[met]*sin(values_[metphi]), 0.0, values_[met] );
   if (runMETResCorrection && applyMETResCorrection)
     met_p4 = LorentzVector( values_[met_rs]*cos(values_[metphi_rs]), values_[met_rs]*sin(values_[metphi_rs]), 0.0, values_[met_rs]);
   system_p4 += met_p4;
@@ -1375,6 +1388,7 @@ void StopLooper::fillHistosForCRemu(string suf, int trigType) {
         plot1d("h_metphi"+s,   values_[metphi]  , evtweight_, cr.histMap, ";#phi(#slash{E}_{T})"  , 32, -3.2, 3.2);
         plot1d("h_mll"+s,      values_[mll]     , evtweight_, cr.histMap, ";M_{ll} [GeV]"         , 40,  0, 400);
         plot1d("h_ptll"+s,     values_[ptll]    , evtweight_, cr.histMap, ";p_{T}(ll) [GeV]"      , 40,  0, 800);
+        plot1d("h_ptbb"+s,     values_[ptbb]    , evtweight_, cr.histMap, ";p_{T}(bb) [GeV]"      , 40,  0, 800);
         plot1d("h_lep1pt"+s,   values_[lep1pt]  , evtweight_, cr.histMap, ";p_{T}(lepton) [GeV]"  , 24,  0, 600);
         plot1d("h_lep2pt"+s,   values_[lep2pt]  , evtweight_, cr.histMap, ";p_{T}(lep2) [GeV]"    , 30,  0, 300);
         plot1d("h_lep1eta"+s,  values_[lep1eta] , evtweight_, cr.histMap, ";#eta(lepton)"         , 36, -2.4, 2.4);
