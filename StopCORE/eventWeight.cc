@@ -349,13 +349,22 @@ void evtWgtInfo::Setup(string samplestr, int inyear, bool applyUnc, bool useBTag
 
   // Initialize bTag SF machinery
   if ( !is_data_ && useBTagSFs_fromFiles ) {
-    bTagSFUtil = new eventWeight_bTagSF( is_fastsim_ );
+    bTagSFUtil = new eventWeight_bTagSF();
+    if (is_fastsim_ && year == 2017 && samplestr.find("ext1") != string::npos) {
+      bTagSFUtil->setup(true, 2017, "DeepCSV_102XSF_V1.csv", "deepcsv_13TEV_1718SLDiff_18_3_2019ExUnc.csv");
+    } else {
+      bTagSFUtil->setup(is_fastsim_, year);
+    }
   }
 
   // Initialize Lepton Scale Factors
   if ( !is_data_ && useLepSFs_fromFiles ) {
     lepSFUtil  = new eventWeight_lepSF();
-    lepSFUtil->setup(is_fastsim_, year, "../StopCORE/inputs/lepsf");
+    if (is_fastsim_ && year == 2017 && samplestr.find("ext1") != string::npos) {
+      lepSFUtil->setup(true, 2018, Form("../StopCORE/inputs/lepsf/analysisRun2_2018"));
+    } else {
+      lepSFUtil->setup(is_fastsim_, year, Form("../StopCORE/inputs/lepsf/analysisRun2_%d", year));
+    }
   }
 
   // Get pileup wgt histo

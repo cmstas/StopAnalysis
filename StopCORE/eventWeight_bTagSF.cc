@@ -2,68 +2,7 @@
 
 //////////////////////////////////////////////////////////////////////
 
-eventWeight_bTagSF::eventWeight_bTagSF( bool isFastsim ){
-
-  sampleIsFastsim = isFastsim;
-
-  // DeepCSV working points 94X
-  BTAG_LSE = 0.1522;
-  BTAG_MED = 0.4941;
-  BTAG_TGT = 0.8001;
-
-  std::cout << "[eventWeight_bTagSF] Loading btag SFs..." << std::endl;
-
-  // 25s version of SFs
-  calib = new BTagCalibration("DeepCSV", "btagsf/run2_25ns/DeepCSV_94XSF_V2_B_F.csv"); // DeepCSV version of SFs
-  reader_medium = new BTagCalibrationReader(BTagEntry::OP_MEDIUM, "central", {"up", "down"});
-  reader_medium->load(*calib, BTagEntry::FLAV_B, "comb");
-  reader_medium->load(*calib, BTagEntry::FLAV_C, "comb");
-  reader_medium->load(*calib, BTagEntry::FLAV_UDSG, "incl");
-  reader_tight = new BTagCalibrationReader(BTagEntry::OP_TIGHT, "central", {"up", "down"});
-  reader_tight->load(*calib, BTagEntry::FLAV_B, "comb");
-  reader_tight->load(*calib, BTagEntry::FLAV_C, "comb");
-  reader_tight->load(*calib, BTagEntry::FLAV_UDSG, "incl");
-  reader_loose = new BTagCalibrationReader(BTagEntry::OP_LOOSE, "central", {"up", "down"});
-  reader_loose->load(*calib, BTagEntry::FLAV_B, "comb");
-  reader_loose->load(*calib, BTagEntry::FLAV_C, "comb");
-  reader_loose->load(*calib, BTagEntry::FLAV_UDSG, "incl");
-
-  calib_fastsim = new BTagCalibration("deepcsv", "btagsf/run2_fastsim/fastsim_deepcsv_ttbar_26_1_2017.csv"); // DeepCSV fastsim version of SFs
-  reader_medium_FS = new BTagCalibrationReader(BTagEntry::OP_MEDIUM, "central", {"up", "down"});
-  reader_medium_FS->load(*calib_fastsim, BTagEntry::FLAV_B, "fastsim");
-  reader_medium_FS->load(*calib_fastsim, BTagEntry::FLAV_C, "fastsim");
-  reader_medium_FS->load(*calib_fastsim, BTagEntry::FLAV_UDSG, "fastsim");
-  reader_tight_FS = new BTagCalibrationReader(BTagEntry::OP_TIGHT, "central", {"up", "down"});
-  reader_tight_FS->load(*calib_fastsim, BTagEntry::FLAV_B, "fastsim");
-  reader_tight_FS->load(*calib_fastsim, BTagEntry::FLAV_C, "fastsim");
-  reader_tight_FS->load(*calib_fastsim, BTagEntry::FLAV_UDSG, "fastsim");
-  reader_loose_FS = new BTagCalibrationReader(BTagEntry::OP_LOOSE, "central", {"up", "down"});
-  reader_loose_FS->load(*calib_fastsim, BTagEntry::FLAV_B, "fastsim");
-  reader_loose_FS->load(*calib_fastsim, BTagEntry::FLAV_C, "fastsim");
-  reader_loose_FS->load(*calib_fastsim, BTagEntry::FLAV_UDSG, "fastsim");
-
-  if(isFastsim){
-    // Created using https://github.com/cmstas/bTagEfficiencyTools. Todo: change to deepCSV later
-    feff =  new TFile("../StopBabyMaker/btagsf/btageff__SMS-T1bbbb-T1qqqq_25ns_Moriond17.root");
-  } else {
-    // Todo: create efficiency in the phase space of the stop analysis
-    feff =  new TFile("../StopBabyMaker/btagsf/btageff__ttbar_powheg_pythia8_25ns_Moriond17_deepCSV.root");
-  }
-  if (!feff) throw std::invalid_argument("eventWeight_bTagSF.cc: btagsf file does not exist!");
-
-  h_btag_eff_b = (TH2D*) feff->Get("h2_BTaggingEff_csv_med_Eff_b")->Clone("h_btag_eff_b");
-  h_btag_eff_c = (TH2D*) feff->Get("h2_BTaggingEff_csv_med_Eff_c")->Clone("h_btag_eff_c");
-  h_btag_eff_udsg = (TH2D*) feff->Get("h2_BTaggingEff_csv_med_Eff_udsg")->Clone("h_btag_eff_udsg");
-  h_tight_btag_eff_b = (TH2D*) feff->Get("h2_BTaggingEff_csv_tight_Eff_b")->Clone("h_tight_btag_eff_b");
-  h_tight_btag_eff_c = (TH2D*) feff->Get("h2_BTaggingEff_csv_tight_Eff_c")->Clone("h_tight_btag_eff_c");
-  h_tight_btag_eff_udsg = (TH2D*) feff->Get("h2_BTaggingEff_csv_tight_Eff_udsg")->Clone("h_tight_btag_eff_udsg");
-  h_loose_btag_eff_b = (TH2D*) feff->Get("h2_BTaggingEff_csv_loose_Eff_b")->Clone("h_loose_btag_eff_b");
-  h_loose_btag_eff_c = (TH2D*) feff->Get("h2_BTaggingEff_csv_loose_Eff_c")->Clone("h_loose_btag_eff_c");
-  h_loose_btag_eff_udsg = (TH2D*) feff->Get("h2_BTaggingEff_csv_loose_Eff_udsg")->Clone("h_loose_btag_eff_udsg");
-
-}
-
-//////////////////////////////////////////////////////////////////////
+eventWeight_bTagSF::eventWeight_bTagSF() {}
 
 eventWeight_bTagSF::~eventWeight_bTagSF(){
 
@@ -77,6 +16,94 @@ eventWeight_bTagSF::~eventWeight_bTagSF(){
   delete reader_loose_FS;
 
   feff->Close();
+
+}
+
+//////////////////////////////////////////////////////////////////////
+
+void eventWeight_bTagSF::setup(bool isFastsim, int year, std::string fn_btagSF, std::string fn_btagSF_FS) {
+
+  sampleIsFastsim = isFastsim;
+
+  // DeepCSV working points 94X
+  if (year == 2016) {
+    BTAG_TGT = 0.8953;
+    BTAG_MED = 0.6321;
+    BTAG_LSE = 0.2217;
+    if (fn_btagSF == "") fn_btagSF = "DeepCSV_2016LegacySF_V1.csv";
+    if (fn_btagSF_FS == "") fn_btagSF_FS = "deepcsv_13TEV_16SL_18_3_2019.csv";
+  } else if (year == 2017) {
+    BTAG_TGT = 0.8001;
+    BTAG_MED = 0.4941;
+    BTAG_LSE = 0.1522;
+    if (fn_btagSF == "") fn_btagSF = "DeepCSV_94XSF_V4_B_F.csv";
+    if (fn_btagSF_FS == "") fn_btagSF_FS = "deepcsv_13TEV_17SL_18_3_2019.csv";
+  } else if (year == 2018) {
+    BTAG_TGT = 0.7527;
+    BTAG_MED = 0.4184;
+    BTAG_LSE = 0.1241;
+    if (fn_btagSF == "") fn_btagSF = "DeepCSV_102XSF_V1.csv";
+    if (fn_btagSF_FS == "") fn_btagSF_FS = "deepcsv_13TEV_1718SLSame_18_3_2019ExUnc.csv"; // for 2017 ext1 signals
+  }
+
+  std::cout << "[eventWeight_bTagSF] >> loaded btag SFs: " << fn_btagSF << ((isFastsim)? " and "+fn_btagSF_FS : "") << std::endl;
+
+  // 25s version of SFs
+  calib = new BTagCalibration("DeepCSV", "../CORE/Tools/btagsf/data/run2_25ns/"+fn_btagSF); // DeepCSV version of SFs
+  reader_medium = new BTagCalibrationReader(BTagEntry::OP_MEDIUM, "central", {"up", "down"});
+  reader_medium->load(*calib, BTagEntry::FLAV_B, "comb");
+  reader_medium->load(*calib, BTagEntry::FLAV_C, "comb");
+  reader_medium->load(*calib, BTagEntry::FLAV_UDSG, "incl");
+  reader_tight = new BTagCalibrationReader(BTagEntry::OP_TIGHT, "central", {"up", "down"});
+  reader_tight->load(*calib, BTagEntry::FLAV_B, "comb");
+  reader_tight->load(*calib, BTagEntry::FLAV_C, "comb");
+  reader_tight->load(*calib, BTagEntry::FLAV_UDSG, "incl");
+  reader_loose = new BTagCalibrationReader(BTagEntry::OP_LOOSE, "central", {"up", "down"});
+  reader_loose->load(*calib, BTagEntry::FLAV_B, "comb");
+  reader_loose->load(*calib, BTagEntry::FLAV_C, "comb");
+  reader_loose->load(*calib, BTagEntry::FLAV_UDSG, "incl");
+
+  if (isFastsim) {
+    calib_fastsim = new BTagCalibration("deepcsv", "../CORE/Tools/btagsf/data/run2_fastsim/"+fn_btagSF_FS); // DeepCSV fastsim version of SFs
+    reader_medium_FS = new BTagCalibrationReader(BTagEntry::OP_MEDIUM, "central", {"up", "down"});
+    reader_medium_FS->load(*calib_fastsim, BTagEntry::FLAV_B, "fastsim");
+    reader_medium_FS->load(*calib_fastsim, BTagEntry::FLAV_C, "fastsim");
+    reader_medium_FS->load(*calib_fastsim, BTagEntry::FLAV_UDSG, "fastsim");
+    reader_tight_FS = new BTagCalibrationReader(BTagEntry::OP_TIGHT, "central", {"up", "down"});
+    reader_tight_FS->load(*calib_fastsim, BTagEntry::FLAV_B, "fastsim");
+    reader_tight_FS->load(*calib_fastsim, BTagEntry::FLAV_C, "fastsim");
+    reader_tight_FS->load(*calib_fastsim, BTagEntry::FLAV_UDSG, "fastsim");
+    reader_loose_FS = new BTagCalibrationReader(BTagEntry::OP_LOOSE, "central", {"up", "down"});
+    reader_loose_FS->load(*calib_fastsim, BTagEntry::FLAV_B, "fastsim");
+    reader_loose_FS->load(*calib_fastsim, BTagEntry::FLAV_C, "fastsim");
+    reader_loose_FS->load(*calib_fastsim, BTagEntry::FLAV_UDSG, "fastsim");
+  }
+
+  if(isFastsim){
+    // Created using https://github.com/cmstas/bTagEfficiencyTools.
+    if (year >= 2017)
+      feff =  new TFile("../CORE/Tools/btagsf/data/run2_fastsim/btageff__SMS-T1tttt_2017_94X_deepCSV.root");
+    else if (year == 2016)
+      feff =  new TFile("../CORE/Tools/btagsf/data/run2_fastsim/btageff__SMS-T1tttt_2016_80X_deepCSV.root");
+  } else {
+    if (year == 2018)
+      feff =  new TFile("../CORE/Tools/btagsf/data/run2_25ns/btageff__ttbar_amc_102X_deepCSV.root");
+    else if (year == 2017)
+      feff =  new TFile("../CORE/Tools/btagsf/data/run2_25ns/btageff__ttbar_amc_94X_deepCSV.root");
+    else if (year == 2016)
+      feff =  new TFile("../CORE/Tools/btagsf/data/run2_25ns/btageff__ttbar_powheg_pythia8_25ns_Moriond17_deepCSV.root");
+  }
+  if (!feff) throw std::invalid_argument("eventWeight_bTagSF.cc: btagsf file does not exist!");
+
+  h_btag_eff_b = (TH2D*) feff->Get("h2_BTaggingEff_csv_med_Eff_b")->Clone("h_btag_eff_b");
+  h_btag_eff_c = (TH2D*) feff->Get("h2_BTaggingEff_csv_med_Eff_c")->Clone("h_btag_eff_c");
+  h_btag_eff_udsg = (TH2D*) feff->Get("h2_BTaggingEff_csv_med_Eff_udsg")->Clone("h_btag_eff_udsg");
+  h_tight_btag_eff_b = (TH2D*) feff->Get("h2_BTaggingEff_csv_tight_Eff_b")->Clone("h_tight_btag_eff_b");
+  h_tight_btag_eff_c = (TH2D*) feff->Get("h2_BTaggingEff_csv_tight_Eff_c")->Clone("h_tight_btag_eff_c");
+  h_tight_btag_eff_udsg = (TH2D*) feff->Get("h2_BTaggingEff_csv_tight_Eff_udsg")->Clone("h_tight_btag_eff_udsg");
+  h_loose_btag_eff_b = (TH2D*) feff->Get("h2_BTaggingEff_csv_loose_Eff_b")->Clone("h_loose_btag_eff_b");
+  h_loose_btag_eff_c = (TH2D*) feff->Get("h2_BTaggingEff_csv_loose_Eff_c")->Clone("h_loose_btag_eff_c");
+  h_loose_btag_eff_udsg = (TH2D*) feff->Get("h2_BTaggingEff_csv_loose_Eff_udsg")->Clone("h_loose_btag_eff_udsg");
 
 }
 
