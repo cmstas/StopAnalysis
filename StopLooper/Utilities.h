@@ -42,6 +42,18 @@ inline void moveXOverFlowToLastBin3D(TH3* hist) {
   }
 }
 
+inline void zeroOutNegativeYields(TH1* hist) {
+  int nbin = hist->GetNbinsX();
+  for (int ibin = 1; ibin <= nbin; ++ibin) {
+    if (hist->GetBinContent(ibin) < 0) {
+      cout << "Reverting negative yield " << hist->GetBinContent(ibin) << " in: " << hist->GetTitle() << " bin " << ibin << "to 0!" << endl;
+      hist->SetBinContent(ibin, 0);
+      // hist->SetBinError(ibin, 0); // should we set the error to 0 also?
+    }
+  }
+}
+
+// Quick helper functions
 inline float deltaPhi(float phi1, float phi2) {
   float dphi = fabs(phi1 - phi2);
   if (dphi > TMath::Pi()) dphi = TMath::TwoPi() - dphi;

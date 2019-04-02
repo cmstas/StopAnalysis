@@ -44,9 +44,9 @@ class SR;
 
 const bool verbose = false;
 // turn on to apply btag sf - take from files defined in eventWeight_btagSF.cc
-const bool applyBtagSFfromFiles = false; // default false
+const bool applyBtagSFfromFiles = true; // default false
 // turn on to apply lepton sf to central value - reread from files
-const bool applyLeptonSFfromFiles = false; // default false
+const bool applyLeptonSFfromFiles = true; // default false
 // turn on to apply json file to data
 const bool applyGoodRunList = true;
 // apply the MET resolution correction to the MET variables, required running
@@ -68,7 +68,7 @@ const bool runResTopMVA = false;
 // run the MET resolution correction (and store in separate branches)
 const bool runMETResCorrection = true;
 // only produce yield histos
-const bool runYieldsOnly = false;
+const bool runYieldsOnly = true;
 // only running selected signal points to speed up
 const bool runFullSignalScan = true;
 // debug symbol, for printing exact event kinematics that passes
@@ -828,10 +828,12 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
       for (auto& h : sr.histMap) {
         if (h.first.find("HI") != string::npos || h.first.find("LOW") != string::npos) continue;
         // Move overflows of the yield hist to the last bin of histograms
-        if (h.first.find("h_metbins") != string::npos)
+        if (h.first.find("h_metbins") != string::npos) {
           moveOverFlowToLastBin1D(h.second);
-        else if (h.first.find("hSMS_metbins") != string::npos)
+          zeroOutNegativeYields(h.second);
+        } else if (h.first.find("hSMS_metbins") != string::npos) {
           moveXOverFlowToLastBin3D((TH3*) h.second);
+        }
         h.second->Write();
       }
     }
