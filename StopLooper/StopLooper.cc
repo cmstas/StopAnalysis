@@ -103,8 +103,11 @@ void StopLooper::SetSignalRegions() {
   // SRVec = getStopInclusiveRegionsRun2();
 
   // Adding the inclusive regions
-  auto inclSRvec = getStopInclusiveRegionsRun2();
-  SRVec.insert(SRVec.begin()+1, inclSRvec.begin()+1, inclSRvec.end());
+  if (!runYieldsOnly) {
+    auto inclSRvec = getStopInclusiveRegionsRun2();
+    SRVec.insert(SRVec.begin()+1, inclSRvec.begin()+1, inclSRvec.end());
+    CRemuVec = getStopCrosscheckRegionsEMuRun2();
+  }
 
   CR0bVec = getStopControlRegionsNoBTagsRun2(SRVec);
   CR2lVec = getStopControlRegionsDileptonRun2(SRVec);
@@ -114,7 +117,6 @@ void StopLooper::SetSignalRegions() {
   // CR2lVec = getStopInclusiveControlRegionsDilepton();
 
   // CRemuVec = getStopCrosscheckRegionsEMu();
-  CRemuVec = getStopCrosscheckRegionsEMuRun2();
 
   values_.resize(nvars, NAN);
 
@@ -320,7 +322,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
     //   evtWgt.setDefaultSystematics(0);  // systematic set for Moriond17 analysis
     // else if (year_ >= 2017)
     //   evtWgt.setDefaultSystematics(1);  // systematic set for 94X
-    evtWgt.setDefaultSystematics(evtWgtInfo::stop_Run2);
+    evtWgt.setDefaultSystematics(evtWgtInfo::stop_Run2, is_fastsim_);
 
     // evtWgt.apply_L1prefire_sf = false;
     evtWgt.apply_HEMveto_el_sf = doHEMElectronVeto;
@@ -616,7 +618,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
           // suffix = "_nominal";
         } else if (systype == 1) {
           if (!applyMETResCorrection) continue;
-          if (year_ == 2017) {  // temporary as only 2017 is available
+          if (year_ == 2017 && (samplestr.find("f17v2_ext1")) == string::npos) {  // temporary as only 2017 is available
             values_[met] = pfmet_resup();
             values_[metphi] = pfmet_phi_resup();
             values_[mt] = calculateMT(lep1_p4().pt(), lep1_p4().phi(), values_[met], values_[metphi]);
@@ -633,7 +635,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
           suffix = "_metResUp";
         } else if (systype == 2) {
           if (!applyMETResCorrection) continue;
-          if (year_ == 2017) {  // temporary as only 2017 is available
+          if (year_ == 2017 && (samplestr.find("f17v2_ext1")) == string::npos) {  // temporary as only 2017 is available
             values_[met] = pfmet_resdown();
             values_[metphi] = pfmet_phi_resdown();
             values_[mt] = calculateMT(lep1_p4().pt(), lep1_p4().phi(), values_[met], values_[metphi]);

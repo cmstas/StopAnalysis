@@ -91,7 +91,7 @@ class evtWgtInfo {
   // Lost lepton analyis uses met with 2nd lepton removed
   bool add2ndLepToMet;
 
-  enum SampleType {data, ttbar, Wjets, singletop, ttW, ttZ, WZ, diboson, fastsim, unknown=-1 } samptype;
+  enum SampleType {data, ttbar, Wjets, singletop, ttW, ttZ, WZ, diboson, fastsim, fs17ext1, unknown=-1 } samptype;
   enum SystSet {stop_Moriond17, stop_Run2, test_alloff};
 
   // Counter histograms stored in babies
@@ -324,7 +324,7 @@ class evtWgtInfo {
   double getExtSampleWeightSummer16v2( TString sample, bool apply=true );
   double getExtSampleWeightSummer16v3( TString sample, bool apply=true );
   double getExtSampleWeightFall17v2( TString sample, bool apply=true );
-  void setDefaultSystematics( int syst_set=0 );
+  void setDefaultSystematics( int syst_set=0, bool isfastsim=false );
   bool doingSystematic( systID systid );
   SampleType findSampleType( std::string samplestr);  // <-- todo: finish this function
   std::string getLabel( systID systid );

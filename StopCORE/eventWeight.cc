@@ -299,7 +299,7 @@ void evtWgtInfo::Setup(string samplestr, int inyear, bool applyUnc, bool useBTag
   // Get sample info from enum
   if ( samptype == data ) {
     is_data_ = true;
-  } else if ( samptype == fastsim ) {
+  } else if ( samptype == fastsim || samptype == fs17ext1 ) {
     is_fastsim_ = true;
   }
   is_bkg_ = !is_data_ && !is_fastsim_;
@@ -350,7 +350,7 @@ void evtWgtInfo::Setup(string samplestr, int inyear, bool applyUnc, bool useBTag
   // Initialize bTag SF machinery
   if ( !is_data_ && useBTagSFs_fromFiles ) {
     bTagSFUtil = new eventWeight_bTagSF();
-    if (is_fastsim_ && year == 2017 && samplestr.find("ext1") != string::npos) {
+    if (samptype == fs17ext1) {
       bTagSFUtil->setup(true, 2017, "DeepCSV_102XSF_V1.csv", "deepcsv_13TEV_1718SLDiff_18_3_2019ExUnc.csv");
     } else {
       bTagSFUtil->setup(is_fastsim_, year);
@@ -360,7 +360,7 @@ void evtWgtInfo::Setup(string samplestr, int inyear, bool applyUnc, bool useBTag
   // Initialize Lepton Scale Factors
   if ( !is_data_ && useLepSFs_fromFiles ) {
     lepSFUtil  = new eventWeight_lepSF();
-    if (is_fastsim_ && year == 2017 && samplestr.find("ext1") != string::npos) {
+    if (samptype == fs17ext1) {
       lepSFUtil->setup(true, 2018, Form("../StopCORE/inputs/lepsf/analysisRun2_2018"));
     } else {
       lepSFUtil->setup(is_fastsim_, year, Form("../StopCORE/inputs/lepsf/analysisRun2_%d", year));
@@ -628,7 +628,7 @@ void evtWgtInfo::calculateWeightsForEvent() {
   }
 
   // L1 un-prefiring probability for 2016 and 2017
-  if (apply_L1prefire_sf && (year == 2016 || year == 2017 )) {
+  if (apply_L1prefire_sf && (year == 2016 || (year == 2017 && samptype != fs17ext1))) {
     getL1PrefireWeight( sf_L1prefire, sf_L1prefire_up, sf_L1prefire_dn );
   }
 
@@ -2278,6 +2278,7 @@ evtWgtInfo::SampleType evtWgtInfo::findSampleType( string samplestr ) {
   else if (sample.BeginsWith("ttZ") || sample.BeginsWith("TTZ")) samptype = ttZ;
   else if (sample.BeginsWith("W") && sample.Contains("Jets")) samptype = Wjets;
   else if (sample.BeginsWith("WZ")) samptype = WZ;
+  else if (sample.BeginsWith("SMS") && sample.Contains("f17v2_ext1")) samptype = fs17ext1;
   else if (sample.BeginsWith("SMS") || sample.BeginsWith("Signal") ) samptype = fastsim;
   else cout << "[eventWeight] >> Cannot assigned sampletype for " << samplestr << endl;
 
@@ -2301,7 +2302,7 @@ double evtWgtInfo::getWeight( systID isyst, bool is_cr2l ) {
   return sys_wgts[isyst];
 }
 
-void evtWgtInfo::setDefaultSystematics( int syst_set ) {
+void evtWgtInfo::setDefaultSystematics( int syst_set, bool isfastsim ) {
   switch (syst_set) {
     // Set of systematics used in the Moriond17 analysis
     case stop_Moriond17:
@@ -2318,7 +2319,7 @@ void evtWgtInfo::setDefaultSystematics( int syst_set ) {
       apply_ISR_sf         = true;  // only !=1.0 for signal
       apply_pu_sf          = true;
       apply_sample_sf      = true;
-      if (is_fastsim_) {
+      if (isfastsim) {
         apply_lepFS_sf     = true;
         apply_bTagFS_sf    = true;
         apply_metRes_sf    = false;
@@ -2348,7 +2349,7 @@ void evtWgtInfo::setDefaultSystematics( int syst_set ) {
       apply_HEMveto_el_sf  = true;   // scale down 2018 event with HEM electron
       apply_HEMveto_jet_sf = true;   // scale down 2018 event with HEM jet
       apply_sample_sf      = false;  // no multiple sample available yet
-      if (is_fastsim_) {
+      if (isfastsim) {
         apply_lepFS_sf     = true;   // updated on and after v31
         apply_bTagFS_sf    = true;
       }
@@ -2368,7 +2369,7 @@ void evtWgtInfo::setDefaultSystematics( int syst_set ) {
       apply_ISR_sf         = false;
       apply_pu_sf          = false;
       apply_sample_sf      = false;
-      if (is_fastsim_) {
+      if (isfastsim) {
         apply_lepFS_sf     = false;  // no fast sim yet
         apply_bTagFS_sf    = false;
       }
