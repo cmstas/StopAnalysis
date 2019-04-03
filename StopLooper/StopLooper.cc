@@ -44,9 +44,9 @@ class SR;
 
 const bool verbose = false;
 // turn on to apply btag sf - take from files defined in eventWeight_btagSF.cc
-const bool applyBtagSFfromFiles = true; // default false
+const bool applyBtagSFfromFiles = false; // default false
 // turn on to apply lepton sf to central value - reread from files
-const bool applyLeptonSFfromFiles = true; // default false
+const bool applyLeptonSFfromFiles = false; // default false
 // turn on to apply json file to data
 const bool applyGoodRunList = true;
 // apply the MET resolution correction to the MET variables, required running
@@ -66,7 +66,7 @@ const bool doHEMJetVeto = true;
 // re-run resolved top MVA locally
 const bool runResTopMVA = false;
 // run the MET resolution correction (and store in separate branches)
-const bool runMETResCorrection = true;
+const bool runMETResCorrection = false;
 // only produce yield histos
 const bool runYieldsOnly = true;
 // only running selected signal points to speed up
@@ -618,12 +618,13 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
           // suffix = "_nominal";
         } else if (systype == 1) {
           if (!applyMETResCorrection) continue;
-          if (year_ == 2017 && (samplestr.find("f17v2_ext1")) == string::npos) {  // temporary as only 2017 is available
+          if (samplever.find("v31") == 0 && (samplestr.find("f17v2_ext1")) == string::npos) {  // temporary as only 2017 is available
+            values_[mt] = mt_met_lep_resup();
             values_[met] = pfmet_resup();
+            values_[tmod] = topnessMod_resup();
+            values_[dphijmet] = mindphi_met_j1_j2_resup();
+            values_[dphilmet] = lep1_dphiMET_resup();
             values_[metphi] = pfmet_phi_resup();
-            values_[mt] = calculateMT(lep1_p4().pt(), lep1_p4().phi(), values_[met], values_[metphi]);
-            values_[dphilmet] = deltaPhi(lep1_p4().phi(), values_[metphi]);
-            values_[dphijmet] = (ngoodjets() > 1)? min2deltaPhi(values_[metphi], ak4pfjets_p4().at(0).phi(), ak4pfjets_p4().at(1).phi()) : -9;
           } else if (runMETResCorrection) {
             values_[met] = metobj.extras.met_METup;
             values_[metphi] = metobj.extras.phi_METup;
@@ -635,12 +636,13 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
           suffix = "_metResUp";
         } else if (systype == 2) {
           if (!applyMETResCorrection) continue;
-          if (year_ == 2017 && (samplestr.find("f17v2_ext1")) == string::npos) {  // temporary as only 2017 is available
+          if (samplever.find("v31") == 0 && (samplestr.find("f17v2_ext1")) == string::npos) {  // temporary as only 2017 is available
+            values_[mt] = mt_met_lep_resdown();
             values_[met] = pfmet_resdown();
+            values_[tmod] = topnessMod_resdown();
+            values_[dphijmet] = mindphi_met_j1_j2_resdown();
+            values_[dphilmet] = lep1_dphiMET_resdown();
             values_[metphi] = pfmet_phi_resdown();
-            values_[mt] = calculateMT(lep1_p4().pt(), lep1_p4().phi(), values_[met], values_[metphi]);
-            values_[dphilmet] = deltaPhi(lep1_p4().phi(), values_[metphi]);
-            values_[dphijmet] = (ngoodjets() > 1)? min2deltaPhi(values_[metphi], ak4pfjets_p4().at(0).phi(), ak4pfjets_p4().at(1).phi()) : -9;
           } else if (runMETResCorrection) {
             values_[met] = metobj.extras.met_METdn;
             values_[metphi] = metobj.extras.phi_METdn;
@@ -746,21 +748,19 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
           values_[dphilmet_rl] = lep1_dphiMET_rl();
           values_[tmod_rl] = topnessMod_rl();
         } else if (systype == 1 && values_[nlep_rl] > 1) {
-          LorentzVector newmet(values_[met]*cos(values_[metphi]), values_[met]*sin(values_[metphi]), 0, values_[met]);
-          newmet += lep2_p4();
-          values_[met_rl] = newmet.pt();
-          values_[metphi_rl] = newmet.phi();
-          values_[mt_rl] = calculateMT(lep1_p4().pt(), lep1_p4().phi(), values_[met_rl], values_[metphi_rl]);
-          values_[dphilmet_rl] = deltaPhi(lep1_p4().phi(), values_[metphi_rl]);
-          values_[dphijmet_rl] = (ngoodjets() > 1)? min2deltaPhi(values_[metphi_rl], ak4pfjets_p4().at(0).phi(), ak4pfjets_p4().at(1).phi()) : -9;
+          values_[mt_rl] = mt_met_lep_rl_resup();
+          values_[mt2_ll] = (doTopTagging)? MT2_ll_resup() : 90;
+          values_[met_rl] = pfmet_rl_resup();
+          values_[tmod_rl] = topnessMod_rl_resup();
+          values_[dphijmet_rl] = mindphi_met_j1_j2_rl_resup();
+          values_[dphilmet_rl] = lep1_dphiMET_rl_resup();
         } else if (systype == 2 && values_[nlep_rl] > 1) {
-          LorentzVector newmet(values_[met]*cos(values_[metphi]), values_[met]*sin(values_[metphi]), 0, values_[met]);
-          newmet += lep2_p4();
-          values_[met_rl] = newmet.pt();
-          values_[metphi_rl] = newmet.phi();
-          values_[mt_rl] = calculateMT(lep1_p4().pt(), lep1_p4().phi(), values_[met_rl], values_[metphi_rl]);
-          values_[dphilmet_rl] = deltaPhi(lep1_p4().phi(), values_[metphi_rl]);
-          values_[dphijmet_rl] = (ngoodjets() > 1)? min2deltaPhi(values_[metphi_rl], ak4pfjets_p4().at(0).phi(), ak4pfjets_p4().at(1).phi()) : -9;
+          values_[mt_rl] = mt_met_lep_rl_resdown();
+          values_[mt2_ll] = (doTopTagging)? MT2_ll_resdown() : 90;
+          values_[met_rl] = pfmet_rl_resdown();
+          values_[tmod_rl] = topnessMod_rl_resdown();
+          values_[dphijmet_rl] = mindphi_met_j1_j2_rl_resdown();
+          values_[dphilmet_rl] = lep1_dphiMET_rl_resdown();
         } else if (jestype_ == 1) {
           values_[mt_rl] = mt_met_lep_rl_jup();
           values_[mt2_ll] = (doTopTagging)? MT2_ll_jup() : 90;

@@ -147,26 +147,10 @@ void StopTree::Init(TTree *tree) {
   if (pfmet_uncorr_branch) pfmet_uncorr_branch->SetAddress(&pfmet_uncorr_);
   pfmet_uncorr_phi_branch = tree->GetBranch("pfmet_uncorr_phi");
   if (pfmet_uncorr_phi_branch) pfmet_uncorr_phi_branch->SetAddress(&pfmet_uncorr_phi_);
-  pfmet_uncorr_jup_branch = tree->GetBranch("pfmet_uncorr_jup");
-  if (pfmet_uncorr_jup_branch) pfmet_uncorr_jup_branch->SetAddress(&pfmet_uncorr_jup_);
-  pfmet_uncorr_phi_jup_branch = tree->GetBranch("pfmet_uncorr_phi_jup");
-  if (pfmet_uncorr_phi_jup_branch) pfmet_uncorr_phi_jup_branch->SetAddress(&pfmet_uncorr_phi_jup_);
-  pfmet_uncorr_jdown_branch = tree->GetBranch("pfmet_uncorr_jdown");
-  if (pfmet_uncorr_jdown_branch) pfmet_uncorr_jdown_branch->SetAddress(&pfmet_uncorr_jdown_);
-  pfmet_uncorr_phi_jdown_branch = tree->GetBranch("pfmet_uncorr_phi_jdown");
-  if (pfmet_uncorr_phi_jdown_branch) pfmet_uncorr_phi_jdown_branch->SetAddress(&pfmet_uncorr_phi_jdown_);
   pfmet_original_branch = tree->GetBranch("pfmet_original");
   if (pfmet_original_branch) pfmet_original_branch->SetAddress(&pfmet_original_);
   pfmet_original_phi_branch = tree->GetBranch("pfmet_original_phi");
   if (pfmet_original_phi_branch) pfmet_original_phi_branch->SetAddress(&pfmet_original_phi_);
-  pfmet_resup_branch = tree->GetBranch("pfmet_resup");
-  if (pfmet_resup_branch) pfmet_resup_branch->SetAddress(&pfmet_resup_);
-  pfmet_phi_resup_branch = tree->GetBranch("pfmet_phi_resup");
-  if (pfmet_phi_resup_branch) pfmet_phi_resup_branch->SetAddress(&pfmet_phi_resup_);
-  pfmet_resdown_branch = tree->GetBranch("pfmet_resdown");
-  if (pfmet_resdown_branch) pfmet_resdown_branch->SetAddress(&pfmet_resdown_);
-  pfmet_phi_resdown_branch = tree->GetBranch("pfmet_phi_resdown");
-  if (pfmet_phi_resdown_branch) pfmet_phi_resdown_branch->SetAddress(&pfmet_phi_resdown_);
   scale1fb_branch = tree->GetBranch("scale1fb");
   if (scale1fb_branch) scale1fb_branch->SetAddress(&scale1fb_);
   xsec_branch = tree->GetBranch("xsec");
@@ -273,6 +257,14 @@ void StopTree::Init(TTree *tree) {
   if (weight_Q2_up_branch) weight_Q2_up_branch->SetAddress(&weight_Q2_up_);
   weight_Q2_down_branch = tree->GetBranch("weight_Q2_down");
   if (weight_Q2_down_branch) weight_Q2_down_branch->SetAddress(&weight_Q2_down_);
+  weight_muF_up_branch = tree->GetBranch("weight_muF_up");
+  if (weight_muF_up_branch) weight_muF_up_branch->SetAddress(&weight_muF_up_);
+  weight_muF_down_branch = tree->GetBranch("weight_muF_down");
+  if (weight_muF_down_branch) weight_muF_down_branch->SetAddress(&weight_muF_down_);
+  weight_muR_up_branch = tree->GetBranch("weight_muR_up");
+  if (weight_muR_up_branch) weight_muR_up_branch->SetAddress(&weight_muR_up_);
+  weight_muR_down_branch = tree->GetBranch("weight_muR_down");
+  if (weight_muR_down_branch) weight_muR_down_branch->SetAddress(&weight_muR_down_);
   weight_alphas_up_branch = tree->GetBranch("weight_alphas_up");
   if (weight_alphas_up_branch) weight_alphas_up_branch->SetAddress(&weight_alphas_up_);
   weight_alphas_down_branch = tree->GetBranch("weight_alphas_down");
@@ -507,6 +499,14 @@ void StopTree::Init(TTree *tree) {
   if (lep1_dphiMET_rl_jup_branch) lep1_dphiMET_rl_jup_branch->SetAddress(&lep1_dphiMET_rl_jup_);
   lep1_dphiMET_rl_jdown_branch = tree->GetBranch("lep1_dphiMET_rl_jdown");
   if (lep1_dphiMET_rl_jdown_branch) lep1_dphiMET_rl_jdown_branch->SetAddress(&lep1_dphiMET_rl_jdown_);
+  lep1_dphiMET_resup_branch = tree->GetBranch("lep1_dphiMET_resup");
+  if (lep1_dphiMET_resup_branch) lep1_dphiMET_resup_branch->SetAddress(&lep1_dphiMET_resup_);
+  lep1_dphiMET_resdown_branch = tree->GetBranch("lep1_dphiMET_resdown");
+  if (lep1_dphiMET_resdown_branch) lep1_dphiMET_resdown_branch->SetAddress(&lep1_dphiMET_resdown_);
+  lep1_dphiMET_rl_resup_branch = tree->GetBranch("lep1_dphiMET_rl_resup");
+  if (lep1_dphiMET_rl_resup_branch) lep1_dphiMET_rl_resup_branch->SetAddress(&lep1_dphiMET_rl_resup_);
+  lep1_dphiMET_rl_resdown_branch = tree->GetBranch("lep1_dphiMET_rl_resdown");
+  if (lep1_dphiMET_rl_resdown_branch) lep1_dphiMET_rl_resdown_branch->SetAddress(&lep1_dphiMET_rl_resdown_);
   lep2_pdgid_branch = tree->GetBranch("lep2_pdgid");
   if (lep2_pdgid_branch) lep2_pdgid_branch->SetAddress(&lep2_pdgid_);
   lep2_production_type_branch = tree->GetBranch("lep2_production_type");
@@ -539,6 +539,14 @@ void StopTree::Init(TTree *tree) {
   if (lep2_dphiMET_rl_jup_branch) lep2_dphiMET_rl_jup_branch->SetAddress(&lep2_dphiMET_rl_jup_);
   lep2_dphiMET_rl_jdown_branch = tree->GetBranch("lep2_dphiMET_rl_jdown");
   if (lep2_dphiMET_rl_jdown_branch) lep2_dphiMET_rl_jdown_branch->SetAddress(&lep2_dphiMET_rl_jdown_);
+  lep2_dphiMET_resup_branch = tree->GetBranch("lep2_dphiMET_resup");
+  if (lep2_dphiMET_resup_branch) lep2_dphiMET_resup_branch->SetAddress(&lep2_dphiMET_resup_);
+  lep2_dphiMET_resdown_branch = tree->GetBranch("lep2_dphiMET_resdown");
+  if (lep2_dphiMET_resdown_branch) lep2_dphiMET_resdown_branch->SetAddress(&lep2_dphiMET_resdown_);
+  lep2_dphiMET_rl_resup_branch = tree->GetBranch("lep2_dphiMET_rl_resup");
+  if (lep2_dphiMET_rl_resup_branch) lep2_dphiMET_rl_resup_branch->SetAddress(&lep2_dphiMET_rl_resup_);
+  lep2_dphiMET_rl_resdown_branch = tree->GetBranch("lep2_dphiMET_rl_resdown");
+  if (lep2_dphiMET_rl_resdown_branch) lep2_dphiMET_rl_resdown_branch->SetAddress(&lep2_dphiMET_rl_resdown_);
   ph_sigmaIEtaEta_fill5x5_branch = tree->GetBranch("ph_sigmaIEtaEta_fill5x5");
   if (ph_sigmaIEtaEta_fill5x5_branch) ph_sigmaIEtaEta_fill5x5_branch->SetAddress(&ph_sigmaIEtaEta_fill5x5_);
   ph_hOverE_branch = tree->GetBranch("ph_hOverE");
@@ -585,6 +593,12 @@ void StopTree::Init(TTree *tree) {
   if (nanalysisbtags_branch) nanalysisbtags_branch->SetAddress(&nanalysisbtags_);
   ak4_HT_branch = tree->GetBranch("ak4_HT");
   if (ak4_HT_branch) ak4_HT_branch->SetAddress(&ak4_HT_);
+  ak4_HTeta5_branch = tree->GetBranch("ak4_HTeta5");
+  if (ak4_HTeta5_branch) ak4_HTeta5_branch->SetAddress(&ak4_HTeta5_);
+  ak4_MHT_pt_branch = tree->GetBranch("ak4_MHT_pt");
+  if (ak4_MHT_pt_branch) ak4_MHT_pt_branch->SetAddress(&ak4_MHT_pt_);
+  ak4_MHT_phi_branch = tree->GetBranch("ak4_MHT_phi");
+  if (ak4_MHT_phi_branch) ak4_MHT_phi_branch->SetAddress(&ak4_MHT_phi_);
   ak4_htratiom_branch = tree->GetBranch("ak4_htratiom");
   if (ak4_htratiom_branch) ak4_htratiom_branch->SetAddress(&ak4_htratiom_);
   dphi_ak4pfjet_met_branch = tree->GetBranch("dphi_ak4pfjet_met");
@@ -627,6 +641,12 @@ void StopTree::Init(TTree *tree) {
   if (jup_nanalysisbtags_branch) jup_nanalysisbtags_branch->SetAddress(&jup_nanalysisbtags_);
   jup_ak4_HT_branch = tree->GetBranch("jup_ak4_HT");
   if (jup_ak4_HT_branch) jup_ak4_HT_branch->SetAddress(&jup_ak4_HT_);
+  jup_ak4_HTeta5_branch = tree->GetBranch("jup_ak4_HTeta5");
+  if (jup_ak4_HTeta5_branch) jup_ak4_HTeta5_branch->SetAddress(&jup_ak4_HTeta5_);
+  jup_ak4_MHT_pt_branch = tree->GetBranch("jup_ak4_MHT_pt");
+  if (jup_ak4_MHT_pt_branch) jup_ak4_MHT_pt_branch->SetAddress(&jup_ak4_MHT_pt_);
+  jup_ak4_MHT_phi_branch = tree->GetBranch("jup_ak4_MHT_phi");
+  if (jup_ak4_MHT_phi_branch) jup_ak4_MHT_phi_branch->SetAddress(&jup_ak4_MHT_phi_);
   jup_ak4_htratiom_branch = tree->GetBranch("jup_ak4_htratiom");
   if (jup_ak4_htratiom_branch) jup_ak4_htratiom_branch->SetAddress(&jup_ak4_htratiom_);
   jup_dphi_ak4pfjet_met_branch = tree->GetBranch("jup_dphi_ak4pfjet_met");
@@ -669,6 +689,12 @@ void StopTree::Init(TTree *tree) {
   if (jdown_nanalysisbtags_branch) jdown_nanalysisbtags_branch->SetAddress(&jdown_nanalysisbtags_);
   jdown_ak4_HT_branch = tree->GetBranch("jdown_ak4_HT");
   if (jdown_ak4_HT_branch) jdown_ak4_HT_branch->SetAddress(&jdown_ak4_HT_);
+  jdown_ak4_HTeta5_branch = tree->GetBranch("jdown_ak4_HTeta5");
+  if (jdown_ak4_HTeta5_branch) jdown_ak4_HTeta5_branch->SetAddress(&jdown_ak4_HTeta5_);
+  jdown_ak4_MHT_pt_branch = tree->GetBranch("jdown_ak4_MHT_pt");
+  if (jdown_ak4_MHT_pt_branch) jdown_ak4_MHT_pt_branch->SetAddress(&jdown_ak4_MHT_pt_);
+  jdown_ak4_MHT_phi_branch = tree->GetBranch("jdown_ak4_MHT_phi");
+  if (jdown_ak4_MHT_phi_branch) jdown_ak4_MHT_phi_branch->SetAddress(&jdown_ak4_MHT_phi_);
   jdown_ak4_htratiom_branch = tree->GetBranch("jdown_ak4_htratiom");
   if (jdown_ak4_htratiom_branch) jdown_ak4_htratiom_branch->SetAddress(&jdown_ak4_htratiom_);
   jdown_dphi_ak4pfjet_met_branch = tree->GetBranch("jdown_dphi_ak4pfjet_met");
@@ -1045,6 +1071,56 @@ void StopTree::Init(TTree *tree) {
   if (isoTracks_isVetoTrack_v2_branch) isoTracks_isVetoTrack_v2_branch->SetAddress(&isoTracks_isVetoTrack_v2_);
   isoTracks_isVetoTrack_v3_branch = tree->GetBranch("isoTracks_isVetoTrack_v3");
   if (isoTracks_isVetoTrack_v3_branch) isoTracks_isVetoTrack_v3_branch->SetAddress(&isoTracks_isVetoTrack_v3_);
+  pfmet_uncorr_jup_branch = tree->GetBranch("pfmet_uncorr_jup");
+  if (pfmet_uncorr_jup_branch) pfmet_uncorr_jup_branch->SetAddress(&pfmet_uncorr_jup_);
+  pfmet_uncorr_phi_jup_branch = tree->GetBranch("pfmet_uncorr_phi_jup");
+  if (pfmet_uncorr_phi_jup_branch) pfmet_uncorr_phi_jup_branch->SetAddress(&pfmet_uncorr_phi_jup_);
+  pfmet_uncorr_jdown_branch = tree->GetBranch("pfmet_uncorr_jdown");
+  if (pfmet_uncorr_jdown_branch) pfmet_uncorr_jdown_branch->SetAddress(&pfmet_uncorr_jdown_);
+  pfmet_uncorr_phi_jdown_branch = tree->GetBranch("pfmet_uncorr_phi_jdown");
+  if (pfmet_uncorr_phi_jdown_branch) pfmet_uncorr_phi_jdown_branch->SetAddress(&pfmet_uncorr_phi_jdown_);
+  pfmet_resup_branch = tree->GetBranch("pfmet_resup");
+  if (pfmet_resup_branch) pfmet_resup_branch->SetAddress(&pfmet_resup_);
+  pfmet_phi_resup_branch = tree->GetBranch("pfmet_phi_resup");
+  if (pfmet_phi_resup_branch) pfmet_phi_resup_branch->SetAddress(&pfmet_phi_resup_);
+  pfmet_resdown_branch = tree->GetBranch("pfmet_resdown");
+  if (pfmet_resdown_branch) pfmet_resdown_branch->SetAddress(&pfmet_resdown_);
+  pfmet_phi_resdown_branch = tree->GetBranch("pfmet_phi_resdown");
+  if (pfmet_phi_resdown_branch) pfmet_phi_resdown_branch->SetAddress(&pfmet_phi_resdown_);
+  pfmet_rl_resup_branch = tree->GetBranch("pfmet_rl_resup");
+  if (pfmet_rl_resup_branch) pfmet_rl_resup_branch->SetAddress(&pfmet_rl_resup_);
+  pfmet_phi_rl_resup_branch = tree->GetBranch("pfmet_phi_rl_resup");
+  if (pfmet_phi_rl_resup_branch) pfmet_phi_rl_resup_branch->SetAddress(&pfmet_phi_rl_resup_);
+  pfmet_rl_resdown_branch = tree->GetBranch("pfmet_rl_resdown");
+  if (pfmet_rl_resdown_branch) pfmet_rl_resdown_branch->SetAddress(&pfmet_rl_resdown_);
+  mt_met_lep_resup_branch = tree->GetBranch("mt_met_lep_resup");
+  if (mt_met_lep_resup_branch) mt_met_lep_resup_branch->SetAddress(&mt_met_lep_resup_);
+  mt_met_lep_rl_resup_branch = tree->GetBranch("mt_met_lep_rl_resup");
+  if (mt_met_lep_rl_resup_branch) mt_met_lep_rl_resup_branch->SetAddress(&mt_met_lep_rl_resup_);
+  mt_met_lep_resdown_branch = tree->GetBranch("mt_met_lep_resdown");
+  if (mt_met_lep_resdown_branch) mt_met_lep_resdown_branch->SetAddress(&mt_met_lep_resdown_);
+  mt_met_lep_rl_resdown_branch = tree->GetBranch("mt_met_lep_rl_resdown");
+  if (mt_met_lep_rl_resdown_branch) mt_met_lep_rl_resdown_branch->SetAddress(&mt_met_lep_rl_resdown_);
+  topnessMod_resup_branch = tree->GetBranch("topnessMod_resup");
+  if (topnessMod_resup_branch) topnessMod_resup_branch->SetAddress(&topnessMod_resup_);
+  topnessMod_rl_resup_branch = tree->GetBranch("topnessMod_rl_resup");
+  if (topnessMod_rl_resup_branch) topnessMod_rl_resup_branch->SetAddress(&topnessMod_rl_resup_);
+  topnessMod_resdown_branch = tree->GetBranch("topnessMod_resdown");
+  if (topnessMod_resdown_branch) topnessMod_resdown_branch->SetAddress(&topnessMod_resdown_);
+  topnessMod_rl_resdown_branch = tree->GetBranch("topnessMod_rl_resdown");
+  if (topnessMod_rl_resdown_branch) topnessMod_rl_resdown_branch->SetAddress(&topnessMod_rl_resdown_);
+  mindphi_met_j1_j2_resup_branch = tree->GetBranch("mindphi_met_j1_j2_resup");
+  if (mindphi_met_j1_j2_resup_branch) mindphi_met_j1_j2_resup_branch->SetAddress(&mindphi_met_j1_j2_resup_);
+  mindphi_met_j1_j2_rl_resup_branch = tree->GetBranch("mindphi_met_j1_j2_rl_resup");
+  if (mindphi_met_j1_j2_rl_resup_branch) mindphi_met_j1_j2_rl_resup_branch->SetAddress(&mindphi_met_j1_j2_rl_resup_);
+  mindphi_met_j1_j2_resdown_branch = tree->GetBranch("mindphi_met_j1_j2_resdown");
+  if (mindphi_met_j1_j2_resdown_branch) mindphi_met_j1_j2_resdown_branch->SetAddress(&mindphi_met_j1_j2_resdown_);
+  mindphi_met_j1_j2_rl_resdown_branch = tree->GetBranch("mindphi_met_j1_j2_rl_resdown");
+  if (mindphi_met_j1_j2_rl_resdown_branch) mindphi_met_j1_j2_rl_resdown_branch->SetAddress(&mindphi_met_j1_j2_rl_resdown_);
+  MT2_ll_resup_branch = tree->GetBranch("MT2_ll_resup");
+  if (MT2_ll_resup_branch) MT2_ll_resup_branch->SetAddress(&MT2_ll_resup_);
+  MT2_ll_resdown_branch = tree->GetBranch("MT2_ll_resdown");
+  if (MT2_ll_resdown_branch) MT2_ll_resdown_branch->SetAddress(&MT2_ll_resdown_);
   ph_selectedidx_branch = tree->GetBranch("ph_selectedidx");
   if (ph_selectedidx_branch) ph_selectedidx_branch->SetAddress(&ph_selectedidx_);
   ph_met_branch = tree->GetBranch("ph_met");
@@ -1213,16 +1289,8 @@ void StopTree::GetEntry(unsigned int idx) {
   pfmet_phi_rl_jdown_isLoaded = false;
   pfmet_uncorr_isLoaded = false;
   pfmet_uncorr_phi_isLoaded = false;
-  pfmet_uncorr_jup_isLoaded = false;
-  pfmet_uncorr_phi_jup_isLoaded = false;
-  pfmet_uncorr_jdown_isLoaded = false;
-  pfmet_uncorr_phi_jdown_isLoaded = false;
   pfmet_original_isLoaded = false;
   pfmet_original_phi_isLoaded = false;
-  pfmet_resup_isLoaded = false;
-  pfmet_phi_resup_isLoaded = false;
-  pfmet_resdown_isLoaded = false;
-  pfmet_phi_resdown_isLoaded = false;
   scale1fb_isLoaded = false;
   xsec_isLoaded = false;
   xsec_uncert_isLoaded = false;
@@ -1276,6 +1344,10 @@ void StopTree::GetEntry(unsigned int idx) {
   genweights_isLoaded = false;
   weight_Q2_up_isLoaded = false;
   weight_Q2_down_isLoaded = false;
+  weight_muF_up_isLoaded = false;
+  weight_muF_down_isLoaded = false;
+  weight_muR_up_isLoaded = false;
+  weight_muR_down_isLoaded = false;
   weight_alphas_up_isLoaded = false;
   weight_alphas_down_isLoaded = false;
   weight_btagsf_isLoaded = false;
@@ -1395,6 +1467,10 @@ void StopTree::GetEntry(unsigned int idx) {
   lep1_dphiMET_rl_isLoaded = false;
   lep1_dphiMET_rl_jup_isLoaded = false;
   lep1_dphiMET_rl_jdown_isLoaded = false;
+  lep1_dphiMET_resup_isLoaded = false;
+  lep1_dphiMET_resdown_isLoaded = false;
+  lep1_dphiMET_rl_resup_isLoaded = false;
+  lep1_dphiMET_rl_resdown_isLoaded = false;
   lep2_pdgid_isLoaded = false;
   lep2_production_type_isLoaded = false;
   lep2_MiniIso_isLoaded = false;
@@ -1413,6 +1489,10 @@ void StopTree::GetEntry(unsigned int idx) {
   lep2_dphiMET_rl_isLoaded = false;
   lep2_dphiMET_rl_jup_isLoaded = false;
   lep2_dphiMET_rl_jdown_isLoaded = false;
+  lep2_dphiMET_resup_isLoaded = false;
+  lep2_dphiMET_resdown_isLoaded = false;
+  lep2_dphiMET_rl_resup_isLoaded = false;
+  lep2_dphiMET_rl_resdown_isLoaded = false;
   ph_sigmaIEtaEta_fill5x5_isLoaded = false;
   ph_hOverE_isLoaded = false;
   ph_r9_isLoaded = false;
@@ -1438,6 +1518,9 @@ void StopTree::GetEntry(unsigned int idx) {
   ntightbtags_isLoaded = false;
   nanalysisbtags_isLoaded = false;
   ak4_HT_isLoaded = false;
+  ak4_HTeta5_isLoaded = false;
+  ak4_MHT_pt_isLoaded = false;
+  ak4_MHT_phi_isLoaded = false;
   ak4_htratiom_isLoaded = false;
   dphi_ak4pfjet_met_isLoaded = false;
   ak4pfjets_p4_isLoaded = false;
@@ -1464,6 +1547,9 @@ void StopTree::GetEntry(unsigned int idx) {
   jup_ntightbtags_isLoaded = false;
   jup_nanalysisbtags_isLoaded = false;
   jup_ak4_HT_isLoaded = false;
+  jup_ak4_HTeta5_isLoaded = false;
+  jup_ak4_MHT_pt_isLoaded = false;
+  jup_ak4_MHT_phi_isLoaded = false;
   jup_ak4_htratiom_isLoaded = false;
   jup_dphi_ak4pfjet_met_isLoaded = false;
   jup_ak4pfjets_p4_isLoaded = false;
@@ -1490,6 +1576,9 @@ void StopTree::GetEntry(unsigned int idx) {
   jdown_ntightbtags_isLoaded = false;
   jdown_nanalysisbtags_isLoaded = false;
   jdown_ak4_HT_isLoaded = false;
+  jdown_ak4_HTeta5_isLoaded = false;
+  jdown_ak4_MHT_pt_isLoaded = false;
+  jdown_ak4_MHT_phi_isLoaded = false;
   jdown_ak4_htratiom_isLoaded = false;
   jdown_dphi_ak4pfjet_met_isLoaded = false;
   jdown_ak4pfjets_p4_isLoaded = false;
@@ -1712,6 +1801,31 @@ void StopTree::GetEntry(unsigned int idx) {
   isoTracks_isVetoTrack_isLoaded = false;
   isoTracks_isVetoTrack_v2_isLoaded = false;
   isoTracks_isVetoTrack_v3_isLoaded = false;
+  pfmet_uncorr_jup_isLoaded = false;
+  pfmet_uncorr_phi_jup_isLoaded = false;
+  pfmet_uncorr_jdown_isLoaded = false;
+  pfmet_uncorr_phi_jdown_isLoaded = false;
+  pfmet_resup_isLoaded = false;
+  pfmet_phi_resup_isLoaded = false;
+  pfmet_resdown_isLoaded = false;
+  pfmet_phi_resdown_isLoaded = false;
+  pfmet_rl_resup_isLoaded = false;
+  pfmet_phi_rl_resup_isLoaded = false;
+  pfmet_rl_resdown_isLoaded = false;
+  mt_met_lep_resup_isLoaded = false;
+  mt_met_lep_rl_resup_isLoaded = false;
+  mt_met_lep_resdown_isLoaded = false;
+  mt_met_lep_rl_resdown_isLoaded = false;
+  topnessMod_resup_isLoaded = false;
+  topnessMod_rl_resup_isLoaded = false;
+  topnessMod_resdown_isLoaded = false;
+  topnessMod_rl_resdown_isLoaded = false;
+  mindphi_met_j1_j2_resup_isLoaded = false;
+  mindphi_met_j1_j2_rl_resup_isLoaded = false;
+  mindphi_met_j1_j2_resdown_isLoaded = false;
+  mindphi_met_j1_j2_rl_resdown_isLoaded = false;
+  MT2_ll_resup_isLoaded = false;
+  MT2_ll_resdown_isLoaded = false;
   ph_selectedidx_isLoaded = false;
   ph_met_isLoaded = false;
   ph_met_phi_isLoaded = false;
@@ -1807,16 +1921,8 @@ void StopTree::LoadAllBranches() {
   if (pfmet_phi_rl_jdown_branch != 0) pfmet_phi_rl_jdown();
   if (pfmet_uncorr_branch != 0) pfmet_uncorr();
   if (pfmet_uncorr_phi_branch != 0) pfmet_uncorr_phi();
-  if (pfmet_uncorr_jup_branch != 0) pfmet_uncorr_jup();
-  if (pfmet_uncorr_phi_jup_branch != 0) pfmet_uncorr_phi_jup();
-  if (pfmet_uncorr_jdown_branch != 0) pfmet_uncorr_jdown();
-  if (pfmet_uncorr_phi_jdown_branch != 0) pfmet_uncorr_phi_jdown();
   if (pfmet_original_branch != 0) pfmet_original();
   if (pfmet_original_phi_branch != 0) pfmet_original_phi();
-  if (pfmet_resup_branch != 0) pfmet_resup();
-  if (pfmet_phi_resup_branch != 0) pfmet_phi_resup();
-  if (pfmet_resdown_branch != 0) pfmet_resdown();
-  if (pfmet_phi_resdown_branch != 0) pfmet_phi_resdown();
   if (scale1fb_branch != 0) scale1fb();
   if (xsec_branch != 0) xsec();
   if (xsec_uncert_branch != 0) xsec_uncert();
@@ -1870,6 +1976,10 @@ void StopTree::LoadAllBranches() {
   if (genweights_branch != 0) genweights();
   if (weight_Q2_up_branch != 0) weight_Q2_up();
   if (weight_Q2_down_branch != 0) weight_Q2_down();
+  if (weight_muF_up_branch != 0) weight_muF_up();
+  if (weight_muF_down_branch != 0) weight_muF_down();
+  if (weight_muR_up_branch != 0) weight_muR_up();
+  if (weight_muR_down_branch != 0) weight_muR_down();
   if (weight_alphas_up_branch != 0) weight_alphas_up();
   if (weight_alphas_down_branch != 0) weight_alphas_down();
   if (weight_btagsf_branch != 0) weight_btagsf();
@@ -1989,6 +2099,10 @@ void StopTree::LoadAllBranches() {
   if (lep1_dphiMET_rl_branch != 0) lep1_dphiMET_rl();
   if (lep1_dphiMET_rl_jup_branch != 0) lep1_dphiMET_rl_jup();
   if (lep1_dphiMET_rl_jdown_branch != 0) lep1_dphiMET_rl_jdown();
+  if (lep1_dphiMET_resup_branch != 0) lep1_dphiMET_resup();
+  if (lep1_dphiMET_resdown_branch != 0) lep1_dphiMET_resdown();
+  if (lep1_dphiMET_rl_resup_branch != 0) lep1_dphiMET_rl_resup();
+  if (lep1_dphiMET_rl_resdown_branch != 0) lep1_dphiMET_rl_resdown();
   if (lep2_pdgid_branch != 0) lep2_pdgid();
   if (lep2_production_type_branch != 0) lep2_production_type();
   if (lep2_MiniIso_branch != 0) lep2_MiniIso();
@@ -2007,6 +2121,10 @@ void StopTree::LoadAllBranches() {
   if (lep2_dphiMET_rl_branch != 0) lep2_dphiMET_rl();
   if (lep2_dphiMET_rl_jup_branch != 0) lep2_dphiMET_rl_jup();
   if (lep2_dphiMET_rl_jdown_branch != 0) lep2_dphiMET_rl_jdown();
+  if (lep2_dphiMET_resup_branch != 0) lep2_dphiMET_resup();
+  if (lep2_dphiMET_resdown_branch != 0) lep2_dphiMET_resdown();
+  if (lep2_dphiMET_rl_resup_branch != 0) lep2_dphiMET_rl_resup();
+  if (lep2_dphiMET_rl_resdown_branch != 0) lep2_dphiMET_rl_resdown();
   if (ph_sigmaIEtaEta_fill5x5_branch != 0) ph_sigmaIEtaEta_fill5x5();
   if (ph_hOverE_branch != 0) ph_hOverE();
   if (ph_r9_branch != 0) ph_r9();
@@ -2032,6 +2150,9 @@ void StopTree::LoadAllBranches() {
   if (ntightbtags_branch != 0) ntightbtags();
   if (nanalysisbtags_branch != 0) nanalysisbtags();
   if (ak4_HT_branch != 0) ak4_HT();
+  if (ak4_HTeta5_branch != 0) ak4_HTeta5();
+  if (ak4_MHT_pt_branch != 0) ak4_MHT_pt();
+  if (ak4_MHT_phi_branch != 0) ak4_MHT_phi();
   if (ak4_htratiom_branch != 0) ak4_htratiom();
   if (dphi_ak4pfjet_met_branch != 0) dphi_ak4pfjet_met();
   if (ak4pfjets_p4_branch != 0) ak4pfjets_p4();
@@ -2058,6 +2179,9 @@ void StopTree::LoadAllBranches() {
   if (jup_ntightbtags_branch != 0) jup_ntightbtags();
   if (jup_nanalysisbtags_branch != 0) jup_nanalysisbtags();
   if (jup_ak4_HT_branch != 0) jup_ak4_HT();
+  if (jup_ak4_HTeta5_branch != 0) jup_ak4_HTeta5();
+  if (jup_ak4_MHT_pt_branch != 0) jup_ak4_MHT_pt();
+  if (jup_ak4_MHT_phi_branch != 0) jup_ak4_MHT_phi();
   if (jup_ak4_htratiom_branch != 0) jup_ak4_htratiom();
   if (jup_dphi_ak4pfjet_met_branch != 0) jup_dphi_ak4pfjet_met();
   if (jup_ak4pfjets_p4_branch != 0) jup_ak4pfjets_p4();
@@ -2084,6 +2208,9 @@ void StopTree::LoadAllBranches() {
   if (jdown_ntightbtags_branch != 0) jdown_ntightbtags();
   if (jdown_nanalysisbtags_branch != 0) jdown_nanalysisbtags();
   if (jdown_ak4_HT_branch != 0) jdown_ak4_HT();
+  if (jdown_ak4_HTeta5_branch != 0) jdown_ak4_HTeta5();
+  if (jdown_ak4_MHT_pt_branch != 0) jdown_ak4_MHT_pt();
+  if (jdown_ak4_MHT_phi_branch != 0) jdown_ak4_MHT_phi();
   if (jdown_ak4_htratiom_branch != 0) jdown_ak4_htratiom();
   if (jdown_dphi_ak4pfjet_met_branch != 0) jdown_dphi_ak4pfjet_met();
   if (jdown_ak4pfjets_p4_branch != 0) jdown_ak4pfjets_p4();
@@ -2306,6 +2433,31 @@ void StopTree::LoadAllBranches() {
   if (isoTracks_isVetoTrack_branch != 0) isoTracks_isVetoTrack();
   if (isoTracks_isVetoTrack_v2_branch != 0) isoTracks_isVetoTrack_v2();
   if (isoTracks_isVetoTrack_v3_branch != 0) isoTracks_isVetoTrack_v3();
+  if (pfmet_uncorr_jup_branch != 0) pfmet_uncorr_jup();
+  if (pfmet_uncorr_phi_jup_branch != 0) pfmet_uncorr_phi_jup();
+  if (pfmet_uncorr_jdown_branch != 0) pfmet_uncorr_jdown();
+  if (pfmet_uncorr_phi_jdown_branch != 0) pfmet_uncorr_phi_jdown();
+  if (pfmet_resup_branch != 0) pfmet_resup();
+  if (pfmet_phi_resup_branch != 0) pfmet_phi_resup();
+  if (pfmet_resdown_branch != 0) pfmet_resdown();
+  if (pfmet_phi_resdown_branch != 0) pfmet_phi_resdown();
+  if (pfmet_rl_resup_branch != 0) pfmet_rl_resup();
+  if (pfmet_phi_rl_resup_branch != 0) pfmet_phi_rl_resup();
+  if (pfmet_rl_resdown_branch != 0) pfmet_rl_resdown();
+  if (mt_met_lep_resup_branch != 0) mt_met_lep_resup();
+  if (mt_met_lep_rl_resup_branch != 0) mt_met_lep_rl_resup();
+  if (mt_met_lep_resdown_branch != 0) mt_met_lep_resdown();
+  if (mt_met_lep_rl_resdown_branch != 0) mt_met_lep_rl_resdown();
+  if (topnessMod_resup_branch != 0) topnessMod_resup();
+  if (topnessMod_rl_resup_branch != 0) topnessMod_rl_resup();
+  if (topnessMod_resdown_branch != 0) topnessMod_resdown();
+  if (topnessMod_rl_resdown_branch != 0) topnessMod_rl_resdown();
+  if (mindphi_met_j1_j2_resup_branch != 0) mindphi_met_j1_j2_resup();
+  if (mindphi_met_j1_j2_rl_resup_branch != 0) mindphi_met_j1_j2_rl_resup();
+  if (mindphi_met_j1_j2_resdown_branch != 0) mindphi_met_j1_j2_resdown();
+  if (mindphi_met_j1_j2_rl_resdown_branch != 0) mindphi_met_j1_j2_rl_resdown();
+  if (MT2_ll_resup_branch != 0) MT2_ll_resup();
+  if (MT2_ll_resdown_branch != 0) MT2_ll_resdown();
   if (ph_selectedidx_branch != 0) ph_selectedidx();
   if (ph_met_branch != 0) ph_met();
   if (ph_met_phi_branch != 0) ph_met_phi();
@@ -2651,58 +2803,6 @@ const float &StopTree::pfmet_uncorr_phi() {
   return pfmet_uncorr_phi_;
 }
 
-const float &StopTree::pfmet_uncorr_jup() {
-  if (not pfmet_uncorr_jup_isLoaded) {
-    if (pfmet_uncorr_jup_branch != 0) {
-      pfmet_uncorr_jup_branch->GetEntry(index);
-    } else {
-      printf("branch pfmet_uncorr_jup_branch does not exist!\n");
-      exit(1);
-    }
-    pfmet_uncorr_jup_isLoaded = true;
-  }
-  return pfmet_uncorr_jup_;
-}
-
-const float &StopTree::pfmet_uncorr_phi_jup() {
-  if (not pfmet_uncorr_phi_jup_isLoaded) {
-    if (pfmet_uncorr_phi_jup_branch != 0) {
-      pfmet_uncorr_phi_jup_branch->GetEntry(index);
-    } else {
-      printf("branch pfmet_uncorr_phi_jup_branch does not exist!\n");
-      exit(1);
-    }
-    pfmet_uncorr_phi_jup_isLoaded = true;
-  }
-  return pfmet_uncorr_phi_jup_;
-}
-
-const float &StopTree::pfmet_uncorr_jdown() {
-  if (not pfmet_uncorr_jdown_isLoaded) {
-    if (pfmet_uncorr_jdown_branch != 0) {
-      pfmet_uncorr_jdown_branch->GetEntry(index);
-    } else {
-      printf("branch pfmet_uncorr_jdown_branch does not exist!\n");
-      exit(1);
-    }
-    pfmet_uncorr_jdown_isLoaded = true;
-  }
-  return pfmet_uncorr_jdown_;
-}
-
-const float &StopTree::pfmet_uncorr_phi_jdown() {
-  if (not pfmet_uncorr_phi_jdown_isLoaded) {
-    if (pfmet_uncorr_phi_jdown_branch != 0) {
-      pfmet_uncorr_phi_jdown_branch->GetEntry(index);
-    } else {
-      printf("branch pfmet_uncorr_phi_jdown_branch does not exist!\n");
-      exit(1);
-    }
-    pfmet_uncorr_phi_jdown_isLoaded = true;
-  }
-  return pfmet_uncorr_phi_jdown_;
-}
-
 const float &StopTree::pfmet_original() {
   if (not pfmet_original_isLoaded) {
     if (pfmet_original_branch != 0) {
@@ -2727,58 +2827,6 @@ const float &StopTree::pfmet_original_phi() {
     pfmet_original_phi_isLoaded = true;
   }
   return pfmet_original_phi_;
-}
-
-const float &StopTree::pfmet_resup() {
-  if (not pfmet_resup_isLoaded) {
-    if (pfmet_resup_branch != 0) {
-      pfmet_resup_branch->GetEntry(index);
-    } else {
-      printf("branch pfmet_resup_branch does not exist!\n");
-      exit(1);
-    }
-    pfmet_resup_isLoaded = true;
-  }
-  return pfmet_resup_;
-}
-
-const float &StopTree::pfmet_phi_resup() {
-  if (not pfmet_phi_resup_isLoaded) {
-    if (pfmet_phi_resup_branch != 0) {
-      pfmet_phi_resup_branch->GetEntry(index);
-    } else {
-      printf("branch pfmet_phi_resup_branch does not exist!\n");
-      exit(1);
-    }
-    pfmet_phi_resup_isLoaded = true;
-  }
-  return pfmet_phi_resup_;
-}
-
-const float &StopTree::pfmet_resdown() {
-  if (not pfmet_resdown_isLoaded) {
-    if (pfmet_resdown_branch != 0) {
-      pfmet_resdown_branch->GetEntry(index);
-    } else {
-      printf("branch pfmet_resdown_branch does not exist!\n");
-      exit(1);
-    }
-    pfmet_resdown_isLoaded = true;
-  }
-  return pfmet_resdown_;
-}
-
-const float &StopTree::pfmet_phi_resdown() {
-  if (not pfmet_phi_resdown_isLoaded) {
-    if (pfmet_phi_resdown_branch != 0) {
-      pfmet_phi_resdown_branch->GetEntry(index);
-    } else {
-      printf("branch pfmet_phi_resdown_branch does not exist!\n");
-      exit(1);
-    }
-    pfmet_phi_resdown_isLoaded = true;
-  }
-  return pfmet_phi_resdown_;
 }
 
 const float &StopTree::scale1fb() {
@@ -3468,6 +3516,58 @@ const float &StopTree::weight_Q2_down() {
     weight_Q2_down_isLoaded = true;
   }
   return weight_Q2_down_;
+}
+
+const float &StopTree::weight_muF_up() {
+  if (not weight_muF_up_isLoaded) {
+    if (weight_muF_up_branch != 0) {
+      weight_muF_up_branch->GetEntry(index);
+    } else {
+      printf("branch weight_muF_up_branch does not exist!\n");
+      exit(1);
+    }
+    weight_muF_up_isLoaded = true;
+  }
+  return weight_muF_up_;
+}
+
+const float &StopTree::weight_muF_down() {
+  if (not weight_muF_down_isLoaded) {
+    if (weight_muF_down_branch != 0) {
+      weight_muF_down_branch->GetEntry(index);
+    } else {
+      printf("branch weight_muF_down_branch does not exist!\n");
+      exit(1);
+    }
+    weight_muF_down_isLoaded = true;
+  }
+  return weight_muF_down_;
+}
+
+const float &StopTree::weight_muR_up() {
+  if (not weight_muR_up_isLoaded) {
+    if (weight_muR_up_branch != 0) {
+      weight_muR_up_branch->GetEntry(index);
+    } else {
+      printf("branch weight_muR_up_branch does not exist!\n");
+      exit(1);
+    }
+    weight_muR_up_isLoaded = true;
+  }
+  return weight_muR_up_;
+}
+
+const float &StopTree::weight_muR_down() {
+  if (not weight_muR_down_isLoaded) {
+    if (weight_muR_down_branch != 0) {
+      weight_muR_down_branch->GetEntry(index);
+    } else {
+      printf("branch weight_muR_down_branch does not exist!\n");
+      exit(1);
+    }
+    weight_muR_down_isLoaded = true;
+  }
+  return weight_muR_down_;
 }
 
 const float &StopTree::weight_alphas_up() {
@@ -5017,6 +5117,58 @@ const float &StopTree::lep1_dphiMET_rl_jdown() {
   return lep1_dphiMET_rl_jdown_;
 }
 
+const float &StopTree::lep1_dphiMET_resup() {
+  if (not lep1_dphiMET_resup_isLoaded) {
+    if (lep1_dphiMET_resup_branch != 0) {
+      lep1_dphiMET_resup_branch->GetEntry(index);
+    } else {
+      printf("branch lep1_dphiMET_resup_branch does not exist!\n");
+      exit(1);
+    }
+    lep1_dphiMET_resup_isLoaded = true;
+  }
+  return lep1_dphiMET_resup_;
+}
+
+const float &StopTree::lep1_dphiMET_resdown() {
+  if (not lep1_dphiMET_resdown_isLoaded) {
+    if (lep1_dphiMET_resdown_branch != 0) {
+      lep1_dphiMET_resdown_branch->GetEntry(index);
+    } else {
+      printf("branch lep1_dphiMET_resdown_branch does not exist!\n");
+      exit(1);
+    }
+    lep1_dphiMET_resdown_isLoaded = true;
+  }
+  return lep1_dphiMET_resdown_;
+}
+
+const float &StopTree::lep1_dphiMET_rl_resup() {
+  if (not lep1_dphiMET_rl_resup_isLoaded) {
+    if (lep1_dphiMET_rl_resup_branch != 0) {
+      lep1_dphiMET_rl_resup_branch->GetEntry(index);
+    } else {
+      printf("branch lep1_dphiMET_rl_resup_branch does not exist!\n");
+      exit(1);
+    }
+    lep1_dphiMET_rl_resup_isLoaded = true;
+  }
+  return lep1_dphiMET_rl_resup_;
+}
+
+const float &StopTree::lep1_dphiMET_rl_resdown() {
+  if (not lep1_dphiMET_rl_resdown_isLoaded) {
+    if (lep1_dphiMET_rl_resdown_branch != 0) {
+      lep1_dphiMET_rl_resdown_branch->GetEntry(index);
+    } else {
+      printf("branch lep1_dphiMET_rl_resdown_branch does not exist!\n");
+      exit(1);
+    }
+    lep1_dphiMET_rl_resdown_isLoaded = true;
+  }
+  return lep1_dphiMET_rl_resdown_;
+}
+
 const int &StopTree::lep2_pdgid() {
   if (not lep2_pdgid_isLoaded) {
     if (lep2_pdgid_branch != 0) {
@@ -5249,6 +5401,58 @@ const float &StopTree::lep2_dphiMET_rl_jdown() {
     lep2_dphiMET_rl_jdown_isLoaded = true;
   }
   return lep2_dphiMET_rl_jdown_;
+}
+
+const float &StopTree::lep2_dphiMET_resup() {
+  if (not lep2_dphiMET_resup_isLoaded) {
+    if (lep2_dphiMET_resup_branch != 0) {
+      lep2_dphiMET_resup_branch->GetEntry(index);
+    } else {
+      printf("branch lep2_dphiMET_resup_branch does not exist!\n");
+      exit(1);
+    }
+    lep2_dphiMET_resup_isLoaded = true;
+  }
+  return lep2_dphiMET_resup_;
+}
+
+const float &StopTree::lep2_dphiMET_resdown() {
+  if (not lep2_dphiMET_resdown_isLoaded) {
+    if (lep2_dphiMET_resdown_branch != 0) {
+      lep2_dphiMET_resdown_branch->GetEntry(index);
+    } else {
+      printf("branch lep2_dphiMET_resdown_branch does not exist!\n");
+      exit(1);
+    }
+    lep2_dphiMET_resdown_isLoaded = true;
+  }
+  return lep2_dphiMET_resdown_;
+}
+
+const float &StopTree::lep2_dphiMET_rl_resup() {
+  if (not lep2_dphiMET_rl_resup_isLoaded) {
+    if (lep2_dphiMET_rl_resup_branch != 0) {
+      lep2_dphiMET_rl_resup_branch->GetEntry(index);
+    } else {
+      printf("branch lep2_dphiMET_rl_resup_branch does not exist!\n");
+      exit(1);
+    }
+    lep2_dphiMET_rl_resup_isLoaded = true;
+  }
+  return lep2_dphiMET_rl_resup_;
+}
+
+const float &StopTree::lep2_dphiMET_rl_resdown() {
+  if (not lep2_dphiMET_rl_resdown_isLoaded) {
+    if (lep2_dphiMET_rl_resdown_branch != 0) {
+      lep2_dphiMET_rl_resdown_branch->GetEntry(index);
+    } else {
+      printf("branch lep2_dphiMET_rl_resdown_branch does not exist!\n");
+      exit(1);
+    }
+    lep2_dphiMET_rl_resdown_isLoaded = true;
+  }
+  return lep2_dphiMET_rl_resdown_;
 }
 
 const vector<float> &StopTree::ph_sigmaIEtaEta_fill5x5() {
@@ -5574,6 +5778,45 @@ const float &StopTree::ak4_HT() {
     ak4_HT_isLoaded = true;
   }
   return ak4_HT_;
+}
+
+const float &StopTree::ak4_HTeta5() {
+  if (not ak4_HTeta5_isLoaded) {
+    if (ak4_HTeta5_branch != 0) {
+      ak4_HTeta5_branch->GetEntry(index);
+    } else {
+      printf("branch ak4_HTeta5_branch does not exist!\n");
+      exit(1);
+    }
+    ak4_HTeta5_isLoaded = true;
+  }
+  return ak4_HTeta5_;
+}
+
+const float &StopTree::ak4_MHT_pt() {
+  if (not ak4_MHT_pt_isLoaded) {
+    if (ak4_MHT_pt_branch != 0) {
+      ak4_MHT_pt_branch->GetEntry(index);
+    } else {
+      printf("branch ak4_MHT_pt_branch does not exist!\n");
+      exit(1);
+    }
+    ak4_MHT_pt_isLoaded = true;
+  }
+  return ak4_MHT_pt_;
+}
+
+const float &StopTree::ak4_MHT_phi() {
+  if (not ak4_MHT_phi_isLoaded) {
+    if (ak4_MHT_phi_branch != 0) {
+      ak4_MHT_phi_branch->GetEntry(index);
+    } else {
+      printf("branch ak4_MHT_phi_branch does not exist!\n");
+      exit(1);
+    }
+    ak4_MHT_phi_isLoaded = true;
+  }
+  return ak4_MHT_phi_;
 }
 
 const float &StopTree::ak4_htratiom() {
@@ -5914,6 +6157,45 @@ const float &StopTree::jup_ak4_HT() {
   return jup_ak4_HT_;
 }
 
+const float &StopTree::jup_ak4_HTeta5() {
+  if (not jup_ak4_HTeta5_isLoaded) {
+    if (jup_ak4_HTeta5_branch != 0) {
+      jup_ak4_HTeta5_branch->GetEntry(index);
+    } else {
+      printf("branch jup_ak4_HTeta5_branch does not exist!\n");
+      exit(1);
+    }
+    jup_ak4_HTeta5_isLoaded = true;
+  }
+  return jup_ak4_HTeta5_;
+}
+
+const float &StopTree::jup_ak4_MHT_pt() {
+  if (not jup_ak4_MHT_pt_isLoaded) {
+    if (jup_ak4_MHT_pt_branch != 0) {
+      jup_ak4_MHT_pt_branch->GetEntry(index);
+    } else {
+      printf("branch jup_ak4_MHT_pt_branch does not exist!\n");
+      exit(1);
+    }
+    jup_ak4_MHT_pt_isLoaded = true;
+  }
+  return jup_ak4_MHT_pt_;
+}
+
+const float &StopTree::jup_ak4_MHT_phi() {
+  if (not jup_ak4_MHT_phi_isLoaded) {
+    if (jup_ak4_MHT_phi_branch != 0) {
+      jup_ak4_MHT_phi_branch->GetEntry(index);
+    } else {
+      printf("branch jup_ak4_MHT_phi_branch does not exist!\n");
+      exit(1);
+    }
+    jup_ak4_MHT_phi_isLoaded = true;
+  }
+  return jup_ak4_MHT_phi_;
+}
+
 const float &StopTree::jup_ak4_htratiom() {
   if (not jup_ak4_htratiom_isLoaded) {
     if (jup_ak4_htratiom_branch != 0) {
@@ -6250,6 +6532,45 @@ const float &StopTree::jdown_ak4_HT() {
     jdown_ak4_HT_isLoaded = true;
   }
   return jdown_ak4_HT_;
+}
+
+const float &StopTree::jdown_ak4_HTeta5() {
+  if (not jdown_ak4_HTeta5_isLoaded) {
+    if (jdown_ak4_HTeta5_branch != 0) {
+      jdown_ak4_HTeta5_branch->GetEntry(index);
+    } else {
+      printf("branch jdown_ak4_HTeta5_branch does not exist!\n");
+      exit(1);
+    }
+    jdown_ak4_HTeta5_isLoaded = true;
+  }
+  return jdown_ak4_HTeta5_;
+}
+
+const float &StopTree::jdown_ak4_MHT_pt() {
+  if (not jdown_ak4_MHT_pt_isLoaded) {
+    if (jdown_ak4_MHT_pt_branch != 0) {
+      jdown_ak4_MHT_pt_branch->GetEntry(index);
+    } else {
+      printf("branch jdown_ak4_MHT_pt_branch does not exist!\n");
+      exit(1);
+    }
+    jdown_ak4_MHT_pt_isLoaded = true;
+  }
+  return jdown_ak4_MHT_pt_;
+}
+
+const float &StopTree::jdown_ak4_MHT_phi() {
+  if (not jdown_ak4_MHT_phi_isLoaded) {
+    if (jdown_ak4_MHT_phi_branch != 0) {
+      jdown_ak4_MHT_phi_branch->GetEntry(index);
+    } else {
+      printf("branch jdown_ak4_MHT_phi_branch does not exist!\n");
+      exit(1);
+    }
+    jdown_ak4_MHT_phi_isLoaded = true;
+  }
+  return jdown_ak4_MHT_phi_;
 }
 
 const float &StopTree::jdown_ak4_htratiom() {
@@ -9138,6 +9459,331 @@ const vector<bool> &StopTree::isoTracks_isVetoTrack_v3() {
   return *isoTracks_isVetoTrack_v3_;
 }
 
+const float &StopTree::pfmet_uncorr_jup() {
+  if (not pfmet_uncorr_jup_isLoaded) {
+    if (pfmet_uncorr_jup_branch != 0) {
+      pfmet_uncorr_jup_branch->GetEntry(index);
+    } else {
+      printf("branch pfmet_uncorr_jup_branch does not exist!\n");
+      exit(1);
+    }
+    pfmet_uncorr_jup_isLoaded = true;
+  }
+  return pfmet_uncorr_jup_;
+}
+
+const float &StopTree::pfmet_uncorr_phi_jup() {
+  if (not pfmet_uncorr_phi_jup_isLoaded) {
+    if (pfmet_uncorr_phi_jup_branch != 0) {
+      pfmet_uncorr_phi_jup_branch->GetEntry(index);
+    } else {
+      printf("branch pfmet_uncorr_phi_jup_branch does not exist!\n");
+      exit(1);
+    }
+    pfmet_uncorr_phi_jup_isLoaded = true;
+  }
+  return pfmet_uncorr_phi_jup_;
+}
+
+const float &StopTree::pfmet_uncorr_jdown() {
+  if (not pfmet_uncorr_jdown_isLoaded) {
+    if (pfmet_uncorr_jdown_branch != 0) {
+      pfmet_uncorr_jdown_branch->GetEntry(index);
+    } else {
+      printf("branch pfmet_uncorr_jdown_branch does not exist!\n");
+      exit(1);
+    }
+    pfmet_uncorr_jdown_isLoaded = true;
+  }
+  return pfmet_uncorr_jdown_;
+}
+
+const float &StopTree::pfmet_uncorr_phi_jdown() {
+  if (not pfmet_uncorr_phi_jdown_isLoaded) {
+    if (pfmet_uncorr_phi_jdown_branch != 0) {
+      pfmet_uncorr_phi_jdown_branch->GetEntry(index);
+    } else {
+      printf("branch pfmet_uncorr_phi_jdown_branch does not exist!\n");
+      exit(1);
+    }
+    pfmet_uncorr_phi_jdown_isLoaded = true;
+  }
+  return pfmet_uncorr_phi_jdown_;
+}
+
+const float &StopTree::pfmet_resup() {
+  if (not pfmet_resup_isLoaded) {
+    if (pfmet_resup_branch != 0) {
+      pfmet_resup_branch->GetEntry(index);
+    } else {
+      printf("branch pfmet_resup_branch does not exist!\n");
+      exit(1);
+    }
+    pfmet_resup_isLoaded = true;
+  }
+  return pfmet_resup_;
+}
+
+const float &StopTree::pfmet_phi_resup() {
+  if (not pfmet_phi_resup_isLoaded) {
+    if (pfmet_phi_resup_branch != 0) {
+      pfmet_phi_resup_branch->GetEntry(index);
+    } else {
+      printf("branch pfmet_phi_resup_branch does not exist!\n");
+      exit(1);
+    }
+    pfmet_phi_resup_isLoaded = true;
+  }
+  return pfmet_phi_resup_;
+}
+
+const float &StopTree::pfmet_resdown() {
+  if (not pfmet_resdown_isLoaded) {
+    if (pfmet_resdown_branch != 0) {
+      pfmet_resdown_branch->GetEntry(index);
+    } else {
+      printf("branch pfmet_resdown_branch does not exist!\n");
+      exit(1);
+    }
+    pfmet_resdown_isLoaded = true;
+  }
+  return pfmet_resdown_;
+}
+
+const float &StopTree::pfmet_phi_resdown() {
+  if (not pfmet_phi_resdown_isLoaded) {
+    if (pfmet_phi_resdown_branch != 0) {
+      pfmet_phi_resdown_branch->GetEntry(index);
+    } else {
+      printf("branch pfmet_phi_resdown_branch does not exist!\n");
+      exit(1);
+    }
+    pfmet_phi_resdown_isLoaded = true;
+  }
+  return pfmet_phi_resdown_;
+}
+
+const float &StopTree::pfmet_rl_resup() {
+  if (not pfmet_rl_resup_isLoaded) {
+    if (pfmet_rl_resup_branch != 0) {
+      pfmet_rl_resup_branch->GetEntry(index);
+    } else {
+      printf("branch pfmet_rl_resup_branch does not exist!\n");
+      exit(1);
+    }
+    pfmet_rl_resup_isLoaded = true;
+  }
+  return pfmet_rl_resup_;
+}
+
+const float &StopTree::pfmet_phi_rl_resup() {
+  if (not pfmet_phi_rl_resup_isLoaded) {
+    if (pfmet_phi_rl_resup_branch != 0) {
+      pfmet_phi_rl_resup_branch->GetEntry(index);
+    } else {
+      printf("branch pfmet_phi_rl_resup_branch does not exist!\n");
+      exit(1);
+    }
+    pfmet_phi_rl_resup_isLoaded = true;
+  }
+  return pfmet_phi_rl_resup_;
+}
+
+const float &StopTree::pfmet_rl_resdown() {
+  if (not pfmet_rl_resdown_isLoaded) {
+    if (pfmet_rl_resdown_branch != 0) {
+      pfmet_rl_resdown_branch->GetEntry(index);
+    } else {
+      printf("branch pfmet_rl_resdown_branch does not exist!\n");
+      exit(1);
+    }
+    pfmet_rl_resdown_isLoaded = true;
+  }
+  return pfmet_rl_resdown_;
+}
+
+const float &StopTree::mt_met_lep_resup() {
+  if (not mt_met_lep_resup_isLoaded) {
+    if (mt_met_lep_resup_branch != 0) {
+      mt_met_lep_resup_branch->GetEntry(index);
+    } else {
+      printf("branch mt_met_lep_resup_branch does not exist!\n");
+      exit(1);
+    }
+    mt_met_lep_resup_isLoaded = true;
+  }
+  return mt_met_lep_resup_;
+}
+
+const float &StopTree::mt_met_lep_rl_resup() {
+  if (not mt_met_lep_rl_resup_isLoaded) {
+    if (mt_met_lep_rl_resup_branch != 0) {
+      mt_met_lep_rl_resup_branch->GetEntry(index);
+    } else {
+      printf("branch mt_met_lep_rl_resup_branch does not exist!\n");
+      exit(1);
+    }
+    mt_met_lep_rl_resup_isLoaded = true;
+  }
+  return mt_met_lep_rl_resup_;
+}
+
+const float &StopTree::mt_met_lep_resdown() {
+  if (not mt_met_lep_resdown_isLoaded) {
+    if (mt_met_lep_resdown_branch != 0) {
+      mt_met_lep_resdown_branch->GetEntry(index);
+    } else {
+      printf("branch mt_met_lep_resdown_branch does not exist!\n");
+      exit(1);
+    }
+    mt_met_lep_resdown_isLoaded = true;
+  }
+  return mt_met_lep_resdown_;
+}
+
+const float &StopTree::mt_met_lep_rl_resdown() {
+  if (not mt_met_lep_rl_resdown_isLoaded) {
+    if (mt_met_lep_rl_resdown_branch != 0) {
+      mt_met_lep_rl_resdown_branch->GetEntry(index);
+    } else {
+      printf("branch mt_met_lep_rl_resdown_branch does not exist!\n");
+      exit(1);
+    }
+    mt_met_lep_rl_resdown_isLoaded = true;
+  }
+  return mt_met_lep_rl_resdown_;
+}
+
+const float &StopTree::topnessMod_resup() {
+  if (not topnessMod_resup_isLoaded) {
+    if (topnessMod_resup_branch != 0) {
+      topnessMod_resup_branch->GetEntry(index);
+    } else {
+      printf("branch topnessMod_resup_branch does not exist!\n");
+      exit(1);
+    }
+    topnessMod_resup_isLoaded = true;
+  }
+  return topnessMod_resup_;
+}
+
+const float &StopTree::topnessMod_rl_resup() {
+  if (not topnessMod_rl_resup_isLoaded) {
+    if (topnessMod_rl_resup_branch != 0) {
+      topnessMod_rl_resup_branch->GetEntry(index);
+    } else {
+      printf("branch topnessMod_rl_resup_branch does not exist!\n");
+      exit(1);
+    }
+    topnessMod_rl_resup_isLoaded = true;
+  }
+  return topnessMod_rl_resup_;
+}
+
+const float &StopTree::topnessMod_resdown() {
+  if (not topnessMod_resdown_isLoaded) {
+    if (topnessMod_resdown_branch != 0) {
+      topnessMod_resdown_branch->GetEntry(index);
+    } else {
+      printf("branch topnessMod_resdown_branch does not exist!\n");
+      exit(1);
+    }
+    topnessMod_resdown_isLoaded = true;
+  }
+  return topnessMod_resdown_;
+}
+
+const float &StopTree::topnessMod_rl_resdown() {
+  if (not topnessMod_rl_resdown_isLoaded) {
+    if (topnessMod_rl_resdown_branch != 0) {
+      topnessMod_rl_resdown_branch->GetEntry(index);
+    } else {
+      printf("branch topnessMod_rl_resdown_branch does not exist!\n");
+      exit(1);
+    }
+    topnessMod_rl_resdown_isLoaded = true;
+  }
+  return topnessMod_rl_resdown_;
+}
+
+const float &StopTree::mindphi_met_j1_j2_resup() {
+  if (not mindphi_met_j1_j2_resup_isLoaded) {
+    if (mindphi_met_j1_j2_resup_branch != 0) {
+      mindphi_met_j1_j2_resup_branch->GetEntry(index);
+    } else {
+      printf("branch mindphi_met_j1_j2_resup_branch does not exist!\n");
+      exit(1);
+    }
+    mindphi_met_j1_j2_resup_isLoaded = true;
+  }
+  return mindphi_met_j1_j2_resup_;
+}
+
+const float &StopTree::mindphi_met_j1_j2_rl_resup() {
+  if (not mindphi_met_j1_j2_rl_resup_isLoaded) {
+    if (mindphi_met_j1_j2_rl_resup_branch != 0) {
+      mindphi_met_j1_j2_rl_resup_branch->GetEntry(index);
+    } else {
+      printf("branch mindphi_met_j1_j2_rl_resup_branch does not exist!\n");
+      exit(1);
+    }
+    mindphi_met_j1_j2_rl_resup_isLoaded = true;
+  }
+  return mindphi_met_j1_j2_rl_resup_;
+}
+
+const float &StopTree::mindphi_met_j1_j2_resdown() {
+  if (not mindphi_met_j1_j2_resdown_isLoaded) {
+    if (mindphi_met_j1_j2_resdown_branch != 0) {
+      mindphi_met_j1_j2_resdown_branch->GetEntry(index);
+    } else {
+      printf("branch mindphi_met_j1_j2_resdown_branch does not exist!\n");
+      exit(1);
+    }
+    mindphi_met_j1_j2_resdown_isLoaded = true;
+  }
+  return mindphi_met_j1_j2_resdown_;
+}
+
+const float &StopTree::mindphi_met_j1_j2_rl_resdown() {
+  if (not mindphi_met_j1_j2_rl_resdown_isLoaded) {
+    if (mindphi_met_j1_j2_rl_resdown_branch != 0) {
+      mindphi_met_j1_j2_rl_resdown_branch->GetEntry(index);
+    } else {
+      printf("branch mindphi_met_j1_j2_rl_resdown_branch does not exist!\n");
+      exit(1);
+    }
+    mindphi_met_j1_j2_rl_resdown_isLoaded = true;
+  }
+  return mindphi_met_j1_j2_rl_resdown_;
+}
+
+const float &StopTree::MT2_ll_resup() {
+  if (not MT2_ll_resup_isLoaded) {
+    if (MT2_ll_resup_branch != 0) {
+      MT2_ll_resup_branch->GetEntry(index);
+    } else {
+      printf("branch MT2_ll_resup_branch does not exist!\n");
+      exit(1);
+    }
+    MT2_ll_resup_isLoaded = true;
+  }
+  return MT2_ll_resup_;
+}
+
+const float &StopTree::MT2_ll_resdown() {
+  if (not MT2_ll_resdown_isLoaded) {
+    if (MT2_ll_resdown_branch != 0) {
+      MT2_ll_resdown_branch->GetEntry(index);
+    } else {
+      printf("branch MT2_ll_resdown_branch does not exist!\n");
+      exit(1);
+    }
+    MT2_ll_resdown_isLoaded = true;
+  }
+  return MT2_ll_resdown_;
+}
+
 const int &StopTree::ph_selectedidx() {
   if (not ph_selectedidx_isLoaded) {
     if (ph_selectedidx_branch != 0) {
@@ -10092,16 +10738,8 @@ const float &pfmet_rl_jdown() { return babyAnalyzer.pfmet_rl_jdown(); }
 const float &pfmet_phi_rl_jdown() { return babyAnalyzer.pfmet_phi_rl_jdown(); }
 const float &pfmet_uncorr() { return babyAnalyzer.pfmet_uncorr(); }
 const float &pfmet_uncorr_phi() { return babyAnalyzer.pfmet_uncorr_phi(); }
-const float &pfmet_uncorr_jup() { return babyAnalyzer.pfmet_uncorr_jup(); }
-const float &pfmet_uncorr_phi_jup() { return babyAnalyzer.pfmet_uncorr_phi_jup(); }
-const float &pfmet_uncorr_jdown() { return babyAnalyzer.pfmet_uncorr_jdown(); }
-const float &pfmet_uncorr_phi_jdown() { return babyAnalyzer.pfmet_uncorr_phi_jdown(); }
 const float &pfmet_original() { return babyAnalyzer.pfmet_original(); }
 const float &pfmet_original_phi() { return babyAnalyzer.pfmet_original_phi(); }
-const float &pfmet_resup() { return babyAnalyzer.pfmet_resup(); }
-const float &pfmet_phi_resup() { return babyAnalyzer.pfmet_phi_resup(); }
-const float &pfmet_resdown() { return babyAnalyzer.pfmet_resdown(); }
-const float &pfmet_phi_resdown() { return babyAnalyzer.pfmet_phi_resdown(); }
 const float &scale1fb() { return babyAnalyzer.scale1fb(); }
 const float &xsec() { return babyAnalyzer.xsec(); }
 const float &xsec_uncert() { return babyAnalyzer.xsec_uncert(); }
@@ -10155,6 +10793,10 @@ const int &ngenweights() { return babyAnalyzer.ngenweights(); }
 const vector<float> &genweights() { return babyAnalyzer.genweights(); }
 const float &weight_Q2_up() { return babyAnalyzer.weight_Q2_up(); }
 const float &weight_Q2_down() { return babyAnalyzer.weight_Q2_down(); }
+const float &weight_muF_up() { return babyAnalyzer.weight_muF_up(); }
+const float &weight_muF_down() { return babyAnalyzer.weight_muF_down(); }
+const float &weight_muR_up() { return babyAnalyzer.weight_muR_up(); }
+const float &weight_muR_down() { return babyAnalyzer.weight_muR_down(); }
 const float &weight_alphas_up() { return babyAnalyzer.weight_alphas_up(); }
 const float &weight_alphas_down() { return babyAnalyzer.weight_alphas_down(); }
 const float &weight_btagsf() { return babyAnalyzer.weight_btagsf(); }
@@ -10274,6 +10916,10 @@ const float &lep1_dphiMET_jdown() { return babyAnalyzer.lep1_dphiMET_jdown(); }
 const float &lep1_dphiMET_rl() { return babyAnalyzer.lep1_dphiMET_rl(); }
 const float &lep1_dphiMET_rl_jup() { return babyAnalyzer.lep1_dphiMET_rl_jup(); }
 const float &lep1_dphiMET_rl_jdown() { return babyAnalyzer.lep1_dphiMET_rl_jdown(); }
+const float &lep1_dphiMET_resup() { return babyAnalyzer.lep1_dphiMET_resup(); }
+const float &lep1_dphiMET_resdown() { return babyAnalyzer.lep1_dphiMET_resdown(); }
+const float &lep1_dphiMET_rl_resup() { return babyAnalyzer.lep1_dphiMET_rl_resup(); }
+const float &lep1_dphiMET_rl_resdown() { return babyAnalyzer.lep1_dphiMET_rl_resdown(); }
 const int &lep2_pdgid() { return babyAnalyzer.lep2_pdgid(); }
 const int &lep2_production_type() { return babyAnalyzer.lep2_production_type(); }
 const float &lep2_MiniIso() { return babyAnalyzer.lep2_MiniIso(); }
@@ -10292,6 +10938,10 @@ const float &lep2_dphiMET_jdown() { return babyAnalyzer.lep2_dphiMET_jdown(); }
 const float &lep2_dphiMET_rl() { return babyAnalyzer.lep2_dphiMET_rl(); }
 const float &lep2_dphiMET_rl_jup() { return babyAnalyzer.lep2_dphiMET_rl_jup(); }
 const float &lep2_dphiMET_rl_jdown() { return babyAnalyzer.lep2_dphiMET_rl_jdown(); }
+const float &lep2_dphiMET_resup() { return babyAnalyzer.lep2_dphiMET_resup(); }
+const float &lep2_dphiMET_resdown() { return babyAnalyzer.lep2_dphiMET_resdown(); }
+const float &lep2_dphiMET_rl_resup() { return babyAnalyzer.lep2_dphiMET_rl_resup(); }
+const float &lep2_dphiMET_rl_resdown() { return babyAnalyzer.lep2_dphiMET_rl_resdown(); }
 const vector<float> &ph_sigmaIEtaEta_fill5x5() { return babyAnalyzer.ph_sigmaIEtaEta_fill5x5(); }
 const vector<float> &ph_hOverE() { return babyAnalyzer.ph_hOverE(); }
 const vector<float> &ph_r9() { return babyAnalyzer.ph_r9(); }
@@ -10317,6 +10967,9 @@ const int &nloosebtags() { return babyAnalyzer.nloosebtags(); }
 const int &ntightbtags() { return babyAnalyzer.ntightbtags(); }
 const int &nanalysisbtags() { return babyAnalyzer.nanalysisbtags(); }
 const float &ak4_HT() { return babyAnalyzer.ak4_HT(); }
+const float &ak4_HTeta5() { return babyAnalyzer.ak4_HTeta5(); }
+const float &ak4_MHT_pt() { return babyAnalyzer.ak4_MHT_pt(); }
+const float &ak4_MHT_phi() { return babyAnalyzer.ak4_MHT_phi(); }
 const float &ak4_htratiom() { return babyAnalyzer.ak4_htratiom(); }
 const vector<float> &dphi_ak4pfjet_met() { return babyAnalyzer.dphi_ak4pfjet_met(); }
 const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &ak4pfjets_p4() { return babyAnalyzer.ak4pfjets_p4(); }
@@ -10343,6 +10996,9 @@ const int &jup_nloosebtags() { return babyAnalyzer.jup_nloosebtags(); }
 const int &jup_ntightbtags() { return babyAnalyzer.jup_ntightbtags(); }
 const int &jup_nanalysisbtags() { return babyAnalyzer.jup_nanalysisbtags(); }
 const float &jup_ak4_HT() { return babyAnalyzer.jup_ak4_HT(); }
+const float &jup_ak4_HTeta5() { return babyAnalyzer.jup_ak4_HTeta5(); }
+const float &jup_ak4_MHT_pt() { return babyAnalyzer.jup_ak4_MHT_pt(); }
+const float &jup_ak4_MHT_phi() { return babyAnalyzer.jup_ak4_MHT_phi(); }
 const float &jup_ak4_htratiom() { return babyAnalyzer.jup_ak4_htratiom(); }
 const vector<float> &jup_dphi_ak4pfjet_met() { return babyAnalyzer.jup_dphi_ak4pfjet_met(); }
 const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &jup_ak4pfjets_p4() { return babyAnalyzer.jup_ak4pfjets_p4(); }
@@ -10369,6 +11025,9 @@ const int &jdown_nloosebtags() { return babyAnalyzer.jdown_nloosebtags(); }
 const int &jdown_ntightbtags() { return babyAnalyzer.jdown_ntightbtags(); }
 const int &jdown_nanalysisbtags() { return babyAnalyzer.jdown_nanalysisbtags(); }
 const float &jdown_ak4_HT() { return babyAnalyzer.jdown_ak4_HT(); }
+const float &jdown_ak4_HTeta5() { return babyAnalyzer.jdown_ak4_HTeta5(); }
+const float &jdown_ak4_MHT_pt() { return babyAnalyzer.jdown_ak4_MHT_pt(); }
+const float &jdown_ak4_MHT_phi() { return babyAnalyzer.jdown_ak4_MHT_phi(); }
 const float &jdown_ak4_htratiom() { return babyAnalyzer.jdown_ak4_htratiom(); }
 const vector<float> &jdown_dphi_ak4pfjet_met() { return babyAnalyzer.jdown_dphi_ak4pfjet_met(); }
 const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &jdown_ak4pfjets_p4() { return babyAnalyzer.jdown_ak4pfjets_p4(); }
@@ -10591,6 +11250,31 @@ const vector<int> &isoTracks_pdgId() { return babyAnalyzer.isoTracks_pdgId(); }
 const vector<bool> &isoTracks_isVetoTrack() { return babyAnalyzer.isoTracks_isVetoTrack(); }
 const vector<bool> &isoTracks_isVetoTrack_v2() { return babyAnalyzer.isoTracks_isVetoTrack_v2(); }
 const vector<bool> &isoTracks_isVetoTrack_v3() { return babyAnalyzer.isoTracks_isVetoTrack_v3(); }
+const float &pfmet_uncorr_jup() { return babyAnalyzer.pfmet_uncorr_jup(); }
+const float &pfmet_uncorr_phi_jup() { return babyAnalyzer.pfmet_uncorr_phi_jup(); }
+const float &pfmet_uncorr_jdown() { return babyAnalyzer.pfmet_uncorr_jdown(); }
+const float &pfmet_uncorr_phi_jdown() { return babyAnalyzer.pfmet_uncorr_phi_jdown(); }
+const float &pfmet_resup() { return babyAnalyzer.pfmet_resup(); }
+const float &pfmet_phi_resup() { return babyAnalyzer.pfmet_phi_resup(); }
+const float &pfmet_resdown() { return babyAnalyzer.pfmet_resdown(); }
+const float &pfmet_phi_resdown() { return babyAnalyzer.pfmet_phi_resdown(); }
+const float &pfmet_rl_resup() { return babyAnalyzer.pfmet_rl_resup(); }
+const float &pfmet_phi_rl_resup() { return babyAnalyzer.pfmet_phi_rl_resup(); }
+const float &pfmet_rl_resdown() { return babyAnalyzer.pfmet_rl_resdown(); }
+const float &mt_met_lep_resup() { return babyAnalyzer.mt_met_lep_resup(); }
+const float &mt_met_lep_rl_resup() { return babyAnalyzer.mt_met_lep_rl_resup(); }
+const float &mt_met_lep_resdown() { return babyAnalyzer.mt_met_lep_resdown(); }
+const float &mt_met_lep_rl_resdown() { return babyAnalyzer.mt_met_lep_rl_resdown(); }
+const float &topnessMod_resup() { return babyAnalyzer.topnessMod_resup(); }
+const float &topnessMod_rl_resup() { return babyAnalyzer.topnessMod_rl_resup(); }
+const float &topnessMod_resdown() { return babyAnalyzer.topnessMod_resdown(); }
+const float &topnessMod_rl_resdown() { return babyAnalyzer.topnessMod_rl_resdown(); }
+const float &mindphi_met_j1_j2_resup() { return babyAnalyzer.mindphi_met_j1_j2_resup(); }
+const float &mindphi_met_j1_j2_rl_resup() { return babyAnalyzer.mindphi_met_j1_j2_rl_resup(); }
+const float &mindphi_met_j1_j2_resdown() { return babyAnalyzer.mindphi_met_j1_j2_resdown(); }
+const float &mindphi_met_j1_j2_rl_resdown() { return babyAnalyzer.mindphi_met_j1_j2_rl_resdown(); }
+const float &MT2_ll_resup() { return babyAnalyzer.MT2_ll_resup(); }
+const float &MT2_ll_resdown() { return babyAnalyzer.MT2_ll_resdown(); }
 const int &ph_selectedidx() { return babyAnalyzer.ph_selectedidx(); }
 const float &ph_met() { return babyAnalyzer.ph_met(); }
 const float &ph_met_phi() { return babyAnalyzer.ph_met_phi(); }
