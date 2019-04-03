@@ -68,6 +68,9 @@ public:
     int ntightbtags;
     int nanalysisbtags;
     float ak4_HT;
+    float ak4_HTeta5;
+    float ak4_MHT_pt;
+    float ak4_MHT_phi;
     
     float ak4_htssm;
     float ak4_htosm;

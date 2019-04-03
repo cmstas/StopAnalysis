@@ -3,6 +3,7 @@
 METIS_PATH=~/working/ProjectMetis
 BATCH_DIR=$PWD
 BABYMAKER_DIR=..
+tag=${1}
 
 # Checkout ProjectMetis, if necessary
 if [ -z $METIS_PATH ] && [ ! -d ProjectMetis ]; then
@@ -27,6 +28,7 @@ mkdir $BATCH_DIR/input/ResTopTagger && cp ResTopTagger/*.xml $BATCH_DIR/input/Re
 mkdir $BATCH_DIR/input/TFTopTagger && cp TFTopTagger/*.pb TFTopTagger/*.cfg $BATCH_DIR/input/TFTopTagger
 popd > /dev/null
 tar -czf input.tar.gz input
+[[ ! -z $tag ]] && echo "[setup] Creating tag $tag" && cp input.tar.gz tarfiles/input_$tag.tar.gz
 
 if [ ! -f merge_scripts.tar.gz ]; then
     echo "[setup] Making tarfile for merge scripts."

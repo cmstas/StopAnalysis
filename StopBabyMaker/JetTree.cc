@@ -69,8 +69,11 @@ void JetTree::InitBtagSFTool(bool isFastsim_) {
     TH2D* h_loose_btag_eff_c_temp = NULL;
     TH2D* h_loose_btag_eff_udsg_temp = NULL;
     if(isFastsim){
-      // Created using https://github.com/cmstas/bTagEfficiencyTools. TODO: change to deepCSV version
-      feff =  new TFile("btagsf/run2_fastsim/btageff__SMS-T1bbbb-T1qqqq_25ns_Moriond17.root");
+      // Created using https://github.com/cmstas/bTagEfficiencyTools.
+      if (gconf.year >= 2017)
+        feff =  new TFile("btagsf/run2_fastsim/btageff__SMS-T1tttt_2017_94X_deepCSV.root");
+      else if (gconf.year == 2016)
+        feff =  new TFile("btagsf/run2_fastsim/btageff__SMS-T1tttt_2016_80X_deepCSV.root");
     } else {
       // TODO: create efficiency in the phase space of the stop analysis
       if (gconf.year == 2018)
@@ -186,6 +189,7 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx, Factorize
     int nFailJets=0.;
     unsigned int jindex=0;
     float HT = 0.;
+    float HTeta5 = 0.;
     float JET_PT = 0.;
     int nbtags_med = 0;
     int nbtags_tight = 0;
@@ -197,6 +201,8 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx, Factorize
     float htssm = 0.;
     float htosm = 0.;
     float htratiom = 0.;
+
+    LorentzVector sumMHTp4 = LorentzVector(0,0,0,0);
 
     nskimjets = 0;
     nskimbtagmed = 0;
@@ -320,8 +326,9 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx, Factorize
 
         //Jet selections
         if(p4sCorrJets.at(jindex).pt() < m_ak4_pt_cut) continue;
-        if(fabs(p4sCorrJets.at(jindex).eta()) > m_ak4_eta_cut) continue;
         bool passJetID = (gconf.year < 2017)? isTightPFJetV2(jindex) : isTightPFJet_2017_v1(jindex);
+        if (passJetID && p4sCorrJets.at(jindex).eta() < 5 ) HTeta5 += p4sCorrJets.at(jindex).pt();
+        if(fabs(p4sCorrJets.at(jindex).eta()) > m_ak4_eta_cut) continue;
         if(!passJetID) ++nFailJets;
         if(!isFastsim && m_ak4_passid && !passJetID) continue;
         nskimjets++;
@@ -401,6 +408,7 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx, Factorize
         else htosm = htosm + p4sCorrJets.at(jindex).pt();	
 
         HT = HT + p4sCorrJets.at(jindex).pt();
+        sumMHTp4 -= p4sCorrJets.at(jindex);
 
 	float eff(1.), effloose(1.), efftight(1.);
 	BTagEntry::JetFlavor flavor = BTagEntry::FLAV_UDSG;
@@ -609,6 +617,9 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx, Factorize
     ak4_htosm = htosm;
     htratiom   = htssm / (htosm + htssm);
     ak4_htratiom = htratiom; 
+    ak4_MHT_pt  = sumMHTp4.pt();
+    ak4_MHT_phi = sumMHTp4.phi();
+    ak4_HTeta5 = HTeta5;
 
     nGoodJets = 0;
 
@@ -969,7 +980,10 @@ void JetTree::Reset ()
     nskimbtagtight = -9999;
     ngoodjets     = -9999;  
     nfailjets     = -9999;  
-    ak4_HT 	  = -9999.; 
+    ak4_HT        = -9999.;
+    ak4_HTeta5    = -9999.;
+    ak4_MHT_pt    = -9999.;
+    ak4_MHT_phi   = -9999.;
     nGoodAK8PFJets = -9999;
     nGoodGenJets  = -9999;
     ngoodbtags    = -9999;
@@ -991,6 +1005,9 @@ void JetTree::SetAK4Branches (TTree* tree)
     tree->Branch(Form("%sntightbtags", prefix_.c_str()) , &ntightbtags);
     tree->Branch(Form("%snanalysisbtags", prefix_.c_str()) , &nanalysisbtags);
     tree->Branch(Form("%sak4_HT", prefix_.c_str()) , &ak4_HT);
+    tree->Branch(Form("%sak4_HTeta5", prefix_.c_str()) , &ak4_HTeta5);
+    tree->Branch(Form("%sak4_MHT_pt", prefix_.c_str()) , &ak4_MHT_pt);
+    tree->Branch(Form("%sak4_MHT_phi", prefix_.c_str()) , &ak4_MHT_phi);
     tree->Branch(Form("%sak4_htratiom", prefix_.c_str()) , &ak4_htratiom);
     tree->Branch(Form("%sdphi_ak4pfjet_met", prefix_.c_str()) , &dphi_ak4pfjet_met);
 
