@@ -15,7 +15,6 @@
 #include "TTreeCache.h"
 #include "TGraphAsymmErrors.h"
 
-#include "CMS3.h"
 #include "MCSelections.h"
 #include "StopSelections.h"
 #include "TriggerSelections.h"
@@ -28,6 +27,7 @@
 #include "JetCorrector.h"
 
 // CORE
+#include "CMS3.h"
 #include "Config.h"
 #include "PhotonSelections.h"
 #include "MuonSelections.h"
@@ -169,6 +169,7 @@ void babyMaker::MakeBabyNtuple(const char* output_name){
   if(filltaus)  Taus.SetBranches(BabyTree);
   if(filltracks)  Tracks.SetBranches(BabyTree);
 
+  if(applyMETResCorr) StopEvt.SetMETResBranches(BabyTree);
   if(fillZll)  StopEvt.SetZllBranches(BabyTree);
   if(fillPhoton) StopEvt.SetPhotonBranches(BabyTree);
   if(fillMETfilt) StopEvt.SetMETFilterBranches(BabyTree);
@@ -1116,7 +1117,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
         }
       }
 
-      if(applyMETResCorr){
+      if(applyMETResCorr && !isDataFromFileName){
         StopEvt.pfmet_uncorr = StopEvt.pfmet;
         StopEvt.pfmet_uncorr_phi = StopEvt.pfmet_phi;
         StopEvt.pfmet_uncorr_jup = StopEvt.pfmet_jup;
@@ -1275,8 +1276,12 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
           lep1.dphiMET_jup = getdphi(lep1.p4.Phi(),StopEvt.pfmet_phi_jup);
           lep1.dphiMET_jdown = getdphi(lep1.p4.Phi(),StopEvt.pfmet_phi_jdown);
         }
+        if(applyMETResCorr){
+          lep1.dphiMET_resup = getdphi(lep1.p4.Phi(),StopEvt.pfmet_phi_resup);
+          lep1.dphiMET_resdown = getdphi(lep1.p4.Phi(),StopEvt.pfmet_phi_resdown);
+        }
       }
-      if( nVetoLeptons > 1 ) {
+      if( nVetoLeptons > 1 && fill2ndlep) {
         lep2.dphiMET = getdphi(lep2.p4.Phi(),StopEvt.pfmet_phi);
         if(applyJECfromFile){
           lep2.dphiMET_jup = getdphi(lep2.p4.Phi(),StopEvt.pfmet_phi_jup);
@@ -1833,6 +1838,16 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
         if(nVetoLeptons>0) StopEvt.topnessMod_jdown = CalcTopness_(1,StopEvt.pfmet_jdown,StopEvt.pfmet_phi_jdown,lep1.p4,mybjets_jdown,myaddjets_jdown);
       }
 
+      if(applyMETResCorr && !isDataFromFileName && nVetoLeptons>0){
+        StopEvt.mt_met_lep_resup = calculateMt(lep1.p4, StopEvt.pfmet_resup, StopEvt.pfmet_phi_resup);
+        StopEvt.mt_met_lep_resdown = calculateMt(lep1.p4, StopEvt.pfmet_resdown, StopEvt.pfmet_phi_resdown);
+        if(jets.ngoodjets>1){
+          StopEvt.mindphi_met_j1_j2_resup = getMinDphi(StopEvt.pfmet_phi_resup,jets.ak4pfjets_p4.at(0),jets.ak4pfjets_p4.at(1));
+          StopEvt.mindphi_met_j1_j2_resdown = getMinDphi(StopEvt.pfmet_phi_resdown,jets.ak4pfjets_p4.at(0),jets.ak4pfjets_p4.at(1));
+          StopEvt.topnessMod_resup = CalcTopness_(1,StopEvt.pfmet_resup,StopEvt.pfmet_phi_resup,lep1.p4,mybjets,myaddjets);
+          StopEvt.topnessMod_resdown = CalcTopness_(1,StopEvt.pfmet_resdown,StopEvt.pfmet_phi_resdown,lep1.p4,mybjets,myaddjets);
+        }
+      }
 
       vector<pair<float, int> > rankminDR;
       vector<pair<float, int> > rankminDR_jup;
@@ -2418,6 +2433,27 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
       StopEvt.pfmet_rl     = std::sqrt(new_pfmet_x*new_pfmet_x + new_pfmet_y*new_pfmet_y);
       StopEvt.pfmet_phi_rl = std::atan2(new_pfmet_y, new_pfmet_x);
 
+      if (applyMETResCorr && !isDataFromFileName && nVetoLeptons > 1) {
+        float new_pfmet_x_resup = lep2.p4.px() + (StopEvt.pfmet_resup * std::cos(StopEvt.pfmet_phi_resup));
+        float new_pfmet_y_resup = lep2.p4.py() + (StopEvt.pfmet_resup * std::sin(StopEvt.pfmet_phi_resup));
+        float new_pfmet_x_resdown = lep2.p4.px() + (StopEvt.pfmet_resdown * std::cos(StopEvt.pfmet_phi_resdown));
+        float new_pfmet_y_resdown = lep2.p4.py() + (StopEvt.pfmet_resdown * std::sin(StopEvt.pfmet_phi_resdown));
+        StopEvt.pfmet_rl_resup     = std::sqrt(new_pfmet_x_resup*new_pfmet_x_resup + new_pfmet_y_resup*new_pfmet_y_resup);
+        StopEvt.pfmet_phi_rl_resup = std::atan2(new_pfmet_y_resup, new_pfmet_x_resup);
+        StopEvt.pfmet_rl_resdown     = std::sqrt(new_pfmet_x_resdown*new_pfmet_x_resdown + new_pfmet_y_resdown*new_pfmet_y_resdown);
+        StopEvt.pfmet_phi_rl_resdown = std::atan2(new_pfmet_y_resdown, new_pfmet_x_resdown);
+        StopEvt.mt_met_lep_rl_resup = calculateMt(lep1.p4, StopEvt.pfmet_rl_resup, StopEvt.pfmet_phi_rl_resup);
+        StopEvt.mt_met_lep_rl_resdown = calculateMt(lep1.p4, StopEvt.pfmet_rl_resdown, StopEvt.pfmet_phi_rl_resdown);
+        StopEvt.MT2_ll_resup = CalcMT2_(StopEvt.pfmet_resup,StopEvt.pfmet_phi_resup,lep1.p4,lep2.p4,false,0);
+        StopEvt.MT2_ll_resdown = CalcMT2_(StopEvt.pfmet_resdown,StopEvt.pfmet_phi_resdown,lep1.p4,lep2.p4,false,0);
+        if(jets.ngoodjets>1){
+          StopEvt.mindphi_met_j1_j2_rl_resup = getMinDphi(StopEvt.pfmet_phi_rl_resup,jets.ak4pfjets_p4.at(0),jets.ak4pfjets_p4.at(1));
+          StopEvt.mindphi_met_j1_j2_rl_resdown = getMinDphi(StopEvt.pfmet_phi_rl_resdown,jets.ak4pfjets_p4.at(0),jets.ak4pfjets_p4.at(1));
+          StopEvt.topnessMod_rl_resup = CalcTopness_(1,StopEvt.pfmet_rl_resup,StopEvt.pfmet_phi_rl_resup,lep1.p4,mybjets,myaddjets);
+          StopEvt.topnessMod_rl_resdown = CalcTopness_(1,StopEvt.pfmet_rl_resdown,StopEvt.pfmet_phi_rl_resdown,lep1.p4,mybjets,myaddjets);
+        }
+      }
+
       if (nVetoLeptons > 0) {
         StopEvt.mt_met_lep_rl = calculateMt(lep1.p4, StopEvt.pfmet_rl, StopEvt.pfmet_phi_rl);
         StopEvt.MT2W_rl = CalcMT2W_(mybjets,myaddjets,lep1.p4,StopEvt.pfmet_rl, StopEvt.pfmet_phi_rl);
@@ -2457,6 +2493,10 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
         if(applyJECfromFile){
           lep1.dphiMET_rl_jup = getdphi(lep1.p4.Phi(),StopEvt.pfmet_phi_rl_jup);
           lep1.dphiMET_rl_jdown = getdphi(lep1.p4.Phi(),StopEvt.pfmet_phi_rl_jdown);
+        }
+        if(applyMETResCorr){
+          lep1.dphiMET_rl_resup = getdphi(lep1.p4.Phi(),StopEvt.pfmet_phi_rl_resup);
+          lep1.dphiMET_rl_resdown = getdphi(lep1.p4.Phi(),StopEvt.pfmet_phi_rl_resdown);
         }
       }
       if( nVetoLeptons > 1 ) {

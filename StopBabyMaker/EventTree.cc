@@ -203,6 +203,7 @@ void EventTree::Reset ()
     run = 0;
     ls = 0;
     evt = 0;
+    is_data        = false;
 
     ngoodleps      =  -9999;
     nlooseleps     =  -9999;
@@ -283,6 +284,10 @@ void EventTree::Reset ()
     mindphi_met_j1_j2_jdown= -9999.;
     mindphi_met_j1_j2_rl_jup= -9999.;
     mindphi_met_j1_j2_rl_jdown= -9999.;
+    mindphi_met_j1_j2_resup= -9999.;
+    mindphi_met_j1_j2_resdown= -9999.;
+    mindphi_met_j1_j2_rl_resup= -9999.;
+    mindphi_met_j1_j2_rl_resdown= -9999.;
     mt_met_lep           = -9999.;
     mt_met_lep2          = -9999.;
     mt_met_lep_rl        = -9999.;
@@ -290,8 +295,11 @@ void EventTree::Reset ()
     mt_met_lep_jdown     = -9999.;
     mt_met_lep_rl_jup    = -9999.;
     mt_met_lep_rl_jdown  = -9999.;
+    mt_met_lep_resup     = -9999.;
+    mt_met_lep_resdown   = -9999.;
+    mt_met_lep_rl_resup  = -9999.;
+    mt_met_lep_rl_resdown= -9999.;
     hadronic_top_chi2    = -9999.; 
-    is_data              = false;
 
     topness                = -9999.; 
     topness_lep2           = -9999.; 
@@ -302,9 +310,15 @@ void EventTree::Reset ()
     topnessMod_jdown       = -9999.;
     topnessMod_rl_jup      = -9999.;
     topnessMod_rl_jdown    = -9999.;
+    topnessMod_resup       = -9999.;
+    topnessMod_resdown     = -9999.;
+    topnessMod_rl_resup    = -9999.;
+    topnessMod_rl_resdown  = -9999.;
     MT2_ll                 = -9999.;
     MT2_ll_jup             = -9999.;
     MT2_ll_jdown           = -9999.;
+    MT2_ll_resup           = -9999.;
+    MT2_ll_resdown         = -9999.;
     MT2_lb_b               = -9999.; 
     MT2_lb_b_lep2          = -9999.; 
     MT2_lb_b_mass          = -9999.; 
@@ -623,16 +637,8 @@ void EventTree::SetBranches (TTree* tree)
     tree->Branch("pfmet_phi_rl_jdown", &pfmet_phi_rl_jdown);
     tree->Branch("pfmet_uncorr", &pfmet_uncorr);    
     tree->Branch("pfmet_uncorr_phi", &pfmet_uncorr_phi);
-    tree->Branch("pfmet_uncorr_jup", &pfmet_uncorr_jup);    
-    tree->Branch("pfmet_uncorr_phi_jup", &pfmet_uncorr_phi_jup);
-    tree->Branch("pfmet_uncorr_jdown", &pfmet_uncorr_jdown);    
-    tree->Branch("pfmet_uncorr_phi_jdown", &pfmet_uncorr_phi_jdown);
     tree->Branch("pfmet_original", &pfmet_original);    
     tree->Branch("pfmet_original_phi", &pfmet_original_phi);
-    tree->Branch("pfmet_resup", &pfmet_resup);    
-    tree->Branch("pfmet_phi_resup", &pfmet_phi_resup);
-    tree->Branch("pfmet_resdown", &pfmet_resdown);    
-    tree->Branch("pfmet_phi_resdown", &pfmet_phi_resdown);
     tree->Branch("scale1fb", &scale1fb);
     tree->Branch("xsec", &xsec);
     tree->Branch("xsec_uncert", &xsec_uncert);
@@ -686,6 +692,10 @@ void EventTree::SetBranches (TTree* tree)
     tree->Branch("genweights", &genweights);
     tree->Branch("weight_Q2_up", &weight_Q2_up);
     tree->Branch("weight_Q2_down", &weight_Q2_down);
+    tree->Branch("weight_muF_up", &weight_muF_up);
+    tree->Branch("weight_muF_down", &weight_muF_down);
+    tree->Branch("weight_muR_up", &weight_muR_up);
+    tree->Branch("weight_muR_down", &weight_muR_down);
     tree->Branch("weight_alphas_up", &weight_alphas_up);
     tree->Branch("weight_alphas_down", &weight_alphas_down);
     tree->Branch("weight_btagsf", &weight_btagsf);
@@ -787,6 +797,34 @@ void EventTree::SetBranches (TTree* tree)
     tree->Branch("hardgenpt", &hardgenpt);
     tree->Branch("calomet", &calomet);
     tree->Branch("calomet_phi", &calomet_phi);
+}
+
+void EventTree::SetMETResBranches (TTree* tree) {
+    tree->Branch("pfmet_uncorr_jup", &pfmet_uncorr_jup);
+    tree->Branch("pfmet_uncorr_phi_jup", &pfmet_uncorr_phi_jup);
+    tree->Branch("pfmet_uncorr_jdown", &pfmet_uncorr_jdown);
+    tree->Branch("pfmet_uncorr_phi_jdown", &pfmet_uncorr_phi_jdown);
+    tree->Branch("pfmet_resup", &pfmet_resup);
+    tree->Branch("pfmet_phi_resup", &pfmet_phi_resup);
+    tree->Branch("pfmet_resdown", &pfmet_resdown);
+    tree->Branch("pfmet_phi_resdown", &pfmet_phi_resdown);
+    tree->Branch("pfmet_rl_resup", &pfmet_rl_resup);
+    tree->Branch("pfmet_phi_rl_resup", &pfmet_phi_rl_resup);
+    tree->Branch("pfmet_rl_resdown", &pfmet_rl_resdown);
+    tree->Branch("mt_met_lep_resup", &mt_met_lep_resup);
+    tree->Branch("mt_met_lep_rl_resup", &mt_met_lep_rl_resup);
+    tree->Branch("mt_met_lep_resdown", &mt_met_lep_resdown);
+    tree->Branch("mt_met_lep_rl_resdown", &mt_met_lep_rl_resdown);
+    tree->Branch("topnessMod_resup", &topnessMod_resup);
+    tree->Branch("topnessMod_rl_resup", &topnessMod_rl_resup);
+    tree->Branch("topnessMod_resdown", &topnessMod_resdown);
+    tree->Branch("topnessMod_rl_resdown", &topnessMod_rl_resdown);
+    tree->Branch("mindphi_met_j1_j2_resup", &mindphi_met_j1_j2_resup);
+    tree->Branch("mindphi_met_j1_j2_rl_resup", &mindphi_met_j1_j2_rl_resup);
+    tree->Branch("mindphi_met_j1_j2_resdown", &mindphi_met_j1_j2_resdown);
+    tree->Branch("mindphi_met_j1_j2_rl_resdown", &mindphi_met_j1_j2_rl_resdown);
+    tree->Branch("MT2_ll_resup", &MT2_ll_resup);
+    tree->Branch("MT2_ll_resdown", &MT2_ll_resdown);
 }
 
 void EventTree::SetSecondLepBranches (TTree* tree)

@@ -218,6 +218,10 @@ void LeptonTree::Reset()
     dphiMET_rl= -9999.;
     dphiMET_rl_jup= -9999.;
     dphiMET_rl_jdown= -9999.;
+    dphiMET_resup= -9999.;
+    dphiMET_resdown= -9999.;
+    dphiMET_rl_resup= -9999.;
+    dphiMET_rl_resdown= -9999.;
 
 }
 
@@ -244,7 +248,10 @@ void LeptonTree::SetBranches(TTree* tree)
     tree->Branch(Form("%sdphiMET_rl"   , prefix_.c_str()) , &dphiMET_rl);
     tree->Branch(Form("%sdphiMET_rl_jup"   , prefix_.c_str()) , &dphiMET_rl_jup);
     tree->Branch(Form("%sdphiMET_rl_jdown"   , prefix_.c_str()) , &dphiMET_rl_jdown);
-
+    tree->Branch(Form("%sdphiMET_resup"   , prefix_.c_str()) , &dphiMET_resup);
+    tree->Branch(Form("%sdphiMET_resdown"   , prefix_.c_str()) , &dphiMET_resdown);
+    tree->Branch(Form("%sdphiMET_rl_resup"   , prefix_.c_str()) , &dphiMET_rl_resup);
+    tree->Branch(Form("%sdphiMET_rl_resdown"   , prefix_.c_str()) , &dphiMET_rl_resdown);
 }
 
 

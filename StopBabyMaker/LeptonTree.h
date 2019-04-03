@@ -135,6 +135,10 @@ public:
     float dphiMET_rl;
     float dphiMET_rl_jup;
     float dphiMET_rl_jdown;
+    float dphiMET_resup;
+    float dphiMET_resdown;
+    float dphiMET_rl_resup;
+    float dphiMET_rl_resdown;
 
 
 };

@@ -29,6 +29,7 @@ public:
     void SetBranches (TTree* tree);
     void SetZllBranches (TTree* tree);
     void SetPhotonBranches (TTree* tree);
+    void SetMETResBranches (TTree* tree);
     void SetMETFilterBranches (TTree* tree);
     void SetExtraVariablesBranches (TTree* tree);
     void SetSecondLepBranches (TTree* tree);
@@ -88,12 +89,19 @@ public:
     float MT2W_rl_jdown;
     float topnessMod_rl_jdown;
 
+    float topnessMod_resup;
+    float topnessMod_resdown;
+    float topnessMod_rl_resup;
+    float topnessMod_rl_resdown;
+
     float MT2W_jup;
     float topnessMod_jup;
-    float MT2_ll_jup;
     float MT2W_jdown;
     float topnessMod_jdown;
+    float MT2_ll_jup;
     float MT2_ll_jdown;
+    float MT2_ll_resup;
+    float MT2_ll_resdown;
 
     float MT2_lb_b;
     float MT2_lb_b_lep2;
@@ -145,6 +153,10 @@ public:
     float pfmet_phi_resup;
     float pfmet_resdown;
     float pfmet_phi_resdown;
+    float pfmet_rl_resup;
+    float pfmet_phi_rl_resup;
+    float pfmet_rl_resdown;
+    float pfmet_phi_rl_resdown;
    
     float calomet;
     float calomet_phi;
@@ -189,6 +201,10 @@ public:
     float mindphi_met_j1_j2_rl_jdown;
     float mindphi_met_j1_j2_jup;
     float mindphi_met_j1_j2_jdown;
+    float mindphi_met_j1_j2_rl_resup;
+    float mindphi_met_j1_j2_rl_resdown;
+    float mindphi_met_j1_j2_resup;
+    float mindphi_met_j1_j2_resdown;
     float mt_met_lep;
     float mt_met_lep2;
     float mt_met_lep_rl;
@@ -196,6 +212,10 @@ public:
     float mt_met_lep_rl_jdown;
     float mt_met_lep_jup;
     float mt_met_lep_jdown;
+    float mt_met_lep_rl_resup;
+    float mt_met_lep_rl_resdown;
+    float mt_met_lep_resup;
+    float mt_met_lep_resdown;
 
     float dphi_Wlep;
     float MET_over_sqrtHT;
