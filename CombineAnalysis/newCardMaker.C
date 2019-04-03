@@ -54,6 +54,21 @@ TFile *fznunu;
 TFile *fdata;
 TFile *fsig_genmet;
 
+// Set of systematics
+// vector<string> systNamesCard = {"PUSyst", "BLFSyst", "BHFSyst", "JESSyst", "ISRSyst", "LEffSyst", "LEffFSSyst", "BFSSyst", "MuRFSyst"};
+vector<string> systNames_sig = {"pileup", "bTagEffLF", "bTagEffHF", "jes", "ISR", "lepSF", "lepFSSF", "bTagFSEff", "L1prefire"}; //  "q2" <-- fix this
+// vector<string> systNames_sig = {"bTagEffLF", "bTagEffHF", "jes", "lepSF", }; //  temporary as most ones aren't available
+vector<string> systNames_corr = {"bTagEffHF", "bTagEffLF", "lepSF", "pdf", "q2", "jes", "ISR", "pileup", "alphas", "metRes", "L1prefire"};
+
+// individual systematic uncertainties for different backgrounds
+// vector<string> systNames_bg2l = {"metRes", "ttbarSysPt", "tauSF"};
+vector<string> systNames_bg2l = {"tauSF",};     // temporary
+vector<string> systNames_bg1l = {"CRpurity", "WbXsec"};
+vector<string> systNames_bgZnunu;
+
+///////////////////////
+// Helper functions
+
 // generic function to get yield from histograms
 double getYield(TFile* file, TString hname, int metbin, int m1 = 0, int m2 = 0, int endbin = 0) {
   TH1* hist = (TH1*) file->Get(hname);
@@ -268,8 +283,8 @@ int makeCardForOneBin(TString dir, int mstop, int mlsp, int metbin, int bin, TSt
   // constants uncertainties
   // TODO: numbers to be updated for new analysis
   double triggerrDn = 0.98;
-  if (bin == 1 || bin == 4 || bin == 8 || bin == 11)  // TODO: To use better scheme for these
-    triggerrDn = 0.95;
+  // if (bin == 1 || bin == 4 || bin == 8 || bin == 11)  // TODO: To use better scheme for these
+  //   triggerrDn = 0.95;
   double triggerrUp  = 1.01;
   double lumierr     = 1.025;
   double lepvetoerr  = 1.03;
@@ -327,7 +342,13 @@ int makeCardForOneBin(TString dir, int mstop, int mlsp, int metbin, int bin, TSt
 
   data = getYieldAndError(dataerr, fdata, hname, metbin);
   bg2l = getYieldAndError(bg2lerr, f2l, hname + "_dataStats", metbin);  // <-- look up for the errors
-  bg1l = getYieldAndError(bg1lerr, f1l, hname + "_dataStats", metbin);
+  // Taking 1l estimate directly from MC for top tagged bins
+  bool take1lfromMC = (getYield(f1l, "h_MCyields_CR", 1) == 0);
+  if (take1lfromMC) {
+    bg1l = getYieldAndError(bg1lerr, f1l, hname, metbin);
+  } else {
+    bg1l = getYieldAndError(bg1lerr, f1l, hname + "_dataStats", metbin);
+  }
   bg1ltop = getYieldAndError(bg1ltoperr, f1ltop, hname, metbin);
   bgznunu = getYieldAndError(bgznunuerr, fznunu, hname, metbin);
 
@@ -364,9 +385,6 @@ int makeCardForOneBin(TString dir, int mstop, int mlsp, int metbin, int bin, TSt
   numnuis += addOneUnc(fLogStream, "SigStat",     sigerr,     -1, 0, bin, "lnN"); // <-- revisit the Stats later
 
   if (!nosigsyst && sig > 0) {
-    // vector<string> systNamesCard = {"PUSyst", "BLFSyst", "BHFSyst", "JESSyst", "ISRSyst", "LEffSyst", "LEffFSSyst", "BFSSyst", "MuRFSyst"};
-    // vector<string> systNames_sig = {"pileup", "bTagEffLF", "bTagEffHF", "jes", "ISR", "lepSF", "lepFSSF", "bTagFSEff"}; //  "q2" <-- fix this
-    vector<string> systNames_sig = {"bTagEffLF", "bTagEffHF", "jes", "lepSF", }; //  temporary as most ones aren't available
     for (string syst : systNames_sig) {
       double systUp, systDn;
       getUncertainties(systUp, systDn, osig, fsig, hname_sig+"_"+syst.c_str(), metbin, mstop, mlsp);
@@ -382,23 +400,19 @@ int makeCardForOneBin(TString dir, int mstop, int mlsp, int metbin, int bin, TSt
     numnuis += addOneUnc(fLogStream, "Bg2lMCStat",   bg2lerr, -1, 1, bin, "lnN");
   }
   if (bg1l > 0) {
-    numnuis += addOneUnc(fLogStream, "Bg1lDataStat", bg1lerr, -1, 2, bin, "lnN");
-    getYieldAndError(bg1lerr, f1l, hname + "_MCStats", metbin);
-    numnuis += addOneUnc(fLogStream, "Bg1lMCStat",   bg1lerr, -1, 2, bin, "lnN");
+    if (take1lfromMC) {
+      numnuis += addOneUnc(fLogStream, "Bg1lMCStat", bg1lerr, -1, 2, bin, "lnN"); // MC SR
+    } else {
+      numnuis += addOneUnc(fLogStream, "Bg1lDataStat", bg1lerr, -1, 2, bin, "lnN");
+      getYieldAndError(bg1lerr, f1l, hname + "_MCStats", metbin);
+      numnuis += addOneUnc(fLogStream, "Bg1lMCStat",   bg1lerr, -1, 2, bin, "lnN"); // MC SR+CR
+    }
   }
   if (bg1ltop > 0) numnuis += addOneUnc(fLogStream, "Bg1lTopSyst", bg1ltoperr, -1, 3, bin, "lnN");
   if (bgznunu > 0) numnuis += addOneUnc(fLogStream, "BgZnunuStat", bgznunuerr, -1, 4, bin, "lnN");
 
   if (!nobgsyst) {
     // common systematic uncertainties
-    // vector<string> systNames_corr = {"bTagEffHF", "bTagEffLF", "lepSF", "pdf", "q2", "jes", "ISR", "pileup", "alphas"};
-    vector<string> systNames_corr = {"bTagEffHF", "bTagEffLF", "lepSF", "pdf", "q2", "jes", "pileup", "alphas"}; // temporary
-    // individual systematic uncertainties for different backgrounds
-    // vector<string> systNames_bg2l = {"metRes", "ttbarSysPt", "tauSF"};
-    // vector<string> systNames_bg1l = {"metRes", "CRpurity", "WbXsec"};
-    vector<string> systNames_bg2l = {"tauSF"};     // temporary
-    vector<string> systNames_bg1l = {"CRpurity",}; // temporary
-    vector<string> systNames_bgZnunu;
 
     double dnerr[] = {triggerrDn, -1, -1, triggerrDn, triggerrDn }; // obviously(?) need to swap CR2l sf
     double uperr[] = {triggerrUp, -1, -1, triggerrUp, triggerrUp }; // why 1l[2] has been left out?
@@ -428,7 +442,7 @@ int makeCardForOneBin(TString dir, int mstop, int mlsp, int metbin, int bin, TSt
     for (string syst : systNames_bg2l) {
       double systUp, systDn;
       getUncertainties(systUp, systDn, bg2l, f2l, hname_2l+syst.c_str(), metbin);
-      numnuis += addOneUnc(fLogStream, syst+"Syst2l", systDn, systUp, 0,  -1, "lnN");
+      numnuis += addOneUnc(fLogStream, syst+"Syst2l", systDn, systUp, 1,  -1, "lnN");
     }
     // bg1l
     for (string syst : systNames_bg1l) {
@@ -471,22 +485,23 @@ void makeCardsForPoint(TString signal, int mstop, int mlsp, TString outdir) {
   TList* listOfDirs = fsig->GetListOfKeys();
   string keep = "sr";
   string skip = "srbase";
-  for (auto k : *listOfDirs) {
-    TString dir = k->GetName();
-    if (dir[2] < 'A' || dir[2] > 'I') continue;
-    if (strncmp (dir, keep.c_str(), keep.length()) == 0) { // it is a signal region
-      TString hname = dir + "/h_metbins"; // for met binning information, empty hist for signal output
-      // cout << "Looking at hname  " << hname << endl;
-      TH1D* hist = (TH1D*) fdata->Get(hname);
-      if (!hist) { cout << "Cannot find yield hist " << hname << " in " << fdata->GetName() << endl; continue; }
-      int n_metbins = hist->GetNbinsX();
-      for (int ibin = 1; ibin <= n_metbins; ++ibin, ++nbintot) {
-        // Make a separate card for each met bin.
-        TString anName = (dir.Contains("srI"))? "compressed" : "std";
-        if (dir == "srI" && nbintot > 10) nbintot = 1;  // temporary solution to recount for corridor
-        TString cardname = outdir + Form("/datacard_%s_%s_%d_%d_bin%d.txt", anName.Data(), signal.Data(), mstop, mlsp, nbintot);
-        makeCardForOneBin(dir, mstop, mlsp, ibin, nbintot, cardname);
-      }
+  // for (auto k : *listOfDirs) {
+  //   TString dir = k->GetName();
+  //   if (dir[2] < 'A' || dir[2] > 'J') continue;
+  //   if (strncmp (dir, keep.c_str(), keep.length()) != 0) continue; // it is a signal region
+  for (TString dir : {"srA0", "srA1", "srA2", "srB", "srC", "srD", "srE0", "srE1", "srE2", "srE3", "srF", "srG0", "srG1", "srG2", "srG3", "srH", "srI", "srJ"}) {
+    // Fixed SRs for Run2 legacy analysis
+    TString hname = dir + "/h_metbins"; // for met binning information, empty hist for signal output
+    // cout << "Looking at hname  " << hname << endl;
+    TH1D* hist = (TH1D*) fdata->Get(hname);
+    if (!hist) { cout << "Cannot find yield hist " << hname << " in " << fdata->GetName() << endl; continue; }
+    int n_metbins = hist->GetNbinsX();
+    TString anName = (dir == "srI")? "tcor" : (dir == "srJ")? "Wcor" : "std";
+    if (dir == "srI" || dir == "srJ") nbintot = 1;  // temporary solution to recount for corridor
+    for (int ibin = 1; ibin <= n_metbins; ++ibin, ++nbintot) {
+      // Make a separate card for each met bin.
+      TString cardname = outdir + Form("/datacard_%s_%s_%d_%d_bin%d.txt", anName.Data(), signal.Data(), mstop, mlsp, nbintot);
+      makeCardForOneBin(dir, mstop, mlsp, ibin, nbintot, cardname);
     }
   }
 }

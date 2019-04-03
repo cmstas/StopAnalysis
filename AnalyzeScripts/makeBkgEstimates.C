@@ -2,7 +2,7 @@
 bool useMetExtrapolation = true;
 double extr_threshold = 5;  // minimum number of events in a bin to not need an MET extrapolation
 bool doCRPurityError = true;
-double extr_TFcap = 10;  // maximum value for the transfer factor to not do MET extrapolation
+double extr_TFcap = 3;  // maximum value for the transfer factor to not do MET extrapolation
 double maxFractionForMC = 0.10;  // minimum value for bkg fraction in SR to do extrapolation, else take from MC
 
 void dataDrivenFromCR(TFile* fdata, TFile* fmc, TFile* fout, TString ddtype, TString gentype) {
@@ -12,7 +12,9 @@ void dataDrivenFromCR(TFile* fdata, TFile* fmc, TFile* fout, TString ddtype, TSt
   for (auto k : *listOfDirs) {
     TString srname = k->GetName();
     if (!srname.Contains("sr")) continue;
-    if (srname.Contains("base")) continue;
+    if (srname.Contains("base") || srname.Contains("incl") || srname.Contains("sb")) continue;
+    if (ddtype == "cr0b" && (srname.EndsWith("2") || srname.EndsWith("3"))) continue;
+
     TString crname = srname;
     crname.ReplaceAll("sr", ddtype);
 
@@ -176,7 +178,8 @@ void takeDirectlyFromMC(TFile* fin, TFile* fout, TString gentype) {
   for (auto k : *listOfDirs) {
     TString srname = k->GetName();
     if (!srname.Contains("sr")) continue;
-    if (srname.Contains("base")) continue;
+    if (srname.Contains("base") || srname.Contains("incl") || srname.Contains("sb")) continue;
+    if (gentype == "_1lepW" && !srname.EndsWith("2") && !srname.EndsWith("3")) continue;
 
     auto indir = (TDirectoryFile*) fin->Get(srname);
     auto outdir = (TDirectory*) fout->mkdir(srname);
@@ -272,6 +275,7 @@ int makeBkgEstimates(string input_dir="../StopLooper/output/temp14", string outp
   useMetExtrapolation=MetExtrFor0b;
   dataDrivenFromCR(fdata, fbkg, f1l, "cr0b", "_1lepW");
 
+  takeDirectlyFromMC(fbkg, f1l,    "_1lepW");  // only for top-tagged bins
   takeDirectlyFromMC(fbkg, f1ltop, "_1lepTop");
   takeDirectlyFromMC(fbkg, fznunu, "_Znunu");
 
