@@ -1,4 +1,6 @@
 #include "eventWeight.h"
+#include <algorithm>
+#include <numeric>
 
 using namespace stop1l;
 
@@ -1720,48 +1722,88 @@ void evtWgtInfo::getMetTTbarWeight( double &weight_metTTbar, double &weight_metT
   // Find SF
   //
 
-  // Region B
-  if ( nGoodJets<4 && modTopness>=10.0 && mlb>=175.0 && nTightTags>=1 ) {
-    if ( met>450.0 && met<600.0 ) {
-      sf_val = 1.00;
-      sf_err = 0.24;
-    } else if ( met>=600.0 ) {
-      sf_val = 0.99;
-      sf_err = 0.39;
-    }
+  // -------------------------------------------------
+  // cremuA1/h_rlmetbinA : Data/MC = 0.388  nData 1 = 51  nData 2 = 11
+  // 600.0: 1.072 +- 0.155
+  // 750.0: 0.763 +- 0.236
+  // -------------------------------------------------
+  // cremuA1/h_rlmetbinB : Data/MC = 0.551  nData 1 = 452  nData 2 = 21
+  // 450.0: 1.022 +- 0.051
+  // 700.0: 0.681 +- 0.153
+  // -------------------------------------------------
+  // cremuA1/h_rlmetbinC : Data/MC = 0.382  nData 1 = 33  nData 2 = 3
+  // 650.0: 1.221 +- 0.221
+  // 800.0: 0.335 +- 0.195
+  // -------------------------------------------------
+  // cremuA1/h_rlmetbinE : Data/MC = 0.551  nData 1 = 411  nData 2 = 62
+  // 450.0: 1.068 +- 0.056
+  // 600.0: 0.704 +- 0.092
+  // -------------------------------------------------
+  // cremuA1/h_rlmetbinG : Data/MC = 0.448  nData 1 = 110  nData 2 = 11
+  // 550.0: 1.054 +- 0.105
+  // 750.0: 0.661 +- 0.205
+  // -------------------------------------------------
+  // cremuA1/h_rlmetbinH : Data/MC = 0.66  nData 1 = 9592  nData 2 = 240
+  // 250.0: 1.007 +- 0.011
+  // 500.0: 0.785 +- 0.053
+  // -------------------------------------------------
+  // cremuA1/h_rlmetbinI : Data/MC = 0.448  nData 1 = 110  nData 2 = 11
+  // 550.0: 1.054 +- 0.105
+  // 750.0: 0.661 +- 0.205
+  // -------------------------------------------------
+  // cremuA1/h_rlmetbinJ : Data/MC = 0.551  nData 1 = 352  nData 2 = 121
+  // 450.0: 1.086 +- 0.061
+  // 550.0: 0.813 +- 0.077
+
+  bool passlmet_corr = (lep1_p4().pt() < 50) || (lep1_p4().pt() < (250 - 100*lep1_dphiMET_rl()));
+
+  // cremuA1/h_rlmetbinA : Data/MC = 0.388  nData 1 = 51  nData 2 = 11
+  if ( nGoodJets<4 && modTopness>=10.0 && mlb<175.0 ) {
+    if ( met > 600.0 ) { sf_val = 1.072; sf_err = 0.155; }
+    if ( met > 750.0 ) { sf_val = 0.763; sf_err = 0.236; }
+  }
+  // -------------------------------------------------
+  // cremuA1/h_rlmetbinB : Data/MC = 0.551  nData 1 = 452  nData 2 = 21
+  else if ( nGoodJets<4 && modTopness>=10.0 && mlb>175.0 && nTightTags) {
+    if ( met > 450.0) { sf_val = 1.022; sf_err = 0.051; }
+    if ( met > 700.0) { sf_val = 0.681; sf_err = 0.153; }
+  }
+  // -------------------------------------------------
+  // cremuA1/h_rlmetbinC : Data/MC = 0.382  nData 1 = 33  nData 2 = 3
+  else if ( nGoodJets>=4 && modTopness<0.0 && mlb<175.0 ) {
+    if ( met > 650.0) { sf_val = 1.221; sf_err = 0.221; }
+    if ( met > 800.0) { sf_val = 0.335; sf_err = 0.195; }
+  }
+  // -------------------------------------------------
+  // cremuA1/h_rlmetbinE : Data/MC = 0.551  nData 1 = 411  nData 2 = 62
+  else if ( nGoodJets>=4 && modTopness>=0.0 && modTopness<10.0 && mlb<175.0 ) {
+    if ( met > 450.0) { sf_val = 1.068; sf_err = 0.056; }
+    if ( met > 600.0) { sf_val = 0.704; sf_err = 0.092; }
+  }
+  // -------------------------------------------------
+  // cremuA1/h_rlmetbinG : Data/MC = 0.448  nData 1 = 110  nData 2 = 11
+  else if ( nGoodJets>=4 && modTopness>=10.0 && mlb<175.0 ) {
+    if ( met > 550.0) { sf_val = 1.054; sf_err = 0.105; }
+    if ( met > 750.0) { sf_val = 0.661; sf_err = 0.205; }
+  }
+  // -------------------------------------------------
+  // cremuA1/h_rlmetbinH : Data/MC = 0.66  nData 1 = 9592  nData 2 = 240
+  else if ( nGoodJets>=4 && modTopness>=10.0 && mlb>175.0 && nTightTags) {
+    if ( met > 250.0) { sf_val = 1.007; sf_err = 0.011; }
+    if ( met > 500.0) { sf_val = 0.785; sf_err = 0.053; }
   }
 
-  // Region E
-  if ( nGoodJets>=4 && modTopness>=0.0 && modTopness<10.0 && mlb<175.0 ) {
-    if ( met>350.0 && met<550.0 ) {
-      sf_val = 1.04;
-      sf_err = 0.10;
-    } else if ( met>=550.0 ) {
-      sf_val = 0.62;
-      sf_err = 0.18;
-    }
+  // -------------------------------------------------
+  // cremuA1/h_rlmetbinI : Data/MC = 0.448  nData 1 = 110  nData 2 = 11
+  else if ( nGoodJets>=5 && passlmet_corr ) {
+    if ( met > 550.0) { sf_val = 1.054; sf_err = 0.105; }
+    if ( met > 750.0) { sf_val = 0.661; sf_err = 0.205; }
   }
-
-  // Region F
-  if ( nGoodJets>=4 && modTopness>=0.0 && modTopness<10.0 && mlb>=175.0 && nTightTags>=1 ) {
-    if ( met>250.0 && met<450.0 ) {
-      sf_val = 1.02;
-      sf_err = 0.05;
-    } else if ( met>=450.0 ) {
-      sf_val = 0.62;
-      sf_err = 0.10;
-    }
-  }
-
-  // Region H
-  if ( nGoodJets>=4 && modTopness>=10.0 && mlb>=175.0 && nTightTags>=1) {
-    if ( met>250.0 && met<450.0 ) {
-      sf_val = 1.02;
-      sf_err = 0.05;
-    } else if ( met>=450.0 ) {
-      sf_val = 0.62;
-      sf_err = 0.10;
-    }
+  // -------------------------------------------------
+  // cremuA1/h_rlmetbinJ : Data/MC = 0.551  nData 1 = 352  nData 2 = 121
+  else if ( nGoodJets>=5 && passlmet_corr && nsoftbtags() > 0 ) {
+    if ( met > 450.0) { sf_val = 1.086; sf_err = 0.061; }
+    if ( met > 550.0) { sf_val = 0.813; sf_err = 0.077; }
   }
 
   // 50% uncertainty on difference between no sf and applying it
@@ -1840,6 +1882,72 @@ void evtWgtInfo::getTTbarSysPtSF( double &weight_ttbarSysPt, double &weight_ttba
   weight_ttbarSysPt    = sf_val;
   weight_ttbarSysPt_up = (sf_val + sf_err );
   weight_ttbarSysPt_dn = (sf_val - sf_err );
+
+}
+
+//////////////////////////////////////////////////////////////////////
+
+void evtWgtInfo::getNjetTTbarPtSF( double &weight_njttbarpt, double &weight_njttbarpt_up, double &weight_njttbarpt_dn ) {
+
+  weight_njttbarpt    = 1.0;
+  weight_njttbarpt_up = 1.0;
+  weight_njttbarpt_dn = 1.0;
+
+  if ( !is2lep() ) return;
+  if ( nvetoleps() < 2 ) return;
+  if ( ngoodjets() < 2) return;
+
+  // Get ttbar/tW system pT
+  LorentzVector system_p4 = lep1_p4() + lep2_p4();
+
+  // Highest DeepCSV Jet
+  vector<size_t> jetidx( ak4pfjets_p4().size() );
+  std::iota(jetidx.begin(), jetidx.end(), 0);
+  std::sort(jetidx.begin(), jetidx.end(), [&](size_t i, size_t j) {
+    return ak4pfjets_deepCSV().at(i) > ak4pfjets_deepCSV().at(j);
+  });
+  system_p4 += ak4pfjets_p4().at(jetidx.at(0)) + ak4pfjets_p4().at(jetidx.at(1));
+
+  // Met
+  LorentzVector met_p4( pfmet()*cos(pfmet_phi()), pfmet()*sin(pfmet_phi()), 0.0, pfmet() );
+
+  // Get system Pt
+  double system_pt = system_p4.Pt();
+
+  const vector<double> ptcats = {0, 50, 100, 150, 200, 250, 350, 450, 600, 1500};
+  vector<vector<double>> sfvals;
+  sfvals.emplace_back(ptcats.size()-1, 1.0);  // 0
+  sfvals.emplace_back(ptcats.size()-1, 1.0);  // 1
+  sfvals.push_back(vector<double>{ 1.047, 1.017, 1.046, 1.069, 0.907, 0.890, 0.840, 0.841, 0.342}); // 2
+  sfvals.push_back(vector<double>{ 1.060, 0.991, 0.950, 0.913, 0.917, 0.995, 0.975, 0.959, 0.801}); // 3
+  sfvals.push_back(vector<double>{ 1.065, 0.980, 0.903, 0.874, 0.858, 0.870, 0.857, 0.832, 0.939}); // 4
+  sfvals.push_back(vector<double>{ 1.017, 0.925, 0.904, 0.890, 0.832, 0.893, 0.651, 0.948, 0.435}); // 5
+  sfvals.push_back(vector<double>{ 1.058, 0.935, 0.871, 0.829, 0.792, 0.880, 0.889, 0.742, 0.719}); // 6
+  sfvals.push_back(vector<double>{ 1.058, 0.935, 0.871, 0.829, 0.792, 0.880, 0.889, 0.742, 0.719}); // 7
+  sfvals.push_back(vector<double>{ 1.294, 0.824, 0.773, 0.936, 1.034, 0.629, 0.791, 0.909, 0.373}); // 8
+
+  vector<vector<double>> sferrs;
+  sferrs.emplace_back(ptcats.size()-1, 1.0);  // 0
+  sferrs.emplace_back(ptcats.size()-1, 1.0);  // 1
+  sferrs.push_back(vector<double>{ 0.006, 0.008, 0.018, 0.035, 0.054, 0.067, 0.146, 0.275, 0.458}); // 2
+  sferrs.push_back(vector<double>{ 0.012, 0.009, 0.012, 0.018, 0.027, 0.032, 0.057, 0.086, 0.144}); // 3
+  sferrs.push_back(vector<double>{ 0.024, 0.016, 0.016, 0.021, 0.028, 0.030, 0.049, 0.071, 0.131}); // 4
+  sferrs.push_back(vector<double>{ 0.049, 0.031, 0.029, 0.032, 0.039, 0.040, 0.052, 0.086, 0.097}); // 5
+  sferrs.push_back(vector<double>{ 0.101, 0.060, 0.050, 0.051, 0.055, 0.054, 0.077, 0.090, 0.129}); // 6
+  sferrs.push_back(vector<double>{ 0.101, 0.060, 0.050, 0.051, 0.055, 0.054, 0.077, 0.090, 0.129}); // 7
+  sferrs.push_back(vector<double>{ 0.563, 0.243, 0.210, 0.237, 0.240, 0.150, 0.223, 0.262, 0.232}); // 8
+
+  int icat = std::upper_bound(ptcats.begin(), ptcats.end(), std::min(system_pt, 800.0)) - ptcats.begin() - 1;
+  int njet = std::min(ngoodjets(), 8);
+ 
+  double sf_val = sfvals.at(njet).at(icat);
+  double sf_err = sferrs.at(njet).at(icat);
+
+  weight_njttbarpt    = sf_val;
+  weight_njttbarpt_up = (sf_val + sf_err );
+  weight_njttbarpt_dn = (sf_val - sf_err );
+
+  if (weight_njttbarpt_dn < 0) weight_njttbarpt_dn = 0.;
 
 }
 
@@ -2278,6 +2386,7 @@ evtWgtInfo::SampleType evtWgtInfo::findSampleType( string samplestr ) {
 
   if (sample.BeginsWith("data")) samptype = data;
   else if (sample.BeginsWith("ttbar") || sample.BeginsWith("TTJets")) samptype = ttbar;
+  else if (sample.BeginsWith("TTTo")) samptype = ttbar;
   else if (sample.BeginsWith("t_") || sample.BeginsWith("ST_")) samptype = singletop;
   else if (sample.BeginsWith("ttW") || sample.BeginsWith("TTW")) samptype = ttW;
   else if (sample.BeginsWith("ttZ") || sample.BeginsWith("TTZ")) samptype = ttZ;
@@ -2344,7 +2453,7 @@ void evtWgtInfo::setDefaultSystematics( int syst_set, bool isfastsim ) {
       apply_tau_sf         = true;
       apply_topPt_sf       = false;  // false=uncertainty, but not to be used
       apply_metRes_sf      = false;  // not controlled here anymore
-      apply_metTTbar_sf    = false;
+      apply_metTTbar_sf    = true;
       apply_ttbarSysPt_sf  = false;  // false=uncertainty, need to be updated
       apply_WbXsec_sf      = true;   // to be verified?
       apply_ISR_sf         = true;   // 2017 & 2018 to be updated

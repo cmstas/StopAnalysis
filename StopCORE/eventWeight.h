@@ -305,6 +305,7 @@ class evtWgtInfo {
   void getMetResWeight_corridor( double &weight_metRes, double &weight_metRes_up, double &weight_metRes_dn );
   void getMetTTbarWeight( double &weight_metTTbar, double &weight_metTTbar_up, double &weight_metTTbar_dn );
   void getTTbarSysPtSF( double &weight_ttbarSysPt, double &weight_ttbarSysPt_up, double &weight_ttbarSysPt_dn );
+  void getNjetTTbarPtSF( double &weight_njttbarpt, double &weight_njttbarpt_up, double &weight_njttbart_dn );
   void getNuPtSF( double &weight_nuPt_up, double &weight_nuPt_dn );
   void getWwidthSF( double &weight_Wwidth_up, double &weight_Wwidth_dn );
   void getWbXSecSF( double &weight_WbXsec_up, double &weight_WbXsec_dn );
