@@ -319,29 +319,121 @@ std::vector<SR> getStopCrosscheckRegionsEMuRun2() {
   cr.SetVar(nbjet, 2, fInf);
   CRvec.emplace_back(cr);
 
+  cr.SetName("cremuA3");
+  cr.SetDetailName("ge2j_2b_met50toInf");
+  cr.SetVar(nbjet, 2, 3);
+  CRvec.emplace_back(cr);
+
   cr.SetName("cremuB1");
-  cr.SetDetailName("ge2j_ge1b_met50toInf_mt0to150");
+  cr.SetDetailName("2to3j_ge1b_met50toInf");
+  cr.SetVar(njet, 2, 4);
   cr.SetVar(nbjet, 1, fInf);
   CRvec.emplace_back(cr);
 
-  cr.SetVar(mt, 150, fInf);
-  cr.SetName("cremuC0");
-  cr.SetDetailName("ge2j_0b_met50toInf_mt150toInf");
-  cr.SetVar(nbjet, 0, 1);
+  cr.SetName("cremuB2");
+  cr.SetDetailName("ge4j_ge1b_met50toInf");
+  cr.SetVar(njet, 4, fInf);
+  cr.SetVar(nbjet, 1, fInf);
   CRvec.emplace_back(cr);
 
-  cr.SetName("cremuC1");
-  cr.SetDetailName("ge2j_1b_met50toInf_mt150toInf");
-  cr.SetVar(nbjet, 1, 2);
+  cr.SetName("cremuB3");
+  cr.SetDetailName("ge5j_ge1b_met50toInf");
+  cr.SetVar(njet, 5, fInf);
+  cr.SetVar(nbjet, 1, fInf);
   CRvec.emplace_back(cr);
 
-  cr.SetName("cremuC2");
-  cr.SetDetailName("ge2j_ge2b_met50toInf_mt150toInf");
-  cr.SetVar(nbjet, 2, fInf);
-  CRvec.emplace_back(cr);
+  // // SRs
+  // cr.SetName("cremuA");
+  // cr.SetDetailName("2to3j_ge1b_met50toInf_tmod10toInf_mlb0to175");
+  // cr.SetVar(njet, 2, 4);
+  // cr.SetVar(nbjet, 1, fInf);
+  // cr.SetVar(mlb, 0, 175);
+  // cr.SetVar(tmod, 10, fInf);
+  // cr.SetMETBins({50, 100, 150, 200, 250, 350, 450, 600, 750, 1500});
+  // CRvec.emplace_back(cr);
 
-  cr.SetVar(mt, 0, fInf);
-  cr.SetVar(tmod, 0, 10);
+  // cr.SetName("cremuB");
+  // cr.SetDetailName("2to3j_ge1b_met50toInf_tmod10toInf_mlb175toInf");
+  // cr.SetVar(njet, 2, 4);
+  // cr.SetVar(nbjet, 1, fInf);
+  // cr.SetVar(mlb, 175, fInf);
+  // cr.SetVar(tmod, 10, fInf);
+  // cr.SetMETBins({50, 100, 150, 200, 250, 450, 700, 1500});
+  // CRvec.emplace_back(cr);
+
+  // cr.SetName("cremuC");
+  // cr.SetDetailName("ge4j_ge1b_met50toInf_tmodInfto0_mlb0to175");
+  // cr.SetVar(njet, 4, fInf);
+  // cr.SetVar(nbjet, 1, fInf);
+  // cr.SetVar(mlb, 0, 175);
+  // cr.SetVar(tmod, -fInf, 0);
+  // cr.SetMETBins({50, 100, 150, 200, 250, 350, 450, 550, 650, 800, 1500});
+  // CRvec.emplace_back(cr);
+
+  // cr.SetName("cremuE");
+  // cr.SetDetailName("ge4j_ge1b_met50toInf_tmod0to10_mlb0to175");
+  // cr.SetVar(njet, 4, fInf);
+  // cr.SetVar(nbjet, 1, fInf);
+  // cr.SetVar(mlb, 0, 175);
+  // cr.SetVar(tmod, 0, 10);
+  // cr.SetMETBins({50, 100, 150, 200, 250, 350, 450, 600, 1500});
+  // CRvec.emplace_back(cr);
+
+  // cr.SetName("cremuG");
+  // cr.SetDetailName("ge4j_ge1b_met50toInf_tmod10toInf_mlb0to175");
+  // cr.SetVar(njet, 4, fInf);
+  // cr.SetVar(nbjet, 1, fInf);
+  // cr.SetVar(mlb, 0, 175);
+  // cr.SetVar(tmod, 0, 10);
+  // cr.SetMETBins({50, 100, 150, 200, 250, 350, 450, 550, 750, 1500});
+  // CRvec.emplace_back(cr);
+
+  // cr.SetName("cremuH");
+  // cr.SetDetailName("ge4j_ge1b_met50toInf_tmod10toInf_mlb175toInf");
+  // cr.SetVar(njet, 4, fInf);
+  // cr.SetVar(nbjet, 1, fInf);
+  // cr.SetVar(mlb, 0, 175);
+  // cr.SetVar(tmod, 0, 10);
+  // cr.SetMETBins({50, 100, 150, 200, 250, 500, 800, 1500});
+  // CRvec.emplace_back(cr);
+
+  // cr.SetName("cremuI");
+  // cr.SetDetailName("ge5j_ge1b_met50toInf");
+  // cr.SetVar(njet, 5, fInf);
+  // cr.SetVar(nbjet, 1, fInf);
+  // cr.RemoveVar(mlb);
+  // cr.RemoveVar(tmod);
+  // cr.SetVar(passlmetcor, 1, 2);
+  // cr.SetVar(j1passbtag, 0, 1);  // Require j1 not b-tagged
+  // cr.SetMETBins({50, 100, 150, 200, 250, 350, 450, 550, 750, 1500});
+  // CRvec.emplace_back(cr);
+
+  // cr.SetName("cremuJ");
+  // cr.SetDetailName("ge5j_ge1b_met50toInf");
+  // cr.SetVar(njet, 5, fInf);
+  // cr.SetVar(nbjet, 0, fInf);
+  // cr.SetVar(nsbtag, 1, fInf);
+  // cr.SetMETBins({50, 100, 150, 200, 250, 350, 450, 550, 800, 1500});
+  // CRvec.emplace_back(cr);
+
+  // cr.SetVar(mt, 150, fInf);
+  // cr.SetName("cremuC0");
+  // cr.SetDetailName("ge2j_0b_met50toInf_mt150toInf");
+  // cr.SetVar(nbjet, 0, 1);
+  // CRvec.emplace_back(cr);
+
+  // cr.SetName("cremuC1");
+  // cr.SetDetailName("ge2j_1b_met50toInf_mt150toInf");
+  // cr.SetVar(nbjet, 1, 2);
+  // CRvec.emplace_back(cr);
+
+  // cr.SetName("cremuC2");
+  // cr.SetDetailName("ge2j_ge2b_met50toInf_mt150toInf");
+  // cr.SetVar(nbjet, 2, fInf);
+  // CRvec.emplace_back(cr);
+
+  // cr.SetVar(mt, 0, fInf);
+  // cr.SetVar(tmod, 0, 10);
 
   // cr.SetName("cremuD0");
   // cr.SetDetailName("ge2j_0b_met50toInf_tmod0to10");
@@ -353,17 +445,17 @@ std::vector<SR> getStopCrosscheckRegionsEMuRun2() {
   // cr.SetVar(nbjet, 1, fInf);
   // CRvec.emplace_back(cr);
 
-  cr.SetVar(tmod, 10, fInf);
+  // cr.SetVar(tmod, 10, fInf);
 
-  cr.SetName("cremuE0");
-  cr.SetDetailName("ge2j_0b_met50toInf_tmod10toInf");
-  cr.SetVar(nbjet, 0, 1);
-  CRvec.emplace_back(cr);
+  // cr.SetName("cremuE0");
+  // cr.SetDetailName("ge2j_0b_met50toInf_tmod10toInf");
+  // cr.SetVar(nbjet, 0, 1);
+  // CRvec.emplace_back(cr);
 
-  cr.SetName("cremuE1");
-  cr.SetDetailName("ge2j_ge1b_met50toInf_tmod10toInf");
-  cr.SetVar(nbjet, 1, fInf);
-  CRvec.emplace_back(cr);
+  // cr.SetName("cremuE1");
+  // cr.SetDetailName("ge2j_ge1b_met50toInf_tmod10toInf");
+  // cr.SetVar(nbjet, 1, fInf);
+  // CRvec.emplace_back(cr);
 
 
   return CRvec;
