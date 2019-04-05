@@ -46,7 +46,8 @@ inline void zeroOutNegativeYields(TH1* hist) {
   int nbin = hist->GetNbinsX();
   for (int ibin = 1; ibin <= nbin; ++ibin) {
     if (hist->GetBinContent(ibin) < 0) {
-      cout << "Reverting negative yield " << hist->GetBinContent(ibin) << " in: " << hist->GetTitle() << " bin " << ibin << "to 0!" << endl;
+      if (string(hist->GetName()).find("h_metbins_") == string::npos)  // only print out for central hist
+        cout << "Reverting negative yield " << hist->GetBinContent(ibin) << " in: " << hist->GetTitle() << " bin " << ibin << " to 0!" << endl;
       hist->SetBinContent(ibin, 0);
       // hist->SetBinError(ibin, 0); // should we set the error to 0 also?
     }
