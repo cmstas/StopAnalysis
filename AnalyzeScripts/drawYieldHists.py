@@ -6,32 +6,39 @@ import sys
 from math import sqrt
 import ROOT as r
 import numpy as np
+import pyRootPlotMaker.ppmUtils as ppu
 from utilities.errors import *
 from utilities.yields_utils import *
 
+def GetSystRatioGraph(h_mc, h_data, g_ratio, drawZeros=True, useMCErr=True):
+    pass
 
-def GetPoissonRatioGraph(h_mc, h_data, g_ratio, drawZeros=True, useMCErr=True):
-    alpha = 1-0.6827
-    for i in range(1,h_mc.GetNbinsX()+1):
-        x = h_mc.GetBinCenter(i)
-        mcy = h_mc.GetBinContent(i)
-        datay = h_data.GetBinContent(i)
-        if mcy==0 or (datay==0 and not drawZeros):
-            continue
-        mcerr = h_mc.GetBinError(i)
-        if not useMCErr:
-            mcerr = 0
-        dataerrup = r.Math.gamma_quantile_c(alpha/2, datay+1, 1) - datay
-        dataerrdown = 0 if datay==0 else (datay-r.Math.gamma_quantile(alpha/2, datay, 1))
+def GetSystTemporary(bkgtype, systype):
+    if bkgtype == 'lostlep':
+        systups = {
+            'ISRUp'       : [ 0.006,   0.014,   0.003,   0.010,   0.005,   0.002,   0.001,   0.001,   0.012,   0.021,   0.029,   0.002,   0.001,   0.012,   0.014,   0.037,   0.070,   0.044,   0.001,   0.001,   0.006,   0.019,   0.051,   0.010,   0.000,   0.030,   0.025,   0.065,   0.023,   0.057,   0.086,   0.003,   0.004,   0.000,   0.000,   0.078,   0.069,   0.078,   0.022 ],
+            'alphasUp'    : [ 0.065,   0.095,   0.000,   0.000,   0.066,   0.009,   0.022,   0.021,   0.001,   0.001,   0.005,   0.019,   0.036,   0.000,   0.000,   0.044,   0.030,   0.047,   0.045,   0.001,   0.016,   0.000,   0.000,   0.015,   0.000,   0.035,   0.046,   0.069,   0.023,   0.025,   0.055,   0.021,   0.024,   0.000,   0.000,   0.042,   0.063,   0.039,   0.007 ],
+            'bTagEffHFUp' : [ 0.017,   0.028,   0.002,   0.000,   0.001,   0.004,   0.027,   0.014,   0.001,   0.003,   0.002,   0.015,   0.001,   0.001,   0.000,   0.007,   0.037,   0.004,   0.039,   0.002,   0.005,   0.006,   0.014,   0.002,   0.000,   0.002,   0.014,   0.017,   0.010,   0.004,   0.016,   0.007,   0.005,   0.000,   0.000,   0.017,   0.019,   0.002,   0.019 ],
+            'bTagEffLFUp' : [ 0.003,   0.002,   0.003,   0.006,   0.001,   0.009,   0.047,   0.050,   0.006,   0.007,   0.003,   0.003,   0.023,   0.011,   0.002,   0.000,   0.013,   0.005,   0.009,   0.000,   0.003,   0.009,   0.026,   0.009,   0.000,   0.007,   0.003,   0.000,   0.009,   0.001,   0.002,   0.004,   0.001,   0.000,   0.000,   0.036,   0.031,   0.054,   0.235 ],
+            'jesUp'       : [ 0.011,   0.025,   0.028,   0.001,   0.043,   0.044,   0.041,   0.042,   0.008,   0.008,   0.015,   0.018,   0.054,   0.005,   0.009,   0.007,   0.001,   0.041,   0.343,   0.007,   0.037,   0.030,   0.102,   0.037,   0.000,   0.128,   0.169,   0.063,   0.018,   0.041,   0.034,   0.091,   0.009,   0.000,   0.000,   0.999,   0.151,   0.030,   0.068 ],
+            'lepSFUp'     : [ 0.009,   0.000,   0.018,   0.005,   0.009,   0.011,   0.006,   0.003,   0.019,   0.051,   0.022,   0.010,   0.011,   0.027,   0.040,   0.019,   0.002,   0.015,   0.018,   0.019,   0.009,   0.008,   0.003,   0.032,   0.000,   0.022,   0.009,   0.003,   0.018,   0.019,   0.022,   0.044,   0.095,   0.000,   0.000,   0.060,   0.059,   0.334,   0.006 ],
+            'pileupUp'    : [ 0.125,   0.088,   0.005,   0.004,   0.035,   0.041,   0.107,   0.007,   0.002,   0.005,   0.008,   0.055,   0.027,   0.002,   0.003,   0.011,   0.056,   0.044,   0.074,   0.007,   0.001,   0.047,   0.041,   0.012,   0.000,   0.006,   0.194,   0.011,   0.018,   0.047,   0.036,   0.007,   0.064,   0.000,   0.000,   0.072,   0.056,   0.065,   0.039 ],
+            'q2Up'        : [ 0.009,   0.005,   0.000,   0.000,   0.018,   0.009,   0.004,   0.020,   0.001,   0.002,   0.004,   0.004,   0.011,   0.000,   0.000,   0.015,   0.003,   0.015,   0.000,   0.001,   0.014,   0.000,   0.000,   0.005,   0.000,   0.020,   0.005,   0.305,   0.001,   0.012,   0.036,   0.001,   0.013,   0.000,   0.000,   0.017,   0.005,   0.025,   0.026 ],
+            'tauSFUp'     : [ 0.009,   0.008,   0.005,   0.004,   0.005,   0.005,   0.009,   0.009,   0.006,   0.006,   0.006,   0.007,   0.006,   0.005,   0.006,   0.007,   0.011,   0.007,   0.006,   0.004,   0.005,   0.003,   0.003,   0.003,   0.000,   0.002,   0.011,   0.000,   0.005,   0.015,   0.015,   0.008,   0.005,   0.000,   0.000,   0.006,   0.006,   0.005,   0.002 ],
+        }
+        systdns = {
+            'ISRDn'       :  [ 0.007,   0.016,   0.004,   0.011,   0.005,   0.002,   0.001,   0.001,   0.016,   0.030,   0.040,   0.003,   0.002,   0.017,   0.019,   0.050,   0.113,   0.057,   0.007,   0.001,   0.009,   0.028,   0.083,   0.014,   0.000,   0.038,   0.032,   0.089,   0.032,   0.079,   0.130,   0.003,   0.005,   0.000,   0.000,   0.092,   0.084,   0.115,   0.026 ],
+            'alphasDn'    :  [ 0.039,   0.027,   0.000,   0.000,   0.007,   0.029,   0.008,   0.004,   0.001,   0.014,   0.021,   0.027,   0.030,   0.000,   0.000,   0.002,   0.038,   0.030,   0.030,   0.002,   0.001,   0.000,   0.000,   0.026,   0.000,   0.014,   0.078,   0.039,   0.029,   0.022,   0.018,   0.013,   0.021,   0.000,   0.000,   0.020,   0.012,   0.045,   0.013 ],
+            'bTagEffHFDn' :  [ 0.017,   0.027,   0.002,   0.000,   0.001,   0.004,   0.027,   0.014,   0.001,   0.003,   0.002,   0.016,   0.001,   0.001,   0.000,   0.007,   0.035,   0.004,   0.036,   0.002,   0.005,   0.006,   0.014,   0.002,   0.000,   0.002,   0.016,   0.016,   0.011,   0.003,   0.016,   0.007,   0.005,   0.000,   0.000,   0.017,   0.019,   0.002,   0.020 ],
+            'bTagEffLFDn' :  [ 0.003,   0.002,   0.003,   0.006,   0.001,   0.009,   0.054,   0.054,   0.006,   0.007,   0.003,   0.004,   0.022,   0.011,   0.002,   0.000,   0.013,   0.005,   0.009,   0.000,   0.002,   0.009,   0.028,   0.009,   0.000,   0.007,   0.003,   0.000,   0.009,   0.001,   0.001,   0.004,   0.001,   0.000,   0.000,   0.035,   0.031,   0.051,   0.191 ],
+            'jesDn'       :  [ 0.013,   0.029,   0.009,   0.072,   0.176,   0.003,   0.037,   0.052,   0.005,   0.004,   0.004,   0.001,   0.011,   0.010,   0.006,   0.062,   0.061,   0.079,   0.082,   0.034,   0.020,   0.017,   0.009,   0.019,   0.000,   0.066,   0.556,   0.123,   0.042,   0.032,   0.094,   0.001,   0.058,   0.000,   0.000,   0.086,   0.297,   0.021,   0.078 ],
+            'lepSFDn'     :  [ 0.030,   0.025,   0.055,   0.031,   0.051,   0.047,   0.040,   0.025,   0.059,   0.094,   0.064,   0.051,   0.053,   0.066,   0.081,   0.057,   0.040,   0.056,   0.063,   0.059,   0.050,   0.031,   0.039,   0.074,   0.000,   0.056,   0.036,   0.044,   0.059,   0.061,   0.069,   0.087,   0.159,   0.000,   0.000,   0.103,   0.102,   0.558,   0.040 ],
+            'pileupDn'    :  [ 0.172,   0.098,   0.005,   0.009,   0.034,   0.063,   0.109,   0.031,   0.001,   0.009,   0.013,   0.056,   0.053,   0.002,   0.002,   0.020,   0.058,   0.030,   0.179,   0.007,   0.000,   0.019,   0.059,   0.011,   0.000,   0.001,   0.161,   0.049,   0.006,   0.066,   0.042,   0.007,   0.057,   0.000,   0.000,   0.044,   0.074,   0.069,   0.057 ],
+            'q2Dn'        :  [ 0.013,   0.014,   0.000,   0.000,   0.020,   0.011,   0.004,   0.025,   0.002,   0.002,   0.003,   0.002,   0.008,   0.000,   0.000,   0.019,   0.004,   0.024,   0.002,   0.000,   0.015,   0.000,   0.000,   0.009,   0.000,   0.025,   0.006,   0.320,   0.004,   0.014,   0.040,   0.001,   0.016,   0.000,   0.000,   0.021,   0.001,   0.034,   0.036 ],
+            'tauSFDn'     :  [ 0.009,   0.008,   0.005,   0.004,   0.005,   0.005,   0.009,   0.009,   0.006,   0.006,   0.006,   0.007,   0.006,   0.005,   0.006,   0.007,   0.012,   0.007,   0.006,   0.004,   0.006,   0.003,   0.003,   0.003,   0.000,   0.002,   0.011,   0.000,   0.006,   0.015,   0.015,   0.008,   0.005,   0.000,   0.000,   0.006,   0.006,   0.005,   0.002 ],
+        }
 
-        ratio = datay/mcy
-        rerrup = r.TMath.Sqrt((dataerrup/mcy)**2 + (mcerr*datay/mcy**2)**2)
-        rerrdown = r.TMath.Sqrt((dataerrdown/mcy)**2 + (mcerr*datay/mcy**2)**2)
-
-        xerr = h_mc.GetBinWidth(i)/2
-        thisPoint = g_ratio.GetN()
-        g_ratio.SetPoint(thisPoint, x, ratio)
-        g_ratio.SetPointError(thisPoint, xerr, xerr, rerrdown, rerrup)
+        return systups.get(systype), systdns.get(systype)
 
 def getLabelsTemporary(srNames):
 
@@ -121,14 +128,17 @@ def getLabelsTemporary(srNames):
         'I:[450,550]',
         'I:[550,750]',
         'I:[750,+#infty]',
-        # 'I:[550,+#infty]',
+        'J:[250,350]',
+        'J:[350,450]',
+        'J:[450,550]',
+        'J:[550,+#infty]',
     ]
 
-    if len(srNames) == 17:
+    if len(srNames) == 18:
         return std_labels+cor_labels
     elif len(srNames) == 16:
         return std_labels
-    elif len(srNames) == 12:
+    elif len(srNames) == 13:
         return cr0b_labels+cor_labels
     elif len(srNames) == 11:
         return cr0b_labels
@@ -213,8 +223,8 @@ def drawSRyieldHist(hist, xlabels, hleg=None, savename='sigYieldHist.pdf', drawo
 
     c0.SaveAs(savename)
 
-def drawSRyieldStack(hstk, xlabels, legitems=None, savename='sigYieldHist.pdf', drawops='hist', linear=False, hline=None, 
-                     hdata=None, hsigs=None, ytitle='N Events', noRatio=False, noBkgError=False):
+def drawSRyieldStack(hstk, xlabels, legitems=None, savename='sigYieldHist.pdf', drawops='hist', linear=False, hline=None,
+                     hdata=None, hsigs=None, gsyst=None, ytitle='N Events', noRatio=False, noBkgError=False, yrange=None):
 
     r.gStyle.SetOptStat('')
     r.gStyle.SetPadGridX(0)
@@ -267,6 +277,8 @@ def drawSRyieldStack(hstk, xlabels, legitems=None, savename='sigYieldHist.pdf', 
     htot.GetYaxis().SetTitleOffset(0.5)
     htot.GetYaxis().SetTitleSize(0.06)
     htot.GetYaxis().SetRangeUser(0.1, 5000)
+    if yrange != None:
+        htot.GetYaxis().SetRangeUser(yrange[0], yrange[1])
     # htot.GetYaxis().SetRangeUser(0.0001, 10)
 
     htot.Draw(drawops)
@@ -280,10 +292,19 @@ def drawSRyieldStack(hstk, xlabels, legitems=None, savename='sigYieldHist.pdf', 
         h_err.Draw("E2same")
 
     if hdata != None:
-        hdata.SetMarkerStyle(20)
-        hdata.SetMarkerSize(1.2)
-        hdata.SetLineWidth(2)
-        hdata.Draw('PEsame')
+        g_data = r.TGraphAsymmErrors()
+        ppu.ConvertToPoissonGraph(hdata, g_data, drawZeros=True)
+        # g_data.SetPointError(g_data.GetN()-1, 0, 0, 0, 0)
+        g_data.SetMarkerStyle(20)
+        g_data.SetMarkerSize(1.2)
+        g_data.SetLineWidth(1)
+
+        # draw the graph and then axes again on top
+        g_data.Draw("SAME P")
+
+        # hdata.SetMarkerStyle(20)
+        # hdata.SetMarkerSize(1.2)
+        # hdata.Draw('PEsame')
 
     if type(hsigs) == list:
         sig_colors = [  r.kTeal, r.kPink, r.kCyan, r.kGray+2,]
@@ -298,10 +319,10 @@ def drawSRyieldStack(hstk, xlabels, legitems=None, savename='sigYieldHist.pdf', 
         if width < 1000:
             # leg = r.TLegend(0.65, 0.64, 0.91, 0.89)
             leg = r.TLegend(0.58, 0.78, 0.89, 0.89)
-        if len(legitems) > 2: 
+        if len(legitems) > 2:
             leg.SetNColumns(2)
         if hdata != None:
-            leg = r.TLegend(0.52, 0.76, 0.82, 0.89)
+            leg = r.TLegend(0.49, 0.76, 0.76, 0.89)
             leg.SetNColumns(3)
         for i in range(len(legitems)-1, -1, -1):
             leg.AddEntry(hstk.GetHists().At(i), legitems[i], 'lf')
@@ -317,7 +338,7 @@ def drawSRyieldStack(hstk, xlabels, legitems=None, savename='sigYieldHist.pdf', 
         h_axis_ratio.GetYaxis().SetTitleSize(0.22)
         h_axis_ratio.GetYaxis().SetNdivisions(4)
         h_axis_ratio.GetYaxis().SetLabelSize(0.15)
-        h_axis_ratio.GetYaxis().SetRangeUser(0, 2)
+        h_axis_ratio.GetYaxis().SetRangeUser(0, 3)
         h_axis_ratio.GetYaxis().SetTitle('Ratios  ')
         h_axis_ratio.GetYaxis().SetTitleOffset(0.5)
         h_axis_ratio.GetXaxis().SetTickLength(0.07)
@@ -325,22 +346,31 @@ def drawSRyieldStack(hstk, xlabels, legitems=None, savename='sigYieldHist.pdf', 
         h_axis_ratio.GetXaxis().SetLabelSize(0.)
         h_axis_ratio.Draw('axis')
 
+        line = r.TF1('line1', '1', 0, len(xlabels)+1)
+        line.SetLineStyle(2)
+        line.SetLineColor(r.kGray+2)
+        line.Draw('same')
+
+        if gsyst != None:
+            gsyst.SetFillStyle(1001)
+            gsyst.SetFillColor(r.kGray)
+            gsyst.Draw('same 2')
+            line.Draw('same')
+            h_axis_ratio.Draw('axissame')
+
         hRatio = hdata.Clone('h_ratio')
         # hRatio.Divide(hdata, htot, 1, 1, 'B')
         hRatio.Divide(htot)
         ratioGraph = r.TGraphAsymmErrors()
-        GetPoissonRatioGraph(htot,hdata,ratioGraph)
+        for i in range(1, htot.GetNbinsX()+1):
+            htot.SetBinError(i, 0)
+        ppu.GetPoissonRatioGraph(htot,hdata,ratioGraph)
         ratioGraph.SetMarkerStyle(20)
         ratioGraph.SetMarkerSize(1.6)
         ratioGraph.SetMarkerColor(r.kGray+3)
         ratioGraph.SetLineColor(r.kGray+3)
         ratioGraph.SetLineWidth(2)
         ratioGraph.Draw('PZsame')
-
-        line = r.TF1('line1', '0.92', 0, len(xlabels)+1)
-        line.SetLineStyle(2)
-        line.SetLineColor(r.kGray+2)
-        line.Draw('same')
 
     c0.SaveAs(savename)
     c0.Clear()
@@ -394,10 +424,10 @@ def drawBkgCompositionStack(indir, srNames=None, savename='bkgCompostion_std.pdf
     y_1lW  = [ y.round(2) for y in sum(getYieldEInTopoBins(f_bkg, srNames, 'metbins_1lepW'), []) ]
     y_Zinv = [ y.round(2) for y in sum(getYieldEInTopoBins(f_bkg, srNames, 'metbins_Znunu'), []) ]
 
-    h_2lep = getSRHistFromYieldE(y_2lep, 'h_SRyields_2lep', '', fcolor=r.kAzure+7)
-    h_1lW  = getSRHistFromYieldE(y_1lW , 'h_SRyields_1lW' , '', fcolor=r.kOrange-2)
+    h_2lep = getSRHistFromYieldE(y_2lep, 'h_SRyields_2lep', '', fcolor=r.kAzure+6)
+    h_1lW  = getSRHistFromYieldE(y_1lW , 'h_SRyields_1lW' , '', fcolor=r.kOrange-4)
     h_1lt  = getSRHistFromYieldE(y_1lt , 'h_SRyields_1lt' , '', fcolor=r.kRed-7)
-    h_Zinv = getSRHistFromYieldE(y_Zinv, 'h_SRyields_Zinv', '', fcolor=r.kMagenta-3)
+    h_Zinv = getSRHistFromYieldE(y_Zinv, 'h_SRyields_Zinv', '', fcolor=r.kViolet-8)
 
     hstk = r.THStack('hs1', '')
     if 'cr0b' in srNames[0]:
@@ -433,24 +463,25 @@ def drawBkgCompositionStack(indir, srNames=None, savename='bkgCompostion_std.pdf
     f_bkg.Close()
 
 
-def drawBkgPredictionStack(indir, srNames=None, savename='bkgPrediction_std.pdf', plotData=False):
+def drawBkgPredictionStack(indir, srNames=None, savename='bkgPrediction_std.pdf', ysuf='run2', plotData=False):
 
     # -------------------------------------------------------
     # Draw test bkg composition / expected yields hists
     if srNames == None:
         srNames = ['srA0', 'srA1', 'srA2', 'srB', 'srC','srD', 'srE0', 'srE1', 'srE2', 'srE3', 'srF', 'srG0', 'srG1', 'srG2', 'srG3', 'srH', 'srI',]
 
-    f_lostlep = r.TFile(indir+'/lostlepton_run2.root','read')
-    f_1lepW   = r.TFile(indir+'/1lepFromW_run2.root','read')
-    f_1lepTop = r.TFile(indir+'/1lepFromTop_run2.root','read')
-    f_Zinv    = r.TFile(indir+'/ZToNuNu_run2.root','read')
+    f_lostlep = r.TFile(indir+'/lostlepton_'+ysuf+'.root','read')
+    f_1lepW   = r.TFile(indir+'/1lepFromW_'+ysuf+'.root','read')
+    f_1lepTop = r.TFile(indir+'/1lepFromTop_'+ysuf+'.root','read')
+    f_Zinv    = r.TFile(indir+'/ZToNuNu_'+ysuf+'.root','read')
 
     # y_all  = [ y.round(2) for y in sum(getYieldEInTopoBins(f_bkg, srNames, 'metbins'), []) ]
 
-    y_2lep = [ y.round(2) for y in sum(getYieldEInTopoBins(f_lostlep, srNames, 'metbins'), []) ]
-    y_1lt  = [ y.round(2) for y in sum(getYieldEInTopoBins(f_1lepTop, srNames, 'metbins'), []) ]
-    y_1lW  = [ y.round(2) for y in sum(getYieldEInTopoBins(f_1lepW,   srNames, 'metbins'), []) ]
-    y_Zinv = [ y.round(2) for y in sum(getYieldEInTopoBins(f_Zinv,    srNames, 'metbins'), []) ]
+    y_2lep = [ y.round(4) for y in sum(getYieldEInTopoBins(f_lostlep, srNames, 'metbins'), []) ]
+    y_1lt  = [ y.round(4) for y in sum(getYieldEInTopoBins(f_1lepTop, srNames, 'metbins'), []) ]
+    y_1lW  = [ y.round(4) for y in sum(getYieldEInTopoBins(f_1lepW,   srNames, 'metbins'), []) ]
+    y_Zinv = [ y.round(4) for y in sum(getYieldEInTopoBins(f_Zinv,    srNames, 'metbins'), []) ]
+    y_tot  = [ (y1+y2+y3+y4) for y1, y2, y3, y4 in zip(y_2lep, y_1lt, y_1lW, y_Zinv)]
 
     h_2lep = getSRHistFromYieldE(y_2lep, 'h_SRyields_lostlep' , '', fcolor=r.kAzure+8)
     h_1lW  = getSRHistFromYieldE(y_1lW , 'h_SRyields_1lepTop' , '', fcolor=r.kOrange-2)
@@ -466,13 +497,59 @@ def drawBkgPredictionStack(indir, srNames=None, savename='bkgPrediction_std.pdf'
 
     xlabels = getLabelsTemporary(srNames)
 
+    if ysuf == '16': yrange = [0.05, 1000]
+
+    systup = [0.0,]*len(y_tot)
+    systdn = [0.0,]*len(y_tot)
+    for s in ['MC','data']:
+        stat_2lep = [ y.round(4) for y in sum(getYieldEInTopoBins(f_lostlep, srNames, 'metbins_'+s+'Stats'), []) ]
+        stat_1lt  = y_1lt
+        stat_1lW  = [ y.round(4) for y in sum(getYieldEInTopoBins(f_1lepW,   srNames, 'metbins_'+s+'Stats'), []) ]
+        stat_Zinv = y_Zinv
+        stat_tot = [ y1+y2+y3+y4 for y1, y2, y3, y4 in zip(stat_2lep, stat_1lt, stat_1lW, stat_Zinv)]
+        for i in range(len(systup)):
+            if stat_tot[i].val <= 0:
+                staterr = y_tot[i].err/ y_tot[i].val
+            else:
+                staterr = stat_tot[i].err / stat_tot[i].val
+            systup[i] = sqrt(systup[i]**2 + staterr**2)
+            systdn[i] = systup[i]
+
+    # systs = ['jes','metRes', 'lepSF','alphas', 'q2', 'ISR',  'WbXsec', 'pdf', 'tauSF']
+    systs = ['jes','metRes', 'lepSF', 'ISR',]
+    # systs = ['jes','metRes', ]
+
+    for sys in systs:
+        sysup_2lep = [ y.round(4).val for y in sum(getYieldEInTopoBins(f_lostlep, srNames, 'metbins_'+sys+'Up'), []) ]
+        sysup_1lt  = [ y.round(4).val for y in sum(getYieldEInTopoBins(f_1lepTop, srNames, 'metbins_'+sys+'Up'), []) ]
+        sysup_1lW  = [ y.round(4).val for y in sum(getYieldEInTopoBins(f_1lepW,   srNames, 'metbins_'+sys+'Up'), []) ]
+        sysup_Zinv = [ y.round(4).val for y in sum(getYieldEInTopoBins(f_Zinv,    srNames, 'metbins_'+sys+'Up'), []) ]
+        sysup_tot = [ y1+y2+y3+y4 for y1, y2, y3, y4 in zip(sysup_2lep, sysup_1lt, sysup_1lW, sysup_Zinv)]
+        for i in range(len(systup)):
+            systup[i] = sqrt(systup[i]**2 + (sysup_tot[i]/y_tot[i].val-1)**2)
+
+        sysdn_2lep = [ y.round(4).val for y in sum(getYieldEInTopoBins(f_lostlep, srNames, 'metbins_'+sys+'Dn'), []) ]
+        sysdn_1lt  = [ y.round(4).val for y in sum(getYieldEInTopoBins(f_1lepTop, srNames, 'metbins_'+sys+'Dn'), []) ]
+        sysdn_1lW  = [ y.round(4).val for y in sum(getYieldEInTopoBins(f_1lepW,   srNames, 'metbins_'+sys+'Dn'), []) ]
+        sysdn_Zinv = [ y.round(4).val for y in sum(getYieldEInTopoBins(f_Zinv,    srNames, 'metbins_'+sys+'Dn'), []) ]
+        sysdn_tot = [ y1+y2+y3+y4 for y1, y2, y3, y4 in zip(sysdn_2lep, sysdn_1lt, sysdn_1lW, sysdn_Zinv)]
+        for i in range(len(systdn)):
+            systdn[i] = sqrt(systdn[i]**2 + (1-sysdn_tot[i]/y_tot[i].val)**2)
+
+    if systs != None:
+        g_sys = r.TGraphAsymmErrors()
+        for i in range(len(systup)):
+            thisPoint = g_sys.GetN()
+            g_sys.SetPoint(thisPoint, i+0.5, 1)
+            g_sys.SetPointError(thisPoint, 0.5, 0.5, systup[i], systdn[i])
+
     if plotData:
-        f_data = r.TFile(indir+'/allData_run2.root')
+        f_data = r.TFile(indir+'/allData_'+ysuf+'.root')
         y_data = [ y.round(2) for y in sum(getYieldEInTopoBins(f_data, srNames, 'metbins'), []) ]
         h_data = getSRHistFromYieldE(y_data, 'h_SRyields_yields', '', fcolor=r.kBlack)
-        drawSRyieldStack(hstk, xlabels, legname, savename, 'hist', hdata=h_data)
+        drawSRyieldStack(hstk, xlabels, legname, savename, 'hist', hdata=h_data, gsyst=g_sys, yrange=yrange)
     else:
-        drawSRyieldStack(hstk, xlabels, legname, savename, 'hist')
+        drawSRyieldStack(hstk, xlabels, legname, savename, 'hist', yrange=yrange)
 
     f_lostlep.Close()
     f_1lepW.Close()
@@ -607,13 +684,11 @@ def drawYieldsRatioComparison(srNames=None, savename='srYieldCompare_METResOnvsO
     drawSRyieldHist(hrat_bkg,  xlabels, 'noleg', savename, 'PE', True, [0.6, 1.4], 1)
 
 
-if __name__ == '__main__':
+def drawAllPlots():
 
-    r.gROOT.SetBatch(1)
-
-    bvsuf = 'v39_m4'
-    # indir = '../StopLooper/output/combRun2_'+bvsuf
-    indir = '../StopLooper/output/samp17_v39_mrs2'
+    bvsuf = 'v39_s8'
+    indir = '../StopLooper/output/combRun2_'+bvsuf
+    # indir = '../StopLooper/output/samp17_v39_mrs2'
 
     # f18 = r.TFile('../StopLooper/output/samp18_'+bvsuf+'/lostlepton_18.root')
     # f17 = r.TFile('../StopLooper/output/samp17_'+bvsuf+'/lostlepton_17.root')
@@ -626,28 +701,48 @@ if __name__ == '__main__':
     # drawBkgEstimateHists(f17, srNames, '17')
     # drawBkgEstimateHists(f16, srNames, '16')
 
-    srNames = ['srA0', 'srA1', 'srA2', 'srB', 'srC', 'srD', 'srE0', 'srE1', 'srE2', 'srE3', 'srF', 'srG0', 'srG1', 'srG2', 'srG3', 'srH', 'srI',]
-    # drawBkgCompositionStack(indir, srNames, 'bkgCompostion_all.pdf')
+    srNames = ['srA0', 'srA1', 'srA2', 'srB', 'srC', 'srD', 'srE0', 'srE1', 'srE2', 'srE3', 'srF', 'srG0', 'srG1', 'srG2', 'srG3', 'srH', 'srI', 'srJ',]
+    drawBkgCompositionStack(indir, srNames, 'SRCompostion_all.pdf')
 
     # drawYieldsRatioComparison()
 
     # drawBkgEstimateHists(indir, srNames, 'run2', 'lostlep')
 
     crNames = [ sr.replace('sr', 'cr2l') for sr in srNames ]
-    # drawBkgCompositionStack(indir, crNames, 'CR2lYields_all_mrs2.pdf', plotData=True)
+    drawBkgCompositionStack(indir, crNames, 'CR2lYields_all.pdf', plotData=True)
 
     # drawYieldsRatioComparison(crNames, 'cr2lYieldCompare_METResOnvsOff_17.pdf')
 
-    # srNames = ['srA0', 'srA1', 'srB', 'srC', 'srD', 'srE0', 'srE1', 'srF', 'srG0', 'srG1', 'srH', 'srI',]
+    srNames = ['srA0', 'srA1', 'srB', 'srC', 'srD', 'srE0', 'srE1', 'srF', 'srG0', 'srG1', 'srH', 'srI', 'srJ',]
     # drawBkgEstimateHists(indir, srNames, 'run2', '1lepW')
 
     crNames = [ sr.replace('sr', 'cr0b') for sr in srNames ]
-    # drawBkgCompositionStack(indir, crNames, 'CR0bYields_all_mrs2.pdf', plotData=True)
+    drawBkgCompositionStack(indir, crNames, 'CR0bYields_all.pdf', plotData=True)
 
     # drawYieldsRatioComparison(crNames, 'cr0bYieldCompare_METResOnvsOff_17.pdf')
 
-    # srNames = ['srA0', 'srA1', 'srA2', 'srB', 'srC', 'srD', 'srE0', 'srE1', 'srE2', 'srE3', 'srF', 'srG0', 'srG1', 'srG2', 'srG3', 'srH',]
-    # drawBkgPredictionStack(indir, srNames, 'bkgPrediction_std.pdf')
+    # # # # # # # # # # # # # # #
+    # Data driven predictions
+    srNames = ['srA0', 'srA1', 'srA2', 'srB', 'srC', 'srD', 'srE0', 'srE1', 'srE2', 'srE3', 'srF', 'srG0', 'srG1', 'srG2', 'srG3', 'srH', 'srI', 'srJ',]
+    drawBkgPredictionStack(indir, srNames, 'bkgPrediction_all.pdf')
+
+    exit()
+    # # # # # # # # # # # # # # #
+    # Standard search bins only
+
+    srNames = ['srA0', 'srA1', 'srA2', 'srB', 'srC', 'srD', 'srE0', 'srE1', 'srE2', 'srE3', 'srF', 'srG0', 'srG1', 'srG2', 'srG3', 'srH', ]
+    drawBkgCompositionStack(indir, srNames, 'SRCompostion_std.pdf')
+
+    crNames = [ sr.replace('sr', 'cr2l') for sr in srNames ]
+    drawBkgCompositionStack(indir, crNames, 'CR2lYields_std.pdf', plotData=True)
+
+    srNames = ['srA0', 'srA1', 'srB', 'srC', 'srD', 'srE0', 'srE1', 'srF', 'srG0', 'srG1', 'srH', ]
+    # drawBkgEstimateHists(indir, srNames, 'run2', '1lepW')
+
+    crNames = [ sr.replace('sr', 'cr0b') for sr in srNames ]
+    drawBkgCompositionStack(indir, crNames, 'CR0bYields_std.pdf', plotData=True)
+
+    drawBkgPredictionStack(indir, srNames, 'bkgPrediction_std.pdf')
 
     # drawBkgCompositionStack(indir, srNames, 'bkgCompostion_all.pdf')
     # drawBkgCompositionStack(['srI',], 'bkgCompostion_cor6.pdf')
@@ -655,5 +750,34 @@ if __name__ == '__main__':
     # drawBkgCompositionStack(['cr0bI'], 'CR0bCompostion_cor6.pdf')
 
     # drawL1prefireEffect()
-    drawHEMVetoEffect()
+    # drawHEMVetoEffect()
 
+    # # # # # # # # # # # # # # #
+    # Year separated
+
+    indir16 = '../StopLooper/output/samp16_'+bvsuf
+    indir17 = '../StopLooper/output/samp17_'+bvsuf
+    indir18 = '../StopLooper/output/samp18_'+bvsuf
+
+    srNames = ['srA0', 'srA1', 'srA2', 'srB', 'srC', 'srD', 'srE0', 'srE1', 'srE2', 'srE3', 'srF', 'srG0', 'srG1', 'srG2', 'srG3', 'srH', 'srI', 'srJ',]
+    drawBkgCompositionStack(indir16, srNames, 'SRCompostion_2016_all.pdf')
+
+    crNames = [ sr.replace('sr', 'cr0b') for sr in srNames ]
+    drawBkgCompositionStack(indir16, crNames, 'CR0bYields_2016_all.pdf', plotData=True)
+
+
+
+if __name__ == '__main__':
+
+    r.gROOT.SetBatch(1)
+
+    bvsuf = 'v30_m2'
+    indir = '../StopLooper/output/combRun2_'+bvsuf
+    indir16 = '../StopLooper/output/samp16_'+bvsuf
+
+    srNames = ['srA0', 'srA1', 'srA2', 'srB', 'srC', 'srD', 'srE0', 'srE1', 'srE2', 'srE3', 'srF', 'srG0', 'srG1', 'srG2', 'srG3', 'srH', 'srI', 'srJ',]
+    drawBkgPredictionStack(indir16, srNames, 'bkgPrediction_2016.pdf', '16', plotData=True)
+
+    bkgnames = ['2l', '1lW', 'znunu',  '1ltop',]
+    systnames = ['jes', 'metTTbar', ]
+    # GetUncertaintiesFromDatacard('../CombineAnalysis/datacards/scan_samp16_v39_m9/combinedcards/datacard_std_T2tt_1250_50.txt', bkgnames, systnames, True)

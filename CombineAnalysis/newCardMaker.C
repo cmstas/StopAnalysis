@@ -33,9 +33,9 @@ const bool correlated = true;
 // do subtract signal contamination from CR? default: true
 const bool dosigcont = true;
 // do average with yields using genmet for signal? default: true
-const bool dogenmet = true;
+const bool dogenmet = false;
 // test without real data?
-const bool fakedata = true;
+const bool fakedata = false;
 // test without background systematics?
 const bool nobgsyst = false;
 // test without signal systematics?
@@ -62,7 +62,7 @@ vector<string> systNames_corr = {"bTagEffHF", "bTagEffLF", "lepSF", "pdf", "q2",
 
 // individual systematic uncertainties for different backgrounds
 // vector<string> systNames_bg2l = {"metRes", "ttbarSysPt", "tauSF"};
-vector<string> systNames_bg2l = {"tauSF",};     // temporary
+vector<string> systNames_bg2l = {"tauSF","metTTbar"};
 vector<string> systNames_bg1l = {"CRpurity", "WbXsec"};
 vector<string> systNames_bgZnunu;
 

@@ -61,6 +61,8 @@ void dataDrivenFromCR(TFile* fdata, TFile* fmc, TFile* fout, TString ddtype, TSt
         double TFval = hist_MC_SR->GetBinContent(extr_start_bin) / yldCR;
         if (yldCR > extr_threshold && (TFval < extr_TFcap)) break;
       }
+      if (gentype == "_2lep" && (srname == "srE2" || srname == "srG2")) extr_start_bin = lastbin; // temporary hack for 2016
+      if (gentype == "_2lep" && (srname == "srH")) extr_start_bin = 1; // temporary hack for 2016
       if (extr_start_bin != lastbin) {
         cout << "Doing MET extrapolation for  " << crname << "  from bin " << lastbin << " (last bin) to bin " << extr_start_bin << "!" << endl;
         hist_data_CR->Clone("h_datayields_CR_raw")->Write();
@@ -90,11 +92,19 @@ void dataDrivenFromCR(TFile* fdata, TFile* fmc, TFile* fout, TString ddtype, TSt
         hist_MC_SR = (TH1D*) fmc->Get(hname_MC_SR)->Clone(hnameSR);
       }
 
+      auto alphaHist = (TH1D*) hist_MC_SR->Clone(hname+"_alpha");
       if (useMetExtrapolation && extr_start_bin != lastbin) {
+        // To take the MET distribution from the CR
+        double cerr_SR = 0;
+        double cyld_SR = alphaHist->IntegralAndError(extr_start_bin, -1, cerr_SR);
+        double cyld_CR = hist_MC_CR->Integral(extr_start_bin, -1);
+        for (int ibin = extr_start_bin; ibin <= lastbin; ++ibin) {
+          double metfrac = hist_MC_CR->GetBinContent(ibin) / cyld_CR;
+          alphaHist->SetBinContent(ibin, metfrac * cyld_SR);
+          alphaHist->SetBinError(ibin, metfrac * cerr_SR);
+        }
         combineYieldsInExtrBins(hist_MC_CR);
       }
-
-      auto alphaHist = (TH1D*) hist_MC_SR->Clone(hname+"_alpha");
       alphaHist->Divide(hist_MC_CR);
 
       for (int i = 1; i <= alphaHist->GetNbinsX(); ++i) {
