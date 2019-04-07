@@ -56,12 +56,14 @@ def getYieldAndErrsFromTopoSRs(f, srNames, hname='metbins', suf=''):
 
     return yields, yerrs
 
-def getYieldEInTopoBins(f, srNames, hname='metbins'):
+def getYieldEInTopoBins(f, srNames, hname='metbins', backup_hname=None):
     yields = []
     for sr in srNames:
         hist = f.Get(sr+'/h_'+hname)
+        if not hist and backup_hname:
+            hist = f.Get(sr+'/h_'+backup_hname)
         if not hist:
-            print "Can't find", sr+'/h_'+hname, "!! Returning 0s";
+            print "Can't find", sr+'/h_'+hname, "from", f.GetName(), "!! Returning 0s";
             hist = f.Get(sr+'/h_metbins')
             if not hist: print "This should not happen!"
             yields.append([E(0,0)]*hist.GetNbinsX())
@@ -73,6 +75,9 @@ def getYieldEInTopoBins(f, srNames, hname='metbins'):
 
     return yields
 
+def getYieldEInFlatBins(f, srNames, hname='metbins', backup_hname=None):
+    return  sum(getYieldEInTopoBins(f, srNames, hname, backup_hname),[])
+
 
 # # # # # # # # # # # # # # # # # # # # # # # #
 # Additional statistic tools
@@ -83,6 +88,16 @@ def StoBErr(s, b, se, be):
     v /= 4*(s+b)**3
     return sqrt(v)
 
+
+def getPoissonUpDn(y):
+    alpha = 1-0.6827
+    yup = r.Math.gamma_quantile_c(alpha/2, y+1, 1)
+    ydn = 0 if y==0 else r.Math.gamma_quantile(alpha/2, y, 1)
+    return yup, ydn
+
+def getPoissonErrors(y):
+    yup, ydn = getPoissonUpDn(y)
+    return yup-y, y-ydn
 
 # # # # # # # # # # # # # # # # # # # # # # # #
 # SR yield hist makers

@@ -61,8 +61,8 @@ void dataDrivenFromCR(TFile* fdata, TFile* fmc, TFile* fout, TString ddtype, TSt
         double TFval = hist_MC_SR->GetBinContent(extr_start_bin) / yldCR;
         if (yldCR > extr_threshold && (TFval < extr_TFcap)) break;
       }
-      if (gentype == "_2lep" && (srname == "srE2" || srname == "srG2")) extr_start_bin = lastbin; // temporary hack for 2016
-      if (gentype == "_2lep" && (srname == "srH")) extr_start_bin = 1; // temporary hack for 2016
+      // if (gentype == "_2lep" && (srname == "srE2" || srname == "srG2")) extr_start_bin = lastbin; // temporary hack for 2016
+      // if (gentype == "_2lep" && (srname == "srH")) extr_start_bin = 1; // temporary hack for 2016
       if (extr_start_bin != lastbin) {
         cout << "Doing MET extrapolation for  " << crname << "  from bin " << lastbin << " (last bin) to bin " << extr_start_bin << "!" << endl;
         hist_data_CR->Clone("h_datayields_CR_raw")->Write();

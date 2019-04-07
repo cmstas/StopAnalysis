@@ -37,6 +37,70 @@ def printTableDataDriven(f, srNames, crname=''):
 
     return tab
 
+def printDataDrivenTable(f, srNames, crname='', systs=None, doAsymErr=True):
+    if crname != '' and crname[-1] != ' ': crname += ' '
+
+    tab = Table()
+    preds  = getYieldEInFlatBins(f, srNames, 'metbins')
+    alpha  = getYieldEInFlatBins(f, srNames, 'alphaHist')
+    yMC_SR = getYieldEInFlatBins(f, srNames, 'MCyields_SR')
+    yMC_CR = getYieldEInFlatBins(f, srNames, 'MCyields_CR')
+    yld_CR = getYieldEInFlatBins(f, srNames, 'datayields_CR')
+    purity = getYieldEInTopoBins(f, srNames, 'CRpurity')
+
+    # errMC = [ 0 if m.val <= 0.01 else round(m.err/m.val,4) for m in getYieldEInFlatBins(f, srNames, 'metbins_MCStats', 'metbins')]
+    systup = [a.err for a in alpha]
+    systdn = systup
+
+    if type(systs) == list:
+        for sys in systs:
+            predup = getYieldEInFlatBins(f, srNames, 'metbins_'+sys+'Up', 'metbins')
+            preddn = getYieldEInFlatBins(f, srNames, 'metbins_'+sys+'Dn', 'metbins')
+            sysup = [ 0 if ycen.val <= 0 else round(yup.val/ycen.val-1, 4) for yup, ycen in zip(predup, preds)]
+            sysdn = [ 0 if ycen.val <= 0 else round(ydn.val/ycen.val-1, 4) for ydn, ycen in zip(preddn, preds)]
+            for i in range(len(preds)):
+                sup = sysup[i]
+                sdn = sysdn[i]
+                if sysup[i] < 0 and sysdn[i] > 0:
+                    sdn = sysup[i]
+                    sup = sysdn[i]
+                elif not (sysup[i] > 0 and sysdn[i] < 0):
+                    print 'Syst:', sys, 'at bin', i, 'has single sided variation! sysup =', sysup[i], 'sysdn =', sysdn[i]
+                    if np.isnan(sup): sup = 0
+                    if np.isnan(sdn): sdn = 0
+                    sup = max(abs(sup), abs(sdn))
+                    sdn = sup
+
+                systup[i] = sqrt(systup[i]**2 + sup**2)
+                systdn[i] = sqrt(systdn[i]**2 + sdn**2)
+
+    metrange = getBinningFromTopoSRs(f, srNames)
+    tab.add_column('SR name', sum([[sr]*n for sr, n in zip(srNames, map(len, purity))], []))
+    tab.add_column('MET [GeV]', [m[0]+' -- '+m[1] for m in sum(metrange, [])])
+    tab.add_column(crname+'MC SR', [y.round(2) for y in yMC_SR])
+    tab.add_column(crname+'MC CR', [y.round(2) for y in yMC_CR])
+    tab.add_column(crname+'Purity', [y.round(2) for y in sum(purity, [])])
+    if doAsymErr:
+        pderr = [ getPoissonErrors(y.val) for y in yld_CR]
+        preds = [ y.round(2).val for y in preds]
+        alpha = [ a.round(2).val for a in alpha]
+        # staterr = [ (sqrt(d[0]**2 + m**2), sqrt(d[1]**2 + m**2)) for d, m in zip(errdat, errMC)]
+        tab.add_column(crname+'TF$_{CR}^{SR}$', [ '${0}^{{+{1}}}_{{-{2}}}$'.format(a, round(a*(1+sup),2), round(a*(1-sdn),2)) for a, sup, sdn in zip(alpha, systup, systdn)])
+        tab.add_column(crname+'Data CR', [ '${0}^{{+{1}}}_{{-{2}}}$'.format(int(y.val), round(e[0],2), round(e[1],2)) for y, e in zip(yld_CR, pderr)]) 
+        # tab.add_column(crname+'R$_{CR}$(data/MC)', [ '({})%'.format((d/m*100).round(1)) for d, m in zip(yld_CR, yMC_CR)])
+        tab.add_column(crname+'R$_{CR}$(data/MC)', [(d/m).round(2) for d, m in zip(yld_CR, yMC_CR)])
+        tab.add_column(crname+'Prediction', [ '${0}^{{+{1}+{3}}}_{{-{2}-{4}}}$'.format(y, round(pde[0]*a,2), round(pde[1]*a,2), round(sup*y,2), round(sdn*y,2)) for y,pde,a,sup,sdn in zip(preds, pderr, alpha, systup, systdn)])
+    else:
+        tab.add_column(crname+'TF$_{CR}^{SR}$', [ E(a.val, a.val*max(sup,sdn)).round(2) for a, sup, sdn in zip(alpha, systup, systdn)])
+        tab.add_column(crname+'data CR', [y.round(2) for y in yld_CR])
+        tab.add_column(crname+'R$_{CR}$(data/MC)', [(d/m).round(2) for d, m in zip(yld_CR, yMC_CR)])
+        tab.add_column(crname+'Prediction', [y.round(2) for y in preds])
+
+    tab.print_table()
+
+    return tab
+
+
 def printTableWithMETextrpInfo(f1, f2, srNames, crname=''):
     if crname != '' and crname[-1] != ' ': crname += ' '
 
@@ -144,18 +208,21 @@ def makeTFComparisonTable():
     tab.print_pdf('compareCR0b_MRSOffvsOn.pdf')
 
 
-def makeBkgEstimateTablesLostLepton(indir):
+def makeBkgEstimateTablesLostLepton(indir, ysuf='run2'):
 
     # f1 = r.TFile('../StopLooper/output/samp17_v13_tf/lostlepton.root')
     # f2 = r.TFile('../StopLooper/output/samp17_v13_tf_v1/lostlepton_wMETextrp.root')
     # f1 = r.TFile('../StopLooper/output/comb1617_tf/lostlepton.root')
     # f1 = r.TFile('../StopLooper/output/combRun2_v37_c5/lostlepton_run2.root')
-    f1 = r.TFile(indir+'/lostlepton_run2.root')
+    f1 = r.TFile(indir+'/lostlepton_'+ysuf+'.root')
 
     srNames = ['srA0', 'srA1', 'srA2', 'srB', 'srC','srD', 'srE0', 'srE1', 'srE2', 'srE3', 'srF', 'srG0', 'srG1', 'srG2', 'srG3', 'srH', 'srI', 'srJ']
 
     print '\n ----------------------------------- lost lepton w/ MET extrapolation ----------------------------------------'
-    tab1 = printTableDataDriven(f1, srNames)
+    # tab1 = printTableDataDriven(f1, srNames)
+    syst = ['jes',]
+    syst = ['jes', 'ISR', 'lepSF', 'metTTbar', 'L1prefire', 'pileup', 'pdf', 'q2', 'alphas', 'metRes', 'tauSF']
+    tab1 = printDataDrivenTable(f1, srNames, systs=syst)
     tab1.set_theme_latex()
     tab1.print_pdf('lostlepRun2_allSRs.pdf')
 
@@ -169,33 +236,33 @@ def makeBkgEstimateTablesLostLepton(indir):
     # tab3.set_theme_latex()
     # tab3.print_pdf('lostlep_METextrpInfo.pdf')
 
-    print '\n ----------------------------------- lost lepton separate by top tags ----------------------------------------'
+    # print '\n ----------------------------------- lost lepton separate by top tags ----------------------------------------'
 
-    srNames = ['srA0', 'srB', 'srC','srD', 'srE0', 'srF', 'srG0', 'srH',]
-    tab0 = printTableDataDriven(f1, srNames)
-    tab0.set_theme_latex()
-    tab0.print_pdf('lostlepRun2_inclTopTags.pdf')
+    # srNames = ['srA0', 'srB', 'srC','srD', 'srE0', 'srF', 'srG0', 'srH',]
+    # tab0 = printTableDataDriven(f1, srNames)
+    # tab0.set_theme_latex()
+    # tab0.print_pdf('lostlepRun2_inclTopTags.pdf')
 
-    srNames = ['srA1', 'srE1', 'srG1',]
-    tab1 = printTableDataDriven(f1, srNames)
-    tab1.set_theme_latex()
-    tab1.print_pdf('lostlepRun2_noTopTags.pdf')
+    # srNames = ['srA1', 'srE1', 'srG1',]
+    # tab1 = printTableDataDriven(f1, srNames)
+    # tab1.set_theme_latex()
+    # tab1.print_pdf('lostlepRun2_noTopTags.pdf')
 
-    srNames = ['srA2', 'srE2', 'srG2',]
-    tab2 = printTableDataDriven(f1, srNames)
-    tab2.set_theme_latex()
-    tab2.print_pdf('lostlepRun2_mergeTags.pdf')
+    # srNames = ['srA2', 'srE2', 'srG2',]
+    # tab2 = printTableDataDriven(f1, srNames)
+    # tab2.set_theme_latex()
+    # tab2.print_pdf('lostlepRun2_mergeTags.pdf')
 
-    srNames = ['srE3', 'srG3',]
-    tab3 = printTableDataDriven(f1, srNames)
-    tab3.set_theme_latex()
-    tab3.print_pdf('lostlepRun2_tfresTags.pdf')
+    # srNames = ['srE3', 'srG3',]
+    # tab3 = printTableDataDriven(f1, srNames)
+    # tab3.set_theme_latex()
+    # tab3.print_pdf('lostlepRun2_tfresTags.pdf')
 
-    print '\n ----------------------------------- lost lepton for corridor ----------------------------------------'
-    srNames = ['srI','srJ']
-    tab4 = printTableDataDriven(f1, srNames)
-    tab4.set_theme_latex()
-    tab4.print_pdf('lostlepRun2_corridor.pdf')
+    # print '\n ----------------------------------- lost lepton for corridor ----------------------------------------'
+    # srNames = ['srI','srJ']
+    # tab4 = printTableDataDriven(f1, srNames)
+    # tab4.set_theme_latex()
+    # tab4.print_pdf('lostlepRun2_corridor.pdf')
 
 
 def makeBkgEstimateTables1LepFromW(indir):
@@ -203,24 +270,26 @@ def makeBkgEstimateTables1LepFromW(indir):
     f1 = r.TFile(indir+'/1lepFromW_run2.root')
 
     # srNames = ['srA0', 'srA1', 'srA2', 'srB', 'srC','srD', 'srE0', 'srE1', 'srE2', 'srE3', 'srF', 'srG0', 'srG1', 'srG2', 'srG3', 'srH',]
-    srNames = ['srA0', 'srA1', 'srB', 'srC','srD', 'srE0', 'srE1', 'srF', 'srG0', 'srG1', 'srH',]
+    srNames = ['srA0', 'srA1', 'srB', 'srC','srD', 'srE0', 'srE1', 'srF', 'srG0', 'srG1', 'srH', 'srI', 'srJ']
 
     print '\n ----------------------------------- W+jets all ---------------------------------------'
-    tab1 = printTableDataDriven(f1, srNames)
+    # tab1 = printTableDataDriven(f1, srNames)
+    syst = ['jes', 'bTagEffHF', 'bTagEffLF', 'WbXsec', 'L1prefire', 'pileup', 'pdf', 'q2', 'alphas', 'metRes']
+    tab1 = printDataDrivenTable(f1, srNames, systs=syst)
     tab1.set_theme_latex()
     tab1.print_pdf('1lepWRun2_allDDSRs.pdf')
 
     print '\n ----------------------------------- W+jets separate by top tags ----------------------------------------'
 
-    srNames = ['srA0', 'srB', 'srC','srD', 'srE0', 'srF', 'srG0', 'srH',]
-    tab0 = printTableDataDriven(f1, srNames)
-    tab0.set_theme_latex()
-    tab0.print_pdf('1lepWRun2_inclTopTags.pdf')
+    # srNames = ['srA0', 'srB', 'srC','srD', 'srE0', 'srF', 'srG0', 'srH',]
+    # tab0 = printTableDataDriven(f1, srNames)
+    # tab0.set_theme_latex()
+    # tab0.print_pdf('1lepWRun2_inclTopTags.pdf')
 
-    srNames = ['srA1', 'srE1', 'srG1',]
-    tab1 = printTableDataDriven(f1, srNames)
-    tab1.set_theme_latex()
-    tab1.print_pdf('1lepWRun2_noTopTags.pdf')
+    # srNames = ['srA1', 'srE1', 'srG1',]
+    # tab1 = printTableDataDriven(f1, srNames)
+    # tab1.set_theme_latex()
+    # tab1.print_pdf('1lepWRun2_noTopTags.pdf')
 
     srNames = ['srA2', 'srE2', 'srG2',]
     # tab2 = printTableDataDriven(f1, srNames)
@@ -250,10 +319,10 @@ def makeBkgEstimateTables1LepFromW(indir):
     # tab3.print_pdf('1lepWRun2_srG.pdf')
 
     print '\n ----------------------------------- W+jets for corridor ----------------------------------------'
-    srNames = ['srI','srJ']
-    tab4 = printTableDataDriven(f1, srNames)
-    tab4.set_theme_latex()
-    tab4.print_pdf('1lepWRun2_corridor.pdf')
+    # srNames = ['srI','srJ']
+    # tab4 = printTableDataDriven(f1, srNames)
+    # tab4.set_theme_latex()
+    # tab4.print_pdf('1lepWRun2_corridor.pdf')
 
 
 def makeMETExtrInfoTable():
@@ -485,10 +554,13 @@ if __name__ == '__main__':
     # makeBkgCompositionTable(f1, srNames, 'run2_rare_all')
 
     indir16 = '../StopLooper/output/samp16_'+bvsuf
-    makePredictionTable(indir16, srNames, '16', True)
+    # makePredictionTable(indir16, srNames, '16', True)
+    # makePredictionTable(indir16, srNames, '16', True)
 
-
-    # makeBkgEstimateTablesLostLepton(indir)
+    bvsuf = 'v31_m1'
+    indir = '../StopLooper/output/combRun2_'+bvsuf
+    makeBkgEstimateTablesLostLepton(indir)
+    makeBkgEstimateTables1LepFromW(indir)
 
     # makeMETExtrInfoTable()
     # makeSystUncertaintyMaxTable(indir, srNames)
