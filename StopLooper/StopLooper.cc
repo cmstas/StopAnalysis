@@ -66,13 +66,17 @@ const bool doHEMJetVeto = true;
 // re-run resolved top MVA locally
 const bool runResTopMVA = false;
 // run the MET resolution correction (and store in separate branches)
-const bool runMETResCorrection = true;
+const bool runMETResCorrection = false;
 // only produce yield histos
 const bool runYieldsOnly = true;
 // only running selected signal points to speed up
 const bool runFullSignalScan = true;
 // debug symbol, for printing exact event kinematics that passes
 const bool printPassedEvents = false;
+// fill the distribution of event weights
+const bool fillWeights = true;
+// apply the HT5/HT cut
+const bool doHT5cut = true;
 
 // some global helper variables to be used in member functions
 int datayear = -1;
@@ -225,9 +229,10 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
 
   outfile_ = new TFile(output_name.Data(), "RECREATE") ;
 
-  float kLumi = 133.53;
-  // Combined 2016 (35.922/fb), 2017 (41.529/fb) and 2018 (56.077/fb) json,
+  float kLumi = 137.19;
+  // Combined 2016 (35.922/fb), 2017 (41.529/fb) and 2018 (59.740/fb) json,
   const char* json_file = "../StopCORE/inputs/json_files/Cert_271036-325175_13TeV_Combined161718_JSON_snt.txt";
+  // const char* json_file = "../StopCORE/inputs/json_files/2017BCDEF_snt.txt";
 
   // Determine datayear from the sample name
   if (samplestr == "data_single_lepton_met") datayear = 16;
@@ -421,9 +426,9 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
 
       // For testing on only subset of mass points
       if (!runFullSignalScan && is_fastsim_) {
-        // if (!checkMassPt(800,400)  && !checkMassPt(1200,50)  && !checkMassPt(400,100) &&
-        //     !checkMassPt(1100,300) && !checkMassPt(1100,500) && !checkMassPt(900,600) &&
-        //     !checkMassPt(1200,200) && !checkMassPt(1200,400) && !checkMassPt(1200,600)) continue;
+        if (!checkMassPt(800,400)  && !checkMassPt(1200,50)  && !checkMassPt(400,100) &&
+            !checkMassPt(1100,300) && !checkMassPt(1100,500) && !checkMassPt(900,600) &&
+            !checkMassPt(1200,200) && !checkMassPt(1200,400) && !checkMassPt(1200,600)) continue;
         if (dsname.Contains("T2tt")) {
           float massdiff = mass_stop() - mass_lsp();
           // if (mass_lsp() < 400 && mass_stop() < 1000) continue;
@@ -432,7 +437,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
           // if (massdiff < 600 || mass_stop() < 1000) continue;
           // if (massdiff < 300 || mass_stop() < 800 || mass_stop() > 1300 || mass_lsp() > 750 || mass_lsp() < 500) continue;
           // if (massdiff < 300 || massdiff > 500) continue;
-          if (massdiff < 600) continue;
+          if (massdiff < 0) continue;
           plot2d("h2d_T2tt_masspts", mass_stop(), mass_lsp(), 1, SRVec.at(0).histMap, ";M_{stop} [GeV]; M_{lsp} [GeV]", 100, 300, 1300, 80, 0, 800);
         } else if (dsname.Contains("T2bW")) {
           float massdiff = mass_stop() - mass_lsp();
@@ -527,6 +532,38 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
         if (hasHEMjet) continue;
       }
 
+      LorentzVector sumMHTp4(0,0,0,0);
+      if (samplever.find("v31_2") != 0) {
+        for (auto jet : ak4pfjets_p4()) {
+          sumMHTp4 -= jet;
+        }
+      } else {
+        sumMHTp4 = LorentzVector(ak4_MHT_pt()*cos(ak4_MHT_phi()),ak4_MHT_pt()*sin(ak4_MHT_phi()),0,ak4_MHT_pt());
+      }
+      sumMHTp4 -= lep1_p4();
+      if (nvetoleps() > 1) sumMHTp4 -= lep2_p4();
+      float MHT_pt = sumMHTp4.pt();
+      float MHT_phi = sumMHTp4.phi();
+
+      const bool doDiffMHTMETVeto = false;
+      if (doDiffMHTMETVeto) {
+        float diffMHTMET = fabs(MHT_pt - pfmet());
+        if (diffMHTMET / pfmet() > 0.5) {
+          // ofile << run() << ' ' << ls() << ' ' << evt() << endl;
+          continue;
+        }
+      }
+
+      float dphij1mht = (ngoodjets() > 0)? deltaPhi(ak4pfjets_p4().at(0).phi(), MHT_phi) : 9;
+      if (samplever.find("v31_2") == 0 && ngoodjets() > 0)
+        plot2d("h2d_ht5_dphijmht", dphij1mht, ak4_HTeta5()/ak4_HT(), 1, testVec[0].histMap, ";#Delta#phi(j1,MHT);HT5/HT", 16, 0, 3.2, 20, 1, 3);
+
+      if (doHT5cut && year_ >= 2017) {
+        float HT5overHT = ak4_HTeta5() / ak4_HT();
+        // if (dphij1mht < 5.3*HT5overHT - 4.78) continue;
+        if (HT5overHT > 1.5) continue;
+      }
+
       // MET resolution stuff: recalculate MET using METObject
       METObject metobj;
       if (!is_data() && runMETResCorrection) {
@@ -551,6 +588,9 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
       // Filling the variables for analysis
       values_.clear();
       values_.resize(nvars, NAN);
+
+      values_[mht] = MHT_pt;
+      values_[mhtphi] = MHT_phi;
 
       /// Common variables for all JES type
       values_[nlep] = ngoodleps();
@@ -931,6 +971,10 @@ void StopLooper::fillYieldHistos(SR& sr, float met, string suf, bool is_cr2l) {
           else
             plot1d("h_metbins"+s+"_"+evtWgt.getLabel(syst), met, evtWgt.getWeight(syst, is_cr2l), sr.histMap,
                    (sr.GetName()+":"+evtWgt.getLabel(syst)+";E^{miss}_{T} [GeV]").c_str(), sr.GetNMETBins(), sr.GetMETBinsPtr());
+          if (fillWeights && s == "") {
+            plot1d("h_weights"+s+"_"+evtWgt.getLabel(syst), evtWgt.getWeight(syst, is_cr2l)/evtWgt.getWeight(evtWgtInfo::k_nominal, is_cr2l), 1, sr.histMap,
+                   (sr.GetName()+":"+evtWgt.getLabel(syst)+";event weights").c_str(), 200, 0, 2);
+          }
         }
       }
     }
@@ -1015,6 +1059,11 @@ void StopLooper::fillHistosForSR(string suf) {
       plot1d("h_jet2pt"+s,  values_[jet2pt],  evtweight_, sr.histMap, ";p_{T}(jet2) [GeV]"  , 32,  0, 800);
       plot1d("h_jet1eta"+s, values_[jet1eta], evtweight_, sr.histMap, ";#eta(jet1) [GeV]"   , 30,  -3,  3);
       plot1d("h_jet2eta"+s, values_[jet2eta], evtweight_, sr.histMap, ";#eta(jet2) [GeV]"   , 60,  -3,  3);
+
+      if (suf == "" && samplever.find("v31_2") == 0 && ngoodjets() > 0) {
+        plot2d("h2d_ht5_dphijmht", deltaPhi(ak4pfjets_p4().at(0).phi(), values_[mhtphi]), ak4_HTeta5()/ak4_HT(), evtweight_, sr.histMap, ";#Delta#phi(j1,MHT);HT5/HT", 32, 0, 3.2, 40, 1, 3);
+        plot1d("h2d_ht5overht", ak4_HTeta5()/ak4_HT(), evtweight_, sr.histMap, ";HT5/HT", 80, 1, 3);
+      }
     };
 
     if (suf == "") fillKineHists(suf);
@@ -1044,6 +1093,11 @@ void StopLooper::fillHistosForSR(string suf) {
       plot1d("h_mt_rs"+s,       values_[mt_rs]       , evtweight_, sr.histMap, ";M_{T} [GeV]"                   , 40, 0, 400);
       plot1d("h_dphijmet_rs"+s, values_[dphijmet_rs] , evtweight_, sr.histMap, ";#Delta#phi(jet,#slash{E}_{T})" , 25,  0.8, 3.3);
       plot1d("h_dphilmet_rs"+s, values_[dphilmet_rs] , evtweight_, sr.histMap, ";#Delta#phi(l,MET)"             , 32,   0, 3.2);
+
+      plot1d("h_mht"+s,           values_[mht]       , evtweight_, sr.histMap, ";H_{T}^{miss} [GeV]"                , 40, 0, 800);
+      plot1d("h_mhtovermet"+s, values_[mht]/values_[met], evtweight_, sr.histMap, ";H_{T}^{miss}/E_{T}^{miss}" , 40, 0, 4);
+      plot1d("h_diffmhtmet"+s, fabs(values_[mht]-values_[met])/values_[met], evtweight_, sr.histMap, ";#Delta(H_{T}^{miss}, E_{T}^{miss})/E_{T}^{miss}" , 40, 0, 1);
+
     };
     if (sr.GetName().find("sb") != string::npos && suf == "")
       fillExtraHists(suf);
@@ -1121,6 +1175,9 @@ void StopLooper::fillHistosForCR2l(string suf) {
       plot1d("h_jet1eta"+s, values_[jet1eta], evtweight_, cr.histMap, ";#eta(jet1) [GeV]"   , 30,  -3,  3);
       plot1d("h_jet2eta"+s, values_[jet2eta], evtweight_, cr.histMap, ";#eta(jet2) [GeV]"   , 60,  -3,  3);
 
+      plot1d("h_mht"+s,           values_[mht]       , evtweight_, cr.histMap, ";H_{T}^{miss} [GeV]"                , 40, 0, 800);
+      plot1d("h_mhtovermet"+s, values_[mht]/values_[met], evtweight_, cr.histMap, ";H_{T}^{miss}/E_{T}^{miss}" , 40, 0, 4);
+      plot1d("h_diffmhtmet"+s, fabs(values_[mht]-values_[met])/values_[met], evtweight_, cr.histMap, ";#Delta(H_{T}^{miss}, E_{T}^{miss})/E_{T}^{miss}" , 40, 0, 1);
       // Luminosity test at Z peak
     };
     if (suf == "") fillKineHists(suf);
@@ -1239,6 +1296,11 @@ void StopLooper::fillHistosForCR0b(string suf) {
       // Temporary test for low dphijmet excess
       if (jestype_ == 0)
         plot1d("h_dphij1j2"+s, fabs(ak4pfjets_p4().at(0).phi()-ak4pfjets_p4().at(1).phi()), evtweight_, cr.histMap, ";#Delta#phi(j1,j2)" , 33,  0, 3.3);
+
+      plot1d("h_mht"+s,           values_[mht]       , evtweight_, cr.histMap, ";H_{T}^{miss} [GeV]"                , 40, 0, 800);
+      plot1d("h_mhtovermet"+s, values_[mht]/values_[met], evtweight_, cr.histMap, ";H_{T}^{miss}/E_{T}^{miss}" , 40, 0, 4);
+      plot1d("h_diffmhtmet"+s, fabs(values_[mht]-values_[met])/values_[met], evtweight_, cr.histMap, ";#Delta(H_{T}^{miss}, E_{T}^{miss})/E_{T}^{miss}" , 40, 0, 1);
+
     };
     if (suf == "") fillKineHists(suf);
     if (is_fastsim_ && suf == "" && (checkMassPt(1200, 50) || checkMassPt(800, 400) || checkMassPt(800, 675)))
@@ -1251,6 +1313,15 @@ void StopLooper::fillHistosForCR0b(string suf) {
       else if (is1lepFromW()) fillKineHists("_1lepW");
       else if (is1lepFromTop()) fillKineHists("_1lepTop");
       else fillKineHists("_unclass");  // either unclassified 1lep or 0lep, or something else unknown, shouldn't have (m)any
+    }
+
+    // if (cr.GetName() == "cr0bbase" && fabs(values_[mht]-values_[met]) / values_[met] > 0.5) {
+    //   ofile << run() << ':' << ls() << ':' << evt() << endl;
+    // }
+
+    if (suf == "" && samplever.find("v31_2") == 0 && ngoodjets() > 0) {
+      plot2d("h2d_ht5_dphijmht", deltaPhi(ak4pfjets_p4().at(0).phi(), values_[mhtphi]), ak4_HTeta5()/ak4_HT(), evtweight_, cr.histMap, ";#Delta#phi(j1,MHT);HT5/HT", 32, 0, 3.2, 40, 1, 3);
+      plot1d("h2d_ht5overht", ak4_HTeta5()/ak4_HT(), evtweight_, cr.histMap, ";HT5/HT", 80, 1, 3);
     }
 
     auto fillExtraHists = [&](string s) {

@@ -16,46 +16,51 @@ skimtype=skimmed
 
 OUTDIR18=$OUTDIR
 
-vsuf=v39_s6
+vsuf=v31_s6
 
 OUTDIR18=output/samp18_$vsuf
 OUTDIR17=output/samp17_$vsuf
 OUTDIR16=output/samp16_$vsuf
 OUTDIRRUN2=output/combRun2_$vsuf
 
-run18dat=1
-run18bkg=1
-run18sig=1
+run18dat=0
+run18bkg=0
+run18sig=0
 
-run17dat=1
-run17bkg=1
-run17sig=1
+run17dat=0
+run17bkg=0
+run17sig=0
 
-run16dat=1
-run16bkg=1
-run16sig=1
+run16dat=0
+run16bkg=0
+run16sig=0
 
 # OUTDIRRUN2=""
 
 function runLooperJobs {
+    # [[ -d ${OUTDIR} ]] && rm -r ${OUTDIR}
     mkdir -p ${OUTDIR}; mkdir -p ${LOGDIR}
+    cp do.sh StopLooper.cc StopRegions.cc ${LOGDIR}
     for SAMPLE in ${Samples[@]}; do
         # ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
         echo ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} '>&' ${LOGDIR}/log_${SAMPLE}.txt
-        eval "nohup nice -n 1 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
+        eval "nohup nice -n -10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
     done
 }
 
 ########################
 # 2018 Data
 
-INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/data_v30_10
+# INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/data_v30_10
+INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/data_v31_2
+# INDIR=/hadoop/cms/store/user/sicheng/ProjectMetis/stopbaby_data_2018D_met_v31_2
 OUTDIR=$OUTDIR18
 # INDIR=/nfs-7/userdata/sicheng/stopbabies/merged/data_v30_3/jetht
 # OUTDIR=output/jetht_v30
 LOGDIR=$OUTDIR/logs
 
 declare -a Samples=(data_2018A data_2018B data_2018C data_2018D)
+# declare -a Samples=(stopbaby)
 # declare -a Samples=(data_2018A_jetht data_2018B_jetht data_2018C_jetht data_2018D_jetht)
 # declare -a Samples=(data_2018 data_2017 data_2016)
 
@@ -64,8 +69,8 @@ declare -a Samples=(data_2018A data_2018B data_2018C data_2018D)
 ########################
 # 2018 MC
 
-# INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/f17v2_v30_7
-INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/a18v1_v30_10
+# INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/a18v1_v30_10
+INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/a18v1_v31_2
 # OUTDIR=output/samp18_v30
 # LOGDIR=$OUTDIR/logs
 
@@ -80,8 +85,8 @@ Samples+=( WZTo1L3Nu WZTo3LNu WZTo2L2Q WWToLNuQQ WWTo2L2Nu ZZ )   # diboson
 
 # Samples+=( W1JetsToLNu W2JetsToLNu W3JetsToLNu W4JetsToLNu DYJets )       # Vjets : Wjets + DY
 # Samples+=( W1Jets_NuPt200 W2Jets_NuPt200 W3Jets_NuPt200  )       # Vjets : Wjets + DY
-# Samples+=( TTJets_1lep_top_a18b1_0 TTJets_1lep_top_a18b1_1 TTJets_1lep_top_a18b1_2 )
-# Samples+=( TTJets_1lep_tbar_a18b1_0 TTJets_1lep_tbar_a18b1_1 TTJets_1lep_tbar_a18b1_2 )
+# Samples+=( TTJets_1lep_top_a18v1_0 TTJets_1lep_top_a18v1_1 TTJets_1lep_top_a18v1_2 )
+# Samples+=( TTJets_1lep_tbar_a18v1_0 TTJets_1lep_tbar_a18v1_1 TTJets_1lep_tbar_a18v1_2 )
 # Samples+=( W1Jets W2Jets W3Jets W4JetsToLNu DYJets )
 # Samples+=( W4Jets_NuPt200_a18v1_0 W4Jets_NuPt200_a18v1_1 W4Jets_NuPt200_a18v1_2 W4Jets_NuPt200_a18v1_3 )
 # Samples+=( W4Jets_NuPt200_a18v1_4 W4Jets_NuPt200_a18v1_5 W4Jets_NuPt200_a18v1_6 )
@@ -91,7 +96,8 @@ Samples+=( WZTo1L3Nu WZTo3LNu WZTo2L2Q WWToLNuQQ WWTo2L2Nu ZZ )   # diboson
 ########################
 # 2018 Signal <-- use f17v2_ext1 until a18 ones come out
 
-INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/f17v2_v30_8
+# INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/f17v2_v30_8
+INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/f17v2_v31_2
 # declare -a Samples=(T2tt_mStop850_mLSP100 T2tt_mStop650_mLSP350 T2tt_mStop1200_mLSP100)
 declare -a Samples=()
 Samples+=( SMS_T2tt_mStop1200to2000_f17v2_ext1_0 SMS_T2tt_mStop1200to2000_f17v2_ext1_1 SMS_T2tt_mStop1200to2000_f17v2_ext1_2 )
@@ -115,7 +121,8 @@ Samples+=( SMS_T2tt_mStop150to250_f17v2_ext1_0 SMS_T2tt_mStop150to250_f17v2_ext1
 # INDIR=/nfs-7/userdata/haweber/stopbabiesInteractive/2017_5p8fbinv
 # INDIR=/nfs-7/userdata/haweber/tupler_babies/merged/Stop_1l/v2017/output/
 # INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/data_v30_7
-INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/data_v30_3
+# INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/data_v30_3
+INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/data_v31_2
 OUTDIR=$OUTDIR17
 # OUTDIR=output/data17_v30_leptrig
 LOGDIR=$OUTDIR/logs
@@ -132,8 +139,10 @@ declare -a Samples=(data_2017B data_2017C data_2017D data_2017E data_2017F)
 # INDIR=/nfs-7/userdata/sicheng/stopbabies/merged_v25_4
 # INDIR=/nfs-7/userdata/sicheng/stopbabies/merged_v28_10
 # INDIR=/nfs-7/userdata/sicheng/stopbabies/skimmed_v29_13
-# INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/f17v2_v30_7
-INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/f17v2_v31_1
+# INDIR=/hadoop/cms/store/user/sicheng/ProjectMetis/stopbaby_TTTo2L2Nu_f17v2_v31_2/merged
+# INDIR=/hadoop/cms/store/user/sicheng/ProjectMetis/stopbaby_TTJets_amcnlo_f17v2_v31_2/merged
+# INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/f17v2_v30_9
+INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/f17v2_v31_2
 # OUTDIR=output/samp17_$output17
 LOGDIR=${OUTDIR}/logs
 
@@ -145,8 +154,11 @@ Samples+=( ST_tW_top ST_tW_tbar ST_schan ST_tchan )   # singleT
 Samples+=( TTZToLLNuNu TTWJetsToLNu TTWJetsToQQ TTZToQQ TTZToLL_M1to10 ) # rare  : ttV
 Samples+=( WZTo1L3Nu WZTo3LNu WZTo2L2Q WZTo1L1Nu2Q WWToLNuQQ WWTo2L2Nu TTWZ ZZ )   # diboson
 
+# Samples+=( TTTo2L2Nu )
+# Samples+=( TTJets_amcnlo_f17v2_0 TTJets_amcnlo_f17v2_1 TTJets_amcnlo_f17v2_2 TTJets_amcnlo_f17v2_3 TTJets_amcnlo_f17v2_4 )
+# Samples+=( TTJets_amcnlo_f17v2_5 TTJets_amcnlo_f17v2_6 TTJets_amcnlo_f17v2_7)
 # Samples+=( TTJets_1lep_top_f17v2_0 TTJets_1lep_top_f17v2_1 TTJets_1lep_top_f17v2_2 TTJets_1lep_top_f17v2_3 )
-# Samples+=( TTJets_1lep_tbar_f17v2_0 TTJets_1lep_tbar_f17v2_1 TTJets_1lep_tbar_f17v2_2 )
+# Samples+=( TTJets_1lep_tbar_f17v2_0 TTJets_1lep_tbar_f17v2_1 TTJets_1lep_tbar_f17v2_2 TTJets_1lep_tbar_f17v2_3 )
 # Samples+=( W1Jets W2Jets W3Jets W4JetsToLNu DYJets )       # Vjets : Wjets + DY
 # Samples+=( W4Jets_NuPt200_f17v2_0 W4Jets_NuPt200_f17v2_1 W4Jets_NuPt200_f17v2_2 )
 # Samples+=( W4Jets_NuPt200_f17v2_3 W4Jets_NuPt200_f17v2_4 W4Jets_NuPt200_f17v2_5 )
@@ -156,7 +168,7 @@ Samples+=( WZTo1L3Nu WZTo3LNu WZTo2L2Q WZTo1L1Nu2Q WWToLNuQQ WWTo2L2Nu TTWZ ZZ )
 ########################
 # 2017 Signal
 
-INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/f17v2_v31_1
+INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/f17v2_v31_2
 # declare -a Samples=(T2tt_mStop850_mLSP100 T2tt_mStop650_mLSP350 T2tt_mStop1200_mLSP100)
 declare -a Samples=()
 Samples+=( SMS_T2tt_mStop1200to2000_f17v2_ext0_0 SMS_T2tt_mStop1200to2000_f17v2_ext0_1 SMS_T2tt_mStop1200to2000_f17v2_ext0_2 )
@@ -177,7 +189,7 @@ Samples+=( SMS_T2tt_mStop150to250_f17v2_ext0_0 SMS_T2tt_mStop150to250_f17v2_ext0
 # INDIR=/nfs-7/userdata/stopRun2/analysis2016_SUS-16-051_35p9fbinv/v24/output
 # INDIR=/nfs-7/userdata/sicheng/stopbabies/merged_v25_10
 # INDIR=/nfs-7/userdata/sicheng/stopbabies/skimmed_v29_14
-INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/data_v30_3
+INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/data_v31_1
 OUTDIR=$OUTDIR16
 # OUTDIR=output/samp16_v30_s3
 # OUTDIR=output/data16_jetht
@@ -206,7 +218,8 @@ declare -a Samples=(data_2016B data_2016C data_2016D data_2016E data_2016F data_
 # INDIR=/nfs-7/userdata/sicheng/stopbabies/skimmed_v25_9
 # INDIR=/nfs-7/userdata/sicheng/stopbabies/skimmed_v29_11
 # INDIR=/nfs-7/userdata/sicheng/stopbabies/skimmed/s16v3_v29_14
-INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/s16v3_v30_9
+# INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/s16v3_v30_9
+INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/s16v3_v31_2
 # OUTDIR=output/samp16_$output16
 # LOGDIR=$OUTDIR/logs
 
@@ -217,7 +230,8 @@ Samples+=( TTJets_1lep_top TTJets_1lep_tbar )
 Samples+=( ST_tW_top ST_tW_tbar ST_tchan ST_schan )    # singleT
 Samples+=( W1Jets W2Jets W3Jets W4Jets DYJets )       # Vjets : Wjets + DY
 Samples+=( TTZToLLNuNu TTWJetsToLNu TTWJetsToQQ TTZToQQ )  # rare  : ttV
-Samples+=( WZTo1L3Nu WZTo1L1Nu2Q WZTo3LNu_powheg WZTo2L2Q WWTo2L2Nu WWToLNuQQ ZZ )      # rare : smaller contributions
+Samples+=( WZTo1L3Nu WZTo1L1Nu2Q WZTo3LNu_amcnlo WZTo2L2Q WWTo2L2Nu WWToLNuQQ ZZ )      # rare : smaller contributions
+# Samples+=( WZTo1L3Nu WZTo1L1Nu2Q WZTo3LNu_powheg WZTo2L2Q WWTo2L2Nu WWToLNuQQ ZZ )      # rare : smaller contributions
 
 # Samples+=( TTJets_1lep_tbar_s16v3_ext0_1 TTJets_1lep_tbar_s16v3_ext1_0 )
 # Samples+=( TTJets_1lep_tbar_s16v3_ext1_1 TTJets_1lep_tbar_s16v3_ext1_2 )
@@ -232,8 +246,8 @@ Samples+=( WZTo1L3Nu WZTo1L1Nu2Q WZTo3LNu_powheg WZTo2L2Q WWTo2L2Nu WWToLNuQQ ZZ
 ########################
 # 2016 signal
 
-# INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/s16v3_v30_8
-INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/s16v3_v30_9
+# INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/s16v3_v30_9
+INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/s16v3_v31_2
 # INDIR=/nfs-7/userdata/stopRun2/analysis2016_SUS-16-051_35p9fbinv/v22/skim
 # INDIR=/nfs-7/userdata/stopRun2/analysis2016_SUS-16-051_35p9fbinv/v22_usegenMET/skim
 # OUTDIR=output/temp12
@@ -299,7 +313,7 @@ popd > /dev/null
 pushd ${OUTDIR17}
 [[ $run17bkg == 1 ]] && hadd -f tt2l_17.root     TTJets_2lep*.root > /dev/null
 [[ $run17bkg == 1 ]] && hadd -f tt1l_17.root     TTJets_1lep*.root > /dev/null
-[[ $run17bkg == 1 ]] && hadd -f ttbar_17.root    TTJets*.root > /dev/null
+[[ $run17bkg == 1 ]] && hadd -f ttbar_17.root    TTJets_?lep*.root > /dev/null
 [[ $run17bkg == 1 ]] && hadd -f singleT_17.root  ST_*.root  > /dev/null
 [[ $run17bkg == 1 ]] && hadd -f Vjets_17.root    W?Jets*.root DYJets*.root > /dev/null
 # [[ $run17bkg == 1 ]] && hadd -f Vjets_17.root    W?Jets*.root > /dev/null
@@ -337,7 +351,7 @@ if [ ! ${OUTDIRRUN2} == "" ]; then
         jsamp=${isamp%_17.root}
         hadd -f ${jsamp}_run2.root ${jsamp}_16.root $isamp ${jsamp}_18.root > /dev/null
     done
-    rm *_1?.root
+    # rm *_1?.root
     popd > /dev/null
 fi
 
