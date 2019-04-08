@@ -615,8 +615,8 @@ void evtWgtInfo::calculateWeightsForEvent() {
     getTTbarSysPtSF( sf_ttbarSysPt, sf_ttbarSysPt_up, sf_ttbarSysPt_dn );
 
   // ISR Correction
-  if (apply_ISR_sf && (samptype == ttbar || samptype == fastsim)) {
-    if (year == 2016)
+  if (apply_ISR_sf && (samptype == ttbar || is_fastsim_)) {
+    if (year == 2016 || is_fastsim_)
       getISRnJetsWeight( sf_ISR, sf_ISR_up, sf_ISR_dn );
     else
       getISRnJetsWeight_local( sf_ISR, sf_ISR_up, sf_ISR_dn );
@@ -1953,6 +1953,34 @@ void evtWgtInfo::getNjetTTbarPtSF( double &weight_njttbarpt, double &weight_njtt
 
 //////////////////////////////////////////////////////////////////////
 
+// void evtWgtInfo::getResolvedTagSF( double &weight_tftag, double &weight_tftag_up, double &weight_tftag_dn ) {
+//   const double TWP_tfttag = 0.95;
+//   const double XWP_tfttag = 0.92;
+//   const double MWP_tfttag = 0.85;
+
+//   double sf_val = 1.0;
+//   double sf_err = 0.0;
+
+//   double lead_tftopdisc = -0.1;
+//   for (auto disc : tftops_disc()) {
+//     if (disc > lead_tftopdisc) lead_tftopdisc = disc;
+//   }
+
+//   if (lead_tftopdisc > TWP_tfttag) {
+//     sf_val = 0.923;
+//     sf_err = 0.015;
+//   } else {
+
+//   }
+
+//   weight_tftag = sf_val;
+//   weight_tftag_up = sf_val + sf_err;
+//   weight_tftag_dn = sf_val - sf_err;
+
+// }
+
+//////////////////////////////////////////////////////////////////////
+
 void evtWgtInfo::getNuPtSF( double &weight_nuPt_up, double &weight_nuPt_dn ) {
 
   weight_nuPt_up = 1.0;
@@ -2250,7 +2278,7 @@ void evtWgtInfo::getISRnJetsWeight_local( double &weight_ISR, double &weight_ISR
   }
   // To take the distance as the uncertainty for 2017 and 2018
   else if (year == 2017 || year == 2018) {
-    isr_unc = fabs(1.0 - weight_ISR);
+    isr_unc = 1.0 - weight_ISR;
     weight_ISR = 1.0;
   }
 
