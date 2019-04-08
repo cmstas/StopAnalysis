@@ -1004,6 +1004,7 @@ void JetTree::SetAK4Branches (TTree* tree)
     tree->Branch(Form("%snloosebtags", prefix_.c_str()) , &nloosebtags);
     tree->Branch(Form("%sntightbtags", prefix_.c_str()) , &ntightbtags);
     tree->Branch(Form("%snanalysisbtags", prefix_.c_str()) , &nanalysisbtags);
+    tree->Branch(Form("%snfailjets", prefix_.c_str()) , &nfailjets);
     tree->Branch(Form("%sak4_HT", prefix_.c_str()) , &ak4_HT);
     tree->Branch(Form("%sak4_HTeta5", prefix_.c_str()) , &ak4_HTeta5);
     tree->Branch(Form("%sak4_MHT_pt", prefix_.c_str()) , &ak4_MHT_pt);
@@ -1019,8 +1020,6 @@ void JetTree::SetAK4Branches (TTree* tree)
     tree->Branch(Form("%sak4pfjets_mva", prefix_.c_str()) , &ak4pfjets_mva);
     tree->Branch(Form("%sak4pfjets_parton_flavor", prefix_.c_str()) , &ak4pfjets_parton_flavor);
     tree->Branch(Form("%sak4pfjets_hadron_flavor", prefix_.c_str()) , &ak4pfjets_hadron_flavor);
-    tree->Branch(Form("%sak4pfjets_loose_puid", prefix_.c_str()) , &ak4pfjets_loose_puid);
-    tree->Branch(Form("%sak4pfjets_loose_pfid", prefix_.c_str()) , &ak4pfjets_loose_pfid);
 
     tree->Branch(Form("%sak4pfjets_leadMEDbjet_p4", prefix_.c_str()) , &ak4pfjets_leadMEDbjet_p4);
     tree->Branch(Form("%sak4pfjets_leadbtag_p4", prefix_.c_str()) , &ak4pfjets_leadbtag_p4);
@@ -1135,7 +1134,6 @@ void JetTree::SetAK4Branches_Other(TTree* tree)
 {
 //these are not completely useless but could go?
     tree->Branch(Form("%snGoodGenJets", prefix_.c_str()) , &nGoodGenJets); 
-    tree->Branch(Form("%snfailjets", prefix_.c_str()) , &nfailjets);
     tree->Branch(Form("%sak4_htssm", prefix_.c_str()) , &ak4_htssm);                                                                 
     tree->Branch(Form("%sak4_htosm", prefix_.c_str()) , &ak4_htosm);
     tree->Branch(Form("%sak4pfjets_qg_disc", prefix_.c_str()) , &ak4pfjets_qg_disc);
@@ -1148,4 +1146,6 @@ void JetTree::SetAK4Branches_Other(TTree* tree)
     tree->Branch(Form("%sak4pfjets_mc3id", prefix_.c_str()) , &ak4pfjets_mc3id);                                        
     tree->Branch(Form("%sak4pfjets_mc3idx", prefix_.c_str()) , &ak4pfjets_mc3idx);
     tree->Branch(Form("%sak4pfjets_mcmotherid", prefix_.c_str()) , &ak4pfjets_mcmotherid);
+    tree->Branch(Form("%sak4pjfets_loose_puid", prefix_.c_str()) , &ak4pfjets_loose_puid);
+    tree->Branch(Form("%sak4pfjets_loose_pfid", prefix_.c_str()) , &ak4pfjets_loose_pfid);
 }

@@ -137,8 +137,8 @@ void babyMaker::MakeBabyNtuple(const char* output_name){
   lep2.SetBranches(BabyTree);
   ph.SetBranches(BabyTree);
   jets.SetAK4Branches(BabyTree);
-  jets_jup.SetAK4Branches(BabyTree);
-  jets_jdown.SetAK4Branches(BabyTree);
+  if (!useGenMet) jets_jup.SetAK4Branches(BabyTree);
+  if (!useGenMet) jets_jdown.SetAK4Branches(BabyTree);
   // Taus.SetBranches(BabyTree);
   // Tracks.SetBranches(BabyTree);
   gen_leps.SetBranches(BabyTree);
@@ -1035,6 +1035,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
       }
       if( thisFile.Contains("WZ")  ||
           thisFile.Contains("TTZ") ||
+          thisFile.Contains("ttZ") ||
           thisFile.Contains("tZq")    ){
         if(nNusHardProcess-nLepsHardProcess>=2) zToNuNu=true;
       }
@@ -1058,7 +1059,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
       nEvents_pass_skim_nVtx++;
       //keep those here - any event without vertex is BS
       //save met here because of JEC
-      if(applyJECfromFile){
+      if(applyJECfromFile && !useGenMet){
         int useCleanedMET = 0;
         if (applyMETRecipeV2 && gconf.year == 2017) {
           useCleanedMET = 2;
@@ -1097,6 +1098,13 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
                << ", evt_pfmet()= " << evt_pfmet() << ", StopEvt.pfmet= " << StopEvt.pfmet << endl;
           continue;
         }
+      }
+      else if(useGenMet && isFastsim){
+        // Only reasonable place to use genmet is to 
+        StopEvt.genmet = StopEvt.pfmet;
+        StopEvt.genmet_phi = StopEvt.pfmet_phi;
+        StopEvt.pfmet = gen_met();
+        StopEvt.pfmet_phi = gen_metPhi();
       }
       else{
         StopEvt.pfmet = evt_pfmet();

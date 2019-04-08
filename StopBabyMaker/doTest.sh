@@ -32,9 +32,10 @@
 ./runBabyMaker stopbaby 1000 3 ./ /hadoop/cms/store/group/snt/run2_data2017/SingleMuon_Run2017F-09May2018-v1_MINIAOD_CMS4_V10-02-04/merged_ntuple_2.root 0 applyMETRecipeV2=false
 ./runBabyMaker stopbaby 1000 3 ./ /hadoop/cms/store/group/snt/run2_data2016_94x/SingleMuon_Run2016G-17Jul2018-v1_MINIAOD_CMS4_V10-02-04/merged_ntuple_1.root 0
 ./runBabyMaker stopbaby 1000 3 ./ /hadoop/cms/store/group/snt/run2_mc2016_94x/TTJets_DiLept_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3_ext1-v2_MINIAODSIM_CMS4_V09-04-17/merged_ntuple_19.root 0
-./runBabyMaker stopbaby 1000 3 ./ /hadoop/cms/store/group/snt/run2_mc2016_94x/SMS-T2tt_mStop-1200to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv3-PUSummer16v3Fast_94X_mcRun2_asymptotic_v3-v1_MINIAODSIM_CMS4_V10-02-05/merged_ntuple_1.root 1
 ./runBabyMaker stopbaby 1000 3 ./ /hadoop/cms/store/group/snt/run2_data2018/SingleMuon_Run2018D-PromptReco-v2_MINIAOD_CMS4_V10-02-04/merged_ntuple_1.root 0
 ./runBabyMaker stopbaby 1000 3 ./ /hadoop/cms/store/group/snt/run2_mc2018/TT_DiLept_TuneCP5_13TeV-amcatnlo-pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15_ext1-v2_MINIAODSIM_CMS4_V10-02-04/merged_ntuple_10.root 0
+./runBabyMaker stopbaby 1000 3 ./ /hadoop/cms/store/group/snt/run2_mc2016_94x/SMS-T2tt_mStop-1200to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv3-PUSummer16v3Fast_94X_mcRun2_asymptotic_v3-v1_MINIAODSIM_CMS4_V10-02-05/merged_ntuple_1.root 1
+./runBabyMaker stopbaby 1000 4 ./ /hadoop/cms/store/group/snt/run2_mc2016_94x/SMS-T2tt_mStop-1200to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv3-PUSummer16v3Fast_94X_mcRun2_asymptotic_v3-v1_MINIAODSIM_CMS4_V10-02-05/merged_ntuple_1.root 3
 
 # # Produce fullsim signals since they don't need to be batch jobs
 # ./runBabyMaker T2tt_mStop1200_mLSP100 -1 1 ./ /hadoop/cms/store/group/snt/run2_mc2017/SMS-T2tt_mStop-1200_mLSP-100_TuneCP5_13TeV-madgraphMLM-pythia8_RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1_MINIAODSIM_CMS4_V09-04-19/merged_ntuple_1.root 0

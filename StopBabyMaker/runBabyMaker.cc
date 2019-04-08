@@ -138,6 +138,7 @@ int main(int argc, char **argv){
   mylooper->applyVetoLeptonSFs = true;
   mylooper->apply2ndLepVeto    = false;
   mylooper->isFastsim          = isFastsim;
+  mylooper->useGenMet          = false;
 
   mylooper->skim_jet_ak8_pt    = 200.0;
   mylooper->skim_jet_ak8_eta   = 2.4;
@@ -172,6 +173,18 @@ int main(int argc, char **argv){
     mylooper->fillPhoton    = true;
     mylooper->skim_nPhotons = 1;
     mylooper->skim_met      = 100;
+  }
+
+  if (sampletype == 3) {
+    cout << "[runBabyMaker] >> Using genmet for this fastsim sample! Doing the smallest skim!" << endl;
+    mylooper->isFastsim       = true;
+    mylooper->useGenMet       = true;
+    mylooper->skim_met        = 250.0;
+    mylooper->skim_met_emuEvt = 250.0;
+    mylooper->applyMETResCorr = false;
+    mylooper->fillMETfilt     = false;
+    mylooper->filltaus        = false;
+    mylooper->filltracks      = false;
   }
 
   TString suffix;
@@ -224,6 +237,8 @@ int main(int argc, char **argv){
   parseAndSet_b("fillPhoton"       , mylooper->fillPhoton);
   parseAndSet_b("fillZll"          , mylooper->fillZll);
   parseAndSet_b("fillExtraEvtVar"  , mylooper->fillExtraEvtVar);
+  parseAndSet_b("fillAK4_Other"    , mylooper->fillAK4_Other);
+  parseAndSet_b("useGenMet"        , mylooper->useGenMet);
 
   if (ifile != -1) suffix += Form("_%i", ifile);
 
