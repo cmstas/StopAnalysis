@@ -338,6 +338,16 @@ void EventTree::Reset ()
     Mjjj                   = -9999.; 
     Mjjj_lep2              = -9999.; 
 
+    genmet_rl               = -9999.;
+    genmet_phi_rl           = -9999.;
+    mindphi_genmet_j1_j2    = -9999.;
+    mindphi_genmet_j1_j2_rl = -9999.;
+    mt_genmet_lep           = -9999.;
+    mt_genmet_lep_rl        = -9999.;
+    topnessMod_genmet       = -9999.;
+    topnessMod_rl_genmet    = -9999.;
+    MT2_ll_genmet           = -9999.;
+
     dphi_Wlep       = -9999.;
     MET_over_sqrtHT = -9999.;
     ak4pfjets_rho   = -9999.;
@@ -825,6 +835,16 @@ void EventTree::SetMETResBranches (TTree* tree) {
     tree->Branch("mindphi_met_j1_j2_rl_resdown", &mindphi_met_j1_j2_rl_resdown);
     tree->Branch("MT2_ll_resup", &MT2_ll_resup);
     tree->Branch("MT2_ll_resdown", &MT2_ll_resdown);
+
+    tree->Branch("genmet_rl", &genmet_rl);
+    tree->Branch("genmet_phi_rl", &genmet_phi_rl);
+    tree->Branch("topnessMod_genmet", &topnessMod_genmet);
+    tree->Branch("topnessMod_rl_genmet", &topnessMod_rl_genmet);
+    tree->Branch("mt_genmet_lep", &mt_genmet_lep);
+    tree->Branch("mt_genmet_lep_rl", &mt_genmet_lep_rl);
+    tree->Branch("mindphi_genmet_j1_j2", &mindphi_genmet_j1_j2);
+    tree->Branch("mindphi_genmet_j1_j2_rl", &mindphi_genmet_j1_j2_rl);
+    tree->Branch("MT2_ll_genmet", &MT2_ll_genmet);
 }
 
 void EventTree::SetSecondLepBranches (TTree* tree)

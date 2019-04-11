@@ -139,6 +139,8 @@ public:
     float dphiMET_resdown;
     float dphiMET_rl_resup;
     float dphiMET_rl_resdown;
+    float dphiGenMET;
+    float dphiGenMET_rl;
 
 
 };

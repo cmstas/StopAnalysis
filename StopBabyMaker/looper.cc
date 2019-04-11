@@ -137,8 +137,8 @@ void babyMaker::MakeBabyNtuple(const char* output_name){
   lep2.SetBranches(BabyTree);
   ph.SetBranches(BabyTree);
   jets.SetAK4Branches(BabyTree);
-  if (!useGenMet) jets_jup.SetAK4Branches(BabyTree);
-  if (!useGenMet) jets_jdown.SetAK4Branches(BabyTree);
+  jets_jup.SetAK4Branches(BabyTree);
+  jets_jdown.SetAK4Branches(BabyTree);
   // Taus.SetBranches(BabyTree);
   // Tracks.SetBranches(BabyTree);
   gen_leps.SetBranches(BabyTree);
@@ -742,10 +742,11 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
         //note to get correct scale1fb you need to use in your looper xsec/nevt, where nevt you get via
         //histNEvts->GetBinContent(histNEvts->FindBin(mStop,mLSP));
 
-        if (StopEvt.cms3tag.find("CMS4_V1") == 0) {
+        if (false) {
           // The correctly yearly normalized gen_LHEweight branches are available since CMS4_V10-02-04
           // note that the gen_LHEweight branches are already ratios wrt nominal
           // Q: will the LHE tool still be valid on the fastsim samples?
+          // A: No... so use the old method
           StopEvt.pdf_up_weight      = gen_LHEweight_PDFVariation_Up();
           StopEvt.pdf_down_weight    = gen_LHEweight_PDFVariation_Dn();
           StopEvt.weight_Q2_up       = gen_LHEweight_QCDscale_muR2_muF2();
@@ -1059,7 +1060,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
       nEvents_pass_skim_nVtx++;
       //keep those here - any event without vertex is BS
       //save met here because of JEC
-      if(applyJECfromFile && !useGenMet){
+      if(applyJECfromFile){
         int useCleanedMET = 0;
         if (applyMETRecipeV2 && gconf.year == 2017) {
           useCleanedMET = 2;
@@ -1098,13 +1099,6 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
                << ", evt_pfmet()= " << evt_pfmet() << ", StopEvt.pfmet= " << StopEvt.pfmet << endl;
           continue;
         }
-      }
-      else if(useGenMet && isFastsim){
-        // Only reasonable place to use genmet is to 
-        StopEvt.genmet = StopEvt.pfmet;
-        StopEvt.genmet_phi = StopEvt.pfmet_phi;
-        StopEvt.pfmet = gen_met();
-        StopEvt.pfmet_phi = gen_metPhi();
       }
       else{
         StopEvt.pfmet = evt_pfmet();
@@ -2461,14 +2455,33 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
           StopEvt.topnessMod_rl_resdown = CalcTopness_(1,StopEvt.pfmet_rl_resdown,StopEvt.pfmet_phi_rl_resdown,lep1.p4,mybjets,myaddjets);
         }
       }
-
-      if (nVetoLeptons > 0) {
+      if (nVetoLeptons > 1) {
         StopEvt.mt_met_lep_rl = calculateMt(lep1.p4, StopEvt.pfmet_rl, StopEvt.pfmet_phi_rl);
         StopEvt.MT2W_rl = CalcMT2W_(mybjets,myaddjets,lep1.p4,StopEvt.pfmet_rl, StopEvt.pfmet_phi_rl);
         StopEvt.topnessMod_rl = CalcTopness_(1,StopEvt.pfmet_rl,StopEvt.pfmet_phi_rl,lep1.p4,mybjets,myaddjets);
       }
 
       if(jets.ngoodjets>1) StopEvt.mindphi_met_j1_j2_rl = getMinDphi(StopEvt.pfmet_phi_rl,jets.ak4pfjets_p4.at(0),jets.ak4pfjets_p4.at(1));
+
+      if(!evt_isRealData()){
+        if(nVetoLeptons>0) StopEvt.mt_genmet_lep = calculateMt(lep1.p4, StopEvt.genmet, StopEvt.genmet_phi);
+        if(jets.ngoodjets>1){
+          StopEvt.mindphi_genmet_j1_j2 = getMinDphi(StopEvt.genmet_phi,jets.ak4pfjets_p4.at(0),jets.ak4pfjets_p4.at(1));
+          StopEvt.topnessMod_genmet = CalcTopness_(1,StopEvt.genmet,StopEvt.genmet_phi,lep1.p4,mybjets,myaddjets);
+        }
+      }
+      if(!evt_isRealData() && nVetoLeptons>1){
+        float new_genmet_x = lep2.p4.px() + (StopEvt.genmet * std::cos(StopEvt.genmet_phi));
+        float new_genmet_y = lep2.p4.py() + (StopEvt.genmet * std::sin(StopEvt.genmet_phi));
+        StopEvt.genmet_rl     = std::sqrt(new_genmet_x*new_genmet_x + new_genmet_y*new_genmet_y);
+        StopEvt.genmet_phi_rl = std::atan2(new_genmet_y, new_genmet_x);
+        StopEvt.mt_genmet_lep_rl = calculateMt(lep1.p4, StopEvt.genmet_rl, StopEvt.genmet_phi_rl);
+        StopEvt.MT2_ll_genmet = CalcMT2_(StopEvt.genmet,StopEvt.genmet_phi,lep1.p4,lep2.p4,false,0);
+        if(jets.ngoodjets>1){
+          StopEvt.mindphi_genmet_j1_j2_rl = getMinDphi(StopEvt.genmet_phi_rl,jets.ak4pfjets_p4.at(0),jets.ak4pfjets_p4.at(1));
+          StopEvt.topnessMod_rl_genmet = CalcTopness_(1,StopEvt.genmet_rl,StopEvt.genmet_phi_rl,lep1.p4,mybjets,myaddjets);
+        }
+      }
 
       //JEC up
       if(applyJECfromFile){

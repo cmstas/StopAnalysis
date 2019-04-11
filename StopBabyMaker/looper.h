@@ -107,7 +107,6 @@ class babyMaker {
   bool fillLepSynch;
 
   bool isFastsim;
-  bool useGenMet;
 
   // Flat tree maker for top tagger training
   bool runTopCandTreeMaker;

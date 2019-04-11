@@ -93,6 +93,8 @@ public:
     float topnessMod_resdown;
     float topnessMod_rl_resup;
     float topnessMod_rl_resdown;
+    float topnessMod_genmet;
+    float topnessMod_rl_genmet;
 
     float MT2W_jup;
     float topnessMod_jup;
@@ -102,6 +104,7 @@ public:
     float MT2_ll_jdown;
     float MT2_ll_resup;
     float MT2_ll_resdown;
+    float MT2_ll_genmet;
 
     float MT2_lb_b;
     float MT2_lb_b_lep2;
@@ -205,6 +208,8 @@ public:
     float mindphi_met_j1_j2_rl_resdown;
     float mindphi_met_j1_j2_resup;
     float mindphi_met_j1_j2_resdown;
+    float mindphi_genmet_j1_j2;
+    float mindphi_genmet_j1_j2_rl;
     float mt_met_lep;
     float mt_met_lep2;
     float mt_met_lep_rl;
@@ -216,6 +221,8 @@ public:
     float mt_met_lep_rl_resdown;
     float mt_met_lep_resup;
     float mt_met_lep_resdown;
+    float mt_genmet_lep;
+    float mt_genmet_lep_rl;
 
     float dphi_Wlep;
     float MET_over_sqrtHT;
@@ -312,6 +319,8 @@ public:
     //gen met
     float genmet;
     float genmet_phi;
+    float genmet_rl;
+    float genmet_phi_rl;
     float genht;
     float nupt;
     //veto
