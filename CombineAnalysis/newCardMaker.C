@@ -33,15 +33,13 @@ const bool correlated = true;
 // do subtract signal contamination from CR? default: true
 const bool dosigcont = true;
 // do average with yields using genmet for signal? default: true
-const bool dogenmet = false;
+const bool dogenmet = true;
 // test without real data?
 const bool fakedata = false;
 // test without background systematics?
 const bool nobgsyst = false;
 // test without signal systematics?
 const bool nosigsyst = false;
-// temporary symbol to scale the 2016 signal to the run2 lumi
-const bool scalesig = false;
 
 bool verbose = true;  // automatic turned off if is signal scan
 
@@ -56,7 +54,7 @@ TFile *fsig_genmet;
 
 // Set of systematics
 // vector<string> systNamesCard = {"PUSyst", "BLFSyst", "BHFSyst", "JESSyst", "ISRSyst", "LEffSyst", "LEffFSSyst", "BFSSyst", "MuRFSyst"};
-vector<string> systNames_sig = {"pileup", "bTagEffLF", "bTagEffHF", "jes", "ISR", "lepSF", "lepFSSF", "bTagFSEff", "L1prefire"}; //  "q2" <-- fix this
+vector<string> systNames_sig = {"jes", "ISR", "lepFSSF", "bTagFSEff"}; //  "q2" <-- fix this
 // vector<string> systNames_sig = {"bTagEffLF", "bTagEffHF", "jes", "lepSF", }; //  temporary as most ones aren't available
 vector<string> systNames_corr = {"bTagEffHF", "bTagEffLF", "lepSF", "pdf", "q2", "jes", "ISR", "pileup", "alphas", "metRes", "L1prefire"};
 
@@ -151,11 +149,12 @@ int getUncertainties(double& errup, double& errdn, double origyield, TFile* file
   if (std::isnan(errup)) { errup = -1; onereturn = true; }
   if (std::isnan(errdn)) { errdn = -1; onereturn = true; }
   if (onereturn) return -1;
-  if (errup <= 0 && errup != -1) errup = 0.001;
-  else if (errup > 2) errup = 2;
-  if (errdn <= 0 && errdn != -1) errdn = 0.001;
-  else if (errdn>2) errdn = 2;
+  if (errup > 2) errup = 2;
+  if (errdn > 2) errdn = 2;
   if (errup == 1 && errdn == 1) return 0;
+  if (errup <= 0 && errup != -1 && errdn > 0 ) errup = 1. / errdn;
+  else if (errdn <= 0 && errdn != -1 && errup > 0 ) errdn = 1. / errup;
+  else if (errup <= 0 && errup != -1 && errdn <= 0 && errdn != -1) errup = errdn = 0.001;
   return 1;
 }
 
@@ -210,23 +209,24 @@ int addCorrelatedUnc(std::ostringstream *fLogStream, string name, double *d, dou
 
   for(int i = 0; i<maxnprocess; ++i){
     if(isgmN)                 *fLogStream << u[i] << " ";
-    else if(fabs(d[i])<10e-10&&fabs(u[i])<10e-10) *fLogStream << "- ";
-    else if(fabs(d[i]-1.)<10e-10&&fabs(u[i]-1.)<10e-10) *fLogStream << "- ";
-    else if(d[i]>=0&&u[i] <0) {
-      if(d[i]>=1) *fLogStream << d[i] << " ";
-      else        *fLogStream << 2.-d[i] << " ";
+    else if (fabs(d[i]-u[i]) < 10e-10) {
+      if ((fabs(d[i]) < 10e-10 || fabs(d[i]-1.) < 10e-10) && (fabs(u[i]) < 10e-10 || fabs(u[i]-1.) < 10e-10))
+        *fLogStream << "- ";
+      else if (u[i] >= 1) *fLogStream << u[i] << " ";
+      else if (u[i] > 0)  *fLogStream << 1./u[i] << " ";
+      else  *fLogStream << "- " << " ";
     }
-    else if(u[i]>=0&&u[i]==d[i]) {
-      if(u[i]>=1) *fLogStream << u[i] << " ";
-      else        *fLogStream << 2.-u[i] << " ";
-    }
+    // else if(fabs(d[i]-1.)<10e-10&&fabs(u[i]-1.)<10e-10) *fLogStream << "- ";
     else if(d[i]>=0&&u[i]>=0) {
-      if(d[i]>=1&&u[i]>=1)     *fLogStream << TMath::Min(1.999,d[i]) << "/" << TMath::Min(1.999,u[i]) << " ";
-      else if(d[i]>=1&&u[i]<1) *fLogStream << TMath::Min(1.999,d[i]) << "/" << TMath::Max(0.001,1./(2.-u[i])) << " ";
-      else if(d[i]<1&&u[i]>=1) *fLogStream << TMath::Max(0.001,1./(2.-d[i])) << "/" << TMath::Min(1.999,u[i]) << " ";
-      else                     *fLogStream << TMath::Max(0.001,1./(2.-d[i])) << "/" << TMath::Max(0.001,1./(2.-u[i])) << " ";
+      *fLogStream << TMath::Max(TMath::Min(1.999,u[i]),0.001) << "/" << TMath::Max(TMath::Min(1.999,d[i]),0.001) << " ";
     }
-    else                      *fLogStream << "- ";
+    else if (u[i] >= 0 && d[i] < 0) {
+      *fLogStream << u[i] << " ";
+    }
+    else if (d[i] >= 0 && u[i] < 0) {
+      *fLogStream << 1./d[i] << " ";
+    }
+    else *fLogStream << "- ";
   }
   *fLogStream << endl;
   resetArray(d);
@@ -236,35 +236,36 @@ int addCorrelatedUnc(std::ostringstream *fLogStream, string name, double *d, dou
 
 //helper function to make one line in datacard for uncorrelated uncertainties
 int addOneUnc(std::ostringstream *fLogStream, string name, double d, double u, int process, int bin, string unctype){
-  if(fabs(d)<10e-10) return 0;
-  //if(d>0&&u==0) cout << name << " " << d << " " << u << endl;//return;
-  if(fabs(d)<10e-10&&fabs(u)<10e-10) return 0;
-  if(fabs(d-1.)<10e-10&&fabs(u-1.)<10e-10) return 0;
-  if(fabs(d-1.)<10e-10&&u<0) return 0;
-  if(unctype.find(string("gmN")) != string::npos && u<0) return 0;
+  if(fabs(d)<10e-10 || fabs(u)<10e-10) return 0;
+  if(fabs(d-1.)<10e-10 && fabs(u-1.)<10e-10) return 0;
+  if(fabs(d-1.)<10e-10 && u<0) return 0;
+
+  bool isgmN = (unctype == "gmN");
+  if(isgmN && u<0) return 0;
+
   *fLogStream << " " << setw(15) << name;
   if(bin>0) *fLogStream << bin;
   *fLogStream << " " << setw(6) << unctype << " ";
-  if(unctype.find(string("gmN")) != string::npos) {
+  if(isgmN) {
     *fLogStream << int(d) << " ";
     d = -1;
   }
   for(int i = 0; i<process; ++i) *fLogStream << "- ";
-  if(d==0){ d = 2.0; }
-  if(d<0)      *fLogStream << u << " ";//gmN
-  else if(u<0){
-    if(d>=1) *fLogStream << d << " ";//only one uncertainty
-    else     *fLogStream << 2.-d << " ";//only one uncertainty
+
+  // if(d==0) d = 2.0; 
+  if (d < 0) {
+    *fLogStream << u << " ";//gmN
   }
-  else if(u==d){
-    if(d>=1) *fLogStream << d << " ";//only one uncertainty
-    else     *fLogStream << 2.-d << " ";//only one uncertainty
+  else if (u < 0) {
+    if (d >= 1) *fLogStream << d << " ";//only one uncertainty
+    else        *fLogStream << 1./d << " ";//only one uncertainty
+  }
+  else if (u == d) {
+    if (d >= 1) *fLogStream << d << " ";//only one uncertainty
+    else        *fLogStream << 1./d << " ";//only one uncertainty
   }
   else {
-    if(d>=1&&u>=1)     *fLogStream << TMath::Min(1.999,d) << "/" << TMath::Min(1.999,u) << " ";
-    else if(d>=1&&u<1) *fLogStream << TMath::Min(1.999,d) << "/" << TMath::Max(0.001,1./(2.-u)) << " ";
-    else if(d<1&&u>=1) *fLogStream << TMath::Max(0.001,1./(2.-d)) << "/" << TMath::Min(1.999,u) << " ";
-    else               *fLogStream << TMath::Max(0.001,1./(2.-d)) << "/" << TMath::Max(0.001,1./(2.-u)) << " ";
+    *fLogStream << TMath::Max(TMath::Min(1.999,u),0.001) << "/" << TMath::Max(TMath::Min(1.999,d),0.001) << " ";
   }
   for(int i = process + 1; i<maxnprocess; ++i) *fLogStream << "- ";
   *fLogStream << endl;
@@ -306,7 +307,7 @@ int makeCardForOneBin(TString dir, int mstop, int mlsp, int metbin, int bin, TSt
       TString hnameCR_sig = TString(hname_sig).ReplaceAll("sr", crname);
       TString hname_alpha = TString(hname).ReplaceAll("metbins", "alphaHist");
       int extr_start_bin = getYield(fbkg, "h_extrstart", 1);
-      if (extr_start_bin > 0 && extr_start_bin <= metbin) {
+      if (extr_start_bin > 0 && metbin >= extr_start_bin) {
         // doing met extrapolation for this bin
         sigcont = getYield(fsig, hnameCR_sig, extr_start_bin, mstop, mlsp, -1);
         sigcont *= getYield(fbkg, hname_alpha, metbin);
@@ -333,22 +334,10 @@ int makeCardForOneBin(TString dir, int mstop, int mlsp, int metbin, int bin, TSt
       sig = (sig1 + sig2) / 2;
     }
   }
-  if (scalesig) {
-    sig    *= (59.97+41.53+35.92) / 35.92;
-    sigerr *= (59.97+41.53+35.92) / 35.92;
-    sig1   *= (59.97+41.53+35.92) / 35.92;
-    sig2   *= (59.97+41.53+35.92) / 35.92;
-  }
 
   data = getYieldAndError(dataerr, fdata, hname, metbin);
-  bg2l = getYieldAndError(bg2lerr, f2l, hname + "_dataStats", metbin);  // <-- look up for the errors
-  // Taking 1l estimate directly from MC for top tagged bins
-  bool take1lfromMC = (getYield(f1l, "h_MCyields_CR", 1) == 0);
-  if (take1lfromMC) {
-    bg1l = getYieldAndError(bg1lerr, f1l, hname, metbin);
-  } else {
-    bg1l = getYieldAndError(bg1lerr, f1l, hname + "_dataStats", metbin);
-  }
+  bg2l = getYieldAndError(bg2lerr, f2l, hname, metbin);  // <-- look up for the errors
+  bg1l = getYieldAndError(bg1lerr, f1l, hname, metbin);
   bg1ltop = getYieldAndError(bg1ltoperr, f1ltop, hname, metbin);
   bgznunu = getYieldAndError(bgznunuerr, fznunu, hname, metbin);
 
@@ -362,11 +351,11 @@ int makeCardForOneBin(TString dir, int mstop, int mlsp, int metbin, int bin, TSt
   if (fakedata) data = bg2l + bg1l + bg1ltop + bgznunu;
 
   *fLogStream << "------------" << endl << "# observations " << endl;
-  *fLogStream << "bin         " << bin << endl;
+  *fLogStream << "bin         b" << bin << endl;
   *fLogStream << "observation " << data << endl; // use float for data as to check against exp for fake data
   *fLogStream << "------------" << endl;
   *fLogStream << "#now we list all expected number of events" << endl;
-  *fLogStream << "bin          " << bin << "       " << bin << "       " << bin << "       " << bin << "       " << bin << "       " << endl;
+  *fLogStream << "bin          b" << bin << "       b" << bin << "       b" << bin << "       b" << bin << "       b" << bin << "       " << endl;
   *fLogStream << "process     sig       2l      1lW       1ltop       znunu" << endl;
   *fLogStream << "process      0        1        2          3           4  " << endl;
   *fLogStream << "rate        " << sig << "  " << bg2l << "  " << bg1l << "  " << bg1ltop << "  " << bgznunu << endl;
@@ -377,7 +366,7 @@ int makeCardForOneBin(TString dir, int mstop, int mlsp, int metbin, int bin, TSt
     double genmetunc = 1. + fabs(sig1-sig) / (2.*sig); // <-- careful for sig == 0.
     if (fsig_genmet && (fabs(fabs(sig1-sig)-fabs(sig2-sig)) > 0.001)) cout << "This should not happen " << fabs(sig1-sig) << " " << fabs(sig2-sig) << endl;
     if (genmetunc != 1) {
-      numnuis += addOneUnc(fLogStream, "SigGenMETunc", genmetunc, -1, 0,  bin, "lnU");
+      numnuis += addOneUnc(fLogStream, "SigGenMETunc", genmetunc, -1, 0,  -1, "lnU");
     }
   }
 
@@ -393,19 +382,33 @@ int makeCardForOneBin(TString dir, int mstop, int mlsp, int metbin, int bin, TSt
     numnuis += addOneUnc(fLogStream, "lepVetoSyst", lepvetoerr, -1, 0, bin, "lnN");
   }
 
+  auto addStatUncsDataDriven = [&](TFile* fbkg, string bgname) {
+    TString hname_alpha = TString(hname).ReplaceAll("metbins", "alphaHist");
+    TString hname_dataCR = TString(hname).ReplaceAll("metbins", "datayields_CR");
+    double tferr = 0;
+    double alphaTF = getYieldAndError(tferr, fbkg, hname_alpha, metbin);
+    double ydata = getYield(fbkg, hname_dataCR, metbin);
+    int extr_start_bin = getYield(fbkg, TString(hname).ReplaceAll("metbins", "extrstart"), 1);
+    if (extr_start_bin > 0 && metbin >= extr_start_bin) {
+      numnuis += addOneUnc(fLogStream, bgname+"DataStat", ydata, alphaTF, 1, (bin-metbin+extr_start_bin), "gmN");
+    } else {
+      numnuis += addOneUnc(fLogStream, bgname+"DataStat", ydata, alphaTF, 1, bin, "gmN");
+    }
+    numnuis += addOneUnc(fLogStream, bgname+"MCStat", tferr, -1, 1, bin, "lnN");
+    // getYieldAndError(tferr, fbkg, hname + "_MCStats", metbin);
+  };
+
   // Statistical uncertainties
   if (bg2l > 0) {
-    numnuis += addOneUnc(fLogStream, "Bg2lDataStat", bg2lerr, -1, 1, bin, "lnN");
-    getYieldAndError(bg2lerr, f2l, hname + "_MCStats", metbin);
-    numnuis += addOneUnc(fLogStream, "Bg2lMCStat",   bg2lerr, -1, 1, bin, "lnN");
+    addStatUncsDataDriven(f2l, "Bg2l");
   }
+  bool take1lfromMC = !f1l->Get((hname+"_dataStats").Data());
   if (bg1l > 0) {
+    // Taking 1l estimate directly from MC for top tagged bins
     if (take1lfromMC) {
       numnuis += addOneUnc(fLogStream, "Bg1lMCStat", bg1lerr, -1, 2, bin, "lnN"); // MC SR
     } else {
-      numnuis += addOneUnc(fLogStream, "Bg1lDataStat", bg1lerr, -1, 2, bin, "lnN");
-      getYieldAndError(bg1lerr, f1l, hname + "_MCStats", metbin);
-      numnuis += addOneUnc(fLogStream, "Bg1lMCStat",   bg1lerr, -1, 2, bin, "lnN"); // MC SR+CR
+      addStatUncsDataDriven(f1l, "Bg1l");
     }
   }
   if (bg1ltop > 0) numnuis += addOneUnc(fLogStream, "Bg1lTopSyst", bg1ltoperr, -1, 3, bin, "lnN");
@@ -419,17 +422,24 @@ int makeCardForOneBin(TString dir, int mstop, int mlsp, int metbin, int bin, TSt
     getUncertainties(uperr[1], dnerr[1], bg2l, f2l, hname_2l + "cr2lTriggerSF", metbin);
     numnuis += addCorrelatedUnc(fLogStream, "TrigSyst", dnerr, uperr, -1, "lnN"); // err array are reset after addCorrelatedUnc()
 
-    dnerr[0] = lumierr; dnerr[3] = lumierr; dnerr[4] = lumierr;
+    uperr[0] = uperr[3] = uperr[4] = lumierr;
+    dnerr[0] = dnerr[3] = dnerr[4] = lumierr;
     numnuis += addCorrelatedUnc(fLogStream, "LumiSyst", dnerr, uperr, -1, "lnN");
 
     if (correlated) {
       for (auto syst : systNames_corr) {
-        getUncertainties(uperr[1], dnerr[1], bg2l, f2l, hname_2l + syst.c_str(), metbin); // doing pdf?
+        string suf = "SystBG";
+        if (std::find(systNames_sig.begin(), systNames_sig.end(), syst) == systNames_sig.end() && syst != "pdf" && syst != "alphas") {
+          getUncertainties(uperr[0], dnerr[0], osig, fsig, hname_sig+"_"+syst.c_str(), metbin, mstop, mlsp);
+          suf = "Syst";
+        }
+        if (true)              // bg2l
+          getUncertainties(uperr[1], dnerr[1], bg2l, f2l, hname_2l + syst.c_str(), metbin); // doing pdf?
         if (syst != "lepSF")  // bg1l
           getUncertainties(uperr[2], dnerr[2], bg1l, f1l, hname_1l + syst.c_str(), metbin);
         // bgZnunu <-- uses both up and dn err for Znunu bkg until otherwise instructed
         getUncertainties(uperr[4], dnerr[4], bgznunu, fznunu, hname_Z + syst.c_str(), metbin);
-        numnuis += addCorrelatedUnc(fLogStream, syst+"SystBG", dnerr, uperr, -1, "lnN");
+        numnuis += addCorrelatedUnc(fLogStream, syst+suf, dnerr, uperr, -1, "lnN");
       }
     } else {
       for (auto syst : systNames_corr) {
@@ -446,6 +456,7 @@ int makeCardForOneBin(TString dir, int mstop, int mlsp, int metbin, int bin, TSt
     }
     // bg1l
     for (string syst : systNames_bg1l) {
+      if (take1lfromMC && syst == "CRpurity") continue;
       double systUp, systDn;
       getUncertainties(systUp, systDn, bg1l, f1l, hname_1l+syst.c_str(), metbin);
       numnuis += addOneUnc(fLogStream, syst+"Syst1l", systDn, systUp, 2,  -1, "lnN");
@@ -497,6 +508,8 @@ void makeCardsForPoint(TString signal, int mstop, int mlsp, TString outdir) {
     if (!hist) { cout << "Cannot find yield hist " << hname << " in " << fdata->GetName() << endl; continue; }
     int n_metbins = hist->GetNbinsX();
     TString anName = (dir == "srI")? "tcor" : (dir == "srJ")? "Wcor" : "std";
+    if (anName == "tcor" && mstop - mlsp > 350) return;  // only make top corridor cards for deltaM < 350 GeV
+    if (anName == "Wcor" && mstop - mlsp > 150) return;  // only make W corridor cards for deltaM < 150 GeV
     if (dir == "srI" || dir == "srJ") nbintot = 1;  // temporary solution to recount for corridor
     for (int ibin = 1; ibin <= n_metbins; ++ibin, ++nbintot) {
       // Make a separate card for each met bin.
@@ -508,7 +521,7 @@ void makeCardsForPoint(TString signal, int mstop, int mlsp, TString outdir) {
 
 // -------------------------------------------------------------------------------------------------------------------
 // Make cards for a single mass point
-void newCardMaker(string signal = "T2tt", int mStop = 800, int mLSP = 400, string input_dir="../StopLooper/output/temp", string output_dir="datacards/temp", string ysuf="25ns") {
+void newCardMaker(string signal = "T2tt", int mStop = 800, int mLSP = 400, string input_dir="../StopLooper/output/combRun2_v31_s6", string output_dir="datacards/temp", string ysuf="run2") {
   cout << "Making cards for single mass point: " << signal << endl;
   system(Form("mkdir -p %s", output_dir.c_str()));
 
@@ -520,7 +533,7 @@ void newCardMaker(string signal = "T2tt", int mStop = 800, int mLSP = 400, strin
   f1ltop = new TFile(Form("%s/1lepFromTop_%s.root",input_dir.c_str(), ysuf.c_str()));
   fznunu = new TFile(Form("%s/ZToNuNu_%s.root",input_dir.c_str(), ysuf.c_str()));
   fsig_genmet = nullptr; // don't use switched genmet signal for now
-  // fsig_genmet = new TFile(Form("%s/Signal_%s_gen.root",input_dir.c_str(), signal.substr(0,4).c_str()));
+  fsig_genmet = new TFile(Form("%s/SMS_%s_genmet_%s.root",input_dir.c_str(), signal.c_str(), ysuf.c_str()));
 
   if (!fakedata) fdata = new TFile(Form("%s/allData_%s.root", input_dir.c_str(), ysuf.c_str()));
   else fdata = new TFile(Form("%s/allBkg_%s.root", input_dir.c_str(), ysuf.c_str()));
@@ -552,7 +565,7 @@ int newCardMaker(string signal, string input_dir="../StopLooper/output/temp", st
   f1ltop = new TFile(Form("%s/1lepFromTop_%s.root",input_dir.c_str(), ysuf.c_str()));
   fznunu = new TFile(Form("%s/ZToNuNu_%s.root",input_dir.c_str(), ysuf.c_str()));
   fsig_genmet = nullptr; // don't use switched genmet signal for now
-  // fsig_genmet = new TFile(Form("%s/Signal_%s_gen.root",input_dir.c_str(), signal.c_str()));
+  fsig_genmet = new TFile(Form("%s/SMS_%s_genmet_%s.root",input_dir.c_str(), signal.c_str(), ysuf.c_str()));
 
   if (!fakedata) fdata = new TFile(Form("%s/allData_%s.root", input_dir.c_str(), ysuf.c_str()));
   else fdata = new TFile(Form("%s/allBkg_%s.root", input_dir.c_str(), ysuf.c_str()));
@@ -571,7 +584,8 @@ int newCardMaker(string signal, string input_dir="../StopLooper/output/temp", st
     return -1;
   }
 
-  for (int im1 = 150; im1 <= 2000; im1 += 25) {
+  // for (int im1 = 150; im1 <= 1450; im1 += 25) {
+  for (int im1 = 400; im1 <= 1450; im1 += 25) {
     for (int im2 = 0; im2 <= 1150; im2 += 25) {
       // if (im1 < 900 && im2 < 400) continue;
       // if (im1 - im2 < 400) continue;
