@@ -382,7 +382,7 @@ int makeCardForOneBin(TString dir, int mstop, int mlsp, int metbin, int bin, TSt
     numnuis += addOneUnc(fLogStream, "lepVetoSyst", lepvetoerr, -1, 0, bin, "lnN");
   }
 
-  auto addStatUncsDataDriven = [&](TFile* fbkg, string bgname) {
+  auto addStatUncsDataDriven = [&](TFile* fbkg, string bgname, int proc) {
     TString hname_alpha = TString(hname).ReplaceAll("metbins", "alphaHist");
     TString hname_dataCR = TString(hname).ReplaceAll("metbins", "datayields_CR");
     double tferr = 0;
@@ -390,17 +390,17 @@ int makeCardForOneBin(TString dir, int mstop, int mlsp, int metbin, int bin, TSt
     double ydata = getYield(fbkg, hname_dataCR, metbin);
     int extr_start_bin = getYield(fbkg, TString(hname).ReplaceAll("metbins", "extrstart"), 1);
     if (extr_start_bin > 0 && metbin >= extr_start_bin) {
-      numnuis += addOneUnc(fLogStream, bgname+"DataStat", ydata, alphaTF, 1, (bin-metbin+extr_start_bin), "gmN");
+      numnuis += addOneUnc(fLogStream, bgname+"DataStat", ydata, alphaTF, proc, (bin-metbin+extr_start_bin), "gmN");
     } else {
-      numnuis += addOneUnc(fLogStream, bgname+"DataStat", ydata, alphaTF, 1, bin, "gmN");
+      numnuis += addOneUnc(fLogStream, bgname+"DataStat", ydata, alphaTF, proc, bin, "gmN");
     }
-    numnuis += addOneUnc(fLogStream, bgname+"MCStat", tferr, -1, 1, bin, "lnN");
+    numnuis += addOneUnc(fLogStream, bgname+"MCStat", tferr, -1, proc, bin, "lnN");
     // getYieldAndError(tferr, fbkg, hname + "_MCStats", metbin);
   };
 
   // Statistical uncertainties
   if (bg2l > 0) {
-    addStatUncsDataDriven(f2l, "Bg2l");
+    addStatUncsDataDriven(f2l, "Bg2l", 1);
   }
   bool take1lfromMC = !f1l->Get((hname+"_dataStats").Data());
   if (bg1l > 0) {
@@ -408,7 +408,7 @@ int makeCardForOneBin(TString dir, int mstop, int mlsp, int metbin, int bin, TSt
     if (take1lfromMC) {
       numnuis += addOneUnc(fLogStream, "Bg1lMCStat", bg1lerr, -1, 2, bin, "lnN"); // MC SR
     } else {
-      addStatUncsDataDriven(f1l, "Bg1l");
+      addStatUncsDataDriven(f1l, "Bg1l", 2);
     }
   }
   if (bg1ltop > 0) numnuis += addOneUnc(fLogStream, "Bg1lTopSyst", bg1ltoperr, -1, 3, bin, "lnN");
