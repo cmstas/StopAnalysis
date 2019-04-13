@@ -413,6 +413,7 @@ void evtWgtInfo::Cleanup() {
 void evtWgtInfo::resetEvent() {
   event_ready = false;
   add2ndLepToMet = false;
+  corridorType = 0;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1755,53 +1756,55 @@ void evtWgtInfo::getMetTTbarWeight( double &weight_metTTbar, double &weight_metT
   // 450.0: 1.086 +- 0.061
   // 550.0: 0.813 +- 0.077
 
-  bool passlmet_corr = (lep1_p4().pt() < 50) || (lep1_p4().pt() < (250 - 100*lep1_dphiMET_rl()));
+  // bool passlmet_corr = (lep1_p4().pt() < 50) || (lep1_p4().pt() < (250 - 100*lep1_dphiMET_rl()));
 
-  // cremuA1/h_rlmetbinA : Data/MC = 0.388  nData 1 = 51  nData 2 = 11
-  if ( nGoodJets<4 && modTopness>=10.0 && mlb<175.0 ) {
-    if ( met > 600.0 ) { sf_val = 1.072; sf_err = 0.155; }
-    if ( met > 750.0 ) { sf_val = 0.763; sf_err = 0.236; }
-  }
-  // -------------------------------------------------
-  // cremuA1/h_rlmetbinB : Data/MC = 0.551  nData 1 = 452  nData 2 = 21
-  else if ( nGoodJets<4 && modTopness>=10.0 && mlb>175.0 && nTightTags) {
-    if ( met > 450.0) { sf_val = 1.022; sf_err = 0.051; }
-    if ( met > 700.0) { sf_val = 0.681; sf_err = 0.153; }
-  }
-  // -------------------------------------------------
-  // cremuA1/h_rlmetbinC : Data/MC = 0.382  nData 1 = 33  nData 2 = 3
-  else if ( nGoodJets>=4 && modTopness<0.0 && mlb<175.0 ) {
-    if ( met > 650.0) { sf_val = 1.221; sf_err = 0.221; }
-    if ( met > 800.0) { sf_val = 0.335; sf_err = 0.195; }
-  }
-  // -------------------------------------------------
-  // cremuA1/h_rlmetbinE : Data/MC = 0.551  nData 1 = 411  nData 2 = 62
-  else if ( nGoodJets>=4 && modTopness>=0.0 && modTopness<10.0 && mlb<175.0 ) {
-    if ( met > 450.0) { sf_val = 1.068; sf_err = 0.056; }
-    if ( met > 600.0) { sf_val = 0.704; sf_err = 0.092; }
-  }
-  // -------------------------------------------------
-  // cremuA1/h_rlmetbinG : Data/MC = 0.448  nData 1 = 110  nData 2 = 11
-  else if ( nGoodJets>=4 && modTopness>=10.0 && mlb<175.0 ) {
-    if ( met > 550.0) { sf_val = 1.054; sf_err = 0.105; }
-    if ( met > 750.0) { sf_val = 0.661; sf_err = 0.205; }
-  }
-  // -------------------------------------------------
-  // cremuA1/h_rlmetbinH : Data/MC = 0.66  nData 1 = 9592  nData 2 = 240
-  else if ( nGoodJets>=4 && modTopness>=10.0 && mlb>175.0 && nTightTags) {
-    if ( met > 250.0) { sf_val = 1.007; sf_err = 0.011; }
-    if ( met > 500.0) { sf_val = 0.785; sf_err = 0.053; }
+  if (corridorType == 0) {
+    // cremuA1/h_rlmetbinA : Data/MC = 0.388  nData 1 = 51  nData 2 = 11
+    if ( nGoodJets<4 && modTopness>=10.0 && mlb<175.0 ) {
+      if ( met > 600.0 ) { sf_val = 1.072; sf_err = 0.155; }
+      if ( met > 750.0 ) { sf_val = 0.763; sf_err = 0.236; }
+    }
+    // -------------------------------------------------
+    // cremuA1/h_rlmetbinB : Data/MC = 0.551  nData 1 = 452  nData 2 = 21
+    else if ( nGoodJets<4 && modTopness>=10.0 && mlb>175.0 && nTightTags) {
+      if ( met > 450.0) { sf_val = 1.022; sf_err = 0.051; }
+      if ( met > 700.0) { sf_val = 0.681; sf_err = 0.153; }
+    }
+    // -------------------------------------------------
+    // cremuA1/h_rlmetbinC : Data/MC = 0.382  nData 1 = 33  nData 2 = 3
+    else if ( nGoodJets>=4 && modTopness<0.0 && mlb<175.0 ) {
+      if ( met > 650.0) { sf_val = 1.221; sf_err = 0.221; }
+      if ( met > 800.0) { sf_val = 0.335; sf_err = 0.195; }
+    }
+    // -------------------------------------------------
+    // cremuA1/h_rlmetbinE : Data/MC = 0.551  nData 1 = 411  nData 2 = 62
+    else if ( nGoodJets>=4 && modTopness>=0.0 && modTopness<10.0 && mlb<175.0 ) {
+      if ( met > 450.0) { sf_val = 1.068; sf_err = 0.056; }
+      if ( met > 600.0) { sf_val = 0.704; sf_err = 0.092; }
+    }
+    // -------------------------------------------------
+    // cremuA1/h_rlmetbinG : Data/MC = 0.448  nData 1 = 110  nData 2 = 11
+    else if ( nGoodJets>=4 && modTopness>=10.0 && mlb<175.0 ) {
+      if ( met > 550.0) { sf_val = 1.054; sf_err = 0.105; }
+      if ( met > 750.0) { sf_val = 0.661; sf_err = 0.205; }
+    }
+    // -------------------------------------------------
+    // cremuA1/h_rlmetbinH : Data/MC = 0.66  nData 1 = 9592  nData 2 = 240
+    else if ( nGoodJets>=4 && modTopness>=10.0 && mlb>175.0 && nTightTags) {
+      if ( met > 250.0) { sf_val = 1.007; sf_err = 0.011; }
+      if ( met > 500.0) { sf_val = 0.785; sf_err = 0.053; }
+    }
   }
 
   // -------------------------------------------------
   // cremuA1/h_rlmetbinI : Data/MC = 0.448  nData 1 = 110  nData 2 = 11
-  else if ( nGoodJets>=5 && passlmet_corr ) {
+  if ( corridorType == 1 ) {
     if ( met > 550.0) { sf_val = 1.054; sf_err = 0.105; }
     if ( met > 750.0) { sf_val = 0.661; sf_err = 0.205; }
   }
   // -------------------------------------------------
   // cremuA1/h_rlmetbinJ : Data/MC = 0.551  nData 1 = 352  nData 2 = 121
-  else if ( nGoodJets>=5 && passlmet_corr && nsoftbtags() > 0 ) {
+  if ( corridorType == 2 ) {
     if ( met > 450.0) { sf_val = 1.086; sf_err = 0.061; }
     if ( met > 550.0) { sf_val = 0.813; sf_err = 0.077; }
   }
@@ -2433,9 +2436,13 @@ string evtWgtInfo::getLabel( systID isyst ) {
   return util.label;
 }
 
-double evtWgtInfo::getWeight( systID isyst, bool is_cr2l ) {
+double evtWgtInfo::getWeight( systID isyst, bool is_cr2l, int cortype ) {
   if (is_cr2l != add2ndLepToMet) {
     add2ndLepToMet = is_cr2l;
+    event_ready = false;
+  }
+  if (corridorType != cortype) {
+    corridorType = cortype;
     event_ready = false;
   }
   if (!event_ready)

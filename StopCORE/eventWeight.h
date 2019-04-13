@@ -90,6 +90,7 @@ class evtWgtInfo {
 
   // Lost lepton analyis uses met with 2nd lepton removed
   bool add2ndLepToMet;
+  int corridorType;
 
   enum SampleType {data, ttbar, Wjets, singletop, ttW, ttZ, WZ, diboson, fastsim, fs17ext1, unknown=-1 } samptype;
   enum SystSet {stop_Moriond17, stop_Run2, test_alloff};
@@ -329,7 +330,7 @@ class evtWgtInfo {
   bool doingSystematic( systID systid );
   SampleType findSampleType( std::string samplestr);  // <-- todo: finish this function
   std::string getLabel( systID systid );
-  double getWeight( systID systid, bool cr2lregions=false );
+  double getWeight( systID systid, bool cr2lregions=false, int cortype=0 );
 
  private:
   bool is_bkg_;
