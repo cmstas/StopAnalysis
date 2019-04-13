@@ -342,6 +342,30 @@ std::vector<SR> getStopCrosscheckRegionsEMuRun2() {
   cr.SetVar(nbjet, 1, fInf);
   CRvec.emplace_back(cr);
 
+
+  cr = crbase;
+  cr.SetName("cremuM1");
+  cr.SetDetailName("ge2j_ge1b_met50to100");
+  cr.SetVar(met, 50, 100);
+  cr.SetVar(njet, 2, fInf);
+  cr.SetVar(nbjet, 1, fInf);
+  CRvec.emplace_back(cr);
+
+  cr.SetName("cremuM2");
+  cr.SetDetailName("ge2j_ge1b_met150toInf");
+  cr.SetVar(met, 150, 250);
+  cr.SetVar(njet, 2, fInf);
+  cr.SetVar(nbjet, 1, fInf);
+  CRvec.emplace_back(cr);
+
+  cr.SetName("cremuM3");
+  cr.SetDetailName("ge2j_ge1b_met150toInf");
+  cr.SetVar(met, 250, fInf);
+  cr.SetVar(njet, 2, fInf);
+  cr.SetVar(nbjet, 1, fInf);
+  CRvec.emplace_back(cr);
+
+
   // // SRs
   // cr.SetName("cremuA");
   // cr.SetDetailName("2to3j_ge1b_met50toInf_tmod10toInf_mlb0to175");
@@ -1591,14 +1615,16 @@ std::vector<SR> getStopSignalRegionsRun2() {
   sr.SetVar(passlmetcor, 1, 2); // shape cut on lep1pt & dphilmet
   sr.SetVar(dphijmet, 0.5, 3.1416);
   sr.SetVar(j1passbtag, 0, 1);  // Require j1 not b-tagged
+  sr.RemoveVar(tmod);
+  sr.RemoveVar(mlb);
   sr.SetMETBins({250, 350, 450, 550, 750, 1500});
   SRvec.emplace_back(sr);
 
-  sr = srbase;
+  // sr = srbase;
   sr.SetName("srJ");
   sr.SetDetailName("ge5j_ge1sb_passlmetcor_j1notb");
   sr.SetVar(njet, 5, fInf);
-  // sr.SetVar(nbjet, 1, fInf);
+  sr.SetVar(nbjet, 0, fInf);
   sr.SetVar(nsbtag, 1, fInf);
   sr.SetVar(passlmetcor, 1, 2); // shape cut on lep1pt & dphilmet
   sr.SetVar(dphijmet, 0.5, 3.1416);
@@ -1621,7 +1647,7 @@ std::vector<SR> getStopControlRegionsNoBTagsRun2(const std::vector<SR>& SRvec = 
     } else if (cr.VarExists(nbtag)) {
       cr.SetVar(nbtag, 0, 1);
     }
-    if (cr.GetLowerBound(tmod) < 10)
+    if (cr.VarExists(tmod) && cr.GetLowerBound(tmod) < 10)
       cr.SetVar(nbjet, 0, 1);
 
     if (cr.VarExists(tfttag))   cr.RemoveVar(tfttag);
@@ -1645,8 +1671,8 @@ std::vector<SR> getStopControlRegionsDileptonRun2(const std::vector<SR>& SRvec =
     cr.ReplaceVar(mt, mt_rl);
     cr.ReplaceVar(dphijmet, dphijmet_rl);
     cr.ReplaceVar(nlep, nlep_rl);
-    cr.ReplaceVar(tmod, tmod_rl);
     cr.RemoveVar(passvetos);
+    if (cr.VarExists(tmod)) cr.ReplaceVar(tmod, tmod_rl);
     if (cr.VarExists(dphilmet)) cr.ReplaceVar(dphilmet, dphilmet_rl);
     if (cr.VarExists(passlmetcor)) cr.ReplaceVar(passlmetcor, passlmet_rl);
     cr.SetVar(nvlep, 2, fInf);
