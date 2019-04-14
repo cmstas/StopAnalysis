@@ -4,6 +4,9 @@ double extr_threshold = 5;  // minimum number of events in a bin to not need an 
 bool doCRPurityError = true;
 double extr_TFcap = 3;  // maximum value for the transfer factor to not do MET extrapolation
 double maxFractionForMC = 0.10;  // minimum value for bkg fraction in SR to do extrapolation, else take from MC
+bool yearSeparateSyst = true;
+
+TFile* fbkgs[4];
 
 void dataDrivenFromCR(TFile* fdata, TFile* fmc, TFile* fout, TString ddtype, TString gentype) {
   // Additional hists to consider: dataStats, MCstats, impurity
@@ -83,7 +86,7 @@ void dataDrivenFromCR(TFile* fdata, TFile* fmc, TFile* fout, TString ddtype, TSt
       hnameSR.ReplaceAll("h_metbins", "h_metbins" + gentype);
 
       // Not using fraction
-      auto hist_MC_CR = (TH1D*) crdir->Get(hname);
+      auto hist_MC_CR = (TH1D*) crdir->Get(hname)->Clone(hname+"_cr");
       auto hist_MC_SR = (TH1D*) fmc->Get(srname + "/" + hnameSR);
 
       if (!hist_MC_SR) {
@@ -119,6 +122,54 @@ void dataDrivenFromCR(TFile* fdata, TFile* fmc, TFile* fout, TString ddtype, TSt
       TH1D* hout = (TH1D*) alphaHist->Clone(hname);
       hout->Multiply(hist_data_CR);
       hout->Write();
+
+      if (yearSeparateSyst && (hname.EndsWith("Up") || hname.EndsWith("Dn"))) {
+        for (int i = 1; i < 4; ++i) {
+
+          auto hcen_MC_CR = (TH1D*) fbkgs[i]->Get(crname+"/h_metbins");
+          auto hcen_MC_SR = (TH1D*) fbkgs[i]->Get(srname+"/h_metbins"+gentype);
+          auto hsys_MC_CR = (TH1D*) fbkgs[i]->Get(crname+"/"+hname);
+          auto hsys_MC_SR = (TH1D*) fbkgs[i]->Get(srname+"/"+hnameSR);
+
+          if (!hist_MC_SR) {
+            if (!hnameSR.Contains("cr2lTriggerSF"))
+              cout << "Couldn't find yield hist for " << (srname + "/" + hnameSR) << " in " << fmc->GetName() << ". Use centralHist!" << endl;
+            hist_MC_SR = (TH1D*) fmc->Get(hname_MC_SR)->Clone(hnameSR);
+          }
+
+          auto alphaHist_yi = (TH1D*) fmc->Get(hname_MC_SR)->Clone(TString(hname).Insert(hname.Length()-2, Form("%d", 15+i)));
+          auto h_MC_CR_yi = (TH1D*) fmc->Get(hname_MC_CR)->Clone(Form("%s_den_%d", hname.Data(), 15+i));
+          if (hcen_MC_SR) alphaHist_yi->Add(hcen_MC_SR, -1);
+          if (hsys_MC_SR) alphaHist_yi->Add(hsys_MC_SR);
+          if (hcen_MC_CR) h_MC_CR_yi->Add(hcen_MC_CR, -1);
+          if (hsys_MC_CR) h_MC_CR_yi->Add(hsys_MC_CR);
+
+          if (useMetExtrapolation && extr_start_bin != lastbin) {
+            // To take the MET distribution from the CR
+            double cerr_SR = 0;
+            double cyld_SR = alphaHist_yi->IntegralAndError(extr_start_bin, -1, cerr_SR);
+            double cyld_CR = h_MC_CR_yi->Integral(extr_start_bin, -1);
+            for (int ibin = extr_start_bin; ibin <= lastbin; ++ibin) {
+              double metfrac = h_MC_CR_yi->GetBinContent(ibin) / cyld_CR;
+              alphaHist_yi->SetBinContent(ibin, metfrac * cyld_SR);
+              alphaHist_yi->SetBinError(ibin, metfrac * cerr_SR);
+            }
+            combineYieldsInExtrBins(h_MC_CR_yi);
+          }
+          alphaHist_yi->Divide(h_MC_CR_yi);
+
+          for (int i = 1; i <= alphaHist_yi->GetNbinsX(); ++i) {
+            // zero out negative yields
+            if (alphaHist_yi->GetBinContent(i) < 0) {
+              alphaHist_yi->SetBinContent(i, 0);
+              alphaHist_yi->SetBinError(i, 0);
+            }
+          }
+          outdir->cd();
+          alphaHist_yi->Multiply(hist_data_CR);
+          alphaHist_yi->Write();
+        }
+      }
 
       if (hname.EndsWith("h_metbins")) {
         centralHist = hout;
@@ -200,7 +251,7 @@ void takeDirectlyFromMC(TFile* fin, TFile* fout, TString gentype) {
       if (!hname.BeginsWith("h_metbins" + gentype)) continue;
       TH1D* hin = (TH1D*) indir->Get(hname);
       outdir->cd();
-      TH1D* hout = (TH1D*) hin->Clone(hname.ReplaceAll(gentype, ""));
+      TH1D* hout = (TH1D*) hin->Clone(TString(hname).ReplaceAll(gentype, ""));
       for (int i = 1; i <= hout->GetNbinsX(); ++i) {
         // zero out negative yields
         if (hout->GetBinContent(i) < 0) {
@@ -209,6 +260,20 @@ void takeDirectlyFromMC(TFile* fin, TFile* fout, TString gentype) {
         }
       }
       hout->Write();
+
+      if (yearSeparateSyst && (hname.EndsWith("Up") || hname.EndsWith("Dn"))) {
+        for (int i = 1; i < 4; ++i) {
+          TH1D* hcen_yi = (TH1D*) fbkgs[i]->Get(srname+"/h_metbins"+gentype);
+          TH1D* hsys_yi = (TH1D*) fbkgs[i]->Get(srname+"/"+hname);
+          if (hsys_yi && !hcen_yi) {
+            cout << "Find " << srname+"/"+hname << " from " << fbkgs[i]->GetName() << " but not hcen " << srname+"/h_metbins"+gentype << " Should not happen?" << endl;
+          }
+          TH1D* hout_yi = (TH1D*) fin->Get(srname+"/h_metbins"+gentype)->Clone(TString(hname).Insert(hname.Length()-2, Form("%d", 15+i)).ReplaceAll(gentype, ""));
+          if (hcen_yi) hout_yi->Add(hcen_yi, -1);
+          if (hsys_yi) hout_yi->Add(hsys_yi);
+          hout_yi->Write();
+        }
+      }
     }
     if (!outdir->Get("h_metbins")) {
       cout << "Didn't find yield hist for " << gentype << " in " << fin->GetName() << ":" << srname << "/. Faking a 0 one!" << endl;
@@ -258,9 +323,9 @@ int makeBkgEstimates(string input_dir="../StopLooper/output/temp14", string outp
   bool MetExtrFor2l = true;
   bool MetExtrFor0b = true;
 
-  // parseAndSet_b(extrargs, "useMetExtrapolation" , useMetExtrapolation);
-  parseAndSet_b(extrargs, "MetExtrFor2l"        , MetExtrFor2l);
-  parseAndSet_b(extrargs, "MetExtrFor0b"        , MetExtrFor0b);
+  parseAndSet_b(extrargs, "useMetExtrapolation" , useMetExtrapolation);
+  // parseAndSet_b(extrargs, "MetExtrFor2l"        , MetExtrFor2l);
+  // parseAndSet_b(extrargs, "MetExtrFor0b"        , MetExtrFor0b);
   parseAndSet_b(extrargs, "doCRPurityError"     , doCRPurityError);
   parseAndSet_d(extrargs, "extr_threshold"      , extr_threshold);
   parseAndSet_d(extrargs, "extr_TFcap"          , extr_TFcap);
@@ -274,15 +339,20 @@ int makeBkgEstimates(string input_dir="../StopLooper/output/temp14", string outp
     cout << "Couldn't find fdata!! Can't procceed, exiting!\n"; return -1;
   }
 
+  if (yearSeparateSyst) {
+    fbkgs[0] = fbkg;
+    fbkgs[1] = new TFile(Form("%s/allBkg_16.root",input_dir.c_str()));
+    fbkgs[2] = new TFile(Form("%s/allBkg_17.root",input_dir.c_str()));
+    fbkgs[3] = new TFile(Form("%s/allBkg_18.root",input_dir.c_str()));
+  }
+
   // Create output files
   TFile* f2l = new TFile(Form("%s/lostlepton_%s.root",output_dir.c_str(), suffix.c_str()), "RECREATE");
   TFile* f1l = new TFile(Form("%s/1lepFromW_%s.root",output_dir.c_str(), suffix.c_str()), "RECREATE");
   TFile* f1ltop = new TFile(Form("%s/1lepFromTop_%s.root",output_dir.c_str(), suffix.c_str()), "RECREATE");
   TFile* fznunu = new TFile(Form("%s/ZToNuNu_%s.root",output_dir.c_str(), suffix.c_str()), "RECREATE");
 
-  useMetExtrapolation=MetExtrFor2l;
   dataDrivenFromCR(fdata, fbkg, f2l, "cr2l", "_2lep");
-  useMetExtrapolation=MetExtrFor0b;
   dataDrivenFromCR(fdata, fbkg, f1l, "cr0b", "_1lepW");
 
   takeDirectlyFromMC(fbkg, f1l,    "_1lepW");  // only for top-tagged bins
