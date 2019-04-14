@@ -45,6 +45,9 @@ bool verbose = true;  // automatic turned off if is signal scan
 
 // global file pointers
 TFile *fsig;
+TFile *fsig16;
+TFile *fsig17;
+TFile *fsig18;
 TFile *f2l;
 TFile *f1l;
 TFile *f1ltop;
@@ -54,13 +57,18 @@ TFile *fsig_genmet;
 
 // Set of systematics
 // vector<string> systNamesCard = {"PUSyst", "BLFSyst", "BHFSyst", "JESSyst", "ISRSyst", "LEffSyst", "LEffFSSyst", "BFSSyst", "MuRFSyst"};
-vector<string> systNames_sig = {"jes", "ISR", "lepFSSF", "bTagFSEff"}; //  "q2" <-- fix this
+// vector<string> systNames_sig = {"jes", "ISR", "lepFSSF", "bTagFSEff"}; //  "q2" <-- fix this
+vector<string> systNames_sig = {"jes16", "jes17", "jes18", "ISR", "lepFSSF", "bTagFSEff"}; //  "q2" <-- fix this
+// vector<string> systNames_sig = {"jes", "ISR", "lepFSSF", "bTagFSEff"}; //  "q2" <-- fix this
 // vector<string> systNames_sig = {"bTagEffLF", "bTagEffHF", "jes", "lepSF", }; //  temporary as most ones aren't available
-vector<string> systNames_corr = {"bTagEffHF", "bTagEffLF", "lepSF", "pdf", "q2", "jes", "ISR", "pileup", "alphas", "metRes", "L1prefire"};
+// vector<string> systNames_corr = {"bTagEffHF", "bTagEffLF", "lepSF", "pdf", "q2", "jes", "ISR", "pileup", "alphas", "metRes", "L1prefire"};
+vector<string> systNames_corr = {"bTagEffHF16", "bTagEffHF17", "bTagEffHF18", "bTagEffLF16", "bTagEffLF17", "bTagEffLF18", "lepSF",
+                                 "pdf", "q2", "jes16", "jes17", "jes18", "ISR16", "pileup16", "pileup17", "pileup18",
+                                 "alphas", "metRes16", "metRes17", "metRes18", "L1prefire"};
 
 // individual systematic uncertainties for different backgrounds
 // vector<string> systNames_bg2l = {"metRes", "ttbarSysPt", "tauSF"};
-vector<string> systNames_bg2l = {"tauSF","metTTbar"};
+vector<string> systNames_bg2l = {"tauSF", "metTTbar"};
 vector<string> systNames_bg1l = {"CRpurity", "WbXsec"};
 vector<string> systNames_bgZnunu;
 
@@ -124,19 +132,65 @@ int getUncertainties(double& errup, double& errdn, double origyield, TFile* file
   errup = 1; errdn = 1;
   if (origyield <= 0) return 0;
 
-  TH1* histUp = (TH1*) file->Get(hname+"Up");
-  TH1* histDn = (TH1*) file->Get(hname+"Dn");
-  if (!histUp || !histDn) {
-    if (verbose) cout << "[getUncertainties] Cannot find the up or down syst for: " << hname << " in file: " << file->GetName() << " !! skipping!\n";
-    return 0;
-  }
-
   if (hname.Contains("hSMS")) {
+    TH1* histUp = (TH1*) file->Get(hname+"Up");
+    TH1* histDn = (TH1*) file->Get(hname+"Dn");
+    TString hname2 = hname(0,hname.Length()-2);
+    if (hname.EndsWith("16") || hname.EndsWith("17") || hname.EndsWith("18")) {
+      histUp = (TH1*) file->Get(hname2+"Up");
+      histDn = (TH1*) file->Get(hname2+"Dn");
+    }
     int biny = histUp->GetYaxis()->FindBin(m1);
     int binz = histUp->GetZaxis()->FindBin(m2);
-    errup = histUp->GetBinContent(metbin, biny, binz) / origyield;
-    errdn = histDn->GetBinContent(metbin, biny, binz) / origyield;
+    double yldup = histUp->GetBinContent(metbin, biny, binz);
+    double ylddn = histDn->GetBinContent(metbin, biny, binz);
+
+    if (!histUp || !histDn) {
+      if (verbose) cout << "[getUncertainties] Cannot find the up or down syst for: " << hname << " in file: " << file->GetName() << " !! skipping!\n";
+      return 0;
+    }
+
+    if (hname.EndsWith("16")) {
+      TString hname3 = hname(0,hname.Index("metbins")+7);
+      TH1* histCen = (TH1*) file->Get(hname3.Data());
+      TH1* histCen16 = (TH1*) fsig16->Get(hname3.Data());
+      TH1* histUp16 = (TH1*) fsig16->Get(hname2+"Up");
+      TH1* histDn16 = (TH1*) fsig16->Get(hname2+"Dn");
+      double yld16 = histCen->GetBinContent(metbin, biny, binz) - histCen16->GetBinContent(metbin, biny, binz);
+      yldup = histUp16->GetBinContent(metbin, biny, binz) + yld16;
+      ylddn = histDn16->GetBinContent(metbin, biny, binz) + yld16;
+    } 
+    else if (hname.EndsWith("17")) {
+      TString hname3 = hname(0,hname.Index("metbins")+7);
+      TH1* histCen = (TH1*) file->Get(hname3.Data());
+      TH1* histCen17 = (TH1*) fsig17->Get(hname3.Data());
+      TH1* histUp17 = (TH1*) fsig17->Get(hname2+"Up");
+      TH1* histDn17 = (TH1*) fsig17->Get(hname2+"Dn");
+      double yld17 = histCen->GetBinContent(metbin, biny, binz) - histCen17->GetBinContent(metbin, biny, binz);
+      yldup = histUp17->GetBinContent(metbin, biny, binz) + yld17;
+      ylddn = histDn17->GetBinContent(metbin, biny, binz) + yld17;
+    } 
+    else if (hname.EndsWith("18")) {
+      TString hname3 = hname(0,hname.Index("metbins")+7);
+      TH1* histCen = (TH1*) file->Get(hname3.Data());
+      TH1* histCen18 = (TH1*) fsig18->Get(hname3.Data());
+      TH1* histUp18 = (TH1*) fsig18->Get(hname2+"Up");
+      TH1* histDn18 = (TH1*) fsig18->Get(hname2+"Dn");
+      double yld18 = histCen->GetBinContent(metbin, biny, binz) - histCen18->GetBinContent(metbin, biny, binz);
+      yldup = histUp18->GetBinContent(metbin, biny, binz) + yld18;
+      ylddn = histDn18->GetBinContent(metbin, biny, binz) + yld18;
+    } 
+
+    errup = yldup / origyield;
+    errdn = ylddn / origyield;
   } else {
+    TH1* histUp = (TH1*) file->Get(hname+"Up");
+    TH1* histDn = (TH1*) file->Get(hname+"Dn");
+    if (!histUp || !histDn) {
+      if (verbose) cout << "[getUncertainties] Cannot find the up or down syst for: " << hname << " in file: " << file->GetName() << " !! skipping!\n";
+      return 0;
+    }
+
     errup = histUp->GetBinContent(metbin) / origyield;
     errdn = histDn->GetBinContent(metbin) / origyield;
   }
@@ -155,6 +209,18 @@ int getUncertainties(double& errup, double& errdn, double origyield, TFile* file
   if (errup <= 0 && errup != -1 && errdn > 0 ) errup = 1. / errdn;
   else if (errdn <= 0 && errdn != -1 && errup > 0 ) errdn = 1. / errup;
   else if (errup <= 0 && errup != -1 && errdn <= 0 && errdn != -1) errup = errdn = 0.001;
+
+  // Sloppy hack to bring jes to be symmetric
+  if ((hname.Contains("jes") || hname.Contains("metRes"))) {
+    if (errup > 1 && errdn > 1) {
+      errup = TMath::Max(errup, errdn);
+      errdn = 1. / errup;
+    } else if (errup < 1 && errdn < 1) {
+      errdn = TMath::Min(errup, errdn);
+      errup = 1. / errdn;
+    }
+  }
+
   return 1;
 }
 
@@ -429,12 +495,14 @@ int makeCardForOneBin(TString dir, int mstop, int mlsp, int metbin, int bin, TSt
     if (correlated) {
       for (auto syst : systNames_corr) {
         string suf = "SystBG";
-        if (std::find(systNames_sig.begin(), systNames_sig.end(), syst) == systNames_sig.end() && syst != "pdf" && syst != "alphas") {
+        if (std::find(systNames_sig.begin(), systNames_sig.end(), syst) == systNames_sig.end() && syst != "pdf" && syst != "alphas" && syst != "ISR16") {
           getUncertainties(uperr[0], dnerr[0], osig, fsig, hname_sig+"_"+syst.c_str(), metbin, mstop, mlsp);
+          // cout << __LINE__ << ": uperr[0]= " << uperr[0] << ", dnerr[0]= " << dnerr[0] << endl;
           suf = "Syst";
         }
         if (true)              // bg2l
           getUncertainties(uperr[1], dnerr[1], bg2l, f2l, hname_2l + syst.c_str(), metbin); // doing pdf?
+        // cout << __LINE__ << ": uperr[1]= " << uperr[1] << ", dnerr[1]= " << dnerr[1] << endl;
         if (syst != "lepSF")  // bg1l
           getUncertainties(uperr[2], dnerr[2], bg1l, f1l, hname_1l + syst.c_str(), metbin);
         // bgZnunu <-- uses both up and dn err for Znunu bkg until otherwise instructed
@@ -521,12 +589,15 @@ void makeCardsForPoint(TString signal, int mstop, int mlsp, TString outdir) {
 
 // -------------------------------------------------------------------------------------------------------------------
 // Make cards for a single mass point
-void newCardMaker(string signal = "T2tt", int mStop = 800, int mLSP = 400, string input_dir="../StopLooper/output/combRun2_v31_s6", string output_dir="datacards/temp", string ysuf="run2") {
+void newCardMaker(string signal = "T2tt", int mStop = 800, int mLSP = 400, string input_dir="../StopLooper/output/combRun2_v31_s8", string output_dir="datacards/temp", string ysuf="run2") {
   cout << "Making cards for single mass point: " << signal << endl;
   system(Form("mkdir -p %s", output_dir.c_str()));
 
   // set input files (global pointers)
   fsig = new TFile(Form("%s/SMS_%s_%s.root",input_dir.c_str(), signal.substr(0,4).c_str(), ysuf.c_str()));
+  fsig16 = new TFile(Form("%s/SMS_%s_16.root",input_dir.c_str(), signal.c_str()));
+  fsig17 = new TFile(Form("%s/SMS_%s_17.root",input_dir.c_str(), signal.c_str()));
+  fsig18 = new TFile(Form("%s/SMS_%s_18.root",input_dir.c_str(), signal.c_str()));
   // fsig = new TFile(Form("%s/Signal_%s.root",input_dir.c_str(), signal.substr(0,4).c_str()));
   f2l = new TFile(Form("%s/lostlepton_%s.root",input_dir.c_str(), ysuf.c_str()));
   f1l = new TFile(Form("%s/1lepFromW_%s.root",input_dir.c_str(), ysuf.c_str()));
@@ -559,6 +630,9 @@ int newCardMaker(string signal, string input_dir="../StopLooper/output/temp", st
 
   // set input files (global pointers)
   fsig = new TFile(Form("%s/SMS_%s_%s.root",input_dir.c_str(), signal.c_str(), ysuf.c_str()));
+  fsig16 = new TFile(Form("%s/SMS_%s_16.root",input_dir.c_str(), signal.c_str()));
+  fsig17 = new TFile(Form("%s/SMS_%s_17.root",input_dir.c_str(), signal.c_str()));
+  fsig18 = new TFile(Form("%s/SMS_%s_18.root",input_dir.c_str(), signal.c_str()));
   // fsig = new TFile(Form("%s/Signal_%s.root",input_dir.c_str(), signal.c_str()));
   f2l = new TFile(Form("%s/lostlepton_%s.root",input_dir.c_str(), ysuf.c_str()));
   f1l = new TFile(Form("%s/1lepFromW_%s.root",input_dir.c_str(), ysuf.c_str()));
@@ -584,8 +658,7 @@ int newCardMaker(string signal, string input_dir="../StopLooper/output/temp", st
     return -1;
   }
 
-  // for (int im1 = 150; im1 <= 1450; im1 += 25) {
-  for (int im1 = 400; im1 <= 1450; im1 += 25) {
+  for (int im1 = 150; im1 <= 1450; im1 += 25) {
     for (int im2 = 0; im2 <= 1150; im2 += 25) {
       // if (im1 < 900 && im2 < 400) continue;
       // if (im1 - im2 < 400) continue;
