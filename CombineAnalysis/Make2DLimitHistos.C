@@ -156,6 +156,13 @@ void Make2DLimitHistos(TString signaltype="std_T2tt", TString indir="limits", bo
       if(prefit) limitfilebase = limitfilebase + "PreFit_";
       else       limitfilebase = limitfilebase + "PostFit_";
       TString signalname = signaltype + "_" + std::to_string(stop) + "_" + ((lsp == 0)? "1" : std::to_string(lsp));
+      if(signalname.Contains("comb")){
+        signalname.ReplaceAll("comb", "std");
+        if (stop - lsp < 225) signalname.ReplaceAll("std", "tcor");
+        // if (stop - lsp <= 150) signalname.ReplaceAll("tcor", "Wcor");
+        if (stop - lsp <= 150) signalname.ReplaceAll("tcor", "srJ3");
+        // if (stop - lsp < 151) continue;  // temporary
+      }
       TString limitfile = indir + limitfilebase + signalname + ".root";
       //cout << limitfile << endl;
       ifstream infile(limitfile.Data());

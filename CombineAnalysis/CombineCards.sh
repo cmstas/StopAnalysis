@@ -45,7 +45,11 @@ for i in `seq 1 ${maxbins}`; do
     counter=$((counter+1))
     validcommand=true
     chnum=$(($i + 1))
-    combinestring="${combinestring} ch${i}=$ifile"
+    if [[ $i -lt 10 ]]; then
+        combinestring="${combinestring} ch0${i}=$ifile"
+    else
+        combinestring="${combinestring} ch${i}=$ifile"
+    fi
     #echo ${combinestring}
 done
 

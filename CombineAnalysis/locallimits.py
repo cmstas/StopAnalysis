@@ -64,7 +64,7 @@ if __name__ == "__main__":
     ext_cards = filter(lambda x : sigscan in x and "bin1.txt" in x, ext_cards)
 
     sigs = [ x[9:-9] for x in ext_cards]
-    # print sigs
+    sigs = [ s for s in sigs if int(s.split('_')[2]) < 1500]
 
     pool = ThreadPool(40)
     cards = []
