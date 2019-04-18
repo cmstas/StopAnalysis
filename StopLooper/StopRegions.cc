@@ -343,27 +343,27 @@ std::vector<SR> getStopCrosscheckRegionsEMuRun2() {
   CRvec.emplace_back(cr);
 
 
-  cr = crbase;
-  cr.SetName("cremuM1");
-  cr.SetDetailName("ge2j_ge1b_met50to100");
-  cr.SetVar(met, 50, 100);
-  cr.SetVar(njet, 2, fInf);
-  cr.SetVar(nbjet, 1, fInf);
-  CRvec.emplace_back(cr);
+  // cr = crbase;
+  // cr.SetName("cremuM1");
+  // cr.SetDetailName("ge2j_ge1b_met50to100");
+  // cr.SetVar(met, 50, 100);
+  // cr.SetVar(njet, 2, fInf);
+  // cr.SetVar(nbjet, 1, fInf);
+  // CRvec.emplace_back(cr);
 
-  cr.SetName("cremuM2");
-  cr.SetDetailName("ge2j_ge1b_met150toInf");
-  cr.SetVar(met, 150, 250);
-  cr.SetVar(njet, 2, fInf);
-  cr.SetVar(nbjet, 1, fInf);
-  CRvec.emplace_back(cr);
+  // cr.SetName("cremuM2");
+  // cr.SetDetailName("ge2j_ge1b_met150toInf");
+  // cr.SetVar(met, 150, 250);
+  // cr.SetVar(njet, 2, fInf);
+  // cr.SetVar(nbjet, 1, fInf);
+  // CRvec.emplace_back(cr);
 
-  cr.SetName("cremuM3");
-  cr.SetDetailName("ge2j_ge1b_met150toInf");
-  cr.SetVar(met, 250, fInf);
-  cr.SetVar(njet, 2, fInf);
-  cr.SetVar(nbjet, 1, fInf);
-  CRvec.emplace_back(cr);
+  // cr.SetName("cremuM3");
+  // cr.SetDetailName("ge2j_ge1b_met150toInf");
+  // cr.SetVar(met, 250, fInf);
+  // cr.SetVar(njet, 2, fInf);
+  // cr.SetVar(nbjet, 1, fInf);
+  // CRvec.emplace_back(cr);
 
 
   // // SRs
@@ -1623,13 +1623,13 @@ std::vector<SR> getStopSignalRegionsRun2() {
   // sr = srbase;
   sr.SetName("srJ");
   sr.SetDetailName("ge5j_ge1sb_passlmetcor_j1notb");
-  sr.SetVar(njet, 5, fInf);
+  sr.SetVar(njet, 3, fInf);
   sr.SetVar(nbjet, 0, fInf);
   sr.SetVar(nsbtag, 1, fInf);
   sr.SetVar(passlmetcor, 1, 2); // shape cut on lep1pt & dphilmet
   sr.SetVar(dphijmet, 0.5, 3.1416);
   sr.SetVar(j1passbtag, 0, 1);  // Require j1 not b-tagged
-  sr.SetMETBins({250, 350, 450, 550, 1500});
+  sr.SetMETBins({250, 350, 450, 550, 750, 1500});
   SRvec.emplace_back(sr);
 
   return SRvec;
@@ -1893,16 +1893,76 @@ std::vector<SR> getStopSignalRegionsCorridorRun2() {
   SRvec.emplace_back(sr);
 
   sr = srbase;
-  sr.SetName("srJ");
+  sr.SetName("srJ0");
   sr.SetDetailName("ge5j_ge1sb_passlmetcor_j1notb");
   sr.SetVar(njet, 5, fInf);
-  // sr.SetVar(nbjet, 1, fInf);
+  sr.SetVar(nbjet, 0, fInf);
   sr.SetVar(nsbtag, 1, fInf);
   sr.SetVar(passlmetcor, 1, 2); // shape cut on lep1pt & dphilmet
   sr.SetVar(dphijmet, 0.5, 3.1416);
   sr.SetVar(j1passbtag, 0, 1);  // Require j1 not b-tagged
   sr.SetMETBins({250, 350, 450, 550, 1500});
   SRvec.emplace_back(sr);
+
+  // sr = srbase;
+  // sr.SetName("srJ1");
+  // sr.SetDetailName("ge5j_ge1sb_passlmetcor_j1notb");
+  // sr.SetVar(njet, 4, fInf);
+  // sr.SetVar(nbjet, 0, fInf);
+  // sr.SetVar(nsbtag, 1, fInf);
+  // sr.SetVar(passlmetcor, 1, 2); // shape cut on lep1pt & dphilmet
+  // sr.SetVar(dphijmet, 0.5, 3.1416);
+  // sr.SetVar(j1passbtag, 0, 1);  // Require j1 not b-tagged
+  // sr.SetMETBins({250, 350, 450, 550, 750, 1500});
+  // SRvec.emplace_back(sr);
+
+  // sr = srbase;
+  // sr.SetName("srJ2");
+  // sr.SetDetailName("ge5j_ge1sb_passlmetcor_j1notb");
+  // sr.SetVar(njet, 3, 4);
+  // sr.SetVar(nbjet, 0, fInf);
+  // sr.SetVar(nsbtag, 1, fInf);
+  // sr.SetVar(passlmetcor, 1, 2); // shape cut on lep1pt & dphilmet
+  // sr.SetVar(dphijmet, 0.5, 3.1416);
+  // sr.SetVar(j1passbtag, 0, 1);  // Require j1 not b-tagged
+  // sr.SetMETBins({250, 350, 450, 550, 750, 1500});
+  // SRvec.emplace_back(sr);
+
+  sr = srbase;
+  sr.SetName("srJ3");
+  sr.SetDetailName("ge5j_ge1sb_passlmetcor_j1notb");
+  sr.SetVar(njet, 3, fInf);
+  sr.SetVar(nbjet, 0, fInf);
+  sr.SetVar(nsbtag, 1, fInf);
+  sr.SetVar(passlmetcor, 1, 2); // shape cut on lep1pt & dphilmet
+  sr.SetVar(dphijmet, 0.5, 3.1416);
+  sr.SetVar(j1passbtag, 0, 1);  // Require j1 not b-tagged
+  sr.SetMETBins({250, 350, 450, 550, 750, 1500});
+  SRvec.emplace_back(sr);
+
+  // sr = srbase;
+  // sr.SetName("srJ4");
+  // sr.SetDetailName("ge5j_ge1sb_passlmetcor_j1notb");
+  // sr.SetVar(njet, 3, fInf);
+  // sr.SetVar(nbjet, 1, fInf);
+  // sr.SetVar(nsbtag, 1, fInf);
+  // sr.SetVar(passlmetcor, 1, 2); // shape cut on lep1pt & dphilmet
+  // sr.SetVar(dphijmet, 0.5, 3.1416);
+  // sr.SetVar(j1passbtag, 0, 1);  // Require j1 not b-tagged
+  // sr.SetMETBins({250, 350, 450, 550, 750, 1500});
+  // SRvec.emplace_back(sr);
+
+  // sr = srbase;
+  // sr.SetName("srJ5");
+  // sr.SetDetailName("ge5j_ge1sb_passlmetcor_j1notb");
+  // sr.SetVar(njet, 3, fInf);
+  // sr.SetVar(nbjet, 0, fInf);
+  // sr.SetVar(nsbtag, 1, fInf);
+  // sr.SetVar(passlmetcor, 1, 2); // shape cut on lep1pt & dphilmet
+  // sr.SetVar(dphijmet, 0.5, 3.1416);
+  // sr.SetVar(j1passbtag, 0, 1);  // Require j1 not b-tagged
+  // sr.SetMETBins({350, 450, 550, 750, 1500});
+  // SRvec.emplace_back(sr);
 
   return SRvec;
 }
