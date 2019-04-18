@@ -1798,16 +1798,16 @@ void evtWgtInfo::getMetTTbarWeight( double &weight_metTTbar, double &weight_metT
 
   // -------------------------------------------------
   // cremuA1/h_rlmetbinI : Data/MC = 0.448  nData 1 = 110  nData 2 = 11
-  if ( corridorType == 1 ) {
+  if ( corridorType >= 1 ) {
     if ( met > 550.0) { sf_val = 1.054; sf_err = 0.105; }
     if ( met > 750.0) { sf_val = 0.661; sf_err = 0.205; }
   }
   // -------------------------------------------------
   // cremuA1/h_rlmetbinJ : Data/MC = 0.551  nData 1 = 352  nData 2 = 121
-  if ( corridorType == 2 ) {
-    if ( met > 450.0) { sf_val = 1.086; sf_err = 0.061; }
-    if ( met > 550.0) { sf_val = 0.813; sf_err = 0.077; }
-  }
+  // if ( corridorType == 2 ) {
+  //   if ( met > 450.0) { sf_val = 1.086; sf_err = 0.061; }
+  //   if ( met > 550.0) { sf_val = 0.813; sf_err = 0.077; }
+  // }
 
   // 50% uncertainty on difference between no sf and applying it
   //sf_err = fabs(0.5*(1.0-sf_val));
@@ -2071,7 +2071,6 @@ void evtWgtInfo::getWbXSecSF( double &weight_WbXsec_up, double &weight_WbXsec_dn
 
   bool isWHF = false;
   // Question: Is this the correct way to get events from W+b production?
-  // TODO: check how was pfjet->hadronFlavour() assigned
   for (auto hadFlavor : babyAnalyzer.ak4pfjets_hadron_flavor()) {
     if (abs(hadFlavor) == 5) {
       isWHF = true;
