@@ -131,10 +131,11 @@ def getLabelsTemporary(srNames):
         'J:[250,350]',
         'J:[350,450]',
         'J:[450,550]',
-        'J:[550,+#infty]',
+        'J:[550,750]',
+        'J:[750,+#infty]',
     ]
 
-    if len(srNames) == 18:
+    if len(srNames) >= 18:
         return std_labels+cor_labels
     elif len(srNames) == 16:
         return std_labels
@@ -146,6 +147,33 @@ def getLabelsTemporary(srNames):
         return cor_labels
 
     return std_labels+cor_labels
+
+def DrawHeaderText(canvas, lumi=137.2):
+    tCMS = r.TLatex()
+    tCMS.SetNDC(1)
+    tCMS.SetTextFont(61)
+    tCMS.SetTextAlign(11)
+    tCMS.SetTextSize(0.0625)
+    canvas.cd()
+    tCMS.DrawLatex(canvas.GetLeftMargin(), 1.0-canvas.GetTopMargin()+0.01, "CMS")
+
+    tplm = r.TLatex()
+    tplm.SetNDC(1)
+    tplm.SetTextFont(52)
+    tplm.SetTextAlign(11)
+    tplm.SetTextSize(0.052)
+    canvas.cd()
+    tplm.DrawLatex(canvas.GetLeftMargin()+0.054, 1.0-canvas.GetTopMargin()+0.01, "Preliminary")
+
+    ttext = r.TLatex()
+    ttext.SetNDC(1)
+    ttext.SetTextFont(42)
+    ttext.SetTextAlign(31)
+    ttext.SetTextSize(0.052)
+    canvas.cd()
+    text = "{0} {1}^{{-1}} ({2} TeV)".format(lumi,"fb",13)
+    ttext.DrawLatex(1.0-canvas.GetRightMargin()-0.01, 1.0-canvas.GetTopMargin()+0.01, text)
+
 
 def getSRHistFromYieldE(ylds, hname, htitle=None, fcolor=None, lcolor=None):
     if htitle is None: htitle = hname
@@ -241,7 +269,7 @@ def drawSRyieldStack(hstk, xlabels, legitems=None, savename='sigYieldHist.pdf', 
     if not hdata and not gsyst: noRatio = True
     if not noRatio:
         c0 = r.TCanvas('c0', 'c0', width, 1200)
-        mainPad = r.TPad('1', '1', 0.0, 0.20, 1.0, 1.0)
+        mainPad = r.TPad('1', '1', 0.0, 0.20, 1.0, 0.99)
         ratioPad = r.TPad('2', '2', 0.0, 0.02, 1.0, 0.23)
 
     r.SetOwnership(c0, False)
@@ -274,8 +302,8 @@ def drawSRyieldStack(hstk, xlabels, legitems=None, savename='sigYieldHist.pdf', 
 
     htot.GetXaxis().LabelsOption('v')
     htot.GetYaxis().SetTitle(ytitle)
-    htot.GetYaxis().SetTitleOffset(0.5)
-    htot.GetYaxis().SetTitleSize(0.06)
+    htot.GetYaxis().SetTitleOffset(0.45)
+    htot.GetYaxis().SetTitleSize(0.058)
     htot.GetYaxis().SetRangeUser(0.1, 5000)
     if yrange != None:
         htot.GetYaxis().SetRangeUser(yrange[0], yrange[1])
@@ -307,7 +335,6 @@ def drawSRyieldStack(hstk, xlabels, legitems=None, savename='sigYieldHist.pdf', 
         g_data.SetMarkerStyle(20)
         g_data.SetMarkerSize(1.2)
         g_data.SetLineWidth(1)
-        print g_data.GetErrorYhigh(0), g_data.GetErrorYhigh(1)
 
         # draw the graph and then axes again on top
         g_data.Draw("SAME P")
@@ -341,16 +368,17 @@ def drawSRyieldStack(hstk, xlabels, legitems=None, savename='sigYieldHist.pdf', 
 
         leg.Draw()
 
+    DrawHeaderText(mainPad)
+
     ratioPad.cd()
     if not noRatio:
         h_axis_ratio = r.TH1D('ratio_axis','', htot.GetNbinsX(), 0, htot.GetNbinsX())
-        h_axis_ratio.GetYaxis().SetTitleOffset(0.18)
-        h_axis_ratio.GetYaxis().SetTitleSize(0.22)
         h_axis_ratio.GetYaxis().SetNdivisions(4)
         h_axis_ratio.GetYaxis().SetLabelSize(0.15)
-        h_axis_ratio.GetYaxis().SetRangeUser(0,3)
+        h_axis_ratio.GetYaxis().SetRangeUser(0,4)
         h_axis_ratio.GetYaxis().SetTitle('Ratios  ')
-        h_axis_ratio.GetYaxis().SetTitleOffset(0.5)
+        h_axis_ratio.GetYaxis().SetTitleOffset(0.45)
+        h_axis_ratio.GetYaxis().SetTitleSize(1)
         h_axis_ratio.GetXaxis().SetTickLength(0.07)
         h_axis_ratio.GetXaxis().SetTitleSize(0.)
         h_axis_ratio.GetXaxis().SetLabelSize(0.)
@@ -418,7 +446,7 @@ def drawBkgEstimateHists(indir, srNames, suf='', bkgType='lostlep'):
     drawSRyieldHist(h_purity, xlabels, 'noleg', bkgType+suf+'_CRpurity.pdf', 'PE', True, [0, 1.2], 1, ytitle='')
 
 
-def drawBkgCompositionStack(indir, srNames=None, savename='bkgCompostion_std.pdf', plotData=False):
+def drawBkgCompositionStack(indir, srNames=None, savename='bkgCompostion_std.pdf', plotData=False, normalize=False):
 
     # -------------------------------------------------------
     # Draw test bkg composition / expected yields hists
@@ -428,12 +456,18 @@ def drawBkgCompositionStack(indir, srNames=None, savename='bkgCompostion_std.pdf
     # f_bkg = r.TFile('../StopLooper/output/combRun2_v37_s5/allBkg_run2.root')
     f_bkg = r.TFile(indir+'/allBkg_run2.root','read')
 
-    y_all  = [ y.round(2) for y in sum(getYieldEInTopoBins(f_bkg, srNames, 'metbins'), []) ]
+    y_all  = [ y for y in sum(getYieldEInTopoBins(f_bkg, srNames, 'metbins'), []) ]
 
-    y_2lep = [ y.round(2) for y in sum(getYieldEInTopoBins(f_bkg, srNames, 'metbins_2lep'), []) ]
-    y_1lt  = [ y.round(2) for y in sum(getYieldEInTopoBins(f_bkg, srNames, 'metbins_1lepTop'), []) ]
-    y_1lW  = [ y.round(2) for y in sum(getYieldEInTopoBins(f_bkg, srNames, 'metbins_1lepW'), []) ]
-    y_Zinv = [ y.round(2) for y in sum(getYieldEInTopoBins(f_bkg, srNames, 'metbins_Znunu'), []) ]
+    y_2lep = [ y for y in sum(getYieldEInTopoBins(f_bkg, srNames, 'metbins_2lep'), []) ]
+    y_1lt  = [ y for y in sum(getYieldEInTopoBins(f_bkg, srNames, 'metbins_1lepTop'), []) ]
+    y_1lW  = [ y for y in sum(getYieldEInTopoBins(f_bkg, srNames, 'metbins_1lepW'), []) ]
+    y_Zinv = [ y for y in sum(getYieldEInTopoBins(f_bkg, srNames, 'metbins_Znunu'), []) ]
+
+    if not plotData and normalize:
+        y_2lep = [ yi/ya for yi, ya in zip(y_2lep, y_all) ]
+        y_1lt  = [ yi/ya for yi, ya in zip(y_1lt , y_all) ]
+        y_1lW  = [ yi/ya for yi, ya in zip(y_1lW , y_all) ]
+        y_Zinv = [ yi/ya for yi, ya in zip(y_Zinv, y_all) ]
 
     h_2lep = getSRHistFromYieldE(y_2lep, 'h_SRyields_2lep', '', fcolor=r.kAzure+6)
     h_1lW  = getSRHistFromYieldE(y_1lW , 'h_SRyields_1lW' , '', fcolor=r.kOrange-4)
@@ -468,13 +502,15 @@ def drawBkgCompositionStack(indir, srNames=None, savename='bkgCompostion_std.pdf
         h_data = getSRHistFromYieldE(y_data, 'h_SRyields_data', '', fcolor=r.kBlack)
 
         drawSRyieldStack(hstk, xlabels, legname, savename, 'hist', hdata=h_data)
+    elif normalize:
+        drawSRyieldStack(hstk, xlabels, legname, savename, 'hist', linear=True, yrange=[0.0,1.3], noBkgError=True, ytitle='Bkg Fraction')
     else:
         drawSRyieldStack(hstk, xlabels, legname, savename, 'hist')
 
     f_bkg.Close()
 
 
-def drawBkgPredictionStack(indir, srNames=None, savename='bkgPrediction_std.pdf', ysuf='run2', plotData=False, plotRatio=True):
+def drawBkgPredictionStack(indir, srNames=None, savename='bkgPrediction_std.pdf', ysuf='run2', plotData=False, plotRatio=True, scale=1):
 
     # -------------------------------------------------------
     # Draw test bkg composition / expected yields hists
@@ -488,7 +524,6 @@ def drawBkgPredictionStack(indir, srNames=None, savename='bkgPrediction_std.pdf'
 
     # y_all  = [ y.round(2) for y in sum(getYieldEInTopoBins(f_bkg, srNames, 'metbins'), []) ]
     # scale = 1
-    scale = 5/137.2
 
     y_2lep = [ (scale*y).round(4) for y in sum(getYieldEInTopoBins(f_lostlep, srNames, 'metbins'), []) ]
     y_1lt  = [ (scale*y).round(4) for y in sum(getYieldEInTopoBins(f_1lepTop, srNames, 'metbins'), []) ]
@@ -510,7 +545,7 @@ def drawBkgPredictionStack(indir, srNames=None, savename='bkgPrediction_std.pdf'
 
     xlabels = getLabelsTemporary(srNames)
 
-    yrange = [0.05, 1000] if ysuf == '16' else [0.005, 500] if scale < 0.1 else None
+    yrange = [0.1*scale, 5000*scale] if scale != 1.0 else None
 
     systup = [0.0,]*len(y_tot)
     systdn = [0.0,]*len(y_tot)
@@ -636,15 +671,38 @@ def drawHEMVetoEffect():
     # y_bkg_w = [ y.round(3) for y in sum(getYieldEInTopoBins(f_bkg_w, srNames, 'metbins'), []) ]
     # y_bkg_n = [ y.round(3) for y in sum(getYieldEInTopoBins(f_bkg_n, srNames, 'metbins'), []) ]
 
+
+def drawDifftt1lMETres():
+
+    srNames = ['srA0', 'srA1', 'srA2', 'srB', 'srC','srD', 'srE0', 'srE1', 'srE2', 'srE3', 'srF', 'srG0', 'srG1', 'srG2', 'srG3', 'srH', 'srI', 'srJ']
+
+    f_bkg_w = r.TFile('../StopLooper/output/combRun2_v31_s6/allBkg_run2.root')
+    f_bkg_n = r.TFile('../StopLooper/output/combRun2_v39_s6_noMETres/allBkg_run2.root')
+
+    y_bkg_w = [ y for y in sum(getYieldEInTopoBins(f_bkg_w, srNames, 'metbins_1lepTop'), []) ]
+    y_bkg_n = [ y for y in sum(getYieldEInTopoBins(f_bkg_n, srNames, 'metbins_1lepTop'), []) ]
+
+    rat_bkg  = [ E(0,n.val) if d.val <= 0.01 else n/d for n, d in zip(y_bkg_w, y_bkg_n) ]
+
+    xlabels = getLabelsTemporary(srNames)
+    # xlabels = srNames
+    hrat_bkg  = getSRHistFromYieldE(rat_bkg, 'h_SRyields_metres_tt1l', '')
+    hrat_bkg.SetLineWidth(2)
+
+    drawSRyieldHist(hrat_bkg,  xlabels, 'noleg', 'METres_1lepTop_run2.pdf', 'PE', True, [0.0, 3], 1, '')
+
+    # y_bkg_w = [ y.round(3) for y in sum(getYieldEInTopoBins(f_bkg_w, srNames, 'metbins'), []) ]
+    # y_bkg_n = [ y.round(3) for y in sum(getYieldEInTopoBins(f_bkg_n, srNames, 'metbins'), []) ]
+
 def drawDiffMHTCutEffect():
 
     srNames = ['srA0', 'srA1', 'srA2', 'srB', 'srC','srD', 'srE0', 'srE1', 'srE2', 'srE3', 'srF', 'srG0', 'srG1', 'srG2', 'srG3', 'srH', 'srI', 'srJ']
 
-    f_bkg_w = r.TFile('../StopLooper/output/samp17_v31_s1_HT5Cut/allBkg_17.root')
-    f_bkg_n = r.TFile('../StopLooper/output/samp17_v31_s1/allBkg_17.root')
+    f_bkg_w = r.TFile('../StopLooper/output/samp17_v31_s3_mhtcut/allBkg_17.root')
+    f_bkg_n = r.TFile('../StopLooper/output/samp17_v31_s3/allBkg_17.root')
 
-    f_sig_w = r.TFile('../StopLooper/output/samp17_v31_s1_diffMHTcut/SMS_T2tt_17.root')
-    f_sig_n = r.TFile('../StopLooper/output/samp17_v31_s1/SMS_T2tt_17.root')
+    f_sig_w = r.TFile('../StopLooper/output/samp18_v31_s3_mhtcut/SMS_T2tt_18.root')
+    f_sig_n = r.TFile('../StopLooper/output/samp18_v31_s3/SMS_T2tt_18.root')
 
     y_bkg_w = [ y for y in sum(getYieldEInTopoBins(f_bkg_w, srNames, 'metbins'), []) ]
     y_bkg_n = [ y for y in sum(getYieldEInTopoBins(f_bkg_n, srNames, 'metbins'), []) ]
@@ -668,9 +726,13 @@ def drawDiffMHTCutEffect():
     hrat_sig1.SetLineWidth(2)
     hrat_sig2.SetLineWidth(2)
 
-    drawSRyieldHist(hrat_bkg,  xlabels, 'noleg', 'HT5overHTcut_allbkg_17.png', 'PE', True, [0.6, 1.1], 1, '')
-    # drawSRyieldHist(hrat_sig1, xlabels, 'noleg', 'HT5overHTcut_T2tt_1200_50_17.pdf', 'PE', True, [0.6, 1.1], 1, '')
-    # drawSRyieldHist(hrat_sig2, xlabels, 'noleg', 'HT5overHTcut_T2tt_800_400_17.pdf', 'PE', True, [0.6, 1.1], 1, '')
+    # drawSRyieldHist(hrat_bkg,  xlabels, 'noleg', 'HT5overHTcut_allbkg_17.png', 'PE', True, [0.6, 1.1], 1, '')
+    # drawSRyieldHist(hrat_sig1, xlabels, 'noleg', 'HT5overHTcut_T2tt_1200_50_18.pdf', 'PE', True, [0.6, 1.1], 1, '')
+    # drawSRyieldHist(hrat_sig2, xlabels, 'noleg', 'HT5overHTcut_T2tt_800_400_18.pdf', 'PE', True, [0.6, 1.1], 1, '')
+
+    drawSRyieldHist(hrat_bkg,  xlabels, 'noleg', 'HT5overHTcut_allbkg_17.pdf', 'PE', True, [0.6, 1.1], 1, '')
+    # drawSRyieldHist(hrat_sig1, xlabels, 'noleg', 'MHTcut_T2tt_1200_50_18.pdf', 'PE', True, [0.6, 1.1], 1, '')
+    # drawSRyieldHist(hrat_sig2, xlabels, 'noleg', 'MHTcut_T2tt_800_400_18.pdf', 'PE', True, [0.6, 1.1], 1, '')
 
     # y_bkg_w = [ y.round(3) for y in sum(getYieldEInTopoBins(f_bkg_w, srNames, 'metbins'), []) ]
     # y_bkg_n = [ y.round(3) for y in sum(getYieldEInTopoBins(f_bkg_n, srNames, 'metbins'), []) ]
@@ -718,6 +780,29 @@ def drawL1prefireEffect():
     # y_bkg_w = [ y.round(3) for y in sum(getYieldEInTopoBins(f_bkg_w, srNames, 'metbins'), []) ]
     # y_bkg_n = [ y.round(3) for y in sum(getYieldEInTopoBins(f_bkg_n, srNames, 'metbins'), []) ]
 
+
+def drawImpactInTransferFactor():
+
+    srNames = ['srA0', 'srA1', 'srA2', 'srB', 'srC','srD', 'srE0', 'srE1', 'srE2', 'srE3', 'srF', 'srG0', 'srG1', 'srG2', 'srG3', 'srH', 'srI', 'srJ']
+
+    f_bkg_w = r.TFile('../StopLooper/output/samp17_v31_s3/lostlepton_17.root')
+    f_bkg_n = r.TFile('../StopLooper/output/samp17_v39_s3/lostlepton_17.root')
+
+    y_bkg_w = [ y for y in sum(getYieldEInTopoBins(f_bkg_w, srNames, 'alphaHist'), []) ]
+    y_bkg_n = [ y for y in sum(getYieldEInTopoBins(f_bkg_n, srNames, 'alphaHist'), []) ]
+
+    y_err_w = [ 0 if y.val == 0 else round(y.err/y.val,2) for y in sum(getYieldEInTopoBins(f_bkg_w, srNames, 'metbins_MCStats'), []) ]
+    y_err_n = [ 0 if y.val == 0 else round(y.err/y.val,2) for y in sum(getYieldEInTopoBins(f_bkg_n, srNames, 'metbins_MCStats'), []) ]
+
+    # rat_bkg  = [ get_efficiency(n,d) for n, d in zip(y_bkg_w, y_bkg_n) ]
+    rat_bkg  = [ E((n/d).round(2).val, en) for n, d, en, ed in zip(y_bkg_w, y_bkg_n, y_err_w, y_err_n) ]
+
+    xlabels = getLabelsTemporary(srNames)
+    hrat_bkg  = getSRHistFromYieldE(rat_bkg, 'h_SRyields_TFimpact', '')
+    hrat_bkg.SetLineWidth(2)
+
+    drawSRyieldHist(hrat_bkg,  xlabels, 'noleg', 'ImpactOnTF_METRes_17.pdf', 'PE', True, [0.6, 1.4], 1, '')
+
 def drawYieldsRatioComparison(srNames=None, savename='srYieldCompare_METResOnvsOff_17.pdf'):
 
     if srNames == None:
@@ -742,7 +827,7 @@ def drawYieldsRatioComparison(srNames=None, savename='srYieldCompare_METResOnvsO
 
 def drawAllPlots():
 
-    bvsuf = 'v39_s8'
+    bvsuf = 'v31_s12'
     indir = '../StopLooper/output/combRun2_'+bvsuf
     # indir = '../StopLooper/output/samp17_v39_mrs2'
 
@@ -757,30 +842,30 @@ def drawAllPlots():
     # drawBkgEstimateHists(f17, srNames, '17')
     # drawBkgEstimateHists(f16, srNames, '16')
 
-    srNames = ['srA0', 'srA1', 'srA2', 'srB', 'srC', 'srD', 'srE0', 'srE1', 'srE2', 'srE3', 'srF', 'srG0', 'srG1', 'srG2', 'srG3', 'srH', 'srI', 'srJ',]
-    drawBkgCompositionStack(indir, srNames, 'SRCompostion_all.pdf')
+    srNames = ['srA0', 'srA1', 'srA2', 'srB', 'srC', 'srD', 'srE0', 'srE1', 'srE2', 'srE3', 'srF', 'srG0', 'srG1', 'srG2', 'srG3', 'srH', 'srI', 'srJ']
+    # drawBkgCompositionStack(indir, srNames, 'SRCompostion_norm_s12.pdf', normalize=True)
 
     # drawYieldsRatioComparison()
 
     # drawBkgEstimateHists(indir, srNames, 'run2', 'lostlep')
 
     crNames = [ sr.replace('sr', 'cr2l') for sr in srNames ]
-    drawBkgCompositionStack(indir, crNames, 'CR2lYields_all.pdf', plotData=True)
+    drawBkgCompositionStack(indir, crNames, 'CR2lYields_s12_all.pdf', plotData=True)
 
     # drawYieldsRatioComparison(crNames, 'cr2lYieldCompare_METResOnvsOff_17.pdf')
 
-    srNames = ['srA0', 'srA1', 'srB', 'srC', 'srD', 'srE0', 'srE1', 'srF', 'srG0', 'srG1', 'srH', 'srI', 'srJ',]
+    srNames = ['srA0', 'srA1', 'srB', 'srC', 'srD', 'srE0', 'srE1', 'srF', 'srG0', 'srG1', 'srH', 'srI', 'srJ']
     # drawBkgEstimateHists(indir, srNames, 'run2', '1lepW')
 
     crNames = [ sr.replace('sr', 'cr0b') for sr in srNames ]
-    drawBkgCompositionStack(indir, crNames, 'CR0bYields_all.pdf', plotData=True)
+    # drawBkgCompositionStack(indir, crNames, 'CR0bYields_s12_all.pdf', plotData=True)
 
     # drawYieldsRatioComparison(crNames, 'cr0bYieldCompare_METResOnvsOff_17.pdf')
 
     # # # # # # # # # # # # # # #
     # Data driven predictions
-    srNames = ['srA0', 'srA1', 'srA2', 'srB', 'srC', 'srD', 'srE0', 'srE1', 'srE2', 'srE3', 'srF', 'srG0', 'srG1', 'srG2', 'srG3', 'srH', 'srI', 'srJ',]
-    drawBkgPredictionStack(indir, srNames, 'bkgPrediction_all.pdf')
+    # srNames = ['srA0', 'srA1', 'srA2', 'srB', 'srC', 'srD', 'srE0', 'srE1', 'srE2', 'srE3', 'srF', 'srG0', 'srG1', 'srG2', 'srG3', 'srH', 'srI', 'srJ',]
+    # drawBkgPredictionStack(indir, srNames, 'bkgPrediction_all.pdf')
 
     exit()
     # # # # # # # # # # # # # # #
@@ -827,19 +912,37 @@ if __name__ == '__main__':
 
     r.gROOT.SetBatch(1)
 
-    bvsuf = 'v31_m1'
+    bvsuf = 'v31_s12'
     indir = '../StopLooper/output/combRun2_'+bvsuf
     indir16 = '../StopLooper/output/samp16_'+bvsuf
 
-    srNames = ['srA0', 'srA1', 'srA2', 'srB', 'srC', 'srD', 'srE0', 'srE1', 'srE2', 'srE3', 'srF', 'srG0', 'srG1', 'srG2', 'srG3', 'srH', 'srI', 'srJ',]
+    srNames = ['srA0', 'srA1', 'srA2', 'srB', 'srC', 'srD', 'srE0', 'srE1', 'srE2', 'srE3', 'srF', 'srG0', 'srG1', 'srG2', 'srG3', 'srH', 'srI', 'srJ']
     # drawBkgPredictionStack(indir16, srNames, 'bkgPrediction_2016.pdf', '16', plotData=True)
 
     # drawBkgPredictionStack(indir, srNames, 'bkgPrediction_run2.pdf', 'run2', plotData=False)
-    drawBkgPredictionStack(indir, srNames, 'bkgPrediction_unblind_2017BCDE.pdf', 'run2', plotData='data_2017BCDE_5fb')
+    # drawBkgPredictionStack(indir, srNames, 'bkgPrediction_unblind_2017BCDE.pdf', 'run2', plotData='data_2017BCDE_5fb')
+    # drawBkgPredictionStack(indir, srNames, 'bkgPrediction_unblind_2017_10fb.pdf', 'run2', plotData='data_2017_10fb')
+    # drawBkgPredictionStack(indir, srNames, 'bkgPrediction_unblind_2018_15fb.pdf', 'run2', plotData='data_2018ABD_15fb', scale=15.0/137.2)
+    # drawBkgPredictionStack(indir, srNames, 'bkgPrediction_unblind_2018_full.pdf', 'run2', plotData='allData_18', scale=59.7/137.2)
+    # drawBkgPredictionStack(indir, srNames, 'bkgPrediction_unblind_2016_full.pdf', 'run2', plotData='allData_16', scale=35.9/137.2)
+    # drawBkgPredictionStack(indir, srNames, 'bkgPrediction_unblind_run2_61fb.pdf', 'run2', plotData='data_run2_61fb', scale=60.9/137.2)
+    # drawBkgPredictionStack(indir, srNames, 'Results_prefit_run2_noJ_s8.pdf', 'run2', plotData='allData_run2')
+    drawBkgPredictionStack(indir, srNames, 'Results_prefit_run2_all_s12.pdf', 'run2', plotData='allData_run2')
 
     bkgnames = ['2l', '1lW', 'znunu',  '1ltop',]
     systnames = ['jes', 'metTTbar', ]
     # GetUncertaintiesFromDatacard('../CombineAnalysis/datacards/scan_samp16_v39_m9/combinedcards/datacard_std_T2tt_1250_50.txt', bkgnames, systnames, True)
 
+    # drawAllPlots()
+
     # drawDiffMHTCutEffect()
 
+    # drawDifftt1lMETres()
+
+    # drawImpactInTransferFactor()
+
+    bvsuf = 'v31_cor_w3'
+    indir = '../StopLooper/output/combRun2_'+bvsuf
+    srNames = ['srI', 'srJ0', 'srJ3',]
+
+    # drawBkgPredictionStack(indir, srNames, 'Results_prefit_run2_w3.pdf', 'run2', plotData='allData_run2')

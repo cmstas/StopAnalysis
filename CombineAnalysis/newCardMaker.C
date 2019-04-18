@@ -40,6 +40,10 @@ const bool fakedata = false;
 const bool nobgsyst = false;
 // test without signal systematics?
 const bool nosigsyst = false;
+// use Poisson for data stats
+const bool usegmN = true;
+// use Poisson for data stats
+const bool yearseparated = true;
 
 bool verbose = true;  // automatic turned off if is signal scan
 
@@ -57,18 +61,18 @@ TFile *fsig_genmet;
 
 // Set of systematics
 // vector<string> systNamesCard = {"PUSyst", "BLFSyst", "BHFSyst", "JESSyst", "ISRSyst", "LEffSyst", "LEffFSSyst", "BFSSyst", "MuRFSyst"};
-// vector<string> systNames_sig = {"jes", "ISR", "lepFSSF", "bTagFSEff"}; //  "q2" <-- fix this
-vector<string> systNames_sig = {"jes16", "jes17", "jes18", "ISR", "lepFSSF", "bTagFSEff"}; //  "q2" <-- fix this
-// vector<string> systNames_sig = {"jes", "ISR", "lepFSSF", "bTagFSEff"}; //  "q2" <-- fix this
 // vector<string> systNames_sig = {"bTagEffLF", "bTagEffHF", "jes", "lepSF", }; //  temporary as most ones aren't available
+// vector<string> systNames_sig = {"jes", "ISR", "lepFSSF", "bTagFSEff"}; //  "q2" <-- fix this
 // vector<string> systNames_corr = {"bTagEffHF", "bTagEffLF", "lepSF", "pdf", "q2", "jes", "ISR", "pileup", "alphas", "metRes", "L1prefire"};
+vector<string> systNames_sig = {"jes16", "jes17", "jes18", "ISR", "lepFSSF", "bTagFSEff"}; //  "q2" <-- fix this
 vector<string> systNames_corr = {"bTagEffHF16", "bTagEffHF17", "bTagEffHF18", "bTagEffLF16", "bTagEffLF17", "bTagEffLF18", "lepSF",
                                  "pdf", "q2", "jes16", "jes17", "jes18", "ISR16", "pileup16", "pileup17", "pileup18",
                                  "alphas", "metRes16", "metRes17", "metRes18", "L1prefire"};
 
 // individual systematic uncertainties for different backgrounds
 // vector<string> systNames_bg2l = {"metRes", "ttbarSysPt", "tauSF"};
-vector<string> systNames_bg2l = {"tauSF", "metTTbar"};
+// vector<string> systNames_bg2l = {"tauSF", "metTTbar", "cr2lTriggerSF16", "cr2lTriggerSF17", "cr2lTriggerSF18"};
+vector<string> systNames_bg2l = {"tauSF", "metTTbar", "cr2lTriggerSF"};
 vector<string> systNames_bg1l = {"CRpurity", "WbXsec"};
 vector<string> systNames_bgZnunu;
 
@@ -212,7 +216,9 @@ int getUncertainties(double& errup, double& errdn, double origyield, TFile* file
 
   // Sloppy hack to bring jes to be symmetric
   if ((hname.Contains("jes") || hname.Contains("metRes"))) {
-    if (errup > 1 && errdn > 1) {
+    if (errup <= 9 && errdn > 0) {
+      errup = 1. / errdn;
+    } else if (errup > 1 && errdn > 1) {
       errup = TMath::Max(errup, errdn);
       errdn = 1. / errup;
     } else if (errup < 1 && errdn < 1) {
@@ -466,7 +472,14 @@ int makeCardForOneBin(TString dir, int mstop, int mlsp, int metbin, int bin, TSt
 
   // Statistical uncertainties
   if (bg2l > 0) {
-    addStatUncsDataDriven(f2l, "Bg2l", 1);
+    if (usegmN) {
+      addStatUncsDataDriven(f2l, "Bg2l", 1);
+    } else {
+      getYieldAndError(bg2lerr, f2l, hname + "_dataStats", metbin);  // <-- look up for the errors
+      numnuis += addOneUnc(fLogStream, "Bg2lDataStat", bg2lerr, -1, 1, bin, "lnN");
+      getYieldAndError(bg2lerr, f2l, hname + "_MCStats", metbin);
+      numnuis += addOneUnc(fLogStream, "Bg2lMCStat",   bg2lerr, -1, 1, bin, "lnN");
+    }
   }
   bool take1lfromMC = !f1l->Get((hname+"_dataStats").Data());
   if (bg1l > 0) {
@@ -474,7 +487,14 @@ int makeCardForOneBin(TString dir, int mstop, int mlsp, int metbin, int bin, TSt
     if (take1lfromMC) {
       numnuis += addOneUnc(fLogStream, "Bg1lMCStat", bg1lerr, -1, 2, bin, "lnN"); // MC SR
     } else {
-      addStatUncsDataDriven(f1l, "Bg1l", 2);
+      if (usegmN) {
+        addStatUncsDataDriven(f1l, "Bg1l", 2);
+      } else {
+        getYieldAndError(bg1lerr, f1l, hname + "_dataStats", metbin);
+        numnuis += addOneUnc(fLogStream, "Bg1lDataStat", bg1lerr, -1, 1, bin, "lnN");
+        getYieldAndError(bg1lerr, f1l, hname + "_MCStats", metbin);
+        numnuis += addOneUnc(fLogStream, "Bg1lMCStat",   bg1lerr, -1, 1, bin, "lnN");
+      }
     }
   }
   if (bg1ltop > 0) numnuis += addOneUnc(fLogStream, "Bg1lTopSyst", bg1ltoperr, -1, 3, bin, "lnN");
@@ -497,12 +517,10 @@ int makeCardForOneBin(TString dir, int mstop, int mlsp, int metbin, int bin, TSt
         string suf = "SystBG";
         if (std::find(systNames_sig.begin(), systNames_sig.end(), syst) == systNames_sig.end() && syst != "pdf" && syst != "alphas" && syst != "ISR16") {
           getUncertainties(uperr[0], dnerr[0], osig, fsig, hname_sig+"_"+syst.c_str(), metbin, mstop, mlsp);
-          // cout << __LINE__ << ": uperr[0]= " << uperr[0] << ", dnerr[0]= " << dnerr[0] << endl;
           suf = "Syst";
         }
         if (true)              // bg2l
           getUncertainties(uperr[1], dnerr[1], bg2l, f2l, hname_2l + syst.c_str(), metbin); // doing pdf?
-        // cout << __LINE__ << ": uperr[1]= " << uperr[1] << ", dnerr[1]= " << dnerr[1] << endl;
         if (syst != "lepSF")  // bg1l
           getUncertainties(uperr[2], dnerr[2], bg1l, f1l, hname_1l + syst.c_str(), metbin);
         // bgZnunu <-- uses both up and dn err for Znunu bkg until otherwise instructed
@@ -568,7 +586,9 @@ void makeCardsForPoint(TString signal, int mstop, int mlsp, TString outdir) {
   //   TString dir = k->GetName();
   //   if (dir[2] < 'A' || dir[2] > 'J') continue;
   //   if (strncmp (dir, keep.c_str(), keep.length()) != 0) continue; // it is a signal region
-  for (TString dir : {"srA0", "srA1", "srA2", "srB", "srC", "srD", "srE0", "srE1", "srE2", "srE3", "srF", "srG0", "srG1", "srG2", "srG3", "srH", "srI", "srJ"}) {
+  // for (TString dir : {"srA0", "srA1", "srA2", "srB", "srC", "srD", "srE0", "srE1", "srE2", "srE3", "srF", "srG0", "srG1", "srG2", "srG3", "srH", "srI", "srJ"}) {
+  // for (TString dir : {"srI", "srJ0", "srJ3", "srJ5",}) {
+  for (TString dir : {"srI", "srJ",}) {
     // Fixed SRs for Run2 legacy analysis
     TString hname = dir + "/h_metbins"; // for met binning information, empty hist for signal output
     // cout << "Looking at hname  " << hname << endl;
@@ -578,7 +598,9 @@ void makeCardsForPoint(TString signal, int mstop, int mlsp, TString outdir) {
     TString anName = (dir == "srI")? "tcor" : (dir == "srJ")? "Wcor" : "std";
     if (anName == "tcor" && mstop - mlsp > 350) return;  // only make top corridor cards for deltaM < 350 GeV
     if (anName == "Wcor" && mstop - mlsp > 150) return;  // only make W corridor cards for deltaM < 150 GeV
-    if (dir == "srI" || dir == "srJ") nbintot = 1;  // temporary solution to recount for corridor
+    anName = dir;
+    // if (dir == "srI" || dir == "srJ") nbintot = 1;  // temporary solution to recount for corridor
+    nbintot = 1;  // temporary solution to recount for corridor
     for (int ibin = 1; ibin <= n_metbins; ++ibin, ++nbintot) {
       // Make a separate card for each met bin.
       TString cardname = outdir + Form("/datacard_%s_%s_%d_%d_bin%d.txt", anName.Data(), signal.Data(), mstop, mlsp, nbintot);
@@ -589,7 +611,7 @@ void makeCardsForPoint(TString signal, int mstop, int mlsp, TString outdir) {
 
 // -------------------------------------------------------------------------------------------------------------------
 // Make cards for a single mass point
-void newCardMaker(string signal = "T2tt", int mStop = 800, int mLSP = 400, string input_dir="../StopLooper/output/combRun2_v31_s8", string output_dir="datacards/temp", string ysuf="run2") {
+void newCardMaker(string signal = "T2tt", int mStop = 500, int mLSP = 325, string input_dir="../StopLooper/output/combRun2_v31_s8", string output_dir="datacards/temp", string ysuf="run2") {
   cout << "Making cards for single mass point: " << signal << endl;
   system(Form("mkdir -p %s", output_dir.c_str()));
 
@@ -630,9 +652,11 @@ int newCardMaker(string signal, string input_dir="../StopLooper/output/temp", st
 
   // set input files (global pointers)
   fsig = new TFile(Form("%s/SMS_%s_%s.root",input_dir.c_str(), signal.c_str(), ysuf.c_str()));
-  fsig16 = new TFile(Form("%s/SMS_%s_16.root",input_dir.c_str(), signal.c_str()));
-  fsig17 = new TFile(Form("%s/SMS_%s_17.root",input_dir.c_str(), signal.c_str()));
-  fsig18 = new TFile(Form("%s/SMS_%s_18.root",input_dir.c_str(), signal.c_str()));
+  if (yearseparated) {
+    fsig16 = new TFile(Form("%s/SMS_%s_16.root",input_dir.c_str(), signal.c_str()));
+    fsig17 = new TFile(Form("%s/SMS_%s_17.root",input_dir.c_str(), signal.c_str()));
+    fsig18 = new TFile(Form("%s/SMS_%s_18.root",input_dir.c_str(), signal.c_str()));
+  }
   // fsig = new TFile(Form("%s/Signal_%s.root",input_dir.c_str(), signal.c_str()));
   f2l = new TFile(Form("%s/lostlepton_%s.root",input_dir.c_str(), ysuf.c_str()));
   f1l = new TFile(Form("%s/1lepFromW_%s.root",input_dir.c_str(), ysuf.c_str()));
@@ -661,7 +685,7 @@ int newCardMaker(string signal, string input_dir="../StopLooper/output/temp", st
   for (int im1 = 150; im1 <= 1450; im1 += 25) {
     for (int im2 = 0; im2 <= 1150; im2 += 25) {
       // if (im1 < 900 && im2 < 400) continue;
-      // if (im1 - im2 < 400) continue;
+      // if (im1 - im2 > 150) continue;
       if (hpoints->GetBinContent(hpoints->FindBin(im1, im2)) == 0) continue;
       if (im2 == 0) im2 = 1;
       cout << "Making cards for point: " << Form("%s_%d_%d", signal.c_str(), im1, im2) << endl;

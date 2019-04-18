@@ -123,14 +123,27 @@ def GetSubtitles(dirname):
 
     subtitle = [met+" > 250 GeV", mt+" > 150 GeV", "#geq 2j, #geq 1b"]
 
+    if "I" in dirname: subtitle[2] = "#geq 5j, #geq 1 med-b"
+    if "J" in dirname: subtitle[2] = "#geq 3j, #geq 1 soft-b"
+
     if "cr0b" in dirname:
         subtitle[2] = "#geq 2j, = 0b"
+        if "J" in dirname: 
+            subtitle[2] = "#geq 3j, =0med-b, =0soft-b"
+
     if "cremu" in dirname:
         subtitle = [met+" > 50 GeV", "M(e#mu) > 20 GeV", "#geq 2j, #geq 0b"]
         if   "A1" in dirname: subtitle[2] = "#geq 2j, #geq 1b"
         elif "A2" in dirname: subtitle[2] = "#geq 2j, #geq 2b"
+        elif "A3" in dirname: subtitle[2] = "#geq 2j, = 2b"
         elif "B0" in dirname: subtitle[2] = "#geq 2j, 0b"
         elif "B1" in dirname: subtitle[2] = "#geq 2j, 1b"
+
+        if "emuM" in dirname: subtitle[2] = "#geq 2j, 1b"
+        if   "M1" in dirname: subtitle[1] = "50 GeV < "+met+"< 100 GeV "
+        elif "M2" in dirname: subtitle[1] = "150 GeV < "+met+"< 250 GeV "
+        elif "M3" in dirname: subtitle[1] = met+" > 250 GeV"
+
     if "sbmet"  in dirname:
         subtitle[0] = "150 GeV < "+met+" < 250 GeV"
         if "sbmet2" in dirname:

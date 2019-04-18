@@ -106,6 +106,126 @@ class E:
         elif idx==1: return self.err
         else: raise IndexError
 
+
+class AE:
+    """
+    Properly propagates errors using all standard operations
+    """
+    def __init__(self, val, eup=None, edn=None):
+        # assume poisson
+        if eup is None: eup = edn = abs(1.0*val)**0.5
+        elif edn is None: edn = eup
+        if edn < 0: edn = abs(edn)
+        self.val, self.eup, self.edn = 1.0*val, 1.0*eup, 1.0*edn
+
+    def __add__(self, other):
+        other_val, other_eup = self.get_val(other)
+        new_val = self.val + other_val
+        new_eup = (self.eup**2.0 + other_eup**2.0)**0.5
+        new_edn = (self.edn**2.0 + other_edn**2.0)**0.5
+        return E(new_val, new_eup, new_edn)
+
+    __radd__ = __add__
+
+    def __sub__(self, other):
+        other_val, other_eup = self.get_val(other)
+        new_val = self.val - other_val
+        new_eup = (self.eup**2.0 + other_eup**2.0)**0.5
+        new_edn = (self.edn**2.0 + other_edn**2.0)**0.5
+        return E(new_val, new_eup, new_edn)
+
+    def __rsub__(self, other):
+        other_val, other_eup = self.get_val(other)
+        new_val = -(self.val - other_val)
+        new_eup = (self.eup**2.0 + other_eup**2.0)**0.5
+        new_edn = (self.edn**2.0 + other_edn**2.0)**0.5
+        return E(new_val, new_eup, new_edn)
+
+
+    def __mul__(self, other):
+        other_val, other_eup = self.get_val(other)
+        new_val = self.val * other_val
+        new_eup = ((self.eup * other_val)**2.0 + (other_eup * self.val)**2.0)**0.5
+        new_edn = ((self.edn * other_val)**2.0 + (other_edn * self.val)**2.0)**0.5
+        return E(new_val, new_eup, new_edn)
+
+    __rmul__ = __mul__
+
+    def __div__(self, other):
+        other_val, other_eup = self.get_val(other)
+        new_val = self.val / other_val
+        new_eup = ((self.eup/other_val)**2.0+(other_eup*self.val/(other_val)**2.0)**2.0)**0.5
+        new_edn = ((self.edn/other_val)**2.0+(other_edn*self.val/(other_val)**2.0)**2.0)**0.5
+        return E(new_val, new_eup, new_edn)
+
+    def __rdiv__(self, other):
+        other_val, other_eup = self.get_val(other)
+        new_val = other_val / self.val
+        new_eup = ((other_eup/self.val)**2.0+(self.eup*other_val/(self.val)**2.0)**2.0)**0.5
+        new_edn = ((other_edn/self.val)**2.0+(self.edn*other_val/(self.val)**2.0)**2.0)**0.5
+        return E(new_val, new_eup, new_edn)
+
+    def __pow__(self, other):
+        # doesn't accept an argument of class E, only normal number
+        new_val = self.val ** other
+        new_eup = ((other * self.val**(other-1) * self.eup)**2.0)**0.5
+        new_edn = ((other * self.val**(other-1) * self.edn)**2.0)**0.5
+        return E(new_val, new_eup, new_edn)
+
+    def __neg__(self):
+        return E(-1.*self.val, self.eup)
+
+    def __eq__(self, other):
+        other_val, other_eup, other_edn = self.get_val(other)
+        return self.val == other_val and self.eup == other_eup and self.edn == other_edn
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def get_val(self, other):
+        other_val, other_eup, other_edn = other, 0.0, 0.0
+        if type(other)==type(self):
+            other_val, other_eup, other_edn = other.val, other.eup, other.edn
+        return other_val, other_eup, other_edn
+
+    def round(self, ndec):
+        if ndec == 0:
+            self.val = int(self.val)
+        else:
+            self.val = round(self.val,ndec)
+        self.eup = round(self.eup,ndec)
+        self.edn = round(self.edn,ndec)
+        return self
+
+    def rep(self):
+        use_ascii = False
+        if use_ascii:
+            sep = "+-"
+        else:
+            sep = u"\u00B1".encode("utf-8")
+        return "%s %s %s(%s)" % (str(self.val), sep, str(self.eup), str(self.edn))
+
+    def pct_rep(self,ndec=1):
+        use_ascii = False
+        if use_ascii:
+            sep = "+-"
+        else:
+            sep = u"\u00B1".encode("utf-8")
+        return "(%s %s %s)%%" % (str(round(self.val*100,ndec)), sep, str(round(self.eup*100,ndec)))
+
+    def tex_rep(self,ndec=1):
+        use_ascii = False
+        return "${0}^{{+{1}}}_{{-{2}}}$".format(self.val, self.eup, self.edn)
+
+    __str__ = rep
+
+    __repr__ = rep
+
+    def __getitem__(self, idx):
+        if idx==0: return self.val
+        elif idx==1: return self.eup
+        else: raise IndexError
+
 root_e = None
 def get_significance(exp,obs):
     """

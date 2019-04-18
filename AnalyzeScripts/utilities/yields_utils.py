@@ -79,6 +79,165 @@ def getYieldEInFlatBins(f, srNames, hname='metbins', backup_hname=None):
     return  sum(getYieldEInTopoBins(f, srNames, hname, backup_hname),[])
 
 
+def getSystYieldAEInFlatBins(f, srNames, sys):
+    pass
+    preds = getYieldEInFlatBins(f, srNames, 'metbins')
+    predup = getYieldEInFlatBins(f, srNames, 'metbins_'+sys+'Up', 'metbins')
+    preddn = getYieldEInFlatBins(f, srNames, 'metbins_'+sys+'Dn', 'metbins')
+    sysup = [ 0 if ycen.val <= 0 else round(yup.val/ycen.val-1, 4) for yup, ycen in zip(predup, preds)]
+    sysdn = [ 0 if ycen.val <= 0 else round(ydn.val/ycen.val-1, 4) for ydn, ycen in zip(preddn, preds)]
+    for i in range(len(preds)):
+        sup = sysup[i]
+        sdn = sysdn[i]
+        if sysup[i] < 0 and sysdn[i] > 0:
+            sdn = sysup[i]
+            sup = sysdn[i]
+        elif not (sysup[i] > 0 and sysdn[i] < 0):
+            print 'Syst:', sys, 'at bin', i, 'has single sided variation! sysup =', sysup[i], 'sysdn =', sysdn[i]
+            if np.isnan(sup): sup = 0
+            if np.isnan(sdn): sdn = 0
+            sup = max(abs(sup), abs(sdn))
+            sdn = sup
+
+
+
+
+def getAESystDataDriven(f, srNames, systs=None, doAsymErr=True):
+    preds  = [ AE(y.val, y.err) for y in getYieldEInFlatBins(f, srNames, 'metbins')]
+    alpha  = [ AE(y.val, y.err) for y in getYieldEInFlatBins(f, srNames, 'alphaHist')]
+    yMC_SR = [ AE(y.val, y.err) for y in getYieldEInFlatBins(f, srNames, 'MCyields_SR')]
+    yMC_CR = [ AE(y.val, y.err) for y in getYieldEInFlatBins(f, srNames, 'MCyields_CR')]
+    yld_CR = [ AE(y.val, y.err) for y in getYieldEInFlatBins(f, srNames, 'datayields_CR')]
+    purity = [ AE(y.val, y.err) for y in getYieldEInTopoBins(f, srNames, 'CRpurity')]
+
+    systup = [a.eup for a in alpha]
+    systdn = systup
+
+
+    if type(systs) == list:
+        for sys in systs:
+            sysup = [ 0 if ycen.val <= 0 else round(yup.val/ycen.val-1, 4) for yup, ycen in zip(predup, preds)]
+            sysdn = [ 0 if ycen.val <= 0 else round(ydn.val/ycen.val-1, 4) for ydn, ycen in zip(preddn, preds)]
+            for i in range(len(preds)):
+                sup = sysup[i]
+                sdn = sysdn[i]
+                if sysup[i] < 0 and sysdn[i] > 0:
+                    sdn = sysup[i]
+                    sup = sysdn[i]
+                elif not (sysup[i] > 0 and sysdn[i] < 0):
+                    print 'Syst:', sys, 'at bin', i, 'has single sided variation! sysup =', sysup[i], 'sysdn =', sysdn[i]
+                    if np.isnan(sup): sup = 0
+                    if np.isnan(sdn): sdn = 0
+                    sup = max(abs(sup), abs(sdn))
+                    sdn = sup
+
+                systup[i] = sqrt(systup[i]**2 + sup**2)
+                systdn[i] = sqrt(systdn[i]**2 + sdn**2)
+
+
+def rond(y, errup=None, errdn=None, digit=2):
+    if y > 1000: digit = 0
+    if y > 100: digit = 1
+    if y > 10: digit = 1
+    if type(y) == float:
+        y = round(y,digit)
+
+    if errup == None:
+        return y
+    elif errdn == None:
+        return y, round(errup,digit)
+    else:
+        return y, round(errup,digit), round(errdn,digit)
+
+
+def getPredStrDataDriven(f, srNames, systs=None, showUpDn=True):
+    preds  = getYieldEInFlatBins(f, srNames, 'metbins')
+    alpha  = getYieldEInFlatBins(f, srNames, 'alphaHist')
+    yMC_SR = getYieldEInFlatBins(f, srNames, 'MCyields_SR')
+    yMC_CR = getYieldEInFlatBins(f, srNames, 'MCyields_CR')
+    yld_CR = getYieldEInFlatBins(f, srNames, 'datayields_CR')
+    purity = getYieldEInTopoBins(f, srNames, 'CRpurity')
+
+    systup = [a.err for a in alpha]
+    systdn = systup
+
+    if type(systs) == list:
+        for sys in systs:
+            predup = getYieldEInFlatBins(f, srNames, 'metbins_'+sys+'Up', 'metbins')
+            preddn = getYieldEInFlatBins(f, srNames, 'metbins_'+sys+'Dn', 'metbins')
+            sysup = [ 0 if ycen.val <= 0 else round(yup.val/ycen.val-1, 4) for yup, ycen in zip(predup, preds)]
+            sysdn = [ 0 if ycen.val <= 0 else round(ydn.val/ycen.val-1, 4) for ydn, ycen in zip(preddn, preds)]
+            for i in range(len(preds)):
+                sup = sysup[i]
+                sdn = sysdn[i]
+                if sysup[i] < 0 and sysdn[i] > 0:
+                    sdn = sysup[i]
+                    sup = sysdn[i]
+                elif not (sysup[i] > 0 and sysdn[i] < 0):
+                    print 'Syst:', sys, 'at bin', i, 'has single sided variation! sysup =', sysup[i], 'sysdn =', sysdn[i]
+                    if np.isnan(sup): sup = 0
+                    if np.isnan(sdn): sdn = 0
+                    sup = max(abs(sup), abs(sdn))
+                    sdn = sup
+
+                systup[i] = sqrt(systup[i]**2 + sup**2)
+                systdn[i] = sqrt(systdn[i]**2 + sdn**2)
+
+    pderr = [ getPoissonErrors(y.val) for y in yld_CR]
+    preds = [ y.round(2).val for y in preds]
+    alpha = [ a.round(2).val for a in alpha]
+    # TFs = [ '${0}^{{+{1}}}_{{-{2}}}$'.format(a, round(a*(1+sup),2), round(a*(1-sdn),2)) for a, sup, sdn in zip(alpha, systup, systdn)]
+    # y_CR = [ '${0}^{{+{1}}}_{{-{2}}}$'.format(int(y.val), round(e[0],2), round(e[1],2)) for y, e in zip(yld_CR, pderr)])
+    # R_CR = [(d/m).round(2) for d, m in zip(yld_CR, yMC_CR)]
+    if showUpDn:
+        pstr = [ '${0}^{{+{1}+{3}}}_{{-{2}-{4}}}$'.format(y, round(sup*y,2), round(sdn*y,2), round(pde[0]*a,2), round(pde[1]*a,2)) for y,pde,a,sup,sdn in zip(preds, pderr, alpha, systup, systdn)]
+    else:
+        # pstr = [ '${0}^{{+{1}}}_{{-{2}}}\pm{3}$'.format(y, round(pde[0]*a,2), round(pde[1]*a,2), max(round(sup*y,2), round(sdn*y,2))) for y,pde,a,sup,sdn in zip(preds, pderr, alpha, systup, systdn)]
+        pstr = [ '${0}^{{+{1}}}_{{-{2}}}$'.format(*rond(y, sqrt((pde[0]*a)**2+(sup*y)**2), sqrt((pde[1]*a)**2+(sdn*y)**2), 2)) for y,pde,a,sup,sdn in zip(preds, pderr, alpha, systup, systdn)]
+    peup = [ round(sqrt((pde[0]*a)**2 +(sup*y)**2),2) for y,pde,a,sup in zip(preds, pderr, alpha, systup)]
+    pedn = [ round(sqrt((pde[1]*a)**2 +(sdn*y)**2),2) for y,pde,a,sdn in zip(preds, pderr, alpha, systdn)]
+
+    return pstr, preds, peup, pedn
+
+def getPredStrMCDriven(f, srNames, systs=None):
+    preds  = getYieldEInFlatBins(f, srNames, 'metbins')
+
+    systup = [0.0 if y.val <= 0 else round(y.err/y.val,4) for y in preds]
+    systdn = systup
+
+    if type(systs) == list:
+        for sys in systs:
+            predup = getYieldEInFlatBins(f, srNames, 'metbins_'+sys+'Up', 'metbins')
+            preddn = getYieldEInFlatBins(f, srNames, 'metbins_'+sys+'Dn', 'metbins')
+            sysup = [ 0 if ycen.val <= 0 else round(yup.val/ycen.val-1, 4) for yup, ycen in zip(predup, preds)]
+            sysdn = [ 0 if ycen.val <= 0 else round(ydn.val/ycen.val-1, 4) for ydn, ycen in zip(preddn, preds)]
+            for i in range(len(preds)):
+                sup = sysup[i]
+                sdn = sysdn[i]
+                if sysup[i] < 0 and sysdn[i] > 0:
+                    sdn = sysup[i]
+                    sup = sysdn[i]
+                elif not (sysup[i] > 0 and sysdn[i] < 0):
+                    print 'Syst:', sys, 'at bin', i, 'has single sided variation! sysup =', sysup[i], 'sysdn =', sysdn[i]
+                    if np.isnan(sup): sup = 0
+                    if np.isnan(sdn): sdn = 0
+                    sup = max(abs(sup), abs(sdn))
+                    sdn = sup
+
+                systup[i] = sqrt(systup[i]**2 + sup**2)
+                systdn[i] = sqrt(systdn[i]**2 + sdn**2)
+    elif type(systs) == float:
+        systup = [systs for y in preds]
+        systdn = systup
+
+    preds = [ y.round(2).val for y in preds]
+    # pstr = [ '${0}^{{+{1}}}_{{-{2}}}$'.format(y, round(sup*y,2), round(sdn*y,2)) for y,sup,sdn in zip(preds, systup, systdn)]
+    pstr = [ '${0}\pm{1}$'.format(*rond(y, max(sup*y, sdn*y))) for y,sup,sdn in zip(preds, systup, systdn)]
+    peup = [ round(sup*y,2) for y,sup in zip(preds, systup)]
+    pedn = [ round(sdn*y,2) for y,sdn in zip(preds, systdn)]
+
+    return pstr, preds, peup, pedn
+
 # # # # # # # # # # # # # # # # # # # # # # # #
 # Additional statistic tools
 # # # # # # # # # # # # # # # # # # # # # # # #
