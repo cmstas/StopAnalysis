@@ -16,7 +16,7 @@ skimtype=skimmed
 
 OUTDIR18=$OUTDIR
 
-vsuf=v31_s6
+vsuf=v31_s12
 
 OUTDIR18=output/samp18_$vsuf
 OUTDIR17=output/samp17_$vsuf
@@ -35,7 +35,7 @@ run16dat=0
 run16bkg=0
 run16sig=0
 
-# OUTDIRRUN2=""
+OUTDIRRUN2=""
 
 function runLooperJobs {
     # [[ -d ${OUTDIR} ]] && rm -r ${OUTDIR}
@@ -97,7 +97,8 @@ Samples+=( WZTo1L3Nu WZTo3LNu WZTo2L2Q WWToLNuQQ WWTo2L2Nu ZZ )   # diboson
 # 2018 Signal <-- use f17v2_ext1 until a18 ones come out
 
 # INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/f17v2_v30_8
-INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/f17v2_v31_2
+# INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/f17v2_v31_2
+INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/signal_v31_4
 # declare -a Samples=(T2tt_mStop850_mLSP100 T2tt_mStop650_mLSP350 T2tt_mStop1200_mLSP100)
 declare -a Samples=()
 Samples+=( SMS_T2tt_mStop1200to2000_f17v2_ext1_0 SMS_T2tt_mStop1200to2000_f17v2_ext1_1 SMS_T2tt_mStop1200to2000_f17v2_ext1_2 )
@@ -122,6 +123,7 @@ Samples+=( SMS_T2tt_mStop150to250_f17v2_ext1_0 SMS_T2tt_mStop150to250_f17v2_ext1
 # INDIR=/nfs-7/userdata/haweber/tupler_babies/merged/Stop_1l/v2017/output/
 # INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/data_v30_7
 # INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/data_v30_3
+# INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/data_v31_2
 INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/data_v31_2
 OUTDIR=$OUTDIR17
 # OUTDIR=output/data17_v30_leptrig
@@ -168,7 +170,8 @@ Samples+=( WZTo1L3Nu WZTo3LNu WZTo2L2Q WZTo1L1Nu2Q WWToLNuQQ WWTo2L2Nu TTWZ ZZ )
 ########################
 # 2017 Signal
 
-INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/f17v2_v31_2
+# INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/f17v2_v31_2
+INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/signal_v31_4
 # declare -a Samples=(T2tt_mStop850_mLSP100 T2tt_mStop650_mLSP350 T2tt_mStop1200_mLSP100)
 declare -a Samples=()
 Samples+=( SMS_T2tt_mStop1200to2000_f17v2_ext0_0 SMS_T2tt_mStop1200to2000_f17v2_ext0_1 SMS_T2tt_mStop1200to2000_f17v2_ext0_2 )
@@ -247,7 +250,8 @@ Samples+=( WZTo1L3Nu WZTo1L1Nu2Q WZTo3LNu_amcnlo WZTo2L2Q WWTo2L2Nu WWToLNuQQ ZZ
 # 2016 signal
 
 # INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/s16v3_v30_9
-INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/s16v3_v31_2
+# INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/s16v3_v31_2
+INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/signal_v31_4
 # INDIR=/nfs-7/userdata/stopRun2/analysis2016_SUS-16-051_35p9fbinv/v22/skim
 # INDIR=/nfs-7/userdata/stopRun2/analysis2016_SUS-16-051_35p9fbinv/v22_usegenMET/skim
 # OUTDIR=output/temp12
@@ -301,7 +305,8 @@ pushd ${OUTDIR18}
 [[ $run18bkg == 1 ]] && hadd -f tt1l_18.root     TTJets_1lep*.root > /dev/null
 [[ $run18bkg == 1 ]] && hadd -f ttbar_18.root    TTJets*.root > /dev/null
 [[ $run18bkg == 1 ]] && hadd -f singleT_18.root  ST_*.root  > /dev/null
-[[ $run18bkg == 1 ]] && hadd -f Vjets_18.root    W?Jets*.root DYJets*.root > /dev/null
+# [[ $run18bkg == 1 ]] && hadd -f Vjets_18.root    W?Jets*.root DYJets*.root > /dev/null
+[[ $run18bkg == 1 ]] && hadd -f Vjets_18.root    W?Jets*.root > /dev/null
 [[ $run18bkg == 1 ]] && hadd -f rare_18.root     TTZ*.root TTW*.root WZ*.root WW*.root ZZ*.root > /dev/null
 # [[ $run18bkg == 1 ]] && hadd -f rare_18.root     TTZ*.root TTW*.root WZ*.root > /dev/null
 [[ $run18bkg == 1 ]] && hadd -f allBkg_18.root   ttbar_18.root singleT_18.root Vjets_18.root rare_18.root > /dev/null
