@@ -148,6 +148,74 @@ def getLabelsTemporary(srNames):
 
     return std_labels+cor_labels
 
+def DrawTextPad(textpad):
+    textpad.cd()
+    textpad.SetFillColor(0);
+    textpad.SetBorderMode(0);
+    textpad.SetBorderSize(2);
+    textpad.SetTickx(1);
+    textpad.SetTicky(1);
+    textpad.SetLeftMargin(0.07);
+    textpad.SetRightMargin(0.05);
+    textpad.SetTopMargin(0.07);
+    textpad.SetBottomMargin(0.28);
+    textpad.SetFrameFillStyle(0);
+    textpad.SetFrameBorderMode(0);
+
+    txt = r.TLatex()
+    txt.SetNDC()
+    txt.SetTextFont(42)
+    txt.SetTextAlign(13)
+    txt.SetLineWidth(2)
+    txt.SetTextSize(0.075)
+    step = 0.06
+    lmar = textpad.GetLeftMargin()
+    tmar = 1-textpad.GetTopMargin()
+
+    txt.DrawLatex(lmar+0.09, tmar-step*0 ,"  N_{J}")
+    ls1 = r.TLine();
+    ls1.DrawLineNDC(0.05, tmar-step*0.8, 0.85, tmar-step*0.8)
+
+    ls1.DrawLineNDC(lmar+0.085, tmar-step*9, lmar+0.085, tmar)
+
+    txt.DrawLatex(lmar, tmar-step*1 ,"A   2--3")
+    txt.DrawLatex(lmar, tmar-step*2 ,"B   2--3")
+    txt.DrawLatex(lmar, tmar-step*3 ,"C   #geq 4")
+    txt.DrawLatex(lmar, tmar-step*4 ,"D   #geq 4")
+    txt.DrawLatex(lmar, tmar-step*5 ,"E   #geq 4")
+    txt.DrawLatex(lmar, tmar-step*6 ,"F   #geq 4")
+    txt.DrawLatex(lmar, tmar-step*7 ,"G   #geq 4")
+    txt.DrawLatex(lmar, tmar-step*8 ,"H   #geq 4")
+
+    ls1.DrawLineNDC(lmar+0.25, tmar-step*9, lmar+0.25, tmar)
+
+    txt.DrawLatex(lmar+0.28, tmar-step*0 ," t_{mod}  ")
+    txt.DrawLatex(lmar+0.28, tmar-step*1 ," > 10 ")
+    txt.DrawLatex(lmar+0.28, tmar-step*2 ," > 10 ")
+    txt.DrawLatex(lmar+0.28, tmar-step*3 ," #leq 0 ")
+    txt.DrawLatex(lmar+0.28, tmar-step*4 ," #leq 0 ")
+    txt.DrawLatex(lmar+0.28, tmar-step*5 ,"0--10 ")
+    txt.DrawLatex(lmar+0.28, tmar-step*6 ,"0--10 ")
+    txt.DrawLatex(lmar+0.28, tmar-step*7 ," > 10 ")
+    txt.DrawLatex(lmar+0.28, tmar-step*8 ," > 10 ")
+
+    ls1.DrawLineNDC(lmar+0.47, tmar-step*9, lmar+0.47, tmar)
+    txt.DrawLatex(lmar+0.48, tmar-step*0 ," M_{#font[12]{l}b} [GeV] ")
+    txt.DrawLatex(lmar+0.51, tmar-step*1 ," #leq 175")
+    txt.DrawLatex(lmar+0.51, tmar-step*2 ," > 175")
+    txt.DrawLatex(lmar+0.51, tmar-step*3 ," #leq 175")
+    txt.DrawLatex(lmar+0.51, tmar-step*4 ," > 175")
+    txt.DrawLatex(lmar+0.51, tmar-step*5 ," #leq 175")
+    txt.DrawLatex(lmar+0.51, tmar-step*6 ," > 175")
+    txt.DrawLatex(lmar+0.51, tmar-step*7 ," #leq 175")
+    txt.DrawLatex(lmar+0.51, tmar-step*8 ," > 175")
+
+    txt.DrawLatex(lmar, tmar-step*9.2 ,"#splitline{X0: Incl tag,    X1: No top,}{X2: Mer. top,  X3: Res. top}")
+
+    txt.DrawLatex(lmar, tmar-step*12 ,"I : N_{J} #geq 5, N_{med-b} #geq 1")
+    txt.DrawLatex(lmar, tmar-step*13 ,"J: N_{J} #geq 3, N_{soft-b} #geq 1")
+
+
 def DrawHeaderText(canvas, lumi=137.2):
     tCMS = r.TLatex()
     tCMS.SetNDC(1)
@@ -163,7 +231,7 @@ def DrawHeaderText(canvas, lumi=137.2):
     tplm.SetTextAlign(11)
     tplm.SetTextSize(0.052)
     canvas.cd()
-    tplm.DrawLatex(canvas.GetLeftMargin()+0.054, 1.0-canvas.GetTopMargin()+0.01, "Preliminary")
+    tplm.DrawLatex(canvas.GetLeftMargin()+0.059, 1.0-canvas.GetTopMargin()+0.01, "Preliminary")
 
     ttext = r.TLatex()
     ttext.SetNDC(1)
@@ -252,7 +320,8 @@ def drawSRyieldHist(hist, xlabels, hleg=None, savename='sigYieldHist.pdf', drawo
     c0.SaveAs(savename)
 
 def drawSRyieldStack(hstk, xlabels, legitems=None, savename='sigYieldHist.pdf', drawops='hist', linear=False, hline=None,
-                     hdata=None, hsigs=None, gsyst=None, ytitle='N Events', noRatio=False, noBkgError=False, yrange=None):
+                     hdata=None, hsigs=None, gsyst=None, ytitle='N Events', noRatio=False, noBkgError=False, yrange=None,
+                     drawTextPad=False):
 
     r.gStyle.SetOptStat('')
     r.gStyle.SetPadGridX(0)
@@ -262,15 +331,22 @@ def drawSRyieldStack(hstk, xlabels, legitems=None, savename='sigYieldHist.pdf', 
     r.gStyle.SetFrameBorderMode(0)
 
     width = max(len(xlabels)*40, 1200) if noRatio else max(len(xlabels)*50, 1600)
-    c0 = r.TCanvas('c0', 'c0', width, 1000) # todo: adjustable canvas width later
-    mainPad = r.TPad('1', '1', 0.0, 0.05, 1.0, 1.0)
-    ratioPad = r.TPad('2', '2', 0.0, 0.0, 1.0, 0.23)
 
     if not hdata and not gsyst: noRatio = True
-    if not noRatio:
+
+    if drawTextPad and not noRatio:
+        c0 = r.TCanvas('c0', 'c0', width+200, 1200)
+        mainPad = r.TPad('1', '1', 0.0, 0.20, 0.82, 0.99)
+        ratioPad = r.TPad('2', '2', 0.0, 0.02, 0.82, 0.225)
+        textPad = r.TPad('3', '3', 0.79, 0.02, 1.0, 0.99)
+    elif not noRatio:
         c0 = r.TCanvas('c0', 'c0', width, 1200)
         mainPad = r.TPad('1', '1', 0.0, 0.20, 1.0, 0.99)
         ratioPad = r.TPad('2', '2', 0.0, 0.02, 1.0, 0.23)
+    else:
+        c0 = r.TCanvas('c0', 'c0', width, 1000) # todo: adjustable canvas width later
+        mainPad = r.TPad('1', '1', 0.0, 0.05, 1.0, 1.0)
+        ratioPad = r.TPad('2', '2', 0.0, 0.0, 1.0, 0.23)
 
     r.SetOwnership(c0, False)
     r.SetOwnership(mainPad, False)
@@ -286,6 +362,7 @@ def drawSRyieldStack(hstk, xlabels, legitems=None, savename='sigYieldHist.pdf', 
     ratioPad.SetLeftMargin(0.10)
     ratioPad.SetRightMargin(0.05)
     if not noRatio: ratioPad.Draw()
+    if drawTextPad: textPad.Draw()
     mainPad.cd()
 
     if hstk.GetHists().GetSize() < 1:
@@ -304,6 +381,7 @@ def drawSRyieldStack(hstk, xlabels, legitems=None, savename='sigYieldHist.pdf', 
     htot.GetYaxis().SetTitle(ytitle)
     htot.GetYaxis().SetTitleOffset(0.45)
     htot.GetYaxis().SetTitleSize(0.058)
+    htot.GetYaxis().SetTickSize(0.02)
     htot.GetYaxis().SetRangeUser(0.1, 5000)
     if yrange != None:
         htot.GetYaxis().SetRangeUser(yrange[0], yrange[1])
@@ -333,7 +411,7 @@ def drawSRyieldStack(hstk, xlabels, legitems=None, savename='sigYieldHist.pdf', 
         ppu.ConvertToPoissonGraph(hdata, g_data, drawZeros=True)
         # g_data.SetPointError(g_data.GetN()-1, 0, 0, 0, 0)
         g_data.SetMarkerStyle(20)
-        g_data.SetMarkerSize(1.2)
+        g_data.SetMarkerSize(1.6)
         g_data.SetLineWidth(1)
 
         # draw the graph and then axes again on top
@@ -379,6 +457,7 @@ def drawSRyieldStack(hstk, xlabels, legitems=None, savename='sigYieldHist.pdf', 
         h_axis_ratio.GetYaxis().SetTitle('Ratios  ')
         h_axis_ratio.GetYaxis().SetTitleOffset(0.45)
         h_axis_ratio.GetYaxis().SetTitleSize(1)
+        h_axis_ratio.GetYaxis().SetTickLength(0.01)
         h_axis_ratio.GetXaxis().SetTickLength(0.07)
         h_axis_ratio.GetXaxis().SetTitleSize(0.)
         h_axis_ratio.GetXaxis().SetLabelSize(0.)
@@ -405,11 +484,14 @@ def drawSRyieldStack(hstk, xlabels, legitems=None, savename='sigYieldHist.pdf', 
                 htot.SetBinError(i, 0)
             ppu.GetPoissonRatioGraph(htot,hdata,ratioGraph)
             ratioGraph.SetMarkerStyle(20)
-            ratioGraph.SetMarkerSize(1.6)
+            ratioGraph.SetMarkerSize(2.2)
             ratioGraph.SetMarkerColor(r.kGray+3)
             ratioGraph.SetLineColor(r.kGray+3)
             ratioGraph.SetLineWidth(2)
             ratioGraph.Draw('PZsame')
+
+    if drawTextPad:
+        DrawTextPad(textPad)
 
     c0.SaveAs(savename)
     c0.Clear()
@@ -510,7 +592,7 @@ def drawBkgCompositionStack(indir, srNames=None, savename='bkgCompostion_std.pdf
     f_bkg.Close()
 
 
-def drawBkgPredictionStack(indir, srNames=None, savename='bkgPrediction_std.pdf', ysuf='run2', plotData=False, plotRatio=True, scale=1):
+def drawBkgPredictionStack(indir, srNames=None, savename='bkgPrediction_std.pdf', ysuf='run2', plotData=False, plotRatio=True, scale=1, drawTextPad=False):
 
     # -------------------------------------------------------
     # Draw test bkg composition / expected yields hists
@@ -598,7 +680,7 @@ def drawBkgPredictionStack(indir, srNames=None, savename='bkgPrediction_std.pdf'
             f_data = r.TFile(indir+'/'+plotData+'.root')
         y_data = [ y.round(2) for y in sum(getYieldEInTopoBins(f_data, srNames, 'metbins'), []) ]
         h_data = getSRHistFromYieldE(y_data, 'h_SRyields_yields', '', fcolor=r.kBlack)
-        drawSRyieldStack(hstk, xlabels, legname, savename, 'hist', hdata=h_data, gsyst=g_sys, yrange=yrange)
+        drawSRyieldStack(hstk, xlabels, legname, savename, 'hist', hdata=h_data, gsyst=g_sys, yrange=yrange, drawTextPad=drawTextPad)
     else:
         drawSRyieldStack(hstk, xlabels, legname, savename, 'hist', gsyst=g_sys, yrange=yrange)
 
@@ -927,7 +1009,8 @@ if __name__ == '__main__':
     # drawBkgPredictionStack(indir, srNames, 'bkgPrediction_unblind_2016_full.pdf', 'run2', plotData='allData_16', scale=35.9/137.2)
     # drawBkgPredictionStack(indir, srNames, 'bkgPrediction_unblind_run2_61fb.pdf', 'run2', plotData='data_run2_61fb', scale=60.9/137.2)
     # drawBkgPredictionStack(indir, srNames, 'Results_prefit_run2_noJ_s8.pdf', 'run2', plotData='allData_run2')
-    drawBkgPredictionStack(indir, srNames, 'Results_prefit_run2_all_s12.pdf', 'run2', plotData='allData_run2')
+    # drawBkgPredictionStack(indir, srNames, 'Results_prefit_run2_all_s12.pdf', 'run2', plotData='allData_run2')
+    drawBkgPredictionStack(indir, srNames, 'Results_prefit_test_s12.pdf', 'run2', plotData='allData_run2', drawTextPad=True)
 
     bkgnames = ['2l', '1lW', 'znunu',  '1ltop',]
     systnames = ['jes', 'metTTbar', ]
