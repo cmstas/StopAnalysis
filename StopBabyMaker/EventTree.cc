@@ -53,7 +53,7 @@ void EventTree::SetMetFilterEvents(){
  
 void EventTree::FillCommon (const std::string &root_file_name)
 {
-    bool signal=false;
+    bool fastsim=false;
 
     if(evt_dataset().size()>0) dataset = evt_dataset().at(0).Data();
     if(evt_CMS3tag().size()>0) cms3tag = evt_CMS3tag().at(0).Data();
@@ -64,10 +64,10 @@ void EventTree::FillCommon (const std::string &root_file_name)
     string lspstr ("mLSP");//add those for testing purpose
     string smsstr ("SMS");//add those for testing purpose
 
-    if (filestr.find(signalstr) != string::npos) signal = true;
-    else if (filestr.find(lspstr) != string::npos) signal = true;
-    else if (filestr.find(smsstr) != string::npos) signal = true;
-    if (filestr.find(smsstr) != string::npos && filestr.find(lspstr) != string::npos) signal = false;
+    if (filestr.find(signalstr) != string::npos) fastsim = true;
+    else if (filestr.find(lspstr) != string::npos) fastsim = true;
+    else if (filestr.find(smsstr) != string::npos) fastsim = true;
+    if (filestr.find(smsstr) != string::npos && filestr.find(lspstr) != string::npos) fastsim = false;
     //std::cout << "run "<<evt_run()<<" lumiblock "<<evt_lumiBlock() <<" event "<<evt_event()<<" nvtxs "<<numberOfGoodVertices()<<" pfmet "<<evt_pfmet()<<" pfmetphi "<< evt_pfmetPhi()<< std::endl;
     run = evt_run();
     ls  = evt_lumiBlock();
@@ -82,36 +82,38 @@ void EventTree::FillCommon (const std::string &root_file_name)
     calomet_phi = evt_calometPhi();
 
     is_data = evt_isRealData();
-    // the recommended met filters //
-    if(!signal){
-      // filt_met = (nvtxs>0) && filt_globalTightHalo2016() && filt_ecalTP() && filt_eeBadSc() && filt_hbheNoise() && filt_hbheNoiseIso();
-      filt_met = passesMETfiltersRun2(is_data);
 
-      if (gconf.cmssw_ver == 80) {
-        filt_badMuonFilter = badMuonFilterV2(); //still some problems with MC
-        filt_badChargedCandidateFilter = badChargedCandidateFilterV2();
-      } else if (gconf.cmssw_ver >= 94) {
-        filt_badMuonFilter = filt_BadPFMuonFilter();
-        filt_badChargedCandidateFilter = filt_BadChargedCandidateFilter();
-      }
+    // the recommended met filters //
+    filt_met = passesMETfiltersRun2(is_data, fastsim);
+    if (gconf.cmssw_ver == 80) {
+      filt_badMuonFilter = badMuonFilterV2(); //still some problems with MC
+      filt_badChargedCandidateFilter = badChargedCandidateFilterV2();
+    } else if (gconf.cmssw_ver >= 94) {
+      filt_badMuonFilter = filt_BadPFMuonFilter();
+      filt_badChargedCandidateFilter = filt_BadChargedCandidateFilter();
+      if (gconf.year == 2017 || gconf.year == 2018)
+        filt_ecalbadcalib = filt_ecalBadCalibFilterUpdate();  // new in 94X, updated version ran over MiniAOD
+    }
+    filt_globaltighthalo2016 = filt_globalTightHalo2016();
+    filt_globalsupertighthalo2016 = filt_globalSuperTightHalo2016();
+    filt_goodvtx = filt_goodVertices(); //not working but same as our 1goodvertex requirement
+    filt_ecaltp = filt_ecalTP();
+    filt_eebadsc = (is_data)? filt_eeBadSc() : 1;
+    filt_hbhenoise = filt_hbheNoise(); // hbheNoiseFilter_25ns();
+    filt_hbheisonoise = filt_hbheNoiseIso();//hbheIsoNoiseFilter();
+
+    // some old filters
+    if(!fastsim){
+      // filt_met = (nvtxs>0) && filt_globalTightHalo2016() && filt_ecalTP() && filt_eeBadSc() && filt_hbheNoise() && filt_hbheNoiseIso();
       filt_cscbeamhalo = filt_cscBeamHalo();
       filt_cscbeamhalo2015 = filt_cscBeamHalo2015();
-      filt_globaltighthalo2016 = filt_globalTightHalo2016();
-      filt_globalsupertighthalo2016 = filt_globalSuperTightHalo2016();
-      filt_eebadsc = (is_data)? filt_eeBadSc() : 1;
-      filt_goodvtx = filt_goodVertices(); //not working but same as our 1goodvertex requirement
       filt_ecallaser = filt_ecalLaser();
-      filt_ecaltp = filt_ecalTP();
       filt_hcallaser = filt_hcalLaser();
       filt_trkfail = filt_trackingFailure();
       filt_trkPOG = filt_trkPOGFilters();
       filt_trkPOG_logerr_tmc = filt_trkPOG_logErrorTooManyClusters();
       filt_trkPOG_tmc =filt_trkPOG_manystripclus53X();
       filt_trkPOG_tms = filt_trkPOG_toomanystripclus53X();
-      filt_hbhenoise = filt_hbheNoise(); // hbheNoiseFilter_25ns();
-      filt_hbheisonoise = filt_hbheNoiseIso();//hbheIsoNoiseFilter();
-      if (gconf.year == 2017 || gconf.year == 2018)
-        filt_ecalbadcalib = filt_ecalBadCalibFilterUpdate();  // new in 94X, updated version ran over MiniAOD
     }
     
     if (!is_data)
@@ -126,7 +128,7 @@ void EventTree::FillCommon (const std::string &root_file_name)
       genweights = vector<float>(cms3.genweights().begin(), cms3.genweights().begin()+ngenweights);
       genweightsID = vector<string>(cms3.genweightsID().begin(), cms3.genweightsID().begin()+std::min(cms3.genweightsID().size(), 112UL));
 
-      if(signal){
+      if(fastsim){
 	sparms_values = sparm_values();
 	for ( auto name : sparm_names() )
 	  sparms_names.push_back(name.Data());
@@ -154,7 +156,6 @@ void EventTree::FillCommon (const std::string &root_file_name)
          }
          genht = _genht;
 
- 
     }
 
     firstGoodVtxIdx = firstGoodVertex();   
@@ -881,6 +882,9 @@ void EventTree::SetExtraVariablesBranches (TTree* tree)
     tree->Branch("pfmet_muegclean_phi", &pfmet_muegclean_phi);
     tree->Branch("pfmet_muegcleanfix", &pfmet_muegcleanfix);
     tree->Branch("pfmet_muegcleanfix_phi", &pfmet_muegcleanfix_phi);
+    tree->Branch("filt_badmuons", &filt_badmuons);
+    tree->Branch("filt_duplicatemuons", &filt_duplicatemuons);
+    tree->Branch("filt_nobadmuons", &filt_nobadmuons);
 }
 
 void EventTree::SetMETFilterBranches (TTree* tree)
@@ -914,9 +918,6 @@ void EventTree::SetMETFilterBranches (TTree* tree)
     tree->Branch("filt_jetWithBadMuon_jup", &filt_jetWithBadMuon_jup);
     tree->Branch("filt_jetWithBadMuon_jdown", &filt_jetWithBadMuon_jdown);
     tree->Branch("filt_pfovercalomet", &filt_pfovercalomet);
-    tree->Branch("filt_badmuons", &filt_badmuons);
-    tree->Branch("filt_duplicatemuons", &filt_duplicatemuons);
-    tree->Branch("filt_nobadmuons", &filt_nobadmuons);
 }
 
 void EventTree::SetPhotonBranches (TTree* tree)
