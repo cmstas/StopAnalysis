@@ -57,6 +57,8 @@ class evtWgtInfo {
     k_WwidthSF_Down,
     k_WbXsec_Up,
     k_WbXsec_Down,
+    k_ttZxsec_Up,
+    k_ttZxsec_Down,
     k_pdfUp,
     k_pdfDown,
     k_alphasUp,
@@ -252,6 +254,10 @@ class evtWgtInfo {
   double sf_WbXsec_up;
   double sf_WbXsec_dn;
 
+  bool apply_ttZxsec_sf;
+  double sf_ttZxsec_up;
+  double sf_ttZxsec_dn;
+
   bool apply_genweights_unc;
   double sf_pdf_up;
   double sf_pdf_dn;
@@ -310,6 +316,7 @@ class evtWgtInfo {
   void getNuPtSF( double &weight_nuPt_up, double &weight_nuPt_dn );
   void getWwidthSF( double &weight_Wwidth_up, double &weight_Wwidth_dn );
   void getWbXSecSF( double &weight_WbXsec_up, double &weight_WbXsec_dn );
+  void getttZxsecUnc( double &weight_ttZxsec_up, double &weight_ttZxsec_dn );
   void getPDFWeight( double &weight_pdf_up, double &weight_pdf_dn );
   void getAlphasWeight( double &weight_alphas_up, double &weight_alphas_dn );
   void getQ2Weight( double &weight_q2_up, double &weight_q2_dn );

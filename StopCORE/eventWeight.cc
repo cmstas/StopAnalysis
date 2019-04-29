@@ -141,6 +141,14 @@ evtWgtInfo::Util::Util( systID systematic ) {
       label       = "WbXsecDn";
       title       = "W+b x-section, Down";
       break;
+    case( k_ttZxsec_Up ):
+      label       = "ttZxsecUp";
+      title       = "ttZ x-section, Up";
+      break;
+    case( k_ttZxsec_Down ):
+      label       = "ttZxsecDn";
+      title       = "ttZ x-section, Down";
+      break;
     case( k_pdfUp ):
       label       = "pdfUp";
       title       = "PDF, Up";
@@ -245,6 +253,7 @@ evtWgtInfo::evtWgtInfo() {
   apply_metTTbar_sf     = false;
   apply_ttbarSysPt_sf   = false;
   apply_WbXsec_sf       = false;
+  apply_ttZxsec_sf      = false;
   apply_ISR_sf          = false;
   apply_pu_sf           = false;
   apply_pu_sf_fromFile  = false;
@@ -520,6 +529,9 @@ void evtWgtInfo::initializeWeights() {
   sf_WbXsec_up = 1.0;
   sf_WbXsec_dn = 1.0;
 
+  sf_ttZxsec_up = 1.0;
+  sf_ttZxsec_dn = 1.0;
+
   sf_pdf_up = 1.0;
   sf_pdf_dn = 1.0;
 
@@ -784,6 +796,10 @@ void evtWgtInfo::calculateWeightsForEvent() {
         sys_wgt *= sf_WbXsec_up; break;
       case k_WbXsec_Down:
         sys_wgt *= sf_WbXsec_dn; break;
+      case k_ttZxsec_Up:  // W+HF XSec Up
+        sys_wgt *= sf_ttZxsec_up; break;
+      case k_ttZxsec_Down:
+        sys_wgt *= sf_ttZxsec_dn; break;
       case k_pdfUp:
         sys_wgt *= sf_pdf_up; break;
       case k_pdfDown:
@@ -2089,12 +2105,28 @@ void evtWgtInfo::getWbXSecSF( double &weight_WbXsec_up, double &weight_WbXsec_dn
 
 //////////////////////////////////////////////////////////////////////
 
+void evtWgtInfo::getttZxsecUnc( double &weight_ttZxsec_up, double &weight_ttZxsec_dn ) {
+
+  weight_ttZxsec_up = 1.0;
+  weight_ttZxsec_dn = 1.0;
+
+  if ( !babyAnalyzer.isZtoNuNu() ) return;
+  if (samptype == ttZ) {
+    weight_ttZxsec_up = 1.28/1.17;
+    weight_ttZxsec_dn = 1.07/1.17;
+  }
+}
+
+//////////////////////////////////////////////////////////////////////
+
 void evtWgtInfo::getPDFWeight( double &weight_pdf_up, double &weight_pdf_dn ) {
 
   if ( babyAnalyzer.genweights().size() < 110 ) return;
 
   weight_pdf_up = babyAnalyzer.pdf_up_weight();
   weight_pdf_dn = babyAnalyzer.pdf_down_weight();
+
+  if (samptype == WZ) return;
 
   // Normalization
   if ( is_fastsim_ ) {
@@ -2135,6 +2167,8 @@ void evtWgtInfo::getAlphasWeight( double &weight_alphas_up, double &weight_alpha
   weight_alphas_up = babyAnalyzer.weight_alphas_up();
   weight_alphas_dn = babyAnalyzer.weight_alphas_down();
 
+  if (samptype == WZ) return;
+
   if ( is_fastsim_ ) {
     weight_alphas_up *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,12)) );
     weight_alphas_dn *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,13)) );
@@ -2173,6 +2207,9 @@ void evtWgtInfo::getQ2Weight( double &weight_q2_up, double &weight_q2_dn ) {
   // New method, start from v27
   weight_q2_up = babyAnalyzer.weight_Q2_up();
   weight_q2_dn = babyAnalyzer.weight_Q2_down();
+
+  if (samptype == WZ) return;
+
 
   if ( is_fastsim_ ) {
     weight_q2_up *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,5)) );
@@ -2378,6 +2415,9 @@ bool evtWgtInfo::doingSystematic( systID isyst ) {
     case k_WbXsec_Up:
     case k_WbXsec_Down:
       return apply_WbXsec_sf;
+    case k_ttZxsec_Up:
+    case k_ttZxsec_Down:
+      return apply_ttZxsec_sf;
     case k_pdfUp:
     case k_pdfDown:
     case k_alphasUp:
@@ -2489,7 +2529,8 @@ void evtWgtInfo::setDefaultSystematics( int syst_set, bool isfastsim ) {
       apply_metRes_sf      = false;  // not controlled here anymore
       apply_metTTbar_sf    = true;
       apply_ttbarSysPt_sf  = false;  // false=uncertainty, need to be updated
-      apply_WbXsec_sf      = true;   // to be verified?
+      apply_WbXsec_sf      = true;
+      apply_ttZxsec_sf     = true;
       apply_ISR_sf         = true;   // 2017 & 2018 to be updated
       apply_pu_sf          = false;  // not available in baby yet
       apply_pu_sf_fromFile = true;
@@ -2533,13 +2574,13 @@ double evtWgtInfo::getZSampleWeightFromCR3l( TString fname, bool apply ) {
     sf_xsec = 1.17;
   else if (fname.Contains("TTW"))
     sf_xsec = 1.23;
-  // WZ measurement from CMS: https://arxiv.org/abs/1901.03428
-  // For WZ -> 1l 3nu: 48.09*0.327*0.200 = 3.145, SNT uses 3.058
-  else if (fname.Contains("WZTo1L3Nu"))
-    sf_xsec = 1.03;
-  // For WZ -> 3l 1nu: Unknown since sample may have included Wgamma, use values from SS
-  else if (fname.Contains("WZTo3LNu"))
-    sf_xsec = 1.07;
+  // // WZ measurement from CMS: https://arxiv.org/abs/1901.03428
+  // // For WZ -> 1l 3nu: 48.09*0.327*0.200 = 3.145, SNT uses 3.058
+  // else if (fname.Contains("WZTo1L3Nu"))
+  //   sf_xsec = 1.03;
+  // // For WZ -> 3l 1nu: Unknown since sample may have included Wgamma, use values from SS
+  // else if (fname.Contains("WZTo3LNu"))
+  //   sf_xsec = 1.07;
 
   if (apply) sf_extra_file *= sf_xsec;
   return sf_xsec;
