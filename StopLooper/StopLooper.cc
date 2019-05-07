@@ -104,6 +104,7 @@ void StopLooper::SetSignalRegions() {
   // CR2lVec = getStopControlRegionsDileptonNewMETBinning();
 
   SRVec = getStopSignalRegionsRun2();
+  // SRVec = getStopSignalRegionsTestRun2();
   // SRVec = getStopSignalRegionsCorridorRun2();
   // SRVec = getStopInclusiveRegionsRun2();
 
@@ -223,7 +224,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
   cout << "[StopLooper::looper] creating output file: " << output_name << endl;  outfile_ = new TFile(output_name.Data(),"RECREATE") ;
   cout << "Complied with C++ standard: " << __cplusplus << endl;
 
-  if (printPassedEvents) ofile.open("passEventList.txt");
+  if (printPassedEvents) ofile.open(output_dir+"/passEventList.txt");
 
   if (runResTopMVA)
     resTopMVA = new ResolvedTopMVA("../StopCORE/TopTagger/resTop_xGBoost_v2.weights.xml", "BDT");
@@ -338,6 +339,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
     // evtWgt.susy_xsec_fromfile = true;
     // evtWgt.apply_pu_sf_fromFile = true;
     // evtWgt.apply_ISR_sf = false;
+    // evtWgt.apply_metRes_sf_sf = false;
 
     // evtWgt.setDefaultSystematics(evtWgtInfo::test_alloff);  // for test purpose
 
@@ -384,7 +386,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
       // fillEfficiencyHistos(testVec[0], "filters");
 
       // Apply met filters
-      if (samplever.find("v3") == 0) {
+      if (samplever.find("v31") == 0) {
         if ( !is_fastsim_ && !filt_met() ) continue;  // use the CORE function passesMETfiltersRun2()
         // if ( is_data() && !filt_met() ) continue;  // to test effect on MC
       } else if (doTopTagging) {
@@ -395,7 +397,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
         if ( !filt_hbheisonoise() )   continue;
         if ( !filt_ecaltp() ) continue;
         if ( !filt_badMuonFilter() ) continue;
-        if ( !filt_badChargedCandidateFilter() ) continue;
+        // if ( !filt_badChargedCandidateFilter() ) continue;
         if ( is_data() && !filt_eebadsc() ) continue;
         if ( year_ >= 2017 && !filt_ecalbadcalib() ) continue;  // only for 2017 and 2018
       } else if (samplever.find("v24") == 0) {
@@ -619,6 +621,10 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
       values_[binttag] = lead_bindisc_top;
       values_[nsblep] = nsboverlep;
 
+      // // Temporary to for no top-tagging result
+      // values_[deepttag] = 0;
+      // values_[tfttag] = 0;
+
       if (runResTopMVA) {
         // Prepare deep_cvsl vector
         vector<float> ak4pfjets_dcvsl;
@@ -669,7 +675,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
           // suffix = "_nominal";
         } else if (systype == 1) {
           if (!applyMETResCorrection) continue;
-          if (samplever.find("v31_2") == 0 && (samplestr.find("f17v2_ext1")) == string::npos) {  // temporary as only 2017 is available
+          if (samplever.find("v31") == 0) {  // available on and after v31_2
             values_[mt] = mt_met_lep_resup();
             values_[met] = pfmet_resup();
             values_[tmod] = topnessMod_resup();
@@ -687,7 +693,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
           suffix = "_metResUp";
         } else if (systype == 2) {
           if (!applyMETResCorrection) continue;
-          if (samplever.find("v31_2") == 0 && (samplestr.find("f17v2_ext1")) == string::npos) {  // temporary as only 2017 is available
+          if (samplever.find("v31") == 0) {  // available on and after v31_2
             values_[mt] = mt_met_lep_resdown();
             values_[met] = pfmet_resdown();
             values_[tmod] = topnessMod_resdown();
@@ -799,7 +805,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
           values_[dphilmet_rl] = lep1_dphiMET_rl();
           values_[tmod_rl] = topnessMod_rl();
         } else if (systype == 1 && values_[nlep_rl] > 1) {
-          if (samplever.find("v31_2") == 0 && (samplestr.find("f17v2_ext1")) == string::npos) {
+          if (samplever.find("v31")) {
             values_[mt_rl] = mt_met_lep_rl_resup();
             values_[mt2_ll] = (doTopTagging)? MT2_ll_resup() : 90;
             values_[met_rl] = pfmet_rl_resup();
@@ -816,7 +822,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
             values_[dphijmet_rl] = (ngoodjets() > 1)? min2deltaPhi(values_[metphi_rl], ak4pfjets_p4().at(0).phi(), ak4pfjets_p4().at(1).phi()) : -9;
           }
         } else if (systype == 2 && values_[nlep_rl] > 1) {
-          if (samplever.find("v31_2") == 0 && (samplestr.find("f17v2_ext1")) == string::npos) {
+          if (samplever.find("v31") == 0) {
             values_[mt_rl] = mt_met_lep_rl_resdown();
             values_[mt2_ll] = (doTopTagging)? MT2_ll_resdown() : 90;
             values_[met_rl] = pfmet_rl_resdown();
@@ -864,7 +870,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
         fillHistosForCR2l(suffix);
 
         // testCutFlowHistos(testVec[2]);
-        // fillTopTaggingHistos(suffix);
+        fillTopTaggingHistos(suffix);
 
         // Also do yield using genmet for fastsim samples <-- under development
         if (is_fastsim_ && systype == 0 && samplever.find("v31_4") == 0) {
@@ -1023,12 +1029,14 @@ void StopLooper::fillYieldHistos(SR& sr, float met, string suf, bool is_cr2l) {
   }
 
   // Block for debugging, active when setting printPassedEvents = true
-  if (printPassedEvents && sr.GetName() == "srbase" && suf == "") {
+  // if (printPassedEvents && sr.GetName() == "srbase" && suf == "") {
+  if (printPassedEvents && met > 450 && suf == "" && sr.GetName().find("sr") == 0) {
     // static bool printOnce1 = false;
     // if (!printOnce1) { for (auto& v : values_) ofile << ' ' << v.first; ofile << endl; printOnce1 = true; }
     ofile << run() << ' ' << ls() << ' ' << evt() << ' ' << sr.GetName();
     // if (run() == 277168) for (auto& v : values_) ofile << ' ' << v.second;
-    ofile << ": pfmet()= " << pfmet() << ", ngoodjets()= " << ngoodjets() << ", ak4pfjets_p4()[1].pt()= " << ak4pfjets_p4()[1].pt() << endl;
+    ofile << ": values_[met]= " << values_[Vars::met] << ", values_[mt]= " << values_[mt] << ", values_[njet]= " << values_[njet] << ", values_[nbjet] = " << values_[nbjet]  << ", values_[tmod]= " << values_[tmod] << ", values_[mlb]= " << values_[mlb];
+    // ofile << ": pfmet()= " << pfmet() << ", ngoodjets()= " << ngoodjets() << ", ak4pfjets_p4()[1].pt()= " << ak4pfjets_p4()[1].pt() << endl;
     // ofile << ' ' << evtweight_ << ' ' << evtWgt.getWeight(evtWgtInfo::systID::k_bTagEffHFUp) << ' ' << evtWgt.getLabel(evtWgtInfo::systID::k_bTagEffHFUp);
     // ofile << ' ' << evtweight_ << ' ' << pfmet() << ' ' << mt_met_lep() << ' ' << Mlb_closestb() << ' ' << topnessMod() << ' ' << ngoodjets() << ' ' << ngoodbtags() << ' ' << mindphi_met_j1_j2() << ' ' << pfmet_rl();
     ofile << endl;
