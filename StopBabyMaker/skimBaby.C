@@ -50,18 +50,26 @@ int skimBaby(TString inFileName="output.root", TString outFileName="skim.root"){
   float met=0.0;
   float met_jup=0.0;
   float met_jdown=0.0;
+  float met_resup=0.0;
+  float met_resdown=0.0;
 
   t->SetBranchAddress("pfmet", &met);
   t->SetBranchAddress("pfmet_jup", &met_jup);
   t->SetBranchAddress("pfmet_jdown", &met_jdown);
+  t->SetBranchAddress("pfmet_resup", &met_resup);
+  t->SetBranchAddress("pfmet_resdown", &met_resdown);
 
   float met_rl=0.0;
   float met_rl_jup=0.0;
   float met_rl_jdown=0.0;
+  float met_rl_resup=0.0;
+  float met_rl_resdown=0.0;
 
   t->SetBranchAddress("pfmet_rl", &met_rl);
   t->SetBranchAddress("pfmet_rl_jup", &met_rl_jup);
   t->SetBranchAddress("pfmet_rl_jdown", &met_rl_jdown);
+  t->SetBranchAddress("pfmet_rl_resup", &met_rl_resup);
+  t->SetBranchAddress("pfmet_rl_resdown", &met_rl_resdown);
 
   // MT
   float cut_mt = 150.0;
@@ -70,18 +78,26 @@ int skimBaby(TString inFileName="output.root", TString outFileName="skim.root"){
   float mt=0.0;
   float mt_jup=0.0;
   float mt_jdown=0.0;
+  float mt_resup=0.0;
+  float mt_resdown=0.0;
   
   t->SetBranchAddress("mt_met_lep", &mt);
   t->SetBranchAddress("mt_met_lep_jup", &mt_jup);
   t->SetBranchAddress("mt_met_lep_jdown", &mt_jdown);
+  t->SetBranchAddress("mt_met_lep_resup", &mt_resup);
+  t->SetBranchAddress("mt_met_lep_resdown", &mt_resdown);
 
   float mt_rl=0.0;
   float mt_rl_jup=0.0;
   float mt_rl_jdown=0.0;
+  float mt_rl_resup=0.0;
+  float mt_rl_resdown=0.0;
 
   t->SetBranchAddress("mt_met_lep_rl", &mt_rl);
   t->SetBranchAddress("mt_met_lep_rl_jup", &mt_rl_jup);
   t->SetBranchAddress("mt_met_lep_rl_jdown", &mt_rl_jdown);
+  t->SetBranchAddress("mt_met_lep_rl_resup", &mt_rl_resup);
+  t->SetBranchAddress("mt_met_lep_rl_resdown", &mt_rl_resdown);
 
   // MinDPhi(met,j1/j2)
   float cut_minDPhi = 0.5;
@@ -90,19 +106,26 @@ int skimBaby(TString inFileName="output.root", TString outFileName="skim.root"){
   float minDPhi=0.0;
   float minDPhi_jup=0.0;
   float minDPhi_jdown=0.0;
+  float minDPhi_resup=0.0;
+  float minDPhi_resdown=0.0;
 
   t->SetBranchAddress("mindphi_met_j1_j2", &minDPhi);
   t->SetBranchAddress("mindphi_met_j1_j2_jup", &minDPhi_jup);
   t->SetBranchAddress("mindphi_met_j1_j2_jdown", &minDPhi_jdown);
+  t->SetBranchAddress("mindphi_met_j1_j2_resup", &minDPhi_resup);
+  t->SetBranchAddress("mindphi_met_j1_j2_resdown", &minDPhi_resdown);
 
   float minDPhi_rl=0.0;
   float minDPhi_rl_jup=0.0;
   float minDPhi_rl_jdown=0.0;
+  float minDPhi_rl_resup=0.0;
+  float minDPhi_rl_resdown=0.0;
 
   t->SetBranchAddress("mindphi_met_j1_j2_rl", &minDPhi_rl);
   t->SetBranchAddress("mindphi_met_j1_j2_rl_jup", &minDPhi_rl_jup);
   t->SetBranchAddress("mindphi_met_j1_j2_rl_jdown", &minDPhi_rl_jdown);
-
+  t->SetBranchAddress("mindphi_met_j1_j2_rl_resup", &minDPhi_rl_resup);
+  t->SetBranchAddress("mindphi_met_j1_j2_rl_resdown", &minDPhi_rl_resdown);
 
 
   //
