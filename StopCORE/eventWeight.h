@@ -45,6 +45,10 @@ class evtWgtInfo {
     k_lepFSSFDown,
     k_topPtSFUp,
     k_topPtSFDown,
+    k_ttagSFUp,
+    k_ttagSFDown,
+    k_softbSFUp,
+    k_softbSFDown,
     k_metResUp,
     k_metResDown,
     k_metTTbarUp,
@@ -92,7 +96,7 @@ class evtWgtInfo {
 
   // Lost lepton analyis uses met with 2nd lepton removed
   bool add2ndLepToMet;
-  int corridorType;
+  int srtype;
 
   enum SampleType {data, ttbar, Wjets, singletop, ttW, ttZ, WZ, diboson, fastsim, fs17ext1, unknown=-1 } samptype;
   enum SystSet {stop_Moriond17, stop_Run2, test_alloff};
@@ -129,6 +133,11 @@ class evtWgtInfo {
   // Tau Wgt Machinery
   TFile *f_lepEff;
   TH2D *h_recoEff_tau;
+
+  // Top Tag SFs
+  TFile *f_tfttagSF;
+  TH1D *h_tfttagSF_sig;
+  TH1D *h_tfttagSF_bkg;
 
   // Event weights for each systematic
   double sys_wgts[k_nSyst];
@@ -204,6 +213,16 @@ class evtWgtInfo {
   double sf_lepFS;
   double sf_lepFS_up;
   double sf_lepFS_dn;
+
+  bool   apply_ttag_sf;
+  double sf_ttag;
+  double sf_ttag_up;
+  double sf_ttag_dn;
+
+  bool   apply_softbtag_sf;
+  double sf_softbtag;
+  double sf_softbtag_up;
+  double sf_softbtag_dn;
 
   bool   apply_topPt_sf;
   double sf_topPt;
@@ -307,6 +326,8 @@ class evtWgtInfo {
   void getLepSFWeight( double &weight_lepSF, double &weight_lepSF_Up, double &weight_lepSF_Dn, double &weight_lepFSSF, double &weight_lepFSSF_Up, double &weight_lepFSSF_Dn, double &weight_vetoLepSF, double &weight_vetoLepSF_Up, double &weight_vetoLepSF_Dn );
   void getTauSFWeight( double &weight_tau, double &weight_tau_up, double &weight_tau_dn );
   void getLepSFWeight_fromFiles( double &weight_lepSF, double &weight_lepSF_Up, double &weight_lepSF_Dn, double &weight_lepFSSF, double &weight_lepFSSF_Up, double &weight_lepFSSF_Dn, double &weight_vetoLepSF, double &weight_vetoLepSF_Up, double &weight_vetoLepSF_Dn );
+  void getTopTaggerSF( double &wgt_ttag, double &wgt_ttag_up, double &wgt_ttag_dn );
+  void getSoftBtagSF( double &wgt_softbtag, double &wgt_softbtag_up, double &wgt_softbtag_dn );
   void getTopPtWeight( double &weight_topPt, double &weight_topPt_up, double &weight_topPt_dn );
   void getMetResWeight( double &weight_metRes, double &weight_metRes_up, double &weight_metRes_dn );
   void getMetResWeight_corridor( double &weight_metRes, double &weight_metRes_up, double &weight_metRes_dn );

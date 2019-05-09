@@ -13,6 +13,25 @@ float topPtWeight(float pt_top, float pt_tbar) {
   return sqrt( weight_top * weight_tbar );
 }
 
+inline bool isCloseObject(const float eta1, const float phi1, const float eta2, const float phi2, const float conesize, float* deltaR = nullptr) {
+  const float PI = TMath::Pi();
+  float deltaEta = fabs(eta1 - eta2);
+  if (deltaEta > conesize) return false;
+  float deltaPhi = fabs(phi1 - phi2);
+  if (deltaPhi > PI) deltaPhi = 2*PI - deltaPhi;
+  if (deltaPhi > conesize) return false;
+  float deltaR2 = deltaEta*deltaEta + deltaPhi*deltaPhi;
+  if (deltaR2 > conesize*conesize) return false;
+  if (deltaR) *deltaR = sqrt(deltaR2);
+
+  return true;
+}
+
+template<class LorentzVectorType>
+bool isCloseObject(const LorentzVectorType p1, const LorentzVectorType p2, const float conesize, float* deltaR = nullptr) {
+  return isCloseObject(p1.eta(), p1.phi(), p2.eta(), p2.phi(), conesize, deltaR);
+}
+
 evtWgtInfo::Util::Util( systID systematic ) {
 
   switch( systematic ) {
@@ -92,6 +111,22 @@ evtWgtInfo::Util::Util( systID systematic ) {
     case( k_topPtSFDown ):
       label       = "topPtSFDn";
       title       = "top pT Scale Factor, Down";
+      break;
+    case( k_ttagSFUp ):
+      label       = "ttagSFUp";
+      title       = "top tag Scale Factor, Up";
+      break;
+    case( k_ttagSFDown ):
+      label       = "ttagSFDn";
+      title       = "top tag Scale Factor, Down";
+      break;
+    case( k_softbSFUp ):
+      label       = "softbSFUp";
+      title       = "soft b-tag Scale Factor, Up";
+      break;
+    case( k_softbSFDown ):
+      label       = "softbSFDn";
+      title       = "soft b-tag Scale Factor, Down";
       break;
     case( k_metResUp ):
       label       = "metResUp";
@@ -248,6 +283,8 @@ evtWgtInfo::evtWgtInfo() {
   apply_vetoLep_sf      = false;
   apply_tau_sf          = false;
   apply_lepFS_sf        = false;
+  apply_ttag_sf         = false;
+  apply_softbtag_sf     = false;
   apply_topPt_sf        = false;
   apply_metRes_sf       = false;
   apply_metTTbar_sf     = false;
@@ -273,6 +310,8 @@ evtWgtInfo::evtWgtInfo() {
   h_pu_wgt_up           = nullptr;
   h_pu_wgt_dn           = nullptr;
   h_recoEff_tau         = nullptr;
+  h_tfttagSF_sig        = nullptr;
+  h_tfttagSF_bkg        = nullptr;
 
   // Utilty Var Constants
   year = 0;
@@ -379,7 +418,7 @@ void evtWgtInfo::Setup(string samplestr, int inyear, bool applyUnc, bool useBTag
   }
 
   // Get pileup wgt histo
-  if ( !is_data_ && apply_pu_sf_fromFile) {
+  if ( !is_data_ && apply_pu_sf_fromFile ) {
     f_pu = new TFile("../StopCORE/inputs/pileup/puWeights_Run2.root", "read");
     h_pu_wgt    = (TH1D*) f_pu->Get(Form("puWeight%d", year));
     h_pu_wgt_up = (TH1D*) f_pu->Get(Form("puWeight%dUp", year));
@@ -396,6 +435,30 @@ void evtWgtInfo::Setup(string samplestr, int inyear, bool applyUnc, bool useBTag
     TString lepeff_file = "Moriond17/lepeff__moriond17__ttbar_powheg_pythia8_25ns.root";
     f_lepEff = new TFile("../StopCORE/inputs/lepsf/"+lepeff_file, "read");
     h_recoEff_tau = (TH2D*) f_lepEff->Get("h2_lepEff_vetoSel_Eff_tau");
+  }
+
+  // Get the DeepResolved SF histo
+  if ( !is_data_ && apply_ttag_sf ) {
+    f_tfttagSF = new TFile("../StopCORE/inputs/ttagsf/TopTagSF_TWP.root");
+    h_tfttagSF_sig = (TH1D*) f_tfttagSF->Get(Form("%d/hSF_SIG", min(year, 2017)))->Clone("hsf_sig");
+    h_tfttagSF_bkg = (TH1D*) f_tfttagSF->Get(Form("%d/hSF_BG", min(year, 2017)))->Clone("hsf_bkg");
+
+    map<TString,TH1D*> hsys_sig_up, hsys_bkg_up;
+    for (int ibin = 1; ibin < h_tfttagSF_sig->GetNbinsX()+1; ++ibin) {
+      double binerr_sig(0.), binerr_bkg(0.);
+      for (TString unc : {"BT", "PU", "Stat", "Closure", "CSPur" }) {
+        if (ibin == 1) {
+          hsys_sig_up[unc] = (TH1D*) f_tfttagSF->Get(Form("%d/hSYST_SIG_%s_Up", min(year, 2017), unc.Data()));
+          hsys_bkg_up[unc] = (TH1D*) f_tfttagSF->Get(Form("%d/hSYST_BG_%s_Up", min(year, 2017), unc.Data()));
+          // hsys_sig_dn[unc] = (TH1D*) f_tfttagSF->Get(Form("%d/hSYST_SIG_%s_Down", min(year, 2017), unc));
+          // hsys_bkg_dn[unc] = (TH1D*) f_tfttagSF->Get(Form("%d/hSYST_BG_%s_Down", min(year, 2017), unc));
+        }
+        binerr_sig += pow(hsys_sig_up[unc]->GetBinContent(ibin), 2);
+        binerr_bkg += pow(hsys_bkg_up[unc]->GetBinContent(ibin), 2);
+      }
+      h_tfttagSF_sig->SetBinError(ibin, sqrt(binerr_sig));
+      h_tfttagSF_bkg->SetBinError(ibin, sqrt(binerr_bkg));
+    }
   }
 
 }
@@ -422,7 +485,7 @@ void evtWgtInfo::Cleanup() {
 void evtWgtInfo::resetEvent() {
   event_ready = false;
   add2ndLepToMet = false;
-  corridorType = 0;
+  srtype = 0;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -496,6 +559,14 @@ void evtWgtInfo::initializeWeights() {
   sf_lepFS = 1.0;
   sf_lepFS_up = 1.0;
   sf_lepFS_dn = 1.0;
+
+  sf_ttag = 1.0;
+  sf_ttag_up = 1.0;
+  sf_ttag_dn = 1.0;
+
+  sf_softbtag = 1.0;
+  sf_softbtag_up = 1.0;
+  sf_softbtag_dn = 1.0;
 
   sf_topPt = 1.0;
   sf_topPt_up = 1.0;
@@ -608,6 +679,13 @@ void evtWgtInfo::calculateWeightsForEvent() {
   if (apply_tau_sf)
     getTauSFWeight( sf_tau, sf_tau_up, sf_tau_dn );
 
+  // top tag SF
+  if (apply_ttag_sf && (srtype == 2 || srtype == 3))
+    getTopTaggerSF( sf_ttag, sf_ttag_up, sf_ttag_dn );
+
+  if (apply_softbtag_sf && srtype == 5)
+    getSoftBtagSF( sf_softbtag, sf_softbtag_up, sf_softbtag_dn );
+
   // top pT Reweighting
   if (samptype == ttbar)
     getTopPtWeight( sf_topPt, sf_topPt_up, sf_topPt_dn );
@@ -705,6 +783,10 @@ void evtWgtInfo::calculateWeightsForEvent() {
   evt_wgt *= sf_tau;
   // Apply top pT sf
   evt_wgt *= sf_topPt;
+  // Apply top tag SF
+  evt_wgt *= sf_ttag;
+  // Apply soft b-tag SF
+  evt_wgt *= sf_softbtag;
   // Apply met resolution sf
   evt_wgt *= sf_metRes;
   // Apply met ttbar sf
@@ -772,6 +854,14 @@ void evtWgtInfo::calculateWeightsForEvent() {
         sys_wgt *= (sf_topPt_up/sf_topPt); break;
       case k_topPtSFDown:
         sys_wgt *= (sf_topPt_dn/sf_topPt); break;
+      case k_ttagSFUp:
+        sys_wgt *= (sf_ttag_up/sf_ttag); break;
+      case k_ttagSFDown:
+        sys_wgt *= (sf_ttag_dn/sf_ttag); break;
+      case k_softbSFUp:
+        sys_wgt *= (sf_softbtag_up/sf_softbtag); break;
+      case k_softbSFDown:
+        sys_wgt *= (sf_softbtag_dn/sf_softbtag); break;
       case k_metResUp:
         sys_wgt *= sf_metRes_up/sf_metRes; break;
       case k_metResDown:
@@ -1392,6 +1482,160 @@ void evtWgtInfo::getTauSFWeight( double &weight_tau, double &weight_tau_up, doub
 
 //////////////////////////////////////////////////////////////////////
 
+void evtWgtInfo::getTopTaggerSF( double &wgt_ttag, double &wgt_ttag_up, double &wgt_ttag_dn ) {
+
+  wgt_ttag = 1.0;
+  wgt_ttag_up = 1.0;
+  wgt_ttag_dn = 1.0;
+
+  if ( !apply_ttag_sf ) return;
+  if ( is_data_ ) return;
+  // if ( !babyAnalyzer.is2lep() ) return;
+  if ( samptype == Wjets ) return;
+
+  const float rtop_tight_WP = 0.98;
+  const float mtop_custom_WP = 0.4;
+
+  // First find all hadronic gen tops
+  vector<int> gentopidx;
+  for (size_t q = 0; q < genqs_id().size(); ++q) {
+    if (!genqs_isLastCopy().at(q)) continue;
+    if (abs(genqs_id()[q]) != 6) continue;
+    bool isleptonictop = false;
+    for (size_t l = 0; l < genleps_id().size(); ++l) {
+      if (genleps_isLastCopy().at(l) && genleps_isfromt().at(l) && abs(genleps_motherid().at(l)) == 24 && genleps_gmotheridx().at(l) == genqs__genpsidx().at(q)) {
+        isleptonictop = true;
+      }
+    }
+    if (isleptonictop) continue;
+    gentopidx.push_back(q);
+  }
+
+  // Find all genps that decay from top
+  vector<vector<int>> gentopdaugs;
+  for (int itop : gentopidx) {  // in case there are 2 tops (or more!)
+    vector<int> genq_fromtop;
+    for (size_t q = 0; q < genqs_id().size(); ++q) {
+      if (!genqs_isLastCopy().at(q)) continue;
+      if (abs(genqs_id()[q]) > 5 ) continue;
+      // if (!genleps_isfromt().at(q)) continue;
+      if ((abs(genqs_id()[q]) == 5 && abs(genqs_motheridx().at(q)) == genqs__genpsidx().at(itop)) ||
+          (abs(genqs_motherid().at(q)) == 24 && genqs_gmotheridx().at(q) == genqs__genpsidx().at(itop)))
+        genq_fromtop.push_back(q);
+    }
+    gentopdaugs.push_back(genq_fromtop);
+  }
+
+  // Apply SFs for the merged tagger first if a merged tag is found
+  if (srtype == 2) {
+    for (size_t itop = 0; itop < ak8pfjets_deepdisc_top().size(); ++itop) {
+      if (ak8pfjets_deepdisc_top()[itop] < mtop_custom_WP) continue;
+
+      int igentop = -1;
+      for (size_t igt = 0; igt < gentopidx.size(); ++igt) {
+        if (isCloseObject(genqs_p4().at(gentopidx[igt]), ak8pfjets_p4().at(itop), 0.6))
+          igentop = igt;
+      }
+      if (igentop < 0) continue;
+
+      int ngendaugmatched = -1;
+      for (int daug : gentopdaugs.at(igentop)) {
+        float minDR = 0.8;
+        if (isCloseObject(ak8pfjets_p4().at(itop), genqs_p4().at(daug), 0.8, &minDR)) {
+          ngendaugmatched++;
+        }
+      }
+
+      if (ngendaugmatched < std::min((int)gentopdaugs.at(igentop).size(), 3)) continue;
+
+      // Now the left-over tops are gen-matched merged tops
+      wgt_ttag *= 1.0;
+      wgt_ttag_up *= 1.0 + 0.20;
+      wgt_ttag_dn *= 1.0 - 0.20;
+    }
+  }
+  else if (srtype == 3) {
+    for (size_t itop = 0; itop < tftops_disc().size(); ++itop) {
+      if (tftops_disc()[itop] < rtop_tight_WP) continue;
+      bool is_truetop = true;
+
+      int igentop = -1;
+      for (size_t igt = 0; igt < gentopidx.size(); ++igt) {
+        if (isCloseObject(genqs_p4().at(gentopidx[igt]), tftops_p4().at(itop), 0.6))
+          igentop = igt;
+      }
+      if (igentop < 0) is_truetop = false;
+
+      int ndaugmatched = 0;
+      for (size_t isub = 0; is_truetop && isub < tftops_subjet_eta()[itop].size(); ++isub) {
+        for (int daug : gentopdaugs.at(igentop)) {
+          float minDR = 0.5;
+          if (isCloseObject(tftops_subjet_eta()[itop][isub], tftops_subjet_phi()[itop][isub], genqs_p4().at(daug).eta(), genqs_p4().at(daug).phi(), 0.4, &minDR)) {
+            ndaugmatched++;
+            break;
+          }
+        }
+      }
+
+      if (ndaugmatched < 2) is_truetop = false;
+
+      // Now the left-over tops are gen-matched resolved tops
+      int ibin = h_tfttagSF_sig->FindBin(tftops_p4().at(itop).pt());
+      double sf  = (is_truetop)? h_tfttagSF_sig->GetBinContent(ibin) : h_tfttagSF_bkg->GetBinContent(ibin);
+      double err = (is_truetop)? h_tfttagSF_sig->GetBinError(ibin)   : h_tfttagSF_bkg->GetBinError(ibin);
+
+      wgt_ttag    *= sf;
+      wgt_ttag_up *= sf+err;
+      wgt_ttag_dn *= sf-err;
+    }
+  }
+}
+
+//////////////////////////////////////////////////////////////////////
+
+void evtWgtInfo::getSoftBtagSF( double &wgt_softbtag, double &wgt_softbtag_up, double &wgt_softbtag_dn ) {
+
+  wgt_softbtag = 1.0;
+  wgt_softbtag_up = 1.0;
+  wgt_softbtag_dn = 1.0;
+
+  if ( !apply_softbtag_sf ) return;
+  if ( is_data_ ) return;
+  // if ( !babyAnalyzer.is2lep() ) return;
+  // if ( samptype == Wjets ) return;
+
+  if ( srtype != 5 ) return;
+  if (nsoftbtags() == 0) return;
+
+  for (auto sb : softtags_p4()) {
+    bool matched = false;
+    for (size_t q = 0; q < genqs_id().size(); ++q) {
+      if (!genqs_isLastCopy().at(q)) continue;
+      if (abs(genqs_id()[q]) != 5 ) continue;
+      if (isCloseObject(sb, genqs_p4().at(q), 0.4)) {
+        matched = true;
+        break;
+      }
+    }
+
+    if (!matched) continue;
+
+    double sf  = 1.048;
+    double err = 0.164;
+
+    if (is_fastsim_) {
+      sf  = 0.862;
+      err = 0.138;
+    }
+
+    wgt_softbtag    *= sf;
+    wgt_softbtag_up *= sf + err;
+    wgt_softbtag_dn *= sf - err;
+  }
+}
+
+//////////////////////////////////////////////////////////////////////
+
 void evtWgtInfo::getTopPtWeight( double &weight_topPt, double &weight_topPt_up, double &weight_topPt_dn ) {
 
   weight_topPt    = 1.0;
@@ -1774,7 +2018,7 @@ void evtWgtInfo::getMetTTbarWeight( double &weight_metTTbar, double &weight_metT
 
   // bool passlmet_corr = (lep1_p4().pt() < 50) || (lep1_p4().pt() < (250 - 100*lep1_dphiMET_rl()));
 
-  if (corridorType == 0) {
+  if (srtype == 0) {
     // cremuA1/h_rlmetbinA : Data/MC = 0.388  nData 1 = 51  nData 2 = 11
     if ( nGoodJets<4 && modTopness>=10.0 && mlb<175.0 ) {
       if ( met > 600.0 ) { sf_val = 1.072; sf_err = 0.155; }
@@ -1814,13 +2058,13 @@ void evtWgtInfo::getMetTTbarWeight( double &weight_metTTbar, double &weight_metT
 
   // -------------------------------------------------
   // cremuA1/h_rlmetbinI : Data/MC = 0.448  nData 1 = 110  nData 2 = 11
-  if ( corridorType >= 1 ) {
+  if ( srtype >= 4 ) {
     if ( met > 550.0) { sf_val = 1.054; sf_err = 0.105; }
     if ( met > 750.0) { sf_val = 0.661; sf_err = 0.205; }
   }
   // -------------------------------------------------
   // cremuA1/h_rlmetbinJ : Data/MC = 0.551  nData 1 = 352  nData 2 = 121
-  // if ( corridorType == 2 ) {
+  // if ( srtype == 2 ) {
   //   if ( met > 450.0) { sf_val = 1.086; sf_err = 0.061; }
   //   if ( met > 550.0) { sf_val = 0.813; sf_err = 0.077; }
   // }
@@ -2398,6 +2642,12 @@ bool evtWgtInfo::doingSystematic( systID isyst ) {
     case k_topPtSFUp:
     case k_topPtSFDown:
       return is_bkg_; // apply_topPt_sf =true: do sf, =false: uncertainty only
+    case k_ttagSFUp:
+    case k_ttagSFDown:
+      return apply_ttag_sf && (srtype == 2 || srtype == 3);
+    case k_softbSFUp:
+    case k_softbSFDown:
+      return apply_softbtag_sf && (srtype == 5);
     case k_metResUp:
     case k_metResDown:
       return apply_metRes_sf;
@@ -2472,6 +2722,10 @@ evtWgtInfo::SampleType evtWgtInfo::findSampleType( string samplestr ) {
 
 string evtWgtInfo::getLabel( systID isyst ) {
   Util util(isyst);
+  if (srtype == 2 && util.label.find("ttag") == 0)
+    return util.label.replace(0, 1, "mt");
+  if (srtype == 3 && util.label.find("ttag") == 0)
+    return util.label.replace(0, 1, "rt");
   return util.label;
 }
 
@@ -2480,8 +2734,8 @@ double evtWgtInfo::getWeight( systID isyst, bool is_cr2l, int cortype ) {
     add2ndLepToMet = is_cr2l;
     event_ready = false;
   }
-  if (corridorType != cortype) {
-    corridorType = cortype;
+  if (srtype != cortype) {
+    srtype = cortype;
     event_ready = false;
   }
   if (!event_ready)
@@ -2529,6 +2783,8 @@ void evtWgtInfo::setDefaultSystematics( int syst_set, bool isfastsim ) {
       apply_metRes_sf      = false;  // not controlled here anymore
       apply_metTTbar_sf    = true;
       apply_ttbarSysPt_sf  = false;  // false=uncertainty, need to be updated
+      apply_ttag_sf        = true;
+      apply_softbtag_sf    = true;
       apply_WbXsec_sf      = true;
       apply_ttZxsec_sf     = true;
       apply_ISR_sf         = true;   // 2017 & 2018 to be updated

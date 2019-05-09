@@ -43,7 +43,7 @@ void eventWeight_bTagSF::setup(bool isFastsim, int year, std::string fn_btagSF, 
     BTAG_MED = 0.4184;
     BTAG_LSE = 0.1241;
     if (fn_btagSF == "") fn_btagSF = "DeepCSV_102XSF_V1.csv";
-    if (fn_btagSF_FS == "") fn_btagSF_FS = "deepcsv_13TEV_1718SLSame_18_3_2019ExUnc.csv"; // for 2017 ext1 signals
+    if (fn_btagSF_FS == "") fn_btagSF_FS = "deepcsv_13TEV_18SL_7_5_2019.csv";
   }
 
   std::cout << "[eventWeight_bTagSF] >> loaded btag SFs: " << fn_btagSF << ((isFastsim)? " and "+fn_btagSF_FS : "") << std::endl;
