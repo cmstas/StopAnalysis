@@ -151,7 +151,7 @@ void Make2DLimitHistos(TString signaltype="std_T2tt", TString indir="limits", bo
     // //system ("cd ..");
     // system(rmcommand1.c_str());
     for(int lsp = mLSPLow; lsp<=mLSPHigh; lsp += mLSPStep){
-      if(signaltype.Contains("T2bW")&&stop==350&&lsp==100) continue;
+      // if(signaltype.Contains("T2bW")&&stop==350&&lsp==100) continue;
       TString limitfilebase = "Limits_Asymptotic_";
       if(prefit) limitfilebase = limitfilebase + "PreFit_";
       else       limitfilebase = limitfilebase + "PostFit_";
@@ -159,12 +159,11 @@ void Make2DLimitHistos(TString signaltype="std_T2tt", TString indir="limits", bo
       if(signalname.Contains("comb")){
         signalname.ReplaceAll("comb", "std");
         if (stop - lsp < 225) signalname.ReplaceAll("std", "tcor");
-        // if (stop - lsp <= 150) signalname.ReplaceAll("tcor", "Wcor");
-        if (stop - lsp <= 150) signalname.ReplaceAll("tcor", "srJ3");
+        if (stop - lsp <= 150) signalname.ReplaceAll("tcor", "Wcor");
+        // if (stop - lsp <= 150) signalname.ReplaceAll("tcor", "srJ3");
         // if (stop - lsp < 151) continue;  // temporary
       }
       TString limitfile = indir + limitfilebase + signalname + ".root";
-      //cout << limitfile << endl;
       ifstream infile(limitfile.Data());
       bool exists = infile.good();
       if(!exists) {
