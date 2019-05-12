@@ -65,8 +65,22 @@ inline float min2deltaPhi(float phi0, float phi1, float phi2) {
   return std::min(deltaPhi(phi0, phi1), deltaPhi(phi0, phi2));
 }
 
-inline float calculateMT(double Et1, double phi1, double Et2, double phi2){
+inline float calculateMT(double Et1, double phi1, double Et2, double phi2) {
   return sqrt(2*Et1*Et2*(1.0 - cos(phi1-phi2)));
+}
+
+inline bool isCloseObject(const float eta1, const float phi1, const float eta2, const float phi2, const float conesize, float* deltaR = nullptr) {
+  const float PI = TMath::Pi();
+  float deltaEta = fabs(eta1 - eta2);
+  if (deltaEta > conesize) return false;
+  float deltaPhi = fabs(phi1 - phi2);
+  if (deltaPhi > PI) deltaPhi = 2*PI - deltaPhi;
+  if (deltaPhi > conesize) return false;
+  float deltaR2 = deltaEta*deltaEta + deltaPhi*deltaPhi;
+  if (deltaR2 > conesize*conesize) return false;
+  if (deltaR) *deltaR = sqrt(deltaR2);
+
+  return true;
 }
 
 // Old functions that enforce float for ranges to be consistent with xval for floating point errors
