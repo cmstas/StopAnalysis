@@ -4,6 +4,7 @@ double extr_threshold = 5;  // minimum number of events in a bin to not need an 
 bool doCRPurityError = true;
 double extr_TFcap = 3;  // maximum value for the transfer factor to not do MET extrapolation
 double maxFractionForMC = 0.10;  // minimum value for bkg fraction in SR to do extrapolation, else take from MC
+bool extrShapeFromCR = true;
 bool yearSeparateSyst = true;
 
 TFile* fbkgs[4];
@@ -96,17 +97,20 @@ void dataDrivenFromCR(TFile* fdata, TFile* fmc, TFile* fout, TString ddtype, TSt
       }
 
       auto alphaHist = (TH1D*) hist_MC_SR->Clone(hname+"_alpha");
-      if (useMetExtrapolation && extr_start_bin != lastbin) {
-        // To take the MET distribution from the CR
-        double cerr_SR = 0;
+      if (useMetExtrapolation && extrShapeFromCR && extr_start_bin != lastbin) {
+        // To take the shape of the MET distribution from the CR
+        double cerr_SR(0.), cerr_CR(0.);
         double cyld_SR = alphaHist->IntegralAndError(extr_start_bin, -1, cerr_SR);
-        double cyld_CR = hist_MC_CR->Integral(extr_start_bin, -1);
+        double cyld_CR = hist_MC_CR->IntegralAndError(extr_start_bin, -1, cerr_CR);
         for (int ibin = extr_start_bin; ibin <= lastbin; ++ibin) {
           double metfrac = hist_MC_CR->GetBinContent(ibin) / cyld_CR;
+          double relerr = sqrt(pow(cerr_SR/cyld_SR, 2) + pow(hist_MC_CR->GetBinError(ibin)/hist_MC_CR->GetBinContent(ibin), 2));
           alphaHist->SetBinContent(ibin, metfrac * cyld_SR);
-          alphaHist->SetBinError(ibin, metfrac * cerr_SR);
+          alphaHist->SetBinError(ibin, metfrac * cyld_SR * relerr);
+          hist_MC_CR->SetBinContent(ibin, cyld_CR);
+          hist_MC_CR->SetBinError(ibin, 0);
         }
-        combineYieldsInExtrBins(hist_MC_CR);
+        // combineYieldsInExtrBins(hist_MC_CR);
       }
       alphaHist->Divide(hist_MC_CR);
 
@@ -327,6 +331,8 @@ int makeBkgEstimates(string input_dir="../StopLooper/output/temp14", string outp
   // parseAndSet_b(extrargs, "MetExtrFor2l"        , MetExtrFor2l);
   // parseAndSet_b(extrargs, "MetExtrFor0b"        , MetExtrFor0b);
   parseAndSet_b(extrargs, "doCRPurityError"     , doCRPurityError);
+  parseAndSet_b(extrargs, "extrShapeFromCR"     , extrShapeFromCR);
+  parseAndSet_b(extrargs, "yearSeparateSyst"    , yearSeparateSyst);
   parseAndSet_d(extrargs, "extr_threshold"      , extr_threshold);
   parseAndSet_d(extrargs, "extr_TFcap"          , extr_TFcap);
   parseAndSet_d(extrargs, "maxFractionForMC"    , maxFractionForMC);

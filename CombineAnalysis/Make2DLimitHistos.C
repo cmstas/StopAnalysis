@@ -39,7 +39,9 @@ using namespace std;
 
 // void Make2DLimitHistos(TString signaltype, bool prefit, bool fakedata, bool nosigunc, bool nobkgunc, int xsecupdown, int compressed, bool dropsigcont, bool correlated);
 TH2F* InterpolateThisHistogram(TH2F *hold);
+TH2F* InterpolateThisHistogramNew(TH2F *hold);
 TGraph2D* GetInterpolatingGraph(TH2F *hold);
+TGraph2D* GetInterpolatingGraphNew(TH2F *hold);
 TH2F* PassThisHistogram(TH2F *hold);
 TH2F* XsecThisHistogram(TH2F *hold, TH1D *hxsec);
 TGraph* GetContour(TGraph2D *g, TString name, TGraph *gempty);
@@ -56,7 +58,7 @@ inline TString MakeOutputDir(TString dir){
 }
 
 
-void Make2DLimitHistos(TString signaltype="std_T2tt", TString indir="limits", bool prefit=true){
+void Make2DLimitHistos(TString signaltype="std_T2tt", TString indir="limits", bool prefit=false){
 
   TH1D *hxsec;
   // TFile *fxsec = new TFile("xsec_stop_13TeV.root","READ");
@@ -230,14 +232,14 @@ void Make2DLimitHistos(TString signaltype="std_T2tt", TString indir="limits", bo
     // system(rmcommand2.c_str());
   }//stop
   cout << "Now interpolate these histograms" << endl;  
-  hExp   = (TH2F*)InterpolateThisHistogram(hExpOrg);
-  hExp2m = (TH2F*)InterpolateThisHistogram(hExp2mOrg);
-  hExp1m = (TH2F*)InterpolateThisHistogram(hExp1mOrg);
-  hExp1p = (TH2F*)InterpolateThisHistogram(hExp1pOrg);
-  hExp2m = (TH2F*)InterpolateThisHistogram(hExp2mOrg);
-  hObs   = (TH2F*)InterpolateThisHistogram(hObsOrg);
-  hObs1m = (TH2F*)InterpolateThisHistogram(hObs1mOrg);
-  hObs1p = (TH2F*)InterpolateThisHistogram(hObs1pOrg);
+  hExp   = (TH2F*)InterpolateThisHistogramNew(hExpOrg);
+  hExp2m = (TH2F*)InterpolateThisHistogramNew(hExp2mOrg);
+  hExp1m = (TH2F*)InterpolateThisHistogramNew(hExp1mOrg);
+  hExp1p = (TH2F*)InterpolateThisHistogramNew(hExp1pOrg);
+  hExp2m = (TH2F*)InterpolateThisHistogramNew(hExp2mOrg);
+  hObs   = (TH2F*)InterpolateThisHistogramNew(hObsOrg);
+  hObs1m = (TH2F*)InterpolateThisHistogramNew(hObs1mOrg);
+  hObs1p = (TH2F*)InterpolateThisHistogramNew(hObs1pOrg);
 
   TGraph2D *g2Exp   = (TGraph2D*)GetInterpolatingGraph(hExpOrg);
   TGraph2D *g2Exp2m = (TGraph2D*)GetInterpolatingGraph(hExp2mOrg);
@@ -415,6 +417,33 @@ TH2F* InterpolateThisHistogram(TH2F *hold/*, TH2F* hnew*/){
   return h;
 }
 
+TH2F* InterpolateThisHistogramNew(TH2F *hold/*, TH2F* hnew*/){
+  float binsize = hold->GetXaxis()->GetBinWidth(1)/2.;
+  TString name = hold->GetName();
+  name.ReplaceAll("Org","");
+  TGraph2D *g = new TGraph2D(hold);
+  g->SetNpx(int(g->GetXmax()-g->GetXmin())/binsize);
+  g->SetNpy(int(g->GetYmax()-g->GetYmin())/binsize);
+  TH2F *hnew = (TH2F*)g->GetHistogram();
+  TH2F *h = new TH2F(name.Data(),hold->GetTitle(),hnew->GetNbinsX(),g->GetXmin()-binsize,g->GetXmax()-binsize,hnew->GetNbinsY(),g->GetYmin()-binsize,g->GetYmax()-binsize);
+  for(unsigned int x = 1; x<=hnew->GetNbinsX(); ++x){
+    for(unsigned int y = 1; y<=hnew->GetNbinsY(); ++y){
+      float xval = hnew->GetXaxis()->GetBinCenter(x);
+      float yval = hnew->GetYaxis()->GetBinCenter(y);
+      float rold = hold->GetBinContent(hold->FindBin(xval, yval));
+      float rnew = hnew->GetBinContent(x,y);
+      // if (fabs(xval-yval-175) < 10 && yval < 450) {
+      if (fabs(xval-yval-175) < 15 && yval < 450 && rold > 1 && rnew < 1) {
+        // cout << __LINE__ << ": xval= " << xval << ", yval= " << yval << ", rold= " << rold << ", rnew= " << rnew << endl;
+        rnew = rold;
+      }
+      h->SetBinContent(x,y,rnew);
+    }
+  }
+  delete g;
+  return h;
+}
+
 TGraph2D* GetInterpolatingGraph(TH2F *hold){
   float binsize = hold->GetXaxis()->GetBinWidth(1)/2.;
   TString name = hold->GetName();
@@ -422,6 +451,31 @@ TGraph2D* GetInterpolatingGraph(TH2F *hold){
   TGraph2D *g = new TGraph2D(hold);
   g->SetNpx(int(g->GetXmax()-g->GetXmin())/binsize);
   g->SetNpy(int(g->GetYmax()-g->GetYmin())/binsize);
+  return g;
+}
+
+TGraph2D* GetInterpolatingGraphNew(TH2F *hold){
+  float binsize = hold->GetXaxis()->GetBinWidth(1)/2.;
+  TString name = hold->GetName();
+  name.ReplaceAll("Org","");
+  TGraph2D *g = new TGraph2D(hold);
+  g->SetNpx(int(g->GetXmax()-g->GetXmin())/binsize);
+  g->SetNpy(int(g->GetYmax()-g->GetYmin())/binsize);
+  TH2F* hnew = (TH2F*)g->GetHistogram();
+  for(unsigned int x = 1; x<=hnew->GetNbinsX(); ++x){
+    for(unsigned int y = 1; y<=hnew->GetNbinsY(); ++y){
+      float xval = hnew->GetXaxis()->GetBinCenter(x);
+      float yval = hnew->GetYaxis()->GetBinCenter(y);
+      if (fabs(xval - yval -175) < 15 && yval < 450) {
+        float rold = hold->GetBinContent(hold->FindBin(xval, yval));
+        float rnew = hnew->GetBinContent(x,y);
+        if (rold > 1 && rnew < 1 && yval < 450) {
+          hnew->SetBinContent(hnew->FindBin(x,y), rold);
+        }
+      }
+    }
+  }
+  g = new TGraph2D(hnew);
   return g;
 }
 
@@ -457,6 +511,13 @@ TH2F* XsecThisHistogram(TH2F *hold, TH1D *hxsec){
 TGraph* GetContour(TGraph2D *g, TString name, TGraph *gempty){
   TGraph *gnew;
   TH2D *temp = (TH2D*)g->GetHistogram();//need this for list to work?
+  // if (name == "gExp"){
+  //   TCanvas c1("c1","c1",800,400);
+  //   TH2F* temp2 = PassThisHistogram((TH2F*) temp);
+  //   temp2->GetZaxis()->SetRangeUser(0,2);
+  //   temp2->Draw("colz");
+  //   c1.SaveAs("temp2dcont.pdf");
+  // }
   //g->Draw("alp");//need this for list to work?
   TList *glist = (TList*)g->GetContourList(1.0);
   if(glist == nullptr) {gnew = (TGraph*)gempty->Clone(name); return gnew; }
@@ -478,6 +539,35 @@ TGraph* GetContour(TGraph2D *g, TString name, TGraph *gempty){
       }
     }
   }
+
+  cout << __LINE__ << ": gnew->GetN()= " << gnew->GetN() << endl;
+  double x,y;
+  double px,py;
+  for (int i = 0; i < gnew->GetN(); ++i) {
+    gnew->GetPoint(i,x,y);
+    // ggnew->SetPoint(gnew->GetN(), x, y);
+    double dm = x-y;
+    if (dm < 120 && x > 400) {
+      gnew->RemovePoint(i--);
+    }
+    auto apprpt = [&](double a, double b) {
+      return fabs(x-a) < 2 && fabs(y-b) < 2;
+    };
+    // if (fabs(dm-175) < 15 && x < 550) {
+    //   gnew->SetPoint(i,425,250);
+    // }
+    // if (apprpt(550, 356) || apprpt(543, 351) || apprpt(531, 376) || apprpt(524, 369)
+    //     || apprpt(519, 327) || apprpt(523, 331)  || apprpt(531, 381)  || apprpt(523, 368)) {
+    //   gnew->RemovePoint(i--);
+    // }
+    if (apprpt(589, 435)) gnew->RemovePoint(i--);
+    if (apprpt(595, 430)) gnew->RemovePoint(i--);
+    if (apprpt(562, 372)) gnew->SetPoint(i,425,250);
+    if (apprpt(612, 416)) gnew->SetPoint(i,425,250);
+
+    px = x; py = y;
+  }
+
   return gnew;
 }
 

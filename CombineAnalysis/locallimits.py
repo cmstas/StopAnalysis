@@ -39,11 +39,11 @@ def run_asymptotic(card):
         if not os.path.isfile(card): return -1
         # os.system(cmd)
         logname = card[:-4]+"_asym.log"
-        masspt = 'PreFit_'+re.findall(r'datacard_([A-Za-z0-9_\./\\-]*).txt', card)[0]
-        cmdstr = 'combine -M Asymptotic '+card+' -n '+masspt
+        masspt = 'PostFit_'+re.findall(r'datacard_([A-Za-z0-9_\./\\-]*).txt', card)[0]
+        cmdstr = 'combine -M AsymptoticLimits '+card+' -n '+masspt
         # cmdstr = 'combine -M Asymptotic --freezeNuisances all '+card+' -n '+masspt
         os.system("timeout 25m "+ cmdstr +" >& "+ logname +" || echo 'Job failed for '"+card+", see log at "+logname) # --run expected --noFitAsimov
-        os.system("mv higgsCombine{0}.Asymptotic.mH120.root {1}/Limits_Asymptotic_{0}.root".format(masspt,limitdir)) # --run expected --noFitAsimov
+        os.system("mv higgsCombine{0}.AsymptoticLimits.mH120.root {1}/Limits_Asymptotic_{0}.root".format(masspt,limitdir)) # --run expected --noFitAsimov
         return logname
 
 
@@ -65,12 +65,15 @@ if __name__ == "__main__":
 
     sigs = [ x[9:-9] for x in ext_cards]
     sigs = [ s for s in sigs if int(s.split('_')[2]) < 1500]
+    # sigs = [ s for s in sigs if (int(s.split('_')[2])-int(s.split('_')[3])) > 250]
 
     pool = ThreadPool(40)
     cards = []
 
     for combined in pool.imap_unordered(combine_cards, sigs):
         cards.append(combined)
+
+    # exit()
 
     if not cards:
         cards = os.listdir(combineddir)

@@ -10,36 +10,6 @@ import pyRootPlotMaker.ppmUtils as ppu
 from utilities.errors import *
 from utilities.yields_utils import *
 
-def GetSystRatioGraph(h_mc, h_data, g_ratio, drawZeros=True, useMCErr=True):
-    pass
-
-def GetSystTemporary(bkgtype, systype):
-    if bkgtype == 'lostlep':
-        systups = {
-            'ISRUp'       : [ 0.006,   0.014,   0.003,   0.010,   0.005,   0.002,   0.001,   0.001,   0.012,   0.021,   0.029,   0.002,   0.001,   0.012,   0.014,   0.037,   0.070,   0.044,   0.001,   0.001,   0.006,   0.019,   0.051,   0.010,   0.000,   0.030,   0.025,   0.065,   0.023,   0.057,   0.086,   0.003,   0.004,   0.000,   0.000,   0.078,   0.069,   0.078,   0.022 ],
-            'alphasUp'    : [ 0.065,   0.095,   0.000,   0.000,   0.066,   0.009,   0.022,   0.021,   0.001,   0.001,   0.005,   0.019,   0.036,   0.000,   0.000,   0.044,   0.030,   0.047,   0.045,   0.001,   0.016,   0.000,   0.000,   0.015,   0.000,   0.035,   0.046,   0.069,   0.023,   0.025,   0.055,   0.021,   0.024,   0.000,   0.000,   0.042,   0.063,   0.039,   0.007 ],
-            'bTagEffHFUp' : [ 0.017,   0.028,   0.002,   0.000,   0.001,   0.004,   0.027,   0.014,   0.001,   0.003,   0.002,   0.015,   0.001,   0.001,   0.000,   0.007,   0.037,   0.004,   0.039,   0.002,   0.005,   0.006,   0.014,   0.002,   0.000,   0.002,   0.014,   0.017,   0.010,   0.004,   0.016,   0.007,   0.005,   0.000,   0.000,   0.017,   0.019,   0.002,   0.019 ],
-            'bTagEffLFUp' : [ 0.003,   0.002,   0.003,   0.006,   0.001,   0.009,   0.047,   0.050,   0.006,   0.007,   0.003,   0.003,   0.023,   0.011,   0.002,   0.000,   0.013,   0.005,   0.009,   0.000,   0.003,   0.009,   0.026,   0.009,   0.000,   0.007,   0.003,   0.000,   0.009,   0.001,   0.002,   0.004,   0.001,   0.000,   0.000,   0.036,   0.031,   0.054,   0.235 ],
-            'jesUp'       : [ 0.011,   0.025,   0.028,   0.001,   0.043,   0.044,   0.041,   0.042,   0.008,   0.008,   0.015,   0.018,   0.054,   0.005,   0.009,   0.007,   0.001,   0.041,   0.343,   0.007,   0.037,   0.030,   0.102,   0.037,   0.000,   0.128,   0.169,   0.063,   0.018,   0.041,   0.034,   0.091,   0.009,   0.000,   0.000,   0.999,   0.151,   0.030,   0.068 ],
-            'lepSFUp'     : [ 0.009,   0.000,   0.018,   0.005,   0.009,   0.011,   0.006,   0.003,   0.019,   0.051,   0.022,   0.010,   0.011,   0.027,   0.040,   0.019,   0.002,   0.015,   0.018,   0.019,   0.009,   0.008,   0.003,   0.032,   0.000,   0.022,   0.009,   0.003,   0.018,   0.019,   0.022,   0.044,   0.095,   0.000,   0.000,   0.060,   0.059,   0.334,   0.006 ],
-            'pileupUp'    : [ 0.125,   0.088,   0.005,   0.004,   0.035,   0.041,   0.107,   0.007,   0.002,   0.005,   0.008,   0.055,   0.027,   0.002,   0.003,   0.011,   0.056,   0.044,   0.074,   0.007,   0.001,   0.047,   0.041,   0.012,   0.000,   0.006,   0.194,   0.011,   0.018,   0.047,   0.036,   0.007,   0.064,   0.000,   0.000,   0.072,   0.056,   0.065,   0.039 ],
-            'q2Up'        : [ 0.009,   0.005,   0.000,   0.000,   0.018,   0.009,   0.004,   0.020,   0.001,   0.002,   0.004,   0.004,   0.011,   0.000,   0.000,   0.015,   0.003,   0.015,   0.000,   0.001,   0.014,   0.000,   0.000,   0.005,   0.000,   0.020,   0.005,   0.305,   0.001,   0.012,   0.036,   0.001,   0.013,   0.000,   0.000,   0.017,   0.005,   0.025,   0.026 ],
-            'tauSFUp'     : [ 0.009,   0.008,   0.005,   0.004,   0.005,   0.005,   0.009,   0.009,   0.006,   0.006,   0.006,   0.007,   0.006,   0.005,   0.006,   0.007,   0.011,   0.007,   0.006,   0.004,   0.005,   0.003,   0.003,   0.003,   0.000,   0.002,   0.011,   0.000,   0.005,   0.015,   0.015,   0.008,   0.005,   0.000,   0.000,   0.006,   0.006,   0.005,   0.002 ],
-        }
-        systdns = {
-            'ISRDn'       :  [ 0.007,   0.016,   0.004,   0.011,   0.005,   0.002,   0.001,   0.001,   0.016,   0.030,   0.040,   0.003,   0.002,   0.017,   0.019,   0.050,   0.113,   0.057,   0.007,   0.001,   0.009,   0.028,   0.083,   0.014,   0.000,   0.038,   0.032,   0.089,   0.032,   0.079,   0.130,   0.003,   0.005,   0.000,   0.000,   0.092,   0.084,   0.115,   0.026 ],
-            'alphasDn'    :  [ 0.039,   0.027,   0.000,   0.000,   0.007,   0.029,   0.008,   0.004,   0.001,   0.014,   0.021,   0.027,   0.030,   0.000,   0.000,   0.002,   0.038,   0.030,   0.030,   0.002,   0.001,   0.000,   0.000,   0.026,   0.000,   0.014,   0.078,   0.039,   0.029,   0.022,   0.018,   0.013,   0.021,   0.000,   0.000,   0.020,   0.012,   0.045,   0.013 ],
-            'bTagEffHFDn' :  [ 0.017,   0.027,   0.002,   0.000,   0.001,   0.004,   0.027,   0.014,   0.001,   0.003,   0.002,   0.016,   0.001,   0.001,   0.000,   0.007,   0.035,   0.004,   0.036,   0.002,   0.005,   0.006,   0.014,   0.002,   0.000,   0.002,   0.016,   0.016,   0.011,   0.003,   0.016,   0.007,   0.005,   0.000,   0.000,   0.017,   0.019,   0.002,   0.020 ],
-            'bTagEffLFDn' :  [ 0.003,   0.002,   0.003,   0.006,   0.001,   0.009,   0.054,   0.054,   0.006,   0.007,   0.003,   0.004,   0.022,   0.011,   0.002,   0.000,   0.013,   0.005,   0.009,   0.000,   0.002,   0.009,   0.028,   0.009,   0.000,   0.007,   0.003,   0.000,   0.009,   0.001,   0.001,   0.004,   0.001,   0.000,   0.000,   0.035,   0.031,   0.051,   0.191 ],
-            'jesDn'       :  [ 0.013,   0.029,   0.009,   0.072,   0.176,   0.003,   0.037,   0.052,   0.005,   0.004,   0.004,   0.001,   0.011,   0.010,   0.006,   0.062,   0.061,   0.079,   0.082,   0.034,   0.020,   0.017,   0.009,   0.019,   0.000,   0.066,   0.556,   0.123,   0.042,   0.032,   0.094,   0.001,   0.058,   0.000,   0.000,   0.086,   0.297,   0.021,   0.078 ],
-            'lepSFDn'     :  [ 0.030,   0.025,   0.055,   0.031,   0.051,   0.047,   0.040,   0.025,   0.059,   0.094,   0.064,   0.051,   0.053,   0.066,   0.081,   0.057,   0.040,   0.056,   0.063,   0.059,   0.050,   0.031,   0.039,   0.074,   0.000,   0.056,   0.036,   0.044,   0.059,   0.061,   0.069,   0.087,   0.159,   0.000,   0.000,   0.103,   0.102,   0.558,   0.040 ],
-            'pileupDn'    :  [ 0.172,   0.098,   0.005,   0.009,   0.034,   0.063,   0.109,   0.031,   0.001,   0.009,   0.013,   0.056,   0.053,   0.002,   0.002,   0.020,   0.058,   0.030,   0.179,   0.007,   0.000,   0.019,   0.059,   0.011,   0.000,   0.001,   0.161,   0.049,   0.006,   0.066,   0.042,   0.007,   0.057,   0.000,   0.000,   0.044,   0.074,   0.069,   0.057 ],
-            'q2Dn'        :  [ 0.013,   0.014,   0.000,   0.000,   0.020,   0.011,   0.004,   0.025,   0.002,   0.002,   0.003,   0.002,   0.008,   0.000,   0.000,   0.019,   0.004,   0.024,   0.002,   0.000,   0.015,   0.000,   0.000,   0.009,   0.000,   0.025,   0.006,   0.320,   0.004,   0.014,   0.040,   0.001,   0.016,   0.000,   0.000,   0.021,   0.001,   0.034,   0.036 ],
-            'tauSFDn'     :  [ 0.009,   0.008,   0.005,   0.004,   0.005,   0.005,   0.009,   0.009,   0.006,   0.006,   0.006,   0.007,   0.006,   0.005,   0.006,   0.007,   0.012,   0.007,   0.006,   0.004,   0.006,   0.003,   0.003,   0.003,   0.000,   0.002,   0.011,   0.000,   0.006,   0.015,   0.015,   0.008,   0.005,   0.000,   0.000,   0.006,   0.006,   0.005,   0.002 ],
-        }
-
-        return systups.get(systype), systdns.get(systype)
-
 def getLabelsTemporary(srNames):
 
     std_labels = [
@@ -174,12 +144,12 @@ def DrawTextPad(textpad):
 
     txt.DrawLatex(lmar+0.09, tmar-step*0 ,"  N_{J}")
     ls1 = r.TLine();
-    ls1.DrawLineNDC(0.05, tmar-step*0.8, 0.85, tmar-step*0.8)
+    ls1.DrawLineNDC(0.05, tmar-step*0.8, 0.87, tmar-step*0.8)
 
-    ls1.DrawLineNDC(lmar+0.085, tmar-step*9, lmar+0.085, tmar)
+    ls1.DrawLineNDC(lmar+0.085, tmar-step*8.8, lmar+0.085, tmar)
 
-    txt.DrawLatex(lmar, tmar-step*1 ,"A   2--3")
-    txt.DrawLatex(lmar, tmar-step*2 ,"B   2--3")
+    txt.DrawLatex(lmar, tmar-step*1 ,"A   2#minus3")
+    txt.DrawLatex(lmar, tmar-step*2 ,"B   2#minus3")
     txt.DrawLatex(lmar, tmar-step*3 ,"C   #geq 4")
     txt.DrawLatex(lmar, tmar-step*4 ,"D   #geq 4")
     txt.DrawLatex(lmar, tmar-step*5 ,"E   #geq 4")
@@ -187,19 +157,19 @@ def DrawTextPad(textpad):
     txt.DrawLatex(lmar, tmar-step*7 ,"G   #geq 4")
     txt.DrawLatex(lmar, tmar-step*8 ,"H   #geq 4")
 
-    ls1.DrawLineNDC(lmar+0.25, tmar-step*9, lmar+0.25, tmar)
+    ls1.DrawLineNDC(lmar+0.25, tmar-step*8.8, lmar+0.25, tmar)
 
-    txt.DrawLatex(lmar+0.28, tmar-step*0 ," t_{mod}  ")
+    txt.DrawLatex(lmar+0.28, tmar-step*0 ," #font[12]{t}_{mod}  ")
     txt.DrawLatex(lmar+0.28, tmar-step*1 ," > 10 ")
     txt.DrawLatex(lmar+0.28, tmar-step*2 ," > 10 ")
     txt.DrawLatex(lmar+0.28, tmar-step*3 ," #leq 0 ")
     txt.DrawLatex(lmar+0.28, tmar-step*4 ," #leq 0 ")
-    txt.DrawLatex(lmar+0.28, tmar-step*5 ,"0--10 ")
-    txt.DrawLatex(lmar+0.28, tmar-step*6 ,"0--10 ")
+    txt.DrawLatex(lmar+0.28, tmar-step*5 ,"0#minus10 ")
+    txt.DrawLatex(lmar+0.28, tmar-step*6 ,"0#minus10 ")
     txt.DrawLatex(lmar+0.28, tmar-step*7 ," > 10 ")
     txt.DrawLatex(lmar+0.28, tmar-step*8 ," > 10 ")
 
-    ls1.DrawLineNDC(lmar+0.47, tmar-step*9, lmar+0.47, tmar)
+    ls1.DrawLineNDC(lmar+0.47, tmar-step*8.8, lmar+0.47, tmar)
     txt.DrawLatex(lmar+0.48, tmar-step*0 ," M_{#font[12]{l}b} [GeV] ")
     txt.DrawLatex(lmar+0.51, tmar-step*1 ," #leq 175")
     txt.DrawLatex(lmar+0.51, tmar-step*2 ," > 175")
@@ -210,10 +180,14 @@ def DrawTextPad(textpad):
     txt.DrawLatex(lmar+0.51, tmar-step*7 ," #leq 175")
     txt.DrawLatex(lmar+0.51, tmar-step*8 ," > 175")
 
-    txt.DrawLatex(lmar, tmar-step*9.2 ,"#splitline{X0: Incl tag,    X1: No top,}{X2: Mer. top,  X3: Res. top}")
+    # txt.DrawLatex(lmar, tmar-step*9.2 ,"#splitline{X0: Incl tag,    X1: No top,}{X2: Mer. top,  X3: Res. top}")
+    txt.DrawLatex(lmar, tmar-step*9.3  ,"X0: Inclusive")
+    txt.DrawLatex(lmar, tmar-step*10.1 ,"X1: Untagged")
+    txt.DrawLatex(lmar, tmar-step*10.9 ,"X2: Boosted top")
+    txt.DrawLatex(lmar, tmar-step*11.7 ,"X3: Resolved top")
 
-    txt.DrawLatex(lmar, tmar-step*12 ,"I : N_{J} #geq 5, N_{med-b} #geq 1")
-    txt.DrawLatex(lmar, tmar-step*13 ,"J: N_{J} #geq 3, N_{soft-b} #geq 1")
+    txt.DrawLatex(lmar, tmar-step*13 ,"I : N_{J} #geq 5, N_{b,med} #geq 1")
+    txt.DrawLatex(lmar, tmar-step*14 ,"J: N_{J} #geq 3, N_{b,soft} #geq 1")
 
 
 def DrawHeaderText(canvas, lumi=137.2):
@@ -223,7 +197,7 @@ def DrawHeaderText(canvas, lumi=137.2):
     tCMS.SetTextAlign(11)
     tCMS.SetTextSize(0.0625)
     canvas.cd()
-    tCMS.DrawLatex(canvas.GetLeftMargin(), 1.0-canvas.GetTopMargin()+0.01, "CMS")
+    tCMS.DrawLatex(canvas.GetLeftMargin(), 1.0-canvas.GetTopMargin()+0.012, "CMS")
 
     tplm = r.TLatex()
     tplm.SetNDC(1)
@@ -231,7 +205,7 @@ def DrawHeaderText(canvas, lumi=137.2):
     tplm.SetTextAlign(11)
     tplm.SetTextSize(0.052)
     canvas.cd()
-    tplm.DrawLatex(canvas.GetLeftMargin()+0.059, 1.0-canvas.GetTopMargin()+0.01, "Preliminary")
+    tplm.DrawLatex(canvas.GetLeftMargin()+0.059, 1.0-canvas.GetTopMargin()+0.012, "Preliminary")
 
     ttext = r.TLatex()
     ttext.SetNDC(1)
@@ -240,7 +214,7 @@ def DrawHeaderText(canvas, lumi=137.2):
     ttext.SetTextSize(0.052)
     canvas.cd()
     text = "{0} {1}^{{-1}} ({2} TeV)".format(lumi,"fb",13)
-    ttext.DrawLatex(1.0-canvas.GetRightMargin()-0.01, 1.0-canvas.GetTopMargin()+0.01, text)
+    ttext.DrawLatex(1.0-canvas.GetRightMargin()-0.01, 1.0-canvas.GetTopMargin()+0.012, text)
 
 
 def getSRHistFromYieldE(ylds, hname, htitle=None, fcolor=None, lcolor=None):
@@ -253,7 +227,9 @@ def getSRHistFromYieldE(ylds, hname, htitle=None, fcolor=None, lcolor=None):
         hist.SetBinError(i+1, yld.err)
 
     if fcolor is not None:
+        hist.SetLineWidth(1)
         hist.SetLineColor(r.kGray+2)
+        # hist.SetLineColor(fcolor+2)
         hist.SetFillColor(fcolor)
 
     if lcolor is not None:
@@ -262,7 +238,7 @@ def getSRHistFromYieldE(ylds, hname, htitle=None, fcolor=None, lcolor=None):
 
     return hist
 
-def drawSRyieldHist(hist, xlabels, hleg=None, savename='sigYieldHist.pdf', drawops='hist', linear=False, yrange=None, hline=None, ytitle='N Events'):
+def drawSRyieldHist(hist, xlabels, hleg=None, savename='sigYieldHist.pdf', drawops='hist', linear=False, yrange=None, hline=None, ytitle='Events'):
     if yrange is None: yrange = [0.001, 100]
 
     width = max(len(xlabels)*40, 1200)
@@ -320,7 +296,7 @@ def drawSRyieldHist(hist, xlabels, hleg=None, savename='sigYieldHist.pdf', drawo
     c0.SaveAs(savename)
 
 def drawSRyieldStack(hstk, xlabels, legitems=None, savename='sigYieldHist.pdf', drawops='hist', linear=False, hline=None,
-                     hdata=None, hsigs=None, gsyst=None, ytitle='N Events', noRatio=False, noBkgError=False, yrange=None,
+                     hdata=None, hsigs=None, gsyst=None, ytitle='Events', noRatio=False, noBkgError=False, yrange=None,
                      drawTextPad=False):
 
     r.gStyle.SetOptStat('')
@@ -334,10 +310,12 @@ def drawSRyieldStack(hstk, xlabels, legitems=None, savename='sigYieldHist.pdf', 
 
     if not hdata and not gsyst: noRatio = True
 
+    if yrange == None: yrange = [ 0.1, 5000 ]
+
     if drawTextPad and not noRatio:
-        c0 = r.TCanvas('c0', 'c0', width+200, 1200)
-        mainPad = r.TPad('1', '1', 0.0, 0.20, 0.82, 0.99)
-        ratioPad = r.TPad('2', '2', 0.0, 0.02, 0.82, 0.225)
+        c0 = r.TCanvas('c0', 'c0', width+400, 1200)
+        mainPad = r.TPad('1', '1', 0.0, 0.22, 0.82, 0.99)
+        ratioPad = r.TPad('2', '2', 0.0, 0.0, 0.82, 0.245)
         textPad = r.TPad('3', '3', 0.79, 0.02, 1.0, 0.99)
     elif not noRatio:
         c0 = r.TCanvas('c0', 'c0', width, 1200)
@@ -361,6 +339,7 @@ def drawSRyieldStack(hstk, xlabels, legitems=None, savename='sigYieldHist.pdf', 
     ratioPad.SetTopMargin(0.05)
     ratioPad.SetLeftMargin(0.10)
     ratioPad.SetRightMargin(0.05)
+    ratioPad.SetBottomMargin(0.2)
     if not noRatio: ratioPad.Draw()
     if drawTextPad: textPad.Draw()
     mainPad.cd()
@@ -381,10 +360,8 @@ def drawSRyieldStack(hstk, xlabels, legitems=None, savename='sigYieldHist.pdf', 
     htot.GetYaxis().SetTitle(ytitle)
     htot.GetYaxis().SetTitleOffset(0.45)
     htot.GetYaxis().SetTitleSize(0.058)
-    htot.GetYaxis().SetTickSize(0.02)
-    htot.GetYaxis().SetRangeUser(0.1, 5000)
-    if yrange != None:
-        htot.GetYaxis().SetRangeUser(yrange[0], yrange[1])
+    htot.GetYaxis().SetTickSize(0.015)
+    htot.GetYaxis().SetRangeUser(yrange[0], yrange[1])
     # htot.GetYaxis().SetRangeUser(0.0001, 10)
 
     htot.Draw(drawops)
@@ -409,9 +386,13 @@ def drawSRyieldStack(hstk, xlabels, legitems=None, savename='sigYieldHist.pdf', 
     if hdata != None:
         g_data = r.TGraphAsymmErrors()
         ppu.ConvertToPoissonGraph(hdata, g_data, drawZeros=True)
+        if drawTextPad:
+            for i in range(g_data.GetN()):
+                g_data.SetPointEXlow(i, 0)
+                g_data.SetPointEXhigh(i, 0)
         # g_data.SetPointError(g_data.GetN()-1, 0, 0, 0, 0)
         g_data.SetMarkerStyle(20)
-        g_data.SetMarkerSize(1.6)
+        g_data.SetMarkerSize(2)
         g_data.SetLineWidth(1)
 
         # draw the graph and then axes again on top
@@ -430,36 +411,60 @@ def drawSRyieldStack(hstk, xlabels, legitems=None, savename='sigYieldHist.pdf', 
             hsig.Draw('same')
 
     if type(legitems) == list:
-        leg = r.TLegend(0.58, 0.76, 0.76, 0.89)
+        leg = r.TLegend(0.52, 0.76, 0.76, 0.89)
         if width < 1000:
             # leg = r.TLegend(0.65, 0.64, 0.91, 0.89)
-            leg = r.TLegend(0.58, 0.78, 0.89, 0.89)
+            leg = r.TLegend(0.52, 0.78, 0.89, 0.89)
         if len(legitems) > 2:
             leg.SetNColumns(2)
         if hdata != None:
-            leg = r.TLegend(0.49, 0.76, 0.76, 0.89)
+            leg = r.TLegend(0.47, 0.76, 0.76, 0.89)
             leg.SetNColumns(3)
-        for i in range(len(legitems)-1, -1, -1):
-            leg.AddEntry(hstk.GetHists().At(i), legitems[i], 'lf')
-            if hdata != None and i == len(legitems)-2:
-                leg.AddEntry(hdata, 'data', 'lp')
+        # for i in range(len(legitems)-1, -1, -1):
+        #     leg.AddEntry(hstk.GetHists().At(i), legitems[i], 'lf')
+        #     if hdata != None and i == len(legitems)-2:
+        #         leg.AddEntry(g_data, 'Data', 'lp')
+        for i in [3,1,4,0,2]:
+            if hdata != None and i == len(legitems):
+                leg.AddEntry(g_data, 'Observed', 'lp')
+            elif i < len(legitems):
+                leg.AddEntry(hstk.GetHists().At(i), legitems[i], 'lf')
 
+        # leg.SetEntrySeparation(0.2)
+        leg.SetTextSize(0.047)
+        # leg.SetMargin(0.2)
         leg.Draw()
+
+    if drawTextPad:
+        vlineI = r.TLine(39, 0, 39, yrange[1])
+        vlineI.SetLineStyle(7)
+        vlineI.SetLineWidth(2)
+        vlineI.SetLineColor(r.kGray+2)
+        vlineI.Draw()
+        vlineJ = r.TLine(44, 0, 44, yrange[1])
+        vlineJ.SetLineStyle(7)
+        vlineJ.SetLineWidth(2)
+        vlineJ.SetLineColor(r.kGray+2)
+        vlineJ.Draw()
 
     DrawHeaderText(mainPad)
 
     ratioPad.cd()
+    ratiomax = 4
     if not noRatio:
         h_axis_ratio = r.TH1D('ratio_axis','', htot.GetNbinsX(), 0, htot.GetNbinsX())
         h_axis_ratio.GetYaxis().SetNdivisions(4)
         h_axis_ratio.GetYaxis().SetLabelSize(0.15)
-        h_axis_ratio.GetYaxis().SetRangeUser(0,4)
-        h_axis_ratio.GetYaxis().SetTitle('Ratios  ')
-        h_axis_ratio.GetYaxis().SetTitleOffset(0.45)
-        h_axis_ratio.GetYaxis().SetTitleSize(1)
+        h_axis_ratio.GetYaxis().SetRangeUser(0,ratiomax)
+        # h_axis_ratio.GetYaxis().SetTitle('Ratios  ')
+        h_axis_ratio.GetYaxis().SetTitle('Obs./Exp.')
+        h_axis_ratio.GetYaxis().SetTitleOffset(0.13)
+        h_axis_ratio.GetYaxis().SetTitleSize(0.18)
         h_axis_ratio.GetYaxis().SetTickLength(0.01)
         h_axis_ratio.GetXaxis().SetTickLength(0.07)
-        h_axis_ratio.GetXaxis().SetTitleSize(0.)
+        h_axis_ratio.GetXaxis().SetTitle('Signal Regions')
+        h_axis_ratio.GetXaxis().SetTitleSize(0.15)
+        h_axis_ratio.GetXaxis().SetTitleOffset(0.45)
         h_axis_ratio.GetXaxis().SetLabelSize(0.)
         h_axis_ratio.Draw('axis')
 
@@ -469,8 +474,8 @@ def drawSRyieldStack(hstk, xlabels, legitems=None, savename='sigYieldHist.pdf', 
         line.Draw('same')
 
         if gsyst != None:
-            gsyst.SetFillStyle(1001)
-            gsyst.SetFillColor(r.kGray)
+            gsyst.SetFillStyle(3244)
+            gsyst.SetFillColor(r.kGray+2)
             gsyst.Draw('same 2')
             line.Draw('same')
             h_axis_ratio.Draw('axissame')
@@ -483,12 +488,28 @@ def drawSRyieldStack(hstk, xlabels, legitems=None, savename='sigYieldHist.pdf', 
             for i in range(1, htot.GetNbinsX()+1):
                 htot.SetBinError(i, 0)
             ppu.GetPoissonRatioGraph(htot,hdata,ratioGraph)
+            if drawTextPad:
+                for i in range(ratioGraph.GetN()):
+                    ratioGraph.SetPointEXlow(i, 0)
+                    ratioGraph.SetPointEXhigh(i, 0)
             ratioGraph.SetMarkerStyle(20)
             ratioGraph.SetMarkerSize(2.2)
             ratioGraph.SetMarkerColor(r.kGray+3)
             ratioGraph.SetLineColor(r.kGray+3)
             ratioGraph.SetLineWidth(2)
             ratioGraph.Draw('PZsame')
+
+        if drawTextPad:
+            rvlI = r.TLine(39, 0, 39, ratiomax)
+            rvlI.SetLineStyle(7)
+            rvlI.SetLineWidth(2)
+            rvlI.SetLineColor(r.kGray+2)
+            rvlI.Draw()
+            rvlJ = r.TLine(44, 0, 44, ratiomax)
+            rvlJ.SetLineStyle(7)
+            rvlJ.SetLineWidth(2)
+            rvlJ.SetLineColor(r.kGray+2)
+            rvlJ.Draw()
 
     if drawTextPad:
         DrawTextPad(textPad)
@@ -528,7 +549,7 @@ def drawBkgEstimateHists(indir, srNames, suf='', bkgType='lostlep'):
     drawSRyieldHist(h_purity, xlabels, 'noleg', bkgType+suf+'_CRpurity.pdf', 'PE', True, [0, 1.2], 1, ytitle='')
 
 
-def drawBkgCompositionStack(indir, srNames=None, savename='bkgCompostion_std.pdf', plotData=False, normalize=False):
+def drawBkgCompositionStack(indir, srNames=None, savename='bkgCompostion_std.pdf', plotData=False, normalize=False, drawTextPad=False):
 
     # -------------------------------------------------------
     # Draw test bkg composition / expected yields hists
@@ -546,10 +567,11 @@ def drawBkgCompositionStack(indir, srNames=None, savename='bkgCompostion_std.pdf
     y_Zinv = [ y for y in sum(getYieldEInTopoBins(f_bkg, srNames, 'metbins_Znunu'), []) ]
 
     if not plotData and normalize:
-        y_2lep = [ yi/ya for yi, ya in zip(y_2lep, y_all) ]
-        y_1lt  = [ yi/ya for yi, ya in zip(y_1lt , y_all) ]
-        y_1lW  = [ yi/ya for yi, ya in zip(y_1lW , y_all) ]
-        y_Zinv = [ yi/ya for yi, ya in zip(y_Zinv, y_all) ]
+        y_tot  = [ y1+y2+y3+y4 for y1, y2, y3, y4 in zip(y_2lep, y_1lt, y_1lW, y_Zinv)]
+        y_2lep = [ yi/ya for yi, ya in zip(y_2lep, y_tot) ]
+        y_1lt  = [ yi/ya for yi, ya in zip(y_1lt , y_tot) ]
+        y_1lW  = [ yi/ya for yi, ya in zip(y_1lW , y_tot) ]
+        y_Zinv = [ yi/ya for yi, ya in zip(y_Zinv, y_tot) ]
 
     h_2lep = getSRHistFromYieldE(y_2lep, 'h_SRyields_2lep', '', fcolor=r.kAzure+6)
     h_1lW  = getSRHistFromYieldE(y_1lW , 'h_SRyields_1lW' , '', fcolor=r.kOrange-4)
@@ -564,13 +586,13 @@ def drawBkgCompositionStack(indir, srNames=None, savename='bkgCompostion_std.pdf
         hstk.Add(h_2lep)
         hstk.Add(h_1lW)
     elif 'cr2l' in srNames[0]:
-        legname = ['Zinv', '1lepW', '1lepTop', '2lep']
+        legname = ['Z#rightarrow#nu#nu', '1lepW', '1lepTop', 't#bar{t}/tW#rightarrow2#font[12]{l}']
         hstk.Add(h_Zinv)
         hstk.Add(h_1lW)
         hstk.Add(h_1lt)
         hstk.Add(h_2lep)
     else:
-        legname = ['1lepTop', 'Zinv', '1lepW', '2lep']
+        legname = ['1#font[12]{l} from t', 'Z#rightarrow#nu#nu', '1#font[12]{l} from W', 't#bar{t}/tW#rightarrow2#font[12]{l}']
         hstk.Add(h_1lt)
         hstk.Add(h_Zinv)
         hstk.Add(h_1lW)
@@ -583,7 +605,7 @@ def drawBkgCompositionStack(indir, srNames=None, savename='bkgCompostion_std.pdf
         y_data  = [ y.round(2) for y in sum(getYieldEInTopoBins(f_data, srNames, 'metbins'), []) ]
         h_data = getSRHistFromYieldE(y_data, 'h_SRyields_data', '', fcolor=r.kBlack)
 
-        drawSRyieldStack(hstk, xlabels, legname, savename, 'hist', hdata=h_data)
+        drawSRyieldStack(hstk, xlabels, legname, savename, 'hist', hdata=h_data, drawTextPad=drawTextPad)
     elif normalize:
         drawSRyieldStack(hstk, xlabels, legname, savename, 'hist', linear=True, yrange=[0.0,1.3], noBkgError=True, ytitle='Bkg Fraction')
     else:
@@ -618,7 +640,8 @@ def drawBkgPredictionStack(indir, srNames=None, savename='bkgPrediction_std.pdf'
     h_1lt  = getSRHistFromYieldE(y_1lt , 'h_SRyields_1lepW'   , '', fcolor=r.kRed-7)
     h_Zinv = getSRHistFromYieldE(y_Zinv, 'h_SRyields_Zinv'    , '', fcolor=r.kMagenta-3)
 
-    legname = ['1lepTop', 'Z#rightarrow#nu#nu', 'W+jets', 'lost-lep']
+    legname = ['t#bar{t}/tW#rightarrow1#font[12]{l}', 'Z#rightarrow#nu#nu', 'W+jets', 'Lost lepton']
+    # legname = ['1 #font[12]{l} from t', 'Z#rightarrow#nu#nu', 'W+jets', 'Lost lepton']
     hstk = r.THStack('hs1', '')
     hstk.Add(h_1lt)
     hstk.Add(h_Zinv)
@@ -633,7 +656,7 @@ def drawBkgPredictionStack(indir, srNames=None, savename='bkgPrediction_std.pdf'
     systdn = [0.0,]*len(y_tot)
     for s in ['MC','data']:
         stat_2lep = [ (scale*y).round(4) for y in sum(getYieldEInTopoBins(f_lostlep, srNames, 'metbins_'+s+'Stats'), []) ]
-        stat_1lt  = y_1lt
+        stat_1lt  = [ (scale*E(y.val, y.val)).round(4) for y in y_1lt ]
         stat_1lW  = [ (scale*y).round(4) for y in sum(getYieldEInTopoBins(f_1lepW,   srNames, 'metbins_'+s+'Stats', 'metbins'), []) ]
         stat_Zinv = y_Zinv
         stat_tot = [ y1+y2+y3+y4 for y1, y2, y3, y4 in zip(stat_2lep, stat_1lt, stat_1lW, stat_Zinv)]
@@ -647,7 +670,7 @@ def drawBkgPredictionStack(indir, srNames=None, savename='bkgPrediction_std.pdf'
 
     # systs = ['jes','metRes', 'lepSF','alphas', 'q2', 'ISR',  'WbXsec', 'pdf', 'tauSF']
     # systs = ['jes','metRes', 'lepSF', 'ISR',]
-    systs = ['jes','metRes', 'metTTbar', 'WbXsec', 'ISR', 'lepSF' ]
+    systs = ['jes','metRes', 'metTTbar', 'WbXsec', 'ISR', 'lepSF', 'ttagSF', 'softbSF']
     # systs = ['lepSF',  ]
 
     for sys in systs:
@@ -925,6 +948,7 @@ def drawAllPlots():
     # drawBkgEstimateHists(f16, srNames, '16')
 
     srNames = ['srA0', 'srA1', 'srA2', 'srB', 'srC', 'srD', 'srE0', 'srE1', 'srE2', 'srE3', 'srF', 'srG0', 'srG1', 'srG2', 'srG3', 'srH', 'srI', 'srJ']
+    # drawBkgCompositionStack(indir, srNames, 'SRCompostion_all_s12.pdf')
     # drawBkgCompositionStack(indir, srNames, 'SRCompostion_norm_s12.pdf', normalize=True)
 
     # drawYieldsRatioComparison()
@@ -932,7 +956,8 @@ def drawAllPlots():
     # drawBkgEstimateHists(indir, srNames, 'run2', 'lostlep')
 
     crNames = [ sr.replace('sr', 'cr2l') for sr in srNames ]
-    drawBkgCompositionStack(indir, crNames, 'CR2lYields_s12_all.pdf', plotData=True)
+    # drawBkgCompositionStack(indir, crNames, 'CR2lYields_s12_all.pdf', plotData=True)
+    drawBkgCompositionStack(indir, crNames, 'CR2lYields_s12_atp.pdf', plotData=True, drawTextPad=True)
 
     # drawYieldsRatioComparison(crNames, 'cr2lYieldCompare_METResOnvsOff_17.pdf')
 
@@ -941,6 +966,7 @@ def drawAllPlots():
 
     crNames = [ sr.replace('sr', 'cr0b') for sr in srNames ]
     # drawBkgCompositionStack(indir, crNames, 'CR0bYields_s12_all.pdf', plotData=True)
+    drawBkgCompositionStack(indir, crNames, 'CR0bYields_s12_atp.pdf', plotData=True, drawTextPad=True)
 
     # drawYieldsRatioComparison(crNames, 'cr0bYieldCompare_METResOnvsOff_17.pdf')
 
@@ -994,7 +1020,7 @@ if __name__ == '__main__':
 
     r.gROOT.SetBatch(1)
 
-    bvsuf = 'v31_s12'
+    bvsuf = 'v31_s15'
     indir = '../StopLooper/output/combRun2_'+bvsuf
     indir16 = '../StopLooper/output/samp16_'+bvsuf
 
@@ -1010,7 +1036,8 @@ if __name__ == '__main__':
     # drawBkgPredictionStack(indir, srNames, 'bkgPrediction_unblind_run2_61fb.pdf', 'run2', plotData='data_run2_61fb', scale=60.9/137.2)
     # drawBkgPredictionStack(indir, srNames, 'Results_prefit_run2_noJ_s8.pdf', 'run2', plotData='allData_run2')
     # drawBkgPredictionStack(indir, srNames, 'Results_prefit_run2_all_s12.pdf', 'run2', plotData='allData_run2')
-    drawBkgPredictionStack(indir, srNames, 'Results_prefit_test_s12.pdf', 'run2', plotData='allData_run2', drawTextPad=True)
+    # drawBkgPredictionStack(indir, srNames, 'Results_prefit_test2_s12.pdf', 'run2', plotData='allData_run2')
+    drawBkgPredictionStack(indir, srNames, 'Results_prefit_test_s15.pdf', 'run2', plotData='allData_run2', drawTextPad=True)
 
     bkgnames = ['2l', '1lW', 'znunu',  '1ltop',]
     systnames = ['jes', 'metTTbar', ]

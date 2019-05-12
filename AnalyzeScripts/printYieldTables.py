@@ -351,19 +351,23 @@ def makeMETExtrInfoTable():
     srNames = ['srA0', 'srA1', 'srA2', 'srB', 'srC','srD', 'srE0', 'srE1', 'srE2', 'srE3', 'srF', 'srG0', 'srG1', 'srG2', 'srG3', 'srH', 'srI', 'srJ',]
     # srNames = ['srA0', 'srA1', 'srB', 'srC', ]
 
-    f1 = r.TFile('../StopLooper/output/combRun2_v39_s6/lostlepton_run2.root')
-    f2 = r.TFile('./lostlepton_run2.root')
+    bkgtype = 'lostlepton'
+
+    f1 = r.TFile('../StopLooper/output/combRun2_v31_s13/'+bkgtype+'_run2.root')
+    f2 = r.TFile('./'+bkgtype+'_run2.root')
 
     alpha1  = getYieldEInTopoBins(f1, srNames, 'alphaHist')
     alpha2  = getYieldEInTopoBins(f2, srNames, 'alphaHist')
     yMC_CR1 = getYieldEInTopoBins(f1, srNames, 'MCyields_CR')
     yMC_CR2 = getYieldEInTopoBins(f2, srNames, 'MCyields_CR')
+    yMC_SR1 = getYieldEInTopoBins(f1, srNames, 'MCyields_SR')
     yld_CR1 = getYieldEInTopoBins(f1, srNames, 'datayields_CR')
     yld_CR2 = getYieldEInTopoBins(f2, srNames, 'datayields_CR')
 
     xrtsrs, metbin = zip(*[ (sr, [ i for i, y in enumerate(y2) if y not in y1]) for sr, y1, y2 in zip(srNames, alpha1, alpha2) if y1[-1] != y2[-1] ])
     alpha3  = [ [ y for i, y in enumerate(y2) if y not in y1] for sr, y1, y2 in zip(srNames, alpha1, alpha2) if y1[-1] != y2[-1] ]
     yMC_CR3 = [ [ y for i, y in enumerate(y2) if y not in y1] for sr, y1, y2 in zip(srNames, yMC_CR1, yMC_CR2) if y1[-1] != y2[-1] ]
+    yMC_SR3 = [ [ s for s, y in zip(s1, y2) if y not in y1] for sr, s1, y1, y2 in zip(srNames, yMC_SR1, yMC_CR1, yMC_CR2) if y1[-1] != y2[-1] ]
     yld_CR3 = [ [ y for i, y in enumerate(y2) if y not in y1] for sr, y1, y2 in zip(srNames, yld_CR1, yld_CR2) if y1[-1] != y2[-1] ]
 
 
@@ -374,15 +378,16 @@ def makeMETExtrInfoTable():
     tab.add_column('SR name', sum([[sr]*n for sr, n in zip(xrtsrs, map(len, alpha3))], []))
     # tab.add_column('metbin', sum(metbin, []))
     tab.add_column('MET [GeV]', [m[0]+' -- '+m[1] for m in sum(metrange, [])])
-    tab.add_column('M^{CR} Expected', [y.round(3) for y in sum(yMC_CR3, [])])
+    tab.add_column('$M^{SR}$ Expected', [y.round(3) for y in sum(yMC_SR3, [])])
+    tab.add_column('$M^{CR}$ Expected', [y.round(3) for y in sum(yMC_CR3, [])])
     # print len(sum(yMC_CR3, [])), len(sum(yld_CR3, []))
     # tab.add_column('N^{CR} Observed', [y.round(3) for y in sum(yld_CR3, [])])
     tab.add_column('Transfer Factor', [y.round(3) for y in sum(alpha3, [])])
 
-    # tab.print_table()
-    tab.set_theme_latex()
     tab.print_table()
-    tab.print_pdf('lostlep_METextrBins.pdf')
+    tab.set_theme_latex()
+    # tab.print_table()
+    tab.print_pdf(bkgtype+'_METextrBins.pdf')
 
 
 def makeBkgCompositionTable(f1, srNames, savename='run2', fdata=None, nofraction=False):
@@ -574,10 +579,10 @@ def makeBetterPredictionTable(indir, ysuf='run2', showdata=False, showUpDn=True)
     srNamesDD = ['srA0', 'srA1', 'srB', 'srC','srD', 'srE0', 'srE1', 'srF', 'srG0', 'srG1', 'srH', 'srI', 'srJ']
     srNamesMC = ['srA2', 'srE2', 'srE3', 'srG2', 'srG3', ]
 
-    syst2l  = ['jes', 'ISR', 'lepSF', 'metTTbar', 'L1prefire', 'pileup', 'pdf', 'q2', 'alphas', 'metRes', 'tauSF']
-    syst1lW = ['jes', 'bTagEffHF', 'bTagEffLF', 'WbXsec', 'L1prefire', 'pileup', 'pdf', 'q2', 'alphas', 'metRes']
-    syst1lt = ['jes', 'L1prefire', 'pileup', 'pdf', 'q2', 'alphas', 'metRes']
-    systZnu = ['jes', 'L1prefire', 'pileup', 'pdf', 'q2', 'alphas', 'metRes']
+    syst2l  = ['jes', 'ISR', 'lepSF', 'metTTbar', 'L1prefire', 'pileup', 'pdf', 'q2', 'alphas', 'metRes', 'tauSF', 'softbSF']
+    syst1lW = ['jes', 'bTagEffHF', 'bTagEffLF', 'WbXsec', 'L1prefire', 'pileup', 'pdf', 'q2', 'alphas', 'metRes', 'softbSF']
+    syst1lt = ['jes', 'L1prefire', 'pileup', 'pdf', 'q2', 'alphas', 'metRes', 'ttagSF', 'softbSF']
+    systZnu = ['jes', 'L1prefire', 'pileup', 'pdf', 'q2', 'alphas', 'metRes', 'ttagSF', 'softbSF']
 
     str2l, pred2l, e2lup, e2ldn = getPredStrDataDriven(f_lostlep, srNames, syst2l, showUpDn)
 
@@ -627,7 +632,7 @@ if __name__ == '__main__':
 
     r.gROOT.SetBatch(1)
 
-    printAllTables()
+    # printAllTables()
 
     bvsuf = 'v30_m2'
     # f1 = r.TFile('../StopLooper/output/combRun2_'+bvsuf+'/allBkg_run2.root')
@@ -637,13 +642,13 @@ if __name__ == '__main__':
     indir16 = '../StopLooper/output/samp16_'+bvsuf
     # makePredictionTable(indir16, srNames, '16', True)
 
-    bvsuf = 'v31_s12'
+    bvsuf = 'v31_s15'
     indir = '../StopLooper/output/combRun2_'+bvsuf
     # makeBkgEstimateTablesLostLepton(indir)
     # makeBkgEstimateTables1LepFromW(indir)
 
     # makePredictionTable(indir, srNames, 'run2', True)
-    # makeBetterPredictionTable(indir, 'run2', True, False)
+    makeBetterPredictionTable(indir, 'run2', True, False)
 
     # makeMETExtrInfoTable()
     # makeSystUncertaintyMaxTable(indir, srNames)

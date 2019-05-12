@@ -64,10 +64,11 @@ TFile *fsig_genmet;
 // vector<string> systNames_sig = {"bTagEffLF", "bTagEffHF", "jes", "lepSF", }; //  temporary as most ones aren't available
 // vector<string> systNames_sig = {"jes", "ISR", "lepFSSF", "bTagFSEff"}; //  "q2" <-- fix this
 // vector<string> systNames_corr = {"bTagEffHF", "bTagEffLF", "lepSF", "pdf", "q2", "jes", "ISR", "pileup", "alphas", "metRes", "L1prefire"};
+// vector<string> systNames_corr = {"bTagEffHF", "bTagEffLF", "lepSF", "pdf", "q2", "jes", "ISR", "alphas", "L1prefire"};
 vector<string> systNames_sig = {"jes16", "jes17", "jes18", "ISR", "lepFSSF", "bTagFSEff"}; //  "q2" <-- fix this
 vector<string> systNames_corr = {"bTagEffHF16", "bTagEffHF17", "bTagEffHF18", "bTagEffLF16", "bTagEffLF17", "bTagEffLF18", "lepSF",
                                  "pdf", "q2", "jes16", "jes17", "jes18", "ISR16", "pileup16", "pileup17", "pileup18",
-                                 "alphas", "metRes16", "metRes17", "metRes18", "L1prefire"};
+                                 "alphas", "metRes16", "metRes17", "metRes18", "L1prefire", "ttagSF", "softbSF"};
 
 // individual systematic uncertainties for different backgrounds
 // vector<string> systNames_bg2l = {"metRes", "ttbarSysPt", "tauSF"};
@@ -514,6 +515,9 @@ int makeCardForOneBin(TString dir, int mstop, int mlsp, int metbin, int bin, TSt
 
     if (correlated) {
       for (auto syst : systNames_corr) {
+        if (syst == "ttagSF" && !dir.EndsWith("2") && !dir.EndsWith("3")) continue;
+        if (syst == "softbSF" && !dir.EndsWith("J")) continue;
+
         string suf = "SystBG";
         if (std::find(systNames_sig.begin(), systNames_sig.end(), syst) == systNames_sig.end() && syst != "pdf" && syst != "alphas" && syst != "ISR16") {
           getUncertainties(uperr[0], dnerr[0], osig, fsig, hname_sig+"_"+syst.c_str(), metbin, mstop, mlsp);
@@ -525,11 +529,14 @@ int makeCardForOneBin(TString dir, int mstop, int mlsp, int metbin, int bin, TSt
           getUncertainties(uperr[2], dnerr[2], bg1l, f1l, hname_1l + syst.c_str(), metbin);
         // bgZnunu <-- uses both up and dn err for Znunu bkg until otherwise instructed
         getUncertainties(uperr[4], dnerr[4], bgznunu, fznunu, hname_Z + syst.c_str(), metbin);
+
+        if (syst == "ttagSF" && dir.EndsWith("2")) syst = "merttagSF";
+        if (syst == "ttagSF" && dir.EndsWith("3")) syst = "resttagSF";
         numnuis += addCorrelatedUnc(fLogStream, syst+suf, dnerr, uperr, -1, "lnN");
       }
     } else {
       for (auto syst : systNames_corr) {
-        if (syst != "pdf") systNames_bg2l.push_back(syst);    // bg2l
+        // if (syst != "pdf") systNames_bg2l.push_back(syst);    // bg2l
         if (syst != "lepSF" && syst != "ISR") systNames_bg1l.push_back(syst);  // bg1l
         systNames_bgZnunu.push_back(syst);                    // bgZnunu
       }
@@ -576,6 +583,21 @@ int makeCardForOneBin(TString dir, int mstop, int mlsp, int metbin, int bin, TSt
 void makeCardsForPoint(TString signal, int mstop, int mlsp, TString outdir) {
 
   system(Form("mkdir -p %s", outdir.Data()));
+  vector<TString> dirlist;
+  if (signal == "T2tt")
+    dirlist = vector<TString> {"srA0", "srA1", "srA2", "srB", "srC", "srD", "srE0", "srE1", "srE2", "srE3", "srF", "srG0", "srG1", "srG2", "srG3", "srH", "srI", "srJ"};
+  else
+    dirlist = vector<TString> {"srA0", "srA1", "srA2", "srB", "srC", "srD", "srE0", "srE1", "srE2", "srE3", "srF", "srG0", "srG1", "srG2", "srG3", "srH",};
+
+  if (outdir.Contains("fullsplit") || outdir.Contains("oldsplit"))
+      dirlist = vector<TString> {"srA1", "srA2", "srB", "srC", "srD", "srE1", "srE2", "srE3", "srF", "srG1", "srG2", "srG3", "srH", "srI", "srJ"};
+
+  if (outdir.Contains("m17sync"))
+    dirlist = vector<TString> {"srA", "srB", "srC", "srD", "srE", "srF", "srG", "srH", "srI"};
+
+  if (outdir.Contains("m17fullsplit"))
+    dirlist = vector<TString> {"srA1", "srA2", "srB", "srC1", "srC2", "srC3", "srD", "srE1", "srE2", "srE3", "srF", "srG1", "srG2", "srG3", "srH"};
+
   int nbintot = 1;
   // Loop through list of every directory in the signal file.
   // if directory begins with "sr", excluding "srbase", make cards for it.
@@ -586,9 +608,8 @@ void makeCardsForPoint(TString signal, int mstop, int mlsp, TString outdir) {
   //   TString dir = k->GetName();
   //   if (dir[2] < 'A' || dir[2] > 'J') continue;
   //   if (strncmp (dir, keep.c_str(), keep.length()) != 0) continue; // it is a signal region
-  // for (TString dir : {"srA0", "srA1", "srA2", "srB", "srC", "srD", "srE0", "srE1", "srE2", "srE3", "srF", "srG0", "srG1", "srG2", "srG3", "srH", "srI", "srJ"}) {
-  // for (TString dir : {"srI", "srJ0", "srJ3", "srJ5",}) {
-  for (TString dir : {"srI", "srJ",}) {
+  // for (TString dir : {"srA0", "srA1", "srA2", "srB", "srC", "srD", "srE0", "srE1", "srE2", "srE3", "srF", "srG0", "srG1", "srG2", "srG3", "srH", }) {
+  for (TString dir : dirlist) {
     // Fixed SRs for Run2 legacy analysis
     TString hname = dir + "/h_metbins"; // for met binning information, empty hist for signal output
     // cout << "Looking at hname  " << hname << endl;
@@ -598,9 +619,7 @@ void makeCardsForPoint(TString signal, int mstop, int mlsp, TString outdir) {
     TString anName = (dir == "srI")? "tcor" : (dir == "srJ")? "Wcor" : "std";
     if (anName == "tcor" && mstop - mlsp > 350) return;  // only make top corridor cards for deltaM < 350 GeV
     if (anName == "Wcor" && mstop - mlsp > 150) return;  // only make W corridor cards for deltaM < 150 GeV
-    anName = dir;
-    // if (dir == "srI" || dir == "srJ") nbintot = 1;  // temporary solution to recount for corridor
-    nbintot = 1;  // temporary solution to recount for corridor
+    if (dir == "srI" || dir == "srJ") nbintot = 1;  // temporary solution to recount for corridor
     for (int ibin = 1; ibin <= n_metbins; ++ibin, ++nbintot) {
       // Make a separate card for each met bin.
       TString cardname = outdir + Form("/datacard_%s_%s_%d_%d_bin%d.txt", anName.Data(), signal.Data(), mstop, mlsp, nbintot);
@@ -611,7 +630,7 @@ void makeCardsForPoint(TString signal, int mstop, int mlsp, TString outdir) {
 
 // -------------------------------------------------------------------------------------------------------------------
 // Make cards for a single mass point
-void newCardMaker(string signal = "T2tt", int mStop = 500, int mLSP = 325, string input_dir="../StopLooper/output/combRun2_v31_s8", string output_dir="datacards/temp", string ysuf="run2") {
+void newCardMaker(string signal = "T2tt", int mStop = 800, int mLSP = 400, string input_dir="../StopLooper/output/combRun2_v31_s15", string output_dir="datacards/temp", string ysuf="run2") {
   cout << "Making cards for single mass point: " << signal << endl;
   system(Form("mkdir -p %s", output_dir.c_str()));
 
