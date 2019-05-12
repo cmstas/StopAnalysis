@@ -31,6 +31,8 @@ std::vector<SR> getStopControlRegionsNoBTagsNewMETBinning();
 std::vector<SR> getStopControlRegionsDileptonNewMETBinning();
 
 std::vector<SR> getStopSignalRegionsRun2();
+std::vector<SR> getStopSignalRegionsTestRun2();
+std::vector<SR> getStopSignalRegionsTest2();
 std::vector<SR> getStopInclusiveRegionsRun2();
 std::vector<SR> getStopControlRegionsNoBTagsRun2(const std::vector<SR>& SRvec);
 std::vector<SR> getStopControlRegionsDileptonRun2(const std::vector<SR>& SRvec);
