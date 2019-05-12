@@ -1538,10 +1538,9 @@ void evtWgtInfo::getTopTaggerSF( double &wgt_ttag, double &wgt_ttag_up, double &
       }
       if (igentop < 0) continue;
 
-      int ngendaugmatched = -1;
+      int ngendaugmatched = 0;
       for (int daug : gentopdaugs.at(igentop)) {
-        float minDR = 0.8;
-        if (isCloseObject(ak8pfjets_p4().at(itop), genqs_p4().at(daug), 0.8, &minDR)) {
+        if (isCloseObject(ak8pfjets_p4().at(itop), genqs_p4().at(daug), 0.8)) {
           ngendaugmatched++;
         }
       }
@@ -1555,22 +1554,39 @@ void evtWgtInfo::getTopTaggerSF( double &wgt_ttag, double &wgt_ttag_up, double &
     }
   }
   else if (srtype == 3) {
-    for (size_t itop = 0; itop < tftops_disc().size(); ++itop) {
-      if (tftops_disc()[itop] < rtop_tight_WP) continue;
+    auto* rtop_disc = &tftops_disc();
+    auto* rtop_p4 = &tftops_p4();
+    auto* rtop_subjet_eta = &tftops_subjet_eta();
+    auto* rtop_subjet_phi = &tftops_subjet_phi();
+
+    if (jes_type == k_JESUp) {
+      rtop_disc = &jup_tftops_disc();
+      rtop_p4 = &jup_tftops_p4();
+      rtop_subjet_eta = &jup_tftops_subjet_eta();
+      rtop_subjet_phi = &jup_tftops_subjet_phi();
+    }
+    else if (jes_type == k_JESDown) {
+      rtop_disc = &jdown_tftops_disc();
+      rtop_p4 = &jdown_tftops_p4();
+      rtop_subjet_eta = &jdown_tftops_subjet_eta();
+      rtop_subjet_phi = &jdown_tftops_subjet_phi();
+    }
+
+    for (size_t itop = 0; itop < (*rtop_disc).size(); ++itop) {
+      if ((*rtop_disc)[itop] < rtop_tight_WP) continue;
       bool is_truetop = true;
 
       int igentop = -1;
       for (size_t igt = 0; igt < gentopidx.size(); ++igt) {
-        if (isCloseObject(genqs_p4().at(gentopidx[igt]), tftops_p4().at(itop), 0.6))
+        if (isCloseObject(genqs_p4().at(gentopidx[igt]), (*rtop_p4).at(itop), 0.6))
           igentop = igt;
       }
       if (igentop < 0) is_truetop = false;
 
       int ndaugmatched = 0;
-      for (size_t isub = 0; is_truetop && isub < tftops_subjet_eta()[itop].size(); ++isub) {
+      for (size_t isub = 0; is_truetop && isub < (*rtop_subjet_eta)[itop].size(); ++isub) {
         for (int daug : gentopdaugs.at(igentop)) {
-          float minDR = 0.5;
-          if (isCloseObject(tftops_subjet_eta()[itop][isub], tftops_subjet_phi()[itop][isub], genqs_p4().at(daug).eta(), genqs_p4().at(daug).phi(), 0.4, &minDR)) {
+          if (isCloseObject((*rtop_subjet_eta)[itop][isub], (*rtop_subjet_phi)[itop][isub], genqs_p4().at(daug).eta(), genqs_p4().at(daug).phi(), 0.4)) {
             ndaugmatched++;
             break;
           }
@@ -1580,7 +1596,7 @@ void evtWgtInfo::getTopTaggerSF( double &wgt_ttag, double &wgt_ttag_up, double &
       if (ndaugmatched < 2) is_truetop = false;
 
       // Now the left-over tops are gen-matched resolved tops
-      int ibin = h_tfttagSF_sig->FindBin(tftops_p4().at(itop).pt());
+      int ibin = h_tfttagSF_sig->FindBin((*rtop_p4).at(itop).pt());
       double sf  = (is_truetop)? h_tfttagSF_sig->GetBinContent(ibin) : h_tfttagSF_bkg->GetBinContent(ibin);
       double err = (is_truetop)? h_tfttagSF_sig->GetBinError(ibin)   : h_tfttagSF_bkg->GetBinError(ibin);
 
@@ -2644,10 +2660,10 @@ bool evtWgtInfo::doingSystematic( systID isyst ) {
       return is_bkg_; // apply_topPt_sf =true: do sf, =false: uncertainty only
     case k_ttagSFUp:
     case k_ttagSFDown:
-      return apply_ttag_sf && (srtype == 2 || srtype == 3);
+      return apply_ttag_sf;
     case k_softbSFUp:
     case k_softbSFDown:
-      return apply_softbtag_sf && (srtype == 5);
+      return apply_softbtag_sf;
     case k_metResUp:
     case k_metResDown:
       return apply_metRes_sf;
@@ -2722,10 +2738,10 @@ evtWgtInfo::SampleType evtWgtInfo::findSampleType( string samplestr ) {
 
 string evtWgtInfo::getLabel( systID isyst ) {
   Util util(isyst);
-  if (srtype == 2 && util.label.find("ttag") == 0)
-    return util.label.replace(0, 1, "mt");
-  if (srtype == 3 && util.label.find("ttag") == 0)
-    return util.label.replace(0, 1, "rt");
+  // if (srtype == 2 && util.label.find("ttag") == 0)
+  //   return util.label.replace(0, 1, "mt");
+  // if (srtype == 3 && util.label.find("ttag") == 0)
+  //   return util.label.replace(0, 1, "rt");
   return util.label;
 }
 
