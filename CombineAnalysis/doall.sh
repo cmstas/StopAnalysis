@@ -1,10 +1,11 @@
-bvsuf=v31_s8
+bvsuf=v31_m17sync
 ysuf=16
 
 indir=../StopLooper/output/samp${ysuf}_$bvsuf
 outdir=scan_samp${ysuf}_$bvsuf
 
 # root -b -q fakeBkgEstimates.C"(\"$indir\",\"$indir\",\"$ysuf\")" || return $?
+# root -b -q ../AnalyzeScripts/makeBkgEstimates.C"(\"$indir\",\"$indir\",\"$ysuf\", \"yearSeparateSyst=false\")" || return $?
 # root -b -q ../AnalyzeScripts/makeBkgEstimates.C"(\"$indir\",\"$indir\",\"$ysuf\", \"extr_threshold=1.31\")" || return $?
 
 sigscan=std_T2tt
@@ -39,40 +40,42 @@ outdir=scan_samp${ysuf}_$bvsuf
 # root -b -q ../AnalyzeScripts/makeBkgEstimates.C"(\"$indir\",\"$indir\",\"$ysuf\", \"extr_threshold=2.0\")" || return $?
 
 # bvsuf=v31_cor_w3
-bvsuf=v31_s12
+# bvsuf=v31_s13_noMETttbarSF
+bvsuf=v31_s15
+# bvsuf=v31_m17sync
 
 ysuf=run2
 indir=../StopLooper/output/combRun2_$bvsuf
 outdir=scan_comb${ysuf}_${bvsuf}
 
 # root -b -q fakeBkgEstimates.C"(\"$indir\",\"$indir\",\"$ysuf\")" || return $?
-# root -b -q ../AnalyzeScripts/makeBkgEstimates.C"(\"$indir\",\"$indir\",\"$ysuf\")" || return $?
-# root -b -q ../AnalyzeScripts/makeBkgEstimates.C"(\"$indir\",\"./\",\"$ysuf\",\"MetExtrFor2l=false\")" || return $?
+root -b -q ../AnalyzeScripts/makeBkgEstimates.C"(\"$indir\",\"$indir\",\"$ysuf\")" || return $?
+# root -b -q ../AnalyzeScripts/makeBkgEstimates.C"(\"$indir\",\"$indir\",\"$ysuf\",\"extrShapeFromCR=false\")" || return $?
+# root -b -q ../AnalyzeScripts/makeBkgEstimates.C"(\"$indir\",\"./\",\"$ysuf\",\"useMetExtrapolation=false\")" || return $?
 
 sigscan=T2tt
 root -b -q newCardMaker.C"(\"$sigscan\",\"$indir\",\"datacards/$outdir\",\"$ysuf\")" || return $?
-# python locallimits.py "datacards/$outdir" std_${sigscan}
+python locallimits.py "datacards/$outdir" std_${sigscan}
 python locallimits.py "datacards/$outdir" tcor_${sigscan}
 python locallimits.py "datacards/$outdir" Wcor_${sigscan}
-# root -b -q Make2DLimitHistos.C"(\"comb_${sigscan}\", \"limits/$outdir\")"
-# root -b -q Make2DLimitHistos.C"(\"std_${sigscan}\", \"limits/$outdir\")"
-# root -b -q Make2DLimitHistos.C"(\"tcor_${sigscan}\", \"limits/$outdir\")"
-# root -b -q Make2DLimitHistos.C"(\"Wcor_${sigscan}\", \"limits/$outdir\")"
-# echo -e "Limits for $sigscan in $outdir is done!\\a"
+root -b -q Make2DLimitHistos.C"(\"comb_${sigscan}\", \"limits/$outdir\")"
+root -b -q Make2DLimitHistos.C"(\"std_${sigscan}\", \"limits/$outdir\")"
+root -b -q Make2DLimitHistos.C"(\"tcor_${sigscan}\", \"limits/$outdir\")"
+root -b -q Make2DLimitHistos.C"(\"Wcor_${sigscan}\", \"limits/$outdir\")"
+echo -e "Limits for $sigscan in $outdir is done!\\a"
 # mkcp limits/$outdir/histo/* limits/$outdir/histo_scan
 
-# python locallimits.py "datacards/$outdir" srJ0_${sigscan}
-# python locallimits.py "datacards/$outdir" srJ1_${sigscan}
-# python locallimits.py "datacards/$outdir" srJ3_${sigscan}
-# python locallimits.py "datacards/$outdir" srJ4_${sigscan}
-# python locallimits.py "datacards/$outdir" srJ5_${sigscan}
+sigscan=T2bW
+root -b -q newCardMaker.C"(\"$sigscan\",\"$indir\",\"datacards/$outdir\",\"$ysuf\")" || return $?
+python locallimits.py "datacards/$outdir" std_${sigscan}
+root -b -q Make2DLimitHistos.C"(\"std_${sigscan}\", \"limits/$outdir\")"
 
-# root -b -q Make2DLimitHistos.C"(\"srJ0_${sigscan}\", \"limits/$outdir\")"
-# root -b -q Make2DLimitHistos.C"(\"srJ1_${sigscan}\", \"limits/$outdir\")"
-# root -b -q Make2DLimitHistos.C"(\"srJ3_${sigscan}\", \"limits/$outdir\")"
-# root -b -q Make2DLimitHistos.C"(\"srJ4_${sigscan}\", \"limits/$outdir\")"
-# root -b -q Make2DLimitHistos.C"(\"srJ5_${sigscan}\", \"limits/$outdir\")"
+sigscan=T2bt
+root -b -q newCardMaker.C"(\"$sigscan\",\"$indir\",\"datacards/$outdir\",\"$ysuf\")" || return $?
+python locallimits.py "datacards/$outdir" std_${sigscan}
+root -b -q Make2DLimitHistos.C"(\"std_${sigscan}\", \"limits/$outdir\")"
 
+# root -b -q systTableMaker.C"(\"T2bt\",\"../StopLooper/output/combRun2_v31_s13\",\"datacards/sigcont\",\"run2\")"
 
 # unset indir
 # unset outdir

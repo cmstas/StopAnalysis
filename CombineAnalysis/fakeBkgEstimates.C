@@ -12,6 +12,10 @@ void copyYieldHist(TFile* fin, TFile* fout, TString gentype) {
     if (strncmp (srname, skip.c_str(), skip.length()) == 0) continue;
     if (strncmp (srname, keep.c_str(), keep.length()) != 0) continue;
 
+  // for (TString srname : {"srA0", "srA1", "srB", "srC", "srD", "srE0", "srE1", "srF", "srG0", "srG1", "srH", "srI", "srJ"}) {
+  // for (TString srname : {"srA0", "srA1", "srA2", "srB", "srC", "srD", "srE0", "srE1", "srE2", "srE3", "srF", "srG0", "srG1", "srG2", "srG3", "srH", "srI", "srJ"}) {
+  // for (TString srname : {"srA1", "srA2", "srB", "srC", "srD", "srE1", "srE2", "srE3", "srF", "srG1", "srG2", "srG3", "srH", "srI", "srJ"}) {
+
     auto indir = (TDirectoryFile*) fin->Get(srname);
     auto outdir = (TDirectory*) fout->mkdir(srname);
     auto hlist = indir->GetListOfKeys();
@@ -32,6 +36,7 @@ void copyYieldHist(TFile* fin, TFile* fout, TString gentype) {
       if (scale != 1) hout->Scale(scale);
       hout->Write();
       if (hname.EndsWith("h_metbins")) hout->Clone("h_metbins_dataStats")->Write();
+      if (hname.EndsWith("h_metbins")) hout->Clone("h_metbins_MCStats")->Write();
     }
     if (!outdir->Get("h_metbins")) {
       cout << "Didn't find yield hist for " << gentype << " in " << fin->GetName() << ":" << srname << "/. Faking a 0 one!" << endl;

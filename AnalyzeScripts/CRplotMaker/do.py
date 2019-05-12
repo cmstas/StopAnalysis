@@ -145,23 +145,29 @@ def addsuff(plotset, suf):
 def makePlotsByGenCatRun2():
 
     # srNames = ['cr2lbase', 'cr0bbase']
-    srNames = ['cr2lJ3', 'cr0bJ3']
+    # srNames = ['cr2lJ3', 'cr0bJ3']
+    srNames = [ 'srsbfmt', 'srsbfull', ]
+    # srNames = [  'srsbmet+srbase+srsbmt2' ]
     # srNames = ['cr2lincl1', 'cr2lincl4J']
-    # base_plots = [("rlmet",True,None,None),]
+    base_plots = [("mt_h",True,None,None),("met_h",True,None,None),]
     # srNames = ['cr2lI', 'cr0bI', 'cr2lJ', 'cr0bJ']
 
     # bvsuf = 'v39_s6'
-    bvsuf = 'v31_s8'
-    bvsuf = 'v31_cor_w2'
+    bvsuf = 'v31_m13'
+    # bvsuf = 'v31_cor_w2'
+
+    gencats = [ '1lepTop', '1lepW', '2lep', 'Znunu',]
 
     # for ysuf in ['16', '17', '18']:
     # for ysuf in ['18']:
     for ysuf in ['run2']:
         bkg_set = ['allBkg_'+ysuf]
         dataname = 'allData_'+ysuf
+        dataname = None
         input_dir = '../../StopLooper/output/samp'+ysuf+'_'+bvsuf
         # output_dir = 'plots_'+ysuf+'_MCunscaled_'+bvsuf
-        output_dir = 'plots_'+ysuf+'_'+bvsuf
+        output_dir = 'plots_'+ysuf+'_'+bvsuf+'_nodata'
+        # output_dir = 'plots_'+ysuf+'_'+bvsuf
         if ysuf == 'run2':
             input_dir = '../../StopLooper/output/combRun2_'+bvsuf
 

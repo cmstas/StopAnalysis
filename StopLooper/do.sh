@@ -16,26 +16,26 @@ skimtype=skimmed
 
 OUTDIR18=$OUTDIR
 
-vsuf=v31_s12
+vsuf=v31_s15
 
 OUTDIR18=output/samp18_$vsuf
 OUTDIR17=output/samp17_$vsuf
 OUTDIR16=output/samp16_$vsuf
 OUTDIRRUN2=output/combRun2_$vsuf
 
-run18dat=0
-run18bkg=0
-run18sig=0
+run18dat=1
+run18bkg=1
+run18sig=1
 
-run17dat=0
-run17bkg=0
-run17sig=0
+run17dat=1
+run17bkg=1
+run17sig=1
 
-run16dat=0
-run16bkg=0
-run16sig=0
+run16dat=1
+run16bkg=1
+run16sig=1
 
-OUTDIRRUN2=""
+# OUTDIRRUN2=""
 
 function runLooperJobs {
     # [[ -d ${OUTDIR} ]] && rm -r ${OUTDIR}
@@ -44,7 +44,7 @@ function runLooperJobs {
     for SAMPLE in ${Samples[@]}; do
         # ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
         echo ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} '>&' ${LOGDIR}/log_${SAMPLE}.txt
-        eval "nohup nice -n -10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
+        eval "nohup nice -n 10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
     done
 }
 
@@ -60,6 +60,7 @@ OUTDIR=$OUTDIR18
 LOGDIR=$OUTDIR/logs
 
 declare -a Samples=(data_2018A data_2018B data_2018C data_2018D)
+# declare -a Samples=(data_2018)
 # declare -a Samples=(stopbaby)
 # declare -a Samples=(data_2018A_jetht data_2018B_jetht data_2018C_jetht data_2018D_jetht)
 # declare -a Samples=(data_2018 data_2017 data_2016)
@@ -114,6 +115,11 @@ Samples+=( SMS_T2tt_mStop250to350_f17v2_ext1_0 SMS_T2tt_mStop250to350_f17v2_ext1
 Samples+=( SMS_T2tt_mStop250to350_f17v2_ext1_3 SMS_T2tt_mStop250to350_f17v2_ext1_4 SMS_T2tt_mStop250to350_f17v2_ext1_5 )
 Samples+=( SMS_T2tt_mStop150to250_f17v2_ext1_0 SMS_T2tt_mStop150to250_f17v2_ext1_1 SMS_T2tt_mStop150to250_f17v2_ext1_2 )
 
+Samples+=( SMS_T2bW_a18v1_0 SMS_T2bW_a18v1_1 SMS_T2bW_a18v1_2 SMS_T2bW_a18v1_3 SMS_T2bW_a18v1_4 )
+Samples+=( SMS_T2bW_a18v1_5 SMS_T2bW_a18v1_6 SMS_T2bW_a18v1_7 SMS_T2bW_a18v1_8 SMS_T2bW_a18v1_9 )
+Samples+=( SMS_T2bt_a18v1_0 SMS_T2bt_a18v1_1 SMS_T2bt_a18v1_2 SMS_T2bt_a18v1_3 SMS_T2bt_a18v1_4 )
+Samples+=( SMS_T2bt_a18v1_5 SMS_T2bt_a18v1_6 )
+
 [[ $run18sig == 1 ]] && runLooperJobs
 
 ########################
@@ -129,7 +135,7 @@ OUTDIR=$OUTDIR17
 # OUTDIR=output/data17_v30_leptrig
 LOGDIR=$OUTDIR/logs
 
-# declare -a Samples=(data_2017F)
+# declare -a Samples=(data_2017)
 declare -a Samples=(data_2017B data_2017C data_2017D data_2017E data_2017F)
 # declare -a Samples=(data_2017B data_2017C data_2017D data_2017E data_2017F_09May data_2017F_31Mar)
 
@@ -183,6 +189,10 @@ Samples+=( SMS_T2tt_mStop350to400_f17v2_ext0_3 SMS_T2tt_mStop350to400_f17v2_ext0
 Samples+=( SMS_T2tt_mStop250to350_f17v2_ext0_0 SMS_T2tt_mStop250to350_f17v2_ext0_1 )
 Samples+=( SMS_T2tt_mStop250to350_f17v2_ext0_2 SMS_T2tt_mStop250to350_f17v2_ext0_3 )
 Samples+=( SMS_T2tt_mStop150to250_f17v2_ext0_0 SMS_T2tt_mStop150to250_f17v2_ext0_1 )
+
+Samples+=( SMS_T2bW_f17v2_0 SMS_T2bW_f17v2_1 SMS_T2bW_f17v2_2 SMS_T2bW_f17v2_3 )
+Samples+=( SMS_T2bW_f17v2_4 SMS_T2bW_f17v2_5 SMS_T2bW_f17v2_6 )
+Samples+=( SMS_T2bt_f17v2_0 SMS_T2bt_f17v2_1 SMS_T2bt_f17v2_2 SMS_T2bt_f17v2_3 SMS_T2bt_f17v2_4 )
 
 [[ $run17sig == 1 ]] && runLooperJobs
 
@@ -268,9 +278,12 @@ Samples+=( SMS_T2tt_mStop250to350_s16v3_0 SMS_T2tt_mStop250to350_s16v3_1 )
 Samples+=( SMS_T2tt_mStop250to350_s16v3_2 SMS_T2tt_mStop250to350_s16v3_3 )
 Samples+=( SMS_T2tt_mStop150to250_s16v3_0 SMS_T2tt_mStop150to250_s16v3_1)
 
+Samples+=( SMS_T2bW_s16v3_0 SMS_T2bW_s16v3_1 SMS_T2bW_s16v3_2 SMS_T2bW_s16v3_3 )
+Samples+=( SMS_T2bW_s16v3_4 SMS_T2bW_s16v3_5 SMS_T2bW_s16v3_6 )
+Samples+=( SMS_T2bt_s16v3_0 SMS_T2bt_s16v3_1 SMS_T2bt_s16v3_2 SMS_T2bt_s16v3_3 SMS_T2bt_s16v3_4 )
+
 # Samples+=( SMS_T2tt_400to1200_80X_0 SMS_T2tt_400to1200_80X_1 SMS_T2tt_400to1200_80X_2 )
 # Samples+=( SMS_T2tt_400to1200_80X_3 SMS_T2tt_400to1200_80X_4 )
-# Samples+=( SMS_T2bW_80X_0 SMS_T2bW_80X_1 SMS_T2bW_80X_2 SMS_T2bW_80X_3 SMS_T2bW_80X_4 )
 # Samples+=( SMS_T2bt_80X_0 SMS_T2bt_80X_1 SMS_T2bt_80X_2 SMS_T2bt_80X_3 )
 
 [[ $run16sig == 1 ]] && runLooperJobs
@@ -312,6 +325,8 @@ pushd ${OUTDIR18}
 [[ $run18bkg == 1 ]] && hadd -f allBkg_18.root   ttbar_18.root singleT_18.root Vjets_18.root rare_18.root > /dev/null
 [[ $run18dat == 1 ]] && hadd -f allData_18.root  data_2018*.root > /dev/null
 [[ $run18sig == 1 ]] && hadd -f SMS_T2tt_18.root SMS_T2tt_*to*.root > /dev/null && rm SMS_T2tt_*to*.root
+[[ $run18sig == 1 ]] && hadd -f SMS_T2bW_18.root SMS_T2bW_*_?.root > /dev/null && rm SMS_T2bW_*_?.root
+[[ $run18sig == 1 ]] && hadd -f SMS_T2bt_18.root SMS_T2bt_*_?.root > /dev/null && rm SMS_T2bt_*_?.root
 popd > /dev/null
 
 # Local merge for the v29_11+ babies
@@ -328,6 +343,8 @@ pushd ${OUTDIR17}
 # [[ $run17dat == 1 ]] && hadd -f allData_17.root  data_2017[B-E].root data_2017F_09May.root > /dev/null
 [[ $run17dat == 1 ]] && hadd -f data_2017BtoE.root data_2017[B-E].root > /dev/null
 [[ $run17sig == 1 ]] && hadd -f SMS_T2tt_17.root SMS_T2tt_*to*.root > /dev/null && rm SMS_T2tt_*to*.root
+[[ $run17sig == 1 ]] && hadd -f SMS_T2bW_17.root SMS_T2bW_*_?.root > /dev/null && rm SMS_T2bW_*_?.root
+[[ $run17sig == 1 ]] && hadd -f SMS_T2bt_17.root SMS_T2bt_*_?.root > /dev/null && rm SMS_T2bt_*_?.root
 popd > /dev/null
 
 pushd ${OUTDIR16}
@@ -340,8 +357,8 @@ pushd ${OUTDIR16}
 [[ $run16bkg == 1 ]] && hadd -f allBkg_16.root   ttbar_16.root singleT_16.root Vjets_16.root rare_16.root > /dev/null
 [[ $run16dat == 1 ]] && hadd -f allData_16.root  data_2016*.root > /dev/null
 [[ $run16sig == 1 ]] && hadd -f SMS_T2tt_16.root SMS_T2tt_*to*.root > /dev/null && rm SMS_T2tt_*to*.root
-# [[ $run16sig == 1 ]] && hadd -f SMS_T2bW_16.root SMS_T2bW_*to*.root > /dev/null
-# [[ $run16sig == 1 ]] && hadd -f SMS_T2bt_16.root SMS_T2bt_*to*.root > /dev/null
+[[ $run16sig == 1 ]] && hadd -f SMS_T2bW_16.root SMS_T2bW_*_?.root > /dev/null && rm SMS_T2bW_*_?.root
+[[ $run16sig == 1 ]] && hadd -f SMS_T2bt_16.root SMS_T2bt_*_?.root > /dev/null && rm SMS_T2bt_*_?.root
 popd > /dev/null
 
 # Make combined results

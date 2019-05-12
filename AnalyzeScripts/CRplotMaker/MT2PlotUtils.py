@@ -74,7 +74,7 @@ def GetSampleName(sample):
 
 def GetVarName(var):
     names = {"ht": "H_{T}",
-             "met": "#slash{E}_{T}",
+             "met": "E_{T}^{miss}",
              "mt2": "M_{T2}",
              "mt" : "M_{T}",
              "metbins": "#slash{E}_{T}",
@@ -160,6 +160,8 @@ def GetSubtitles(dirname):
         subtitle[2] = "2-3j, #geq 1b"
     if "incl4J" in dirname:
         subtitle[2] = "#geq 4j, #geq 1b"
+    if "sbmet+srbase" in dirname:
+        subtitle[0] = met+" > 150 GeV"
 
     return subtitle
 
