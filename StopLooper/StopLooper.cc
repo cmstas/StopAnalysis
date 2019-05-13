@@ -225,7 +225,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
   cout << "[StopLooper::looper] creating output file: " << output_name << endl;  outfile_ = new TFile(output_name.Data(),"RECREATE") ;
   cout << "Complied with C++ standard: " << __cplusplus << endl;
 
-  if (printPassedEvents) ofile.open(output_dir+"/passEventList.txt");
+  if (printPassedEvents) ofile.open(output_dir+"/passEventList_"+samplestr+".txt");
 
   if (runResTopMVA)
     resTopMVA = new ResolvedTopMVA("../StopCORE/TopTagger/resTop_xGBoost_v2.weights.xml", "BDT");
@@ -1058,7 +1058,7 @@ void StopLooper::fillYieldHistos(SR& sr, float met, string suf, bool is_cr2l) {
 
   // Block for debugging, active when setting printPassedEvents = true
   // if (printPassedEvents && sr.GetName() == "srbase" && suf == "") {
-  if (printPassedEvents && met > 450 && suf == "" && sr.GetName().find("sr") == 0) {
+  if (printPassedEvents && met > 750 && suf == "" && sr.GetName().find("sr") == 0) {
     // static bool printOnce1 = false;
     // if (!printOnce1) { for (auto& v : values_) ofile << ' ' << v.first; ofile << endl; printOnce1 = true; }
     ofile << run() << ' ' << ls() << ' ' << evt() << ' ' << sr.GetName();

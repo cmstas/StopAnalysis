@@ -2038,37 +2038,37 @@ void evtWgtInfo::getMetTTbarWeight( double &weight_metTTbar, double &weight_metT
     // cremuA1/h_rlmetbinA : Data/MC = 0.388  nData 1 = 51  nData 2 = 11
     if ( nGoodJets<4 && modTopness>=10.0 && mlb<175.0 ) {
       if ( met > 600.0 ) { sf_val = 1.072; sf_err = 0.155; }
-      if ( met > 750.0 ) { sf_val = 0.763; sf_err = 0.236; }
+      if ( met > 750.0 ) { sf_val = 0.763; sf_err = -0.236; }
     }
     // -------------------------------------------------
     // cremuA1/h_rlmetbinB : Data/MC = 0.551  nData 1 = 452  nData 2 = 21
     else if ( nGoodJets<4 && modTopness>=10.0 && mlb>175.0 && nTightTags) {
       if ( met > 450.0) { sf_val = 1.022; sf_err = 0.051; }
-      if ( met > 700.0) { sf_val = 0.681; sf_err = 0.153; }
+      if ( met > 700.0) { sf_val = 0.681; sf_err = -0.153; }
     }
     // -------------------------------------------------
     // cremuA1/h_rlmetbinC : Data/MC = 0.382  nData 1 = 33  nData 2 = 3
     else if ( nGoodJets>=4 && modTopness<0.0 && mlb<175.0 ) {
       if ( met > 650.0) { sf_val = 1.221; sf_err = 0.221; }
-      if ( met > 800.0) { sf_val = 0.335; sf_err = 0.195; }
+      if ( met > 800.0) { sf_val = 0.335; sf_err = -0.195; }
     }
     // -------------------------------------------------
     // cremuA1/h_rlmetbinE : Data/MC = 0.551  nData 1 = 411  nData 2 = 62
     else if ( nGoodJets>=4 && modTopness>=0.0 && modTopness<10.0 && mlb<175.0 ) {
       if ( met > 450.0) { sf_val = 1.068; sf_err = 0.056; }
-      if ( met > 600.0) { sf_val = 0.704; sf_err = 0.092; }
+      if ( met > 600.0) { sf_val = 0.704; sf_err = -0.092; }
     }
     // -------------------------------------------------
     // cremuA1/h_rlmetbinG : Data/MC = 0.448  nData 1 = 110  nData 2 = 11
     else if ( nGoodJets>=4 && modTopness>=10.0 && mlb<175.0 ) {
       if ( met > 550.0) { sf_val = 1.054; sf_err = 0.105; }
-      if ( met > 750.0) { sf_val = 0.661; sf_err = 0.205; }
+      if ( met > 750.0) { sf_val = 0.661; sf_err = -0.205; }
     }
     // -------------------------------------------------
     // cremuA1/h_rlmetbinH : Data/MC = 0.66  nData 1 = 9592  nData 2 = 240
     else if ( nGoodJets>=4 && modTopness>=10.0 && mlb>175.0 && nTightTags) {
       if ( met > 250.0) { sf_val = 1.007; sf_err = 0.011; }
-      if ( met > 500.0) { sf_val = 0.785; sf_err = 0.053; }
+      if ( met > 500.0) { sf_val = 0.785; sf_err = -0.053; }
     }
   }
 
@@ -2076,7 +2076,7 @@ void evtWgtInfo::getMetTTbarWeight( double &weight_metTTbar, double &weight_metT
   // cremuA1/h_rlmetbinI : Data/MC = 0.448  nData 1 = 110  nData 2 = 11
   if ( srtype >= 4 ) {
     if ( met > 550.0) { sf_val = 1.054; sf_err = 0.105; }
-    if ( met > 750.0) { sf_val = 0.661; sf_err = 0.205; }
+    if ( met > 750.0) { sf_val = 0.661; sf_err = -0.205; }
   }
   // -------------------------------------------------
   // cremuA1/h_rlmetbinJ : Data/MC = 0.551  nData 1 = 352  nData 2 = 121
