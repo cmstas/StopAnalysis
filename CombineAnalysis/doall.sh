@@ -41,7 +41,7 @@ outdir=scan_samp${ysuf}_$bvsuf
 
 # bvsuf=v31_cor_w3
 # bvsuf=v31_s13_noMETttbarSF
-bvsuf=v31_s15
+bvsuf=v31_s16
 # bvsuf=v31_m17sync
 
 ysuf=run2
@@ -55,9 +55,9 @@ root -b -q ../AnalyzeScripts/makeBkgEstimates.C"(\"$indir\",\"$indir\",\"$ysuf\"
 
 sigscan=T2tt
 root -b -q newCardMaker.C"(\"$sigscan\",\"$indir\",\"datacards/$outdir\",\"$ysuf\")" || return $?
-python locallimits.py "datacards/$outdir" std_${sigscan}
-python locallimits.py "datacards/$outdir" tcor_${sigscan}
-python locallimits.py "datacards/$outdir" Wcor_${sigscan}
+python locallimits.py "datacards/$outdir" std_${sigscan}  --runsignif # --nolimits
+python locallimits.py "datacards/$outdir" tcor_${sigscan} --runsignif # --nolimits
+python locallimits.py "datacards/$outdir" Wcor_${sigscan} --runsignif # --nolimits
 root -b -q Make2DLimitHistos.C"(\"comb_${sigscan}\", \"limits/$outdir\")"
 root -b -q Make2DLimitHistos.C"(\"std_${sigscan}\", \"limits/$outdir\")"
 root -b -q Make2DLimitHistos.C"(\"tcor_${sigscan}\", \"limits/$outdir\")"
@@ -67,12 +67,12 @@ echo -e "Limits for $sigscan in $outdir is done!\\a"
 
 sigscan=T2bW
 root -b -q newCardMaker.C"(\"$sigscan\",\"$indir\",\"datacards/$outdir\",\"$ysuf\")" || return $?
-python locallimits.py "datacards/$outdir" std_${sigscan}
+python locallimits.py "datacards/$outdir" std_${sigscan}  --runsignif # --nolimits
 root -b -q Make2DLimitHistos.C"(\"std_${sigscan}\", \"limits/$outdir\")"
 
 sigscan=T2bt
 root -b -q newCardMaker.C"(\"$sigscan\",\"$indir\",\"datacards/$outdir\",\"$ysuf\")" || return $?
-python locallimits.py "datacards/$outdir" std_${sigscan}
+python locallimits.py "datacards/$outdir" std_${sigscan}  --runsignif # --nolimits
 root -b -q Make2DLimitHistos.C"(\"std_${sigscan}\", \"limits/$outdir\")"
 
 # root -b -q systTableMaker.C"(\"T2bt\",\"../StopLooper/output/combRun2_v31_s13\",\"datacards/sigcont\",\"run2\")"

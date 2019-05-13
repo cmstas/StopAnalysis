@@ -682,7 +682,7 @@ int newCardMaker(string signal, string input_dir="../StopLooper/output/temp", st
   f1ltop = new TFile(Form("%s/1lepFromTop_%s.root",input_dir.c_str(), ysuf.c_str()));
   fznunu = new TFile(Form("%s/ZToNuNu_%s.root",input_dir.c_str(), ysuf.c_str()));
   fsig_genmet = nullptr; // don't use switched genmet signal for now
-  fsig_genmet = new TFile(Form("%s/SMS_%s_genmet_%s.root",input_dir.c_str(), signal.c_str(), ysuf.c_str()));
+  if (dogenmet) fsig_genmet = new TFile(Form("%s/SMS_%s_genmet_%s.root",input_dir.c_str(), signal.c_str(), ysuf.c_str()));
 
   if (!fakedata) fdata = new TFile(Form("%s/allData_%s.root", input_dir.c_str(), ysuf.c_str()));
   else fdata = new TFile(Form("%s/allBkg_%s.root", input_dir.c_str(), ysuf.c_str()));

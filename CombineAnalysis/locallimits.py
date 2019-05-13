@@ -5,16 +5,12 @@
 import os, sys, ROOT, array, re
 from multiprocessing.dummy import Pool as ThreadPool
 import time, random
+import argparse
 
 have_tqdm = False
 verbose = True
-dosignificances = False
+dosignif = True
 dolimits = True
-
-carddir = 'datacards/scan_temp13'
-combineddir = carddir + '/combinedcards'
-limitdir = 'limits/'+carddir.split('/')[-1]
-
 
 os.nice(10)
 
@@ -29,15 +25,30 @@ def run_asymptotic(card):
     # writing the statUp statDown crap
     time.sleep(30.0*random.random())
 
-    if verbose:
-        print 'Running limit on ', card
+    if not os.path.isfile(card): return -1
 
-    # if dosignificances:
-    #     os.system("timeout 15m combine -M ProfileLikelihood --uncapped 1 --significance --rMin -5 "+d["mydir"]+"/card_"+sig+"_"+d["mylumi"]+"ifb-all.txt >& "+d["mydir"]+"/card_"+sig+"_"+d["mylumi"]+"ifb-all_significance.log || echo 'Triggered timeout of 15m'")
+    if verbose:
+        if dolimits and dosignif:
+            print 'Running limit and significances on ', card
+        elif dolimits:
+            print 'Running limit on ', card
+        elif dosignif:
+            print 'Running significances on ', card
+
+    if dosignif:
+        logname = card[:-4]+"_signif.log"
+        masspt = 'Observed_'+re.findall(r'datacard_([A-Za-z0-9_\./\\-]*).txt', card)[0]
+        cmdstr = 'combine -M Significance '+card+' -n '+masspt+' --uncapped 1 --rMin -50 --rMax 50'
+        # os.system("echo "+cmdstr)
+        os.system("timeout 15m "+ cmdstr +" >& "+ logname +" || echo 'Job failed for '"+card+", see log at "+logname) # --run expected --noFitAsimov
+        os.system("mv higgsCombine{0}.Significance.mH120.root {1}/Significance_{0}.root".format(masspt,signifdir)) # --run expected --noFitAsimov
+
+        masspt = 'Expected_'+re.findall(r'datacard_([A-Za-z0-9_\./\\-]*).txt', card)[0]
+        cmdstr = 'combine -M Significance '+card+' -n '+masspt+' --uncapped 1 --rMin -50 --rMax 50 -t -1 --expectSignal=1'
+        os.system("timeout 15m "+ cmdstr +" >> "+ logname +" || echo 'Job failed for '"+card+", see log at "+logname) # --run expected --noFitAsimov
+        os.system("mv higgsCombine{0}.Significance.mH120.root {1}/Significance_{0}.root".format(masspt,signifdir)) # --run expected --noFitAsimov
 
     if dolimits:
-        if not os.path.isfile(card): return -1
-        # os.system(cmd)
         logname = card[:-4]+"_asym.log"
         masspt = 'PostFit_'+re.findall(r'datacard_([A-Za-z0-9_\./\\-]*).txt', card)[0]
         cmdstr = 'combine -M AsymptoticLimits '+card+' -n '+masspt
@@ -49,14 +60,24 @@ def run_asymptotic(card):
 
 if __name__ == "__main__":
 
-    if len(sys.argv) > 1:
-        carddir = sys.argv[1]
-        combineddir = carddir + '/combinedcards'
-        limitdir = 'limits/'+carddir.split('/')[-1]
+    parser = argparse.ArgumentParser('Run limits locally')
 
-    sigscan = "std_T2tt"
-    if len(sys.argv) > 2:
-        sigscan = sys.argv[2]
+    parser.add_argument('carddir')
+    parser.add_argument('sigscan', nargs='?', default='std_T2tt')
+    parser.add_argument('--runsignif', action='store_true', default=False)
+    parser.add_argument('--nolimits', action='store_true', default=False)
+
+    args = parser.parse_args()
+
+    carddir = args.carddir
+    combineddir = carddir + '/combinedcards'
+    limitdir = 'limits/'+carddir.split('/')[-1]
+    signifdir = 'significances/'+carddir.split('/')[-1]
+
+    sigscan = args.sigscan
+    dosignif = args.runsignif
+    dolimits = not args.nolimits
+    # print 'sigscan =', sigscan, ', dosignif =', dosignif, ', dolimits =', dolimits
 
     print "Doing limits from cards in ", carddir
 
@@ -81,7 +102,8 @@ if __name__ == "__main__":
         cards = [combineddir+'/'+c for c in cards]
         # print cards
 
-    os.system('mkdir -p '+limitdir)
+    if dolimits: os.system('mkdir -p '+limitdir)
+    if dosignif: os.system('mkdir -p '+signifdir)
     limits = []
     for result in pool.imap_unordered(run_asymptotic, cards):
         limits.append(result)
