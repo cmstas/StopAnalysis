@@ -1597,7 +1597,7 @@ void evtWgtInfo::getTopTaggerSF( double &wgt_ttag, double &wgt_ttag_up, double &
 
       // Now the left-over tops are gen-matched resolved tops
       int ibin = h_tfttagSF_sig->FindBin((*rtop_p4).at(itop).pt());
-      double sf  = (is_truetop)? h_tfttagSF_sig->GetBinContent(ibin) : h_tfttagSF_bkg->GetBinContent(ibin);
+      double sf  = (is_truetop)? h_tfttagSF_sig->GetBinContent(ibin) : 1.0;
       double err = (is_truetop)? h_tfttagSF_sig->GetBinError(ibin)   : h_tfttagSF_bkg->GetBinError(ibin);
 
       wgt_ttag    *= sf;
