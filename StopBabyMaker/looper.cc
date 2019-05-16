@@ -42,7 +42,8 @@
 #include "utils.h"
 #include "dorky/dorky.h"
 #include "datasetinfo/getDatasetInfo.h"
-
+#include "hemJet.h"
+#include "MT2/MT2.h"
 
 typedef ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > LorentzVector;
 
@@ -294,10 +295,14 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
   //
   bool isDataFromFileName;
   bool isSignalFromFileName;
+  bool isFastSIMFromFileName;
   bool isTChiFromFileName = false;
   string outfilestr(output_name);
   string filestr(chain->GetFile()->GetName());
-  cout << "[looper] >> The output name will be " << output_name << ".root";
+  cout << "[looper] >> The output name will be " << output_name << ".root"<<endl;
+    if(filestr.find("Fast") != std::string::npos) isFastSIMFromFileName = true;
+    else isFastSIMFromFileName = false;
+
   if (filestr.find("data") != std::string::npos) {
     isDataFromFileName = true;
     isSignalFromFileName = false;
@@ -307,8 +312,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
     isDataFromFileName = false;
     isSignalFromFileName = true;
     cout << ", running on SIGNAL, based on input file name." << endl;
-    if (filestr.find("mLSP") != std::string::npos)  // sample is probably fullsim if mLSP is fixed
-      isSignalFromFileName = false;
+    if(filestr.find("mLSP") != std::string::npos) isSignalFromFileName = false;
     if (filestr.find("TChi") != std::string::npos)
       isTChiFromFileName = true;
   }
@@ -337,9 +341,9 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
     }
 
     if (isFall17FastExt1)
-      lepsf.setup(isSignalFromFileName, 2018, "lepsf/analysisRun2_2018");
+      lepsf.setup(isFastSIMFromFileName, 2018, "lepsf/analysisRun2_2018");
     else
-      lepsf.setup(isSignalFromFileName, gconf.year, lepsf_filepath);
+      lepsf.setup(isFastSIMFromFileName, gconf.year, lepsf_filepath);
   } // end if applying lepton SFs
 
   // Setup the MET resolution correction handler
@@ -566,7 +570,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
     }
   }
   // 2016 Fastsim samples
-  else if (isSignalFromFileName){
+  else if (isFastSIMFromFileName){
     jecVer = gconf.jecEraFS;
   }
   // ICHEP16 samples
@@ -704,7 +708,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
       float mStop = -1;
       float mLSP = -1;
       //This must come before any continue affecting signal scans
-      if(isSignalFromFileName){
+      if(isSignalFromFileName && isFastsim){
         //get stop and lsp mass from sparms
         if (gconf.cmssw_ver >= 94) {  // the sparm_names no longer exists after this
           if (sparm_values().size() < 2) cout << "[looper] ERROR: Sample is determined fastsim but not having 2 sparm values!!\n";
@@ -814,6 +818,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
           }
         }
       }// is signal
+
       else if(!evt_isRealData()){
         if (StopEvt.cms3tag.find("CMS4_V1") == 0) {
           // The correctly yearly normalized gen_LHEweight branches are available since CMS4_V10-02-04
@@ -885,7 +890,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
           }
         }
       }
-
+       if(isFastsim && isSignalFromFileName && (sparm_values().at(0) !=1200 ||sparm_values().at(1) !=800) ) continue; 
       //
       // Gen Information - now goes first
       //
@@ -1064,7 +1069,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
         int useCleanedMET = 0;
         if (applyMETRecipeV2 && gconf.year == 2017) {
           useCleanedMET = 2;
-          if (!thisFile.Contains("09May2018")) {
+          if (!thisFile.Contains("09May2018") ) {
             StopEvt.pfmet_original = evt_old_pfmet_raw();
             StopEvt.pfmet_original_phi = evt_old_pfmetPhi_raw();
           }
@@ -1792,7 +1797,61 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
         StopEvt.MT2_ll_jup = CalcMT2_(StopEvt.pfmet_jup,StopEvt.pfmet_phi_jup,lep1.p4,lep2.p4,false,0);
         StopEvt.MT2_ll_jdown = CalcMT2_(StopEvt.pfmet_jdown,StopEvt.pfmet_phi_jdown,lep1.p4,lep2.p4,false,0);
       }
+      // MT2(had) <-- same as used in the all hadronic MT2 analysis
+      if(fillExtraEvtVar && nGoodLeptons==0){
+        vector<LorentzVector> p4sForHems = jets.ak4pfjets_p4;
+        vector<LorentzVector> p4sForHemsUP = jets_jup.ak4pfjets_p4;
+        vector<LorentzVector> p4sForHemsDN = jets_jdown.ak4pfjets_p4;
+        if(nVetoLeptons>0){
+          p4sForHems.push_back(lep1.p4);
+          p4sForHemsUP.push_back(lep1.p4);
+          p4sForHemsDN.push_back(lep1.p4);
+        }
+        if(nVetoLeptons>1){
+          p4sForHems.push_back(lep2.p4);
+          p4sForHemsUP.push_back(lep2.p4);
+          p4sForHemsDN.push_back(lep2.p4);
+        } // stop at 2 since jets aren't removed with additional lepton overlap
+        sort(p4sForHems.begin(), p4sForHems.end(), sortP4byPt());
+        sort(p4sForHemsUP.begin(), p4sForHemsUP.end(), sortP4byPt());
+        sort(p4sForHemsDN.begin(), p4sForHemsDN.end(), sortP4byPt());
 
+         // compute HT, MHT using same objects as MT2 inputs
+        LorentzVector sumMhtp4 = LorentzVector(0,0,0,0);
+        LorentzVector sumMhtp4UP = LorentzVector(0,0,0,0);
+        LorentzVector sumMhtp4DN = LorentzVector(0,0,0,0);
+        for (size_t ip4 = 0; ip4 < p4sForHems.size(); ++ip4) {
+          sumMhtp4 -= p4sForHems.at(ip4);
+        }
+        for (size_t ip4 = 0; ip4 < p4sForHemsUP.size(); ++ip4) {
+          sumMhtp4UP -= p4sForHemsUP.at(ip4);
+        }
+        for (size_t ip4 = 0; ip4 < p4sForHemsDN.size(); ++ip4) {
+          sumMhtp4DN -= p4sForHemsDN.at(ip4);
+        }
+        StopEvt.mht_pt  = sumMhtp4.pt();
+        StopEvt.mht_phi = sumMhtp4.phi();
+        StopEvt.mht_pt_jup  = sumMhtp4UP.pt();
+        StopEvt.mht_phi_jup = sumMhtp4UP.phi();
+        StopEvt.mht_pt_jdown  = sumMhtp4DN.pt();
+        StopEvt.mht_phi_jdown = sumMhtp4DN.phi();
+
+         // compute the hadronic MT2(s)
+        if(p4sForHems.size() > 1){
+          //Hemispheres used in MT2 calculation
+          vector<LorentzVector> hemJets = getHemJets(p4sForHems);
+          StopEvt.MT2_had = HemMT2(StopEvt.pfmet, StopEvt.pfmet_phi, hemJets.at(0), hemJets.at(1));
+          if (!isDataFromFileName) StopEvt.MT2_had_genmet = HemMT2(StopEvt.genmet, StopEvt.genmet_phi, hemJets.at(0), hemJets.at(1));
+        }
+        if(p4sForHemsUP.size() > 1){
+          vector<LorentzVector> hemJetsUP = getHemJets(p4sForHemsUP);
+          StopEvt.MT2_had_jup = HemMT2(StopEvt.pfmet_jup, StopEvt.pfmet_phi_jup, hemJetsUP.at(0), hemJetsUP.at(1));
+        }
+        if(p4sForHemsDN.size() > 1){
+          vector<LorentzVector> hemJetsDN = getHemJets(p4sForHemsDN);
+          StopEvt.MT2_had_jdown = HemMT2(StopEvt.pfmet_jdown, StopEvt.pfmet_phi_jdown, hemJetsDN.at(0), hemJetsDN.at(1));
+        }
+      }
       if(jets.ngoodjets>1){
 
         // DR(lep, leadB) with medium discriminator
@@ -1977,7 +2036,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
           topcandTreeMaker->FillTree();
         }
 
-        if(nGoodLeptons < skim_nGoodLep) continue;
+        if(nGoodLeptons < skim_nGoodLep) continue;  //only for fastsim studies
         nEvents_pass_skim_nGoodLep++;
       }
 
@@ -2542,7 +2601,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
       // Trigger Information
       //
       //std::cout << "[babymaker::looper]: filling HLT vars" << std::endl;
-      if (!isSignalFromFileName) {
+      if (!isFastSIMFromFileName) {
         if (gconf.year == 2016) {
           // Triggers that were used in Moriond17 analysis (v24)
           StopEvt.HLT_SingleEl = ( passHLTTriggerPattern("HLT_Ele25_eta2p1_WPTight_Gsf_v") || passHLTTriggerPattern("HLT_Ele27_eta2p1_WPTight_Gsf_v") ||

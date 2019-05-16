@@ -54,7 +54,7 @@ void EventTree::SetMetFilterEvents(){
 void EventTree::FillCommon (const std::string &root_file_name)
 {
     bool signal=false;
-
+    bool isfastsim = false;
     if(evt_dataset().size()>0) dataset = evt_dataset().at(0).Data();
     if(evt_CMS3tag().size()>0) cms3tag = evt_CMS3tag().at(0).Data();
     filename = root_file_name;
@@ -63,11 +63,15 @@ void EventTree::FillCommon (const std::string &root_file_name)
     string signalstr ("mStop");
     string lspstr ("mLSP");//add those for testing purpose
     string smsstr ("SMS");//add those for testing purpose
+    string simstr ("Fast");
+       
+    if (filestr.find(simstr) != string::npos) isfastsim = true;     
 
     if (filestr.find(signalstr) != string::npos) signal = true;
     else if (filestr.find(lspstr) != string::npos) signal = true;
     else if (filestr.find(smsstr) != string::npos) signal = true;
-    if (filestr.find(smsstr) != string::npos && filestr.find(lspstr) != string::npos) signal = false;
+
+   // if (filestr.find(smsstr) != string::npos && filestr.find(lspstr) != string::npos) signal = false;
     //std::cout << "run "<<evt_run()<<" lumiblock "<<evt_lumiBlock() <<" event "<<evt_event()<<" nvtxs "<<numberOfGoodVertices()<<" pfmet "<<evt_pfmet()<<" pfmetphi "<< evt_pfmetPhi()<< std::endl;
     run = evt_run();
     ls  = evt_lumiBlock();
@@ -83,9 +87,9 @@ void EventTree::FillCommon (const std::string &root_file_name)
 
     is_data = evt_isRealData();
     // the recommended met filters //
-    if(!signal){
+  //  if(!signal){
       // filt_met = (nvtxs>0) && filt_globalTightHalo2016() && filt_ecalTP() && filt_eeBadSc() && filt_hbheNoise() && filt_hbheNoiseIso();
-      filt_met = passesMETfiltersRun2(is_data);
+      filt_met = passesMETfiltersRun2(is_data,isfastsim);
 
       if (gconf.cmssw_ver == 80) {
         filt_badMuonFilter = badMuonFilterV2(); //still some problems with MC
@@ -110,7 +114,8 @@ void EventTree::FillCommon (const std::string &root_file_name)
       filt_trkPOG_tms = filt_trkPOG_toomanystripclus53X();
       filt_hbhenoise = filt_hbheNoise(); // hbheNoiseFilter_25ns();
       filt_hbheisonoise = filt_hbheNoiseIso();//hbheIsoNoiseFilter();
-      if (gconf.year == 2017 || gconf.year == 2018)
+      if ( (gconf.year == 2017 || gconf.year == 2018) && !filestr.find("SMS-T1tttt_mGluino-2000_mLSP")){
+  cout<<"FUCK"<<endl;
         filt_ecalbadcalib = filt_ecalBadCalibFilterUpdate();  // new in 94X, updated version ran over MiniAOD
     }
     
@@ -126,7 +131,7 @@ void EventTree::FillCommon (const std::string &root_file_name)
       genweights = vector<float>(cms3.genweights().begin(), cms3.genweights().begin()+ngenweights);
       genweightsID = vector<string>(cms3.genweightsID().begin(), cms3.genweightsID().begin()+std::min(cms3.genweightsID().size(), 112UL));
 
-      if(signal){
+      if(signal && isfastsim){
 	sparms_values = sparm_values();
 	for ( auto name : sparm_names() )
 	  sparms_names.push_back(name.Data());
@@ -314,6 +319,10 @@ void EventTree::Reset ()
     topnessMod_resdown     = -9999.;
     topnessMod_rl_resup    = -9999.;
     topnessMod_rl_resdown  = -9999.;
+    MT2_had                = -9999.;
+    MT2_had_jup            = -9999.;
+    MT2_had_jdown          = -9999.;
+    MT2_had_genmet         = -9999.;
     MT2_ll                 = -9999.;
     MT2_ll_jup             = -9999.;
     MT2_ll_jdown           = -9999.;
@@ -337,6 +346,13 @@ void EventTree::Reset ()
     Mlb_lead_bdiscr_lep2   = -9999.; 
     Mjjj                   = -9999.; 
     Mjjj_lep2              = -9999.; 
+    mht_pt                 = -9999.;
+    mht_pt_jup             = -9999.;
+    mht_pt_jdown           = -9999.;
+    mht_phi                = -9999.;
+    mht_phi_jup            = -9999.;
+    mht_phi_jdown          = -9999.;
+
 
     genmet_rl               = -9999.;
     genmet_phi_rl           = -9999.;
@@ -874,6 +890,17 @@ void EventTree::SetExtraVariablesBranches (TTree* tree)
     tree->Branch("MT2_lb_bqq_mass", &MT2_lb_bqq_mass);
     tree->Branch("Mjjj", &Mjjj);
     tree->Branch("Mjjj_lep2", &Mjjj_lep2);
+    tree->Branch("MT2_had", &MT2_had);
+    tree->Branch("MT2_had_genmet", &MT2_had_genmet);
+    tree->Branch("MT2_had_jup", &MT2_had_jup);
+    tree->Branch("MT2_had_jdown", &MT2_had_jdown);
+    tree->Branch("mht_pt", &mht_pt);
+    tree->Branch("mht_pt_jup", &mht_pt_jup);   
+    tree->Branch("mht_pt_jdown", &mht_pt_jdown);
+    tree->Branch("mht_phi", &mht_phi);
+    tree->Branch("mht_phi_jup", &mht_phi_jup);
+    tree->Branch("mht_phi_jdown", &mht_pt_jdown);
+
     // ** obsolete branches **
     tree->Branch("pfmet_egclean", &pfmet_egclean);
     tree->Branch("pfmet_egclean_phi", &pfmet_egclean_phi);

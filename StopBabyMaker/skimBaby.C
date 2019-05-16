@@ -64,7 +64,7 @@ int skimBaby(TString inFileName="output.root", TString outFileName="skim.root"){
   t->SetBranchAddress("pfmet_rl_jdown", &met_rl_jdown);
 
   // MT
-  float cut_mt = 150.0;
+  float cut_mt = 0.0;
   int nEvents_pass_mt=0;
       
   float mt=0.0;
@@ -84,7 +84,7 @@ int skimBaby(TString inFileName="output.root", TString outFileName="skim.root"){
   t->SetBranchAddress("mt_met_lep_rl_jdown", &mt_rl_jdown);
 
   // MinDPhi(met,j1/j2)
-  float cut_minDPhi = 0.5;
+  float cut_minDPhi = 0.0;
   int nEvents_pass_minDPhi=0;
 
   float minDPhi=0.0;
@@ -103,7 +103,17 @@ int skimBaby(TString inFileName="output.root", TString outFileName="skim.root"){
   t->SetBranchAddress("mindphi_met_j1_j2_rl_jup", &minDPhi_rl_jup);
   t->SetBranchAddress("mindphi_met_j1_j2_rl_jdown", &minDPhi_rl_jdown);
 
+  // nJets
+  float cut_njets = 2.0;
+  int nEvents_pass_njet=0;
+  
+  float njet=0.0;
+  float njet_jup=0.0;
+  float njet_jdown=0.0;
 
+  t->SetBranchAddress("ngoodjets", &ngoodjets);
+  t->SetBranchAddress("ngoodjets_jup", &ngoodjets_jup);
+  t->SetBranchAddress("ngoodjets_jdown", &ngoodjets_jdown);
 
   //
   // Output File i/o
@@ -197,6 +207,14 @@ int skimBaby(TString inFileName="output.root", TString outFileName="skim.root"){
 	minDPhi_rl_jdown<cut_minDPhi   ) continue;
 
     nEvents_pass_minDPhi++;
+
+    // nJets
+    if( njet<cut_njets &&
+	ngoodjets_jup<cut_njets &&
+	ngoodjets_jdown<cut_njets  ) continue;
+    
+    nEvents_pass_njet++;
+
 
     // Fill new tree
     t_out->Fill();

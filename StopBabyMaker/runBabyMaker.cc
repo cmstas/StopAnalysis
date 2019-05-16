@@ -101,12 +101,12 @@ int main(int argc, char **argv){
   // Skim Parameters
   //
   mylooper->skim_nvtx            = 1;
-  mylooper->skim_met             = 125;
-  mylooper->skim_met_emuEvt      = 50;
+  mylooper->skim_met             = 0;
+  mylooper->skim_met_emuEvt      = 0;
 
-  mylooper->skim_nGoodLep        = 1;
+  mylooper->skim_nGoodLep        = 0;
   mylooper->skim_goodLep_el_pt   = 20.0;
-  mylooper->skim_goodLep_el_eta  = 1.4442;
+  mylooper->skim_goodLep_el_eta  = 2.4;
   mylooper->skim_goodLep_mu_pt   = 20.0;
   mylooper->skim_goodLep_mu_eta  = 2.4;
 
@@ -120,7 +120,7 @@ int main(int argc, char **argv){
   mylooper->skim_vetoLep_mu_pt   = 5.0;
   mylooper->skim_vetoLep_mu_eta  = 2.4;
 
-  mylooper->skim_nJets           = 2;
+  mylooper->skim_nJets           = 0;
   mylooper->skim_nBJets          = 0;
   mylooper->skim_jet_pt          = 30.0;
   mylooper->skim_jet_eta         = 2.4;
@@ -146,13 +146,13 @@ int main(int argc, char **argv){
   mylooper->skim_ph_pt         = 60.0;
   mylooper->skim_ph_eta        = 2.4;
 
-  mylooper->filltaus        =  true;
-  mylooper->filltracks      =  true;
+  mylooper->filltaus        =  false;
+  mylooper->filltracks      =  false;
   mylooper->fillZll         =  false;
   mylooper->fillPhoton      =  false;
   mylooper->fillMETfilt     =  true;
   mylooper->fill2ndlep      =  false;
-  mylooper->fillExtraEvtVar =  false;
+  mylooper->fillExtraEvtVar =  true;
 
   mylooper->fillAK8         =  true;
   mylooper->fillTopTag      =  true;
