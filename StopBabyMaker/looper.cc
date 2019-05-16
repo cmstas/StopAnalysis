@@ -318,6 +318,11 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
     cout << ", running on MC, based on input file name." << endl;
   }
 
+  if((filestr.find("Fast") != std::string::npos) != isFastsim) {
+    cout << "[looper] >> WARNING: Detect difference in Fastsim flag and filename!! The babymaker may not been setup properly!" << endl;
+    isFastsim = (filestr.find("Fast") != std::string::npos);
+  }
+
   gconf.GetConfigsFromDatasetName(filestr);
   bool isFall17FastExt1 = (filestr.find("Fall17Fast") != string::npos && filestr.find("_ext1-v1") != string::npos);
 
@@ -337,9 +342,9 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
     }
 
     if (isFall17FastExt1)
-      lepsf.setup(isSignalFromFileName, 2018, "lepsf/analysisRun2_2018");
+      lepsf.setup(isFastsim , 2018, "lepsf/analysisRun2_2018");
     else
-      lepsf.setup(isSignalFromFileName, gconf.year, lepsf_filepath);
+      lepsf.setup(isFastsim , gconf.year, lepsf_filepath);
   } // end if applying lepton SFs
 
   // Setup the MET resolution correction handler
@@ -566,7 +571,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
     }
   }
   // 2016 Fastsim samples
-  else if (isSignalFromFileName){
+  else if (isFastsim){
     jecVer = gconf.jecEraFS;
   }
   // ICHEP16 samples
@@ -704,7 +709,13 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
       float mStop = -1;
       float mLSP = -1;
       //This must come before any continue affecting signal scans
-      if(isSignalFromFileName){
+      if(isSignalFromFileName && !isFastsim){
+        int posi = filestr.find("mStop-") + 6;
+        mStop = atof(filestr.substr(posi, filestr.find("_", posi) - posi).c_str());
+        posi = filestr.find("mLSP-", posi) + 5;
+        mLSP = atof(filestr.substr(posi, filestr.find("_", posi) - posi).c_str());
+      }
+      if(isSignalFromFileName && isFastsim){
         //get stop and lsp mass from sparms
         if (gconf.cmssw_ver >= 94) {  // the sparm_names no longer exists after this
           if (sparm_values().size() < 2) cout << "[looper] ERROR: Sample is determined fastsim but not having 2 sparm values!!\n";
@@ -1008,7 +1019,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
         counterhist->Fill(19,StopEvt.weight_ISR);
         counterhist->Fill(20,StopEvt.weight_ISRup);
         counterhist->Fill(21,StopEvt.weight_ISRdown);
-        if(isSignalFromFileName){
+        if(isSignalFromFileName && isFastsim){
           counterhistSig->Fill(mStop,mLSP,19,StopEvt.weight_ISR);
           counterhistSig->Fill(mStop,mLSP,20,StopEvt.weight_ISRup);
           counterhistSig->Fill(mStop,mLSP,21,StopEvt.weight_ISRdown);
@@ -2542,7 +2553,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
       // Trigger Information
       //
       //std::cout << "[babymaker::looper]: filling HLT vars" << std::endl;
-      if (!isSignalFromFileName) {
+      if (!isFastsim) {
         if (gconf.year == 2016) {
           // Triggers that were used in Moriond17 analysis (v24)
           StopEvt.HLT_SingleEl = ( passHLTTriggerPattern("HLT_Ele25_eta2p1_WPTight_Gsf_v") || passHLTTriggerPattern("HLT_Ele27_eta2p1_WPTight_Gsf_v") ||

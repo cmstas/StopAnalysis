@@ -60,14 +60,8 @@ void EventTree::FillCommon (const std::string &root_file_name)
     filename = root_file_name;
 
     std::string filestr (dataset);
-    string signalstr ("mStop");
-    string lspstr ("mLSP");//add those for testing purpose
-    string smsstr ("SMS");//add those for testing purpose
+    if (filestr.find("Fast") != string::npos) fastsim = true;
 
-    if (filestr.find(signalstr) != string::npos) fastsim = true;
-    else if (filestr.find(lspstr) != string::npos) fastsim = true;
-    else if (filestr.find(smsstr) != string::npos) fastsim = true;
-    if (filestr.find(smsstr) != string::npos && filestr.find(lspstr) != string::npos) fastsim = false;
     //std::cout << "run "<<evt_run()<<" lumiblock "<<evt_lumiBlock() <<" event "<<evt_event()<<" nvtxs "<<numberOfGoodVertices()<<" pfmet "<<evt_pfmet()<<" pfmetphi "<< evt_pfmetPhi()<< std::endl;
     run = evt_run();
     ls  = evt_lumiBlock();
