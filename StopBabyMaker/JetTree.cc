@@ -706,13 +706,9 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx, Factorize
     }
 
     // Fill info for soft b-tags
+    nsoftbtags = 0;
     for (size_t i=0; i<svs_p4().size(); i++) {
-
       if (svs_p4().at(i).Pt() >= 20.0) continue;
-      if (svs_nTrks().at(i) < 3) continue;
-      if (svs_distXYval().at(i) >= 3.0) continue;
-      if (svs_dist3Dsig().at(i) <= 4.0) continue;
-      if (cos(svs_anglePV().at(i)) <= 0.98) continue;
 
       bool failDR = false;
       for (size_t j=0; j<ak4pfjets_p4.size(); j++) {
@@ -724,11 +720,21 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx, Factorize
 
       if (failDR) continue;
 
-      softtags_p4.push_back( svs_p4().at(i) );
+      bool passID = true;
+      if (svs_nTrks().at(i) < 3) passID = false;
+      if (svs_distXYval().at(i) >= 3.0) passID = false;
+      if (svs_dist3Dsig().at(i) <= 4.0) passID = false;
+      if (cos(svs_anglePV().at(i)) <= 0.98) passID = false;
 
+      scndvtxs_p4.push_back( svs_p4().at(i) );
+      scndvtxs_passSofttag.push_back( passID );
+
+      if (passID) {
+        softtags_p4.push_back( svs_p4().at(i) );
+        nsoftbtags++;
+      }
     } // end loop over SVs
 
-    nsoftbtags = softtags_p4.size();
 }
         
 // fill info for ak8pfjets
@@ -965,6 +971,8 @@ void JetTree::Reset ()
     lead_ak8deepdisc_top = -1;
  
     softtags_p4.clear();
+    scndvtxs_p4.clear();
+    scndvtxs_passSofttag.clear();
 
     ak4genjets_p4.clear();
  
@@ -1026,6 +1034,8 @@ void JetTree::SetAK4Branches (TTree* tree)
     tree->Branch(Form("%sak4genjets_p4", prefix_.c_str()) , &ak4genjets_p4); 
 
     tree->Branch(Form("%ssofttags_p4", prefix_.c_str()) , &softtags_p4);
+    tree->Branch(Form("%sscndvtxs_p4", prefix_.c_str()) , &scndvtxs_p4);
+    tree->Branch(Form("%sscndvtxs_passSofttag", prefix_.c_str()) , &scndvtxs_passSofttag);
     tree->Branch(Form("%snsoftbtags", prefix_.c_str()) , &nsoftbtags);
 }
 

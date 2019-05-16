@@ -180,6 +180,8 @@ public:
  
     // soft btag
     vecLorentzVector softtags_p4;
+    vecLorentzVector scndvtxs_p4;
+    vecb scndvtxs_passSofttag;
     int nsoftbtags;
 
     // resolved top tagger -- BDT version
