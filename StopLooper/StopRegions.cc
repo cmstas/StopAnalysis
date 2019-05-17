@@ -324,24 +324,29 @@ std::vector<SR> getStopCrosscheckRegionsEMuRun2() {
   cr.SetVar(nbjet, 2, 3);
   CRvec.emplace_back(cr);
 
-  cr.SetName("cremuB1");
+  cr.SetName("cremuB2");
   cr.SetDetailName("2to3j_ge1b_met50toInf");
   cr.SetVar(njet, 2, 4);
   cr.SetVar(nbjet, 1, fInf);
   CRvec.emplace_back(cr);
 
-  cr.SetName("cremuB2");
+  cr.SetName("cremuB3");
+  cr.SetDetailName("ge3j_ge1b_met50toInf");
+  cr.SetVar(njet, 3, fInf);
+  cr.SetVar(nbjet, 1, fInf);
+  CRvec.emplace_back(cr);
+
+  cr.SetName("cremuB4");
   cr.SetDetailName("ge4j_ge1b_met50toInf");
   cr.SetVar(njet, 4, fInf);
   cr.SetVar(nbjet, 1, fInf);
   CRvec.emplace_back(cr);
 
-  cr.SetName("cremuB3");
+  cr.SetName("cremuB5");
   cr.SetDetailName("ge5j_ge1b_met50toInf");
   cr.SetVar(njet, 5, fInf);
   cr.SetVar(nbjet, 1, fInf);
   CRvec.emplace_back(cr);
-
 
   // cr = crbase;
   // cr.SetName("cremuM1");
