@@ -112,13 +112,26 @@ echo ----------------------------------------------
 echo -e "\n--- end running ---\n" #                             <----- section division
 
 # Copy back the output file
-for mergeout in ${OUTPUTNAME}*.root; do
-    gfal-copy -p -f -t 4200 --verbose file://`pwd`/$mergeout gsiftp://gftp.t2.ucsd.edu${mergeout_folder}/${mergeout} --checksum ADLER32
-done
+if [[ $(hostname) == "uaf"* ]]; then
+    for mergeout in ${OUTPUTNAME}*.root; do
+        echo cp $mergeout ${mergeout_folder}/${mergeout}
+        cp $mergeout ${mergeout_folder}/${mergeout}
+    done
+    for skimout in skimmed_*.root; do
+        echo cp $skimout ${skimout_folder}/${skimout:8}
+        cp $skimout ${skimout_folder}/${skimout:8}
+        gfal-copy -p -f -t 4200 --verbose file://`pwd`/$skimout gsiftp://gftp.t2.ucsd.edu${skimout_folder}/${skimout:8} --checksum ADLER32
+    done
+else
+    export LD_PRELOAD=/usr/lib64/gfal2-plugins//libgfal_plugin_xrootd.so # needed in cmssw versions later than 9_3_X
+    for mergeout in ${OUTPUTNAME}*.root; do
+        gfal-copy -p -f -t 4200 --verbose file://`pwd`/$mergeout gsiftp://gftp.t2.ucsd.edu${mergeout_folder}/${mergeout} --checksum ADLER32
+    done
 
-for skimout in skimmed_*.root; do
-    gfal-copy -p -f -t 4200 --verbose file://`pwd`/$skimout gsiftp://gftp.t2.ucsd.edu${skimout_folder}/${skimout:8} --checksum ADLER32
-done
+    for skimout in skimmed_*.root; do
+        gfal-copy -p -f -t 4200 --verbose file://`pwd`/$skimout gsiftp://gftp.t2.ucsd.edu${skimout_folder}/${skimout:8} --checksum ADLER32
+    done
+fi
 
 echo -e "\n--- cleaning up ---\n" #                             <----- section division
 rm -r *.root
