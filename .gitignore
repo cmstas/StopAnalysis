@@ -5,4 +5,5 @@
 *.cxx
 *.in
 *.out
-Output
+*.pdf
+output

@@ -57,8 +57,11 @@ inline TString MakeOutputDir(TString dir){
   return dir;
 }
 
+TString sigtype;
 
 void Make2DLimitHistos(TString signaltype="std_T2tt", TString indir="limits", bool prefit=false){
+
+  sigtype = signaltype;
 
   TH1D *hxsec;
   // TFile *fxsec = new TFile("xsec_stop_13TeV.root","READ");
@@ -434,7 +437,6 @@ TH2F* InterpolateThisHistogramNew(TH2F *hold/*, TH2F* hnew*/){
       float rnew = hnew->GetBinContent(x,y);
       // if (fabs(xval-yval-175) < 10 && yval < 450) {
       if (fabs(xval-yval-175) < 15 && yval < 450 && rold > 1 && rnew < 1) {
-        // cout << __LINE__ << ": xval= " << xval << ", yval= " << yval << ", rold= " << rold << ", rnew= " << rnew << endl;
         rnew = rold;
       }
       h->SetBinContent(x,y,rnew);
@@ -540,31 +542,99 @@ TGraph* GetContour(TGraph2D *g, TString name, TGraph *gempty){
     }
   }
 
-  cout << __LINE__ << ": gnew->GetN()= " << gnew->GetN() << endl;
   double x,y;
   double px,py;
   for (int i = 0; i < gnew->GetN(); ++i) {
     gnew->GetPoint(i,x,y);
-    // ggnew->SetPoint(gnew->GetN(), x, y);
     double dm = x-y;
-    if (dm < 120 && x > 400) {
-      gnew->RemovePoint(i--);
-    }
     auto apprpt = [&](double a, double b) {
       return fabs(x-a) < 2 && fabs(y-b) < 2;
     };
-    // if (fabs(dm-175) < 15 && x < 550) {
-    //   gnew->SetPoint(i,425,250);
-    // }
-    // if (apprpt(550, 356) || apprpt(543, 351) || apprpt(531, 376) || apprpt(524, 369)
-    //     || apprpt(519, 327) || apprpt(523, 331)  || apprpt(531, 381)  || apprpt(523, 368)) {
-    //   gnew->RemovePoint(i--);
-    // }
-    if (apprpt(589, 435)) gnew->RemovePoint(i--);
-    if (apprpt(595, 430)) gnew->RemovePoint(i--);
-    if (apprpt(562, 372)) gnew->SetPoint(i,425,250);
-    if (apprpt(612, 416)) gnew->SetPoint(i,425,250);
+    if (sigtype == "comb_T2tt") {
+      if (name == "gObs") {
+        if (apprpt(608, 508)) gnew->RemovePoint(i--);
+        if (apprpt(593, 481)) gnew->RemovePoint(i--);
+        if (apprpt(651, 473)) gnew->RemovePoint(i--);
+        if (apprpt(687, 460)) gnew->SetPoint(i,670,465);
+        if (apprpt(689, 462)) gnew->SetPoint(i,685,472);
+        if (apprpt(688, 486)) gnew->SetPoint(i,700,475);
+        if (apprpt(612, 418)) {
+          // gnew->InsertPointBefore(i++,450+5,300-5);
+          gnew->InsertPointBefore(i++,450-4,275+6);
+          gnew->InsertPointBefore(i++,450-5,275-5);
+          gnew->InsertPointBefore(i++,450+6,275-4);
+          // gnew->InsertPointBefore(i++,475+5,275+5);
+        }
+        if (dm < 250 && dm > 210 && x > 640 && x < 780) {
+          if (dm < 225 || dm > 235) gnew->RemovePoint(i--);
+        }
+      } else if (name== "gObs1m") {
+        if (apprpt(596, 496)) gnew->RemovePoint(i--);
+        if (apprpt(645, 480)) gnew->RemovePoint(i--);
+        if (x> 657 && x< 672) gnew->RemovePoint(i--);
+        if (apprpt(612, 418)) {
 
+          gnew->InsertPointBefore(i++,412-4,237+6);
+          gnew->InsertPointBefore(i++,412-5,237-5);
+          gnew->InsertPointBefore(i++,412+6,237-4);
+        }
+        if (dm < 250 && dm > 210 && x > 640 && x < 780) {
+          if (dm < 225 || dm > 235) gnew->RemovePoint(i--);
+        }
+      } else if (name== "gObs1p") {
+        if (apprpt(596, 496)) gnew->RemovePoint(i--);
+        if (apprpt(645, 480)) gnew->RemovePoint(i--);
+        if (apprpt(1163, 645)) gnew->RemovePoint(i--);
+        if (x> 657 && x< 672) gnew->RemovePoint(i--);
+        if (apprpt(612, 418)) {
+          gnew->InsertPointBefore(i++,450-4,275+6);
+          gnew->InsertPointBefore(i++,450-5,275-5);
+          gnew->InsertPointBefore(i++,450+6,275-4);
+        }
+        if (dm < 250 && dm > 210 && x > 640 && x < 780) {
+          if (dm < 225 || dm > 235) gnew->RemovePoint(i--);
+        }
+      } else if (name == "gExp") {
+        if (apprpt(665, 565)) gnew->RemovePoint(i--);
+        if (apprpt(640, 510)) gnew->SetPoint(i,640,500);
+        if (apprpt(685, 465)) gnew->SetPoint(i,678,470);
+        if (apprpt(662, 463)) {
+          gnew->InsertPointBefore(i++,625+5,475-5);
+          gnew->InsertPointBefore(i++,600+5,450-5);
+          gnew->InsertPointBefore(i++,575+5,425-5);
+          gnew->InsertPointBefore(i++,425-4,250+6);
+          gnew->InsertPointBefore(i++,425-5,250-5);
+          gnew->InsertPointBefore(i++,425+6,250-4);
+        }
+      } else if (name == "gExp1m") {
+        // if (apprpt(689, 534)) gnew->RemovePoint(i--);
+        if (apprpt(696, 528)) gnew->RemovePoint(i--);
+        if (apprpt(700, 525)) gnew->RemovePoint(i--);
+        if (apprpt(712, 592)) gnew->RemovePoint(i--);
+        if (apprpt(662, 468)) {
+          gnew->InsertPointBefore(i++,625-3,465+3);
+          gnew->InsertPointBefore(i++,600+3,440+3);
+          gnew->InsertPointBefore(i++,475-4,300+6);
+          gnew->InsertPointBefore(i++,475-5,300-5);
+          gnew->InsertPointBefore(i++,475+6,300-4);
+          gnew->InsertPointBefore(i++,650+5,450+5);
+        }
+      } else if (name == "gExp1p") {
+        if (apprpt(597, 497)) gnew->RemovePoint(i--);
+        if (apprpt(605, 419)) gnew->RemovePoint(i--);
+        if (apprpt(587, 485)) gnew->RemovePoint(i--);
+        if (apprpt(542, 408)) gnew->RemovePoint(i--);
+        if (apprpt(562, 365)) {
+          gnew->InsertPointBefore(i++,525-3,365+3);
+          gnew->InsertPointBefore(i++,475+3,312+3);
+          gnew->InsertPointBefore(i++,400-4,225+6);
+          gnew->InsertPointBefore(i++,400-0,225-0);
+          gnew->InsertPointBefore(i++,400+6,225-4);
+          gnew->InsertPointBefore(i++,487+5,287+5);
+          gnew->InsertPointBefore(i++,550+5,350+5);
+        }
+      }
+    }
     px = x; py = y;
   }
 

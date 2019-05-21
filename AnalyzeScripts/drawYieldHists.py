@@ -1020,7 +1020,7 @@ if __name__ == '__main__':
 
     r.gROOT.SetBatch(1)
 
-    bvsuf = 'v31_s15'
+    bvsuf = 'v31_s17'
     indir = '../StopLooper/output/combRun2_'+bvsuf
     indir16 = '../StopLooper/output/samp16_'+bvsuf
 
@@ -1037,7 +1037,7 @@ if __name__ == '__main__':
     # drawBkgPredictionStack(indir, srNames, 'Results_prefit_run2_noJ_s8.pdf', 'run2', plotData='allData_run2')
     # drawBkgPredictionStack(indir, srNames, 'Results_prefit_run2_all_s12.pdf', 'run2', plotData='allData_run2')
     # drawBkgPredictionStack(indir, srNames, 'Results_prefit_test2_s12.pdf', 'run2', plotData='allData_run2')
-    drawBkgPredictionStack(indir, srNames, 'Results_prefit_test_s15.pdf', 'run2', plotData='allData_run2', drawTextPad=True)
+    drawBkgPredictionStack(indir, srNames, 'Results_prefit_test_s17.pdf', 'run2', plotData='allData_run2', drawTextPad=True)
 
     bkgnames = ['2l', '1lW', 'znunu',  '1ltop',]
     systnames = ['jes', 'metTTbar', ]

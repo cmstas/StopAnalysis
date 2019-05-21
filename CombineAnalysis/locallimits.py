@@ -35,26 +35,33 @@ def run_asymptotic(card):
         elif dosignif:
             print 'Running significances on ', card
 
+    sigpoint = re.findall(r'datacard_([A-Za-z0-9_\./\\-]*).txt', card)[0]
+
     if dosignif:
         logname = card[:-4]+"_signif.log"
-        masspt = 'Observed_'+re.findall(r'datacard_([A-Za-z0-9_\./\\-]*).txt', card)[0]
+        masspt = 'Observed_'+sigpoint
         cmdstr = 'combine -M Significance '+card+' -n '+masspt+' --uncapped 1 --rMin -50 --rMax 50'
         # os.system("echo "+cmdstr)
-        os.system("timeout 15m "+ cmdstr +" >& "+ logname +" || echo 'Job failed for '"+card+", see log at "+logname) # --run expected --noFitAsimov
-        os.system("mv higgsCombine{0}.Significance.mH120.root {1}/Significance_{0}.root".format(masspt,signifdir)) # --run expected --noFitAsimov
+        os.system("timeout 15m "+ cmdstr +" >& "+ logname +" || echo 'Job failed for '"+card+", see log at "+logname)
+        os.system("mv higgsCombine{0}.Significance.mH120.root {1}/Significance_{0}.root".format(masspt,signifdir))
 
-        masspt = 'Expected_'+re.findall(r'datacard_([A-Za-z0-9_\./\\-]*).txt', card)[0]
+        masspt = 'ExpPriori_'+sigpoint
         cmdstr = 'combine -M Significance '+card+' -n '+masspt+' --uncapped 1 --rMin -50 --rMax 50 -t -1 --expectSignal=1'
-        os.system("timeout 15m "+ cmdstr +" >> "+ logname +" || echo 'Job failed for '"+card+", see log at "+logname) # --run expected --noFitAsimov
-        os.system("mv higgsCombine{0}.Significance.mH120.root {1}/Significance_{0}.root".format(masspt,signifdir)) # --run expected --noFitAsimov
+        os.system("timeout 15m "+ cmdstr +" >> "+ logname +" || echo 'Job failed for '"+card+", see log at "+logname)
+        os.system("mv higgsCombine{0}.Significance.mH120.root {1}/Significance_{0}.root".format(masspt,signifdir))
+
+        masspt = 'ExpPosteriori_'+sigpoint
+        cmdstr = 'combine -M Significance '+card+' -n '+masspt+' --uncapped 1 --rMin -50 --rMax 50 -t -1 --expectSignal=1 --toysFreq'
+        os.system("timeout 15m "+ cmdstr +" >> "+ logname +" || echo 'Job failed for '"+card+", see log at "+logname)
+        os.system("mv higgsCombine{0}.Significance.mH120.root {1}/Significance_{0}.root".format(masspt,signifdir))
 
     if dolimits:
         logname = card[:-4]+"_asym.log"
-        masspt = 'PostFit_'+re.findall(r'datacard_([A-Za-z0-9_\./\\-]*).txt', card)[0]
+        masspt = 'PostFit_'+sigpoint
         cmdstr = 'combine -M AsymptoticLimits '+card+' -n '+masspt
         # cmdstr = 'combine -M Asymptotic --freezeNuisances all '+card+' -n '+masspt
-        os.system("timeout 25m "+ cmdstr +" >& "+ logname +" || echo 'Job failed for '"+card+", see log at "+logname) # --run expected --noFitAsimov
-        os.system("mv higgsCombine{0}.AsymptoticLimits.mH120.root {1}/Limits_Asymptotic_{0}.root".format(masspt,limitdir)) # --run expected --noFitAsimov
+        os.system("timeout 25m "+ cmdstr +" >& "+ logname +" || echo 'Job failed for '"+card+", see log at "+logname)
+        os.system("mv higgsCombine{0}.AsymptoticLimits.mH120.root {1}/Limits_Asymptotic_{0}.root".format(masspt,limitdir))
         return logname
 
 

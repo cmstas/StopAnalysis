@@ -642,7 +642,7 @@ if __name__ == '__main__':
     indir16 = '../StopLooper/output/samp16_'+bvsuf
     # makePredictionTable(indir16, srNames, '16', True)
 
-    bvsuf = 'v31_s15'
+    bvsuf = 'v31_s18'
     indir = '../StopLooper/output/combRun2_'+bvsuf
     # makeBkgEstimateTablesLostLepton(indir)
     # makeBkgEstimateTables1LepFromW(indir)

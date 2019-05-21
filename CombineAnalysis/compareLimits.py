@@ -85,8 +85,8 @@ def compareSkimsCorridor():
     # fnum = r.TFile('limits/scan_combrun2_v31_m17almtt/histo/Limits2DHistograms_std_T2tt_prefit.root')
     # fden = r.TFile('limits/scan_combrun2_v31_m17sync/histo/Limits2DHistograms_std_T2tt_prefit.root')
 
-    fnum = r.TFile('limits/scan_combrun2_v31_s14/histo/Limits2DHistograms_comb_T2tt_postfit.root')
-    fden = r.TFile('limits/scan_combrun2_v31_s14/histo_org/Limits2DHistograms_comb_T2tt_prefit.root')
+    fnum = r.TFile('limits/scan_combrun2_v31_s18/histo/Limits2DHistograms_comb_T2tt_postfit.root')
+    fden = r.TFile('limits/scan_combrun2_v31_s17/histo/Limits2DHistograms_comb_T2tt_postfit.root')
 
     hden = fden.Get('hExpOrg')
     hnum = fnum.Get('hExpOrg')
@@ -106,7 +106,8 @@ def compareSkimsCorridor():
 
     # hrat.SetTitle('W corridor vs Standard')
     # hrat.SetTitle('New MET bins vs Moriond 17 binning')
-    hrat.SetTitle('full-split vs run2 strategy')
+    # hrat.SetTitle('full-split vs run2 strategy')
+    hrat.SetTitle('softb >5 Gev vs >0 GeV')
     # hrat.SetTitle(' ge3j(num) vs ge5j(den)')
     hrat.SetMarkerSize(0.56)
     # hrat.SetTitle('2016 Corridor vs Standard')
@@ -114,11 +115,11 @@ def compareSkimsCorridor():
     hrat.Draw('textsame')
 
     # c1.Print('temp_c5vsc3_scan.pdf')
-    c1.Print('temp_s14newvss14_scan.pdf')
+    c1.Print('temp_s18vss17_scan.pdf')
 
 def getPassesLimit():
 
-    fnum = r.TFile('limits/scan_combrun2_v31_s13/histo/Limits2DHistograms_comb_T2tt_prefit.root')
+    fnum = r.TFile('limits/scan_combrun2_v31_s17/histo/Limits2DHistograms_comb_T2tt_postfit.root')
     # fnum = r.TFile('limits/scan_combrun2_v31_s13/histo/Limits2DHistograms_std_T2tt_prefit.root')
 
     # hden = fnum.Get('hExpOrg')
@@ -148,7 +149,7 @@ def getPassesLimit():
     hden.GetXaxis().SetRangeUser(150, 1500)
     # hrat.SetTitle('W corridor vs Standard')
     # hrat.SetTitle('New MET bins vs Moriond 17 binning')
-    hden.SetTitle('T2tt combined observed exclusion decision')
+    hden.SetTitle('T2tt observed expected exclusion decision')
     # hrat.SetTitle(' ge3j(num) vs ge5j(den)')
     hden.SetMarkerSize(0.50)
     hnum.GetZaxis().SetLabelSize(0)
@@ -160,7 +161,7 @@ def getPassesLimit():
     hden.Draw('textsame')
 
     # c1.Print('temp_c5vsc3_scan.pdf')
-    c1.Print('temp_pass_T2tt_comb_exp.pdf')
+    c1.Print('temp_pass_T2tt_obs_s17.pdf')
 
 
 def printSigCont():

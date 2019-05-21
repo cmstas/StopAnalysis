@@ -68,7 +68,7 @@ TFile *fsig_genmet;
 vector<string> systNames_sig = {"jes16", "jes17", "jes18", "ISR", "lepFSSF", "bTagFSEff"}; //  "q2" <-- fix this
 vector<string> systNames_corr = {"bTagEffHF16", "bTagEffHF17", "bTagEffHF18", "bTagEffLF16", "bTagEffLF17", "bTagEffLF18", "lepSF",
                                  "pdf", "q2", "jes16", "jes17", "jes18", "ISR16", "pileup16", "pileup17", "pileup18",
-                                 "alphas", "metRes16", "metRes17", "metRes18", "L1prefire", "ttagSF", "softbSF"};
+                                 "alphas", "metRes16", "metRes17", "metRes18", "L1prefire", "ttagSF", "softbSF16", "softbSF17", "softbSF18"};
 
 // individual systematic uncertainties for different backgrounds
 // vector<string> systNames_bg2l = {"metRes", "ttbarSysPt", "tauSF"};
@@ -515,8 +515,8 @@ int makeCardForOneBin(TString dir, int mstop, int mlsp, int metbin, int bin, TSt
 
     if (correlated) {
       for (auto syst : systNames_corr) {
-        if (syst == "ttagSF" && !dir.EndsWith("2") && !dir.EndsWith("3")) continue;
-        if (syst == "softbSF" && !dir.EndsWith("J")) continue;
+        if (syst.find("ttagSF") == 0 && !dir.EndsWith("2") && !dir.EndsWith("3")) continue;
+        if (syst.find("softbSF") == 0 && !dir.EndsWith("J")) continue;
 
         string suf = "SystBG";
         if (std::find(systNames_sig.begin(), systNames_sig.end(), syst) == systNames_sig.end() && syst != "pdf" && syst != "alphas" && syst != "ISR16") {
@@ -530,8 +530,8 @@ int makeCardForOneBin(TString dir, int mstop, int mlsp, int metbin, int bin, TSt
         // bgZnunu <-- uses both up and dn err for Znunu bkg until otherwise instructed
         getUncertainties(uperr[4], dnerr[4], bgznunu, fznunu, hname_Z + syst.c_str(), metbin);
 
-        if (syst == "ttagSF" && dir.EndsWith("2")) syst = "merttagSF";
-        if (syst == "ttagSF" && dir.EndsWith("3")) syst = "resttagSF";
+        if (syst.find("ttagSF") == 0 && dir.EndsWith("2")) syst = "mer"+syst;
+        if (syst.find("ttagSF") == 0 && dir.EndsWith("3")) syst = "res"+syst;
         numnuis += addCorrelatedUnc(fLogStream, syst+suf, dnerr, uperr, -1, "lnN");
       }
     } else {
@@ -630,7 +630,7 @@ void makeCardsForPoint(TString signal, int mstop, int mlsp, TString outdir) {
 
 // -------------------------------------------------------------------------------------------------------------------
 // Make cards for a single mass point
-void newCardMaker(string signal = "T2tt", int mStop = 800, int mLSP = 400, string input_dir="../StopLooper/output/combRun2_v31_s15", string output_dir="datacards/temp", string ysuf="run2") {
+void newCardMaker(string signal = "T2tt", int mStop = 500, int mLSP = 400, string input_dir="../StopLooper/output/combRun2_v31_s17", string output_dir="datacards/temp", string ysuf="run2") {
   cout << "Making cards for single mass point: " << signal << endl;
   system(Form("mkdir -p %s", output_dir.c_str()));
 
