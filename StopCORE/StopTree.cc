@@ -24,6 +24,8 @@ void StopTree::Init(TTree *tree) {
   if (ak4genjets_p4_branch) ak4genjets_p4_branch->SetAddress(&ak4genjets_p4_);
   softtags_p4_branch = tree->GetBranch("softtags_p4");
   if (softtags_p4_branch) softtags_p4_branch->SetAddress(&softtags_p4_);
+  scndvtxs_p4_branch = tree->GetBranch("scndvtxs_p4");
+  if (scndvtxs_p4_branch) scndvtxs_p4_branch->SetAddress(&scndvtxs_p4_);
   jup_ak4pfjets_p4_branch = tree->GetBranch("jup_ak4pfjets_p4");
   if (jup_ak4pfjets_p4_branch) jup_ak4pfjets_p4_branch->SetAddress(&jup_ak4pfjets_p4_);
   jup_ak4pfjets_leadMEDbjet_p4_branch = tree->GetBranch("jup_ak4pfjets_leadMEDbjet_p4");
@@ -34,6 +36,8 @@ void StopTree::Init(TTree *tree) {
   if (jup_ak4genjets_p4_branch) jup_ak4genjets_p4_branch->SetAddress(&jup_ak4genjets_p4_);
   jup_softtags_p4_branch = tree->GetBranch("jup_softtags_p4");
   if (jup_softtags_p4_branch) jup_softtags_p4_branch->SetAddress(&jup_softtags_p4_);
+  jup_scndvtxs_p4_branch = tree->GetBranch("jup_scndvtxs_p4");
+  if (jup_scndvtxs_p4_branch) jup_scndvtxs_p4_branch->SetAddress(&jup_scndvtxs_p4_);
   jdown_ak4pfjets_p4_branch = tree->GetBranch("jdown_ak4pfjets_p4");
   if (jdown_ak4pfjets_p4_branch) jdown_ak4pfjets_p4_branch->SetAddress(&jdown_ak4pfjets_p4_);
   jdown_ak4pfjets_leadMEDbjet_p4_branch = tree->GetBranch("jdown_ak4pfjets_leadMEDbjet_p4");
@@ -44,6 +48,8 @@ void StopTree::Init(TTree *tree) {
   if (jdown_ak4genjets_p4_branch) jdown_ak4genjets_p4_branch->SetAddress(&jdown_ak4genjets_p4_);
   jdown_softtags_p4_branch = tree->GetBranch("jdown_softtags_p4");
   if (jdown_softtags_p4_branch) jdown_softtags_p4_branch->SetAddress(&jdown_softtags_p4_);
+  jdown_scndvtxs_p4_branch = tree->GetBranch("jdown_scndvtxs_p4");
+  if (jdown_scndvtxs_p4_branch) jdown_scndvtxs_p4_branch->SetAddress(&jdown_scndvtxs_p4_);
   genleps_p4_branch = tree->GetBranch("genleps_p4");
   if (genleps_p4_branch) genleps_p4_branch->SetAddress(&genleps_p4_);
   genleps_motherp4_branch = tree->GetBranch("genleps_motherp4");
@@ -625,6 +631,8 @@ void StopTree::Init(TTree *tree) {
   if (ak4pfjets_parton_flavor_branch) ak4pfjets_parton_flavor_branch->SetAddress(&ak4pfjets_parton_flavor_);
   ak4pfjets_hadron_flavor_branch = tree->GetBranch("ak4pfjets_hadron_flavor");
   if (ak4pfjets_hadron_flavor_branch) ak4pfjets_hadron_flavor_branch->SetAddress(&ak4pfjets_hadron_flavor_);
+  scndvtxs_passSofttag_branch = tree->GetBranch("scndvtxs_passSofttag");
+  if (scndvtxs_passSofttag_branch) scndvtxs_passSofttag_branch->SetAddress(&scndvtxs_passSofttag_);
   nsoftbtags_branch = tree->GetBranch("nsoftbtags");
   if (nsoftbtags_branch) nsoftbtags_branch->SetAddress(&nsoftbtags_);
   jup_nskimjets_branch = tree->GetBranch("jup_nskimjets");
@@ -671,6 +679,8 @@ void StopTree::Init(TTree *tree) {
   if (jup_ak4pfjets_parton_flavor_branch) jup_ak4pfjets_parton_flavor_branch->SetAddress(&jup_ak4pfjets_parton_flavor_);
   jup_ak4pfjets_hadron_flavor_branch = tree->GetBranch("jup_ak4pfjets_hadron_flavor");
   if (jup_ak4pfjets_hadron_flavor_branch) jup_ak4pfjets_hadron_flavor_branch->SetAddress(&jup_ak4pfjets_hadron_flavor_);
+  jup_scndvtxs_passSofttag_branch = tree->GetBranch("jup_scndvtxs_passSofttag");
+  if (jup_scndvtxs_passSofttag_branch) jup_scndvtxs_passSofttag_branch->SetAddress(&jup_scndvtxs_passSofttag_);
   jup_nsoftbtags_branch = tree->GetBranch("jup_nsoftbtags");
   if (jup_nsoftbtags_branch) jup_nsoftbtags_branch->SetAddress(&jup_nsoftbtags_);
   jdown_nskimjets_branch = tree->GetBranch("jdown_nskimjets");
@@ -717,6 +727,8 @@ void StopTree::Init(TTree *tree) {
   if (jdown_ak4pfjets_parton_flavor_branch) jdown_ak4pfjets_parton_flavor_branch->SetAddress(&jdown_ak4pfjets_parton_flavor_);
   jdown_ak4pfjets_hadron_flavor_branch = tree->GetBranch("jdown_ak4pfjets_hadron_flavor");
   if (jdown_ak4pfjets_hadron_flavor_branch) jdown_ak4pfjets_hadron_flavor_branch->SetAddress(&jdown_ak4pfjets_hadron_flavor_);
+  jdown_scndvtxs_passSofttag_branch = tree->GetBranch("jdown_scndvtxs_passSofttag");
+  if (jdown_scndvtxs_passSofttag_branch) jdown_scndvtxs_passSofttag_branch->SetAddress(&jdown_scndvtxs_passSofttag_);
   jdown_nsoftbtags_branch = tree->GetBranch("jdown_nsoftbtags");
   if (jdown_nsoftbtags_branch) jdown_nsoftbtags_branch->SetAddress(&jdown_nsoftbtags_);
   genleps_isfromt_branch = tree->GetBranch("genleps_isfromt");
@@ -1275,12 +1287,6 @@ void StopTree::Init(TTree *tree) {
   if (filt_jetWithBadMuon_jdown_branch) filt_jetWithBadMuon_jdown_branch->SetAddress(&filt_jetWithBadMuon_jdown_);
   filt_pfovercalomet_branch = tree->GetBranch("filt_pfovercalomet");
   if (filt_pfovercalomet_branch) filt_pfovercalomet_branch->SetAddress(&filt_pfovercalomet_);
-  filt_badmuons_branch = tree->GetBranch("filt_badmuons");
-  if (filt_badmuons_branch) filt_badmuons_branch->SetAddress(&filt_badmuons_);
-  filt_duplicatemuons_branch = tree->GetBranch("filt_duplicatemuons");
-  if (filt_duplicatemuons_branch) filt_duplicatemuons_branch->SetAddress(&filt_duplicatemuons_);
-  filt_nobadmuons_branch = tree->GetBranch("filt_nobadmuons");
-  if (filt_nobadmuons_branch) filt_nobadmuons_branch->SetAddress(&filt_nobadmuons_);
 
   tree->SetMakeClass(0);
 }
@@ -1559,6 +1565,8 @@ void StopTree::GetEntry(unsigned int idx) {
   ak4pfjets_leadbtag_p4_isLoaded = false;
   ak4genjets_p4_isLoaded = false;
   softtags_p4_isLoaded = false;
+  scndvtxs_p4_isLoaded = false;
+  scndvtxs_passSofttag_isLoaded = false;
   nsoftbtags_isLoaded = false;
   jup_nskimjets_isLoaded = false;
   jup_nskimbtagmed_isLoaded = false;
@@ -1587,6 +1595,8 @@ void StopTree::GetEntry(unsigned int idx) {
   jup_ak4pfjets_leadbtag_p4_isLoaded = false;
   jup_ak4genjets_p4_isLoaded = false;
   jup_softtags_p4_isLoaded = false;
+  jup_scndvtxs_p4_isLoaded = false;
+  jup_scndvtxs_passSofttag_isLoaded = false;
   jup_nsoftbtags_isLoaded = false;
   jdown_nskimjets_isLoaded = false;
   jdown_nskimbtagmed_isLoaded = false;
@@ -1615,6 +1625,8 @@ void StopTree::GetEntry(unsigned int idx) {
   jdown_ak4pfjets_leadbtag_p4_isLoaded = false;
   jdown_ak4genjets_p4_isLoaded = false;
   jdown_softtags_p4_isLoaded = false;
+  jdown_scndvtxs_p4_isLoaded = false;
+  jdown_scndvtxs_passSofttag_isLoaded = false;
   jdown_nsoftbtags_isLoaded = false;
   genleps_isfromt_isLoaded = false;
   genleps_p4_isLoaded = false;
@@ -1923,9 +1935,6 @@ void StopTree::GetEntry(unsigned int idx) {
   filt_jetWithBadMuon_jup_isLoaded = false;
   filt_jetWithBadMuon_jdown_isLoaded = false;
   filt_pfovercalomet_isLoaded = false;
-  filt_badmuons_isLoaded = false;
-  filt_duplicatemuons_isLoaded = false;
-  filt_nobadmuons_isLoaded = false;
 }
 
 void StopTree::LoadAllBranches() {
@@ -2201,6 +2210,8 @@ void StopTree::LoadAllBranches() {
   if (ak4pfjets_leadbtag_p4_branch != 0) ak4pfjets_leadbtag_p4();
   if (ak4genjets_p4_branch != 0) ak4genjets_p4();
   if (softtags_p4_branch != 0) softtags_p4();
+  if (scndvtxs_p4_branch != 0) scndvtxs_p4();
+  if (scndvtxs_passSofttag_branch != 0) scndvtxs_passSofttag();
   if (nsoftbtags_branch != 0) nsoftbtags();
   if (jup_nskimjets_branch != 0) jup_nskimjets();
   if (jup_nskimbtagmed_branch != 0) jup_nskimbtagmed();
@@ -2229,6 +2240,8 @@ void StopTree::LoadAllBranches() {
   if (jup_ak4pfjets_leadbtag_p4_branch != 0) jup_ak4pfjets_leadbtag_p4();
   if (jup_ak4genjets_p4_branch != 0) jup_ak4genjets_p4();
   if (jup_softtags_p4_branch != 0) jup_softtags_p4();
+  if (jup_scndvtxs_p4_branch != 0) jup_scndvtxs_p4();
+  if (jup_scndvtxs_passSofttag_branch != 0) jup_scndvtxs_passSofttag();
   if (jup_nsoftbtags_branch != 0) jup_nsoftbtags();
   if (jdown_nskimjets_branch != 0) jdown_nskimjets();
   if (jdown_nskimbtagmed_branch != 0) jdown_nskimbtagmed();
@@ -2257,6 +2270,8 @@ void StopTree::LoadAllBranches() {
   if (jdown_ak4pfjets_leadbtag_p4_branch != 0) jdown_ak4pfjets_leadbtag_p4();
   if (jdown_ak4genjets_p4_branch != 0) jdown_ak4genjets_p4();
   if (jdown_softtags_p4_branch != 0) jdown_softtags_p4();
+  if (jdown_scndvtxs_p4_branch != 0) jdown_scndvtxs_p4();
+  if (jdown_scndvtxs_passSofttag_branch != 0) jdown_scndvtxs_passSofttag();
   if (jdown_nsoftbtags_branch != 0) jdown_nsoftbtags();
   if (genleps_isfromt_branch != 0) genleps_isfromt();
   if (genleps_p4_branch != 0) genleps_p4();
@@ -2565,9 +2580,6 @@ void StopTree::LoadAllBranches() {
   if (filt_jetWithBadMuon_jup_branch != 0) filt_jetWithBadMuon_jup();
   if (filt_jetWithBadMuon_jdown_branch != 0) filt_jetWithBadMuon_jdown();
   if (filt_pfovercalomet_branch != 0) filt_pfovercalomet();
-  if (filt_badmuons_branch != 0) filt_badmuons();
-  if (filt_duplicatemuons_branch != 0) filt_duplicatemuons();
-  if (filt_nobadmuons_branch != 0) filt_nobadmuons();
 }
 
 const unsigned int &StopTree::run() {
@@ -6093,6 +6105,32 @@ const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &StopTre
   return *softtags_p4_;
 }
 
+const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &StopTree::scndvtxs_p4() {
+  if (not scndvtxs_p4_isLoaded) {
+    if (scndvtxs_p4_branch != 0) {
+      scndvtxs_p4_branch->GetEntry(index);
+    } else {
+      printf("branch scndvtxs_p4_branch does not exist!\n");
+      exit(1);
+    }
+    scndvtxs_p4_isLoaded = true;
+  }
+  return *scndvtxs_p4_;
+}
+
+const vector<bool> &StopTree::scndvtxs_passSofttag() {
+  if (not scndvtxs_passSofttag_isLoaded) {
+    if (scndvtxs_passSofttag_branch != 0) {
+      scndvtxs_passSofttag_branch->GetEntry(index);
+    } else {
+      printf("branch scndvtxs_passSofttag_branch does not exist!\n");
+      exit(1);
+    }
+    scndvtxs_passSofttag_isLoaded = true;
+  }
+  return *scndvtxs_passSofttag_;
+}
+
 const int &StopTree::nsoftbtags() {
   if (not nsoftbtags_isLoaded) {
     if (nsoftbtags_branch != 0) {
@@ -6457,6 +6495,32 @@ const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &StopTre
   return *jup_softtags_p4_;
 }
 
+const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &StopTree::jup_scndvtxs_p4() {
+  if (not jup_scndvtxs_p4_isLoaded) {
+    if (jup_scndvtxs_p4_branch != 0) {
+      jup_scndvtxs_p4_branch->GetEntry(index);
+    } else {
+      printf("branch jup_scndvtxs_p4_branch does not exist!\n");
+      exit(1);
+    }
+    jup_scndvtxs_p4_isLoaded = true;
+  }
+  return *jup_scndvtxs_p4_;
+}
+
+const vector<bool> &StopTree::jup_scndvtxs_passSofttag() {
+  if (not jup_scndvtxs_passSofttag_isLoaded) {
+    if (jup_scndvtxs_passSofttag_branch != 0) {
+      jup_scndvtxs_passSofttag_branch->GetEntry(index);
+    } else {
+      printf("branch jup_scndvtxs_passSofttag_branch does not exist!\n");
+      exit(1);
+    }
+    jup_scndvtxs_passSofttag_isLoaded = true;
+  }
+  return *jup_scndvtxs_passSofttag_;
+}
+
 const int &StopTree::jup_nsoftbtags() {
   if (not jup_nsoftbtags_isLoaded) {
     if (jup_nsoftbtags_branch != 0) {
@@ -6819,6 +6883,32 @@ const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &StopTre
     jdown_softtags_p4_isLoaded = true;
   }
   return *jdown_softtags_p4_;
+}
+
+const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &StopTree::jdown_scndvtxs_p4() {
+  if (not jdown_scndvtxs_p4_isLoaded) {
+    if (jdown_scndvtxs_p4_branch != 0) {
+      jdown_scndvtxs_p4_branch->GetEntry(index);
+    } else {
+      printf("branch jdown_scndvtxs_p4_branch does not exist!\n");
+      exit(1);
+    }
+    jdown_scndvtxs_p4_isLoaded = true;
+  }
+  return *jdown_scndvtxs_p4_;
+}
+
+const vector<bool> &StopTree::jdown_scndvtxs_passSofttag() {
+  if (not jdown_scndvtxs_passSofttag_isLoaded) {
+    if (jdown_scndvtxs_passSofttag_branch != 0) {
+      jdown_scndvtxs_passSofttag_branch->GetEntry(index);
+    } else {
+      printf("branch jdown_scndvtxs_passSofttag_branch does not exist!\n");
+      exit(1);
+    }
+    jdown_scndvtxs_passSofttag_isLoaded = true;
+  }
+  return *jdown_scndvtxs_passSofttag_;
 }
 
 const int &StopTree::jdown_nsoftbtags() {
@@ -10825,45 +10915,6 @@ const bool &StopTree::filt_pfovercalomet() {
   return filt_pfovercalomet_;
 }
 
-const bool &StopTree::filt_badmuons() {
-  if (not filt_badmuons_isLoaded) {
-    if (filt_badmuons_branch != 0) {
-      filt_badmuons_branch->GetEntry(index);
-    } else {
-      printf("branch filt_badmuons_branch does not exist!\n");
-      exit(1);
-    }
-    filt_badmuons_isLoaded = true;
-  }
-  return filt_badmuons_;
-}
-
-const bool &StopTree::filt_duplicatemuons() {
-  if (not filt_duplicatemuons_isLoaded) {
-    if (filt_duplicatemuons_branch != 0) {
-      filt_duplicatemuons_branch->GetEntry(index);
-    } else {
-      printf("branch filt_duplicatemuons_branch does not exist!\n");
-      exit(1);
-    }
-    filt_duplicatemuons_isLoaded = true;
-  }
-  return filt_duplicatemuons_;
-}
-
-const bool &StopTree::filt_nobadmuons() {
-  if (not filt_nobadmuons_isLoaded) {
-    if (filt_nobadmuons_branch != 0) {
-      filt_nobadmuons_branch->GetEntry(index);
-    } else {
-      printf("branch filt_nobadmuons_branch does not exist!\n");
-      exit(1);
-    }
-    filt_nobadmuons_isLoaded = true;
-  }
-  return filt_nobadmuons_;
-}
-
 
 void StopTree::progress( int nEventsTotal, int nEventsChain ){
   int period = 1000;
@@ -11158,6 +11209,8 @@ const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &ak4pfjets_leadME
 const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &ak4pfjets_leadbtag_p4() { return babyAnalyzer.ak4pfjets_leadbtag_p4(); }
 const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &ak4genjets_p4() { return babyAnalyzer.ak4genjets_p4(); }
 const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &softtags_p4() { return babyAnalyzer.softtags_p4(); }
+const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &scndvtxs_p4() { return babyAnalyzer.scndvtxs_p4(); }
+const vector<bool> &scndvtxs_passSofttag() { return babyAnalyzer.scndvtxs_passSofttag(); }
 const int &nsoftbtags() { return babyAnalyzer.nsoftbtags(); }
 const int &jup_nskimjets() { return babyAnalyzer.jup_nskimjets(); }
 const int &jup_nskimbtagmed() { return babyAnalyzer.jup_nskimbtagmed(); }
@@ -11186,6 +11239,8 @@ const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &jup_ak4pfjets_le
 const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &jup_ak4pfjets_leadbtag_p4() { return babyAnalyzer.jup_ak4pfjets_leadbtag_p4(); }
 const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &jup_ak4genjets_p4() { return babyAnalyzer.jup_ak4genjets_p4(); }
 const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &jup_softtags_p4() { return babyAnalyzer.jup_softtags_p4(); }
+const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &jup_scndvtxs_p4() { return babyAnalyzer.jup_scndvtxs_p4(); }
+const vector<bool> &jup_scndvtxs_passSofttag() { return babyAnalyzer.jup_scndvtxs_passSofttag(); }
 const int &jup_nsoftbtags() { return babyAnalyzer.jup_nsoftbtags(); }
 const int &jdown_nskimjets() { return babyAnalyzer.jdown_nskimjets(); }
 const int &jdown_nskimbtagmed() { return babyAnalyzer.jdown_nskimbtagmed(); }
@@ -11214,6 +11269,8 @@ const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &jdown_ak4pfjets_
 const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &jdown_ak4pfjets_leadbtag_p4() { return babyAnalyzer.jdown_ak4pfjets_leadbtag_p4(); }
 const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &jdown_ak4genjets_p4() { return babyAnalyzer.jdown_ak4genjets_p4(); }
 const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &jdown_softtags_p4() { return babyAnalyzer.jdown_softtags_p4(); }
+const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &jdown_scndvtxs_p4() { return babyAnalyzer.jdown_scndvtxs_p4(); }
+const vector<bool> &jdown_scndvtxs_passSofttag() { return babyAnalyzer.jdown_scndvtxs_passSofttag(); }
 const int &jdown_nsoftbtags() { return babyAnalyzer.jdown_nsoftbtags(); }
 const vector<bool> &genleps_isfromt() { return babyAnalyzer.genleps_isfromt(); }
 const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &genleps_p4() { return babyAnalyzer.genleps_p4(); }
@@ -11522,8 +11579,5 @@ const bool &filt_jetWithBadMuon() { return babyAnalyzer.filt_jetWithBadMuon(); }
 const bool &filt_jetWithBadMuon_jup() { return babyAnalyzer.filt_jetWithBadMuon_jup(); }
 const bool &filt_jetWithBadMuon_jdown() { return babyAnalyzer.filt_jetWithBadMuon_jdown(); }
 const bool &filt_pfovercalomet() { return babyAnalyzer.filt_pfovercalomet(); }
-const bool &filt_badmuons() { return babyAnalyzer.filt_badmuons(); }
-const bool &filt_duplicatemuons() { return babyAnalyzer.filt_duplicatemuons(); }
-const bool &filt_nobadmuons() { return babyAnalyzer.filt_nobadmuons(); }
 
 }

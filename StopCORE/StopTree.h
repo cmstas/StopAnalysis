@@ -835,6 +835,12 @@ class StopTree {
   vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > *softtags_p4_;
   TBranch *softtags_p4_branch;
   bool     softtags_p4_isLoaded;
+  vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > *scndvtxs_p4_;
+  TBranch *scndvtxs_p4_branch;
+  bool     scndvtxs_p4_isLoaded;
+  vector<bool> *scndvtxs_passSofttag_;
+  TBranch *scndvtxs_passSofttag_branch;
+  bool     scndvtxs_passSofttag_isLoaded;
   int      nsoftbtags_;
   TBranch *nsoftbtags_branch;
   bool     nsoftbtags_isLoaded;
@@ -919,6 +925,12 @@ class StopTree {
   vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > *jup_softtags_p4_;
   TBranch *jup_softtags_p4_branch;
   bool     jup_softtags_p4_isLoaded;
+  vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > *jup_scndvtxs_p4_;
+  TBranch *jup_scndvtxs_p4_branch;
+  bool     jup_scndvtxs_p4_isLoaded;
+  vector<bool> *jup_scndvtxs_passSofttag_;
+  TBranch *jup_scndvtxs_passSofttag_branch;
+  bool     jup_scndvtxs_passSofttag_isLoaded;
   int      jup_nsoftbtags_;
   TBranch *jup_nsoftbtags_branch;
   bool     jup_nsoftbtags_isLoaded;
@@ -1003,6 +1015,12 @@ class StopTree {
   vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > *jdown_softtags_p4_;
   TBranch *jdown_softtags_p4_branch;
   bool     jdown_softtags_p4_isLoaded;
+  vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > *jdown_scndvtxs_p4_;
+  TBranch *jdown_scndvtxs_p4_branch;
+  bool     jdown_scndvtxs_p4_isLoaded;
+  vector<bool> *jdown_scndvtxs_passSofttag_;
+  TBranch *jdown_scndvtxs_passSofttag_branch;
+  bool     jdown_scndvtxs_passSofttag_isLoaded;
   int      jdown_nsoftbtags_;
   TBranch *jdown_nsoftbtags_branch;
   bool     jdown_nsoftbtags_isLoaded;
@@ -1927,15 +1945,6 @@ class StopTree {
   bool     filt_pfovercalomet_;
   TBranch *filt_pfovercalomet_branch;
   bool     filt_pfovercalomet_isLoaded;
-  bool     filt_badmuons_;
-  TBranch *filt_badmuons_branch;
-  bool     filt_badmuons_isLoaded;
-  bool     filt_duplicatemuons_;
-  TBranch *filt_duplicatemuons_branch;
-  bool     filt_duplicatemuons_isLoaded;
-  bool     filt_nobadmuons_;
-  TBranch *filt_nobadmuons_branch;
-  bool     filt_nobadmuons_isLoaded;
 public: 
 void Init(TTree *tree);
 void GetEntry(unsigned int idx); 
@@ -2211,6 +2220,8 @@ void LoadAllBranches();
   const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &ak4pfjets_leadbtag_p4();
   const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &ak4genjets_p4();
   const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &softtags_p4();
+  const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &scndvtxs_p4();
+  const vector<bool> &scndvtxs_passSofttag();
   const int &nsoftbtags();
   const int &jup_nskimjets();
   const int &jup_nskimbtagmed();
@@ -2239,6 +2250,8 @@ void LoadAllBranches();
   const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &jup_ak4pfjets_leadbtag_p4();
   const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &jup_ak4genjets_p4();
   const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &jup_softtags_p4();
+  const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &jup_scndvtxs_p4();
+  const vector<bool> &jup_scndvtxs_passSofttag();
   const int &jup_nsoftbtags();
   const int &jdown_nskimjets();
   const int &jdown_nskimbtagmed();
@@ -2267,6 +2280,8 @@ void LoadAllBranches();
   const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &jdown_ak4pfjets_leadbtag_p4();
   const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &jdown_ak4genjets_p4();
   const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &jdown_softtags_p4();
+  const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &jdown_scndvtxs_p4();
+  const vector<bool> &jdown_scndvtxs_passSofttag();
   const int &jdown_nsoftbtags();
   const vector<bool> &genleps_isfromt();
   const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &genleps_p4();
@@ -2575,9 +2590,6 @@ void LoadAllBranches();
   const bool &filt_jetWithBadMuon_jup();
   const bool &filt_jetWithBadMuon_jdown();
   const bool &filt_pfovercalomet();
-  const bool &filt_badmuons();
-  const bool &filt_duplicatemuons();
-  const bool &filt_nobadmuons();
 
   static void progress(int nEventsTotal, int nEventsChain);
 };
@@ -2858,6 +2870,8 @@ namespace stop1l {
   const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &ak4pfjets_leadbtag_p4();
   const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &ak4genjets_p4();
   const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &softtags_p4();
+  const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &scndvtxs_p4();
+  const vector<bool> &scndvtxs_passSofttag();
   const int &nsoftbtags();
   const int &jup_nskimjets();
   const int &jup_nskimbtagmed();
@@ -2886,6 +2900,8 @@ namespace stop1l {
   const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &jup_ak4pfjets_leadbtag_p4();
   const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &jup_ak4genjets_p4();
   const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &jup_softtags_p4();
+  const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &jup_scndvtxs_p4();
+  const vector<bool> &jup_scndvtxs_passSofttag();
   const int &jup_nsoftbtags();
   const int &jdown_nskimjets();
   const int &jdown_nskimbtagmed();
@@ -2914,6 +2930,8 @@ namespace stop1l {
   const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &jdown_ak4pfjets_leadbtag_p4();
   const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &jdown_ak4genjets_p4();
   const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &jdown_softtags_p4();
+  const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &jdown_scndvtxs_p4();
+  const vector<bool> &jdown_scndvtxs_passSofttag();
   const int &jdown_nsoftbtags();
   const vector<bool> &genleps_isfromt();
   const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &genleps_p4();
@@ -3222,8 +3240,5 @@ namespace stop1l {
   const bool &filt_jetWithBadMuon_jup();
   const bool &filt_jetWithBadMuon_jdown();
   const bool &filt_pfovercalomet();
-  const bool &filt_badmuons();
-  const bool &filt_duplicatemuons();
-  const bool &filt_nobadmuons();
 }
 #endif

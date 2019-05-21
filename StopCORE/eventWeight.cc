@@ -1639,9 +1639,19 @@ void evtWgtInfo::getSoftBtagSF( double &wgt_softbtag, double &wgt_softbtag_up, d
     double sf  = 1.048;
     double err = 0.164;
 
+    if (year == 2018) {
+      sf  = 1.179;
+      err = 0.179;
+    }
+
     if (is_fastsim_) {
-      sf  = 0.862;
-      err = 0.138;
+      if (year == 2016) {
+        sf *= 0.92;
+      } else if (year == 2017) {
+        sf *= 0.97;
+      } else if (year == 2018) {
+        sf *= 0.96;
+      }
     }
 
     wgt_softbtag    *= sf;

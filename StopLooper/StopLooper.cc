@@ -438,7 +438,8 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
         // if (!(checkMassPt(1050, 100) || checkMassPt(900, 500) || checkMassPt(950, 100) || checkMassPt(425, 325) ||
         //       checkMassPt(1000, 100) || checkMassPt(800, 450) || checkMassPt(750, 400) || checkMassPt(800, 400) ||
         //       checkMassPt(1200, 100) || checkMassPt(850, 100) || checkMassPt(650, 350))) continue;
-        if (!(checkMassPt(1200, 100) || checkMassPt(850, 100) || checkMassPt(650, 350))) continue;
+        // if (!(checkMassPt(1200, 100) || checkMassPt(850, 100) || checkMassPt(650, 350))) continue;
+        if (!(checkMassPt(425, 325) || checkMassPt(450, 325))) continue;
         // if (!checkMassPt(800,400)  && !checkMassPt(1200,50)  && !checkMassPt(400,100) &&
         //     !checkMassPt(1100,300) && !checkMassPt(1100,500) && !checkMassPt(900,600) &&
         //     !checkMassPt(1200,200) && !checkMassPt(1200,400) && !checkMassPt(1200,600)) continue;
@@ -662,7 +663,8 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
 
       // Temporary test for top tagging efficiency
       // testTopTaggingEffficiency(testVec[1]);
-      testGenMatching();
+      // if (samplever.find("v31_6") == 0)  // available on and after v31_6
+      //   testGenMatching();
 
       /// Values only for hist filling or testing
       values_[chi2] = hadronic_top_chi2();
@@ -755,7 +757,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
 
           values_[metphi] = pfmet_phi_jup();
           values_[nbtag] = jup_nanalysisbtags();
-          values_[nsbtag] = (doTopTagging)? jup_nsoftbtags() - nsboverlep : 0;
+          // values_[nsbtag] = (doTopTagging)? jup_nsoftbtags() - nsboverlep : 0;
           values_[leadbpt] = jup_ak4pfjets_leadbtag_p4().pt();
           values_[mlb_0b] = (jup_ak4pfjets_leadbtag_p4() + lep1_p4()).M();
 
@@ -781,7 +783,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
 
           values_[metphi] = pfmet_phi_jdown();
           values_[nbtag] = jdown_nanalysisbtags();
-          values_[nsbtag] = (doTopTagging)? jdown_nsoftbtags() - nsboverlep : 0;
+          // values_[nsbtag] = (doTopTagging)? jdown_nsoftbtags() - nsboverlep : 0;
           values_[leadbpt] = jdown_ak4pfjets_leadbtag_p4().pt();
           values_[mlb_0b] = (jdown_ak4pfjets_leadbtag_p4() + lep1_p4()).M();
 
@@ -1133,6 +1135,9 @@ void StopLooper::fillHistosForSR(string suf) {
       if (suf == "" && samplever.find("v31_2") == 0 && ngoodjets() > 0) {
         plot2d("h2d_ht5_dphijmht", deltaPhi(ak4pfjets_p4().at(0).phi(), values_[mhtphi]), ak4_HTeta5()/ak4_HT(), evtweight_, sr.histMap, ";#Delta#phi(j1,MHT);HT5/HT", 64, 0, 3.2, 80, 1, 3);
         plot1d("h_ht5overht", ak4_HTeta5()/ak4_HT(), evtweight_, sr.histMap, ";HT5/HT", 80, 1, 3);
+      }
+      for (auto sb : softtags_p4()) {
+        plot1d("h_softbs_pt"+s, sb.pt() , evtweight_, sr.histMap, ";p_{T} (soft b)",  20,  0, 20);
       }
     };
 
@@ -1490,7 +1495,8 @@ void StopLooper::fillHistosForCRemu(string suf, int trigType) {
   values_[mllbbmet] = system_p4.M();
   values_[ptttbar] = system_p4.Pt();
 
-  evtweight_ = evtWgt.getWeight(evtWgtInfo::systID::k_nominal);
+  evtweight_ = evtWgt.getWeight(evtWgtInfo::systID::k_nominal, false, 5);
+  if (is_bkg_) evtweight_ *= 0.85;  // dilepton trigger efficiency
 
   // if (evtWgt.samptype == evtWgtInfo::ttbar) {
   //   double sf_njttbarpt(0), sf_njttbarpt_up(0), sf_njttbarpt_dn(0);
@@ -1663,8 +1669,31 @@ void StopLooper::fillHistosForCRemu(string suf, int trigType) {
         plot1d("h_rlmetbinI"+s, values_[met_rl], evtweight_, cr.histMap, ";E_{T}^{miss}(removed lepton) [GeV]", metbinI.size()-1, metbinI.data());
         plot1d("h_rlmetbinJ"+s, values_[met_rl], evtweight_, cr.histMap, ";E_{T}^{miss}(removed lepton) [GeV]", metbinJ.size()-1, metbinJ.data());
 
+        float lead_softb_pt = 0;
+        for (auto sb : softtags_p4()) {
+          plot1d("h_softbs_pt"+s, sb.pt() , evtweight_, cr.histMap, ";p_{T} (soft b)",  20,  0, 20);
+          if (sb.pt() > lead_softb_pt) lead_softb_pt = sb.pt();
+        }
+        plot1d("h_lead_softb_pt"+s, lead_softb_pt, evtweight_, cr.histMap, ";p_{T} (soft b)",  20,  0, 20);
+
+        if (values_[nsbtag] == 1) plot1d("h_nvtxs_1sb"+s,    values_[nvtx]    , evtweight_, cr.histMap, ";Number of vertices"   , 80,  1, 81);
+        if (values_[nsbtag] > 0) plot1d("h_nvtxs_ge1sb"+s,   values_[nvtx]    , evtweight_, cr.histMap, ";Number of vertices"   , 80,  1, 81);
+        if (values_[nsbtag] > 1) plot1d("h_nvtxs_ge2sb"+s,   values_[nvtx]    , evtweight_, cr.histMap, ";Number of vertices"   , 80,  1, 81);
+        if (lead_softb_pt > 0) {
+          if (lead_softb_pt < 10)
+            plot1d("h_nvtxs_lsbptlt10"+s,    values_[nvtx]    , evtweight_, cr.histMap, ";Number of vertices"   , 80,  1, 81);
+          else
+            plot1d("h_nvtxs_lsbptgt10"+s,    values_[nvtx]    , evtweight_, cr.histMap, ";Number of vertices"   , 80,  1, 81);
+       }
+
       };
       fillhists(suf);
+      // if (is_bkg_) {
+      //   evtweight_ = evtWgt.getWeight(evtWgtInfo::systID::k_softbSFUp, false, 5) * 0.85;
+      //   fillhists(suf+"_softbSFUp");
+      //   evtweight_ = evtWgt.getWeight(evtWgtInfo::systID::k_softbSFDown, false, 5) * 0.85;
+      //   fillhists(suf+"_softbSFDn");
+      // }
       // if (abs(lep1_pdgid()) == 13)
       //   fillhists(suf+"_mu");
       // else if (abs(lep1_pdgid()) == 11)
@@ -1754,6 +1783,22 @@ void StopLooper::fillHistosForCRemu(string suf, int trigType) {
 
           plot1d("h_genttbar_eta"+s, ttbar_sys.eta(), evtweight_, cr.histMap, ";#eta(gen-t#bar{t}) [GeV]", 40, -3, 3);
           plot1d("h_genttbar_ptb1"+s, ttbar_sys.pt(), evtweight_, cr.histMap, ";p_{T}(gen-t#bar{t}) [GeV]", ptbin1.size()-1, ptbin1.data());
+        }
+
+        if (is_bkg_ && (plotset | 1<<3)) {
+          int nmatchedsoftb = 0;
+          for (auto sb : softtags_p4()) {
+            if (nvetoleps() > 0 && isCloseObject(sb, lep1_p4(), 0.4)) continue;
+            else if (nvetoleps() > 1 && isCloseObject(sb, lep2_p4(), 0.4)) continue;
+            for (size_t q = 0; q < genqs_id().size(); ++q) {
+              if (!genqs_isLastCopy().at(q)) continue;
+              if (abs(genqs_id()[q]) != 5 ) continue;
+              if (isCloseObject(sb, genqs_p4().at(q), 0.4)) {
+                nmatchedsoftb++;
+              }
+            }
+          }
+          plot1d("h_nmatchedsoftb"+s, nmatchedsoftb, evtweight_, cr.histMap, ";Number of soft b-tagged jets",  5,  0, 5);
         }
       };
       if (suf == "") fillExtraHists(0b101);
@@ -2213,6 +2258,53 @@ void StopLooper::testGenMatching() {
     plot1d("h_nsboverlep"+suf, nsboverlep, 1, hvec, ";N soft-b overlep with lep", 7, 0, 7);
     plot1d("h_nmatchedsoftb"+suf, nmatchedsoftb, 1, hvec, ";N soft-b gen-matched", 7, 0, 7);
   }
+
+  int nmatchedsoftvtx = 0;
+  int nsvoverlep = 0;
+  for (size_t isv = 0; isv < scndvtxs_p4().size(); ++isv) {
+    bool overlep = false;
+    if (nvetoleps() > 0 && isCloseObject(scndvtxs_p4()[isv], lep1_p4(), 0.4)) {
+      plot1d("h_isvoverlep"+suf, 1, 1, hvec, ";N soft-b overlep with lep", 5, 0, 5);
+      nsvoverlep++;
+      overlep = true;
+    } else if (nvetoleps() > 1 && isCloseObject(scndvtxs_p4()[isv], lep2_p4(), 0.4)) {
+      plot1d("h_isboverlep"+suf, 2, 1, hvec, ";N soft-b overlep with lep", 5, 0, 5);
+      nsvoverlep++;
+      overlep = true;
+    }
+
+    bool matched = false;
+    for (size_t q = 0; q < genqs_id().size(); ++q) {
+      if (!genqs_isLastCopy().at(q)) continue;
+      if (abs(genqs_id()[q]) != 5 ) continue;
+      if (isCloseObject(scndvtxs_p4()[isv], genqs_p4().at(q), 0.4)) {
+        matched = true;
+        nmatchedsoftvtx++;
+        plot1d("h_sbmatched_genb_pt"+suf, genqs_p4().at(q).pt(), 1, hvec, ";pt (matched b)", 80, 0, 160);
+        break;
+      }
+    }
+
+    plot1d("h_softb_cat"+suf, 0, 1, hvec, ";secondary vtx cat", 5, 0, 5);
+    if (!overlep) plot1d("h_softb_cat"+suf, 1, 1, hvec, ";secondary vtx cat", 5, 0, 5);
+
+    if (scndvtxs_passSofttag().at(isv)) plot1d("h_softb_cat"+suf, 2, 1, hvec, ";secondary vtx cat", 5, 0, 5);
+    if (!matched) continue;
+    plot1d("h_softb_cat"+suf, 3, 1, hvec, ";secondary vtx cat", 5, 0, 5);
+
+    plot1d("hden_softb_genbase_pt"+suf, scndvtxs_p4()[isv].pt(), 1, hvec, ";pt (matched b)", 10, 0, 20);
+    if (scndvtxs_passSofttag().at(isv)) {
+      plot1d("hnum_softb_genbase_pt"+suf, scndvtxs_p4()[isv].pt(), 1, hvec, ";pt (matched b)", 10, 0, 20);
+      plot1d("h_softb_cat"+suf, 4, 1, hvec, ";secondary vtx cat", 5, 0, 5);
+    }
+
+  }
+
+  if (testplots && nsoftbtags() > 0) {
+    plot1d("h_nsvoverlep"+suf, nsvoverlep, 1, hvec, ";N soft-b overlep with lep", 7, 0, 7);
+    plot1d("h_nmatchedsoftvtx"+suf, nmatchedsoftvtx, 1, hvec, ";N soft-b gen-matched", 7, 0, 7);
+  }
+
 
 }
 
