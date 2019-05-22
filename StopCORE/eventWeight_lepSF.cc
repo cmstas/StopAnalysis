@@ -220,13 +220,9 @@ void eventWeight_lepSF::setup( bool isFastsim, int inyear = 2017, TString filelo
 
     // Fastsim/Fullsim mu files
     // TODO: update the muon fastsim SFs
-    f_mu_FS_ID  = new TFile(filepath+"/sf_mu_mediumID.root", "read"); // double unc for this
-    f_mu_FS_Iso = new TFile(filepath+"/sf_mu_mediumID_mini02.root", "read"); // double unc for this
-    f_mu_FS_Ip  = new TFile(filepath+"/sf_mu_mediumID_tightIP2D.root", "read"); // double unc for this
-
-    f_mu_veto_FS_ID  = new TFile(filepath+"/sf_mu_looseID.root", "read");
-    f_mu_veto_FS_Iso = new TFile(filepath+"/sf_mu_looseID_mini02.root", "read");
-    f_mu_veto_FS_Ip  = new TFile(filepath+"/sf_mu_mediumID_looseIP2D.root", "read"); // double unc for this
+    f_mu_FS_ID  = new TFile(filepath+"/detailed_mu_full_fast_sf_17.root", "read"); // double unc for this
+    f_mu_FS_Iso = f_mu_FS_Ip  = nullptr;
+    f_mu_veto_FS_ID  = f_mu_veto_FS_Iso = f_mu_veto_FS_Ip  = nullptr;
   }
   else if (year == 2018) {
     f_mu_SF_id       = new TFile(filepath+"/RunABCD_SF_ID.root", "read");
@@ -239,13 +235,9 @@ void eventWeight_lepSF::setup( bool isFastsim, int inyear = 2017, TString filelo
 
     // Fastsim/Fullsim mu files
     // TODO: update the muon fastsim SFs
-    f_mu_FS_ID  = new TFile(filepath+"/sf_mu_mediumID.root", "read"); // double unc for this
-    f_mu_FS_Iso = new TFile(filepath+"/sf_mu_mediumID_mini02.root", "read"); // double unc for this
-    f_mu_FS_Ip  = new TFile(filepath+"/sf_mu_mediumID_tightIP2D.root", "read"); // double unc for this
-
-    f_mu_veto_FS_ID  = new TFile(filepath+"/sf_mu_looseID.root", "read");
-    f_mu_veto_FS_Iso = new TFile(filepath+"/sf_mu_looseID_mini02.root", "read");
-    f_mu_veto_FS_Ip  = new TFile(filepath+"/sf_mu_mediumID_looseIP2D.root", "read"); // double unc for this
+    f_mu_FS_ID  = new TFile(filepath+"/detailed_mu_full_fast_sf_17.root", "read"); // double unc for this
+    f_mu_FS_Iso = f_mu_FS_Ip  = nullptr;
+    f_mu_veto_FS_ID  = f_mu_veto_FS_Iso = f_mu_veto_FS_Ip  = nullptr;
   }
 
   // Veto lepton reco efficiency files
@@ -286,14 +278,14 @@ void eventWeight_lepSF::setup( bool isFastsim, int inyear = 2017, TString filelo
   }
 
   // Grab fastsim/fullsim selected mu histos
-  TH2F *h_mu_FS_ID_temp  = (TH2F*)f_mu_FS_ID->Get("histo2D");
-  TH2F *h_mu_FS_Iso_temp = (TH2F*)f_mu_FS_Iso->Get("histo2D");
-  TH2F *h_mu_FS_Ip_temp  = (TH2F*)f_mu_FS_Ip->Get("histo2D");
+  TH2F *h_mu_FS_ID_temp  = (year == 2016)? (TH2F*)f_mu_FS_ID->Get("histo2D") : (TH2F*) f_mu_FS_ID->Get("miniIso01_MediumId_sf");
+  TH2F *h_mu_FS_Iso_temp = (year == 2016)? (TH2F*)f_mu_FS_Iso->Get("histo2D") : nullptr;
+  TH2F *h_mu_FS_Ip_temp  = (year == 2016)? (TH2F*)f_mu_FS_Ip->Get("histo2D") : nullptr;
 
   // Grab fastsim/fullsim veto mu histos
-  TH2F *h_mu_veto_FS_ID_temp  = (TH2F*)f_mu_veto_FS_ID->Get("histo2D");
-  TH2F *h_mu_veto_FS_Iso_temp = (TH2F*)f_mu_veto_FS_Iso->Get("histo2D");
-  TH2F *h_mu_veto_FS_Ip_temp  = (TH2F*)f_mu_veto_FS_Ip->Get("histo2D");
+  TH2F *h_mu_veto_FS_ID_temp  = (year == 2016)? (TH2F*)f_mu_veto_FS_ID->Get("histo2D") : (TH2F*) f_mu_FS_ID->Get("miniIso02_LooseId_sf");
+  TH2F *h_mu_veto_FS_Iso_temp = (year == 2016)? (TH2F*)f_mu_veto_FS_Iso->Get("histo2D") : nullptr;
+  TH2F *h_mu_veto_FS_Ip_temp  = (year == 2016)? (TH2F*)f_mu_veto_FS_Ip->Get("histo2D") : nullptr;
 
 
   // Grab mc eff for veto lepton (for lost lepto SFs) histos
@@ -424,23 +416,25 @@ void eventWeight_lepSF::setup( bool isFastsim, int inyear = 2017, TString filelo
 
   // Get final fullsim/fastsim, selected mu, sfs
   TH2F* h_mu_FS_ID  = (TH2F*)h_mu_FS_ID_temp->Clone("h_mu_FS_ID");
-  TH2F* h_mu_FS_Iso = (TH2F*)h_mu_FS_Iso_temp->Clone("h_mu_FS_Iso");
-  TH2F* h_mu_FS_Ip  = (TH2F*)h_mu_FS_Ip_temp->Clone("h_mu_FS_Ip");
-  // Double unc. on selected muon FS iso sfs, since not for our exact wp
-  for (int x=1; x<=(int)h_mu_FS_Iso->GetNbinsX(); x++) {
-    for (int y=1; y<=(int)h_mu_FS_Iso->GetNbinsY(); y++) {
-      h_mu_FS_Iso->SetBinError(x,y,h_mu_FS_Iso->GetBinError(x,y)*2.0);
-    }
-  }
-  // Double unc. on selected muon FS ip sfs, since not for our exact wp
-  for (int x=1; x<=(int)h_mu_FS_Ip->GetNbinsX(); x++) {
-    for (int y=1; y<=(int)h_mu_FS_Ip->GetNbinsY(); y++) {
-      h_mu_FS_Ip->SetBinError(x,y,h_mu_FS_Ip->GetBinError(x,y)*2.0);
-    }
-  }
   h_mu_FS = (TH2F*)h_mu_FS_ID->Clone("h_mu_FS");
-  h_mu_FS->Multiply(h_mu_FS_Iso);
-  h_mu_FS->Multiply(h_mu_FS_Ip);
+  if (year == 2016) {
+    TH2F* h_mu_FS_Iso = (TH2F*)h_mu_FS_Iso_temp->Clone("h_mu_FS_Iso");
+    TH2F* h_mu_FS_Ip  = (TH2F*)h_mu_FS_Ip_temp->Clone("h_mu_FS_Ip");
+    // Double unc. on selected muon FS iso sfs, since not for our exact wp
+    for (int x=1; x<=(int)h_mu_FS_Iso->GetNbinsX(); x++) {
+      for (int y=1; y<=(int)h_mu_FS_Iso->GetNbinsY(); y++) {
+        h_mu_FS_Iso->SetBinError(x,y,h_mu_FS_Iso->GetBinError(x,y)*2.0);
+      }
+    }
+    // Double unc. on selected muon FS ip sfs, since not for our exact wp
+    for (int x=1; x<=(int)h_mu_FS_Ip->GetNbinsX(); x++) {
+      for (int y=1; y<=(int)h_mu_FS_Ip->GetNbinsY(); y++) {
+        h_mu_FS_Ip->SetBinError(x,y,h_mu_FS_Ip->GetBinError(x,y)*2.0);
+      }
+    }
+    h_mu_FS->Multiply(h_mu_FS_Iso);
+    h_mu_FS->Multiply(h_mu_FS_Ip);
+  }
   xmin_h_mu_FS = h_mu_FS->GetXaxis()->GetBinLowEdge(1)+ferr;
   xmax_h_mu_FS = h_mu_FS->GetXaxis()->GetBinLowEdge(h_mu_FS->GetNbinsX()+1)-ferr;
   ymin_h_mu_FS = h_mu_FS->GetYaxis()->GetBinLowEdge(1)+ferr;
@@ -448,22 +442,25 @@ void eventWeight_lepSF::setup( bool isFastsim, int inyear = 2017, TString filelo
 
   // Get final fullsim/fastsim, veto mu, sfs
   TH2F* h_mu_veto_FS_ID  = (TH2F*)h_mu_veto_FS_ID_temp->Clone("h_mu_veto_FS_ID");
-  TH2F* h_mu_veto_FS_Iso = (TH2F*)h_mu_veto_FS_Iso_temp->Clone("h_mu_veto_FS_Iso");
-  TH2F* h_mu_veto_FS_Ip  = (TH2F*)h_mu_veto_FS_Ip_temp->Clone("h_mu_veto_FS_Ip");
-  // Double unc. on selected muon FS ip sfs, since not for our exact wp
-  for (int x=1; x <= h_mu_veto_FS_Ip->GetNbinsX(); x++) {
-    for (int y=1; y <= h_mu_veto_FS_Ip->GetNbinsY(); y++) {
-      h_mu_veto_FS_Ip->SetBinError(x,y,h_mu_veto_FS_Ip->GetBinError(x,y)*2.0);
-    }
-  }
   h_mu_veto_FS = (TH2F*)h_mu_veto_FS_ID->Clone("h_mu_veto_FS");
-  h_mu_veto_FS->Multiply(h_mu_veto_FS_Iso);
-  h_mu_veto_FS->Multiply(h_mu_veto_FS_Ip);
+  if (year == 2016) {
+    TH2F* h_mu_veto_FS_Iso = (TH2F*)h_mu_veto_FS_Iso_temp->Clone("h_mu_veto_FS_Iso");
+    TH2F* h_mu_veto_FS_Ip  = (TH2F*)h_mu_veto_FS_Ip_temp->Clone("h_mu_veto_FS_Ip");
+    // Double unc. on selected muon FS ip sfs, since not for our exact wp
+    for (int x=1; x <= h_mu_veto_FS_Ip->GetNbinsX(); x++) {
+      for (int y=1; y <= h_mu_veto_FS_Ip->GetNbinsY(); y++) {
+        h_mu_veto_FS_Ip->SetBinError(x,y,h_mu_veto_FS_Ip->GetBinError(x,y)*2.0);
+      }
+    }
+    h_mu_veto_FS->Multiply(h_mu_veto_FS_Iso);
+    h_mu_veto_FS->Multiply(h_mu_veto_FS_Ip);
+  }
   xmin_h_mu_veto_FS = h_mu_veto_FS->GetXaxis()->GetBinLowEdge(1)+ferr;
   xmax_h_mu_veto_FS = h_mu_veto_FS->GetXaxis()->GetBinLowEdge(h_mu_veto_FS->GetNbinsX()+1)-ferr;
   ymin_h_mu_veto_FS = h_mu_veto_FS->GetYaxis()->GetBinLowEdge(1)+ferr;
   ymax_h_mu_veto_FS = h_mu_veto_FS->GetYaxis()->GetBinLowEdge(h_mu_veto_FS->GetNbinsY()+1)-ferr;
 
+  if (year < 2019) xmin_h_mu_veto_FS = std::max(xmin_h_mu_veto_FS, 10+ferr); // temporary to solve for extra low bins in muon FS SF for 2017 and 2018
 
   // Lepton efficiencies for Lost Leptons
   h_el_vetoLepEff = (TH2F*)h_el_vetoLepEff_temp->Clone("h_el_vetoLepEff");

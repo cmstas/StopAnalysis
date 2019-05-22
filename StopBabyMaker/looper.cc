@@ -1367,6 +1367,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
       StopEvt.weight_lepSF_fastSim      = lepSF_FS;
       StopEvt.weight_lepSF_fastSim_up   = lepSF_FS_Up;
       StopEvt.weight_lepSF_fastSim_down = lepSF_FS_Dn;
+      if(isFastsim && lepSF_FS==0) cout << "[looper]>> LepSF_FS is 0!" << endl;
 
       // save the sum of weights for normalization offline to n-babies.
       // comment: this has to go before the selection cuts - else you create a bias
