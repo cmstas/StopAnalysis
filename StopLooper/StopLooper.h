@@ -9,7 +9,7 @@
 
 class StopLooper {
  public:
-  StopLooper() : evtweight_(1.), jestype_(0) {}
+  StopLooper() : evtweight_(1.), jestype_(0), mstop_(0), mlsp_(0) {}
   ~StopLooper() {}
 
   void SetSignalRegions();
@@ -64,6 +64,7 @@ class StopLooper {
   double evtweight_;
   int jestype_;
   int year_;
+  int mstop_, mlsp_;
   // std::map<std::string,float> values_;
   std::vector<float> values_;
 

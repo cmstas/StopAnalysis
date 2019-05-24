@@ -68,9 +68,9 @@ const bool runResTopMVA = false;
 // run the MET resolution correction (and store in separate branches)
 const bool runMETResCorrection = false;
 // only produce yield histos
-const bool runYieldsOnly = false;
+const bool runYieldsOnly = true;
 // only running selected signal points to speed up
-const bool runFullSignalScan = false;
+const bool runFullSignalScan = true;
 // debug symbol, for printing exact event kinematics that passes
 const bool printPassedEvents = false;
 // fill the distribution of event weights
@@ -477,15 +477,24 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
       if (dsname.BeginsWith("/W") && dsname.Contains("JetsToLNu") && !dsname.Contains("NuPt-200") && nupt() > 200) continue;
 
       if (is_fastsim_) {
-        if (fmod(mass_stop(), kSMSMassStep) > 2 || fmod(mass_lsp(), kSMSMassStep) > 2) {
-          // cout << "Running over signal point with mstop = " << mass_stop() << ", and mLSP = " << mass_lsp() << " that is in between the steps!\n";
+        mstop_ = mass_stop();
+        mlsp_ = mass_lsp();
+        if (fmod(mass_lsp(), kSMSMassStep) == 0 && fabs(mass_stop() - mass_lsp() - 175) == 8) {
+          mlsp_ = mstop_ + 63;
+          // cout << "Moving (mstop,mlsp) = (" << mass_stop() << "," << mass_lsp() << ") to (" << mstop_ << "," << mlsp_ << ") \n";
+        } else if (fmod(mass_stop(), kSMSMassStep) == 0 && (mass_stop() - mass_lsp() - 100) == -13) {
+          mlsp_ += 12;
+          // cout << "Moving (mstop,mlsp) = (" << mass_stop() << "," << mass_lsp() << ") to (" << mstop_ << "," << mlsp_ << ") \n";
+        } else if (fmod(mass_stop(), kSMSMassStep) > 2 || fmod(mass_lsp(), kSMSMassStep) > 2) {
+          cout << "Skipping signal point with mstop = " << mass_stop() << ", and mLSP = " << mass_lsp() << " that is in between the steps!\n";
           continue;  // skip points in between the binning
         }
-        plot2d("h2d_signal_masspts", mass_stop(), mass_lsp(), 1, SRVec.at(0).histMap, ";M_{stop} [GeV]; M_{lsp} [GeV]", 160, 100, 2100, 120, 0, 1500);
+        plot2d("h2d_signal_masspts", mass_stop(), mass_lsp(), 1, SRVec.at(0).histMap, ";M_{stop} [GeV]; M_{lsp} [GeV]", 320, 100, 2100, 120, 0, 1500);
+        plot2d("h2d_sigpts_ylds", mstop_, mlsp_, 1, SRVec.at(0).histMap, ";M_{stop} [GeV]; M_{lsp} [GeV]", mStopBins.size()-1, mStopBins.data(), mLSPBins.size()-1, mLSPBins.data());
         // Signal events with xsec weighted
-        int nEventsPoint = h_sig_counter_nEvents->GetBinContent(h_sig_counter_nEvents->FindBin(mass_stop(), mass_lsp()));
+        int nEventsPoint = h_sig_counter_nEvents->GetBinContent(h_sig_counter_nEvents->FindBin(mstop_, mlsp_));
         evtweight_ = kLumi * xsec() * 1000 / nEventsPoint;
-        plot2d("h2d_sigpts_xsecwgtd", mass_stop(), mass_lsp(), evtweight_, SRVec.at(0).histMap, ";M_{stop} [GeV]; M_{lsp} [GeV]", 160, 100, 2100, 120, 0, 1500);
+        plot2d("h2d_sigpts_xsecwgtd", mstop_, mlsp_, evtweight_, SRVec.at(0).histMap, ";M_{stop} [GeV]; M_{lsp} [GeV]", 320, 100, 2100, 120, 0, 1500);
       }
 
       ++nPassedTotal;
@@ -1020,7 +1029,7 @@ void StopLooper::fillYieldHistos(SR& sr, float met, string suf, bool is_cr2l) {
 
   auto fillhists = [&](string s, bool fill3D = true) {
     if (is_fastsim_ && fill3D)
-      plot3d("hSMS_metbins"+s+suf, met, mass_stop(), mass_lsp(), evtweight_, sr.histMap, ";E^{miss}_{T} [GeV];M_{stop};M_{LSP}",
+      plot3d("hSMS_metbins"+s+suf, met, mstop_, mlsp_, evtweight_, sr.histMap, ";E^{miss}_{T} [GeV];M_{stop};M_{LSP}",
              sr.GetNMETBins(), sr.GetMETBinsPtr(), mStopBins.size()-1, mStopBins.data(), mLSPBins.size()-1, mLSPBins.data());
     else
       plot1d("h_metbins"+s+suf, met, evtweight_, sr.histMap, (sr.GetName()+":"+sr.GetDetailName()+";E^{miss}_{T} [GeV]").c_str(),
@@ -1032,7 +1041,7 @@ void StopLooper::fillYieldHistos(SR& sr, float met, string suf, bool is_cr2l) {
         auto syst = (evtWgtInfo::systID) isyst;
         if (evtWgt.doingSystematic(syst)) {
           if (is_fastsim_)
-            plot3d("hSMS_metbins"+s+"_"+evtWgt.getLabel(syst), met, mass_stop(), mass_lsp(), evtWgt.getWeight(syst, is_cr2l, cortype), sr.histMap,
+            plot3d("hSMS_metbins"+s+"_"+evtWgt.getLabel(syst), met, mstop_, mlsp_, evtWgt.getWeight(syst, is_cr2l, cortype), sr.histMap,
                    ";E^{miss}_{T} [GeV];M_{stop};M_{LSP}", sr.GetNMETBins(), sr.GetMETBinsPtr(), mStopBins.size()-1, mStopBins.data(),
                    mLSPBins.size()-1, mLSPBins.data());
           else
@@ -1145,7 +1154,7 @@ void StopLooper::fillHistosForSR(string suf) {
     if (is_fastsim_ && suf == "" && (checkMassPt(1050, 100) || checkMassPt(900, 500) || checkMassPt(950, 100) || checkMassPt(425, 325) ||
                                      checkMassPt(1000, 100) || checkMassPt(800, 450) || checkMassPt(750, 400) ||
                                      checkMassPt(1200, 100) || checkMassPt(850, 100) || checkMassPt(650, 350)))
-      fillKineHists(Form("%s_%.0f_%.0f%s", sigtype.c_str(), mass_stop(), mass_lsp(), suf.c_str()));
+      fillKineHists(Form("%s_%d_%d%s", sigtype.c_str(), mstop_, mlsp_, suf.c_str()));
 
     // Separate contribution by gen classification for background events
     if (doGenClassification && is_bkg_ && suf == "") {
@@ -1266,7 +1275,7 @@ void StopLooper::fillHistosForCR2l(string suf) {
     };
     if (suf == "") fillKineHists(suf);
     if (is_fastsim_ && suf == "" && (checkMassPt(1200, 50) || checkMassPt(800, 400) || checkMassPt(800, 675)))
-      fillKineHists(Form("_%.0f_%.0f%s", mass_stop(), mass_lsp(), suf.c_str()));
+      fillKineHists(Form("_%d_%d%s", mstop_, mlsp_, suf.c_str()));
 
     // Separate contribution by gen classification for background events
     if (doGenClassification && is_bkg_ && suf == "") {
@@ -1391,7 +1400,7 @@ void StopLooper::fillHistosForCR0b(string suf) {
     };
     if (suf == "") fillKineHists(suf);
     if (is_fastsim_ && suf == "" && (checkMassPt(1200, 50) || checkMassPt(800, 400) || checkMassPt(800, 675)))
-      fillKineHists(Form("_%.0f_%.0f%s", mass_stop(), mass_lsp(), suf.c_str()));
+      fillKineHists(Form("_%d_%d%s", mstop_, mlsp_, suf.c_str()));
 
     // Separate contribution by gen classification for background events
     if (doGenClassification && is_bkg_ && suf == "") {
@@ -2019,7 +2028,7 @@ void StopLooper::fillTopTaggingHistos(string suffix) {
     plot2d("h2d_mlb_deeptag", values_[deepttag], values_[mlb], evtweight_, sr.histMap, ";lead deepdisc top;M_{lb}", 60, -0.1f, 1.1f, 50, -10, 15);
   };
 
-  auto checkMassPt = [&](double mstop, double mlsp) { return (mass_stop() == mstop) && (mass_lsp() == mlsp); };
+  auto checkMassPt = [&](double mstop, double mlsp) { return (mstop_ == mstop) && (mlsp_ == mlsp); };
 
   for (auto& sr : SRVec) {
     if (!sr.PassesSelection(values_)) continue;
@@ -2027,7 +2036,7 @@ void StopLooper::fillTopTaggingHistos(string suffix) {
     // Plot kinematics histograms
     fillTopTagHists(sr, suffix);
     if (is_fastsim_ && (checkMassPt(1200, 50) || checkMassPt(800, 400)))
-      fillTopTagHists(sr, "_"+to_string((int)mass_stop())+"_"+to_string((int)mass_lsp()) + suffix);
+      fillTopTagHists(sr, "_"+to_string(mstop_)+"_"+to_string(mlsp_) + suffix);
   }
   for (auto& sr : CR2lVec) {
     if (!sr.PassesSelection(values_)) continue;
@@ -2035,7 +2044,7 @@ void StopLooper::fillTopTaggingHistos(string suffix) {
     // Plot kinematics histograms
     fillTopTagHists(sr, suffix);
     if (is_fastsim_ && (checkMassPt(1200, 50) || checkMassPt(800, 400)))
-      fillTopTagHists(sr, "_"+to_string((int)mass_stop())+"_"+to_string((int)mass_lsp()) + suffix);
+      fillTopTagHists(sr, "_"+to_string(mstop_)+"_"+to_string(mlsp_) + suffix);
   }
   for (auto& sr : CR0bVec) {
     if (!sr.PassesSelection(values_)) continue;
@@ -2043,7 +2052,7 @@ void StopLooper::fillTopTaggingHistos(string suffix) {
     // Plot kinematics histograms
     fillTopTagHists(sr, suffix);
     if (is_fastsim_ && (checkMassPt(1200, 50) || checkMassPt(800, 400)))
-      fillTopTagHists(sr, "_"+to_string((int)mass_stop())+"_"+to_string((int)mass_lsp()) + suffix);
+      fillTopTagHists(sr, "_"+to_string(mstop_)+"_"+to_string(mlsp_) + suffix);
   }
 
 }
@@ -2057,7 +2066,7 @@ void StopLooper::testGenMatching() {
 
   const bool testplots = true;
   auto& hvec = testVec[0].histMap;
-  string suf = (is_fastsim_)? "_"+to_string((int)mass_stop())+"_"+to_string((int)mass_lsp()) : "";
+  string suf = (is_fastsim_)? "_"+to_string(mstop_)+"_"+to_string(mlsp_) : "";
 
   // First find all hadronic gen tops
   int ngentopraw = 0;

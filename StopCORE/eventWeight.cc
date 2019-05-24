@@ -953,6 +953,16 @@ void evtWgtInfo::getSusyMasses( int &mStop, int &mLSP ) {
   if ( is_fastsim_ ) {
     mStop     = babyAnalyzer.mass_stop();
     mLSP      = babyAnalyzer.mass_lsp();
+    // Protection against the 25 Gev bin size for the extra fine scans in the corridors <-- moving scheme need to sync with the babymaker!
+    if (fmod(mLSP, 25.0) < 1 && fabs(fabs(mStop - mLSP - 175) - 7.5) < 1) {
+      mLSP = mStop + 63;
+      // cout << "Moving (mstop,mlsp) = (" << mass_stop() << "," << mass_lsp() << ") to (" << mStop << "," << mLSP << ") \n";
+    } else if (fmod(mStop, 25.0) < 1 && fabs(mStop - mLSP - 87.5) < 1) {
+      mLSP += 12;
+      // cout << "Moving (mstop,mlsp) = (" << mass_stop() << "," << mass_lsp() << ") to (" << mStop << "," << mLSP << ") \n";
+    } else if (fmod(mStop, 25.0) > 1 || fmod(mLSP, 25.0) > 1) {
+      cout << "Unknown signal point with mstop = " << mStop << ", and mLSP = " << mLSP << " !!\n";
+    }
   } else {
     mStop = 0;
     mLSP  = 0;

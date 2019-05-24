@@ -714,6 +714,8 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
         mStop = atof(filestr.substr(posi, filestr.find("_", posi) - posi).c_str());
         posi = filestr.find("mLSP-", posi) + 5;
         mLSP = atof(filestr.substr(posi, filestr.find("_", posi) - posi).c_str());
+        StopEvt.mass_stop = mStop;
+        StopEvt.mass_lsp = mLSP;
       }
       if(isSignalFromFileName && isFastsim){
         //get stop and lsp mass from sparms
@@ -737,6 +739,16 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
 	else if(StopEvt.mass_stop<0&&StopEvt.mass_chargino>0) mStop = StopEvt.mass_chargino;
 	mLSP = StopEvt.mass_lsp;
         if (mStop < 0 || mLSP < 0) cout << "[looper] WARNING: Not getting valid signal mass points!! mStop = " << mStop << ", mLSP = " << mLSP << endl;
+        // Protection against the 25 Gev bin size for the extra fine scans in the corridors <-- moving scheme need to be consistent in looper!
+        if (fmod(mLSP, 25.0) < 1 && fabs(fabs(mStop - mLSP - 175) - 7.5) < 1) {
+          mLSP = mStop + 63;
+          // cout << "Moving (mstop,mlsp) = (" << StopEvt.mass_stop << "," << StopEvt.mass_lsp << ") to (" << mStop << "," << mLSP << ") \n";
+        } else if (fmod(mStop, 25.0) < 1 && fabs(mStop - mLSP - 87.5) < 1) {
+          mLSP += 12;
+        } else if (fmod(mStop, 25.0) > 1 || fmod(mLSP, 25.0) > 1) {
+          cout << "Skipping signal point with mstop = " << mStop << ", and mLSP = " << mLSP << " that is in between the steps!\n";
+          continue;  // skip points in between the binning
+        }
         if(genps_weight()>0)      histNEvts->Fill(mStop,mLSP,1);
         else if(genps_weight()<0) histNEvts->Fill(mStop,mLSP,-1);
         if(genps_weight()>0)      counterhistSig->Fill(mStop,mLSP,36,1);
