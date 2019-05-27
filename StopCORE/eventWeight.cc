@@ -924,6 +924,9 @@ void evtWgtInfo::calculateWeightsForEvent() {
         sys_wgt *= (sf_L1prefire_dn/sf_L1prefire); break;
     }
 
+    if (isnan(sys_wgt) || isinf(sys_wgt))
+      cout << "[evtWgtInfo::calcWeight]: WARNING: the event weight is INF or NAN for syst = " << getLabel(systID(iSys)) << " at evt = " << evt() << "!!\n";
+
     // Corridor regions use alternate MET resolution weights
     double wgt_corridor = sys_wgt;
     if (apply_metRes_corridor_sf && apply_metRes_sf) {
@@ -954,14 +957,17 @@ void evtWgtInfo::getSusyMasses( int &mStop, int &mLSP ) {
     mStop     = babyAnalyzer.mass_stop();
     mLSP      = babyAnalyzer.mass_lsp();
     // Protection against the 25 Gev bin size for the extra fine scans in the corridors <-- moving scheme need to sync with the babymaker!
-    if (fmod(mLSP, 25.0) < 1 && fabs(fabs(mStop - mLSP - 175) - 7.5) < 1) {
-      mLSP = mStop + 63;
-      // cout << "Moving (mstop,mlsp) = (" << mass_stop() << "," << mass_lsp() << ") to (" << mStop << "," << mLSP << ") \n";
-    } else if (fmod(mStop, 25.0) < 1 && fabs(mStop - mLSP - 87.5) < 1) {
-      mLSP += 12;
-      // cout << "Moving (mstop,mlsp) = (" << mass_stop() << "," << mass_lsp() << ") to (" << mStop << "," << mLSP << ") \n";
-    } else if (fmod(mStop, 25.0) > 1 || fmod(mLSP, 25.0) > 1) {
-      cout << "Unknown signal point with mstop = " << mStop << ", and mLSP = " << mLSP << " !!\n";
+    const bool combineCorridorScans = true;
+    if (!combineCorridorScans) {
+      if (fmod(mLSP, 25.0) < 1 && fabs(fabs(mStop - mLSP - 175) - 7.5) < 1) {
+        mLSP = mStop + 63;
+        cout << "Moving (mstop,mlsp) = (" << mass_stop() << "," << mass_lsp() << ") to (" << mStop << "," << mLSP << ") \n";
+      } else if (fmod(mStop, 25.0) < 1 && fabs(mStop - mLSP - 87.5) < 1) {
+        mLSP += 12;
+        cout << "Moving (mstop,mlsp) = (" << mass_stop() << "," << mass_lsp() << ") to (" << mStop << "," << mLSP << ") \n";
+      } else if (fmod(mStop, 25.0) > 1 || fmod(mLSP, 25.0) > 1) {
+        cout << "Unknown signal point with mStop = " << mStop << ", and mLSP = " << mLSP << " !!\n";
+      }
     }
   } else {
     mStop = 0;
@@ -972,6 +978,7 @@ void evtWgtInfo::getSusyMasses( int &mStop, int &mLSP ) {
 void evtWgtInfo::getNEvents( int &nEvts ) {
   if ( is_fastsim_ ) {
     nEvts = (int) h_sig_counter_nEvents->GetBinContent(h_sig_counter_nEvents->FindBin(mStop,mLSP));
+    if (nEvts < 1) throw std::logic_error(Form("[evtWgtInfo::getNEvents]: Cannot find NEvents for point (%d,%d)!!",mStop,mLSP));
   } else {
     nEvts = h_bkg_counter->GetBinContent(22);
   }
@@ -2410,8 +2417,8 @@ void evtWgtInfo::getPDFWeight( double &weight_pdf_up, double &weight_pdf_dn ) {
 
   // Normalization
   if ( is_fastsim_ ) {
-    weight_pdf_up *= (nEvents/h_sig_counter->GetBinContent(mStop,mLSP,10));
-    weight_pdf_dn *= (nEvents/h_sig_counter->GetBinContent(mStop,mLSP,11));
+    weight_pdf_up *= (nEvents/h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,10)));
+    weight_pdf_dn *= (nEvents/h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,11)));
   } else {
     weight_pdf_up *= (nEvents/h_bkg_counter->GetBinContent(10));
     weight_pdf_dn *= (nEvents/h_bkg_counter->GetBinContent(11));
@@ -2614,7 +2621,9 @@ inline void evtWgtInfo::getPileupWeight( double &weight_pu, double &weight_pu_up
 }
 
 void evtWgtInfo::getPileupWeight_fromFile( double &weight_pu, double &weight_pu_up, double &weight_pu_dn ) {
-  int ibin = h_pu_wgt->FindBin(babyAnalyzer.pu_ntrue());
+  float pu_nmax = (year == 2016)? 73 : 97;
+  float pu_nmin = (year == 2018)? 3 : 0;
+  int ibin = h_pu_wgt->FindBin(max(pu_nmin, min(pu_nmax, pu_ntrue())));
   weight_pu    = h_pu_wgt   ->GetBinContent(ibin);
   weight_pu_up = h_pu_wgt_up->GetBinContent(ibin);
   weight_pu_dn = h_pu_wgt_dn->GetBinContent(ibin);

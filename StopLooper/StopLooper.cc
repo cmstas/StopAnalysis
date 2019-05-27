@@ -52,7 +52,7 @@ const bool applyGoodRunList = true;
 // apply the MET resolution correction to the MET variables, required running
 const bool applyMETResCorrection = true;
 // turn on to enable plots of metbins with systematic variations applied. will only do variations for applied weights
-const bool doSystVariations = false;
+const bool doSystVariations = true;
 // turn on to enable plots of metbins with different gen classifications
 const bool doGenClassification = true;
 // turn on to apply Nvtx reweighting to MC / data2016
@@ -73,6 +73,8 @@ const bool runYieldsOnly = true;
 const bool runFullSignalScan = true;
 // debug symbol, for printing exact event kinematics that passes
 const bool printPassedEvents = false;
+// switch to use the separate fine scan points in the corridor or combine them
+const bool combineCorridorScans = true;
 // fill the distribution of event weights
 const bool fillWeights = false;
 // apply the HT5/HT cut
@@ -86,8 +88,8 @@ string sigtype;
 const float fInf = std::numeric_limits<float>::max();
 
 const float kSMSMassStep = 25;
-const vector<float> mStopBins = []() { vector<float> bins; for (float i = 150; i < 2150; i += kSMSMassStep) bins.push_back(i); return bins; } ();
-const vector<float> mLSPBins  = []() { vector<float> bins; for (float i =   0; i < 1450; i += kSMSMassStep) bins.push_back(i); return bins; } ();
+const vector<float> mStopBins = []() { vector<float> bins; for (float m = 137.5; m < 2137.5; m += kSMSMassStep) bins.push_back(m); return bins; } ();
+const vector<float> mLSPBins  = []() { vector<float> bins; for (float m = -12.5; m < 1437.5; m += kSMSMassStep) bins.push_back(m); return bins; } ();
 
 // Helper function to pick out signal events
 auto checkMassPt = [&](double mstop, double mlsp) { return (mass_stop() == mstop) && (mass_lsp() == mlsp); };
@@ -341,7 +343,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
     // evtWgt.apply_pu_sf_fromFile = true;
     // evtWgt.apply_ISR_sf = false;
     // evtWgt.apply_metRes_sf_sf = false;
-    evtWgt.apply_metTTbar_sf = false;
+    // evtWgt.apply_metTTbar_sf = false;
 
     // evtWgt.setDefaultSystematics(evtWgtInfo::test_alloff);  // for test purpose
 
@@ -479,15 +481,17 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
       if (is_fastsim_) {
         mstop_ = mass_stop();
         mlsp_ = mass_lsp();
-        if (fmod(mass_lsp(), kSMSMassStep) == 0 && fabs(mass_stop() - mass_lsp() - 175) == 8) {
-          mlsp_ = mstop_ + 63;
-          // cout << "Moving (mstop,mlsp) = (" << mass_stop() << "," << mass_lsp() << ") to (" << mstop_ << "," << mlsp_ << ") \n";
-        } else if (fmod(mass_stop(), kSMSMassStep) == 0 && (mass_stop() - mass_lsp() - 100) == -13) {
-          mlsp_ += 12;
-          // cout << "Moving (mstop,mlsp) = (" << mass_stop() << "," << mass_lsp() << ") to (" << mstop_ << "," << mlsp_ << ") \n";
-        } else if (fmod(mass_stop(), kSMSMassStep) > 2 || fmod(mass_lsp(), kSMSMassStep) > 2) {
-          cout << "Skipping signal point with mstop = " << mass_stop() << ", and mLSP = " << mass_lsp() << " that is in between the steps!\n";
-          continue;  // skip points in between the binning
+        if (!combineCorridorScans) {
+          if (fmod(mass_lsp(), kSMSMassStep) == 0 && fabs(mass_stop() - mass_lsp() - 175) == 8) {
+            mlsp_ = mstop_ + 63;
+            // cout << "Moving (mstop,mlsp) = (" << mass_stop() << "," << mass_lsp() << ") to (" << mstop_ << "," << mlsp_ << ") \n";
+          } else if (fmod(mass_stop(), kSMSMassStep) == 0 && (mass_stop() - mass_lsp() - 100) == -13) {
+            mlsp_ += 12;
+            // cout << "Moving (mstop,mlsp) = (" << mass_stop() << "," << mass_lsp() << ") to (" << mstop_ << "," << mlsp_ << ") \n";
+          } else if (fmod(mass_stop(), kSMSMassStep) > 2 || fmod(mass_lsp(), kSMSMassStep) > 2) {
+            cout << "Skipping signal point with mstop = " << mass_stop() << ", and mLSP = " << mass_lsp() << " that is in between the steps!\n";
+            continue;  // skip points in between the binning
+          }
         }
         plot2d("h2d_signal_masspts", mass_stop(), mass_lsp(), 1, SRVec.at(0).histMap, ";M_{stop} [GeV]; M_{lsp} [GeV]", 320, 100, 2100, 120, 0, 1500);
         plot2d("h2d_sigpts_ylds", mstop_, mlsp_, 1, SRVec.at(0).histMap, ";M_{stop} [GeV]; M_{lsp} [GeV]", mStopBins.size()-1, mStopBins.data(), mLSPBins.size()-1, mLSPBins.data());
@@ -1027,6 +1031,12 @@ void StopLooper::fillYieldHistos(SR& sr, float met, string suf, bool is_cr2l) {
     if (nvtxs() < 100) evtweight_ *= nvtxscale_[nvtxs()];  // only scale for data
   }
 
+  if (evtweight_ == 0) cout << "[StopLooper::fillYieldHistos]: WARNING: the event weight is 0 at evt = " << evt() << "!!\n";
+  if (isnan(evtweight_)) {
+    cout << "[StopLooper::fillYieldHistos]: WARNING: the event weight is NAN!! Skipping!" << endl;
+    return;
+  }
+
   auto fillhists = [&](string s, bool fill3D = true) {
     if (is_fastsim_ && fill3D)
       plot3d("hSMS_metbins"+s+suf, met, mstop_, mlsp_, evtweight_, sr.histMap, ";E^{miss}_{T} [GeV];M_{stop};M_{LSP}",
@@ -1040,16 +1050,20 @@ void StopLooper::fillYieldHistos(SR& sr, float met, string suf, bool is_cr2l) {
       for (int isyst = 3; isyst < evtWgtInfo::k_nSyst; ++isyst) {
         auto syst = (evtWgtInfo::systID) isyst;
         if (evtWgt.doingSystematic(syst)) {
+          float systwgt = evtWgt.getWeight(syst, is_cr2l, cortype);
+          if (evtweight_ != 0 && systwgt == 0 && syst != evtWgtInfo::k_L1prefireUp)
+            cout << "[StopLooper::fillYieldHistos]: WARNING: the event weight is 0 for syst = " << evtWgt.getLabel(syst) << " at evt = " << evt() << "!!\n";
+          if (isnan(systwgt))
+            cout << "[StopLooper::fillYieldHistos]: WARNING: the event weight is NAN for syst = " << evtWgt.getLabel(syst) << " at evt = " << evt() << "!!\n";
           if (is_fastsim_)
-            plot3d("hSMS_metbins"+s+"_"+evtWgt.getLabel(syst), met, mstop_, mlsp_, evtWgt.getWeight(syst, is_cr2l, cortype), sr.histMap,
-                   ";E^{miss}_{T} [GeV];M_{stop};M_{LSP}", sr.GetNMETBins(), sr.GetMETBinsPtr(), mStopBins.size()-1, mStopBins.data(),
-                   mLSPBins.size()-1, mLSPBins.data());
+            plot3d("hSMS_metbins"+s+"_"+evtWgt.getLabel(syst), met, mstop_, mlsp_, systwgt, sr.histMap, ";E^{miss}_{T} [GeV];M_{stop};M_{LSP}",
+                   sr.GetNMETBins(), sr.GetMETBinsPtr(), mStopBins.size()-1, mStopBins.data(), mLSPBins.size()-1, mLSPBins.data());
           else
-            plot1d("h_metbins"+s+"_"+evtWgt.getLabel(syst), met, evtWgt.getWeight(syst, is_cr2l, cortype), sr.histMap,
+            plot1d("h_metbins"+s+"_"+evtWgt.getLabel(syst), met, systwgt, sr.histMap,
                    (sr.GetName()+":"+evtWgt.getLabel(syst)+";E^{miss}_{T} [GeV]").c_str(), sr.GetNMETBins(), sr.GetMETBinsPtr());
           if (fillWeights && s == "") {
-            plot1d("h_weights"+s+"_"+evtWgt.getLabel(syst), evtWgt.getWeight(syst, is_cr2l, cortype)/evtWgt.getWeight(evtWgtInfo::k_nominal, is_cr2l),
-                   1, sr.histMap, (sr.GetName()+":"+evtWgt.getLabel(syst)+";event weights").c_str(), 200, 0, 2);
+            plot1d("h_weights"+s+"_"+evtWgt.getLabel(syst), systwgt/evtweight_, 1, sr.histMap,
+                   (sr.GetName()+":"+evtWgt.getLabel(syst)+";event weights").c_str(), 200, 0, 2);
           }
         }
       }

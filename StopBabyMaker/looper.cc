@@ -372,6 +372,8 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
   TH1D *hPU;
   TH1D *hPUup;
   TH1D *hPUdown;
+  const float pu_nmax = (gconf.year == 2016)? 73 : 97;
+  const float pu_nmin = (gconf.year == 2018)? 3 : 0;
   if(!isDataFromFileName){
     pileupfile = new TFile("puWeights_Run2.root","READ");
     if(pileupfile->IsZombie()) {
@@ -696,9 +698,9 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
       //std::cout << "[babymaker::looper]: filling event vars completed" << std::endl;
       //dumpDocLines();
       if(!StopEvt.is_data){
-        StopEvt.weight_PU     = hPU    ->GetBinContent(hPU    ->FindBin(StopEvt.pu_ntrue));
-        StopEvt.weight_PUup   = hPUup  ->GetBinContent(hPUup  ->FindBin(StopEvt.pu_ntrue));
-        StopEvt.weight_PUdown = hPUdown->GetBinContent(hPUdown->FindBin(StopEvt.pu_ntrue));
+        StopEvt.weight_PU     = hPU    ->GetBinContent(hPU    ->FindBin(std::max(std::min(StopEvt.pu_ntrue, pu_nmax), pu_nmin)));
+        StopEvt.weight_PUup   = hPUup  ->GetBinContent(hPUup  ->FindBin(std::max(std::min(StopEvt.pu_ntrue, pu_nmax), pu_nmin)));
+        StopEvt.weight_PUdown = hPUdown->GetBinContent(hPUdown->FindBin(std::max(std::min(StopEvt.pu_ntrue, pu_nmax), pu_nmin)));
 
         if (StopEvt.cms3tag.find("CMS4") == 0 && !isSignalFromFileName) {
           float sgnMCweight = (genps_weight() > 0)? 1 : -1;
@@ -740,14 +742,18 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
 	mLSP = StopEvt.mass_lsp;
         if (mStop < 0 || mLSP < 0) cout << "[looper] WARNING: Not getting valid signal mass points!! mStop = " << mStop << ", mLSP = " << mLSP << endl;
         // Protection against the 25 Gev bin size for the extra fine scans in the corridors <-- moving scheme need to be consistent in looper!
-        if (fmod(mLSP, 25.0) < 1 && fabs(fabs(mStop - mLSP - 175) - 7.5) < 1) {
-          mLSP = mStop + 63;
-          // cout << "Moving (mstop,mlsp) = (" << StopEvt.mass_stop << "," << StopEvt.mass_lsp << ") to (" << mStop << "," << mLSP << ") \n";
-        } else if (fmod(mStop, 25.0) < 1 && fabs(mStop - mLSP - 87.5) < 1) {
-          mLSP += 12;
-        } else if (fmod(mStop, 25.0) > 1 || fmod(mLSP, 25.0) > 1) {
-          cout << "Skipping signal point with mstop = " << mStop << ", and mLSP = " << mLSP << " that is in between the steps!\n";
-          continue;  // skip points in between the binning
+        const bool combineCorridorScans = false;
+        if (!combineCorridorScans) {
+          if (fmod(mLSP, 25.0) < 1 && fabs(fabs(mStop - mLSP - 175) - 7.5) < 1) {
+            mLSP = mStop + 63;
+            cout << "Moving (mstop,mlsp) = (" << StopEvt.mass_stop << "," << StopEvt.mass_lsp << ") to (" << mStop << "," << mLSP << ") \n";
+          } else if (fmod(mStop, 25.0) < 1 && fabs(mStop - mLSP - 87.5) < 1) {
+            mLSP += 12;
+            cout << "Moving (mstop,mlsp) = (" << StopEvt.mass_stop << "," << StopEvt.mass_lsp << ") to (" << mStop << "," << mLSP << ") \n";
+          } else if (fmod(mStop, 25.0) > 1 || fmod(mLSP, 25.0) > 1) {
+            cout << "Skipping signal point with mstop = " << mStop << ", and mLSP = " << mLSP << " that is in between the steps!\n";
+            continue;  // skip points in between the binning
+          }
         }
         if(genps_weight()>0)      histNEvts->Fill(mStop,mLSP,1);
         else if(genps_weight()<0) histNEvts->Fill(mStop,mLSP,-1);
