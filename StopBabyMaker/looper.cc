@@ -744,12 +744,12 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
         // Protection against the 25 Gev bin size for the extra fine scans in the corridors <-- moving scheme need to be consistent in looper!
         const bool combineCorridorScans = false;
         if (!combineCorridorScans) {
-          if (fmod(mLSP, 25.0) < 1 && fabs(fabs(mStop - mLSP - 175) - 7.5) < 1) {
+          if (fmod(mLSP, 25.0) <= 1 && fabs(fabs(mStop - mLSP - 175) - 7.5) < 2) {
             mLSP = mStop + 63;
-            cout << "Moving (mstop,mlsp) = (" << StopEvt.mass_stop << "," << StopEvt.mass_lsp << ") to (" << mStop << "," << mLSP << ") \n";
+            // cout << "Moving (mstop,mlsp) = (" << StopEvt.mass_stop << "," << StopEvt.mass_lsp << ") to (" << mStop << "," << mLSP << ") \n";
           } else if (fmod(mStop, 25.0) < 1 && fabs(mStop - mLSP - 87.5) < 1) {
             mLSP += 12;
-            cout << "Moving (mstop,mlsp) = (" << StopEvt.mass_stop << "," << StopEvt.mass_lsp << ") to (" << mStop << "," << mLSP << ") \n";
+            // cout << "Moving (mstop,mlsp) = (" << StopEvt.mass_stop << "," << StopEvt.mass_lsp << ") to (" << mStop << "," << mLSP << ") \n";
           } else if (fmod(mStop, 25.0) > 1 || fmod(mLSP, 25.0) > 1) {
             cout << "Skipping signal point with mstop = " << mStop << ", and mLSP = " << mLSP << " that is in between the steps!\n";
             continue;  // skip points in between the binning
@@ -2195,7 +2195,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
         Taus.FillCommon(iTau, tau_pt, tau_eta);
         bool is_vetotau = isVetoTau(iTau, lep1.p4, lep1.charge);  // Moriond17 analysis selection
         Taus.tau_isVetoTau.push_back(is_vetotau);
-        bool is_vetotau_v2 = isVetoTau_v2(iTau, lep1.p4, lep1.charge); // Legacy analysis selection: new decay mode
+        bool is_vetotau_v2 = isVetoTau_v2(iTau, lep1.p4, lep1.charge); // Run2 Legacy analysis selection: old DM + MVA iso
         Taus.tau_isVetoTau_v2.push_back(is_vetotau_v2);
 
         if (is_vetotau_v2) vetotaus++;
