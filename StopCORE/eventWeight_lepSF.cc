@@ -58,7 +58,7 @@ void eventWeight_lepSF::setup( bool isFastsim, int inyear = 2017, TString filelo
   ymin_h_mu_vetoLepEff = 1.0;
   ymax_h_mu_vetoLepEff = 1.0;
 
-  cout << "[eventWeight_lepSF] Loading lepton scale factors with year " << inyear << " from " << fileloc << endl;
+  cout << "[eventWeight_lepSF] Loading lepton scale factors " << ((isFastsim)? "(fastsim on) " : "") << "with year " << inyear << " from " << fileloc << endl;
 
   // filepath = "../StopCORE/inputs/lepsf/";
   // if (year == 2016) filepath += "Moriond17";
@@ -219,7 +219,6 @@ void eventWeight_lepSF::setup( bool isFastsim, int inyear = 2017, TString filelo
     f_mu_SF_veto_ip  = nullptr;  // nothing available, not applying
 
     // Fastsim/Fullsim mu files
-    // TODO: update the muon fastsim SFs
     f_mu_FS_ID  = new TFile(filepath+"/detailed_mu_full_fast_sf_17.root", "read"); // double unc for this
     f_mu_FS_Iso = f_mu_FS_Ip  = nullptr;
     f_mu_veto_FS_ID  = f_mu_veto_FS_Iso = f_mu_veto_FS_Ip  = nullptr;
@@ -234,8 +233,7 @@ void eventWeight_lepSF::setup( bool isFastsim, int inyear = 2017, TString filelo
     f_mu_SF_veto_ip  = nullptr;  // nothing available, not applying
 
     // Fastsim/Fullsim mu files
-    // TODO: update the muon fastsim SFs
-    f_mu_FS_ID  = new TFile(filepath+"/detailed_mu_full_fast_sf_17.root", "read"); // double unc for this
+    f_mu_FS_ID  = new TFile(filepath+"/detailed_mu_full_fast_sf_18.root", "read"); // double unc for this
     f_mu_FS_Iso = f_mu_FS_Ip  = nullptr;
     f_mu_veto_FS_ID  = f_mu_veto_FS_Iso = f_mu_veto_FS_Ip  = nullptr;
   }
@@ -278,7 +276,7 @@ void eventWeight_lepSF::setup( bool isFastsim, int inyear = 2017, TString filelo
   }
 
   // Grab fastsim/fullsim selected mu histos
-  TH2F *h_mu_FS_ID_temp  = (year == 2016)? (TH2F*)f_mu_FS_ID->Get("histo2D") : (TH2F*) f_mu_FS_ID->Get("miniIso01_MediumId_sf");
+  TH2F *h_mu_FS_ID_temp  = (year == 2016)? (TH2F*)f_mu_FS_ID->Get("histo2D") : (TH2F*) f_mu_FS_ID->Get("miniIso01_MediumPrompt_sf");
   TH2F *h_mu_FS_Iso_temp = (year == 2016)? (TH2F*)f_mu_FS_Iso->Get("histo2D") : nullptr;
   TH2F *h_mu_FS_Ip_temp  = (year == 2016)? (TH2F*)f_mu_FS_Ip->Get("histo2D") : nullptr;
 
@@ -286,7 +284,7 @@ void eventWeight_lepSF::setup( bool isFastsim, int inyear = 2017, TString filelo
   TH2F *h_mu_veto_FS_ID_temp  = (year == 2016)? (TH2F*)f_mu_veto_FS_ID->Get("histo2D") : (TH2F*) f_mu_FS_ID->Get("miniIso02_LooseId_sf");
   TH2F *h_mu_veto_FS_Iso_temp = (year == 2016)? (TH2F*)f_mu_veto_FS_Iso->Get("histo2D") : nullptr;
   TH2F *h_mu_veto_FS_Ip_temp  = (year == 2016)? (TH2F*)f_mu_veto_FS_Ip->Get("histo2D") : nullptr;
-
+  if (year == 2018) h_mu_veto_FS_ID_temp = (TH2F*) f_mu_FS_ID->Get("miniIso04_LooseId_sf"); // Temporary, since miniIso02 doesn't exist in the 2018 SF somehow, but roughly SFmini02 = SFmini04 = 1
 
   // Grab mc eff for veto lepton (for lost lepto SFs) histos
   TH2F *h_el_vetoLepEff_temp = (year == 2016)? (TH2F*)f_vetoLep_eff->Get("h2_lepEff_vetoSel_Eff_el") : (TH2F*)f_vetoLep_eff->Get("heff17_lepeff_veto_el");
@@ -459,8 +457,6 @@ void eventWeight_lepSF::setup( bool isFastsim, int inyear = 2017, TString filelo
   xmax_h_mu_veto_FS = h_mu_veto_FS->GetXaxis()->GetBinLowEdge(h_mu_veto_FS->GetNbinsX()+1)-ferr;
   ymin_h_mu_veto_FS = h_mu_veto_FS->GetYaxis()->GetBinLowEdge(1)+ferr;
   ymax_h_mu_veto_FS = h_mu_veto_FS->GetYaxis()->GetBinLowEdge(h_mu_veto_FS->GetNbinsY()+1)-ferr;
-
-  if (year < 2019) xmin_h_mu_veto_FS = std::max(xmin_h_mu_veto_FS, 10+ferr); // temporary to solve for extra low bins in muon FS SF for 2017 and 2018
 
   // Lepton efficiencies for Lost Leptons
   h_el_vetoLepEff = (TH2F*)h_el_vetoLepEff_temp->Clone("h_el_vetoLepEff");
