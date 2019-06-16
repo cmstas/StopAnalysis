@@ -284,7 +284,6 @@ void eventWeight_lepSF::setup( bool isFastsim, int inyear = 2017, TString filelo
   TH2F *h_mu_veto_FS_ID_temp  = (year == 2016)? (TH2F*)f_mu_veto_FS_ID->Get("histo2D") : (TH2F*) f_mu_FS_ID->Get("miniIso02_LooseId_sf");
   TH2F *h_mu_veto_FS_Iso_temp = (year == 2016)? (TH2F*)f_mu_veto_FS_Iso->Get("histo2D") : nullptr;
   TH2F *h_mu_veto_FS_Ip_temp  = (year == 2016)? (TH2F*)f_mu_veto_FS_Ip->Get("histo2D") : nullptr;
-  if (year == 2018) h_mu_veto_FS_ID_temp = (TH2F*) f_mu_FS_ID->Get("miniIso04_LooseId_sf"); // Temporary, since miniIso02 doesn't exist in the 2018 SF somehow, but roughly SFmini02 = SFmini04 = 1
 
   // Grab mc eff for veto lepton (for lost lepto SFs) histos
   TH2F *h_el_vetoLepEff_temp = (year == 2016)? (TH2F*)f_vetoLep_eff->Get("h2_lepEff_vetoSel_Eff_el") : (TH2F*)f_vetoLep_eff->Get("heff17_lepeff_veto_el");
