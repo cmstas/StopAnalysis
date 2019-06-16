@@ -84,6 +84,7 @@ const bool doHT5cut = true;
 int datayear = -1;
 string samplever;
 string sigtype;
+float babyver;
 
 const float fInf = std::numeric_limits<float>::max();
 
@@ -125,7 +126,7 @@ void StopLooper::SetSignalRegions() {
   // CR0bVec = getStopInclusiveControlRegionsNoBTags();
   // CR2lVec = getStopInclusiveControlRegionsDilepton();
 
-  CRemuVec = getStopCrosscheckRegionsEMuRun2();
+  // CRemuVec = getStopCrosscheckRegionsEMuRun2();
   // CRemuVec = getStopCrosscheckRegionsEMu();
 
   values_.resize(nvars, NAN);
@@ -310,6 +311,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
     if (int i = fname.Index("_v"); i >= 0) samplever = fname(i+1, min(fname.Index("/",i),5)); // include subversions
     else if (fname.Contains("v24")) samplever = "v24";
     else cout << "[looper] >> Cannot find the sample version!" << endl;
+    babyver = TString(samplever).ReplaceAll("v","").ReplaceAll("_",".").Atof();
 
     // Attach the MiniAOD version from dsname
     if      (dsname.Contains("RunIIAutumn18MiniAOD"))   samplever += ":Autumn18v1";
@@ -323,6 +325,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
 
     is_fastsim_ = fname.Contains("SMS") || fname.Contains("Signal");
     is_bkg_ = (!is_data() && !is_fastsim_);
+    // if (dsname.Contains("Fast")) is_fastsim_ = true;
 
     // Get event weight histogram from baby
     TH2D* h_sig_counter_nEvents = nullptr;
@@ -393,9 +396,8 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
       // fillEfficiencyHistos(testVec[0], "filters");
 
       // Apply met filters
-      if (samplever.find("v31") == 0) {
+      if (babyver > 31.5) {
         if ( !is_fastsim_ && !filt_met() ) continue;  // use the CORE function passesMETfiltersRun2()
-        // if ( is_data() && !filt_met() ) continue;  // to test effect on MC
       } else if (doTopTagging) {
         // Recommended filters for the legacy analysis
         if ( !filt_goodvtx() ) continue;
@@ -581,7 +583,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
       }
 
       LorentzVector sumMHTp4(0,0,0,0);
-      if (samplever.find("v31_2") != 0) {
+      if (babyver >= 31.2) {
         for (auto jet : ak4pfjets_p4()) {
           sumMHTp4 -= jet;
         }
@@ -603,7 +605,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
       }
 
       float dphij1mht = (ngoodjets() > 0)? deltaPhi(ak4pfjets_p4().at(0).phi(), MHT_phi) : 9;
-      if (samplever.find("v31_2") == 0 && ngoodjets() > 0)
+      if (babyver >= 31.2 && ngoodjets() > 0)
         plot2d("h2d_ht5_dphijmht", dphij1mht, ak4_HTeta5()/ak4_HT(), 1, testVec[0].histMap, ";#Delta#phi(j1,MHT);HT5/HT", 16, 0, 3.2, 20, 1, 3);
 
       if (doHT5cut && year_ >= 2017) {
@@ -676,8 +678,8 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
 
       // Temporary test for top tagging efficiency
       // testTopTaggingEffficiency(testVec[1]);
-      // if (samplever.find("v31_6") == 0)  // available on and after v31_6
-      //   testGenMatching();
+      if (babyver >= 31.6)  // available on and after v31_6
+        testGenMatching(testVec[0]);
 
       /// Values only for hist filling or testing
       values_[chi2] = hadronic_top_chi2();
@@ -1155,7 +1157,7 @@ void StopLooper::fillHistosForSR(string suf) {
       plot1d("h_jet1eta"+s, values_[jet1eta], evtweight_, sr.histMap, ";#eta(jet1) [GeV]"   , 30,  -3,  3);
       plot1d("h_jet2eta"+s, values_[jet2eta], evtweight_, sr.histMap, ";#eta(jet2) [GeV]"   , 60,  -3,  3);
 
-      if (suf == "" && samplever.find("v31_2") == 0 && ngoodjets() > 0) {
+      if (suf == "" && babyver >= 31.2 && ngoodjets() > 0) {
         plot2d("h2d_ht5_dphijmht", deltaPhi(ak4pfjets_p4().at(0).phi(), values_[mhtphi]), ak4_HTeta5()/ak4_HT(), evtweight_, sr.histMap, ";#Delta#phi(j1,MHT);HT5/HT", 64, 0, 3.2, 80, 1, 3);
         plot1d("h_ht5overht", ak4_HTeta5()/ak4_HT(), evtweight_, sr.histMap, ";HT5/HT", 80, 1, 3);
       }
@@ -1282,7 +1284,7 @@ void StopLooper::fillHistosForCR2l(string suf) {
       plot1d("h_mhtovermet"+s, values_[mht]/values_[met], evtweight_, cr.histMap, ";H_{T}^{miss}/E_{T}^{miss}{miss}"  , 40, 0, 4);
       plot1d("h_diffmhtmet"+s, fabs(values_[mht]-values_[met])/values_[met], evtweight_, cr.histMap, ";#Delta(H_{T}^{miss}, E_{T}^{miss}{miss})/E_{T}^{miss}{miss}"   , 40, 0, 1);
       // Luminosity test at Z peak
-      if (suf == "" && samplever.find("v31_2") == 0 && ngoodjets() > 0) {
+      if (suf == "" && babyver >= 31.2 && ngoodjets() > 0) {
         plot2d("h2d_ht5_dphijmht", deltaPhi(ak4pfjets_p4().at(0).phi(), values_[mhtphi]), ak4_HTeta5()/ak4_HT(), evtweight_, cr.histMap, ";#Delta#phi(j1,MHT);HT5/HT", 64, 0, 3.2, 80, 1, 3);
         plot1d("h_ht5overht", ak4_HTeta5()/ak4_HT(), evtweight_, cr.histMap, ";HT5/HT", 80, 1, 3);
       }
@@ -1407,7 +1409,7 @@ void StopLooper::fillHistosForCR0b(string suf) {
       plot1d("h_mht"+s,           values_[mht]       , evtweight_, cr.histMap, ";H_{T}^{miss} [GeV]"                , 40, 0, 800);
       plot1d("h_mhtovermet"+s, values_[mht]/values_[met], evtweight_, cr.histMap, ";H_{T}^{miss}/E_{T}^{miss}{miss}"  , 40, 0, 4);
       plot1d("h_diffmhtmet"+s, fabs(values_[mht]-values_[met])/values_[met], evtweight_, cr.histMap, ";#Delta(H_{T}^{miss}, E_{T}^{miss}{miss})/E_{T}^{miss}{miss}"   , 40, 0, 1);
-      if (suf == "" && samplever.find("v31_2") == 0 && ngoodjets() > 0) {
+      if (suf == "" && babyver >= 31.2 && ngoodjets() > 0) {
         plot2d("h2d_ht5_dphijmht", deltaPhi(ak4pfjets_p4().at(0).phi(), values_[mhtphi]), ak4_HTeta5()/ak4_HT(), evtweight_, cr.histMap, ";#Delta#phi(j1,MHT);HT5/HT", 64, 0, 3.2, 80, 1, 3);
         plot1d("h_ht5overht", ak4_HTeta5()/ak4_HT(), evtweight_, cr.histMap, ";HT5/HT", 80, 1, 3);
       }
@@ -1429,7 +1431,7 @@ void StopLooper::fillHistosForCR0b(string suf) {
     //   ofile << run() << ':' << ls() << ':' << evt() << endl;
     // }
 
-    if (suf == "" && samplever.find("v31_2") == 0 && ngoodjets() > 0) {
+    if (suf == "" && babyver >= 31.2 && ngoodjets() > 0) {
       plot2d("h2d_ht5_dphijmht", deltaPhi(ak4pfjets_p4().at(0).phi(), values_[mhtphi]), ak4_HTeta5()/ak4_HT(), evtweight_, cr.histMap, ";#Delta#phi(j1,MHT);HT5/HT", 32, 0, 3.2, 40, 1, 3);
       plot1d("h_ht5overht", ak4_HTeta5()/ak4_HT(), evtweight_, cr.histMap, ";HT5/HT", 80, 1, 3);
     }
@@ -1474,7 +1476,8 @@ void StopLooper::fillHistosForCRemu(string suf, int trigType) {
   }
 
   if ( nvetoleps() != 2 ) return;  // ask for 2 lep events only
-  if ( ngoodjets()  < 2 ) return;
+  // if ( ngoodjets()  < 2 ) return;
+  if ( ngoodjets()  < 1 ) return;  // temporary
   if ( !(lep1_pdgid() * lep2_pdgid() == -143) ) return;
 
   // Basic cuts that are not supposed to change frequently
@@ -1504,19 +1507,21 @@ void StopLooper::fillHistosForCRemu(string suf, int trigType) {
   std::sort(jetidx.begin(), jetidx.end(), [&](size_t i, size_t j) {
     return ak4pfjets_deepCSV().at(i) > ak4pfjets_deepCSV().at(j);
   });
-  system_p4 += ak4pfjets_p4().at(jetidx.at(0)) + ak4pfjets_p4().at(jetidx.at(1));
-  values_[ptbb] = (ak4pfjets_p4().at(jetidx.at(0)) + ak4pfjets_p4().at(jetidx.at(1))).pt();
+  if (ngoodjets() > 1) {
+    system_p4 += ak4pfjets_p4().at(jetidx.at(0)) + ak4pfjets_p4().at(jetidx.at(1));
+    values_[ptbb] = (ak4pfjets_p4().at(jetidx.at(0)) + ak4pfjets_p4().at(jetidx.at(1))).pt();
 
-  // LorentzVector met_p4( pfmet()*cos(pfmet_phi()), pfmet()*sin(pfmet_phi()), 0.0, pfmet() );
-  LorentzVector met_p4( values_[met]*cos(values_[metphi]), values_[met]*sin(values_[metphi]), 0.0, values_[met] );
-  if (runMETResCorrection && applyMETResCorrection)
-    met_p4 = LorentzVector( values_[met_rs]*cos(values_[metphi_rs]), values_[met_rs]*sin(values_[metphi_rs]), 0.0, values_[met_rs]);
-  if (samplever.find("v31_2") != 0 && !applyMETResCorrection)
-    met_p4 = LorentzVector( pfmet_uncorr()*cos(pfmet_uncorr_phi()), pfmet_uncorr()*sin(pfmet_uncorr_phi()), 0.0, pfmet_uncorr());
-  system_p4 += met_p4;
+    // LorentzVector met_p4( pfmet()*cos(pfmet_phi()), pfmet()*sin(pfmet_phi()), 0.0, pfmet() );
+    LorentzVector met_p4( values_[met]*cos(values_[metphi]), values_[met]*sin(values_[metphi]), 0.0, values_[met] );
+    if (runMETResCorrection && applyMETResCorrection)
+      met_p4 = LorentzVector( values_[met_rs]*cos(values_[metphi_rs]), values_[met_rs]*sin(values_[metphi_rs]), 0.0, values_[met_rs]);
+    if (samplever.find("v31_2") != 0 && !applyMETResCorrection)
+      met_p4 = LorentzVector( pfmet_uncorr()*cos(pfmet_uncorr_phi()), pfmet_uncorr()*sin(pfmet_uncorr_phi()), 0.0, pfmet_uncorr());
+    system_p4 += met_p4;
 
-  values_[mllbbmet] = system_p4.M();
-  values_[ptttbar] = system_p4.Pt();
+    values_[mllbbmet] = system_p4.M();
+    values_[ptttbar] = system_p4.Pt();
+  }
 
   evtweight_ = evtWgt.getWeight(evtWgtInfo::systID::k_nominal, false, 5);
   if (is_bkg_) evtweight_ *= 0.85;  // dilepton trigger efficiency
@@ -1571,8 +1576,8 @@ void StopLooper::fillHistosForCRemu(string suf, int trigType) {
   // ISR-njets reweighting
   int n_isrjets = NISRjets();
   if (evtWgt.samptype == evtWgtInfo::ttbar) {
-    double isr_weight(0.), isr_weight_up(0.), isr_weight_down(0.);
-    evtWgt.getISRnJetsWeight_local(isr_weight, isr_weight_up, isr_weight_down);
+    // double isr_weight(0.), isr_weight_up(0.), isr_weight_down(0.);
+    // evtWgt.getISRnJetsWeight_local(isr_weight, isr_weight_up, isr_weight_down);
     // if (year_ == 2017) evtweight_ *= isr_weight;
   }
 
@@ -1699,8 +1704,15 @@ void StopLooper::fillHistosForCRemu(string suf, int trigType) {
         }
         plot1d("h_lead_softb_pt"+s, lead_softb_pt, evtweight_, cr.histMap, ";p_{T} (soft b)",  20,  0, 20);
 
-        if (values_[nsbtag] == 1) plot1d("h_nvtxs_1sb"+s,    values_[nvtx]    , evtweight_, cr.histMap, ";Number of vertices"   , 80,  1, 81);
-        if (values_[nsbtag] > 0) plot1d("h_nvtxs_ge1sb"+s,   values_[nvtx]    , evtweight_, cr.histMap, ";Number of vertices"   , 80,  1, 81);
+        plot1d("h_njets_h"+s,    values_[njet]    , evtweight_, cr.histMap, ";Number of jets"       ,  10,  0, 10);
+        if (values_[nsbtag] == 1) {
+          plot1d("h_nvtxs_1sb"+s,    values_[nvtx]    , evtweight_, cr.histMap, ";Number of vertices"   , 80,  1, 81);
+          plot1d("h_njets_1sb"+s,    values_[njet]    , evtweight_, cr.histMap, ";Number of jets"       ,  10,  0, 10);
+        }
+        if (values_[nsbtag] > 0) {
+          plot1d("h_nvtxs_ge1sb"+s,   values_[nvtx]    , evtweight_, cr.histMap, ";Number of vertices"   , 80,  1, 81);
+          plot1d("h_njets_ge1sb"+s,   values_[njet]    , evtweight_, cr.histMap, ";Number of jets"       ,  10,  0, 10);
+        }
         if (values_[nsbtag] > 1) plot1d("h_nvtxs_ge2sb"+s,   values_[nvtx]    , evtweight_, cr.histMap, ";Number of vertices"   , 80,  1, 81);
         if (lead_softb_pt > 0) {
           if (lead_softb_pt < 10)
@@ -1711,12 +1723,14 @@ void StopLooper::fillHistosForCRemu(string suf, int trigType) {
 
       };
       fillhists(suf);
-      // if (is_bkg_) {
-      //   evtweight_ = evtWgt.getWeight(evtWgtInfo::systID::k_softbSFUp, false, 5) * 0.85;
-      //   fillhists(suf+"_softbSFUp");
-      //   evtweight_ = evtWgt.getWeight(evtWgtInfo::systID::k_softbSFDown, false, 5) * 0.85;
-      //   fillhists(suf+"_softbSFDn");
-      // }
+      if ( (cr.GetName() == "cremuA1" || cr.GetName().find("cremuB") == 0) && babyver >= 31.6)  // available on and after v31_6
+        testGenMatching(cr);
+      if (is_bkg_) {
+        evtweight_ = evtWgt.getWeight(evtWgtInfo::systID::k_softbSFUp, false, 5) * 0.85;
+        fillhists(suf+"_softbSFUp");
+        evtweight_ = evtWgt.getWeight(evtWgtInfo::systID::k_softbSFDown, false, 5) * 0.85;
+        fillhists(suf+"_softbSFDn");
+      }
       // if (abs(lep1_pdgid()) == 13)
       //   fillhists(suf+"_mu");
       // else if (abs(lep1_pdgid()) == 11)
@@ -1742,7 +1756,7 @@ void StopLooper::fillHistosForCRemu(string suf, int trigType) {
           plot1d("h_njet_200nonb"+s, njets_pt200nonb, evtweight_, cr.histMap, ";N_{jets} (non-b) [GeV]", 5, 0, 5);
 
           // Plot the gen-NISR for ttbar
-          if (evtWgt.samptype == evtWgtInfo::ttbar) {
+          if (evtWgt.samptype == evtWgtInfo::ttbar || is_fastsim_) {
             plot1d("h_nisrmatch"+s, n_isrjets, evtweight_, cr.histMap, ";N-ISR gen-matched",  7,  0, 7);
             if (values_[nbjet] == 2) {
               plot1d("h_diff_nisr"+s, values_[njet]-n_isrjets-2, evtweight_, cr.histMap, ";#Delta(N-ISR beyond 2b, N-ISR gen)",  7,  -3, 4);
@@ -1806,6 +1820,9 @@ void StopLooper::fillHistosForCRemu(string suf, int trigType) {
 
           plot1d("h_genttbar_eta"+s, ttbar_sys.eta(), evtweight_, cr.histMap, ";#eta(gen-t#bar{t}) [GeV]", 40, -3, 3);
           plot1d("h_genttbar_ptb1"+s, ttbar_sys.pt(), evtweight_, cr.histMap, ";p_{T}(gen-t#bar{t}) [GeV]", ptbin1.size()-1, ptbin1.data());
+
+          plot1d("h_genmet"+s,  genmet() , evtweight_, cr.histMap, ";gen-E_{T}^{miss} [GeV]"   , 40,  00, 800);
+          plot1d("h_nupt"+s,    nupt()   , evtweight_, cr.histMap, ";gen-p_{T} (#nus) [GeV]"   , 40,  0, 800);
         }
 
         if (is_bkg_ && (plotset | 1<<3)) {
@@ -1821,7 +1838,7 @@ void StopLooper::fillHistosForCRemu(string suf, int trigType) {
               }
             }
           }
-          plot1d("h_nmatchedsoftb"+s, nmatchedsoftb, evtweight_, cr.histMap, ";Number of soft b-tagged jets",  5,  0, 5);
+          // plot1d("h_nmatchedsoftb"+s, nmatchedsoftb, evtweight_, cr.histMap, ";Number of soft b-tagged jets",  5,  0, 5);
         }
       };
       if (suf == "") fillExtraHists(0b101);
@@ -2071,15 +2088,16 @@ void StopLooper::fillTopTaggingHistos(string suffix) {
 
 }
 
-void StopLooper::testGenMatching() {
+void StopLooper::testGenMatching(SR& sr) {
 
   const float rtop_tight_WP = 0.98;
   const float mtop_custom_WP = 0.4;
 
   if ( is_data() ) return;
+  if ( runYieldsOnly ) return;
 
   const bool testplots = true;
-  auto& hvec = testVec[0].histMap;
+  auto& hvec = sr.histMap;
   string suf = (is_fastsim_)? "_"+to_string(mstop_)+"_"+to_string(mlsp_) : "";
 
   // First find all hadronic gen tops
@@ -2126,14 +2144,6 @@ void StopLooper::testGenMatching() {
 
     gentopdaugs.push_back(genq_fromtop);
 
-    // if (genq_fromtop.size() > 3) {
-    //   cout << endl;
-    //   for (int q : genq_fromtop) {
-    //     cout << __LINE__ << ": q= " << q << ", genqs_id()[q]= " << genqs_id()[q] << ", genqs_motherid()[q]= " << genqs_motherid()[q] << ", genqs_motheridx()[q]= " << genqs_motheridx()[q] << ", genqs_status()[q]= " << genqs_status()[q] << ", genqs_p4()[q].pt()= " << genqs_p4()[q].pt() << ", genqs_p4()[q].eta()= " << genqs_p4()[q].eta() << ", genqs_p4()[q].phi()= " << genqs_p4()[q].phi() << ", genqs_gmotheridx()[q]= " << genqs_gmotheridx()[q] << ", genqs_isHardProcess()[q]= " << genqs_isHardProcess()[q] << endl;
-    //   }
-    // }
-    // if (genq_fromtop.size() < 2) continue;       // this is a leptonic decaying top, skip
-    // else if (genq_fromtop.size() < 3) // this is a rare case of lost gen particle, skip the event
   }
 
   for (size_t itop = 0; itop < tftops_disc().size(); ++itop) {
@@ -2251,35 +2261,58 @@ void StopLooper::testGenMatching() {
     }
   }
 
+  float wgt = evtweight_ = evtWgt.getWeight(evtWgtInfo::systID::k_nominal, false, 5);
+
   int nmatchedsoftb = 0;
+  int nsoftbmatched = 0;
+  long long imatched_genb = 0;
   int nsboverlep = 0;
   for (auto sb : softtags_p4()) {
     if (nvetoleps() > 0 && isCloseObject(sb, lep1_p4(), 0.4)) {
       plot1d("h_isboverlep"+suf, 1, 1, hvec, ";N soft-b overlep with lep", 5, 0, 5);
       nsboverlep++;
-      continue;
+      // continue;
     } else if (nvetoleps() > 1 && isCloseObject(sb, lep2_p4(), 0.4)) {
       plot1d("h_isboverlep"+suf, 2, 1, hvec, ";N soft-b overlep with lep", 5, 0, 5);
       nsboverlep++;
-      continue;
+      // continue;
     }
     // bool matched = false;
     plot1d("hden_softb_tagbase_pt"+suf, sb.pt(), 1, hvec, ";pt (matched b)", 10, 0, 20);
+    int matchedid = 0;
+    float minDR = 0.4;
+    int qmatched = -1;
     for (size_t q = 0; q < genqs_id().size(); ++q) {
       if (!genqs_isLastCopy().at(q)) continue;
-      if (abs(genqs_id()[q]) != 5 ) continue;
-      if (isCloseObject(sb, genqs_p4().at(q), 0.4)) {
-        // matched = true;
-        nmatchedsoftb++;
-        plot1d("h_sbmatched_genb_pt"+suf, genqs_p4().at(q).pt(), 1, hvec, ";pt (matched b)", 80, 0, 160);
-        plot1d("hnum_softb_tagbase_pt"+suf, sb.pt(), 1, hvec, ";pt (matched b)", 10, 0, 20);
-      }
+      if (!isCloseObject(sb, genqs_p4().at(q), minDR, &minDR)) continue;
+      if (abs(genqs_id()[q]) > 5) continue;
+      qmatched = q;
+      matchedid = abs(genqs_id()[q]);
+    }
+    plot1d("h_softb_genid"+suf, matchedid, 1, hvec, ";pdg id ", 7, 0, 7);
+    plot1d("h_softb_mcat"+suf, 0, wgt, hvec, ";secondary vtx cat", 5, 0, 5);
+    int mcat = (matchedid == 5)? 1 : (matchedid == 0)? 3 : 2;
+    plot1d("h_softb_mcat"+suf, mcat, wgt, hvec, ";secondary vtx cat", 5, 0, 5);
+
+    if (abs(genqs_id()[qmatched]) == 5 ) {
+      // matched = true;
+      nmatchedsoftb++;
+      plot1d("h_sbmatched_genb_pt"+suf, genqs_p4().at(qmatched).pt(), 1, hvec, ";pt (matched b)", 80, 0, 160);
+      plot1d("hnum_softb_tagbase_pt"+suf, sb.pt(), 1, hvec, ";pt (matched b)", 10, 0, 20);
+      plot1d("h_dR_softb_genb"+suf, minDR, wgt, hvec, ";#DeltaR (soft-b,gen-b)", 25, 0, 0.5);
+      bool isfromtop = (abs(genqs_motherid().at(qmatched)) == 6);
+      if (qmatched > 63) cout << "WARNING: qmatched >31!!\n";
+      if (!(1<<qmatched & imatched_genb)) nsoftbmatched++;
+      imatched_genb |= 1<<qmatched;
     }
   }
 
+  plot1d("h_nsoftbmatched"+suf, nsoftbmatched, wgt, hvec, ";N soft-b gen-matched", 7, 0, 7);
+  plot1d("h_nmatchedsoftb"+suf, nmatchedsoftb, wgt, hvec, ";N soft-b gen-matched", 7, 0, 7);
+
   if (testplots && nsoftbtags() > 0) {
     plot1d("h_nsboverlep"+suf, nsboverlep, 1, hvec, ";N soft-b overlep with lep", 7, 0, 7);
-    plot1d("h_nmatchedsoftb"+suf, nmatchedsoftb, 1, hvec, ";N soft-b gen-matched", 7, 0, 7);
+    plot1d("h_nmatchedsoftb_ge1sb"+suf, nmatchedsoftb, wgt, hvec, ";N soft-b gen-matched", 7, 0, 7);
   }
 
   int nmatchedsoftvtx = 0;
@@ -2287,11 +2320,11 @@ void StopLooper::testGenMatching() {
   for (size_t isv = 0; isv < scndvtxs_p4().size(); ++isv) {
     bool overlep = false;
     if (nvetoleps() > 0 && isCloseObject(scndvtxs_p4()[isv], lep1_p4(), 0.4)) {
-      plot1d("h_isvoverlep"+suf, 1, 1, hvec, ";N soft-b overlep with lep", 5, 0, 5);
+      plot1d("h_isvoverlep"+suf, 1, wgt, hvec, ";N soft-b overlep with lep", 5, 0, 5);
       nsvoverlep++;
       overlep = true;
     } else if (nvetoleps() > 1 && isCloseObject(scndvtxs_p4()[isv], lep2_p4(), 0.4)) {
-      plot1d("h_isboverlep"+suf, 2, 1, hvec, ";N soft-b overlep with lep", 5, 0, 5);
+      plot1d("h_isboverlep"+suf, 2, wgt, hvec, ";N soft-b overlep with lep", 5, 0, 5);
       nsvoverlep++;
       overlep = true;
     }
@@ -2303,31 +2336,127 @@ void StopLooper::testGenMatching() {
       if (isCloseObject(scndvtxs_p4()[isv], genqs_p4().at(q), 0.4)) {
         matched = true;
         nmatchedsoftvtx++;
-        plot1d("h_sbmatched_genb_pt"+suf, genqs_p4().at(q).pt(), 1, hvec, ";pt (matched b)", 80, 0, 160);
+        plot1d("h_sbmatched_genb_pt"+suf, genqs_p4().at(q).pt(), wgt, hvec, ";pt (matched b)", 80, 0, 160);
         break;
       }
     }
 
-    plot1d("h_softb_cat"+suf, 0, 1, hvec, ";secondary vtx cat", 5, 0, 5);
-    if (!overlep) plot1d("h_softb_cat"+suf, 1, 1, hvec, ";secondary vtx cat", 5, 0, 5);
+    plot1d("h_softb_cat"+suf, 0, wgt, hvec, ";secondary vtx cat", 5, 0, 5);
+    if (!overlep) plot1d("h_softb_cat"+suf, 1, wgt, hvec, ";secondary vtx cat", 5, 0, 5);
 
-    if (scndvtxs_passSofttag().at(isv)) plot1d("h_softb_cat"+suf, 2, 1, hvec, ";secondary vtx cat", 5, 0, 5);
+    if (scndvtxs_passSofttag().at(isv)) plot1d("h_softb_cat"+suf, 2, wgt, hvec, ";secondary vtx cat", 5, 0, 5);
     if (!matched) continue;
-    plot1d("h_softb_cat"+suf, 3, 1, hvec, ";secondary vtx cat", 5, 0, 5);
+    plot1d("h_softb_cat"+suf, 3, wgt, hvec, ";secondary vtx cat", 5, 0, 5);
 
-    plot1d("hden_softb_genbase_pt"+suf, scndvtxs_p4()[isv].pt(), 1, hvec, ";pt (matched b)", 10, 0, 20);
+    plot1d("hden_softb_objbase_pt"+suf, scndvtxs_p4()[isv].pt(), wgt, hvec, ";pt (matched b)", 10, 0, 20);
     if (scndvtxs_passSofttag().at(isv)) {
-      plot1d("hnum_softb_genbase_pt"+suf, scndvtxs_p4()[isv].pt(), 1, hvec, ";pt (matched b)", 10, 0, 20);
-      plot1d("h_softb_cat"+suf, 4, 1, hvec, ";secondary vtx cat", 5, 0, 5);
+      plot1d("hnum_softb_objbase_pt"+suf, scndvtxs_p4()[isv].pt(), wgt, hvec, ";pt (matched b)", 10, 0, 20);
+      plot1d("h_softb_cat"+suf, 4, wgt, hvec, ";secondary vtx cat", 5, 0, 5);
     }
 
   }
 
   if (testplots && nsoftbtags() > 0) {
-    plot1d("h_nsvoverlep"+suf, nsvoverlep, 1, hvec, ";N soft-b overlep with lep", 7, 0, 7);
-    plot1d("h_nmatchedsoftvtx"+suf, nmatchedsoftvtx, 1, hvec, ";N soft-b gen-matched", 7, 0, 7);
+    plot1d("h_nsvoverlep"+suf, nsvoverlep, wgt, hvec, ";N soft-b overlep with lep", 7, 0, 7);
+    plot1d("h_nmatchedsoftvtx"+suf, nmatchedsoftvtx, wgt, hvec, ";N soft-b gen-matched", 7, 0, 7);
   }
 
+  if (nsoftbtags() == 1) {
+    plot1d("h_nmatchedsoftvtx_nsoftb1"+suf, nmatchedsoftvtx, 1, hvec, ";N soft-b gen-matched, nsb=1", 5, 0, 5);
+    plot1d("h_nmatchedsoftb_nsoftb1"+suf, nmatchedsoftb, 1, hvec, ";N soft-b gen-matched, nsb=1", 5, 0, 5);
+  }
+  else if (nsoftbtags() == 0)
+    plot1d("h_nmatchedsoftvtx_nsoftb0"+suf, nmatchedsoftvtx, 1, hvec, ";N soft-b gen-matched, nsb=1", 5, 0, 5);
+
+  // Start from gen-b and find dR matching
+  int ngenb = 0;
+  int nsbfromtop = 0;
+  for (size_t q = 0; q < genqs_id().size(); ++q) {
+    if (!genqs_isLastCopy().at(q)) continue;
+    if (abs(genqs_id()[q]) != 5 ) continue;
+    if (fabs(genqs_p4()[q].eta()) > 2.4 ) continue;
+
+    // if (float genbpt = genqs_p4()[q].pt(); genbpt < 50) {
+    //   int ibsf = genbpt / 5;
+    //   vector<float> genb_ptSF18 = {0.758, 0.830, 0.898, 0.935, 0.952, 0.991, 0.992, 1.016, 1.028, 1.000,};
+    //   vector<float> genb_ptSF17 = {0.793, 0.837, 0.900, 0.927, 0.948, 0.965, 0.985, 1.025, 1.002, 1.030,};
+    //   if (year_ == 2018) wgt = evtweight_ * genb_ptSF18.at(ibsf);
+    //   if (year_ == 2017) wgt = evtweight_ * genb_ptSF17.at(ibsf);
+    // }
+
+    bool isfromtop = (abs(genqs_motherid().at(q)) == 6);
+    if (!isfromtop) continue;
+    ngenb++;
+    bool jetmatched = false;
+    for (auto jet : ak4pfjets_p4()) {
+      if (isCloseObject(jet, genqs_p4().at(q), 0.4)) {
+        jetmatched = true;
+        break;
+      }
+    }
+    plot1d("h_genb_cat"+suf, 0, wgt, hvec, ";gen-b cat", 5, 0, 5);
+    plot1d("h_genb_genpt"+suf, genqs_p4()[q].pt(), wgt, hvec, ";pt (gen-b)", 60, 0, 300);
+    plot1d("h_genb_genpt_unwgtd"+suf, genqs_p4()[q].pt(), 1, hvec, ";pt (gen-b)", 60, 0, 300);
+    if (isfromtop) {
+      plot1d("h_genb_fromtop_genpt"+suf, genqs_p4()[q].pt(), wgt, hvec, ";pt (gen-b)", 60, 0, 300);
+      plot1d("h_gentop_genpt"+suf, genqs_motherp4().at(q).pt(), wgt, hvec, ";pt (gen-top)", 60, 0, 300);
+    } else {
+      plot1d("h_genb_notfromtop_genpt"+suf, genqs_p4()[q].pt(), wgt, hvec, ";pt (gen-b)", 60, 0, 300);
+    }
+    plot1d("hden_softb_genbase_genpt"+suf, genqs_p4()[q].pt(), wgt, hvec, ";pt (gen-b)", 20, 0, 50);
+    if (jetmatched) {
+      plot1d("h_genb_cat"+suf, 1, wgt, hvec, ";gen-b cat", 5, 0, 5);
+      continue;
+    }
+    plot1d("h_genb_cat"+suf, 2, wgt, hvec, ";gen-b cat", 5, 0, 5);
+    plot1d("hden_softb_genbase2_genpt"+suf, genqs_p4()[q].pt(), wgt, hvec, ";pt (gen-b)", 20, 0, 50);
+    if (isfromtop) plot1d("hden_softb_genbase3_genpt"+suf, genqs_p4()[q].pt(), wgt, hvec, ";pt (gen-b)", 20, 0, 50);
+    // if (fabs(genqs_p4()[q].pt()) > 30) continue;
+    bool svtxmatched = false;
+    for (auto svtx : scndvtxs_p4()) {
+      if (isCloseObject(svtx, genqs_p4().at(q), 0.4)) {
+        svtxmatched = true;
+        break;
+      }
+    }
+    bool sbmatched = false;
+    for (auto sb : softtags_p4()) {
+      float dr = 0.4;
+      if (isCloseObject(sb, genqs_p4().at(q), 0.4, &dr)) {
+        sbmatched = true;
+        plot1d("h_dR_genb_softb"+suf, dr, wgt, hvec, ";#DeltaR (gen-b, soft-b)", 25, 0, 0.5);
+        plot1d("h_sbmatched_pt"+suf, sb.pt(), 1, hvec, ";pt (soft-b)", 10, 0, 20);
+        break;
+      }
+    }
+    plot1d("h_cat2genb_pt"+suf, genqs_p4()[q].pt(), wgt, hvec, ";pt (gen b)", 20, 0, 40);
+    if (svtxmatched) {
+      plot1d("h_genb_cat"+suf, 3, wgt, hvec, ";gen-b cat", 5, 0, 5);
+      if (!sbmatched) continue;
+      plot1d("h_genb_cat"+suf, 4, wgt, hvec, ";gen-b cat", 5, 0, 5);
+      plot1d("hnum_softb_genbase_genpt"+suf, genqs_p4()[q].pt(), wgt, hvec, ";pt (gen-b)", 20, 0, 50);
+      plot1d("hnum_softb_genbase2_genpt"+suf, genqs_p4()[q].pt(), wgt, hvec, ";pt (gen-b)", 20, 0, 50);
+      if (isfromtop) {
+        plot1d("hnum_softb_genbase3_genpt"+suf, genqs_p4()[q].pt(), wgt, hvec, ";pt (gen-b)", 20, 0, 50);
+        nsbfromtop++;
+      }
+      plot1d("h_cat4genb_pt"+suf, genqs_p4()[q].pt(), wgt, hvec, ";pt (gen b)", 20, 0, 40);
+    } else {
+      plot1d("h_cat5genb_pt"+suf, genqs_p4()[q].pt(), wgt, hvec, ";pt (gen b)", 20, 0, 40);
+    }
+  }
+  plot1d("h_ngenb"+suf, ngenb, wgt, hvec, "; number gen-b cat", 5, 0, 5);
+  plot1d("h_nsbfromtop"+suf, nsbfromtop, wgt, hvec, "; Number of soft-b from top", 5, 0, 5);
+
+  // if (ngenb > 2) {
+  //   cout << ngenb << endl;
+  //   for (size_t q = 0; q < genqs_id().size(); ++q) {
+  //     if (!genqs_isLastCopy().at(q)) continue;
+  //     if (abs(genqs_id()[q]) != 5 ) continue;
+  //     // if (fabs(genqs_p4()[q].eta()) > 2.4 ) continue;
+  //     if (abs(genqs_motherid()[q]) != 6) continue;
+  //   }
+  // }
 
 }
 

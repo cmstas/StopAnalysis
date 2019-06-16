@@ -305,45 +305,57 @@ std::vector<SR> getStopCrosscheckRegionsEMuRun2() {
   SR cr = crbase;
 
   cr.SetName("cremuA0");
-  cr.SetDetailName("ge2j_ge0b_met50toInf");
+  cr.SetDetailName("emu_ge2j_ge0b_met50toInf");
   cr.SetVar(nbjet, 0, fInf);
   CRvec.emplace_back(cr);
 
   cr.SetName("cremuA1");
-  cr.SetDetailName("ge2j_ge1b_met50toInf");
+  cr.SetDetailName("emu_ge2j_ge1b_met50toInf");
   cr.SetVar(nbjet, 1, fInf);
   CRvec.emplace_back(cr);
 
   cr.SetName("cremuA2");
-  cr.SetDetailName("ge2j_ge2b_met50toInf");
+  cr.SetDetailName("emu_ge2j_ge2b_met50toInf");
   cr.SetVar(nbjet, 2, fInf);
   CRvec.emplace_back(cr);
 
   cr.SetName("cremuA3");
-  cr.SetDetailName("ge2j_2b_met50toInf");
+  cr.SetDetailName("emu_ge2j_2b_met50toInf");
   cr.SetVar(nbjet, 2, 3);
   CRvec.emplace_back(cr);
 
+  cr.SetName("cremuB1");
+  cr.SetDetailName("emu_ge1j_1b_met50toInf");
+  cr.SetVar(njet, 1, fInf);
+  cr.SetVar(nbjet, 1, 2);
+  CRvec.emplace_back(cr);
+
   cr.SetName("cremuB2");
-  cr.SetDetailName("2to3j_ge1b_met50toInf");
+  cr.SetDetailName("emu_1j_1b_met50toInf");
+  cr.SetVar(njet, 1, 2);
+  cr.SetVar(nbjet, 1, 2);
+  CRvec.emplace_back(cr);
+
+  cr.SetName("cremuC2");
+  cr.SetDetailName("emu_2to3j_ge1b_met50toInf");
   cr.SetVar(njet, 2, 4);
   cr.SetVar(nbjet, 1, fInf);
   CRvec.emplace_back(cr);
 
-  cr.SetName("cremuB3");
-  cr.SetDetailName("ge3j_ge1b_met50toInf");
+  cr.SetName("cremuC3");
+  cr.SetDetailName("emu_ge3j_ge1b_met50toInf");
   cr.SetVar(njet, 3, fInf);
   cr.SetVar(nbjet, 1, fInf);
   CRvec.emplace_back(cr);
 
-  cr.SetName("cremuB4");
-  cr.SetDetailName("ge4j_ge1b_met50toInf");
+  cr.SetName("cremuC4");
+  cr.SetDetailName("emu_ge4j_ge1b_met50toInf");
   cr.SetVar(njet, 4, fInf);
   cr.SetVar(nbjet, 1, fInf);
   CRvec.emplace_back(cr);
 
-  cr.SetName("cremuB5");
-  cr.SetDetailName("ge5j_ge1b_met50toInf");
+  cr.SetName("cremuC5");
+  cr.SetDetailName("emu_ge5j_ge1b_met50toInf");
   cr.SetVar(njet, 5, fInf);
   cr.SetVar(nbjet, 1, fInf);
   CRvec.emplace_back(cr);
@@ -2171,6 +2183,16 @@ std::vector<SR> getStopInclusiveRegionsRun2() {
   sr.SetDetailName("ge3j_met150to250_mt0toInf");
   sr.SetVar(njet, 3, fInf);
   sr.SetVar(mt, 100, 250);
+  SRvec.emplace_back(sr);
+
+  sr = srbase;
+  sr.SetName("srsbfmet4");  // MET sideband
+  sr.SetDetailName("ge2j_met125toInf_mt50toInf_dphijmet0toPi");
+  sr.SetVar(met, 125, fInf);
+  sr.SetVar(mt, 50, fInf);
+  sr.SetVar(dphijmet, 0, 3.1416);
+  sr.SetVar(passlep1pt, 1, 2);
+  sr.SetMETBins({125, 200, 250});
   SRvec.emplace_back(sr);
 
   sr = srbase;

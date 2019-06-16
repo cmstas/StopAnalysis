@@ -44,7 +44,7 @@ class StopLooper {
   void testTopTaggingEffficiency(SR& sr);
   void testCutFlowHistos(SR& sr);
 
-  void testGenMatching();
+  void testGenMatching(SR& sr);
 
   // Under development
   std::map<std::string,SRptrSet> allSRptrSets;
