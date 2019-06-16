@@ -70,7 +70,9 @@ void JetTree::InitBtagSFTool(bool isFastsim_) {
     TH2D* h_loose_btag_eff_udsg_temp = NULL;
     if(isFastsim){
       // Created using https://github.com/cmstas/bTagEfficiencyTools.
-      if (gconf.year >= 2017)
+      if (gconf.year == 2018)
+        feff =  new TFile("btagsf/run2_fastsim/btageff__DeepCSV_SMS_T2tt_fastsim_Autumn18.root");
+      else if (gconf.year == 2017)
         feff =  new TFile("btagsf/run2_fastsim/btageff__SMS-T1tttt_2017_94X_deepCSV.root");
       else if (gconf.year == 2016)
         feff =  new TFile("btagsf/run2_fastsim/btageff__SMS-T1tttt_2016_80X_deepCSV.root");

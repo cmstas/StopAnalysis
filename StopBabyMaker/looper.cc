@@ -2563,7 +2563,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
       bool pass_skim_met_jdown = (applyJECfromFile)? (StopEvt.pfmet_jdown >= skim_met || StopEvt.pfmet_rl_jdown >= skim_met) : false;
 
       if ( ((StopEvt.pfmet >= skim_met || StopEvt.pfmet_rl >= skim_met) || pass_skim_met_jup || pass_skim_met_jdown || pass_skim_met_photon) ) nEvents_pass_skim_met++;
-      else if ( (jets.ngoodjets > 1) && (nLooseLeptons >= 2) && (lep1.pdgid*lep2.pdgid == -143) && (StopEvt.pfmet >= skim_met_emuEvt) ) nEvents_pass_skim_met_emuEvt++;
+      else if ( (jets.ngoodjets >= skim_nJets) && (nLooseLeptons >= 2) && (lep1.pdgid*lep2.pdgid == -143) && (StopEvt.pfmet >= skim_met_emuEvt) ) nEvents_pass_skim_met_emuEvt++;
       else continue;
       //if(!(StopEvt.pfmet >= skim_met) && !(StopEvt.pfmet_rl >= skim_met) && !(StopEvt.pfmet_rl_jup >= skim_met) && !(StopEvt.pfmet_rl_jdown >= skim_met) && !(StopEvt.pfmet_jup >= skim_met) && !(StopEvt.pfmet_jdown >= skim_met) && !(StopEvt.pfmet_egclean >= skim_met) && !(StopEvt.pfmet_muegclean >= skim_met) && !(StopEvt.pfmet_muegcleanfix >= skim_met) && !(StopEvt.pfmet_uncorrcalomet >= skim_met) ) continue;
       /////////////////////////////////////////////////////////
