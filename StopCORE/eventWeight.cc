@@ -301,6 +301,7 @@ evtWgtInfo::evtWgtInfo() {
   apply_HEMveto_jet_sf  = false;
   apply_sample_sf       = false;
   apply_genweights_unc  = true;
+  combineCorridorScans  = true;
 
   // Initialize baby weights histograms
   h_sig_counter         = nullptr;
@@ -959,7 +960,6 @@ void evtWgtInfo::getSusyMasses( int &mStop, int &mLSP ) {
     mStop     = babyAnalyzer.mass_stop();
     mLSP      = babyAnalyzer.mass_lsp();
     // Protection against the 25 Gev bin size for the extra fine scans in the corridors <-- moving scheme need to sync with the babymaker!
-    const bool combineCorridorScans = true;
     if (!combineCorridorScans) {
       if (fmod(mLSP, 25.0) < 1 && fabs(fabs(mStop - mLSP - 175) - 7.5) < 1) {
         mLSP = mStop + 63;

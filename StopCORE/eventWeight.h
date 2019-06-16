@@ -147,6 +147,7 @@ class evtWgtInfo {
   int mStop;
   int mLSP;
   int mChargino;
+  bool combineCorridorScans;
 
   int jes_type;
   int year;

@@ -74,7 +74,7 @@ const bool runFullSignalScan = true;
 // debug symbol, for printing exact event kinematics that passes
 const bool printPassedEvents = false;
 // switch to use the separate fine scan points in the corridor or combine them
-const bool combineCorridorScans = true;
+const bool combineCorridorScans = false;
 // fill the distribution of event weights
 const bool fillWeights = false;
 // apply the HT5/HT cut
@@ -347,6 +347,8 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
     // evtWgt.apply_ISR_sf = false;
     // evtWgt.apply_metRes_sf_sf = false;
     // evtWgt.apply_metTTbar_sf = false;
+    if (babyver > 31.7)
+      evtWgt.combineCorridorScans = false;
 
     // evtWgt.setDefaultSystematics(evtWgtInfo::test_alloff);  // for test purpose
 
@@ -2300,7 +2302,7 @@ void StopLooper::testGenMatching(SR& sr) {
       plot1d("h_sbmatched_genb_pt"+suf, genqs_p4().at(qmatched).pt(), 1, hvec, ";pt (matched b)", 80, 0, 160);
       plot1d("hnum_softb_tagbase_pt"+suf, sb.pt(), 1, hvec, ";pt (matched b)", 10, 0, 20);
       plot1d("h_dR_softb_genb"+suf, minDR, wgt, hvec, ";#DeltaR (soft-b,gen-b)", 25, 0, 0.5);
-      bool isfromtop = (abs(genqs_motherid().at(qmatched)) == 6);
+      // bool isfromtop = (abs(genqs_motherid().at(qmatched)) == 6);
       if (qmatched > 63) cout << "WARNING: qmatched >31!!\n";
       if (!(1<<qmatched & imatched_genb)) nsoftbmatched++;
       imatched_genb |= 1<<qmatched;
