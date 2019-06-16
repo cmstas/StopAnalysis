@@ -4,6 +4,8 @@
 
 using namespace stop1l;
 
+bool is_fsttbar = false;
+
 // SNT CORE function
 /// topPtWeight() copied from MCSelections.cc
 float topPtWeight(float pt_top, float pt_tbar) {
@@ -1475,6 +1477,9 @@ void evtWgtInfo::getTauSFWeight( double &weight_tau, double &weight_tau_up, doub
     } else if (year == 2017) {
       sf = 0.89;
       sf_err = 0.03;
+    } else if (year == 2018) {
+      sf = 0.90;
+      sf_err = 0.02;
     }
 
     double sf_up = sf + sf_err;
@@ -1651,23 +1656,46 @@ void evtWgtInfo::getSoftBtagSF( double &wgt_softbtag, double &wgt_softbtag_up, d
       }
     }
 
-    if (!matched) continue;
+    // double sf  = 1.048;
+    // double err = 0.164;
+    double sf  = 1.0;
+    double err = 0.0;
 
-    double sf  = 1.048;
-    double err = 0.164;
-
-    if (year == 2018) {
-      sf  = 1.179;
-      err = 0.179;
+    if (matched) {
+      if (year == 2016) {
+        sf  = 1.08;
+        err = 0.03;
+      } else if (year == 2017) {
+        sf  = 1.05;
+        err = 0.06;
+      } else if (year == 2018) {
+        sf  = 1.19;
+        err = 0.06;
+      }
     }
 
-    if (is_fastsim_) {
-      if (year == 2016) {
-        sf *= 0.92;
-      } else if (year == 2017) {
-        sf *= 0.97;
-      } else if (year == 2018) {
-        sf *= 0.96;
+    // if (is_fastsim_) {
+    if (is_fastsim_ || is_fsttbar) {
+      if (matched) {
+        if (year == 2016) {
+          sf *= 0.93;
+          err += 0.06;
+        } else if (year == 2017) {
+          sf *= 0.93;
+          err += 0.02;
+        } else if (year == 2018) {
+          sf *= 0.93;
+          err += 0.02;
+        }
+      } else {
+        // float eff = h_softbeff_FS->GetBinContent(h_softbeff_FS->FindBin(sb.pt()));
+        // if (year == 2016) {
+        //   sf *= (1 - 0.92*eff) / (1 - eff);
+        // } else if (year == 2017) {
+        //   sf *= (1 - 0.82*eff) / (1 - eff);
+        // } else if (year == 2018) {
+        //   sf *= (1 - 0.83*eff) / (1 - eff);
+        // }
       }
     }
 
@@ -2608,6 +2636,15 @@ void evtWgtInfo::getISRnJetsWeight_local( double &weight_ISR, double &weight_ISR
     weight_ISR = 1.0;
   }
 
+  if (is_fsttbar && year >= 2016) {
+    weight_ISR    = babyAnalyzer.weight_ISRnjets();
+    weight_ISR_up = babyAnalyzer.weight_ISRnjets_UP();
+    weight_ISR_dn = babyAnalyzer.weight_ISRnjets_DN();
+    weight_ISR    *= ( nEvents / h_bkg_counter->GetBinContent(25) );
+    weight_ISR_up *= ( nEvents / h_bkg_counter->GetBinContent(26) );
+    weight_ISR_dn *= ( nEvents / h_bkg_counter->GetBinContent(27) );
+  }
+
   weight_ISR_up = weight_ISR + isr_unc;
   weight_ISR_dn = weight_ISR - isr_unc;
 }
@@ -2761,6 +2798,8 @@ evtWgtInfo::SampleType evtWgtInfo::findSampleType( string samplestr ) {
   else if (sample.BeginsWith("SMS") || sample.BeginsWith("Signal") ) samptype = fastsim;
   else cout << "[eventWeight] >> Cannot assigned sampletype for " << samplestr << endl;
 
+  if (sample.BeginsWith("TTJets") && sample.EndsWith("fs")) is_fsttbar = true;
+
   if (verbose) cout << "[eventWeight] >> The assigned sampletype based on " << samplestr << " is " << samptype << endl;
   return samptype;
 }
@@ -2839,6 +2878,7 @@ void evtWgtInfo::setDefaultSystematics( int syst_set, bool isfastsim ) {
       apply_HEMveto_el_sf  = true;   // scale down 2018 event with HEM electron
       apply_HEMveto_jet_sf = true;   // scale down 2018 event with HEM jet
       apply_sample_sf      = false;  // no multiple sample available yet
+      apply_lepFS_sf       = true;
       if (isfastsim) {
         apply_lepFS_sf     = true;   // updated on and after v31
         apply_bTagFS_sf    = true;
