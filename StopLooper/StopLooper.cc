@@ -486,13 +486,13 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
         mstop_ = mass_stop();
         mlsp_ = mass_lsp();
         if (!combineCorridorScans) {
-          if (fmod(mass_lsp(), kSMSMassStep) == 0 && fabs(mass_stop() - mass_lsp() - 175) == 8) {
+          if (fmod(mass_lsp(), kSMSMassStep) <= 1 && fabs(fabs(mass_stop() - mass_lsp() - 175) - 7.5) < 2) {
             mlsp_ = mstop_ + 63;
             // cout << "Moving (mstop,mlsp) = (" << mass_stop() << "," << mass_lsp() << ") to (" << mstop_ << "," << mlsp_ << ") \n";
-          } else if (fmod(mass_stop(), kSMSMassStep) == 0 && (mass_stop() - mass_lsp() - 100) == -13) {
+          } else if (fmod(mass_stop(), kSMSMassStep) < 1 && fabs(mass_stop() - mass_lsp() - 87.5) < 1) {
             mlsp_ += 12;
             // cout << "Moving (mstop,mlsp) = (" << mass_stop() << "," << mass_lsp() << ") to (" << mstop_ << "," << mlsp_ << ") \n";
-          } else if (fmod(mass_stop(), kSMSMassStep) > 2 || fmod(mass_lsp(), kSMSMassStep) > 2) {
+          } else if (fmod(mass_stop(), kSMSMassStep) > 1 || fmod(mass_lsp(), kSMSMassStep) > 1) {
             cout << "Skipping signal point with mstop = " << mass_stop() << ", and mLSP = " << mass_lsp() << " that is in between the steps!\n";
             continue;  // skip points in between the binning
           }
