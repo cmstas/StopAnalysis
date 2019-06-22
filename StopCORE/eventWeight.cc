@@ -1549,6 +1549,7 @@ void evtWgtInfo::getTopTaggerSF( double &wgt_ttag, double &wgt_ttag_up, double &
 
   // Apply SFs for the merged tagger first if a merged tag is found
   if (srtype == 2) {
+    // pt-bin: 400-480, 480-600, 600-inf
     const vector<vector<float>> deeptopSFVals {
       {1.01, 1.05, 1.06},  // 2016 values
       {1.08, 0.97, 1.02},  // 2017 values
@@ -1558,6 +1559,18 @@ void evtWgtInfo::getTopTaggerSF( double &wgt_ttag, double &wgt_ttag_up, double &
       {0.11, 0.08, 0.05},  // 2016 errors
       {0.10, 0.07, 0.08},  // 2017 errors
       {0.07, 0.05, 0.05},  // 2018 errors
+    };
+
+    // pt-bin: 200-400, 400-480, 480-600, 600-inf
+    const vector<vector<float>> deeptopFSSFVals {
+      {1.12, 0.99, 0.96, 0.92},  // 2016 values
+      {1.01, 0.95, 1.00, 0.96},  // 2017 values
+      {0.80, 1.03, 1.03, 1.03},  // 2018 values
+    };
+    const vector<vector<float>> deeptopFSSFErrs {
+      {0.15, 0.06, 0.04, 0.02},  // 2016 errors
+      {0.11, 0.04, 0.04, 0.02},  // 2017 errors
+      {0.08, 0.06, 0.04, 0.04},  // 2018 errors
     };
 
     for (size_t itop = 0; itop < ak8pfjets_deepdisc_top().size(); ++itop) {
@@ -1590,13 +1603,9 @@ void evtWgtInfo::getTopTaggerSF( double &wgt_ttag, double &wgt_ttag_up, double &
       err = deeptopSFErrs.at(yrbin).at(ptbin);
 
       if (is_fastsim_) {
-        if (year == 2016) {
-          sf *= 0.94;
-        } else if (year == 2017) {
-          sf *= 0.94;
-        } else if (year == 2018) {
-          sf *= 0.94;
-        }
+        int ptbinFS = (ak8pt < 400)? 0 : ptbin + 1;
+        sf *= deeptopFSSFVals.at(yrbin).at(ptbinFS);
+        err = sqrt(err*err + pow(deeptopFSSFErrs.at(yrbin).at(ptbinFS), 2));
       }
 
       wgt_ttag *= sf;
@@ -1703,7 +1712,6 @@ void evtWgtInfo::getSoftBtagSF( double &wgt_softbtag, double &wgt_softbtag_up, d
       }
     }
 
-    // if (is_fastsim_) {
     if (is_fastsim_ || is_fsttbar) {
       if (matched) {
         if (year == 2016) {
