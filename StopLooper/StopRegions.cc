@@ -2252,6 +2252,18 @@ std::vector<SR> getStopInclusiveRegionsRun2() {
   sr.SetVar(dphijmet, 0, 3.1416);
   SRvec.emplace_back(sr);
 
+  sr = srbase;
+  sr.SetName("srsbjfsb");
+  sr.SetDetailName("ge5j_ge1sb_passlmetcor_j1notb");
+  sr.SetVar(njet, 3, fInf);
+  sr.SetVar(nbjet, 0, fInf);
+  // sr.tVar(nsbtag, 0, fInf);
+  sr.SetVar(passlmetcor, 1, 2); // shape cut on lep1pt & dphilmet
+  sr.SetVar(dphijmet, 0.5, 3.1416);
+  sr.SetVar(j1passbtag, 0, 1);  // Require j1 not b-tagged
+  sr.SetMETBins({250, 350, 450, 550, 750, 1500});
+  SRvec.emplace_back(sr);
+
   return SRvec;
 }
 

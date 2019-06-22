@@ -444,8 +444,8 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
         // if (!(checkMassPt(1050, 100) || checkMassPt(900, 500) || checkMassPt(950, 100) || checkMassPt(425, 325) ||
         //       checkMassPt(1000, 100) || checkMassPt(800, 450) || checkMassPt(750, 400) || checkMassPt(800, 400) ||
         //       checkMassPt(1200, 100) || checkMassPt(850, 100) || checkMassPt(650, 350))) continue;
-        // if (!(checkMassPt(1200, 100) || checkMassPt(850, 100) || checkMassPt(650, 350))) continue;
-        if (!(checkMassPt(425, 325) || checkMassPt(450, 325))) continue;
+        if (!(checkMassPt(1200, 100) || checkMassPt(850, 100) || checkMassPt(650, 350))) continue;
+        // if (!(checkMassPt(425, 325) || checkMassPt(450, 325))) continue;
         // if (!checkMassPt(800,400)  && !checkMassPt(1200,50)  && !checkMassPt(400,100) &&
         //     !checkMassPt(1100,300) && !checkMassPt(1100,500) && !checkMassPt(900,600) &&
         //     !checkMassPt(1200,200) && !checkMassPt(1200,400) && !checkMassPt(1200,600)) continue;
@@ -920,7 +920,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
         // fillTopTaggingHistos(suffix);
 
         // Also do yield using genmet for fastsim samples <-- under development
-        if (is_fastsim_ && systype == 0 && samplever.find("v31_4") == 0) {
+        if (is_fastsim_ && systype == 0 && babyver >= 31.4) {
           values_[met] = genmet();
           values_[mt] = mt_genmet_lep();
           values_[tmod] = topnessMod_genmet();
@@ -2132,7 +2132,7 @@ void StopLooper::testGenMatching(SR& sr) {
     for (size_t q = 0; q < genqs_id().size(); ++q) {
       if (!genqs_isLastCopy().at(q)) continue;
       if (abs(genqs_id()[q]) > 5 ) continue;
-      // if (!genleps_isfromt().at(q)) continue;
+      if (babyver >= 31.9 && !genqs_fromHardProcess().at(q)) continue;
       if ((abs(genqs_id()[q]) == 5 && abs(genqs_motheridx().at(q)) == genqs__genpsidx().at(itop)) ||
           (abs(genqs_motherid().at(q)) == 24 && genqs_gmotheridx().at(q) == genqs__genpsidx().at(itop)))
         genq_fromtop.push_back(q);
@@ -2182,14 +2182,14 @@ void StopLooper::testGenMatching(SR& sr) {
 
     if (ndaugmatched < 2) continue;
 
-    plot1d("hden_rtag_genbase_tftop_pt"+suf, tftops_p4()[itop].pt(), 1, hvec, ";pt (matched top)", 20, 0, 800);
+    plot1d("hden_rtag_genbase_tftop_pt"+suf, tftops_p4()[itop].pt(), 1, hvec, ";p_{T} (matched top)", 20, 0, 800);
     plot1d("hden_rtag_genbase_tftop_mass"+suf, tftops_p4()[itop].M(), 1, hvec, ";M (matched top)", 20, 0, 400);
     plot1d("hden_rtag_genbase_njet"+suf, ngoodjets(), 1, hvec, ";Number of jets", 8, 0, 8);
     if (selected) {
-      plot1d("hnum_rtag_genbase_tftop_pt"+suf, tftops_p4()[itop].pt(), 1, hvec, ";pt (matched top)", 20, 0, 800);
+      plot1d("hnum_rtag_genbase_tftop_pt"+suf, tftops_p4()[itop].pt(), 1, hvec, ";p_{T} (matched top)", 20, 0, 800);
       plot1d("hnum_rtag_genbase_tftop_mass"+suf, tftops_p4()[itop].M(), 1, hvec, ";M (matched top)", 20, 0, 400);
       plot1d("hnum_rtag_genbase_njet"+suf, ngoodjets(), 1, hvec, ";Number of jets", 8, 0, 8);
-      plot1d("hnum_rtag_tagbase_tftop_pt"+suf, tftops_p4()[itop].pt(), 1, hvec, ";pt (matched top)", 20, 0, 800);
+      plot1d("hnum_rtag_tagbase_tftop_pt"+suf, tftops_p4()[itop].pt(), 1, hvec, ";p_{T} (matched top)", 20, 0, 800);
       plot1d("hnum_rtag_tagbase_tftop_mass"+suf, tftops_p4()[itop].M(), 1, hvec, ";M (matched top)", 20, 0, 400);
       plot1d("hnum_rtag_tagbase_njet"+suf, ngoodjets(), 1, hvec, ";Number of jets", 8, 0, 8);
     } else {
@@ -2198,21 +2198,42 @@ void StopLooper::testGenMatching(SR& sr) {
 
     // Now the left-over tops are gen-matched tops
     if (testplots) {
-      plot1d("h_matched_tftop_pt"+suf, tftops_p4()[itop].pt(), 1, hvec, ";pt (matched top)", 80, 0, 800);
+      plot1d("h_matched_tftop_pt"+suf, tftops_p4()[itop].pt(), 1, hvec, ";p_{T} (matched top)", 80, 0, 800);
       plot1d("h_matched_tftop_mass"+suf, tftops_p4()[itop].M(), 1, hvec, ";M (matched top)", 80, 0, 400);
-      plot2d("h2d_matched_toppt_genpt"+suf, genqs_p4().at(gentopidx[igentop]).pt(), tftops_p4()[itop].pt(), 1, hvec, ";pt (gen top);pt (matched top)", 80, 0, 800, 80, 0, 800);
+      plot2d("h2d_matched_toppt_genpt"+suf, genqs_p4().at(gentopidx[igentop]).pt(), tftops_p4()[itop].pt(), 1, hvec, ";p_{T} (gen top);p_{T} (matched top)", 80, 0, 800, 80, 0, 800);
       plot1d("h_njet_wmt"+suf, values_[njet], 1, hvec, ";Number of jets", 8, 0, 8);
     }
 
   }
 
+  float wgt = evtweight_ = evtWgt.getWeight(evtWgtInfo::systID::k_nominal, false, 2);
+
+  // int nvtx = min(nvtxs(), 75);
+  // if (year_ == 2018 && dataset().find("Fast") != string::npos)
+  //   wgt *= nvtx_weight18.at(nvtx);
+
+  plot1d("h_pu_ntrue"+suf, pu_ntrue(), wgt, hvec, ";PU N(true vtx)", 100, 0, 100);
+  plot1d("h_nvtxs_wgtd"+suf, nvtxs(), wgt, hvec, ";Number of Verticies", 100, 0, 100);
+
+  float lead_ak8_pt = 0;
+  for (auto ak8p4 : ak8pfjets_p4()) {
+    plot1d("h_all_ak8jet_pt"+suf, ak8p4.pt(), wgt, hvec, ";p_{T} (AK8 jets)", 24, 0, 1200);
+    plot1d("h_all_ak8jet_mass"+suf, ak8p4.M(), wgt, hvec, ";M (AK8 jets)", 20, 0, 400);
+    if (ak8p4.pt() > lead_ak8_pt) lead_ak8_pt = ak8p4.pt();
+  }
+  plot1d("h_lead_ak8jet_pt"+suf, lead_ak8_pt, wgt, hvec, ";p_{T} (AK8 jets)", 24, 0, 1200);
+  plot1d("h_nak8jets"+suf, values_[nak8jets] , wgt, hvec, ";Number of AK8 jets"   , 7, 0, 7);
+
   for (size_t itop = 0; itop < ak8pfjets_deepdisc_top().size(); ++itop) {
     bool selected = (ak8pfjets_deepdisc_top()[itop] > mtop_custom_WP);
 
+    plot1d("h_deepttag_allak8"+suf, ak8pfjets_deepdisc_top()[itop], wgt, hvec, ";DeepAK8 top score" , 120, -0.1f, 1.1f);
+    if (ak8pfjets_p4()[itop].pt() > 800)
+      plot1d("h_deepttag_allak8pt800"+suf, ak8pfjets_deepdisc_top()[itop], wgt, hvec, ";DeepAK8 top score" , 120, -0.1f, 1.1f);
     plot1d("h_ak8top_cat"+suf, 0, 1, hvec, ";cat (ak8 top)", 5, 0, 5);
     if (selected) {
       plot1d("h_mtag_cat"+suf, 0, 1, hvec, ";cat (ak8 top)", 5, 0, 5);
-      plot1d("hden_mtag_tagbase_ak8top_pt"+suf, ak8pfjets_p4()[itop].pt(), 1, hvec, ";pt (matched top)", 20, 0, 1200);
+      plot1d("hden_mtag_tagbase_ak8top_pt"+suf, ak8pfjets_p4()[itop].pt(), 1, hvec, ";p_{T} (matched top)", 24, 0, 1200);
       plot1d("hden_mtag_tagbase_ak8top_mass"+suf, ak8pfjets_p4()[itop].M(), 1, hvec, ";M (matched top)", 20, 0, 400);
     }
 
@@ -2227,10 +2248,12 @@ void StopLooper::testGenMatching(SR& sr) {
     if (selected) plot1d("h_mtag_cat"+suf, 1, 1, hvec, ";cat (ak8 top)", 5, 0, 5);
 
     int ngendaugmatched = 0;
+    LorentzVector daugsump4;
     for (int daug : gentopdaugs.at(igentop)) {
       float minDR = 0.8;
       if (isCloseObject(ak8pfjets_p4().at(itop), genqs_p4().at(daug), 0.8, &minDR)) {
         ngendaugmatched++;
+        daugsump4 += genqs_p4().at(daug);
         if (testplots) plot1d("h_mtag_minDR_genqmatched"+suf, minDR, 1, hvec, ";#DeltaR(gen quarks)", 50, 0, 1);
       }
     }
@@ -2239,18 +2262,37 @@ void StopLooper::testGenMatching(SR& sr) {
       plot1d("h_deeptop_ndaugmatched"+suf, ngendaugmatched, 1, hvec, ";N matched daug from deep top", 7, 0, 7);
     }
 
-    if (ngendaugmatched < std::min((int)gentopdaugs.at(igentop).size(), 3)) continue;
+    // if (ngendaugmatched < std::min((int)gentopdaugs.at(igentop).size(), 3)) continue;
+    if (ngendaugmatched < 3) continue;
 
+    // float ak8mass = ak8pfjets_p4()[itop].M();
+    // int ibin = min(int(ak8mass/20), 19);
+    // vector<float> ak8m_sfs = {0.2873,0.8617,0.8814,0.9817,1.0562,1.0553,0.9974,0.9834,1.0808,1.0758,0.7461,0.6541,0.5943,0.6358,0.5783,0.6973,0.6965,0.5843,0.6762,1.0180,};
+    // if (year_ == 2018 && dataset().find("Fast") != string::npos)
+    //   wgt *= ak8m_sfs.at(ibin);
+
+    plot1d("h_deepttag_genmatched"+suf, ak8pfjets_deepdisc_top()[itop], wgt, hvec, ";DeepAK8 top score" , 120, -0.1f, 1.1f);
+    if (ak8pfjets_p4()[itop].pt() > 800)
+      plot1d("h_deepttag_genmat_ak8pt800"+suf, ak8pfjets_deepdisc_top()[itop], wgt, hvec, ";DeepAK8 top score" , 120, -0.1f, 1.1f);
     plot1d("h_ak8top_cat"+suf, 2, 1, hvec, ";cat (ak8 top)", 5, 0, 5);
-    plot1d("hden_mtag_genbase_ak8top_pt"+suf, ak8pfjets_p4()[itop].pt(), 1, hvec, ";pt (matched top)", 20, 0, 1200);
-    plot1d("hden_mtag_genbase_ak8top_mass"+suf, ak8pfjets_p4()[itop].M(), 1, hvec, ";M (matched top)", 20, 0, 400);
+
+    const vector<float> ptbin3 = {0, 400, 480, 600, 1200};
+    plot1d("hden_mtag_genbase_ak8top_ptbin"+suf, ak8pfjets_p4()[itop].pt(), wgt, hvec, ";p_{T} (AK8-jet) [GeV]", ptbin3.size()-1, ptbin3.data());
+    plot1d("hden_mtag_genbase_ak8top_pt"+suf, ak8pfjets_p4()[itop].pt(), wgt, hvec, ";p_{T} (AK8-jet) [GeV]", 24, 0, 1200);
+    plot1d("hden_mtag_genbase_ak8top_mass"+suf, ak8pfjets_p4()[itop].M(), wgt, hvec, ";M (AK8-jet) [GeV]", 20, 0, 400);
+    plot1d("hden_mtag_genbase_gentop_pt"+suf, genqs_p4().at(gentopidx[igentop]).pt(), wgt, hvec, ";p_{T} (gen-top) [GeV]", 24, 0, 1200);
+    plot1d("hden_mtag_genbase_gentop_mass"+suf, genqs_p4().at(gentopidx[igentop]).M(), wgt, hvec, ";M (gen-top) [GeV]", 20, 0, 400);
+    plot1d("hden_mtag_genbase_gendaugs_mass"+suf, daugsump4.M(), wgt, hvec, ";M (AK8-jet) [GeV]", 20, 0, 400);
     if (selected) {
-      plot1d("h_mtag_cat"+suf, 2, 1, hvec, ";cat (ak8 top)", 5, 0, 5);
-      plot1d("h_ak8top_cat"+suf, 3, 1, hvec, ";cat (ak8 top)", 5, 0, 5);
-      plot1d("hnum_mtag_genbase_ak8top_pt"+suf, ak8pfjets_p4()[itop].pt(), 1, hvec, ";pt (matched top)", 20, 0, 1200);
-      plot1d("hnum_mtag_genbase_ak8top_mass"+suf, ak8pfjets_p4()[itop].M(), 1, hvec, ";M (matched top)", 20, 0, 400);
-      plot1d("hnum_mtag_tagbase_ak8top_pt"+suf, ak8pfjets_p4()[itop].pt(), 1, hvec, ";pt (matched top)", 20, 0, 1200);
-      plot1d("hnum_mtag_tagbase_ak8top_mass"+suf, ak8pfjets_p4()[itop].M(), 1, hvec, ";M (matched top)", 20, 0, 400);
+      plot1d("h_mtag_cat"+suf, 2, wgt, hvec, ";cat (ak8 top)", 5, 0, 5);
+      plot1d("h_ak8top_cat"+suf, 3, wgt, hvec, ";cat (ak8 top)", 5, 0, 5);
+      plot1d("hnum_mtag_genbase_ak8top_ptbin"+suf, ak8pfjets_p4()[itop].pt(), wgt, hvec, ";p_{T} (AK8-jet) [GeV]", ptbin3.size()-1, ptbin3.data());
+      plot1d("hnum_mtag_genbase_ak8top_pt"+suf, ak8pfjets_p4()[itop].pt(), wgt, hvec, ";p_{T} (AK8-jet) [GeV]", 24, 0, 1200);
+      plot1d("hnum_mtag_genbase_ak8top_mass"+suf, ak8pfjets_p4()[itop].M(), wgt, hvec, ";M (AK8-jet) [GeV]", 20, 0, 400);
+      plot1d("hnum_mtag_genbase_gentop_pt"+suf, genqs_p4().at(gentopidx[igentop]).pt(), wgt, hvec, ";p_{T} (gen-top) [GeV]", 24, 0, 1200);
+      plot1d("hnum_mtag_genbase_gentop_mass"+suf, genqs_p4().at(gentopidx[igentop]).M(), wgt, hvec, ";M (gen-top) [GeV]", 20, 0, 400);
+      plot1d("hnum_mtag_tagbase_ak8top_pt"+suf, ak8pfjets_p4()[itop].pt(), 1, hvec, ";p_{T} (AK8-jet) [GeV]", 24, 0, 1200);
+      plot1d("hnum_mtag_tagbase_ak8top_mass"+suf, ak8pfjets_p4()[itop].M(), 1, hvec, ";M (AK8-jet) [GeV]", 20, 0, 400);
     } else {
       continue;
     }
@@ -2263,7 +2305,7 @@ void StopLooper::testGenMatching(SR& sr) {
     }
   }
 
-  float wgt = evtweight_ = evtWgt.getWeight(evtWgtInfo::systID::k_nominal, false, 5);
+  wgt = evtweight_ = evtWgt.getWeight(evtWgtInfo::systID::k_nominal, false, 5);
 
   int nmatchedsoftb = 0;
   int nsoftbmatched = 0;
@@ -2317,76 +2359,90 @@ void StopLooper::testGenMatching(SR& sr) {
     plot1d("h_nmatchedsoftb_ge1sb"+suf, nmatchedsoftb, wgt, hvec, ";N soft-b gen-matched", 7, 0, 7);
   }
 
-  int nmatchedsoftvtx = 0;
-  int nsvoverlep = 0;
-  for (size_t isv = 0; isv < scndvtxs_p4().size(); ++isv) {
-    bool overlep = false;
-    if (nvetoleps() > 0 && isCloseObject(scndvtxs_p4()[isv], lep1_p4(), 0.4)) {
-      plot1d("h_isvoverlep"+suf, 1, wgt, hvec, ";N soft-b overlep with lep", 5, 0, 5);
-      nsvoverlep++;
-      overlep = true;
-    } else if (nvetoleps() > 1 && isCloseObject(scndvtxs_p4()[isv], lep2_p4(), 0.4)) {
-      plot1d("h_isboverlep"+suf, 2, wgt, hvec, ";N soft-b overlep with lep", 5, 0, 5);
-      nsvoverlep++;
-      overlep = true;
-    }
+  if (babyver >= 31.6) {
+    int nmatchedsoftvtx = 0;
+    int nsvoverlep = 0;
+    for (size_t isv = 0; isv < scndvtxs_p4().size(); ++isv) {
+      bool overlep = false;
+      if (nvetoleps() > 0 && isCloseObject(scndvtxs_p4()[isv], lep1_p4(), 0.4)) {
+        plot1d("h_isvoverlep"+suf, 1, wgt, hvec, ";N soft-b overlep with lep", 5, 0, 5);
+        nsvoverlep++;
+        overlep = true;
+      } else if (nvetoleps() > 1 && isCloseObject(scndvtxs_p4()[isv], lep2_p4(), 0.4)) {
+        plot1d("h_isboverlep"+suf, 2, wgt, hvec, ";N soft-b overlep with lep", 5, 0, 5);
+        nsvoverlep++;
+        overlep = true;
+      }
 
-    bool matched = false;
-    for (size_t q = 0; q < genqs_id().size(); ++q) {
-      if (!genqs_isLastCopy().at(q)) continue;
-      if (abs(genqs_id()[q]) != 5 ) continue;
-      if (isCloseObject(scndvtxs_p4()[isv], genqs_p4().at(q), 0.4)) {
-        matched = true;
-        nmatchedsoftvtx++;
-        plot1d("h_sbmatched_genb_pt"+suf, genqs_p4().at(q).pt(), wgt, hvec, ";pt (matched b)", 80, 0, 160);
-        break;
+      bool matched = false;
+      int genpid = 0;
+      float minDR = 0.4;
+      for (size_t q = 0; q < genqs_id().size(); ++q) {
+        if (!genqs_isLastCopy().at(q)) continue;
+        if (abs(genqs_id()[q]) > 5 ) continue;
+        // if (abs(genqs_id()[q]) != 5 ) continue;
+        if (isCloseObject(scndvtxs_p4()[isv], genqs_p4().at(q), minDR, &minDR)) {
+          genpid = abs(genqs_id()[q]);
+          if (genpid == 5) {
+            matched = true;
+            nmatchedsoftvtx++;
+            plot1d("h_sbmatched_genb_pt"+suf, genqs_p4().at(q).pt(), wgt, hvec, ";pt (matched b)", 80, 0, 160);
+            break;
+          }
+        }
+      }
+      plot1d("h_softb_cat"+suf, 0, wgt, hvec, ";secondary vtx cat", 5, 0, 5);
+      if (!overlep) plot1d("h_softb_cat"+suf, 1, wgt, hvec, ";secondary vtx cat", 5, 0, 5);
+      plot1d("h_softvtx_genpid"+suf, genpid, wgt, hvec, ";pdgID(vtx)", 7, 0, 7);
+
+      plot1d("hden_softb_fake_pt"+suf, scndvtxs_p4()[isv].pt(), wgt, hvec, ";pt (2nd vtx)", 10, 0, 20);
+      if (scndvtxs_passSofttag().at(isv)) {
+        plot1d("h_softb_cat"+suf, 2, wgt, hvec, ";secondary vtx cat", 5, 0, 5);
+        plot1d("hnum_softb_fake_pt"+suf, scndvtxs_p4()[isv].pt(), wgt, hvec, ";pt (2nd vtx)", 10, 0, 20);
+      }
+      if (!matched) continue;
+      plot1d("h_softb_cat"+suf, 3, wgt, hvec, ";secondary vtx cat", 5, 0, 5);
+
+      plot1d("hden_softb_objbase_pt"+suf, scndvtxs_p4()[isv].pt(), wgt, hvec, ";pt (matched b)", 10, 0, 20);
+      if (scndvtxs_passSofttag().at(isv)) {
+        plot1d("hnum_softb_objbase_pt"+suf, scndvtxs_p4()[isv].pt(), wgt, hvec, ";pt (matched b)", 10, 0, 20);
+        plot1d("h_softb_cat"+suf, 4, wgt, hvec, ";secondary vtx cat", 5, 0, 5);
       }
     }
-
-    plot1d("h_softb_cat"+suf, 0, wgt, hvec, ";secondary vtx cat", 5, 0, 5);
-    if (!overlep) plot1d("h_softb_cat"+suf, 1, wgt, hvec, ";secondary vtx cat", 5, 0, 5);
-
-    if (scndvtxs_passSofttag().at(isv)) plot1d("h_softb_cat"+suf, 2, wgt, hvec, ";secondary vtx cat", 5, 0, 5);
-    if (!matched) continue;
-    plot1d("h_softb_cat"+suf, 3, wgt, hvec, ";secondary vtx cat", 5, 0, 5);
-
-    plot1d("hden_softb_objbase_pt"+suf, scndvtxs_p4()[isv].pt(), wgt, hvec, ";pt (matched b)", 10, 0, 20);
-    if (scndvtxs_passSofttag().at(isv)) {
-      plot1d("hnum_softb_objbase_pt"+suf, scndvtxs_p4()[isv].pt(), wgt, hvec, ";pt (matched b)", 10, 0, 20);
-      plot1d("h_softb_cat"+suf, 4, wgt, hvec, ";secondary vtx cat", 5, 0, 5);
+    if (testplots && nsoftbtags() > 0) {
+      plot1d("h_nsvoverlep"+suf, nsvoverlep, wgt, hvec, ";N soft-b overlep with lep", 7, 0, 7);
+      plot1d("h_nmatchedsoftvtx"+suf, nmatchedsoftvtx, wgt, hvec, ";N soft-b gen-matched", 7, 0, 7);
     }
 
+    if (nsoftbtags() == 1) {
+      plot1d("h_nmatchedsoftvtx_nsoftb1"+suf, nmatchedsoftvtx, 1, hvec, ";N soft-b gen-matched, nsb=1", 5, 0, 5);
+      plot1d("h_nmatchedsoftb_nsoftb1"+suf, nmatchedsoftb, 1, hvec, ";N soft-b gen-matched, nsb=1", 5, 0, 5);
+    }
+    else if (nsoftbtags() == 0)
+      plot1d("h_nmatchedsoftvtx_nsoftb0"+suf, nmatchedsoftvtx, 1, hvec, ";N soft-b gen-matched, nsb=1", 5, 0, 5);
   }
-
-  if (testplots && nsoftbtags() > 0) {
-    plot1d("h_nsvoverlep"+suf, nsvoverlep, wgt, hvec, ";N soft-b overlep with lep", 7, 0, 7);
-    plot1d("h_nmatchedsoftvtx"+suf, nmatchedsoftvtx, wgt, hvec, ";N soft-b gen-matched", 7, 0, 7);
-  }
-
-  if (nsoftbtags() == 1) {
-    plot1d("h_nmatchedsoftvtx_nsoftb1"+suf, nmatchedsoftvtx, 1, hvec, ";N soft-b gen-matched, nsb=1", 5, 0, 5);
-    plot1d("h_nmatchedsoftb_nsoftb1"+suf, nmatchedsoftb, 1, hvec, ";N soft-b gen-matched, nsb=1", 5, 0, 5);
-  }
-  else if (nsoftbtags() == 0)
-    plot1d("h_nmatchedsoftvtx_nsoftb0"+suf, nmatchedsoftvtx, 1, hvec, ";N soft-b gen-matched, nsb=1", 5, 0, 5);
 
   // Start from gen-b and find dR matching
   int ngenb = 0;
   int nsbfromtop = 0;
   for (size_t q = 0; q < genqs_id().size(); ++q) {
     if (!genqs_isLastCopy().at(q)) continue;
-    if (abs(genqs_id()[q]) != 5 ) continue;
     if (fabs(genqs_p4()[q].eta()) > 2.4 ) continue;
-
-    // if (float genbpt = genqs_p4()[q].pt(); genbpt < 50) {
-    //   int ibsf = genbpt / 5;
-    //   vector<float> genb_ptSF18 = {0.758, 0.830, 0.898, 0.935, 0.952, 0.991, 0.992, 1.016, 1.028, 1.000,};
-    //   vector<float> genb_ptSF17 = {0.793, 0.837, 0.900, 0.927, 0.948, 0.965, 0.985, 1.025, 1.002, 1.030,};
-    //   if (year_ == 2018) wgt = evtweight_ * genb_ptSF18.at(ibsf);
-    //   if (year_ == 2017) wgt = evtweight_ * genb_ptSF17.at(ibsf);
-    // }
-
+    int genqid = abs(genqs_id()[q]);
     bool isfromtop = (abs(genqs_motherid().at(q)) == 6);
+    if (genqid < 5) {
+      if (genqid == 4) plot1d("hden_softb_cmatch_pt"+suf, genqs_p4()[q].pt(), wgt, hvec, ";pt (2nd vtx)", 10, 0, 50);
+      else plot1d("hden_softb_qmatch_pt"+suf, genqs_p4()[q].pt(), wgt, hvec, ";pt (2nd vtx)", 10, 0, 50);
+      for (auto sb : softtags_p4()) {
+        if (isCloseObject(sb, genqs_p4().at(q), 0.4)) {
+          if (genqid == 4) plot1d("hnum_softb_cmatch_pt"+suf, genqs_p4()[q].pt(), wgt, hvec, ";pt (2nd vtx)", 10, 0, 50);
+          else plot1d("hnum_softb_qmatch_pt"+suf, genqs_p4()[q].pt(), wgt, hvec, ";pt (2nd vtx)", 10, 0, 50);
+          break;
+        }
+      }
+    }
+
+    if (genqid != 5) continue;
     if (!isfromtop) continue;
     ngenb++;
     bool jetmatched = false;
@@ -2415,10 +2471,12 @@ void StopLooper::testGenMatching(SR& sr) {
     if (isfromtop) plot1d("hden_softb_genbase3_genpt"+suf, genqs_p4()[q].pt(), wgt, hvec, ";pt (gen-b)", 20, 0, 50);
     // if (fabs(genqs_p4()[q].pt()) > 30) continue;
     bool svtxmatched = false;
-    for (auto svtx : scndvtxs_p4()) {
-      if (isCloseObject(svtx, genqs_p4().at(q), 0.4)) {
-        svtxmatched = true;
-        break;
+    if (babyver >= 31.6) {
+      for (auto svtx : scndvtxs_p4()) {
+        if (isCloseObject(svtx, genqs_p4().at(q), 0.4)) {
+          svtxmatched = true;
+          break;
+        }
       }
     }
     bool sbmatched = false;
