@@ -963,10 +963,10 @@ void evtWgtInfo::getSusyMasses( int &mStop, int &mLSP ) {
     if (!combineCorridorScans) {
       if (fmod(mLSP, 25.0) < 1 && fabs(fabs(mStop - mLSP - 175) - 7.5) < 1) {
         mLSP = mStop + 63;
-        cout << "Moving (mstop,mlsp) = (" << mass_stop() << "," << mass_lsp() << ") to (" << mStop << "," << mLSP << ") \n";
+        // cout << "Moving (mstop,mlsp) = (" << mass_stop() << "," << mass_lsp() << ") to (" << mStop << "," << mLSP << ") \n";
       } else if (fmod(mStop, 25.0) < 1 && fabs(mStop - mLSP - 87.5) < 1) {
         mLSP += 12;
-        cout << "Moving (mstop,mlsp) = (" << mass_stop() << "," << mass_lsp() << ") to (" << mStop << "," << mLSP << ") \n";
+        // cout << "Moving (mstop,mlsp) = (" << mass_stop() << "," << mass_lsp() << ") to (" << mStop << "," << mLSP << ") \n";
       } else if (fmod(mStop, 25.0) > 1 || fmod(mLSP, 25.0) > 1) {
         cout << "Unknown signal point with mStop = " << mStop << ", and mLSP = " << mLSP << " !!\n";
       }
@@ -995,7 +995,6 @@ void evtWgtInfo::getXSecWeight( double &xsec_val, double &weight_xsec_up, double
   if ( is_fastsim_ && susy_xsec_fromfile ) {
     xsec_val = h_sig_xsec->GetBinContent(h_sig_xsec->FindBin(mStop));
     xsec_err = h_sig_xsec->GetBinError(h_sig_xsec->FindBin(mStop));
-    // xsec_val = h_sig_xsec->GetBinContent(h_sig_xsec->FindBin(1300));
   } else {
     xsec_val = babyAnalyzer.xsec();
     xsec_err = babyAnalyzer.xsec_uncert();
@@ -1550,6 +1549,17 @@ void evtWgtInfo::getTopTaggerSF( double &wgt_ttag, double &wgt_ttag_up, double &
 
   // Apply SFs for the merged tagger first if a merged tag is found
   if (srtype == 2) {
+    const vector<vector<float>> deeptopSFVals {
+      {1.01, 1.05, 1.06},  // 2016 values
+      {1.08, 0.97, 1.02},  // 2017 values
+      {0.95, 1.06, 0.94},  // 2018 values
+    };
+    const vector<vector<float>> deeptopSFErrs {
+      {0.11, 0.08, 0.05},  // 2016 errors
+      {0.10, 0.07, 0.08},  // 2017 errors
+      {0.07, 0.05, 0.05},  // 2018 errors
+    };
+
     for (size_t itop = 0; itop < ak8pfjets_deepdisc_top().size(); ++itop) {
       if (ak8pfjets_deepdisc_top()[itop] < mtop_custom_WP) continue;
 
@@ -1570,9 +1580,28 @@ void evtWgtInfo::getTopTaggerSF( double &wgt_ttag, double &wgt_ttag_up, double &
       if (ngendaugmatched < std::min((int)gentopdaugs.at(igentop).size(), 3)) continue;
 
       // Now the left-over tops are gen-matched merged tops
-      wgt_ttag *= 1.0;
-      wgt_ttag_up *= 1.0 + 0.20;
-      wgt_ttag_dn *= 1.0 - 0.20;
+      float sf  = 1.0;
+      float err = 0.0;
+
+      float ak8pt = ak8pfjets_p4().at(itop).pt();
+      int ptbin = (ak8pt < 480)? 0 : (ak8pt < 600)? 1 : 2;
+      int yrbin = year - 2016;
+      sf  = deeptopSFVals.at(yrbin).at(ptbin);
+      err = deeptopSFErrs.at(yrbin).at(ptbin);
+
+      if (is_fastsim_) {
+        if (year == 2016) {
+          sf *= 0.94;
+        } else if (year == 2017) {
+          sf *= 0.94;
+        } else if (year == 2018) {
+          sf *= 0.94;
+        }
+      }
+
+      wgt_ttag *= sf;
+      wgt_ttag_up *= sf + err;
+      wgt_ttag_dn *= sf - err;
     }
   }
   else if (srtype == 3) {

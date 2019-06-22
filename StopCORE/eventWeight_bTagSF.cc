@@ -81,7 +81,9 @@ void eventWeight_bTagSF::setup(bool isFastsim, int year, std::string fn_btagSF, 
 
   if(isFastsim){
     // Created using https://github.com/cmstas/bTagEfficiencyTools.
-    if (year >= 2017)
+    if (year == 2018)
+      feff =  new TFile("../CORE/Tools/btagsf/data/run2_fastsim/btageff__DeepCSV_SMS_T2tt_fastsim_Autumn18.root");
+    if (year == 2017)
       feff =  new TFile("../CORE/Tools/btagsf/data/run2_fastsim/btageff__SMS-T1tttt_2017_94X_deepCSV.root");
     else if (year == 2016)
       feff =  new TFile("../CORE/Tools/btagsf/data/run2_fastsim/btageff__SMS-T1tttt_2016_80X_deepCSV.root");

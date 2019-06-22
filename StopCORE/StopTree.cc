@@ -739,6 +739,8 @@ void StopTree::Init(TTree *tree) {
   if (genleps__genpsidx_branch) genleps__genpsidx_branch->SetAddress(&genleps__genpsidx_);
   genleps_status_branch = tree->GetBranch("genleps_status");
   if (genleps_status_branch) genleps_status_branch->SetAddress(&genleps_status_);
+  genleps_fromHardProcess_branch = tree->GetBranch("genleps_fromHardProcess");
+  if (genleps_fromHardProcess_branch) genleps_fromHardProcess_branch->SetAddress(&genleps_fromHardProcess_);
   genleps_fromHardProcessDecayed_branch = tree->GetBranch("genleps_fromHardProcessDecayed");
   if (genleps_fromHardProcessDecayed_branch) genleps_fromHardProcessDecayed_branch->SetAddress(&genleps_fromHardProcessDecayed_);
   genleps_fromHardProcessFinalState_branch = tree->GetBranch("genleps_fromHardProcessFinalState");
@@ -771,6 +773,8 @@ void StopTree::Init(TTree *tree) {
   if (gennus__genpsidx_branch) gennus__genpsidx_branch->SetAddress(&gennus__genpsidx_);
   gennus_status_branch = tree->GetBranch("gennus_status");
   if (gennus_status_branch) gennus_status_branch->SetAddress(&gennus_status_);
+  gennus_fromHardProcess_branch = tree->GetBranch("gennus_fromHardProcess");
+  if (gennus_fromHardProcess_branch) gennus_fromHardProcess_branch->SetAddress(&gennus_fromHardProcess_);
   gennus_fromHardProcessDecayed_branch = tree->GetBranch("gennus_fromHardProcessDecayed");
   if (gennus_fromHardProcessDecayed_branch) gennus_fromHardProcessDecayed_branch->SetAddress(&gennus_fromHardProcessDecayed_);
   gennus_fromHardProcessFinalState_branch = tree->GetBranch("gennus_fromHardProcessFinalState");
@@ -803,6 +807,8 @@ void StopTree::Init(TTree *tree) {
   if (genqs__genpsidx_branch) genqs__genpsidx_branch->SetAddress(&genqs__genpsidx_);
   genqs_status_branch = tree->GetBranch("genqs_status");
   if (genqs_status_branch) genqs_status_branch->SetAddress(&genqs_status_);
+  genqs_fromHardProcess_branch = tree->GetBranch("genqs_fromHardProcess");
+  if (genqs_fromHardProcess_branch) genqs_fromHardProcess_branch->SetAddress(&genqs_fromHardProcess_);
   genqs_fromHardProcessDecayed_branch = tree->GetBranch("genqs_fromHardProcessDecayed");
   if (genqs_fromHardProcessDecayed_branch) genqs_fromHardProcessDecayed_branch->SetAddress(&genqs_fromHardProcessDecayed_);
   genqs_fromHardProcessFinalState_branch = tree->GetBranch("genqs_fromHardProcessFinalState");
@@ -835,6 +841,8 @@ void StopTree::Init(TTree *tree) {
   if (genbosons__genpsidx_branch) genbosons__genpsidx_branch->SetAddress(&genbosons__genpsidx_);
   genbosons_status_branch = tree->GetBranch("genbosons_status");
   if (genbosons_status_branch) genbosons_status_branch->SetAddress(&genbosons_status_);
+  genbosons_fromHardProcess_branch = tree->GetBranch("genbosons_fromHardProcess");
+  if (genbosons_fromHardProcess_branch) genbosons_fromHardProcess_branch->SetAddress(&genbosons_fromHardProcess_);
   genbosons_fromHardProcessDecayed_branch = tree->GetBranch("genbosons_fromHardProcessDecayed");
   if (genbosons_fromHardProcessDecayed_branch) genbosons_fromHardProcessDecayed_branch->SetAddress(&genbosons_fromHardProcessDecayed_);
   genbosons_fromHardProcessFinalState_branch = tree->GetBranch("genbosons_fromHardProcessFinalState");
@@ -867,6 +875,8 @@ void StopTree::Init(TTree *tree) {
   if (gensusy__genpsidx_branch) gensusy__genpsidx_branch->SetAddress(&gensusy__genpsidx_);
   gensusy_status_branch = tree->GetBranch("gensusy_status");
   if (gensusy_status_branch) gensusy_status_branch->SetAddress(&gensusy_status_);
+  gensusy_fromHardProcess_branch = tree->GetBranch("gensusy_fromHardProcess");
+  if (gensusy_fromHardProcess_branch) gensusy_fromHardProcess_branch->SetAddress(&gensusy_fromHardProcess_);
   gensusy_fromHardProcessDecayed_branch = tree->GetBranch("gensusy_fromHardProcessDecayed");
   if (gensusy_fromHardProcessDecayed_branch) gensusy_fromHardProcessDecayed_branch->SetAddress(&gensusy_fromHardProcessDecayed_);
   gensusy_fromHardProcessFinalState_branch = tree->GetBranch("gensusy_fromHardProcessFinalState");
@@ -1633,6 +1643,7 @@ void StopTree::GetEntry(unsigned int idx) {
   genleps_id_isLoaded = false;
   genleps__genpsidx_isLoaded = false;
   genleps_status_isLoaded = false;
+  genleps_fromHardProcess_isLoaded = false;
   genleps_fromHardProcessDecayed_isLoaded = false;
   genleps_fromHardProcessFinalState_isLoaded = false;
   genleps_isHardProcess_isLoaded = false;
@@ -1652,6 +1663,7 @@ void StopTree::GetEntry(unsigned int idx) {
   gennus_id_isLoaded = false;
   gennus__genpsidx_isLoaded = false;
   gennus_status_isLoaded = false;
+  gennus_fromHardProcess_isLoaded = false;
   gennus_fromHardProcessDecayed_isLoaded = false;
   gennus_fromHardProcessFinalState_isLoaded = false;
   gennus_isHardProcess_isLoaded = false;
@@ -1671,6 +1683,7 @@ void StopTree::GetEntry(unsigned int idx) {
   genqs_id_isLoaded = false;
   genqs__genpsidx_isLoaded = false;
   genqs_status_isLoaded = false;
+  genqs_fromHardProcess_isLoaded = false;
   genqs_fromHardProcessDecayed_isLoaded = false;
   genqs_fromHardProcessFinalState_isLoaded = false;
   genqs_isHardProcess_isLoaded = false;
@@ -1690,6 +1703,7 @@ void StopTree::GetEntry(unsigned int idx) {
   genbosons_id_isLoaded = false;
   genbosons__genpsidx_isLoaded = false;
   genbosons_status_isLoaded = false;
+  genbosons_fromHardProcess_isLoaded = false;
   genbosons_fromHardProcessDecayed_isLoaded = false;
   genbosons_fromHardProcessFinalState_isLoaded = false;
   genbosons_isHardProcess_isLoaded = false;
@@ -1709,6 +1723,7 @@ void StopTree::GetEntry(unsigned int idx) {
   gensusy_id_isLoaded = false;
   gensusy__genpsidx_isLoaded = false;
   gensusy_status_isLoaded = false;
+  gensusy_fromHardProcess_isLoaded = false;
   gensusy_fromHardProcessDecayed_isLoaded = false;
   gensusy_fromHardProcessFinalState_isLoaded = false;
   gensusy_isHardProcess_isLoaded = false;
@@ -2278,6 +2293,7 @@ void StopTree::LoadAllBranches() {
   if (genleps_id_branch != 0) genleps_id();
   if (genleps__genpsidx_branch != 0) genleps__genpsidx();
   if (genleps_status_branch != 0) genleps_status();
+  if (genleps_fromHardProcess_branch != 0) genleps_fromHardProcess();
   if (genleps_fromHardProcessDecayed_branch != 0) genleps_fromHardProcessDecayed();
   if (genleps_fromHardProcessFinalState_branch != 0) genleps_fromHardProcessFinalState();
   if (genleps_isHardProcess_branch != 0) genleps_isHardProcess();
@@ -2297,6 +2313,7 @@ void StopTree::LoadAllBranches() {
   if (gennus_id_branch != 0) gennus_id();
   if (gennus__genpsidx_branch != 0) gennus__genpsidx();
   if (gennus_status_branch != 0) gennus_status();
+  if (gennus_fromHardProcess_branch != 0) gennus_fromHardProcess();
   if (gennus_fromHardProcessDecayed_branch != 0) gennus_fromHardProcessDecayed();
   if (gennus_fromHardProcessFinalState_branch != 0) gennus_fromHardProcessFinalState();
   if (gennus_isHardProcess_branch != 0) gennus_isHardProcess();
@@ -2316,6 +2333,7 @@ void StopTree::LoadAllBranches() {
   if (genqs_id_branch != 0) genqs_id();
   if (genqs__genpsidx_branch != 0) genqs__genpsidx();
   if (genqs_status_branch != 0) genqs_status();
+  if (genqs_fromHardProcess_branch != 0) genqs_fromHardProcess();
   if (genqs_fromHardProcessDecayed_branch != 0) genqs_fromHardProcessDecayed();
   if (genqs_fromHardProcessFinalState_branch != 0) genqs_fromHardProcessFinalState();
   if (genqs_isHardProcess_branch != 0) genqs_isHardProcess();
@@ -2335,6 +2353,7 @@ void StopTree::LoadAllBranches() {
   if (genbosons_id_branch != 0) genbosons_id();
   if (genbosons__genpsidx_branch != 0) genbosons__genpsidx();
   if (genbosons_status_branch != 0) genbosons_status();
+  if (genbosons_fromHardProcess_branch != 0) genbosons_fromHardProcess();
   if (genbosons_fromHardProcessDecayed_branch != 0) genbosons_fromHardProcessDecayed();
   if (genbosons_fromHardProcessFinalState_branch != 0) genbosons_fromHardProcessFinalState();
   if (genbosons_isHardProcess_branch != 0) genbosons_isHardProcess();
@@ -2354,6 +2373,7 @@ void StopTree::LoadAllBranches() {
   if (gensusy_id_branch != 0) gensusy_id();
   if (gensusy__genpsidx_branch != 0) gensusy__genpsidx();
   if (gensusy_status_branch != 0) gensusy_status();
+  if (gensusy_fromHardProcess_branch != 0) gensusy_fromHardProcess();
   if (gensusy_fromHardProcessDecayed_branch != 0) gensusy_fromHardProcessDecayed();
   if (gensusy_fromHardProcessFinalState_branch != 0) gensusy_fromHardProcessFinalState();
   if (gensusy_isHardProcess_branch != 0) gensusy_isHardProcess();
@@ -6989,6 +7009,19 @@ const vector<int> &StopTree::genleps_status() {
   return *genleps_status_;
 }
 
+const vector<bool> &StopTree::genleps_fromHardProcess() {
+  if (not genleps_fromHardProcess_isLoaded) {
+    if (genleps_fromHardProcess_branch != 0) {
+      genleps_fromHardProcess_branch->GetEntry(index);
+    } else {
+      printf("branch genleps_fromHardProcess_branch does not exist!\n");
+      exit(1);
+    }
+    genleps_fromHardProcess_isLoaded = true;
+  }
+  return *genleps_fromHardProcess_;
+}
+
 const vector<bool> &StopTree::genleps_fromHardProcessDecayed() {
   if (not genleps_fromHardProcessDecayed_isLoaded) {
     if (genleps_fromHardProcessDecayed_branch != 0) {
@@ -7234,6 +7267,19 @@ const vector<int> &StopTree::gennus_status() {
     gennus_status_isLoaded = true;
   }
   return *gennus_status_;
+}
+
+const vector<bool> &StopTree::gennus_fromHardProcess() {
+  if (not gennus_fromHardProcess_isLoaded) {
+    if (gennus_fromHardProcess_branch != 0) {
+      gennus_fromHardProcess_branch->GetEntry(index);
+    } else {
+      printf("branch gennus_fromHardProcess_branch does not exist!\n");
+      exit(1);
+    }
+    gennus_fromHardProcess_isLoaded = true;
+  }
+  return *gennus_fromHardProcess_;
 }
 
 const vector<bool> &StopTree::gennus_fromHardProcessDecayed() {
@@ -7483,6 +7529,19 @@ const vector<int> &StopTree::genqs_status() {
   return *genqs_status_;
 }
 
+const vector<bool> &StopTree::genqs_fromHardProcess() {
+  if (not genqs_fromHardProcess_isLoaded) {
+    if (genqs_fromHardProcess_branch != 0) {
+      genqs_fromHardProcess_branch->GetEntry(index);
+    } else {
+      printf("branch genqs_fromHardProcess_branch does not exist!\n");
+      exit(1);
+    }
+    genqs_fromHardProcess_isLoaded = true;
+  }
+  return *genqs_fromHardProcess_;
+}
+
 const vector<bool> &StopTree::genqs_fromHardProcessDecayed() {
   if (not genqs_fromHardProcessDecayed_isLoaded) {
     if (genqs_fromHardProcessDecayed_branch != 0) {
@@ -7730,6 +7789,19 @@ const vector<int> &StopTree::genbosons_status() {
   return *genbosons_status_;
 }
 
+const vector<bool> &StopTree::genbosons_fromHardProcess() {
+  if (not genbosons_fromHardProcess_isLoaded) {
+    if (genbosons_fromHardProcess_branch != 0) {
+      genbosons_fromHardProcess_branch->GetEntry(index);
+    } else {
+      printf("branch genbosons_fromHardProcess_branch does not exist!\n");
+      exit(1);
+    }
+    genbosons_fromHardProcess_isLoaded = true;
+  }
+  return *genbosons_fromHardProcess_;
+}
+
 const vector<bool> &StopTree::genbosons_fromHardProcessDecayed() {
   if (not genbosons_fromHardProcessDecayed_isLoaded) {
     if (genbosons_fromHardProcessDecayed_branch != 0) {
@@ -7975,6 +8047,19 @@ const vector<int> &StopTree::gensusy_status() {
     gensusy_status_isLoaded = true;
   }
   return *gensusy_status_;
+}
+
+const vector<bool> &StopTree::gensusy_fromHardProcess() {
+  if (not gensusy_fromHardProcess_isLoaded) {
+    if (gensusy_fromHardProcess_branch != 0) {
+      gensusy_fromHardProcess_branch->GetEntry(index);
+    } else {
+      printf("branch gensusy_fromHardProcess_branch does not exist!\n");
+      exit(1);
+    }
+    gensusy_fromHardProcess_isLoaded = true;
+  }
+  return *gensusy_fromHardProcess_;
 }
 
 const vector<bool> &StopTree::gensusy_fromHardProcessDecayed() {
@@ -11277,6 +11362,7 @@ const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &genleps
 const vector<int> &genleps_id() { return babyAnalyzer.genleps_id(); }
 const vector<int> &genleps__genpsidx() { return babyAnalyzer.genleps__genpsidx(); }
 const vector<int> &genleps_status() { return babyAnalyzer.genleps_status(); }
+const vector<bool> &genleps_fromHardProcess() { return babyAnalyzer.genleps_fromHardProcess(); }
 const vector<bool> &genleps_fromHardProcessDecayed() { return babyAnalyzer.genleps_fromHardProcessDecayed(); }
 const vector<bool> &genleps_fromHardProcessFinalState() { return babyAnalyzer.genleps_fromHardProcessFinalState(); }
 const vector<bool> &genleps_isHardProcess() { return babyAnalyzer.genleps_isHardProcess(); }
@@ -11296,6 +11382,7 @@ const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &gennus_
 const vector<int> &gennus_id() { return babyAnalyzer.gennus_id(); }
 const vector<int> &gennus__genpsidx() { return babyAnalyzer.gennus__genpsidx(); }
 const vector<int> &gennus_status() { return babyAnalyzer.gennus_status(); }
+const vector<bool> &gennus_fromHardProcess() { return babyAnalyzer.gennus_fromHardProcess(); }
 const vector<bool> &gennus_fromHardProcessDecayed() { return babyAnalyzer.gennus_fromHardProcessDecayed(); }
 const vector<bool> &gennus_fromHardProcessFinalState() { return babyAnalyzer.gennus_fromHardProcessFinalState(); }
 const vector<bool> &gennus_isHardProcess() { return babyAnalyzer.gennus_isHardProcess(); }
@@ -11315,6 +11402,7 @@ const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &genqs_p
 const vector<int> &genqs_id() { return babyAnalyzer.genqs_id(); }
 const vector<int> &genqs__genpsidx() { return babyAnalyzer.genqs__genpsidx(); }
 const vector<int> &genqs_status() { return babyAnalyzer.genqs_status(); }
+const vector<bool> &genqs_fromHardProcess() { return babyAnalyzer.genqs_fromHardProcess(); }
 const vector<bool> &genqs_fromHardProcessDecayed() { return babyAnalyzer.genqs_fromHardProcessDecayed(); }
 const vector<bool> &genqs_fromHardProcessFinalState() { return babyAnalyzer.genqs_fromHardProcessFinalState(); }
 const vector<bool> &genqs_isHardProcess() { return babyAnalyzer.genqs_isHardProcess(); }
@@ -11334,6 +11422,7 @@ const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &genboso
 const vector<int> &genbosons_id() { return babyAnalyzer.genbosons_id(); }
 const vector<int> &genbosons__genpsidx() { return babyAnalyzer.genbosons__genpsidx(); }
 const vector<int> &genbosons_status() { return babyAnalyzer.genbosons_status(); }
+const vector<bool> &genbosons_fromHardProcess() { return babyAnalyzer.genbosons_fromHardProcess(); }
 const vector<bool> &genbosons_fromHardProcessDecayed() { return babyAnalyzer.genbosons_fromHardProcessDecayed(); }
 const vector<bool> &genbosons_fromHardProcessFinalState() { return babyAnalyzer.genbosons_fromHardProcessFinalState(); }
 const vector<bool> &genbosons_isHardProcess() { return babyAnalyzer.genbosons_isHardProcess(); }
@@ -11353,6 +11442,7 @@ const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &gensusy
 const vector<int> &gensusy_id() { return babyAnalyzer.gensusy_id(); }
 const vector<int> &gensusy__genpsidx() { return babyAnalyzer.gensusy__genpsidx(); }
 const vector<int> &gensusy_status() { return babyAnalyzer.gensusy_status(); }
+const vector<bool> &gensusy_fromHardProcess() { return babyAnalyzer.gensusy_fromHardProcess(); }
 const vector<bool> &gensusy_fromHardProcessDecayed() { return babyAnalyzer.gensusy_fromHardProcessDecayed(); }
 const vector<bool> &gensusy_fromHardProcessFinalState() { return babyAnalyzer.gensusy_fromHardProcessFinalState(); }
 const vector<bool> &gensusy_isHardProcess() { return babyAnalyzer.gensusy_isHardProcess(); }
