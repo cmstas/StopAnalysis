@@ -695,7 +695,8 @@ int newCardMaker(string signal, string input_dir="../StopLooper/output/temp", st
   verbose = false;  // make sure no exccessive printing
   set<pair<int, int> > signal_points;
 
-  TH2D* hpoints = (TH2D*) fsig->Get("srbase/h2d_signal_masspts");
+  // TH2D* hpoints = (TH2D*) fsig->Get("srbase/h2d_signal_masspts");
+  TH2D* hpoints = (TH2D*) fsig->Get("srbase/h2d_sigpts_ylds");
   if (!hpoints) {
     cout << "Cannot find signal mass points hist in " << fsig->GetName() << endl;
     return -1;
@@ -706,11 +707,22 @@ int newCardMaker(string signal, string input_dir="../StopLooper/output/temp", st
       // if (im1 < 900 && im2 < 400) continue;
       // if (im1 - im2 > 150) continue;
       if (hpoints->GetBinContent(hpoints->FindBin(im1, im2)) == 0) continue;
-      if (im2 == 0) im2 = 1;
-      cout << "Making cards for point: " << Form("%s_%d_%d", signal.c_str(), im1, im2) << endl;
-      makeCardsForPoint(signal.c_str(), im1, im2, output_dir.c_str());
-      signal_points.insert( make_pair(im1,im2) );
-      if (im2 == 1) im2 = 0;
+      int mstop = im1;
+      int mlsp = im2;
+      if (im2 == 0) mlsp = 1;
+      int dm = im1 - im2;
+      if (dm == 75) {
+        mlsp -= 12;
+      } else if (dm == -50) {
+        mlsp = mstop - 175;
+        mstop -= 8;
+      } else if (dm == -75) {
+        mlsp = mstop - 175;
+        mstop += 8;
+      }
+      cout << "Making cards for point: " << Form("%s_%d_%d", signal.c_str(), mstop, mlsp) << endl;
+      makeCardsForPoint(signal.c_str(), mstop, mlsp, output_dir.c_str());
+      signal_points.insert( make_pair(mstop, mlsp) );
     } // scanM2 loop
   } // scanM1 loop
 

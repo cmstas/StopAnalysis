@@ -78,8 +78,9 @@ void Make2DLimitHistos(TString signaltype="std_T2tt", TString indir="limits", bo
   int mLSPLow   = 0;
   int mLSPHigh  = 1150;
   int mLSPStep  = 25;
-  int nbinsx = (mStopHigh - mStopLow)/mStopStep;
-  int nbinsy = (mLSPHigh - mLSPLow)/mLSPStep;
+  int binsize = 5;
+  int nbinsx = (mStopHigh - mStopLow) / binsize + 1;
+  int nbinsy = (mLSPHigh - mLSPLow) / binsize + 1;
   
   if (!indir.EndsWith("/")) indir += "/";
   cout << "inputs from " << indir << endl;
@@ -92,6 +93,10 @@ void Make2DLimitHistos(TString signaltype="std_T2tt", TString indir="limits", bo
   if(!prefit) outfilename = outputdir + "Limits2DHistograms_"+signaltype+"_postfit.root";
   TFile *file = new TFile(outfilename, "recreate");
   file->cd();
+  double xlow  = mStopLow  - binsize / 2.0;
+  double xhigh = mStopHigh + binsize / 2.0;
+  double ylow  = mLSPLow  - binsize / 2.0;
+  double yhigh = mLSPHigh + binsize / 2.0;
   TH2F *hExpOrg   = new TH2F("hExpOrg",   "hExp"  , nbinsx, mStopLow, mStopHigh, nbinsy, mLSPLow, mLSPHigh);
   TH2F *hObsOrg   = new TH2F("hObsOrg",   "hObs"  , nbinsx, mStopLow, mStopHigh, nbinsy, mLSPLow, mLSPHigh);
   TH2F *hObs1pOrg = new TH2F("hObs1pOrg", "hObs1p", nbinsx, mStopLow, mStopHigh, nbinsy, mLSPLow, mLSPHigh);
@@ -143,7 +148,7 @@ void Make2DLimitHistos(TString signaltype="std_T2tt", TString indir="limits", bo
   
 
   cout << "First create 2d limit histograms" << endl;
-  for(int stop = mStopLow; stop<=mStopHigh; stop += mStopStep){
+  for(int im1 = mStopLow; im1<=mStopHigh; im1 += mStopStep){
     // string tarfile = "tar_Limits_Asymptotic_PostFit" + (string)signaltype.Data() + "_" + to_string(stop) + ".tar.gz";
     // if(prefit) tarfile = "tar_Limits_Asymptotic_PreFit" + (string)signaltype.Data() + "_" + to_string(stop) + ".tar.gz";
     // string cpcommand = "cp " + (string)myinputdir.Data() + tarfile + " temp/.";
@@ -155,8 +160,19 @@ void Make2DLimitHistos(TString signaltype="std_T2tt", TString indir="limits", bo
     // system(tarcommand.c_str());
     // //system ("cd ..");
     // system(rmcommand1.c_str());
-    for(int lsp = mLSPLow; lsp<=mLSPHigh; lsp += mLSPStep){
+    int tcorpt = 0;
+    for(int im2 = mLSPLow; im2<=mLSPHigh; im2 += mLSPStep){
       // if(signaltype.Contains("T2bW")&&stop==350&&lsp==100) continue;
+      int stop = im1;
+      int lsp = im2;
+      if (lsp == 0) lsp = 1;
+      if (stop - lsp < 0) continue;  // temporary
+      if (stop-lsp == 75) lsp -= 12;
+      if (stop-lsp == 175) {
+        if (tcorpt == 1) stop -= 8;
+        if (tcorpt == 2) stop += 8;
+        tcorpt++;
+      }
       TString limitfilebase = "Limits_Asymptotic_";
       if(prefit) limitfilebase = limitfilebase + "PreFit_";
       else       limitfilebase = limitfilebase + "PostFit_";
@@ -173,9 +189,9 @@ void Make2DLimitHistos(TString signaltype="std_T2tt", TString indir="limits", bo
       bool exists = infile.good();
       if(!exists) {
 	// cout << "No limit name for " << signalname << " - exit" << endl;
+        tcorpt = 0;
 	continue;
       }
-      if (lsp == 0) lsp = 1;
       cout << "Limit file exists for " << signalname << endl;
       double obs    = -1.0; //observed limit
       double obsm1s  = -1.0; //observed limit - 1 sigma theory
@@ -221,6 +237,7 @@ void Make2DLimitHistos(TString signaltype="std_T2tt", TString indir="limits", bo
       delete flimit;
 
       file->cd();
+      if (stop-lsp == 175-8) stop += 4;
       hExpOrg  ->Fill(stop,lsp,exp   );
       hExp2mOrg->Fill(stop,lsp,expm2s);
       hExp1mOrg->Fill(stop,lsp,expm1s);
@@ -230,7 +247,7 @@ void Make2DLimitHistos(TString signaltype="std_T2tt", TString indir="limits", bo
       //xsecupdown
       hObs1pOrg->Fill(stop,lsp,obs*xsec/(xsec+xsecunc)   );
       hObs1mOrg->Fill(stop,lsp,obs*xsec/(xsec-xsecunc)   );
-      if (lsp == 1) lsp = 0;
+      if (tcorpt > 0 && tcorpt < 3) im2 -= mLSPStep;
     }//lsp
     // system(rmcommand2.c_str());
   }//stop
@@ -550,7 +567,9 @@ TGraph* GetContour(TGraph2D *g, TString name, TGraph *gempty){
     auto apprpt = [&](double a, double b) {
       return fabs(x-a) < 2 && fabs(y-b) < 2;
     };
-    if (sigtype == "comb_T2tt") {
+    const bool smooth = true;
+    if (smooth && sigtype == "comb_T2tt") {
+      /*
       if (name == "gObs") {
         if (apprpt(608, 508)) gnew->RemovePoint(i--);
         if (apprpt(593, 481)) gnew->RemovePoint(i--);
@@ -634,7 +653,26 @@ TGraph* GetContour(TGraph2D *g, TString name, TGraph *gempty){
           gnew->InsertPointBefore(i++,550+5,350+5);
         }
       }
+      */
+      if (name == "gObs") {
+        if (apprpt(715, 509)) gnew->RemovePoint(i--);
+        // if (apprpt(593, 481)) gnew->RemovePoint(i--);
+        // if (apprpt(651, 473)) gnew->RemovePoint(i--);
+      }
     }
+    if (smooth && sigtype == "std_T2bW") {
+
+    }
+    if (smooth && sigtype == "std_T2bt") {
+      if (name == "gObs") {
+        // if (apprpt(1013, 478)) gnew->SetPoint(i,1013,469);
+        if (apprpt(570, 370)) gnew->RemovePoint(i--);
+     } else if (name == "gObs1p") {
+       if (apprpt(1000, 523)) gnew->RemovePoint(i--);
+       if (apprpt(587, 387)) gnew->RemovePoint(i--);
+     }
+    }
+
     px = x; py = y;
   }
 
