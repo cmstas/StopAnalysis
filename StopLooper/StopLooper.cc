@@ -408,7 +408,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
         if ( !filt_hbheisonoise() )   continue;
         if ( !filt_ecaltp() ) continue;
         if ( !filt_badMuonFilter() ) continue;
-        // if ( !filt_badChargedCandidateFilter() ) continue;
+        // if ( !filt_badChargedCandidateFilter() ) continue; // no longer recommended
         if ( is_data() && !filt_eebadsc() ) continue;
         if ( year_ >= 2017 && !filt_ecalbadcalib() ) continue;  // only for 2017 and 2018
       } else if (samplever.find("v24") == 0) {
@@ -1721,7 +1721,7 @@ void StopLooper::fillHistosForCRemu(string suf, int trigType) {
             plot1d("h_nvtxs_lsbptlt10"+s,    values_[nvtx]    , evtweight_, cr.histMap, ";Number of vertices"   , 80,  1, 81);
           else
             plot1d("h_nvtxs_lsbptgt10"+s,    values_[nvtx]    , evtweight_, cr.histMap, ";Number of vertices"   , 80,  1, 81);
-       }
+        }
 
       };
       fillhists(suf);
@@ -2148,6 +2148,8 @@ void StopLooper::testGenMatching(SR& sr) {
 
   }
 
+  float wgt = evtweight_ = evtWgt.getWeight(evtWgtInfo::systID::k_nominal, false, 3);
+
   for (size_t itop = 0; itop < tftops_disc().size(); ++itop) {
     bool selected = (tftops_disc()[itop] > rtop_tight_WP);
     int igentop = -1;
@@ -2157,6 +2159,7 @@ void StopLooper::testGenMatching(SR& sr) {
     }
 
     if (testplots && selected) plot1d("h_tftop_igentopmatched"+suf, (igentop >= 0), 1, hvec, ";N gen-top dR matching", 7, 0, 7);
+    plot1d("h_tfttag_alltcand"+suf, tftops_disc()[itop], wgt, hvec, ";DeepResolved top score" , 110, -1.1f, 1.1f);
 
     if (selected) {
       plot1d("hden_rtag_tagbase_tftop_pt"+suf, tftops_p4()[itop].pt(), 1, hvec, ";pt (matched top)", 20, 0, 800);
@@ -2182,15 +2185,20 @@ void StopLooper::testGenMatching(SR& sr) {
 
     if (ndaugmatched < 2) continue;
 
-    plot1d("hden_rtag_genbase_tftop_pt"+suf, tftops_p4()[itop].pt(), 1, hvec, ";p_{T} (matched top)", 20, 0, 800);
-    plot1d("hden_rtag_genbase_tftop_mass"+suf, tftops_p4()[itop].M(), 1, hvec, ";M (matched top)", 20, 0, 400);
+    plot1d("h_tfttag_genmatched"+suf, tftops_disc()[itop], wgt, hvec, ";DeepResolved top score" , 110, -1.1f, 1.1f);
+    // const vector<float> ptbin4 = {0, 150, 250, 300, 350, 400, 450, 500, 600, 1000};
+    const vector<float> ptbin4 = {0, 150, 250, 350, 450, 600, 1000};
+    plot1d("hden_rtag_genbase_tftop_pt"+suf, tftops_p4()[itop].pt(), 1, hvec, ";p_{T}(top candidate)", 20, 0, 800);
+    plot1d("hden_rtag_genbase_tftop_ptbin"+suf, tftops_p4()[itop].pt(), 1, hvec, ";p_{T}(top candidate)", ptbin4.size()-1, ptbin4.data());
+    plot1d("hden_rtag_genbase_tftop_mass"+suf, tftops_p4()[itop].M(), 1, hvec, ";M(top candidate)", 20, 0, 400);
     plot1d("hden_rtag_genbase_njet"+suf, ngoodjets(), 1, hvec, ";Number of jets", 8, 0, 8);
     if (selected) {
-      plot1d("hnum_rtag_genbase_tftop_pt"+suf, tftops_p4()[itop].pt(), 1, hvec, ";p_{T} (matched top)", 20, 0, 800);
-      plot1d("hnum_rtag_genbase_tftop_mass"+suf, tftops_p4()[itop].M(), 1, hvec, ";M (matched top)", 20, 0, 400);
+      plot1d("hnum_rtag_genbase_tftop_pt"+suf, tftops_p4()[itop].pt(), 1, hvec, ";p_{T}(top candidate)", 20, 0, 800);
+      plot1d("hnum_rtag_genbase_tftop_ptbin"+suf, tftops_p4()[itop].pt(), 1, hvec, ";p_{T}(top candidate)", ptbin4.size()-1, ptbin4.data());
+      plot1d("hnum_rtag_genbase_tftop_mass"+suf, tftops_p4()[itop].M(), 1, hvec, ";M(top candidate)", 20, 0, 400);
       plot1d("hnum_rtag_genbase_njet"+suf, ngoodjets(), 1, hvec, ";Number of jets", 8, 0, 8);
-      plot1d("hnum_rtag_tagbase_tftop_pt"+suf, tftops_p4()[itop].pt(), 1, hvec, ";p_{T} (matched top)", 20, 0, 800);
-      plot1d("hnum_rtag_tagbase_tftop_mass"+suf, tftops_p4()[itop].M(), 1, hvec, ";M (matched top)", 20, 0, 400);
+      plot1d("hnum_rtag_tagbase_tftop_pt"+suf, tftops_p4()[itop].pt(), 1, hvec, ";p_{T}(top candidate)", 20, 0, 800);
+      plot1d("hnum_rtag_tagbase_tftop_mass"+suf, tftops_p4()[itop].M(), 1, hvec, ";M(top candidate)", 20, 0, 400);
       plot1d("hnum_rtag_tagbase_njet"+suf, ngoodjets(), 1, hvec, ";Number of jets", 8, 0, 8);
     } else {
       continue;
@@ -2206,7 +2214,7 @@ void StopLooper::testGenMatching(SR& sr) {
 
   }
 
-  float wgt = evtweight_ = evtWgt.getWeight(evtWgtInfo::systID::k_nominal, false, 2);
+  wgt = evtweight_ = evtWgt.getWeight(evtWgtInfo::systID::k_nominal, false, 2);
 
   // int nvtx = min(nvtxs(), 75);
   // if (year_ == 2018 && dataset().find("Fast") != string::npos)
