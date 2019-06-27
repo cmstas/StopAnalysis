@@ -446,6 +446,9 @@ void evtWgtInfo::Setup(string samplestr, int inyear, bool applyUnc, bool useBTag
     h_tfttagSF_sig = (TH1D*) f_tfttagSF->Get(Form("%d/hSF_SIG", min(year, 2017)))->Clone("hsf_sig");
     h_tfttagSF_bkg = (TH1D*) f_tfttagSF->Get(Form("%d/hSF_BG", min(year, 2017)))->Clone("hsf_bkg");
 
+    f_tfttagSF_FS = new TFile("../StopCORE/inputs/ttagsf/rtagSF_TWP_fastsim.root");
+    h_tfttagSF_FS = (TH1D*) f_tfttagSF_FS->Get(Form("%d/SF_rtag_genbase", year))->Clone("hsf_sig_FS");
+
     map<TString,TH1D*> hsys_sig_up, hsys_bkg_up;
     for (int ibin = 1; ibin < h_tfttagSF_sig->GetNbinsX()+1; ++ibin) {
       double binerr_sig(0.), binerr_bkg(0.);
@@ -1656,9 +1659,16 @@ void evtWgtInfo::getTopTaggerSF( double &wgt_ttag, double &wgt_ttag_up, double &
       if (ndaugmatched < 2) is_truetop = false;
 
       // Now the left-over tops are gen-matched resolved tops
-      int ibin = h_tfttagSF_sig->FindBin((*rtop_p4).at(itop).pt());
+      int ibin = h_tfttagSF_sig->FindBin(min((*rtop_p4).at(itop).pt(), 999.0f));
       double sf  = (is_truetop)? h_tfttagSF_sig->GetBinContent(ibin) : 1.0;
       double err = (is_truetop)? h_tfttagSF_sig->GetBinError(ibin)   : h_tfttagSF_bkg->GetBinError(ibin);
+
+      if (is_fastsim_) {
+        int ibinFS = h_tfttagSF_FS->FindBin(min((*rtop_p4).at(itop).pt(), 999.0f));
+        sf *= (is_truetop)? h_tfttagSF_FS->GetBinContent(ibinFS) : 1.0;
+        double errFS = (is_truetop)? h_tfttagSF_FS->GetBinError(ibinFS) : 0.0;
+        err = sqrt(err*err + errFS*errFS);
+      }
 
       wgt_ttag    *= sf;
       wgt_ttag_up *= sf+err;

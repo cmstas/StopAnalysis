@@ -136,8 +136,10 @@ class evtWgtInfo {
 
   // Top Tag SFs
   TFile *f_tfttagSF;
+  TFile *f_tfttagSF_FS;
   TH1D *h_tfttagSF_sig;
   TH1D *h_tfttagSF_bkg;
+  TH1D *h_tfttagSF_FS;
 
   // Event weights for each systematic
   double sys_wgts[k_nSyst];
