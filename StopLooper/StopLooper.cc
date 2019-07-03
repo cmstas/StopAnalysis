@@ -441,7 +441,11 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
         // if (!(checkMassPt(1050, 100) || checkMassPt(900, 500) || checkMassPt(950, 100) || checkMassPt(425, 325) ||
         //       checkMassPt(1000, 100) || checkMassPt(800, 450) || checkMassPt(750, 400) || checkMassPt(800, 400) ||
         //       checkMassPt(1200, 100) || checkMassPt(850, 100) || checkMassPt(650, 350))) continue;
-        if (!(checkMassPt(1200, 100) || checkMassPt(850, 100) || checkMassPt(650, 350))) continue;
+        // if (!(checkMassPt(1200, 100) || checkMassPt(850, 100) || checkMassPt(650, 350))) continue;
+        if (!(checkMassPt(1200, 100) || checkMassPt(850, 100) || checkMassPt(650, 350) ||
+              checkMassPt(1250, 150) || checkMassPt(900, 150) || checkMassPt(700, 400) ||
+              checkMassPt(1150, 50)  || checkMassPt(800,  50) || checkMassPt(600, 300) ||
+              checkMassPt(625, 325)  || checkMassPt(675, 375) )) continue;
         // if (!(checkMassPt(425, 325) || checkMassPt(450, 325))) continue;
         // if (!checkMassPt(800,400)  && !checkMassPt(1200,50)  && !checkMassPt(400,100) &&
         //     !checkMassPt(1100,300) && !checkMassPt(1100,500) && !checkMassPt(900,600) &&
@@ -2089,7 +2093,7 @@ void StopLooper::fillTopTaggingHistos(string suffix) {
 
 void StopLooper::testGenMatching(SR& sr) {
 
-  const float rtop_tight_WP = 0.98;
+  const float rtop_tight_WP = 0.95;
   const float mtop_custom_WP = 0.4;
 
   if ( is_data() ) return;

@@ -459,7 +459,8 @@ void evtWgtInfo::Setup(string samplestr, int inyear, bool applyUnc, bool useBTag
           // hsys_sig_dn[unc] = (TH1D*) f_tfttagSF->Get(Form("%d/hSYST_SIG_%s_Down", min(year, 2017), unc));
           // hsys_bkg_dn[unc] = (TH1D*) f_tfttagSF->Get(Form("%d/hSYST_BG_%s_Down", min(year, 2017), unc));
         }
-        binerr_sig += pow(hsys_sig_up[unc]->GetBinContent(ibin), 2);
+        if (unc != "Closure")  // no need to apply closure unc for sig when applying mis-tag SFs
+          binerr_sig += pow(hsys_sig_up[unc]->GetBinContent(ibin), 2);
         binerr_bkg += pow(hsys_bkg_up[unc]->GetBinContent(ibin), 2);
       }
       h_tfttagSF_sig->SetBinError(ibin, sqrt(binerr_sig));
@@ -1659,19 +1660,29 @@ void evtWgtInfo::getTopTaggerSF( double &wgt_ttag, double &wgt_ttag_up, double &
       if (ndaugmatched < 2) is_truetop = false;
 
       // Now the left-over tops are gen-matched resolved tops
-      int ibin = h_tfttagSF_sig->FindBin(min((*rtop_p4).at(itop).pt(), 999.0f));
-      double sf  = (is_truetop)? h_tfttagSF_sig->GetBinContent(ibin) : 1.0;
-      double err = (is_truetop)? h_tfttagSF_sig->GetBinError(ibin)   : h_tfttagSF_bkg->GetBinError(ibin);
+
+      // Flat SFs for the tight WP
+      const vector<float> tftopSF_sig = { 1.023, 0.957, 0.936 };  // 2016, 2017, 2018 vals
+      const vector<float> tftopSF_bkg = { 0.907, 0.992, 0.904 };  // 2016, 2017, 2018 vals
+
+      int ptbin = h_tfttagSF_sig->FindBin(min((*rtop_p4).at(itop).pt(), 999.0f));
+      // double sf  = (is_truetop)? h_tfttagSF_sig->GetBinContent(ptbin) : 1.0;
+      int yrbin = year - 2016;
+      double sf  = (is_truetop)? tftopSF_sig.at(yrbin) : tftopSF_bkg.at(yrbin);
+      double err = (is_truetop)? h_tfttagSF_sig->GetBinError(ptbin) : h_tfttagSF_bkg->GetBinError(ptbin);
       if (is_truetop && year == 2018) {
-        sf  = 0.936;
-        err = 0.05;
+        err = sqrt(err*err + 0.05*0.05);  // temporary as 2018 ones are available
       }
 
       if (is_fastsim_) {
-        int ibinFS = h_tfttagSF_FS->FindBin(min((*rtop_p4).at(itop).pt(), 999.0f));
-        sf *= (is_truetop)? h_tfttagSF_FS->GetBinContent(ibinFS) : 1.0;
-        double errFS = (is_truetop)? h_tfttagSF_FS->GetBinError(ibinFS) : 0.0;
-        err = sqrt(err*err + errFS*errFS);
+        // int ibinFS = h_tfttagSF_FS->FindBin(min((*rtop_p4).at(itop).pt(), 999.0f));
+        // double errFS = (is_truetop)? h_tfttagSF_FS->GetBinError(ibinFS) : 0.0;
+        // sf *= (is_truetop)? h_tfttagSF_FS->GetBinContent(ibinFS) : 1.0;
+        // err = sqrt(err*err + errFS*errFS);
+        const vector<float> tftopFSSF_val = { 1.01, 0.99, 0.97 };  // 2016, 2017, 2018 vals
+        const vector<float> tftopFSSF_err = { 0.03, 0.03, 0.04 };  // 2016, 2017, 2018 vals
+        sf *= tftopFSSF_val.at(yrbin);
+        err = sqrt(err*err + pow(tftopFSSF_err.at(yrbin),2));
       }
 
       wgt_ttag    *= sf;
