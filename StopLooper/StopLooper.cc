@@ -352,10 +352,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
 
     // evtWgt.setDefaultSystematics(evtWgtInfo::test_alloff);  // for test purpose
 
-    if (is_fastsim_ && dsname.Contains("RunIIAutumn18MiniAOD"))
-      evtWgt.Setup(samplestr, year_, doSystVariations, true, applyLeptonSFfromFiles);
-    else
-      evtWgt.Setup(samplestr, year_, doSystVariations, applyBtagSFfromFiles, applyLeptonSFfromFiles);
+    evtWgt.Setup(samplestr, year_, doSystVariations, applyBtagSFfromFiles, applyLeptonSFfromFiles);
 
     evtWgt.getCounterHistogramFromBaby(&file);
     // Extra file weight for extension dataset, should move these code to other places
@@ -2964,4 +2961,3 @@ void StopLooper::testTopTaggingEffficiency(SR& sr) {
       plot1d("hnum_fakep5_pt", lead_disc, evtweight_, sr.histMap, ";fakecand pt", 110, 0, 1100);
   }
 }
-         

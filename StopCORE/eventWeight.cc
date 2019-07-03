@@ -1662,6 +1662,10 @@ void evtWgtInfo::getTopTaggerSF( double &wgt_ttag, double &wgt_ttag_up, double &
       int ibin = h_tfttagSF_sig->FindBin(min((*rtop_p4).at(itop).pt(), 999.0f));
       double sf  = (is_truetop)? h_tfttagSF_sig->GetBinContent(ibin) : 1.0;
       double err = (is_truetop)? h_tfttagSF_sig->GetBinError(ibin)   : h_tfttagSF_bkg->GetBinError(ibin);
+      if (is_truetop && year == 2018) {
+        sf  = 0.936;
+        err = 0.05;
+      }
 
       if (is_fastsim_) {
         int ibinFS = h_tfttagSF_FS->FindBin(min((*rtop_p4).at(itop).pt(), 999.0f));
