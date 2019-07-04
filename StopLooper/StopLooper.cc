@@ -347,7 +347,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
     // evtWgt.apply_ISR_sf = false;
     // evtWgt.apply_metRes_sf_sf = false;
     // evtWgt.apply_metTTbar_sf = false;
-    if (babyver > 31.7)
+    if (babyver > 31.7 && dsname.Contains("T2tt"))
       evtWgt.combineCorridorScans = false;
 
     // evtWgt.setDefaultSystematics(evtWgtInfo::test_alloff);  // for test purpose
@@ -1038,7 +1038,7 @@ void StopLooper::fillYieldHistos(SR& sr, float met, string suf, bool is_cr2l) {
 
   if (evtweight_ == 0) cout << "[StopLooper::fillYieldHistos]: WARNING: the event weight is 0 at evt = " << evt() << "!!\n";
   if (isnan(evtweight_)) {
-    cout << "[StopLooper::fillYieldHistos]: WARNING: the event weight is NAN!! Skipping!" << endl;
+    cout << "[StopLooper::fillYieldHistos]: WARNING: the event weight is NAN!! Skipping!" << ", SR=" << srname << endl;
     return;
   }
 
@@ -1057,9 +1057,9 @@ void StopLooper::fillYieldHistos(SR& sr, float met, string suf, bool is_cr2l) {
         if (evtWgt.doingSystematic(syst)) {
           float systwgt = evtWgt.getWeight(syst, is_cr2l, cortype);
           if (evtweight_ != 0 && systwgt == 0 && syst != evtWgtInfo::k_L1prefireUp)
-            cout << "[StopLooper::fillYieldHistos]: WARNING: the event weight is 0 for syst = " << evtWgt.getLabel(syst) << " at evt = " << evt() << "!!\n";
+            cout << "[StopLooper::fillYieldHistos]: WARNING: the event weight is 0 for syst = " << evtWgt.getLabel(syst) << " at evt = " << evt() << "!!" << ", SR=" << srname << endl;
           if (isnan(systwgt))
-            cout << "[StopLooper::fillYieldHistos]: WARNING: the event weight is NAN for syst = " << evtWgt.getLabel(syst) << " at evt = " << evt() << "!!\n";
+            cout << "[StopLooper::fillYieldHistos]: WARNING: the event weight is NAN for syst = " << evtWgt.getLabel(syst) << " at evt = " << evt() << "!!" << ", SR=" << srname << endl;
           if (is_fastsim_)
             plot3d("hSMS_metbins"+s+"_"+evtWgt.getLabel(syst), met, mstop_, mlsp_, systwgt, sr.histMap, ";E^{miss}_{T} [GeV];M_{stop};M_{LSP}",
                    sr.GetNMETBins(), sr.GetMETBinsPtr(), mStopBins.size()-1, mStopBins.data(), mLSPBins.size()-1, mLSPBins.data());

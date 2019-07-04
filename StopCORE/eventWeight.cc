@@ -965,7 +965,7 @@ void evtWgtInfo::getSusyMasses( int &mStop, int &mLSP ) {
     mLSP      = babyAnalyzer.mass_lsp();
     // Protection against the 25 Gev bin size for the extra fine scans in the corridors <-- moving scheme need to sync with the babymaker!
     if (!combineCorridorScans) {
-      if (fmod(mLSP, 25.0) < 1 && fabs(fabs(mStop - mLSP - 175) - 7.5) < 1) {
+      if (fmod(mLSP, 25.0) <= 1 && fabs(fabs(mStop - mLSP - 175) - 7.5) < 2) {
         mLSP = mStop + 63;
         // cout << "Moving (mstop,mlsp) = (" << mass_stop() << "," << mass_lsp() << ") to (" << mStop << "," << mLSP << ") \n";
       } else if (fmod(mStop, 25.0) < 1 && fabs(mStop - mLSP - 87.5) < 1) {
@@ -2506,12 +2506,21 @@ void evtWgtInfo::getPDFWeight( double &weight_pdf_up, double &weight_pdf_dn ) {
   if (samptype == WZ) return;
 
   // Normalization
+  float norm = 1;
   if ( is_fastsim_ ) {
-    weight_pdf_up *= (nEvents/h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,10)));
-    weight_pdf_dn *= (nEvents/h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,11)));
+    norm = (nEvents/h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,10)));
+    if (isnan(norm) || isinf(norm)) cout << "[evtWgtInfo::getPDFWeight]: norm for weight_pdf_up = " << norm << ", mStop= " << mStop << ", mLSP= " << mLSP << endl;
+    else  weight_pdf_up *= norm;
+    norm = (nEvents/h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,11)));
+    if (isnan(norm) || isinf(norm)) cout << "[evtWgtInfo::getPDFWeight]: norm for weight_pdf_dn = " << norm << ", mStop= " << mStop << ", mLSP= " << mLSP << endl;
+    else  weight_pdf_dn *= norm;
   } else {
-    weight_pdf_up *= (nEvents/h_bkg_counter->GetBinContent(10));
-    weight_pdf_dn *= (nEvents/h_bkg_counter->GetBinContent(11));
+    norm = (nEvents/h_bkg_counter->GetBinContent(10));
+    if (isnan(norm) || isinf(norm)) cout << "[evtWgtInfo::getPDFWeight]: norm for weight_pdf_up = " << norm << endl;
+    else  weight_pdf_up *= norm;
+    norm = (nEvents/h_bkg_counter->GetBinContent(11));
+    if (isnan(norm) || isinf(norm)) cout << "[evtWgtInfo::getPDFWeight]: norm for weight_pdf_dn = " << norm << endl;
+    else  weight_pdf_dn *= norm;
   }
 
   if ( weight_pdf_up<0.0 ) weight_pdf_up = fabs(weight_pdf_up);
@@ -2546,12 +2555,21 @@ void evtWgtInfo::getAlphasWeight( double &weight_alphas_up, double &weight_alpha
 
   if (samptype == WZ) return;
 
+  float norm = 1;
   if ( is_fastsim_ ) {
-    weight_alphas_up *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,12)) );
-    weight_alphas_dn *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,13)) );
+    norm = ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,12)) );
+    if (isnan(norm)) cout << "[evtWgtInfo::getAlphasWegight]: WARNING: norm for weight_alphas_up = " << norm << ", mStop = " << mStop << ", mLSP = " << mLSP << endl;
+    else weight_alphas_up *= norm;
+    norm = ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,13)) );
+    if (isnan(norm)) cout << "[evtWgtInfo::getAlphasWegight]: WARNING: norm for weight_alphas_dn = " << norm << ", mStop = " << mStop << ", mLSP = " << mLSP << endl;
+    else weight_alphas_dn *= norm;
   } else {
-    weight_alphas_up *= ( nEvents / h_bkg_counter->GetBinContent(12) );
-    weight_alphas_dn *= ( nEvents / h_bkg_counter->GetBinContent(13) );
+    norm = ( nEvents / h_bkg_counter->GetBinContent(12) );
+    if (isnan(norm)) cout << "[evtWgtInfo::getAlphasWegight]: WARNING: norm for weight_alphas_up = " << norm << endl;
+    else weight_alphas_up *= norm;
+    norm = ( nEvents / h_bkg_counter->GetBinContent(13) );
+    if (isnan(norm)) cout << "[evtWgtInfo::getAlphasWegight]: WARNING: norm for weight_alphas_dn = " << norm << endl;
+    else weight_alphas_dn *= norm;
   }
 
   if ( weight_alphas_up < 0.0 || weight_alphas_dn < 0.0 ) {
@@ -2587,13 +2605,21 @@ void evtWgtInfo::getQ2Weight( double &weight_q2_up, double &weight_q2_dn ) {
 
   if (samptype == WZ) return;
 
-
+  float norm = 1;
   if ( is_fastsim_ ) {
-    weight_q2_up *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,5)) );
-    weight_q2_dn *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,9)) );
+    norm = ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,5)) );
+    if (isnan(norm)) cout << "[evtWgtInfo::getQ2Wegight]: WARNING: norm for weight_q2_up = " << norm << ", mStop = " << mStop << ", mLSP = " << mLSP << endl;
+    else weight_q2_up *= norm;
+    norm = ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,9)) );
+    if (isnan(norm)) cout << "[evtWgtInfo::getQ2Wegight]: WARNING: norm for weight_q2_dn = " << norm << ", mStop = " << mStop << ", mLSP = " << mLSP << endl;
+    else weight_q2_dn *= norm;
   } else {
-    weight_q2_up *= ( nEvents / h_bkg_counter->GetBinContent(5) );
-    weight_q2_dn *= ( nEvents / h_bkg_counter->GetBinContent(9) );
+    norm = ( nEvents / h_bkg_counter->GetBinContent(5) );
+    if (isnan(norm)) cout << "[evtWgtInfo::getQ2Wegight]: WARNING: norm for weight_q2_up = " << norm << endl;
+    else weight_q2_up *= norm;
+    norm = ( nEvents / h_bkg_counter->GetBinContent(9) );
+    if (isnan(norm)) cout << "[evtWgtInfo::getQ2Wegight]: WARNING: norm for weight_q2_dn = " << norm << endl;
+    else weight_q2_dn *= norm;
   }
 
   if ( weight_q2_up < 0.0 || weight_q2_dn < 0.0 ) {
