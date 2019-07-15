@@ -702,7 +702,7 @@ int newCardMaker(string signal, string input_dir="../StopLooper/output/temp", st
     return -1;
   }
 
-  for (int im1 = 150; im1 <= 1450; im1 += 25) {
+  for (int im1 = 150; im1 <= 1550; im1 += 25) {
     for (int im2 = 0; im2 <= 1150; im2 += 25) {
       // if (im1 < 900 && im2 < 400) continue;
       // if (im1 - im2 > 150) continue;

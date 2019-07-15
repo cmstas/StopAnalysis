@@ -74,8 +74,13 @@ void Make2DSignifHistos(TString signaltype="std_T2tt", TString indir="significan
   int mLSPLow   = 0;
   int mLSPHigh  = 1150;
   int mLSPStep  = 25;
-  int nbinsx = (mStopHigh - mStopLow)/mStopStep;
-  int nbinsy = (mLSPHigh - mLSPLow)/mLSPStep;
+  int binsize = 5;
+  int nbinsx = (mStopHigh - mStopLow) / binsize + 1;
+  int nbinsy = (mLSPHigh - mLSPLow) / binsize + 1;
+  double xlow  = mStopLow  - binsize / 2.0;
+  double xhigh = mStopHigh + binsize / 2.0;
+  double ylow  = mLSPLow  - binsize / 2.0;
+  double yhigh = mLSPHigh + binsize / 2.0;
 
   if (!indir.EndsWith("/")) indir += "/";
   cout << "inputs from " << indir << endl;
@@ -84,29 +89,38 @@ void Make2DSignifHistos(TString signaltype="std_T2tt", TString indir="significan
   cout << "make directory " << outputdir << endl;
   MakeOutputDir(outputdir);
 
-
   TString outfilename = outputdir + "Significances2DHistograms_"+signaltype+".root";
   TFile *file = new TFile(outfilename, "recreate");
   file->cd();
-  TH2F *hExpPosterioriOrg   = new TH2F("hExpPosterioriOrg",  "hExpPosterioriOrg" , nbinsx, mStopLow, mStopHigh, nbinsy, mLSPLow, mLSPHigh);
-  TH2F *hExpPrioriOrg       = new TH2F("hExpPrioriOrg",      "hExpPrioriOrg"     , nbinsx, mStopLow, mStopHigh, nbinsy, mLSPLow, mLSPHigh);
-  TH2F *hObsOrg             = new TH2F("hObsOrg",            "hObsOrg"           , nbinsx, mStopLow, mStopHigh, nbinsy, mLSPLow, mLSPHigh);
-  TH2F *hpExpPosterioriOrg  = new TH2F("hpExpPosterioriOrg", "hpExpPosterioriOrg", nbinsx, mStopLow, mStopHigh, nbinsy, mLSPLow, mLSPHigh);
-  TH2F *hpExpPrioriOrg      = new TH2F("hpExpPrioriOrg",     "hpExpPrioriOrg"    , nbinsx, mStopLow, mStopHigh, nbinsy, mLSPLow, mLSPHigh);
-  TH2F *hpObsOrg            = new TH2F("hpObsOrg",           "hpObsOrg"          , nbinsx, mStopLow, mStopHigh, nbinsy, mLSPLow, mLSPHigh);
-  TH2F *hExpPosteriori   = new TH2F("hExpPosteriori",  "hExpPosteriori" , nbinsx, mStopLow, mStopHigh, nbinsy, mLSPLow, mLSPHigh);
-  TH2F *hExpPriori       = new TH2F("hExpPriori",      "hExpPriori"     , nbinsx, mStopLow, mStopHigh, nbinsy, mLSPLow, mLSPHigh);
-  TH2F *hObs             = new TH2F("hObs",            "hObs"           , nbinsx, mStopLow, mStopHigh, nbinsy, mLSPLow, mLSPHigh);
-  TH2F *hpExpPosteriori  = new TH2F("hpExpPosteriori", "hpExpPosteriori", nbinsx, mStopLow, mStopHigh, nbinsy, mLSPLow, mLSPHigh);
-  TH2F *hpExpPriori      = new TH2F("hpExpPriori",     "hpExpPriori"    , nbinsx, mStopLow, mStopHigh, nbinsy, mLSPLow, mLSPHigh);
-  TH2F *hpObs            = new TH2F("hpObs",           "hpObs"          , nbinsx, mStopLow, mStopHigh, nbinsy, mLSPLow, mLSPHigh);
 
+  TH2F *hExpPosterioriOrg   = new TH2F("hExpPosterioriOrg",  "hExpPosterioriOrg" , nbinsx, xlow, xhigh, nbinsy, ylow, yhigh);
+  TH2F *hExpPrioriOrg       = new TH2F("hExpPrioriOrg",      "hExpPrioriOrg"     , nbinsx, xlow, xhigh, nbinsy, ylow, yhigh);
+  TH2F *hObsOrg             = new TH2F("hObsOrg",            "hObsOrg"           , nbinsx, xlow, xhigh, nbinsy, ylow, yhigh);
+  TH2F *hpExpPosterioriOrg  = new TH2F("hpExpPosterioriOrg", "hpExpPosterioriOrg", nbinsx, xlow, xhigh, nbinsy, ylow, yhigh);
+  TH2F *hpExpPrioriOrg      = new TH2F("hpExpPrioriOrg",     "hpExpPrioriOrg"    , nbinsx, xlow, xhigh, nbinsy, ylow, yhigh);
+  TH2F *hpObsOrg            = new TH2F("hpObsOrg",           "hpObsOrg"          , nbinsx, xlow, xhigh, nbinsy, ylow, yhigh);
+  TH2F *hExpPosteriori   = new TH2F("hExpPosteriori",  "hExpPosteriori" , nbinsx, xlow, xhigh, nbinsy, ylow, yhigh);
+  TH2F *hExpPriori       = new TH2F("hExpPriori",      "hExpPriori"     , nbinsx, xlow, xhigh, nbinsy, ylow, yhigh);
+  TH2F *hObs             = new TH2F("hObs",            "hObs"           , nbinsx, xlow, xhigh, nbinsy, ylow, yhigh);
+  TH2F *hpExpPosteriori  = new TH2F("hpExpPosteriori", "hpExpPosteriori", nbinsx, xlow, xhigh, nbinsy, ylow, yhigh);
+  TH2F *hpExpPriori      = new TH2F("hpExpPriori",     "hpExpPriori"    , nbinsx, xlow, xhigh, nbinsy, ylow, yhigh);
+  TH2F *hpObs            = new TH2F("hpObs",           "hpObs"          , nbinsx, xlow, xhigh, nbinsy, ylow, yhigh);
 
-
-
-  for(int stop = mStopLow; stop<=mStopHigh; stop += mStopStep){
-    for(int lsp = mLSPLow; lsp<=mLSPHigh; lsp += mLSPStep){
-      if(signaltype.Contains("T2bW")&&stop==350&&lsp==100) continue;
+  for(int im1 = mStopLow; im1<=mStopHigh; im1 += mStopStep){
+    int tcorpt = 0;
+    for(int im2 = mLSPLow; im2<=mLSPHigh; im2 += mLSPStep){
+      int stop = im1;
+      int lsp = im2;
+      if (lsp == 0) lsp = 1;
+      if (signaltype.Contains("T2tt")) {
+        if (stop-lsp == 75) lsp -= 12;
+        if (stop-lsp == 175) {
+          if (tcorpt == 1) stop -= 8;
+          if (tcorpt == 2) stop += 8;
+          tcorpt++;
+        }
+      }
+      // if(signaltype.Contains("T2bW")&&stop==350&&lsp==100) continue;
       TString limitfilebase = "Significance_";
       TString signalname = signaltype + "_" + std::to_string(stop) + "_" + ((lsp == 0)? "1" : std::to_string(lsp));
       if(signalname.Contains("comb")){
@@ -119,7 +133,10 @@ void Make2DSignifHistos(TString signaltype="std_T2tt", TString indir="significan
       TString limitfileExp2 = indir + limitfilebase + "ExpPosteriori_" + signalname + ".root";
       // cout << limitfileExp1 << endl;
       ifstream infile2(limitfileExp1.Data());
-      if(!(infile2.good())) continue;
+      if(!(infile2.good())) {
+        tcorpt = 0;
+        continue;
+      }
       cout << "Significances files exist for " << signalname << endl;
       double obsS    = -1.0; //observed limit
       double obsp    = -1.0; //observed limit
@@ -191,6 +208,8 @@ void Make2DSignifHistos(TString signaltype="std_T2tt", TString indir="significan
       exp2p = RooStats::SignificanceToPValue(exp2S);
 
       file->cd();
+      if (stop-lsp == 175-8) stop += 2;
+      if (stop-lsp == 175+8) stop -= 2;
       hpExpPrioriOrg     ->Fill(stop,lsp,exp1p  );
       hpExpPosterioriOrg ->Fill(stop,lsp,exp2p  );
       hpObsOrg           ->Fill(stop,lsp,obsp   );
@@ -198,6 +217,7 @@ void Make2DSignifHistos(TString signaltype="std_T2tt", TString indir="significan
       hExpPosterioriOrg  ->Fill(stop,lsp,exp2S  );
       hObsOrg            ->Fill(stop,lsp,obsS   );
 
+      if (tcorpt > 0 && tcorpt < 3) im2 -= mLSPStep;
     }//lsp
     // system(rmcommand2.c_str());
   }//stop
@@ -243,8 +263,7 @@ TH2F* InterpolateThisHistogram(TH2F *hold/*, TH2F* hnew*/){
   TH2F *h = new TH2F(name.Data(),hold->GetTitle(),hnew->GetNbinsX(),g->GetXmin()-binsize,g->GetXmax()-binsize,hnew->GetNbinsY(),g->GetYmin()-binsize,g->GetYmax()-binsize);
   for(unsigned int x = 1; x<=hnew->GetNbinsX(); ++x){
     for(unsigned int y = 1; y<=hnew->GetNbinsY(); ++y){
-      float dm = hnew->GetXaxis()->GetBinLowEdge(x) - hnew->GetYaxis()->GetBinLowEdge(y);
-      if (dm >= 100) h->SetBinContent(x,y,hnew->GetBinContent(x,y));
+      h->SetBinContent(x,y,hnew->GetBinContent(x,y));
     }
   }
   delete g;

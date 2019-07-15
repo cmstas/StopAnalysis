@@ -119,11 +119,11 @@ def compareSkimsCorridor():
 
 def getPassesLimit():
 
-    fnum = r.TFile('limits/scan_combrun2_v31_s17/histo/Limits2DHistograms_comb_T2tt_postfit.root')
-    # fnum = r.TFile('limits/scan_combrun2_v31_s13/histo/Limits2DHistograms_std_T2tt_prefit.root')
+    fnum = r.TFile('limits/scan_combrun2_v31_s20/histo/Limits2DHistograms_comb_T2tt_postfit.root')
+    # fnum = r.TFile('limits/scan_combrun2_v31_s20/histo/Limits2DHistograms_std_T2tt_postfit.root')
 
-    # hden = fnum.Get('hExpOrg')
-    hden = fnum.Get('hObsOrg')
+    hden = fnum.Get('hExpOrg')
+    # hden = fnum.Get('hObsOrg')
     hnum = hden.Clone('color')
 
     # hrat = hnum.Clone('ratio_hExpOrg_tcor_vs_std')
@@ -155,13 +155,14 @@ def getPassesLimit():
     hnum.GetZaxis().SetLabelSize(0)
     # hnum.GetZaxis().SetBinLabel(1,'Pass')
     # hnum.GetZaxis().SetBinLabel(19,'Fail')
+    hden.GetZaxis().SetRangeUser(0, 10)
     # hrat.SetTitle('2016 Corridor vs Standard')
     hden.Draw('text')
     hnum.Draw('colzsame')
     hden.Draw('textsame')
 
     # c1.Print('temp_c5vsc3_scan.pdf')
-    c1.Print('temp_pass_T2tt_obs_s17.pdf')
+    c1.Print('temp_pass_std_T2tt_exp_s20.pdf')
 
 
 def printSigCont():
@@ -268,9 +269,9 @@ if __name__ == '__main__':
 
     # compareCorridorStandard(indir)
 
-    compareSkimsCorridor()
+    # compareSkimsCorridor()
 
-    # getPassesLimit()
+    getPassesLimit()
 
     # printSigCont()
 

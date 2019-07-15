@@ -81,6 +81,10 @@ void Make2DLimitHistos(TString signaltype="std_T2tt", TString indir="limits", bo
   int binsize = 5;
   int nbinsx = (mStopHigh - mStopLow) / binsize + 1;
   int nbinsy = (mLSPHigh - mLSPLow) / binsize + 1;
+  double xlow  = mStopLow  - binsize / 2.0;
+  double xhigh = mStopHigh + binsize / 2.0;
+  double ylow  = mLSPLow  - binsize / 2.0;
+  double yhigh = mLSPHigh + binsize / 2.0;
   
   if (!indir.EndsWith("/")) indir += "/";
   cout << "inputs from " << indir << endl;
@@ -93,58 +97,55 @@ void Make2DLimitHistos(TString signaltype="std_T2tt", TString indir="limits", bo
   if(!prefit) outfilename = outputdir + "Limits2DHistograms_"+signaltype+"_postfit.root";
   TFile *file = new TFile(outfilename, "recreate");
   file->cd();
-  double xlow  = mStopLow  - binsize / 2.0;
-  double xhigh = mStopHigh + binsize / 2.0;
-  double ylow  = mLSPLow  - binsize / 2.0;
-  double yhigh = mLSPHigh + binsize / 2.0;
-  TH2F *hExpOrg   = new TH2F("hExpOrg",   "hExp"  , nbinsx, mStopLow, mStopHigh, nbinsy, mLSPLow, mLSPHigh);
-  TH2F *hObsOrg   = new TH2F("hObsOrg",   "hObs"  , nbinsx, mStopLow, mStopHigh, nbinsy, mLSPLow, mLSPHigh);
-  TH2F *hObs1pOrg = new TH2F("hObs1pOrg", "hObs1p", nbinsx, mStopLow, mStopHigh, nbinsy, mLSPLow, mLSPHigh);
-  TH2F *hObs1mOrg = new TH2F("hObs1mOrg", "hObs1m", nbinsx, mStopLow, mStopHigh, nbinsy, mLSPLow, mLSPHigh);
-  TH2F *hExp1mOrg = new TH2F("hExp1mOrg", "hExp1m", nbinsx, mStopLow, mStopHigh, nbinsy, mLSPLow, mLSPHigh);
-  TH2F *hExp2mOrg = new TH2F("hExp2mOrg", "hExp2m", nbinsx, mStopLow, mStopHigh, nbinsy, mLSPLow, mLSPHigh);
-  TH2F *hExp1pOrg = new TH2F("hExp1pOrg", "hExp1p", nbinsx, mStopLow, mStopHigh, nbinsy, mLSPLow, mLSPHigh);
-  TH2F *hExp2pOrg = new TH2F("hExp2pOrg", "hExp2p", nbinsx, mStopLow, mStopHigh, nbinsy, mLSPLow, mLSPHigh);
-  TH2F *hExpXsecOrg   = new TH2F("hExpXsecOrg",   "hExp"  , nbinsx, mStopLow, mStopHigh, nbinsy, mLSPLow, mLSPHigh);
-  TH2F *hObsXsecOrg   = new TH2F("hObsXsecOrg",   "hObs"  , nbinsx, mStopLow, mStopHigh, nbinsy, mLSPLow, mLSPHigh);
-  TH2F *hObs1pXsecOrg = new TH2F("hObs1pXsecOrg", "hObs1p", nbinsx, mStopLow, mStopHigh, nbinsy, mLSPLow, mLSPHigh);
-  TH2F *hObs1mXsecOrg = new TH2F("hObs1mXsecOrg", "hObs1m", nbinsx, mStopLow, mStopHigh, nbinsy, mLSPLow, mLSPHigh);
-  TH2F *hExp1mXsecOrg = new TH2F("hExp1mXsecOrg", "hExp1m", nbinsx, mStopLow, mStopHigh, nbinsy, mLSPLow, mLSPHigh);
-  TH2F *hExp2mXsecOrg = new TH2F("hExp2mXsecOrg", "hExp2m", nbinsx, mStopLow, mStopHigh, nbinsy, mLSPLow, mLSPHigh);
-  TH2F *hExp1pXsecOrg = new TH2F("hExp1pXsecOrg", "hExp1p", nbinsx, mStopLow, mStopHigh, nbinsy, mLSPLow, mLSPHigh);
-  TH2F *hExp2pXsecOrg = new TH2F("hExp2pXsecOrg", "hExp2p", nbinsx, mStopLow, mStopHigh, nbinsy, mLSPLow, mLSPHigh);
-  TH2F *hExpPassOrg   = new TH2F("hExpPassOrg",   "hExp"  , nbinsx, mStopLow, mStopHigh, nbinsy, mLSPLow, mLSPHigh);
-  TH2F *hObsPassOrg   = new TH2F("hObsPassOrg",   "hObs"  , nbinsx, mStopLow, mStopHigh, nbinsy, mLSPLow, mLSPHigh);
-  TH2F *hObs1pPassOrg = new TH2F("hObs1pPassOrg", "hObs1p", nbinsx, mStopLow, mStopHigh, nbinsy, mLSPLow, mLSPHigh);
-  TH2F *hObs1mPassOrg = new TH2F("hObs1mPassOrg", "hObs1m", nbinsx, mStopLow, mStopHigh, nbinsy, mLSPLow, mLSPHigh);
-  TH2F *hExp1mPassOrg = new TH2F("hExp1mPassOrg", "hExp1m", nbinsx, mStopLow, mStopHigh, nbinsy, mLSPLow, mLSPHigh);
-  TH2F *hExp2mPassOrg = new TH2F("hExp2mPassOrg", "hExp2m", nbinsx, mStopLow, mStopHigh, nbinsy, mLSPLow, mLSPHigh);
-  TH2F *hExp1pPassOrg = new TH2F("hExp1pPassOrg", "hExp1p", nbinsx, mStopLow, mStopHigh, nbinsy, mLSPLow, mLSPHigh);
-  TH2F *hExp2pPassOrg = new TH2F("hExp2pPassOrg", "hExp2p", nbinsx, mStopLow, mStopHigh, nbinsy, mLSPLow, mLSPHigh);
-  TH2F *hExp   = new TH2F("hExp",   "hExp"  , nbinsx, mStopLow, mStopHigh, nbinsy, mLSPLow, mLSPHigh);
-  TH2F *hObs   = new TH2F("hObs",   "hObs"  , nbinsx, mStopLow, mStopHigh, nbinsy, mLSPLow, mLSPHigh);
-  TH2F *hObs1p = new TH2F("hObs1p", "hObs1p", nbinsx, mStopLow, mStopHigh, nbinsy, mLSPLow, mLSPHigh);
-  TH2F *hObs1m = new TH2F("hObs1m", "hObs1m", nbinsx, mStopLow, mStopHigh, nbinsy, mLSPLow, mLSPHigh);
-  TH2F *hExp1m = new TH2F("hExp1m", "hExp1m", nbinsx, mStopLow, mStopHigh, nbinsy, mLSPLow, mLSPHigh);
-  TH2F *hExp2m = new TH2F("hExp2m", "hExp2m", nbinsx, mStopLow, mStopHigh, nbinsy, mLSPLow, mLSPHigh);
-  TH2F *hExp1p = new TH2F("hExp1p", "hExp1p", nbinsx, mStopLow, mStopHigh, nbinsy, mLSPLow, mLSPHigh);
-  TH2F *hExp2p = new TH2F("hExp2p", "hExp2p", nbinsx, mStopLow, mStopHigh, nbinsy, mLSPLow, mLSPHigh);
-  TH2F *hExpXsec   = new TH2F("hExpXsec",   "hExp"  , nbinsx, mStopLow, mStopHigh, nbinsy, mLSPLow, mLSPHigh);
-  TH2F *hObsXsec   = new TH2F("hObsXsec",   "hObs"  , nbinsx, mStopLow, mStopHigh, nbinsy, mLSPLow, mLSPHigh);
-  TH2F *hObs1pXsec = new TH2F("hObs1pXsec", "hObs1p", nbinsx, mStopLow, mStopHigh, nbinsy, mLSPLow, mLSPHigh);
-  TH2F *hObs1mXsec = new TH2F("hObs1mXsec", "hObs1m", nbinsx, mStopLow, mStopHigh, nbinsy, mLSPLow, mLSPHigh);
-  TH2F *hExp1mXsec = new TH2F("hExp1mXsec", "hExp1m", nbinsx, mStopLow, mStopHigh, nbinsy, mLSPLow, mLSPHigh);
-  TH2F *hExp2mXsec = new TH2F("hExp2mXsec", "hExp2m", nbinsx, mStopLow, mStopHigh, nbinsy, mLSPLow, mLSPHigh);
-  TH2F *hExp1pXsec = new TH2F("hExp1pXsec", "hExp1p", nbinsx, mStopLow, mStopHigh, nbinsy, mLSPLow, mLSPHigh);
-  TH2F *hExp2pXsec = new TH2F("hExp2pXsec", "hExp2p", nbinsx, mStopLow, mStopHigh, nbinsy, mLSPLow, mLSPHigh);
-  TH2F *hExpPass   = new TH2F("hExpPass",   "hExp"  , nbinsx, mStopLow, mStopHigh, nbinsy, mLSPLow, mLSPHigh);
-  TH2F *hObsPass   = new TH2F("hObsPass",   "hObs"  , nbinsx, mStopLow, mStopHigh, nbinsy, mLSPLow, mLSPHigh);
-  TH2F *hObs1pPass = new TH2F("hObs1pPass", "hObs1p", nbinsx, mStopLow, mStopHigh, nbinsy, mLSPLow, mLSPHigh);
-  TH2F *hObs1mPass = new TH2F("hObs1mPass", "hObs1m", nbinsx, mStopLow, mStopHigh, nbinsy, mLSPLow, mLSPHigh);
-  TH2F *hExp1mPass = new TH2F("hExp1mPass", "hExp1m", nbinsx, mStopLow, mStopHigh, nbinsy, mLSPLow, mLSPHigh);
-  TH2F *hExp2mPass = new TH2F("hExp2mPass", "hExp2m", nbinsx, mStopLow, mStopHigh, nbinsy, mLSPLow, mLSPHigh);
-  TH2F *hExp1pPass = new TH2F("hExp1pPass", "hExp1p", nbinsx, mStopLow, mStopHigh, nbinsy, mLSPLow, mLSPHigh);
-  TH2F *hExp2pPass = new TH2F("hExp2pPass", "hExp2p", nbinsx, mStopLow, mStopHigh, nbinsy, mLSPLow, mLSPHigh);
+
+  TH2F *hExpOrg   = new TH2F("hExpOrg",   "hExp"  , nbinsx, xlow, xhigh, nbinsy, ylow, yhigh);
+  TH2F *hObsOrg   = new TH2F("hObsOrg",   "hObs"  , nbinsx, xlow, xhigh, nbinsy, ylow, yhigh);
+  TH2F *hObs1pOrg = new TH2F("hObs1pOrg", "hObs1p", nbinsx, xlow, xhigh, nbinsy, ylow, yhigh);
+  TH2F *hObs1mOrg = new TH2F("hObs1mOrg", "hObs1m", nbinsx, xlow, xhigh, nbinsy, ylow, yhigh);
+  TH2F *hExp1mOrg = new TH2F("hExp1mOrg", "hExp1m", nbinsx, xlow, xhigh, nbinsy, ylow, yhigh);
+  TH2F *hExp2mOrg = new TH2F("hExp2mOrg", "hExp2m", nbinsx, xlow, xhigh, nbinsy, ylow, yhigh);
+  TH2F *hExp1pOrg = new TH2F("hExp1pOrg", "hExp1p", nbinsx, xlow, xhigh, nbinsy, ylow, yhigh);
+  TH2F *hExp2pOrg = new TH2F("hExp2pOrg", "hExp2p", nbinsx, xlow, xhigh, nbinsy, ylow, yhigh);
+  TH2F *hExpXsecOrg   = new TH2F("hExpXsecOrg",   "hExp"  , nbinsx, xlow, xhigh, nbinsy, ylow, yhigh);
+  TH2F *hObsXsecOrg   = new TH2F("hObsXsecOrg",   "hObs"  , nbinsx, xlow, xhigh, nbinsy, ylow, yhigh);
+  TH2F *hObs1pXsecOrg = new TH2F("hObs1pXsecOrg", "hObs1p", nbinsx, xlow, xhigh, nbinsy, ylow, yhigh);
+  TH2F *hObs1mXsecOrg = new TH2F("hObs1mXsecOrg", "hObs1m", nbinsx, xlow, xhigh, nbinsy, ylow, yhigh);
+  TH2F *hExp1mXsecOrg = new TH2F("hExp1mXsecOrg", "hExp1m", nbinsx, xlow, xhigh, nbinsy, ylow, yhigh);
+  TH2F *hExp2mXsecOrg = new TH2F("hExp2mXsecOrg", "hExp2m", nbinsx, xlow, xhigh, nbinsy, ylow, yhigh);
+  TH2F *hExp1pXsecOrg = new TH2F("hExp1pXsecOrg", "hExp1p", nbinsx, xlow, xhigh, nbinsy, ylow, yhigh);
+  TH2F *hExp2pXsecOrg = new TH2F("hExp2pXsecOrg", "hExp2p", nbinsx, xlow, xhigh, nbinsy, ylow, yhigh);
+  TH2F *hExpPassOrg   = new TH2F("hExpPassOrg",   "hExp"  , nbinsx, xlow, xhigh, nbinsy, ylow, yhigh);
+  TH2F *hObsPassOrg   = new TH2F("hObsPassOrg",   "hObs"  , nbinsx, xlow, xhigh, nbinsy, ylow, yhigh);
+  TH2F *hObs1pPassOrg = new TH2F("hObs1pPassOrg", "hObs1p", nbinsx, xlow, xhigh, nbinsy, ylow, yhigh);
+  TH2F *hObs1mPassOrg = new TH2F("hObs1mPassOrg", "hObs1m", nbinsx, xlow, xhigh, nbinsy, ylow, yhigh);
+  TH2F *hExp1mPassOrg = new TH2F("hExp1mPassOrg", "hExp1m", nbinsx, xlow, xhigh, nbinsy, ylow, yhigh);
+  TH2F *hExp2mPassOrg = new TH2F("hExp2mPassOrg", "hExp2m", nbinsx, xlow, xhigh, nbinsy, ylow, yhigh);
+  TH2F *hExp1pPassOrg = new TH2F("hExp1pPassOrg", "hExp1p", nbinsx, xlow, xhigh, nbinsy, ylow, yhigh);
+  TH2F *hExp2pPassOrg = new TH2F("hExp2pPassOrg", "hExp2p", nbinsx, xlow, xhigh, nbinsy, ylow, yhigh);
+  TH2F *hExp   = new TH2F("hExp",   "hExp"  , nbinsx, xlow, xhigh, nbinsy, ylow, yhigh);
+  TH2F *hObs   = new TH2F("hObs",   "hObs"  , nbinsx, xlow, xhigh, nbinsy, ylow, yhigh);
+  TH2F *hObs1p = new TH2F("hObs1p", "hObs1p", nbinsx, xlow, xhigh, nbinsy, ylow, yhigh);
+  TH2F *hObs1m = new TH2F("hObs1m", "hObs1m", nbinsx, xlow, xhigh, nbinsy, ylow, yhigh);
+  TH2F *hExp1m = new TH2F("hExp1m", "hExp1m", nbinsx, xlow, xhigh, nbinsy, ylow, yhigh);
+  TH2F *hExp2m = new TH2F("hExp2m", "hExp2m", nbinsx, xlow, xhigh, nbinsy, ylow, yhigh);
+  TH2F *hExp1p = new TH2F("hExp1p", "hExp1p", nbinsx, xlow, xhigh, nbinsy, ylow, yhigh);
+  TH2F *hExp2p = new TH2F("hExp2p", "hExp2p", nbinsx, xlow, xhigh, nbinsy, ylow, yhigh);
+  TH2F *hExpXsec   = new TH2F("hExpXsec",   "hExp"  , nbinsx, xlow, xhigh, nbinsy, ylow, yhigh);
+  TH2F *hObsXsec   = new TH2F("hObsXsec",   "hObs"  , nbinsx, xlow, xhigh, nbinsy, ylow, yhigh);
+  TH2F *hObs1pXsec = new TH2F("hObs1pXsec", "hObs1p", nbinsx, xlow, xhigh, nbinsy, ylow, yhigh);
+  TH2F *hObs1mXsec = new TH2F("hObs1mXsec", "hObs1m", nbinsx, xlow, xhigh, nbinsy, ylow, yhigh);
+  TH2F *hExp1mXsec = new TH2F("hExp1mXsec", "hExp1m", nbinsx, xlow, xhigh, nbinsy, ylow, yhigh);
+  TH2F *hExp2mXsec = new TH2F("hExp2mXsec", "hExp2m", nbinsx, xlow, xhigh, nbinsy, ylow, yhigh);
+  TH2F *hExp1pXsec = new TH2F("hExp1pXsec", "hExp1p", nbinsx, xlow, xhigh, nbinsy, ylow, yhigh);
+  TH2F *hExp2pXsec = new TH2F("hExp2pXsec", "hExp2p", nbinsx, xlow, xhigh, nbinsy, ylow, yhigh);
+  TH2F *hExpPass   = new TH2F("hExpPass",   "hExp"  , nbinsx, xlow, xhigh, nbinsy, ylow, yhigh);
+  TH2F *hObsPass   = new TH2F("hObsPass",   "hObs"  , nbinsx, xlow, xhigh, nbinsy, ylow, yhigh);
+  TH2F *hObs1pPass = new TH2F("hObs1pPass", "hObs1p", nbinsx, xlow, xhigh, nbinsy, ylow, yhigh);
+  TH2F *hObs1mPass = new TH2F("hObs1mPass", "hObs1m", nbinsx, xlow, xhigh, nbinsy, ylow, yhigh);
+  TH2F *hExp1mPass = new TH2F("hExp1mPass", "hExp1m", nbinsx, xlow, xhigh, nbinsy, ylow, yhigh);
+  TH2F *hExp2mPass = new TH2F("hExp2mPass", "hExp2m", nbinsx, xlow, xhigh, nbinsy, ylow, yhigh);
+  TH2F *hExp1pPass = new TH2F("hExp1pPass", "hExp1p", nbinsx, xlow, xhigh, nbinsy, ylow, yhigh);
+  TH2F *hExp2pPass = new TH2F("hExp2pPass", "hExp2p", nbinsx, xlow, xhigh, nbinsy, ylow, yhigh);
   
 
   cout << "First create 2d limit histograms" << endl;
@@ -166,12 +167,13 @@ void Make2DLimitHistos(TString signaltype="std_T2tt", TString indir="limits", bo
       int stop = im1;
       int lsp = im2;
       if (lsp == 0) lsp = 1;
-      if (stop - lsp < 0) continue;  // temporary
-      if (stop-lsp == 75) lsp -= 12;
-      if (stop-lsp == 175) {
-        if (tcorpt == 1) stop -= 8;
-        if (tcorpt == 2) stop += 8;
-        tcorpt++;
+      if (signaltype.Contains("T2tt")) {
+        if (stop-lsp == 75) lsp -= 12;
+        if (stop-lsp == 175) {
+          if (tcorpt == 1) stop -= 8;
+          if (tcorpt == 2) stop += 8;
+          tcorpt++;
+        }
       }
       TString limitfilebase = "Limits_Asymptotic_";
       if(prefit) limitfilebase = limitfilebase + "PreFit_";
@@ -237,7 +239,8 @@ void Make2DLimitHistos(TString signaltype="std_T2tt", TString indir="limits", bo
       delete flimit;
 
       file->cd();
-      if (stop-lsp == 175-8) stop += 4;
+      if (stop-lsp == 175-8) stop += 2;
+      if (stop-lsp == 175+8) stop -= 2;
       hExpOrg  ->Fill(stop,lsp,exp   );
       hExp2mOrg->Fill(stop,lsp,expm2s);
       hExp1mOrg->Fill(stop,lsp,expm1s);
@@ -666,10 +669,12 @@ TGraph* GetContour(TGraph2D *g, TString name, TGraph *gempty){
     if (smooth && sigtype == "std_T2bt") {
       if (name == "gObs") {
         // if (apprpt(1013, 478)) gnew->SetPoint(i,1013,469);
-        if (apprpt(570, 370)) gnew->RemovePoint(i--);
+        // if (apprpt(570, 370)) gnew->RemovePoint(i--);
+        if (apprpt(988, 462)) gnew->RemovePoint(i--);
      } else if (name == "gObs1p") {
-       if (apprpt(1000, 523)) gnew->RemovePoint(i--);
-       if (apprpt(587, 387)) gnew->RemovePoint(i--);
+       if (apprpt(1000, 526)) gnew->RemovePoint(i--);
+       if (apprpt(1003, 503)) gnew->RemovePoint(i--);
+       // if (apprpt(587, 387)) gnew->RemovePoint(i--);
      }
     }
 

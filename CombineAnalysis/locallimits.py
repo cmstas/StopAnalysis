@@ -92,8 +92,14 @@ if __name__ == "__main__":
     ext_cards = filter(lambda x : sigscan in x and "bin1.txt" in x, ext_cards)
 
     sigs = [ x[9:-9] for x in ext_cards]
-    sigs = [ s for s in sigs if int(s.split('_')[2]) < 1500]
-    # sigs = [ s for s in sigs if (int(s.split('_')[2])-int(s.split('_')[3])) > 250]
+    if 'T2' in sigscan:
+        sigs = [ s for s in sigs if int(s.split('_')[2]) < 1550]
+    elif 'T8' in sigscan:
+        sigs = [ s for s in sigs if int(s.split('_')[3]) < 1250]
+    # sigs = [ s for s in sigs if (int(s.split('_')[2])-int(s.split('_')[3])) < 100]
+    # sigs = [ s for s in sigs if int(s.split('_')[3]) % 25 != 0]
+    # sigs = [ s for s in sigs if int(s.split('_')[2]) % 25 != 0]
+    print sigs
 
     pool = ThreadPool(40)
     cards = []
@@ -103,11 +109,11 @@ if __name__ == "__main__":
 
     # exit()
 
-    if not cards:
-        cards = os.listdir(combineddir)
-        cards = filter(lambda x : '.txt' in x and '.log' not in x, cards)
-        cards = [combineddir+'/'+c for c in cards]
-        # print cards
+    # if not cards:
+    #     cards = os.listdir(combineddir)
+    #     cards = filter(lambda x : '.txt' in x and '.log' not in x, cards)
+    #     cards = [combineddir+'/'+c for c in cards]
+    #     # print cards
 
     if dolimits: os.system('mkdir -p '+limitdir)
     if dosignif: os.system('mkdir -p '+signifdir)

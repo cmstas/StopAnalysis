@@ -25,7 +25,8 @@ fi
 text2workspace.py --X-allow-no-signal --X-allow-no-background ${datacarddir}${datacard}.txt
 
 #combine -M MaxLikelihoodFit --saveShapes --saveWithUnc --numToysForShape 2000  --saveOverall ${datacard}.root --preFitValue 0
-combine -M MaxLikelihoodFit --saveShapes --saveWithUncertainties --numToysForShape 2000  --saveOverallShapes ${datacarddir}${datacard}.root --preFitValue 0
+# combine -M MaxLikelihoodFit --saveShapes --saveWithUncertainties --numToysForShape 2000  --saveOverallShapes ${datacarddir}${datacard}.root --preFitValue 0
+combine -M FitDiagnostics --toysFreq --saveShapes --saveWithUncertainties --numToysForShape 2000  --saveOverallShapes --preFitValue 0
 
 root -l -b -q GetCorrelationMatrix.C+
 
