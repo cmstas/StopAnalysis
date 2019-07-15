@@ -2576,6 +2576,7 @@ void evtWgtInfo::getAlphasWeight( double &weight_alphas_up, double &weight_alpha
     weight_alphas_up = 1.0;
     weight_alphas_dn = 1.0;
   }
+  if (weight_alphas_dn <= 0) weight_alphas_dn = 1.0/weight_alphas_up;  // strange behaviour for 2016 tt2l and WNjets samples
 }
 
 //////////////////////////////////////////////////////////////////////
