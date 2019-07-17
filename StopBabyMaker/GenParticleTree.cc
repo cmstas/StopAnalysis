@@ -30,6 +30,8 @@ void GenParticleTree::FillCommon (int idx)
 	id.push_back(genps_id().at(idx));
 	genpsidx.push_back(idx);
 	status.push_back(genps_status().at(idx));
+        // fromHardProcess.push_back(genps_fromHardProcess().at(idx));
+        fromHardProcess.push_back(false);
 	fromHardProcessDecayed.push_back(genps_fromHardProcessDecayed().at(idx));
 	fromHardProcessFinalState.push_back(genps_fromHardProcessFinalState().at(idx));
 	isHardProcess.push_back(genps_isHardProcess().at(idx));
@@ -161,6 +163,7 @@ void GenParticleTree::Reset()
   id.clear();
   genpsidx.clear();
   status.clear();
+  fromHardProcess.clear();
   fromHardProcessDecayed.clear();
   fromHardProcessFinalState.clear();
   isHardProcess.clear();
@@ -211,6 +214,7 @@ void GenParticleTree::SetBranches(TTree* tree)
   tree->Branch(Form("gen%sid"  , prefix_.c_str()) ,           &id          );
   tree->Branch(Form("gen%s_genpsidx"  , prefix_.c_str()) ,           &genpsidx          );
   tree->Branch(Form("gen%sstatus"  , prefix_.c_str()) ,           &status          );
+  tree->Branch(Form("gen%sfromHardProcess"  , prefix_.c_str()) ,           &fromHardProcess          );
   tree->Branch(Form("gen%sfromHardProcessDecayed"  , prefix_.c_str()) ,           &fromHardProcessDecayed          );
   tree->Branch(Form("gen%sfromHardProcessFinalState"  , prefix_.c_str()) ,           &fromHardProcessFinalState          );
   tree->Branch(Form("gen%sisHardProcess"  , prefix_.c_str()) ,           &isHardProcess          );

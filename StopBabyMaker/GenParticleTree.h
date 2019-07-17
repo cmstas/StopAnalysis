@@ -42,6 +42,7 @@ public:
 	veci genpsidx;
         vecb isfromt;
 	veci status;
+	vecb fromHardProcess;
 	vecb fromHardProcessDecayed;
 	vecb fromHardProcessFinalState;
 	vecb isHardProcess;

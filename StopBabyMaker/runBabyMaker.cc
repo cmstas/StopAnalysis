@@ -230,13 +230,14 @@ int main(int argc, char **argv){
       // else suffix += "_not" + arg;
     }
   };
-  parseAndSet_b("applyJECfromFile" , mylooper->applyJECfromFile);
-  parseAndSet_b("applyMETRecipeV2" , mylooper->applyMETRecipeV2);
-  parseAndSet_b("applyMETResCorr"  , mylooper->applyMETResCorr);
-  parseAndSet_b("fillPhoton"       , mylooper->fillPhoton);
-  parseAndSet_b("fillZll"          , mylooper->fillZll);
-  parseAndSet_b("fillExtraEvtVar"  , mylooper->fillExtraEvtVar);
-  parseAndSet_b("fillAK4_Other"    , mylooper->fillAK4_Other);
+  parseAndSet_b("applyJECfromFile"    , mylooper->applyJECfromFile);
+  parseAndSet_b("applyAK8JECfromFile" , mylooper->applyAK8JECfromFile);
+  parseAndSet_b("applyMETRecipeV2"    , mylooper->applyMETRecipeV2);
+  parseAndSet_b("applyMETResCorr"     , mylooper->applyMETResCorr);
+  parseAndSet_b("fillPhoton"          , mylooper->fillPhoton);
+  parseAndSet_b("fillZll"             , mylooper->fillZll);
+  parseAndSet_b("fillExtraEvtVar"     , mylooper->fillExtraEvtVar);
+  parseAndSet_b("fillAK4_Other"       , mylooper->fillAK4_Other);
 
   if (ifile != -1) suffix += Form("_%i", ifile);
 

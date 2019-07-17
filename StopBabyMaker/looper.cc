@@ -612,7 +612,8 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
     ak8jetcorr_filenames_pfL1FastJetL2L3.push_back("jecfiles/"+jecVer+"/"+jecVer+"_L1FastJet_AK8PFPuppi.txt");
     ak8jetcorr_filenames_pfL1FastJetL2L3.push_back("jecfiles/"+jecVer+"/"+jecVer+"_L2Relative_AK8PFPuppi.txt");
     ak8jetcorr_filenames_pfL1FastJetL2L3.push_back("jecfiles/"+jecVer+"/"+jecVer+"_L3Absolute_AK8PFPuppi.txt");
-    ak8jetcorr_filenames_pfL1FastJetL2L3.push_back("jecfiles/"+jecVer+"/"+jecVer+"_L2L3Residual_AK8PFPuppi.txt");
+    if (isDataFromFileName)
+      ak8jetcorr_filenames_pfL1FastJetL2L3.push_back("jecfiles/"+jecVer+"/"+jecVer+"_L2L3Residual_AK8PFPuppi.txt");
     ak8jetcorr_uncertainty_filename = "jecfiles/"+jecVer+"/"+jecVer+"_Uncertainty_AK8PFPuppi.txt";
 
     cout << "applying JEC from the following files:" << endl;
