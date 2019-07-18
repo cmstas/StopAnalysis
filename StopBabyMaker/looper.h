@@ -46,6 +46,7 @@ class babyMaker {
   int skim_nvtx;
   float skim_met;
   float skim_met_emuEvt;
+  float skim_met_ZllEvt;
 
   int   skim_nGoodLep;
   float skim_goodLep_el_pt;

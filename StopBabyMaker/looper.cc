@@ -272,6 +272,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
   unsigned int nEvents_pass_skim_nVtx = 0;
   unsigned int nEvents_pass_skim_met = 0;
   unsigned int nEvents_pass_skim_met_emuEvt = 0;
+  unsigned int nEvents_pass_skim_met_ZllEvt = 0;
   unsigned int nEvents_pass_skim_nGoodLep = 0;
   unsigned int nEvents_pass_skim_nJets = 0;
   unsigned int nEvents_pass_skim_nBJets=0;
@@ -2565,6 +2566,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
 
       if ( ((StopEvt.pfmet >= skim_met || StopEvt.pfmet_rl >= skim_met) || pass_skim_met_jup || pass_skim_met_jdown || pass_skim_met_photon) ) nEvents_pass_skim_met++;
       else if ( (jets.ngoodjets >= skim_nJets) && (nLooseLeptons >= 2) && (lep1.pdgid*lep2.pdgid == -143) && (StopEvt.pfmet >= skim_met_emuEvt) ) nEvents_pass_skim_met_emuEvt++;
+      else if ( (nLooseLeptons >= 2) && (lep1.pdgid*lep2.pdgid == -121 || lep1.pdgid*lep2.pdgid == -169) && (fabs((lep1.p4+lep2.p4).M()-90) < 30) && (StopEvt.pfmet >= skim_met_ZllEvt) ) nEvents_pass_skim_met_ZllEvt++;
       else continue;
       //if(!(StopEvt.pfmet >= skim_met) && !(StopEvt.pfmet_rl >= skim_met) && !(StopEvt.pfmet_rl_jup >= skim_met) && !(StopEvt.pfmet_rl_jdown >= skim_met) && !(StopEvt.pfmet_jup >= skim_met) && !(StopEvt.pfmet_jdown >= skim_met) && !(StopEvt.pfmet_egclean >= skim_met) && !(StopEvt.pfmet_muegclean >= skim_met) && !(StopEvt.pfmet_muegcleanfix >= skim_met) && !(StopEvt.pfmet_uncorrcalomet >= skim_met) ) continue;
       /////////////////////////////////////////////////////////
@@ -2800,6 +2802,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
   cout << "Events with apply2ndLepVeto=" << boolalpha << apply2ndLepVeto << "    " << nEvents_pass_skim_2ndlepVeto << endl;
   cout << "Events with MET > " << skim_met << " GeV            " << nEvents_pass_skim_met << endl;
   cout << "Extra emu events with MET > " << skim_met_emuEvt << " GeV   " << nEvents_pass_skim_met_emuEvt << endl;
+  cout << "Extra Zll events with MET > " << skim_met_ZllEvt << " GeV   " << nEvents_pass_skim_met_ZllEvt << endl;
   cout << "-----------------------------" << endl;
   cout << "CPU  Time:   " << Form( "%.01f", bmark->GetCpuTime("benchmark")  ) << endl;
   cout << "Real Time:   " << Form( "%.01f", bmark->GetRealTime("benchmark") ) << endl;

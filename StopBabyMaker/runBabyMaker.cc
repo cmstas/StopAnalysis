@@ -103,6 +103,7 @@ int main(int argc, char **argv){
   mylooper->skim_nvtx            = 1;
   mylooper->skim_met             = 125;
   mylooper->skim_met_emuEvt      = 50;
+  mylooper->skim_met_ZllEvt      = 125;
 
   mylooper->skim_nGoodLep        = 1;
   mylooper->skim_goodLep_el_pt   = 20.0;
@@ -199,6 +200,7 @@ int main(int argc, char **argv){
   };
   parseAndSet_f("skim_met"         , mylooper->skim_met);
   parseAndSet_f("skim_met_emuEvt"  , mylooper->skim_met_emuEvt);
+  parseAndSet_f("skim_met_ZllEvt"  , mylooper->skim_met_ZllEvt);
   parseAndSet_f("skim_ph_pt"       , mylooper->skim_ph_pt);
   parseAndSet_f("skim_ph_eta"      , mylooper->skim_ph_eta);
   parseAndSet_f("skim_jet_ak8_pt"  , mylooper->skim_jet_ak8_pt);
