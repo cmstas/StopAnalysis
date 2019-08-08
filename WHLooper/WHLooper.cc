@@ -38,9 +38,9 @@ using namespace stop1l;
 
 class SR;
 
-const bool verbose = false;
+const bool verbose = true;
 // turn on to apply btag sf - take from files defined in eventWeight_btagSF.cc
-const bool applyBtagSFfromFiles = false; // default false
+const bool applyBtagSFfromFiles = true; // default false
 // turn on to apply lepton sf to central value - reread from files
 const bool applyLeptonSFfromFiles = false; // default false
 // turn on to enable plots of metbins with systematic variations applied. will only do variations for applied weights
@@ -200,6 +200,7 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
 
     //Weight info
     bool pass=true;
+    bool stitch=true;
     bool isgoodrun=true;
     bool duplicate=false;
 
@@ -208,8 +209,12 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
     float w_lumi_scale1fbs=0;
     float w_lumi_getWeight=0;
     float w_noBtagSF=0;
+    float w_BtagSF_medmed=0;
+    float w_BtagSF_medloose=0;
+    float w_BtagSF_WH=0;
 
     TBranch * b_pass = extraTree->Branch("pass",&pass,"pass/O");
+    TBranch * b_stitch = extraTree->Branch("stitch",&stitch,"stitch/O");
     TBranch * b_isgoodrun = extraTree->Branch("goodrun",&isgoodrun,"isgoodrun/O");
     TBranch * b_duplicate = extraTree->Branch("duplicate",&duplicate,"duplicate/O");
 
@@ -218,8 +223,12 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
     TBranch * b_w_lumi_scale1fbs = extraTree->Branch("w_lumi_scale1fbs",&w_lumi_scale1fbs,"w_lumi_scale1fbs/F");
     TBranch * b_w_lumi_getWeight = extraTree->Branch("w_lumi_getWeight",&w_lumi_getWeight,"w_lumi_getWeight/F");
     TBranch * b_w_noBtagSF = extraTree->Branch("w_noBtagSF",&w_noBtagSF,"w_noBtagSF/F");
+    TBranch * b_w_BtagSF_medmed = extraTree->Branch("w_BtagSF_medmed",&w_BtagSF_medmed,"w_BtagSF_medmed/F");
+    TBranch * b_w_BtagSF_medloose = extraTree->Branch("w_BtagSF_medloose",&w_BtagSF_medloose,"w_BtagSF_medloose/F");
+    TBranch * b_w_BtagSF_WH = extraTree->Branch("w_BtagSF_WH",&w_BtagSF_WH,"w_BtagSF_WH/F");
 
     extraTree->SetBranchAddress("pass",&pass,&b_pass);
+    extraTree->SetBranchAddress("stitch",&stitch,&b_stitch);
     extraTree->SetBranchAddress("goodrun",&isgoodrun,&b_isgoodrun);
     extraTree->SetBranchAddress("duplicate",&duplicate,&b_duplicate);
 
@@ -228,6 +237,9 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
     extraTree->SetBranchAddress("w_lumi_scale1fbs",&w_lumi_scale1fbs,&b_w_lumi_scale1fbs);
     extraTree->SetBranchAddress("w_lumi_getWeight",&w_lumi_getWeight,&b_w_lumi_getWeight);
     extraTree->SetBranchAddress("w_noBtagSF",&w_noBtagSF,&b_w_noBtagSF);
+    extraTree->SetBranchAddress("w_BtagSF_medmed",&w_BtagSF_medmed,&b_w_BtagSF_medmed);
+    extraTree->SetBranchAddress("w_BtagSF_medloose",&w_BtagSF_medloose,&b_w_BtagSF_medloose);
+    extraTree->SetBranchAddress("w_BtagSF_WH",&w_BtagSF_WH,&b_w_BtagSF_WH);
     
     //Jet info (flatten LorentzVectors) 
 
@@ -341,6 +353,40 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
     extraTree->SetBranchAddress("mct",&mct,&b_mct);
 
 
+    //Generator information
+    vector<float> * gen_pt = new vector<float>(); 
+    vector<float> * gen_eta = new vector<float>(); 
+    vector<float> * gen_phi = new vector<float>(); 
+    vector<float> * gen_m = new vector<float>(); 
+    vector<int> * gen_id = new vector<int>(); 
+    vector<int> * gen_idx = new vector<int>(); 
+    vector<int> * gen_motherid = new vector<int>(); 
+    vector<int> * gen_motheridx = new vector<int>(); 
+    vector<int> * gen_gmotherid = new vector<int>(); 
+    vector<int> * gen_gmotheridx = new vector<int>(); 
+
+    TBranch * b_gen_pt = extraTree->Branch("gen_pt",&gen_pt);
+    TBranch * b_gen_eta = extraTree->Branch("gen_eta",&gen_eta);
+    TBranch * b_gen_phi = extraTree->Branch("gen_phi",&gen_phi);
+    TBranch * b_gen_m = extraTree->Branch("gen_m",&gen_m);
+    TBranch * b_gen_id = extraTree->Branch("gen_id",&gen_id);
+    TBranch * b_gen_idx = extraTree->Branch("gen_idx",&gen_idx);
+    TBranch * b_gen_motherid = extraTree->Branch("gen_motherid",&gen_motherid);
+    TBranch * b_gen_motheridx = extraTree->Branch("gen_motheridx",&gen_motheridx);
+    TBranch * b_gen_gmotherid = extraTree->Branch("gen_gmotherid",&gen_gmotherid);
+    TBranch * b_gen_gmotheridx = extraTree->Branch("gen_gmotheridx",&gen_gmotheridx);
+
+    extraTree->SetBranchAddress("gen_pt",&gen_pt,&b_gen_pt);
+    extraTree->SetBranchAddress("gen_eta",&gen_eta,&b_gen_eta);
+    extraTree->SetBranchAddress("gen_phi",&gen_phi,&b_gen_phi);
+    extraTree->SetBranchAddress("gen_m",&gen_m,&b_gen_m);
+    extraTree->SetBranchAddress("gen_id",&gen_id,&b_gen_id);
+    extraTree->SetBranchAddress("gen_idx",&gen_idx,&b_gen_idx);
+    extraTree->SetBranchAddress("gen_motherid",&gen_motherid,&b_gen_motherid);
+    extraTree->SetBranchAddress("gen_motheridx",&gen_motheridx,&b_gen_motheridx);
+    extraTree->SetBranchAddress("gen_gmotherid",&gen_gmotherid,&b_gen_gmotherid);
+    extraTree->SetBranchAddress("gen_gmotheridx",&gen_gmotheridx,&b_gen_gmotheridx);
+
     TTreeCache::SetLearnEntries(10);
     tree->SetCacheSize(128*1024*1024);
     babyAnalyzer.Init(tree);
@@ -395,6 +441,9 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
     if (year_ == 2016 && samplever.find("v22") == 0)
       evtWgt.getExtSampleWeightSummer16v2(fname);
 
+    else if (year_ == 2016 && samplever.find("Summer16v3") != string::npos)
+      evtWgt.getExtSampleWeightSummer16v3(fname);
+
     evtWgt.getZSampleWeightFromCR3l(fname);
 
     // if (year_ == 2016) kLumi = 35.867;
@@ -411,9 +460,10 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
     unsigned int nEventsTree = tree->GetEntriesFast();
 
     //nEventsTree = 10;
-    cout<<"apply good run list "<<applyGoodRunList<<endl;
+    //cout<<"apply good run list "<<applyGoodRunList<<endl;
     for (unsigned int event = 0; event < nEventsTree; ++event) {
       // Read Tree
+      //cout<<"Event "<<event<<endl;
       if (nEventsTotal >= nEventsChain) continue;
       tree->LoadTree(event);
       babyAnalyzer.GetEntry(event);
@@ -439,7 +489,7 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
       } else {
         nEvts = h_bkg_counter->GetBinContent(22);
       }  
-
+      //cout<<" Starting to get weights"<<endl;
       /// Get and fill Weight info
       evtWgt.resetEvent();
       if (year_ == 2016)
@@ -457,13 +507,27 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
         evtWgt.setDefaultSystematics(2);
       else if (year_ >= 2017)
         evtWgt.setDefaultSystematics(3);
-      w_noBtagSF = evtWgt.getWeight(evtWgtInfo::systID(0), false);
+      w_noBtagSF = evtWgt.getWeight(evtWgtInfo::systID(0), false,3);
 
       //Sanity test: turn off ALL SF
       evtWgt.resetEvent();
       evtWgt.setDefaultSystematics(4);
-      w_lumi_getWeight = evtWgt.getWeight(evtWgtInfo::systID(0), false);
+      w_lumi_getWeight = evtWgt.getWeight(evtWgtInfo::systID(0), false,4);
+      //cout<<" Trying case 5"<<endl;
 
+      //Btag weights
+      evtWgt.resetEvent();
+      evtWgt.setDefaultSystematics(5);
+      w_BtagSF_medloose = evtWgt.getWeight(evtWgtInfo::systID(0), false,5);
+
+     // cout<<" Trying case 6"<<endl;
+      evtWgt.resetEvent();
+      evtWgt.setDefaultSystematics(6);
+      w_BtagSF_medmed = evtWgt.getWeight(evtWgtInfo::systID(0), false,6);
+
+      evtWgt.resetEvent();
+      evtWgt.setDefaultSystematics(7);
+      w_BtagSF_WH = evtWgt.getWeight(evtWgtInfo::systID(0), false,7);
 
       //Get and fill jet info
       v_ak4pt->clear();
@@ -519,6 +583,17 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
       mus_phi->clear();
       mus_pdgid->clear();
       mus_fromW->clear();
+
+      gen_pt->clear(); 
+      gen_eta->clear(); 
+      gen_phi->clear(); 
+      gen_m->clear(); 
+      gen_id->clear(); 
+      gen_idx->clear(); 
+      gen_motherid->clear(); 
+      gen_motheridx->clear(); 
+      gen_gmotherid->clear(); 
+      gen_gmotheridx->clear(); 
 
       //// Lepton Info ////
       if(ngoodleps()>0){
@@ -624,10 +699,105 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
        
       }
 
-      
+      ///Gen information: susy particles, quarks, bosons, leptons
+
+      //susy
+      for (size_t q = 0; q < gensusy_id().size(); ++q) {
+       if (!gensusy_isLastCopy().at(q)) continue;
+       gen_pt->push_back(gensusy_p4().at(q).pt());
+       gen_phi->push_back(gensusy_p4().at(q).phi());
+       gen_eta->push_back(gensusy_p4().at(q).eta());
+       gen_m->push_back(gensusy_p4().at(q).mass());
+       gen_id->push_back(gensusy_id().at(q));
+       gen_idx->push_back(gensusy__genpsidx().at(q));
+       gen_motherid->push_back(gensusy_motherid().at(q));
+       gen_motheridx->push_back(gensusy_motheridx().at(q));
+       gen_gmotherid->push_back(gensusy_gmotherid().at(q));
+       gen_gmotheridx->push_back(gensusy_gmotheridx().at(q));
+     } 
+     //quarks
+     for (size_t q = 0; q < genqs_id().size(); ++q) {
+      if (!genqs_isLastCopy().at(q)) continue;  
+      if (genqs_p4().at(q).pt()<1) continue;
+      if (abs(genqs_id().at(q)) >= 4 || genqs_isfromt().at(q)){
+        gen_pt->push_back(genqs_p4().at(q).pt());
+        gen_phi->push_back(genqs_p4().at(q).phi());
+        gen_eta->push_back(genqs_p4().at(q).eta());
+        gen_m->push_back(genqs_p4().at(q).mass());
+        gen_id->push_back(genqs_id().at(q));
+        gen_idx->push_back(genqs__genpsidx().at(q));
+        gen_motherid->push_back(genqs_motherid().at(q));
+        gen_motheridx->push_back(genqs_motheridx().at(q));
+        gen_gmotherid->push_back(genqs_gmotherid().at(q));
+        gen_gmotheridx->push_back(genqs_gmotheridx().at(q));
+      }
+    }
+    //bosons
+    for (size_t q = 0; q < genbosons_id().size(); ++q) {
+      if (!genbosons_isLastCopy().at(q)) continue;
+      if (genbosons_p4().at(q).pt()<1) continue;
+      gen_pt->push_back(genbosons_p4().at(q).pt());
+      gen_phi->push_back(genbosons_p4().at(q).phi());
+      gen_eta->push_back(genbosons_p4().at(q).eta());
+      gen_m->push_back(genbosons_p4().at(q).mass());
+      gen_id->push_back(genbosons_id().at(q));
+      gen_idx->push_back(genbosons__genpsidx().at(q));
+      gen_motherid->push_back(genbosons_motherid().at(q));
+      gen_motheridx->push_back(genbosons_motheridx().at(q));
+      gen_gmotherid->push_back(genbosons_gmotherid().at(q));
+      gen_gmotheridx->push_back(genbosons_gmotheridx().at(q));
+    }
+    //leptons
+    for (size_t q = 0; q < genleps_id().size(); ++q) {
+      if (!genleps_isLastCopy().at(q)) continue;
+      if (genleps_p4().at(q).pt()<1) continue;
+      if(genleps_fromHardProcessFinalState().at(q) || genleps_fromHardProcessDecayed().at(q) || abs(genleps_motherid().at(q))==15 || abs(genleps_gmotherid().at(q))==15 || abs(genleps_gmotherid().at(q))==24){
+        gen_pt->push_back(genleps_p4().at(q).pt());
+        gen_phi->push_back(genleps_p4().at(q).phi());
+        gen_eta->push_back(genleps_p4().at(q).eta());
+        gen_m->push_back(genleps_p4().at(q).mass());
+        gen_id->push_back(genleps_id().at(q));
+        gen_idx->push_back(genleps__genpsidx().at(q));
+        gen_motherid->push_back(genleps_motherid().at(q));
+        gen_motheridx->push_back(genleps_motheridx().at(q));
+        gen_gmotherid->push_back(genleps_gmotherid().at(q));
+        gen_gmotheridx->push_back(genleps_gmotheridx().at(q));
+      }
+    }
+    //neutrinos
+
+    float maxnupt =0;
+    for (size_t q = 0; q < gennus_id().size(); ++q) {
+      if (!gennus_isLastCopy().at(q)) continue; 
+      if (gennus_p4().at(q).pt()<1) continue; 
+      gen_pt->push_back(gennus_p4().at(q).pt());
+      if(gennus_p4().at(q).pt() > maxnupt) maxnupt=gennus_p4().at(q).pt();
+      gen_phi->push_back(gennus_p4().at(q).phi());
+      gen_eta->push_back(gennus_p4().at(q).eta());
+      gen_m->push_back(gennus_p4().at(q).mass());
+      gen_id->push_back(gennus_id().at(q));
+      gen_idx->push_back(gennus__genpsidx().at(q));
+      gen_motherid->push_back(gennus_motherid().at(q));
+      gen_motheridx->push_back(gennus_motheridx().at(q));
+      gen_gmotherid->push_back(gennus_gmotherid().at(q));
+      gen_gmotheridx->push_back(gennus_gmotheridx().at(q));
+    }
+
+
+      //cout<<"Got to pass"<<endl;
       // fillEfficiencyHistos(testVec[0], "filters");
       pass=true;
       if(is_data()) pass = isgoodrun && !duplicate;
+      stitch =true;
+      //cout<<dsname<<" "<<genmet()<<" "<<dsname.Contains("TTJets")<<" "<<!dsname.Contains("genMET")<<endl;
+
+      if(dsname.Contains("TTJets") && !dsname.Contains("genMET") && genmet()>150.) stitch = false;
+      //cout<<stitch<<endl;
+      
+      if((dsname.Contains("W1Jets") || dsname.Contains("W2Jets") || dsname.Contains("W3Jets") || dsname.Contains("W4Jets"))  && !dsname.Contains("NuPt-200") && maxnupt>200.) stitch = false;
+
+
+
 
        // Require at least 1 good vertex
       if (nvtxs() < 1) pass=false;
@@ -667,273 +837,12 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
       //   if ( !filt_nobadmuons() ) continue;
       // }
 
+      //cout<<"About to fill tree"<<endl;
       extraTree->Fill();
+      //cout<<"Filled tree"<<endl;
+ 
 
-      // stop defined filters
-      if (is_fastsim_) {
-        if ( !filt_fastsimjets() ) continue;
-      } else {
-        if ( !filt_pfovercalomet() ) continue;  // reject event if pfmet/calomet > 5
-        if ( !filt_jetWithBadMuon() ) continue; // there's a jup/jdown of this filter, but this alone should be enough
-      }
-
-     
-
-      // For testing on only subset of mass points
-      if (!runFullSignalScan && is_fastsim_) {
-        // auto checkMassPt = [&](double mstop, double mlsp) { return (mass_stop() == mstop) && (mass_lsp() == mlsp); };
-        // if (!checkMassPt(800,400)  && !checkMassPt(1200,50)  && !checkMassPt(400,100) &&
-        //     !checkMassPt(1100,300) && !checkMassPt(1100,500) && !checkMassPt(900,600)) continue;
-        if (dsname.Contains("T2tt")) {
-          float massdiff = mass_stop() - mass_lsp();
-          // if (mass_lsp() < 400 && mass_stop() < 1000) continue;
-          // if (massdiff < 200 || massdiff > 400) continue;
-          // if (massdiff < 200 || massdiff > 400 || mass_lsp() < 400) continue;
-          if (massdiff < 600 || mass_stop() < 1000) continue;
-         // plot2d("h2d_T2tt_masspts", mass_stop(), mass_lsp(), 1, SRVec.at(0).histMap, ";M_{stop} [GeV]; M_{lsp} [GeV]", 100, 300, 1300, 80, 0, 800);
-        } else if (dsname.Contains("T2bW")) {
-          float massdiff = mass_stop() - mass_lsp();
-          if (mass_lsp() < 300 && mass_stop() < 800) continue;
-          if (massdiff < 300) continue;
-          // if (massdiff < 900 || mass_stop() < 1000) continue;
-          //plot2d("h2d_T2bW_masspts", mass_stop(), mass_lsp(), 1, SRVec.at(0).histMap, ";M_{stop} [GeV]; M_{lsp} [GeV]", 100, 300, 1300, 80, 0, 800);
-        } else if (dsname.Contains("T2bt")) {
-          float massdiff = mass_stop() - mass_lsp();
-          if (mass_lsp() < 300 && mass_stop() < 800) continue;
-          if (massdiff < 300) continue;
-          // if (massdiff < 900 || mass_stop() < 1000) continue;
-          // if (!checkMassPt(800, 400) && !checkMassPt(800, 600) && !checkMassPt(1000, 50) && !checkMassPt(1000, 200)) continue;
-         // plot2d("h2d_T2bt_masspts", mass_stop(), mass_lsp(), 1, SRVec.at(0).histMap, ";M_{stop} [GeV]; M_{LSP} [GeV]", 100, 300, 1300, 64, 0, 800);
-        }
-      }
-
-      // Only events nupt < 200 for WNJetsToLNu samples -- 80X only since NuPt-200 sample not available in 94X
-      //if (dsname.BeginsWith("/W") && dsname.Contains("JetsToLNu") && dsname.Contains("80X") && !dsname.Contains("NuPt-200") && nupt() > 200) continue;
-
-      if (is_fastsim_) {
-        if (fmod(mass_stop(), kSMSMassStep) > 2 || fmod(mass_lsp(), kSMSMassStep) > 2) continue;  // skip points in between the binning
-        //plot2d("h2d_signal_masspts", mass_stop(), mass_lsp() , evtweight_, SRVec.at(0).histMap, ";M_{stop} [GeV]; M_{lsp} [GeV]", 96, 100, 1300, 64, 0, 800);
-      }
-
-      ++nPassedTotal;
-
-      is_bkg_ = (!is_data() && !is_fastsim_);
-
-      // Calculate event weight
-      //evtWgt.resetEvent(); // full event weights only get calculated if the event get selected for a SR
-
-      // Simple weight with scale1fb only
-      if (!is_data()) {
-        if (is_fastsim_) {
-          int nEventsSample = h_sig_counter_nEvents->GetBinContent(h_sig_counter->FindBin(mass_stop(), mass_lsp()));
-          evtweight_ = kLumi * xsec() * 1000 / nEventsSample;
-        } else {
-          evtweight_ = kLumi * scale1fb();
-        }
-      }
-
-
-
-      if (doNvtxReweight && (datayear == 2016 || datayear == 2018)) {
-        if (nvtxs() < 100) evtweight_ = nvtxscale_[nvtxs()];  // only scale for data
-      }
-
-
-
-      // Calculate leading top tagger variables for the event
-      // float lead_restopdisc = -1.1;
-      // float lead_tftopdisc = -0.1;
-      // float lead_deepdisc_top = -0.1;
-      // float lead_bindisc_top = -0.1;
-      // if (doTopTagging) {
-      //   lead_restopdisc = (topcands_disc().size())? topcands_disc()[0] : -1.1;
-      //   for (size_t iak8 = 0; iak8 < ak8pfjets_deepdisc_top().size(); ++iak8) {
-      //     float disc = ak8pfjets_deepdisc_top()[iak8];
-      //     if (disc > lead_deepdisc_top) lead_deepdisc_top = disc;
-      //     float bindisc = disc / (disc + ak8pfjets_deepdisc_qcd().at(iak8));
-      //     if (bindisc > lead_bindisc_top) lead_bindisc_top = bindisc;
-      //   }
-      //   for (auto disc : tftops_disc()) {
-      //     if (disc > lead_tftopdisc) lead_tftopdisc = disc;
-      //   }
-      // }
-
-      // Filling the variables for analysis
-      values_.clear();
-
-      // /// Common variables for all JES type
-      // values_["nlep"] = ngoodleps();
-      // values_["nvlep"] = nvetoleps();
-      // values_["lep1pt"] = lep1_p4().pt();
-      // values_["passvetos"] = PassTrackVeto() && PassTauVeto();
-
-      // // For toptagging, add correct switch later
-      // // values_["resttag"] = lead_restopdisc;
-      // values_["resttag"] = lead_tftopdisc;
-      // values_["deepttag"] = lead_deepdisc_top;
-      // values_["tfttag"] = lead_tftopdisc;
-      // values_["bdtttag"] = lead_restopdisc;
-      // values_["binttag"] = lead_bindisc_top;
-
-      // if (runResTopMVA) {
-      //   // Prepare deep_cvsl vector
-      //   vector<float> ak4pfjets_dcvsl;
-      //   for (size_t j = 0; j < ak4pfjets_deepCSV().size(); ++j) {
-      //     ak4pfjets_dcvsl.push_back(ak4pfjets_deepCSVc().at(j) / (ak4pfjets_deepCSVc().at(j) + ak4pfjets_deepCSVl().at(j)));
-      //   }
-      //   resTopMVA->setJetVecPtrs(&ak4pfjets_p4(), &ak4pfjets_deepCSV(), &ak4pfjets_dcvsl, &ak4pfjets_ptD(), &ak4pfjets_axis1(), &ak4pfjets_mult());
-      //   std::vector<TopCand> topcands = resTopMVA->getTopCandidates(-1);
-      //   values_["resttag"] = (topcands.size() > 0)? topcands[0].disc : -1.1;
-      // }
-
-      // Temporary test for top tagging efficiency
-      // testTopTaggingEffficiency(testVec[1]);
-
-      /// Values only for hist filling or testing
-      // values_["chi2"] = hadronic_top_chi2();
-      // values_["lep1eta"] = lep1_p4().eta();
-      // values_["passlep1pt"] = (abs(lep1_pdgid()) == 13 && lep1_p4().pt() > 40) || (abs(lep1_pdgid()) == 11 && lep1_p4().pt() > 45);
-
-      for (int jestype = 0; jestype < ((doSystVariations && !is_data())? 3 : 1); ++jestype) {
-        if (doSystVariations) jestype_ = jestype;
-        string suffix = "";
-
-        /// JES type dependent variables
-        if (jestype_ == 0) {
-          values_["mt"] = mt_met_lep();
-          values_["met"] = pfmet();
-          values_["mlb"] = Mlb_closestb();
-          values_["tmod"] = topnessMod();
-          values_["njet"] = ngoodjets();
-          values_["nbjet"] = ngoodbtags();
-          values_["nbtag"]  = nanalysisbtags();
-          values_["dphijmet"] = mindphi_met_j1_j2();
-          values_["dphilmet"] = lep1_dphiMET();
-          values_["j1passbtag"] = (ngoodjets() > 0)? ak4pfjets_passMEDbtag().at(0) : 0;
-
-          values_["jet1pt"] = (ngoodjets() > 0)? ak4pfjets_p4().at(0).pt() : 0;
-          values_["jet2pt"] = (ngoodjets() > 1)? ak4pfjets_p4().at(1).pt() : 0;
-          values_["jet1eta"] = (ngoodjets() > 0)? ak4pfjets_p4().at(0).eta() : -9;
-          values_["jet2eta"] = (ngoodjets() > 1)? ak4pfjets_p4().at(1).eta() : -9;
-
-          values_["ht"] = ak4_HT();
-          values_["metphi"] = pfmet_phi();
-          values_["ntbtag"] = ntightbtags();
-          values_["leadbpt"] = ak4pfjets_leadbtag_p4().pt();
-          values_["mlb_0b"] = (ak4pfjets_leadbtag_p4() + lep1_p4()).M();
-          // values_["htratio"] = ak4_htratiom();
-
-          // suffix = "_nominal";
-        } else if (jestype_ == 1) {
-          values_["mt"] = mt_met_lep_jup();
-          values_["met"] = pfmet_jup();
-          values_["mlb"] = Mlb_closestb_jup();
-          values_["tmod"] = topnessMod_jup();
-          values_["njet"] = jup_ngoodjets();
-          values_["nbjet"] = jup_ngoodbtags();  // nbtag30();
-          values_["nbtag"]  = jup_nanalysisbtags();
-          values_["dphijmet"] = mindphi_met_j1_j2_jup();
-          values_["dphilmet"] = fabs(lep1_p4().phi() - pfmet_phi_jup());
-          values_["j1passbtag"] = (jup_ngoodjets() > 0)? jup_ak4pfjets_passMEDbtag().at(0) : 0;
-
-          values_["jet1pt"] = (jup_ngoodjets() > 0)? jup_ak4pfjets_p4().at(0).pt() : 0;
-          values_["jet2pt"] = (jup_ngoodjets() > 1)? jup_ak4pfjets_p4().at(1).pt() : 0;
-          values_["jet1eta"] = (jup_ngoodjets() > 0)? jup_ak4pfjets_p4().at(0).eta() : -9;
-          values_["jet2eta"] = (jup_ngoodjets() > 1)? jup_ak4pfjets_p4().at(1).eta() : -9;
-
-          values_["ht"] = jup_ak4_HT();
-          values_["metphi"] = pfmet_phi_jup();
-          values_["ntbtag"] = jup_ntightbtags();
-          values_["leadbpt"] = jup_ak4pfjets_leadbtag_p4().pt();
-          values_["mlb_0b"] = (jup_ak4pfjets_leadbtag_p4() + lep1_p4()).M();
-          // values_["htratio"] = jup_ak4_htratiom();
-
-          suffix = "_jesUp";
-        } else if (jestype_ == 2) {
-          values_["mt"] = mt_met_lep_jdown();
-          values_["met"] = pfmet_jdown();
-          values_["mlb"] = Mlb_closestb_jdown();
-          values_["tmod"] = topnessMod_jdown();
-          values_["njet"] = jdown_ngoodjets();
-          values_["nbjet"] = jdown_ngoodbtags();  // nbtag30();
-          values_["ntbtag"] = jdown_ntightbtags();
-          values_["dphijmet"] = mindphi_met_j1_j2_jdown();
-          values_["dphilmet"] = fabs(lep1_p4().phi() - pfmet_phi_jdown());
-          values_["j1passbtag"] = (jdown_ngoodjets() > 0)? jdown_ak4pfjets_passMEDbtag().at(0) : 0;
-
-          values_["jet1pt"] = (jdown_ngoodjets() > 0)? jdown_ak4pfjets_p4().at(0).pt() : 0;
-          values_["jet2pt"] = (jdown_ngoodjets() > 1)? jdown_ak4pfjets_p4().at(1).pt() : 0;
-          values_["jet1eta"] = (jdown_ngoodjets() > 0)? jdown_ak4pfjets_p4().at(0).eta() : -9;
-          values_["jet2eta"] = (jdown_ngoodjets() > 1)? jdown_ak4pfjets_p4().at(1).eta() : -9;
-
-          values_["ht"] = jdown_ak4_HT();
-          values_["metphi"] = pfmet_phi_jdown();
-          values_["nbtag"]  = jdown_nanalysisbtags();
-          values_["leadbpt"] = jdown_ak4pfjets_leadbtag_p4().pt();
-          values_["mlb_0b"] = (jdown_ak4pfjets_leadbtag_p4() + lep1_p4()).M();
-          // values_["htratio"] = jdown_ak4_htratiom();
-
-          suffix = "_jesDn";
-        }
-        /// should do the same job as nanalysisbtags
-        values_["nbtag"] = (values_["mlb"] > 175)? values_["ntbtag"] : values_["nbjet"];
-
-        // // Uncomment following lines if want to use CSV instead
-        // values_["nbtag"] = (values_["mlb"] > 175)? ntbtagCSV : nbtagCSV;
-        // values_["nbjet"] = nbtagCSV;
-        // values_["ntbtag"] = ntbtagCSV;
-
-        // Filling histograms for SR
-        // fillHistosForSR(suffix);
-
-        // fillHistosForCR0b(suffix);
-
-        // Filling analysis variables with removed leptons, for CR2l
-        values_["nlep_rl"] = (ngoodleps() == 1 && nvetoleps() >= 2 && lep2_p4().Pt() > 10)? 2 : ngoodleps();
-        values_["mll"] = (lep1_p4() + lep2_p4()).M();
-
-        if (jestype_ == 0) {
-          values_["mt_rl"] = mt_met_lep_rl();
-          values_["mt2_ll"] = (doTopTagging)? MT2_ll() : 90;
-          values_["met_rl"] = pfmet_rl();
-          values_["dphijmet_rl"]= mindphi_met_j1_j2_rl();
-          values_["dphilmet_rl"] = lep1_dphiMET_rl();
-          values_["tmod_rl"] = topnessMod_rl();
-        } else if (jestype_ == 1) {
-          values_["mt_rl"] = mt_met_lep_rl_jup();
-          values_["mt2_ll"] = (doTopTagging)? MT2_ll_jup() : 90;
-          values_["met_rl"] = pfmet_rl_jup();
-          values_["dphijmet_rl"]= mindphi_met_j1_j2_rl_jup();
-          values_["dphilmet_rl"] = lep1_dphiMET_rl_jup();
-          values_["tmod_rl"] = topnessMod_rl_jup();
-        } else if (jestype_ == 2) {
-          values_["mt_rl"] = mt_met_lep_rl_jdown();
-          values_["mt2_ll"] = (doTopTagging)? MT2_ll_jdown() : 90;
-          values_["met_rl"] = pfmet_rl_jdown();
-          values_["dphijmet_rl"]= mindphi_met_j1_j2_rl_jdown();
-          values_["dphilmet_rl"] = lep1_dphiMET_rl_jdown();
-          values_["tmod_rl"] = topnessMod_rl_jdown();
-        }
-        // fillHistosForCR2l(suffix);
-        // fillHistosForCRemu(suffix);
-
-        // // testCutFlowHistos(testVec[2]);
-        // fillTopTaggingHistos(suffix);
-
-        // // Also do yield using genmet for fastsim samples <-- under development
-        // if (is_fastsim_ && jestype_ == 0) {
-        //   values_["met"] = genmet();
-        //   values_["mt"] = mt_genmet_lep();
-        //   values_["tmod"] = topnessMod_genmet();
-        //   values_["dphijmet"] = mindphi_genmet_j1_j2();
-        //   values_["dphilmet"] = mindphi_genmet_lep1();
-
-        //   fillHistosForSR("_genmet");
-        // }
-
-      }  // end of jes variation
-
-     // if (event > 100) break;  // for debugging purpose
+     // if (event > 10) break;  // for debugging purpose
     } // end of event loop
 
 

@@ -16,6 +16,8 @@ keep HLT*
 drop HLT_Photon*
 ### met ###
 keep pfmet
+keep genmet
+keep genmet_phi
 
 ### leptons ###
 keep ngoodleps

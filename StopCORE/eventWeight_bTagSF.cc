@@ -1,5 +1,5 @@
 #include "eventWeight_bTagSF.h"
-
+ 
 //////////////////////////////////////////////////////////////////////
 
 eventWeight_bTagSF::eventWeight_bTagSF( bool isFastsim ){
@@ -7,14 +7,19 @@ eventWeight_bTagSF::eventWeight_bTagSF( bool isFastsim ){
   sampleIsFastsim = isFastsim;
 
   // DeepCSV working points 94X
-  BTAG_LSE = 0.1522;
-  BTAG_MED = 0.4941;
-  BTAG_TGT = 0.8001;
+  // BTAG_LSE = 0.1522;
+  // BTAG_MED = 0.4941;
+  // BTAG_TGT = 0.8001;
 
+  //Match babymaker, but slightly updated on twiki
+  BTAG_TGT  = 0.8958;
+  BTAG_MED = 0.6324;
+  BTAG_LSE  = 0.2219;
   std::cout << "[eventWeight_bTagSF] Loading btag SFs..." << std::endl;
 
   // 25s version of SFs
-  calib = new BTagCalibration("DeepCSV", "btagsf/run2_25ns/DeepCSV_94XSF_V2_B_F.csv"); // DeepCSV version of SFs
+  // Updated for 2016 samples (94X)
+  calib = new BTagCalibration("DeepCSV", "../CORE/Tools/btagsf/data/run2_25ns/DeepCSV_Moriond17_B_H.csv"); // DeepCSV version of SFs
   reader_medium = new BTagCalibrationReader(BTagEntry::OP_MEDIUM, "central", {"up", "down"});
   reader_medium->load(*calib, BTagEntry::FLAV_B, "comb");
   reader_medium->load(*calib, BTagEntry::FLAV_C, "comb");
@@ -28,7 +33,7 @@ eventWeight_bTagSF::eventWeight_bTagSF( bool isFastsim ){
   reader_loose->load(*calib, BTagEntry::FLAV_C, "comb");
   reader_loose->load(*calib, BTagEntry::FLAV_UDSG, "incl");
 
-  calib_fastsim = new BTagCalibration("deepcsv", "btagsf/run2_fastsim/fastsim_deepcsv_ttbar_26_1_2017.csv"); // DeepCSV fastsim version of SFs
+  calib_fastsim = new BTagCalibration("deepcsv", "../CORE/Tools/btagsf/data/run2_fastsim/fastsim_deepcsv_ttbar_26_1_2017.csv"); // DeepCSV fastsim version of SFs
   reader_medium_FS = new BTagCalibrationReader(BTagEntry::OP_MEDIUM, "central", {"up", "down"});
   reader_medium_FS->load(*calib_fastsim, BTagEntry::FLAV_B, "fastsim");
   reader_medium_FS->load(*calib_fastsim, BTagEntry::FLAV_C, "fastsim");
@@ -44,10 +49,10 @@ eventWeight_bTagSF::eventWeight_bTagSF( bool isFastsim ){
 
   if(isFastsim){
     // Created using https://github.com/cmstas/bTagEfficiencyTools. Todo: change to deepCSV later
-    feff =  new TFile("../StopBabyMaker/btagsf/btageff__SMS-T1bbbb-T1qqqq_25ns_Moriond17.root");
+    feff =  new TFile("../StopBabyMaker/btagsf/run2_fastsim/btageff__SMS-T1bbbb-T1qqqq_25ns_Moriond17.root");
   } else {
     // Todo: create efficiency in the phase space of the stop analysis
-    feff =  new TFile("../StopBabyMaker/btagsf/btageff__ttbar_powheg_pythia8_25ns_Moriond17_deepCSV.root");
+    feff =  new TFile("../StopBabyMaker/btagsf/run2_25ns/btageff__ttbar_powheg_pythia8_25ns_Moriond17_deepCSV.root");
   }
   if (!feff) throw std::invalid_argument("eventWeight_bTagSF.cc: btagsf file does not exist!");
 
@@ -94,8 +99,8 @@ void eventWeight_bTagSF::getBTagWeight( int WP, std::vector< double > jet_pt, st
   weight_btagsf_FS_DN = 1.0;
 
   // Input sanitation
-  if( WP<0 || WP>2 ){
-    std::cout << "btag sf WP needs an argument of 0, 1, or 2, for loose, medium, or tight ID" << std::endl;
+  if( WP<0 || WP>4 ){
+    std::cout << "btag sf WP needs an argument of 0, 1, 2, 3, or 4 for loose, medium, tight, or med+loose ID or medium+inclusive loose" << std::endl;
   }
 
   if( jet_pt.size()!=jet_eta.size() ){
@@ -116,6 +121,8 @@ void eventWeight_bTagSF::getBTagWeight( int WP, std::vector< double > jet_pt, st
   double btagprob_mc   = 1.0;
   double btagprob_data = 1.0;
 
+  double btagprob_eff_loose  = 1.0;
+
   double btagprob_err_heavy_UP = 1.0;
   double btagprob_err_heavy_DN = 1.0;
   double btagprob_err_light_UP = 1.0;
@@ -124,11 +131,16 @@ void eventWeight_bTagSF::getBTagWeight( int WP, std::vector< double > jet_pt, st
   double btagprob_err_FS_DN    = 1.0;
 
   double weight_cent  = 1.0;
+  double weight_cent_loose  = 1.0;
   double weight_UP    = 1.0;
   double weight_DN    = 1.0;
   double weight_FS_UP = 1.0;
   double weight_FS_DN = 1.0;
 
+  //For WH case, find index of highest CSV jet to use medium WP SF. For others, use loose.
+  int idx_max_csv=0;
+  if(WP==4) idx_max_csv = distance(jet_CSV.begin(),std::max_element(jet_CSV.begin(),jet_CSV.end()));
+  
   // Loop over jet vectors
   for(int iJet=0; iJet<(int)jet_pt.size(); iJet++){
 
@@ -138,6 +150,9 @@ void eventWeight_bTagSF::getBTagWeight( int WP, std::vector< double > jet_pt, st
     int binx=-99;
     int biny=-99;
     TH2D* h_eff = NULL;
+    int binx_loose=-99;
+    int biny_loose=-99;
+    TH2D* h_eff_loose = NULL; //Need two histograms for med + loose case
 
     double pt_eff  = std::max(20.0, std::min(399.0, jet_pt[iJet])); // min 20 GeV in the eff hist
     double eta_eff = std::min(2.39, fabs(jet_eta[iJet]) );
@@ -150,37 +165,43 @@ void eventWeight_bTagSF::getBTagWeight( int WP, std::vector< double > jet_pt, st
       flavor = BTagEntry::FLAV_B;
       pt_eff = std::max(20.0,std::min(599.0, jet_pt[iJet])); // max pt of 600.0 GeV for b
 
-      if( WP==BTagEntry::OP_LOOSE  ) h_eff = h_loose_btag_eff_b;
-      if( WP==BTagEntry::OP_MEDIUM ) h_eff = h_btag_eff_b;
+      if( WP==BTagEntry::OP_LOOSE  || (WP==4 && iJet!=idx_max_csv)) h_eff = h_loose_btag_eff_b;
+      if( WP==BTagEntry::OP_MEDIUM || WP==3 || (WP==4 && iJet==idx_max_csv)) h_eff = h_btag_eff_b;
       if( WP==BTagEntry::OP_TIGHT  ) h_eff = h_tight_btag_eff_b;
+      h_eff_loose = h_loose_btag_eff_b;
     }
     // Charm
     else if( abs(jet_flavour[iJet])==4 ){
       flavor = BTagEntry::FLAV_C;
 
-      if( WP==BTagEntry::OP_LOOSE  ) h_eff = h_loose_btag_eff_c;
-      if( WP==BTagEntry::OP_MEDIUM ) h_eff = h_btag_eff_c;
+      if( WP==BTagEntry::OP_LOOSE || (WP==4 && iJet!=idx_max_csv) ) h_eff = h_loose_btag_eff_c;
+      if( WP==BTagEntry::OP_MEDIUM || WP==3 || (WP==4 && iJet==idx_max_csv)) h_eff = h_btag_eff_c;
       if( WP==BTagEntry::OP_TIGHT  ) h_eff = h_tight_btag_eff_c;
+      h_eff_loose = h_loose_btag_eff_c;
     }
     // UDSG
     else{
       flavor = BTagEntry::FLAV_UDSG;
 
-      if( WP==BTagEntry::OP_LOOSE  ) h_eff = h_loose_btag_eff_udsg;
-      if( WP==BTagEntry::OP_MEDIUM ) h_eff = h_btag_eff_udsg;
+      if( WP==BTagEntry::OP_LOOSE || (WP==4 && iJet!=idx_max_csv) ) h_eff = h_loose_btag_eff_udsg;
+      if( WP==BTagEntry::OP_MEDIUM || WP==3 || (WP==4 && iJet==idx_max_csv)) h_eff = h_btag_eff_udsg;
       if( WP==BTagEntry::OP_TIGHT  ) h_eff = h_tight_btag_eff_udsg;
+      h_eff_loose = h_loose_btag_eff_udsg;
     }
 
     binx = h_eff->GetXaxis()->FindBin(pt_eff);
     biny = h_eff->GetYaxis()->FindBin(eta_eff);
     btagprob_eff = h_eff->GetBinContent(binx,biny);
+    binx_loose = h_eff_loose->GetXaxis()->FindBin(pt_eff);
+    biny_loose = h_eff_loose->GetYaxis()->FindBin(eta_eff);
+    btagprob_eff_loose = h_eff_loose->GetBinContent(binx_loose,biny_loose);
 
-    if( WP==BTagEntry::OP_LOOSE ){
+    if( WP==BTagEntry::OP_LOOSE || (WP==4 && iJet!=idx_max_csv)){
       weight_cent = reader_loose->eval_auto_bounds("central", flavor, jet_eta[iJet], jet_pt[iJet]);
       weight_UP   = reader_loose->eval_auto_bounds("up",      flavor, jet_eta[iJet], jet_pt[iJet]);
       weight_DN   = reader_loose->eval_auto_bounds("down",    flavor, jet_eta[iJet], jet_pt[iJet]);
     }
-    else if( WP==BTagEntry::OP_MEDIUM ){
+    else if( WP==BTagEntry::OP_MEDIUM || WP==3 || (WP==4 && iJet==idx_max_csv)){
       weight_cent = reader_medium->eval_auto_bounds("central", flavor, jet_eta[iJet], jet_pt[iJet]);
       weight_UP   = reader_medium->eval_auto_bounds("up",      flavor, jet_eta[iJet], jet_pt[iJet]);
       weight_DN   = reader_medium->eval_auto_bounds("down",    flavor, jet_eta[iJet], jet_pt[iJet]);
@@ -190,6 +211,7 @@ void eventWeight_bTagSF::getBTagWeight( int WP, std::vector< double > jet_pt, st
       weight_UP   = reader_tight->eval_auto_bounds("up",      flavor, jet_eta[iJet], jet_pt[iJet]);
       weight_DN   = reader_tight->eval_auto_bounds("down",    flavor, jet_eta[iJet], jet_pt[iJet]);
     }
+    weight_cent_loose = reader_loose->eval_auto_bounds("central", flavor, jet_eta[iJet], jet_pt[iJet]);
 
     // extra SF for fastsim
     if(sampleIsFastsim) {
@@ -217,14 +239,19 @@ void eventWeight_bTagSF::getBTagWeight( int WP, std::vector< double > jet_pt, st
         weight_DN   *= reader_tight_FS->eval_auto_bounds("central", flavor, jet_eta[iJet], jet_pt[iJet]);//this is still just btagSF
       }
 
+      weight_cent_loose *= reader_loose_FS->eval_auto_bounds("central", flavor, jet_eta[iJet], jet_pt[iJet]);
+
+
     }
 
 
     // Check if CSV passes WP
     bool passWP = false;
-    if( WP==0 && jet_CSV[iJet]>BTAG_LSE ) passWP = true;
-    if( WP==1 && jet_CSV[iJet]>BTAG_MED ) passWP = true;
+    if( (WP==0 || (WP==4 && iJet!=idx_max_csv)) && jet_CSV[iJet]>BTAG_LSE ) passWP = true;
+    if( (WP==1 || WP==3 || (WP==4 && iJet==idx_max_csv)) && jet_CSV[iJet]>BTAG_MED ) passWP = true;
     if( WP==2 && jet_CSV[iJet]>BTAG_TGT ) passWP = true;
+
+    bool passLooseNotMed= (jet_CSV[iJet]<=BTAG_MED && jet_CSV[iJet]>BTAG_LSE);
 
     // If jet is bTagged
     if( passWP ){
@@ -251,6 +278,53 @@ void eventWeight_bTagSF::getBTagWeight( int WP, std::vector< double > jet_pt, st
       }
 
     } // end if jet is bTagged
+
+    else if(WP==3 && passLooseNotMed){ //loose but not medium
+      btagprob_data *= (weight_cent_loose * btagprob_eff_loose - weight_cent * btagprob_eff);
+      btagprob_mc   *= btagprob_eff_loose - btagprob_eff;
+
+      //Need to revisit this more carefully
+      if (flavor == BTagEntry::FLAV_UDSG) {
+        btagprob_err_light_UP *= weight_UP*btagprob_eff;
+        btagprob_err_light_DN *= weight_DN*btagprob_eff;
+        btagprob_err_heavy_UP *= weight_cent*btagprob_eff;
+        btagprob_err_heavy_DN *= weight_cent*btagprob_eff;
+      }
+      else {
+        btagprob_err_light_UP *= weight_cent*btagprob_eff;
+        btagprob_err_light_DN *= weight_cent*btagprob_eff;
+        btagprob_err_heavy_UP *= weight_UP*btagprob_eff;
+        btagprob_err_heavy_DN *= weight_DN*btagprob_eff;
+      }
+
+      if(sampleIsFastsim){ // Need to revisit
+        btagprob_err_FS_UP *= weight_FS_UP*btagprob_eff;
+        btagprob_err_FS_DN *= weight_FS_DN*btagprob_eff;
+      }
+    }
+    else if(WP==3 && !passLooseNotMed && !passWP){
+      btagprob_data *= (1. - weight_cent_loose * btagprob_eff_loose);
+      btagprob_mc   *= (1. - btagprob_eff_loose);
+
+      //Need to revisit this as well
+      if (flavor == BTagEntry::FLAV_UDSG) {
+        btagprob_err_light_UP *= (1. - weight_UP * btagprob_eff_loose);
+        btagprob_err_light_DN *= (1. - weight_DN * btagprob_eff_loose);
+        btagprob_err_heavy_UP *= (1. - weight_cent * btagprob_eff_loose);
+        btagprob_err_heavy_DN *= (1. - weight_cent * btagprob_eff_loose);
+      }
+      else {
+        btagprob_err_light_UP *= (1. - weight_cent * btagprob_eff_loose);
+        btagprob_err_light_DN *= (1. - weight_cent * btagprob_eff_loose);
+        btagprob_err_heavy_UP *= (1. - weight_UP * btagprob_eff_loose);
+        btagprob_err_heavy_DN *= (1. - weight_DN * btagprob_eff_loose);
+      }
+
+      if(sampleIsFastsim){
+        btagprob_err_FS_UP *= (1. - weight_FS_UP * btagprob_eff_loose);
+        btagprob_err_FS_DN *= (1. - weight_FS_DN * btagprob_eff_loose);
+      }
+    }
 
     // if jet fails bTag
     else{

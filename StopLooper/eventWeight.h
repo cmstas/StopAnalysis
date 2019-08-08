@@ -171,12 +171,28 @@ class evtWgtInfo {
   double sf_bTagEffHF_tight_dn;
   double sf_bTagEffLF_tight_up;
   double sf_bTagEffLF_tight_dn;
+  double sf_bTag_medloose;
+  double sf_bTagEffHF_medloose_up;
+  double sf_bTagEffHF_medloose_dn;
+  double sf_bTagEffLF_medloose_up;
+  double sf_bTagEffLF_medloose_dn;
+  double sf_bTag_WH;
+  double sf_bTagEffHF_WH_up;
+  double sf_bTagEffHF_WH_dn;
+  double sf_bTagEffLF_WH_up;
+  double sf_bTagEffLF_WH_dn;
+
+
 
   bool   apply_bTagFS_sf;
   double sf_bTag_FS_up;
   double sf_bTag_FS_dn;
   double sf_bTag_tight_FS_up;
   double sf_bTag_tight_FS_dn;
+  double sf_bTag_medloose_FS_up;
+  double sf_bTag_medloose_FS_dn;
+  double sf_bTag_WH_FS_up;
+  double sf_bTag_WH_FS_dn;
 
   bool   apply_lep_sf;
   double sf_lep;
@@ -273,7 +289,7 @@ class evtWgtInfo {
   void setExtraFileWeight(double sf_extra) { sf_extra_file = sf_extra; }
 
   void initializeWeights();
-  void calculateWeightsForEvent();
+  void calculateWeightsForEvent(int syst_set=0);
   void getSusyMasses( int &mStop, int &mLSP );
   void getNEvents( int &nEvts );
   void getXSecWeight( double &weight_xsec, double &weight_xsec_up, double &weight_xsec_dn );
@@ -309,7 +325,7 @@ class evtWgtInfo {
   bool doingSystematic( systID systid );
   SampleType findSampleType( std::string samplestr);  // <-- todo: finish this function
   std::string getLabel( systID systid );
-  double getWeight( systID systid, bool cr2lregions=false );
+  double getWeight( systID systid, bool cr2lregions=false, int syst_set=0 );
 
  private:
   bool is_bkg_;

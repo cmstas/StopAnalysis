@@ -217,7 +217,7 @@ evtWgtInfo::evtWgtInfo() {
   is_data_    = false;
   is_fastsim_ = false;
   sync16      = false;
-  verbose     = false;
+  verbose     = true;
 
   // Initialize Switches for additional SFs
   apply_diLepTrigger_sf = false;
@@ -450,6 +450,21 @@ void evtWgtInfo::initializeWeights() {
   sf_bTagEffLF_tight_dn = 1.0;
   sf_bTag_tight_FS_up = 1.0;
   sf_bTag_tight_FS_dn = 1.0;
+  sf_bTag_medloose = 1.0;
+  sf_bTagEffHF_medloose_up = 1.0;
+  sf_bTagEffHF_medloose_dn = 1.0;
+  sf_bTagEffLF_medloose_up = 1.0;
+  sf_bTagEffLF_medloose_dn = 1.0;
+  sf_bTag_medloose_FS_up = 1.0;
+  sf_bTag_medloose_FS_dn = 1.0;
+  sf_bTag_WH = 1.0;
+  sf_bTagEffHF_WH_up = 1.0;
+  sf_bTagEffHF_WH_dn = 1.0;
+  sf_bTagEffLF_WH_up = 1.0;
+  sf_bTagEffLF_WH_dn = 1.0;
+  sf_bTag_WH_FS_up = 1.0;
+  sf_bTag_WH_FS_dn = 1.0;
+
 
   sf_lep = 1.0;
   sf_lep_up = 1.0;
@@ -529,7 +544,7 @@ void evtWgtInfo::initializeWeights() {
 
 //////////////////////////////////////////////////////////////////////
 
-void evtWgtInfo::calculateWeightsForEvent() {
+void evtWgtInfo::calculateWeightsForEvent(int syst_set) {
 
   initializeWeights();
 
@@ -560,6 +575,9 @@ void evtWgtInfo::calculateWeightsForEvent() {
   if (apply_bTag_sf) {
     getBTagWeight( 1, sf_bTag, sf_bTagEffHF_up, sf_bTagEffHF_dn, sf_bTagEffLF_up, sf_bTagEffLF_dn, sf_bTag_FS_up, sf_bTag_FS_dn );
     getBTagWeight( 2, sf_bTag_tight, sf_bTagEffHF_tight_up, sf_bTagEffHF_tight_dn, sf_bTagEffLF_tight_up, sf_bTagEffLF_tight_dn, sf_bTag_tight_FS_up, sf_bTag_tight_FS_dn );
+    getBTagWeight( 3, sf_bTag_medloose, sf_bTagEffHF_medloose_up, sf_bTagEffHF_medloose_dn, sf_bTagEffLF_medloose_up, sf_bTagEffLF_medloose_dn, sf_bTag_medloose_FS_up, sf_bTag_medloose_FS_dn );
+    getBTagWeight( 4, sf_bTag_WH, sf_bTagEffHF_WH_up, sf_bTagEffHF_WH_dn, sf_bTagEffLF_WH_up, sf_bTagEffLF_WH_dn, sf_bTag_WH_FS_up, sf_bTag_WH_FS_dn );
+    
   }
 
   // lepSFs
@@ -628,8 +646,8 @@ void evtWgtInfo::calculateWeightsForEvent() {
   }
 
   // Determine if tight btag SF should be used <-- temporary
-  use_tight_bTag = ( babyAnalyzer.Mlb_closestb() >= 175. && babyAnalyzer.ntightbtags() >= 1 );
-
+  use_tight_bTag = ( babyAnalyzer.Mlb_closestb() >= 175. && babyAnalyzer.ntightbtags() >= 1 && syst_set < 2);
+  //bool use_medloose_bTag = syst_set==5;
   //
   // Systematic Weights
   //
@@ -641,7 +659,11 @@ void evtWgtInfo::calculateWeightsForEvent() {
   // Apply CR2l Trigger scale factor
   evt_wgt *= sf_cr2lTrigger;
   // Apply bTag scale factor
+  // if(use_tight_bTag) evt_wgt *= sf_bTag_tight ;
+  // else if(use_medloose_bTag) evt_wgt *= sf_bTag_medloose;
+  // else evt_wgt *= sf_bTag;
   evt_wgt *= (use_tight_bTag)? sf_bTag_tight : sf_bTag;
+
   // Apply lepton scale factor
   evt_wgt *= sf_lep * sf_vetoLep * sf_lepFS;
   // Apply tau sf
@@ -668,13 +690,17 @@ void evtWgtInfo::calculateWeightsForEvent() {
   evt_wgt *= sf_extra_file;
   //cout<<"end "<<evt_wgt<<endl;
 
+  if(syst_set==5) evt_wgt = sf_bTag_medloose;
+  if(syst_set==6) evt_wgt = sf_bTag;
+  if(syst_set==7) evt_wgt = sf_bTag_WH;
+
   //
   // Systematic Weights
   //
   for (int iSys = 0; iSys < k_nSyst; iSys++) {
     if (iSys > 2 && !doingSystematic( systID(iSys) )) continue;
     double sys_wgt = evt_wgt;
-
+    
     switch (iSys) {
       case k_nominal:
       case k_JESUp:
@@ -687,7 +713,7 @@ void evtWgtInfo::calculateWeightsForEvent() {
         sys_wgt *= (sf_cr2lTrigger_up/sf_cr2lTrigger); break;
       case k_cr2lTriggerDown:
         sys_wgt *= (sf_cr2lTrigger_dn/sf_cr2lTrigger); break;
-      case k_bTagEffHFUp:
+      case k_bTagEffHFUp: //Need to update for medloose
         sys_wgt *= (use_tight_bTag)? (sf_bTagEffHF_tight_up/sf_bTag_tight) : (sf_bTagEffHF_up/sf_bTag); break;
       case k_bTagEffHFDown:
         sys_wgt *= (use_tight_bTag)? (sf_bTagEffHF_tight_dn/sf_bTag_tight) : (sf_bTagEffHF_dn/sf_bTag); break;
@@ -779,16 +805,17 @@ void evtWgtInfo::calculateWeightsForEvent() {
 
     // To change the bTag scale factor if JES move it to that bin <-- this is a ugly temporary solution
     // until a better workflow can be designed
-    if ( (iSys==k_JESUp && use_tight_bTag != (babyAnalyzer.jup_ntightbtags() >= 175 && babyAnalyzer.Mlb_closestb_jup() > 0)) ||
-         (iSys==k_JESDown && use_tight_bTag != (babyAnalyzer.jdown_ntightbtags() >= 175 && babyAnalyzer.Mlb_closestb_jdown() > 0)) )
-      sys_wgt *= (use_tight_bTag)? sf_bTag/sf_bTag_tight : sf_bTag_tight/sf_bTag;
-
+    if(syst_set<3){
+      if ( (iSys==k_JESUp && use_tight_bTag != (babyAnalyzer.jup_ntightbtags() >= 175 && babyAnalyzer.Mlb_closestb_jup() > 0)) ||
+          (iSys==k_JESDown && use_tight_bTag != (babyAnalyzer.jdown_ntightbtags() >= 175 && babyAnalyzer.Mlb_closestb_jdown() > 0)) )
+        sys_wgt *= (use_tight_bTag)? sf_bTag/sf_bTag_tight : sf_bTag_tight/sf_bTag;
+    }
     // Fill Array Element
     sys_wgts[iSys] = sys_wgt;
     sys_wgts_corridor[iSys] = wgt_corridor;
 
   } // end loop over systematics
-
+ 
   event_ready = true;
 }
 
@@ -943,7 +970,7 @@ void evtWgtInfo::getCR2lTriggerWeight( double &wgt_trigger, double &wgt_trigger_
 
 void evtWgtInfo::getBTagWeight( int WP, double &wgt_btagsf, double &wgt_btagsf_hf_up, double &wgt_btagsf_hf_dn, double &wgt_btagsf_lf_up, double &wgt_btagsf_lf_dn, double &wgt_btagsf_fs_up, double &wgt_btagsf_fs_dn ) {
 
-  // Working Point, WP = {0, 1, 2} = {loose, medium, tight}
+  // Working Point, WP = {0, 1, 2, 3, 4} = {loose, medium, tight, med+loose, medium+inclusive loose}
   wgt_btagsf       = 1.0;
   wgt_btagsf_hf_up = 1.0;
   wgt_btagsf_hf_dn = 1.0;
@@ -953,7 +980,7 @@ void evtWgtInfo::getBTagWeight( int WP, double &wgt_btagsf, double &wgt_btagsf_h
   wgt_btagsf_fs_dn = 1.0;
 
   if ( !apply_bTag_sf ) return;
-  if ( WP < 0 || WP > 2 ) return;
+  if ( WP < 0 || WP > 4 ) return;
 
   // IF deriving SFs on the Looper level
   if ( useBTagSFs_fromFiles ) {
@@ -976,7 +1003,7 @@ void evtWgtInfo::getBTagWeight( int WP, double &wgt_btagsf, double &wgt_btagsf_h
     } // end if Loose WP
 
     // Medium WP
-    else if ( WP==1 ) {
+    else if ( WP==1 || WP==3 ) {
       wgt_btagsf       = babyAnalyzer.weight_btagsf();
       wgt_btagsf_hf_up = babyAnalyzer.weight_btagsf_heavy_UP();
       wgt_btagsf_hf_dn = babyAnalyzer.weight_btagsf_heavy_DN();
@@ -1027,7 +1054,7 @@ void evtWgtInfo::getBTagWeight( int WP, double &wgt_btagsf, double &wgt_btagsf_h
     } // end if Loose WP
 
     // Medium WP Signal Normalization
-    else if ( WP==1 ) {
+    else if ( WP==1 || WP==3 ) {
       wgt_btagsf       *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,14)) );
       wgt_btagsf_hf_up *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,15)) );
       wgt_btagsf_hf_dn *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,17)) );
@@ -1068,7 +1095,7 @@ void evtWgtInfo::getBTagWeight( int WP, double &wgt_btagsf, double &wgt_btagsf_h
     } // end if Loose WP
 
     // Medium WP Bkg Normalization
-    else if ( WP==1 ) {
+    else if ( WP==1 || WP==3) {
       wgt_btagsf       *= ( nEvents / h_bkg_counter->GetBinContent(14) );
       wgt_btagsf_hf_up *= ( nEvents / h_bkg_counter->GetBinContent(15) );
       wgt_btagsf_hf_dn *= ( nEvents / h_bkg_counter->GetBinContent(17) );
@@ -2169,13 +2196,13 @@ string evtWgtInfo::getLabel( systID isyst ) {
   return util.label;
 }
 
-double evtWgtInfo::getWeight( systID isyst, bool is_cr2l ) {
+double evtWgtInfo::getWeight( systID isyst, bool is_cr2l, int syst_set ) {
   if (is_cr2l != add2ndLepToMet) {
     add2ndLepToMet = is_cr2l;
     event_ready = false;
   }
   if (!event_ready)
-    calculateWeightsForEvent();
+    calculateWeightsForEvent(syst_set);
 
   return sys_wgts[isyst];
 }
@@ -2269,7 +2296,7 @@ void evtWgtInfo::setDefaultSystematics( int syst_set ) {
       apply_WbXsec_sf      = false;  // not dev
       apply_ISR_sf         = false;  // not available yet
       apply_pu_sf          = false;  // not available yet
-      apply_sample_sf      = false;  // no multiple sample available yet
+      apply_sample_sf      = true;  // no multiple sample available yet
       if (is_fastsim_) {
         apply_lepFS_sf     = false;  // no fast sim yet
         apply_bTagFS_sf    = false;
@@ -2290,12 +2317,72 @@ void evtWgtInfo::setDefaultSystematics( int syst_set ) {
       apply_WbXsec_sf      = false;  // not dev
       apply_ISR_sf         = false;  // not available yet
       apply_pu_sf          = false;  // not available yet
-      apply_sample_sf      = false;  // no multiple sample available yet
+      apply_sample_sf      = true;  // no multiple sample available yet
       if (is_fastsim_) {
         apply_lepFS_sf     = false;  // no fast sim yet
         apply_bTagFS_sf    = false;
       }
       break;
+
+      case 5: //Place holder
+        apply_cr2lTrigger_sf = false;   // not available yet
+        apply_bTag_sf        = true;
+        apply_lep_sf         = true;   // available but not updated yet
+        apply_vetoLep_sf     = true;   // same as above
+        apply_tau_sf         = true;   // same as above
+        apply_topPt_sf       = false;
+        apply_metRes_sf      = false;  // not developed for 94X yet
+        apply_metTTbar_sf    = false;
+        apply_ttbarSysPt_sf  = false;
+        apply_WbXsec_sf      = false;  // not dev
+        apply_ISR_sf         = false;  // not available yet
+        apply_pu_sf          = false;  // not available yet
+        apply_sample_sf      = true;  // no multiple sample available yet
+        if (is_fastsim_) {
+          apply_lepFS_sf     = false;  // no fast sim yet
+          apply_bTagFS_sf    = false;
+        }
+        break;
+
+       case 6: //Placeholder
+         apply_cr2lTrigger_sf = false;   // not available yet
+         apply_bTag_sf        = true;
+         apply_lep_sf         = true;   // available but not updated yet
+         apply_vetoLep_sf     = true;   // same as above
+         apply_tau_sf         = true;   // same as above
+         apply_topPt_sf       = false;
+         apply_metRes_sf      = false;  // not developed for 94X yet
+         apply_metTTbar_sf    = false;
+         apply_ttbarSysPt_sf  = false;
+         apply_WbXsec_sf      = false;  // not dev
+         apply_ISR_sf         = false;  // not available yet
+         apply_pu_sf          = false;  // not available yet
+         apply_sample_sf      = true;  // no multiple sample available yet
+         if (is_fastsim_) {
+           apply_lepFS_sf     = false;  // no fast sim yet
+           apply_bTagFS_sf    = false;
+         }
+         break; 
+
+        case 7: //Placeholder
+          apply_cr2lTrigger_sf = false;   // not available yet
+          apply_bTag_sf        = true;
+          apply_lep_sf         = true;   // available but not updated yet
+          apply_vetoLep_sf     = true;   // same as above
+          apply_tau_sf         = true;   // same as above
+          apply_topPt_sf       = false;
+          apply_metRes_sf      = false;  // not developed for 94X yet
+          apply_metTTbar_sf    = false;
+          apply_ttbarSysPt_sf  = false;
+          apply_WbXsec_sf      = false;  // not dev
+          apply_ISR_sf         = false;  // not available yet
+          apply_pu_sf          = false;  // not available yet
+          apply_sample_sf      = true;  // no multiple sample available yet
+          if (is_fastsim_) {
+            apply_lepFS_sf     = false;  // no fast sim yet
+            apply_bTagFS_sf    = false;
+          }
+          break; 
 
   }
 
@@ -2344,9 +2431,9 @@ double evtWgtInfo::getExtSampleWeightSummer16v3( TString fname, bool apply ) {
     sf = 24767666.0 / (24767666.0+6068369.0);
   else if (fname.Contains("TTJets_2lep_s16v3_ext0"))
     sf =  6068369.0 / (24767666.0+6068369.0);
-  else if (fname.Contains("TTJets_1lep_t_s16v3_ext1"))
+  else if ( fname.Contains("TTJets_1lep_t_s16v3_ext1") || fname.Contains("TTJets_1lep_top_s16v3_ext1")) 
     sf = 49664175.0 / (49664175.0+11957043.0);
-  else if (fname.Contains("TTJets_1lep_t_s16v3_ext0"))
+  else if (fname.Contains("TTJets_1lep_t_s16v3_ext0") || fname.Contains("TTJets_1lep_top_s16v3_ext0"))
     sf = 11957043.0 / (49664175.0+11957043.0);
   else if (fname.Contains("TTJets_1lep_tbar_s16v3_ext1"))
     sf = 48387865.0 / (48387865.0+11955887.0);
