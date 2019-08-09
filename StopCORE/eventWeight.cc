@@ -275,7 +275,10 @@ evtWgtInfo::evtWgtInfo() {
   is_fastsim_ = false;
   sync16      = false;
   verbose     = false;
-
+  isWH        = false;
+  bTagSF_only = false;
+  bTagSF_medloose = false;
+  use_hcounter_instead_of_scale1b = false;
   // Initialize Switches for additional SFs
   apply_diLepTrigger_sf = false;
   apply_cr2lTrigger_sf  = false;
@@ -330,7 +333,8 @@ evtWgtInfo::evtWgtInfo() {
 
 //////////////////////////////////////////////////////////////////////
 
-void evtWgtInfo::Setup(string samplestr, int inyear, bool applyUnc, bool useBTagUtils, bool useLepSFUtils) {
+void evtWgtInfo::Setup(string samplestr, int inyear, bool applyUnc, bool useBTagUtils, bool useLepSFUtils, bool WH) {
+  isWH = WH;
 
   samptype = findSampleType(samplestr);
 
@@ -346,6 +350,9 @@ void evtWgtInfo::Setup(string samplestr, int inyear, bool applyUnc, bool useBTag
     lumi = 59.740;          // projected 2018 lumi
     lumi_err = lumi*0.025;  // preliminary value
   }
+
+  if(isWH){lumi=1.0;
+          lumi_err = 0.025;}
 
   sf_extra_file = 1.0;  // reset file weight for each file
 
@@ -371,8 +378,14 @@ void evtWgtInfo::Setup(string samplestr, int inyear, bool applyUnc, bool useBTag
 
   // Get Signal XSection File
   if ( is_fastsim_ && susy_xsec_fromfile ) {
-    f_sig_xsec = new TFile("../CORE/Tools/susyxsecs/xsec_susy_13tev_run2.root","read");
-    h_sig_xsec = (TH1D*) f_sig_xsec->Get("h_xsec_stop");
+    if(!isTChi){
+         f_sig_xsec = new TFile("../CORE/Tools/susyxsecs/xsec_susy_13tev_run2.root","read");
+         h_sig_xsec = (TH1D*) f_sig_xsec->Get("h_xsec_stop");
+       }
+       else{
+         f_sig_xsec  = new TFile("../StopCORE/inputs/signal_xsec/xsec_tchi_13TeV.root","read");
+         h_sig_xsec = (TH1D*) f_sig_xsec->Get("h_xsec_c1n2");
+       }
   }
 
   // Get SR trigger histos
@@ -551,6 +564,15 @@ void evtWgtInfo::initializeWeights() {
   sf_bTag_tight_FS_up = 1.0;
   sf_bTag_tight_FS_dn = 1.0;
 
+  sf_bTag_medloose = 1.0;
+  sf_bTagEffHF_medloose_up = 1.0;
+  sf_bTagEffHF_medloose_dn = 1.0;
+  sf_bTagEffLF_medloose_up = 1.0;
+  sf_bTagEffLF_medloose_dn = 1.0;
+  sf_bTag_medloose_FS_up = 1.0;
+  sf_bTag_medloose_FS_dn = 1.0;
+
+
   sf_lep = 1.0;
   sf_lep_up = 1.0;
   sf_lep_dn = 1.0;
@@ -676,6 +698,8 @@ void evtWgtInfo::calculateWeightsForEvent() {
   if (apply_bTag_sf) {
     getBTagWeight( 1, sf_bTag, sf_bTagEffHF_up, sf_bTagEffHF_dn, sf_bTagEffLF_up, sf_bTagEffLF_dn, sf_bTag_FS_up, sf_bTag_FS_dn );
     getBTagWeight( 2, sf_bTag_tight, sf_bTagEffHF_tight_up, sf_bTagEffHF_tight_dn, sf_bTagEffLF_tight_up, sf_bTagEffLF_tight_dn, sf_bTag_tight_FS_up, sf_bTag_tight_FS_dn );
+    getBTagWeight( 4, sf_bTag_medloose, sf_bTagEffHF_medloose_up, sf_bTagEffHF_medloose_dn, sf_bTagEffLF_medloose_up, sf_bTagEffLF_medloose_dn, sf_bTag_medloose_FS_up, sf_bTag_medloose_FS_dn );
+
   }
 
   // lepSFs
@@ -770,7 +794,7 @@ void evtWgtInfo::calculateWeightsForEvent() {
   }
 
   // Determine if tight btag SF should be used <-- temporary
-  use_tight_bTag = ( babyAnalyzer.Mlb_closestb() >= 175. && babyAnalyzer.ntightbtags() >= 1 );
+  use_tight_bTag = ( babyAnalyzer.Mlb_closestb() >= 175. && babyAnalyzer.ntightbtags() >= 1 ) && !isWH;
 
   //
   // Systematic Weights
@@ -813,6 +837,11 @@ void evtWgtInfo::calculateWeightsForEvent() {
   // Apply any extra weight for the event
   evt_wgt *= sf_extra_event;
 
+
+  if(bTagSF_only){
+    if(bTagSF_medloose) evt_wgt = sf_bTag_medloose;
+    else evt_wgt = sf_bTag;
+  }
   //
   // Systematic Weights
   //
@@ -936,7 +965,7 @@ void evtWgtInfo::calculateWeightsForEvent() {
 
     // Corridor regions use alternate MET resolution weights
     double wgt_corridor = sys_wgt;
-    if (apply_metRes_corridor_sf && apply_metRes_sf) {
+    if (apply_metRes_corridor_sf && apply_metRes_sf && !bTagSF_only) {
       if ( iSys==k_metResUp ) wgt_corridor *= sf_metRes_corridor_up / sf_metRes_up;
       else if ( iSys==k_metResDown ) wgt_corridor *= sf_metRes_corridor_dn / sf_metRes_dn;
       else wgt_corridor *= sf_metRes_corridor / sf_metRes;
@@ -944,10 +973,13 @@ void evtWgtInfo::calculateWeightsForEvent() {
 
     // To change the bTag scale factor if JES move it to that bin <-- this is a ugly temporary solution
     // until a better workflow can be designed
+
+    //Disable for WH
+    if(! isWH){
     if ( (iSys==k_JESUp && use_tight_bTag != (babyAnalyzer.jup_ntightbtags() >= 175 && babyAnalyzer.Mlb_closestb_jup() > 0)) ||
          (iSys==k_JESDown && use_tight_bTag != (babyAnalyzer.jdown_ntightbtags() >= 175 && babyAnalyzer.Mlb_closestb_jdown() > 0)) )
       sys_wgt *= (use_tight_bTag)? sf_bTag/sf_bTag_tight : sf_bTag_tight/sf_bTag;
-
+    }
     // Fill Array Element
     sys_wgts[iSys] = sys_wgt;
     sys_wgts_corridor[iSys] = wgt_corridor;
@@ -996,6 +1028,7 @@ void evtWgtInfo::getXSecWeight( double &xsec_val, double &weight_xsec_up, double
   xsec_val = 1.0;
   double xsec_err = 0.0;
 
+  //Need to double check this for WH
   if ( is_fastsim_ && susy_xsec_fromfile ) {
     xsec_val = h_sig_xsec->GetBinContent(h_sig_xsec->FindBin(mStop));
     xsec_err = h_sig_xsec->GetBinError(h_sig_xsec->FindBin(mStop));
@@ -1012,7 +1045,7 @@ void evtWgtInfo::getScaleToLumiWeight( double &wgt ) {
   wgt = 1.0;
   if ( is_data_ ) return;
 
-  if ( is_fastsim_ ) {
+  if ( is_fastsim_ || use_hcounter_instead_of_scale1b) {
     // getXSecWeight( xsec, sf_xsec_up, sf_xsec_dn );
     // getNEvents( nEvents );
     wgt = lumi*1000.0*xsec/(double)nEvents;
@@ -1114,7 +1147,7 @@ void evtWgtInfo::getCR2lTriggerWeight( double &wgt_trigger, double &wgt_trigger_
 
 void evtWgtInfo::getBTagWeight( int WP, double &wgt_btagsf, double &wgt_btagsf_hf_up, double &wgt_btagsf_hf_dn, double &wgt_btagsf_lf_up, double &wgt_btagsf_lf_dn, double &wgt_btagsf_fs_up, double &wgt_btagsf_fs_dn ) {
 
-  // Working Point, WP = {0, 1, 2} = {loose, medium, tight}
+  // Working Point, WP = {0, 1, 2, 3, 4} = {loose, medium, tight, med+loose, medium+inclusive loose}
   wgt_btagsf       = 1.0;
   wgt_btagsf_hf_up = 1.0;
   wgt_btagsf_hf_dn = 1.0;
@@ -1124,7 +1157,7 @@ void evtWgtInfo::getBTagWeight( int WP, double &wgt_btagsf, double &wgt_btagsf_h
   wgt_btagsf_fs_dn = 1.0;
 
   if ( !apply_bTag_sf ) return;
-  if ( WP < 0 || WP > 2 ) return;
+  if ( WP < 0 || WP > 4 ) return;
 
   // IF deriving SFs on the Looper level
   if ( useBTagSFs_fromFiles ) {
@@ -1147,7 +1180,7 @@ void evtWgtInfo::getBTagWeight( int WP, double &wgt_btagsf, double &wgt_btagsf_h
     } // end if Loose WP
 
     // Medium WP
-    else if ( WP==1 ) {
+    else if ( WP==1 || WP==3) {
       wgt_btagsf       = babyAnalyzer.weight_btagsf();
       wgt_btagsf_hf_up = babyAnalyzer.weight_btagsf_heavy_UP();
       wgt_btagsf_hf_dn = babyAnalyzer.weight_btagsf_heavy_DN();
@@ -1201,7 +1234,7 @@ void evtWgtInfo::getBTagWeight( int WP, double &wgt_btagsf, double &wgt_btagsf_h
     } // end if Loose WP
 
     // Medium WP Signal Normalization
-    else if ( WP==1 ) {
+    else if ( WP==1 || WP==3) {
       wgt_btagsf       *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,14)) );
       wgt_btagsf_hf_up *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,15)) );
       wgt_btagsf_hf_dn *= ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,17)) );
@@ -2872,7 +2905,7 @@ bool evtWgtInfo::doingSystematic( systID isyst ) {
 // Currently only in a test state
 evtWgtInfo::SampleType evtWgtInfo::findSampleType( string samplestr ) {
   TString sample(samplestr);
-
+  isTChi=false;
   SampleType samptype(unknown);
 
   if (sample.BeginsWith("data")) samptype = data;
@@ -2888,6 +2921,10 @@ evtWgtInfo::SampleType evtWgtInfo::findSampleType( string samplestr ) {
   else cout << "[eventWeight] >> Cannot assigned sampletype for " << samplestr << endl;
 
   if (sample.BeginsWith("TTJets") && sample.EndsWith("fs")) is_fsttbar = true;
+  if(sample.BeginsWith("SMS-TChi")) {
+      isTChi=true;
+      cout<<"This is a TChi WH sample"<<endl;
+    }
 
   if (verbose) cout << "[eventWeight] >> The assigned sampletype based on " << samplestr << " is " << samptype << endl;
   return samptype;
@@ -2917,11 +2954,23 @@ double evtWgtInfo::getWeight( systID isyst, bool is_cr2l, int cortype ) {
   return sys_wgts[isyst];
 }
 
+void evtWgtInfo::setbTagSF_only(){
+  bTagSF_only = true;
+}
+
+void evtWgtInfo::setbTagSF_medloose(){
+  bTagSF_medloose = true;
+}
+
+
 void evtWgtInfo::setDefaultSystematics( int syst_set, bool isfastsim ) {
+  bTagSF_only=false;
+  bTagSF_medloose=false;
+
   switch (syst_set) {
     // Set of systematics used in the Moriond17 analysis
     case stop_Moriond17:
-      apply_cr2lTrigger_sf = true;  // only !=1 if pfmet!=pfmet_rl ie no weight for ==1lepton events in SR and CR0b
+      apply_cr2lTrigger_sf = false;  // only !=1 if pfmet!=pfmet_rl ie no weight for ==1lepton events in SR and CR0b
       apply_bTag_sf        = true;  // event weight, product of all jet wgts
       apply_lep_sf         = true;  // both lep1 and lep2 (if available) are multiplied together
       apply_vetoLep_sf     = true;  // this is actually the lost lepton sf, only !=1 if there is >=2 genLeptons and ==1 recoLeptons in the event
@@ -2932,7 +2981,32 @@ void evtWgtInfo::setDefaultSystematics( int syst_set, bool isfastsim ) {
       apply_ttbarSysPt_sf  = false; // true=sf, false=uncertainty, only !=1.0 for madgraph tt2l, tW2l
       apply_WbXsec_sf      = true;
       apply_ISR_sf         = true;  // only !=1.0 for signal
-      apply_pu_sf          = true;
+      apply_pu_sf          = false; //hack
+      apply_sample_sf      = true;
+      if (isfastsim) {
+        apply_lepFS_sf     = true;
+        apply_bTagFS_sf    = true;
+        apply_metRes_sf    = false;
+        apply_tau_sf       = false;
+        apply_WbXsec_sf    = false;
+        apply_vetoLep_sf   = false;  // <-- why??
+        apply_pu_sf        = false;  // <-- why?
+      }
+      break;
+
+    case stop_Moriond17_nobtag:
+      apply_cr2lTrigger_sf = false;  // only !=1 if pfmet!=pfmet_rl ie no weight for ==1lepton events in SR and CR0b
+      apply_bTag_sf        = false;  // event weight, product of all jet wgts
+      apply_lep_sf         = true;  // both lep1 and lep2 (if available) are multiplied together
+      apply_vetoLep_sf     = true;  // this is actually the lost lepton sf, only !=1 if there is >=2 genLeptons and ==1 recoLeptons in the event
+      apply_tau_sf         = true;
+      apply_topPt_sf       = false; // true=sf, false=uncertainty
+      apply_metRes_sf      = true;
+      apply_metTTbar_sf    = false;
+      apply_ttbarSysPt_sf  = false; // true=sf, false=uncertainty, only !=1.0 for madgraph tt2l, tW2l
+      apply_WbXsec_sf      = true;
+      apply_ISR_sf         = true;  // only !=1.0 for signal
+      apply_pu_sf          = false; //Hack
       apply_sample_sf      = true;
       if (isfastsim) {
         apply_lepFS_sf     = true;
@@ -2962,7 +3036,35 @@ void evtWgtInfo::setDefaultSystematics( int syst_set, bool isfastsim ) {
       apply_ttZxsec_sf     = true;
       apply_ISR_sf         = true;   // 2017 & 2018 to be updated
       apply_pu_sf          = false;  // not available in baby yet
-      apply_pu_sf_fromFile = true;
+      apply_pu_sf_fromFile = false;
+      apply_L1prefire_sf   = true;
+      apply_HEMveto_el_sf  = true;   // scale down 2018 event with HEM electron
+      apply_HEMveto_jet_sf = true;   // scale down 2018 event with HEM jet
+      apply_sample_sf      = false;  // no multiple sample available yet
+      apply_lepFS_sf       = true;
+      if (isfastsim) {
+        apply_lepFS_sf     = true;   // updated on and after v31
+        apply_bTagFS_sf    = true;
+      }
+      break;
+
+    case stop_Run2_nobtag:
+      apply_cr2lTrigger_sf = true;
+      apply_bTag_sf        = false;
+      apply_lep_sf         = true;
+      apply_vetoLep_sf     = true;
+      apply_tau_sf         = true;
+      apply_topPt_sf       = false;  // false=uncertainty, but not to be used
+      apply_metRes_sf      = false;  // not controlled here anymore
+      apply_metTTbar_sf    = true;
+      apply_ttbarSysPt_sf  = false;  // false=uncertainty, need to be updated
+      apply_ttag_sf        = true;
+      apply_softbtag_sf    = true;
+      apply_WbXsec_sf      = true;
+      apply_ttZxsec_sf     = true;
+      apply_ISR_sf         = true;   // 2017 & 2018 to be updated
+      apply_pu_sf          = false;  // not available in baby yet
+      apply_pu_sf_fromFile = false;
       apply_L1prefire_sf   = true;
       apply_HEMveto_el_sf  = true;   // scale down 2018 event with HEM electron
       apply_HEMveto_jet_sf = true;   // scale down 2018 event with HEM jet
@@ -2993,6 +3095,8 @@ void evtWgtInfo::setDefaultSystematics( int syst_set, bool isfastsim ) {
         apply_bTagFS_sf    = false;
       }
       break;
+
+      
   }
 
 }
@@ -3043,18 +3147,18 @@ double evtWgtInfo::getExtSampleWeightSummer16v2( TString fname, bool apply ) {
 
 double evtWgtInfo::getExtSampleWeightSummer16v3( TString fname, bool apply ) {
   double sf = 1.0;
-
+  cout<<"ExtSampleWeight " <<fname<<endl;
   if (fname.Contains("TTJets_2lep_s16v3_ext1"))
     sf = 24767666.0 / (24767666.0+6068369.0);
   else if (fname.Contains("TTJets_2lep_s16v3_ext0"))
     sf =  6068369.0 / (24767666.0+6068369.0);
-  else if (fname.Contains("TTJets_1lep_t_s16v3_ext1"))
+  else if (fname.Contains("TTJets_1lep_t_s16v3_ext1") || fname.Contains("TTJets_1lep_top_s16v3_ext1"))
     sf = 49664175.0 / (49664175.0+11957043.0);
   else if (fname.Contains("TTJets_1lep_t_s16v3_ext0"))
     sf = 11957043.0 / (49664175.0+11957043.0);
   else if (fname.Contains("TTJets_1lep_tbar_s16v3_ext1"))
     sf = 48387865.0 / (48387865.0+11955887.0);
-  else if (fname.Contains("TTJets_1lep_tbar_s16v3_ext0"))
+  else if (fname.Contains("TTJets_1lep_tbar_s16v3_ext0") || fname.Contains("TTJets_1lep_top_s16v3_ext0"))
     sf = 11955887.0 / (48387865.0+11955887.0);
   else if (fname.Contains("DYJetsToLL_M50_s16v3_ext2"))
     sf = 96531428.0 / (96531428.0+49748967.0);
@@ -3086,8 +3190,24 @@ double evtWgtInfo::getExtSampleWeightFall17v2( TString fname, bool apply ) {
   else if (fname.Contains("DYJetsToLL_M50_f17v2"))
     sf = 48675378.0 / (49125561.0+48675378.0);
 
+  if (verbose) cout << "[eventWeight] >> The sample weight to be scaled by is: " << sf << endl;
   if (apply) sf_extra_file *= sf;
   return sf;
 }
+
+double evtWgtInfo::getWNJetsNuPt200SampleWeight( TString fname, bool apply ) {
+
+  double sf = 1.0;
+
+  if (fname.Contains("W4Jets") && (fname.Contains("NuPt-200") || fname.Contains("NuPt200"))) sf = 0.79109;
+  else if (fname.Contains("W3Jets") && (fname.Contains("NuPt-200") || fname.Contains("NuPt200"))) sf = 0.77786;
+  else if (fname.Contains("W2Jets") && (fname.Contains("NuPt-200") || fname.Contains("NuPt200"))) sf = 0.78218;
+  else if (fname.Contains("W1Jets") && (fname.Contains("NuPt-200") || fname.Contains("NuPt200"))) sf = 0.78198;
+
+  if (verbose) cout << "[eventWeight] >> The sample weight to be scaled by is: " << sf << endl;
+  if (apply) sf_extra_file *= sf;
+  return sf;
+}
+
 
 //////////////////////////////////////////////////////////////////////

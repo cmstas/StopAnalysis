@@ -99,8 +99,10 @@ class evtWgtInfo {
   int srtype;
 
   enum SampleType {data, ttbar, Wjets, singletop, ttW, ttZ, WZ, diboson, fastsim, fs17ext1, unknown=-1 } samptype;
-  enum SystSet {stop_Moriond17, stop_Run2, test_alloff};
+  enum SystSet {stop_Moriond17, stop_Run2,stop_Moriond17_nobtag, stop_Run2_nobtag, test_alloff};
 
+  bool isTChi;
+  bool isWH;
   // Counter histograms stored in babies
   TH1D *h_bkg_counter;
   TH2D *h_sig_counter_nEvents;
@@ -179,6 +181,8 @@ class evtWgtInfo {
   double sf_cr2lTrigger_dn;
 
   bool   apply_bTag_sf;
+  bool   bTagSF_only;
+  bool   bTagSF_medloose;
   bool   use_tight_bTag;
   double sf_bTag;
   double sf_bTagEffHF_up;
@@ -190,12 +194,19 @@ class evtWgtInfo {
   double sf_bTagEffHF_tight_dn;
   double sf_bTagEffLF_tight_up;
   double sf_bTagEffLF_tight_dn;
+  double sf_bTag_medloose;
+  double sf_bTagEffHF_medloose_up;
+  double sf_bTagEffHF_medloose_dn;
+  double sf_bTagEffLF_medloose_up;
+  double sf_bTagEffLF_medloose_dn;
 
   bool   apply_bTagFS_sf;
   double sf_bTag_FS_up;
   double sf_bTag_FS_dn;
   double sf_bTag_tight_FS_up;
   double sf_bTag_tight_FS_dn;
+  double sf_bTag_medloose_FS_up;
+  double sf_bTag_medloose_FS_dn;
 
   bool   apply_lep_sf;
   double sf_lep;
@@ -305,11 +316,13 @@ class evtWgtInfo {
   bool apply_HEMveto_el_sf;
   bool apply_HEMveto_jet_sf;
 
+  bool use_hcounter_instead_of_scale1b;
+
   double sf_extra_file;  // special weight that is set for all events in a sample
   double sf_extra_event; // special weight that has to be associate with spcific event
 
   evtWgtInfo();
-  void Setup(std::string sample, int year = 0, bool applyUnc=true, bool useBTagUtils=false, bool useLepSFUtils=false);
+  void Setup(std::string sample, int year = 0, bool applyUnc=true, bool useBTagUtils=false, bool useLepSFUtils=false, bool isWH = false);
   void Cleanup();
   void resetEvent();
   void getCounterHistogramFromBaby( TFile *sourceFile );
@@ -357,11 +370,17 @@ class evtWgtInfo {
   double getExtSampleWeightSummer16v2( TString sample, bool apply=true );
   double getExtSampleWeightSummer16v3( TString sample, bool apply=true );
   double getExtSampleWeightFall17v2( TString sample, bool apply=true );
+
+  double getWNJetsNuPt200SampleWeight( TString sample, bool apply=true );
+
   void setDefaultSystematics( int syst_set=0, bool isfastsim=false );
   bool doingSystematic( systID systid );
   SampleType findSampleType( std::string samplestr);  // <-- todo: finish this function
   std::string getLabel( systID systid );
   double getWeight( systID systid, bool cr2lregions=false, int cortype=0 );
+
+  void setbTagSF_only();
+  void setbTagSF_medloose();
 
  private:
   bool is_bkg_;
