@@ -227,6 +227,7 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
     float w_BtagSF_medmed=0;
     float w_BtagSF_medloose=0;
     float w_80X=0;
+    float w_pu=0;
 
     TBranch * b_pass = extraTree->Branch("pass",&pass,"pass/O");
     TBranch * b_stitch = extraTree->Branch("stitch",&stitch,"stitch/O");
@@ -240,6 +241,7 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
     TBranch * b_w_BtagSF_medmed = extraTree->Branch("w_BtagSF_medmed",&w_BtagSF_medmed,"w_BtagSF_medmed/F");
     TBranch * b_w_BtagSF_medloose = extraTree->Branch("w_BtagSF_medloose",&w_BtagSF_medloose,"w_BtagSF_medloose/F");
     TBranch * b_w_80X = extraTree->Branch("w_80X",&w_80X,"w_80X/F");
+    TBranch * b_w_pu = extraTree->Branch("w_pu",&w_pu,"w_pu/F");
 
     extraTree->SetBranchAddress("pass",&pass,&b_pass);
     extraTree->SetBranchAddress("stitch",&stitch,&b_stitch);
@@ -253,6 +255,7 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
     extraTree->SetBranchAddress("w_BtagSF_medmed",&w_BtagSF_medmed,&b_w_BtagSF_medmed);
     extraTree->SetBranchAddress("w_BtagSF_medloose",&w_BtagSF_medloose,&b_w_BtagSF_medloose);
     extraTree->SetBranchAddress("w_80X",&w_80X,&b_w_80X);
+    extraTree->SetBranchAddress("w_pu",&w_pu,&b_w_pu);
     
     //Jet info (flatten LorentzVectors) 
 
@@ -521,15 +524,20 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
       w_80X = evtWgt.getWeight(evtWgtInfo::systID(0), false);
 
       evtWgt.resetEvent();
-      evtWgt.setDefaultSystematics(evtWgtInfo::stop_Run2, is_fastsim_);
+      evtWgt.setDefaultSystematics(evtWgtInfo::WH_Run2, is_fastsim_);
       weight = evtWgt.getWeight(evtWgtInfo::systID(0), false);
       
       evtWgt.resetEvent();
-      evtWgt.setDefaultSystematics(evtWgtInfo::stop_Run2_nobtag, is_fastsim_);
+      evtWgt.setDefaultSystematics(evtWgtInfo::WH_Run2_nobtag, is_fastsim_);
       w_noBtagSF = evtWgt.getWeight(evtWgtInfo::systID(0), false);
       
       evtWgt.resetEvent();
-      evtWgt.setDefaultSystematics(evtWgtInfo::stop_Run2, is_fastsim_);
+      evtWgt.setDefaultSystematics(evtWgtInfo::puOnly, is_fastsim_);
+      w_pu = evtWgt.getWeight(evtWgtInfo::systID(0), false);
+      
+
+      evtWgt.resetEvent();
+      evtWgt.setDefaultSystematics(evtWgtInfo::WH_Run2, is_fastsim_);
       evtWgt.setbTagSF_only();
       w_BtagSF_medmed = evtWgt.getWeight(evtWgtInfo::systID(0), false);
 

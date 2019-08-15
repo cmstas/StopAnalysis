@@ -1,6 +1,6 @@
 #!/bin/bash
 
-datetag=2019_08_09
+datetag=2019_08_13
 babytag=signal
 
 OUTDIR=/home/users/rheller/wh_babies/babies_${babytag}_${datetag}/
@@ -24,7 +24,14 @@ LOGDIR=/home/users/rheller/wh_babies/babies_${babytag}_${datetag}/log/
 ########################
 # 2016 MC
 
-datetag=2019_08_09
+#8_13: no tt met SF
+#8_13 v2: no ISR
+#8_13 v3: no top tag or soft btag
+#8_13 v4: Add Met Res back, keep ISR and top tag off.
+#8_13 v5: Turn off MET res, ISR, top tag, soft btag, top tag, but turn back on PU.
+#8_13 v6: Turn off MET res, ISR, top tag, soft btag, top tag, pu, add separate PU weight branch.
+
+datetag=2019_08_13
 babytag=v31_2
 
 OUTDIR=/home/users/rheller/wh_babies/babies_${babytag}_${datetag}/s16v3/
@@ -45,7 +52,7 @@ Samples+=( TTJets_2lep_s16v3_ext0 TTJets_2lep_s16v3_ext1)
 Samples+=( ST_schan ST_tW_top ST_tW_tbar ST_tchan ) #ST_tW_tbar ST_tchan )      # singleT
 Samples+=( W1Jets W2Jets W3Jets W4Jets)       # Vjets : Wjets + DY
 Samples+=( TTZ TTW WZ WW DYJets)  # rare  : ttV + diboson
-#Samples+=( WWTo2L2Nu WZTo1L1Nu2Q WZTo2L2Q WZTo3LNu_amcnlo TTWJetsToQQ TTZToQQ)      # rare : smaller contributions
+
 
 
 mkdir -p ${OUTDIR}; mkdir -p ${LOGDIR}
@@ -56,11 +63,10 @@ for SAMPLE in ${Samples[@]}; do
 done
 
 
-
 ########################
 # 2017 MC
 
-datetag=2019_08_09
+datetag=2019_08_13
 babytag=v31_2
 
 OUTDIR=/home/users/rheller/wh_babies/babies_${babytag}_${datetag}/f17v2/
@@ -85,11 +91,40 @@ for SAMPLE in ${Samples[@]}; do
    	eval "nohup nice -n -10 ./processWH.py ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
 done
 
+########################
+# 2018 MC
+
+datetag=2019_08_13
+babytag=v31_2
+
+OUTDIR=/home/users/rheller/wh_babies/babies_${babytag}_${datetag}/a18v1/
+LOGDIR=/home/users/rheller/wh_babies/babies_${babytag}_${datetag}/a18v1/log/
+
+INDIR=/nfs-7/userdata/sicheng/stopbabies/merged/a18v1_v31_2/
+
+
+declare -a Samples=()
+Samples+=( TTJets_1lep_top TTJets_1lep_tbar)
+Samples+=( TTJets_2lep)
+Samples+=( ST_schan ST_tW_top ST_tW_tbar ST_tchan )    # singleT
+Samples+=( W1Jets W2Jets W3Jets W4Jets)       # Vjets : Wjets + DY
+Samples+=( TTZ TTW WZ WW DYJets)  # rare  : ttV + diboson
+#Samples+=( WWTo2L2Nu WZTo1L1Nu2Q WZTo2L2Q WZTo3LNu_amcnlo TTWJetsToQQ TTZToQQ)      # rare : smaller contributions
+
+
+mkdir -p ${OUTDIR}; mkdir -p ${LOGDIR}
+for SAMPLE in ${Samples[@]}; do
+
+    echo ./processWH.py ${INDIR} ${SAMPLE} ${OUTDIR}  '>&' ${LOGDIR}/log_${SAMPLE}.txt
+    eval "nohup nice -n -10 ./processWH.py ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
+done
+
+
 
 ########################
 # 2016 Data
 
-datetag=2019_08_09
+datetag=2019_08_13
 babytag=v31_1
 
 OUTDIR=/home/users/rheller/wh_babies/babies_${babytag}_${datetag}/
@@ -112,7 +147,7 @@ done
 ########################
 # 2017/18 Data
 
-datetag=2019_08_09
+datetag=2019_08_13
 babytag=v31_2
 
 OUTDIR=/home/users/rheller/wh_babies/babies_${babytag}_${datetag}/
@@ -134,7 +169,7 @@ done
 
 
 ### met binned 2016 ttbar
-datetag=2019_08_09
+datetag=2019_08_13
 babytag=v30_9
 
 
@@ -153,7 +188,7 @@ declare -a Samples=(TTJets_2lep_met150_s16v3 TTJets_1lep_top_met150_s16v3 TTJets
 
 
 ### met binned 2017 ttbar
-datetag=2019_08_09
+datetag=2019_08_13
 babytag=v30_9
 
 OUTDIR=/home/users/rheller/wh_babies/babies_${babytag}_${datetag}/f17v2/
@@ -172,7 +207,7 @@ declare -a Samples=(TTJets_2lep_met150 TTJets_1lep_top_met150 TTJets_1lep_tbar_m
 
 
 #### special DY samples
-datetag=2019_08_09
+datetag=2019_08_13
 babytag=v32_0z
 INDIR=/home/users/rheller/z_merged/
 OUTDIR=/home/users/rheller/wh_babies/babies_${babytag}_${datetag}/

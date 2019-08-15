@@ -278,6 +278,7 @@ evtWgtInfo::evtWgtInfo() {
   isWH        = false;
   bTagSF_only = false;
   bTagSF_medloose = false;
+  puSF_only = false;
   use_hcounter_instead_of_scale1b = false;
   // Initialize Switches for additional SFs
   apply_diLepTrigger_sf = false;
@@ -842,6 +843,7 @@ void evtWgtInfo::calculateWeightsForEvent() {
     if(bTagSF_medloose) evt_wgt = sf_bTag_medloose;
     else evt_wgt = sf_bTag;
   }
+  if(puSF_only) evt_wgt = sf_pu;
   //
   // Systematic Weights
   //
@@ -2966,6 +2968,7 @@ void evtWgtInfo::setbTagSF_medloose(){
 void evtWgtInfo::setDefaultSystematics( int syst_set, bool isfastsim ) {
   bTagSF_only=false;
   bTagSF_medloose=false;
+  puSF_only=false;
 
   switch (syst_set) {
     // Set of systematics used in the Moriond17 analysis
@@ -3028,13 +3031,41 @@ void evtWgtInfo::setDefaultSystematics( int syst_set, bool isfastsim ) {
       apply_tau_sf         = true;
       apply_topPt_sf       = false;  // false=uncertainty, but not to be used
       apply_metRes_sf      = false;  // not controlled here anymore
-      apply_metTTbar_sf    = true;
+      apply_metTTbar_sf    = true;   
       apply_ttbarSysPt_sf  = false;  // false=uncertainty, need to be updated
-      apply_ttag_sf        = true;
-      apply_softbtag_sf    = true;
+      apply_ttag_sf        = true;   
+      apply_softbtag_sf    = true;   
       apply_WbXsec_sf      = true;
       apply_ttZxsec_sf     = true;
-      apply_ISR_sf         = true;   // 2017 & 2018 to be updated
+      apply_ISR_sf         = true;   // 2017 & 2018 to be updated.
+      apply_pu_sf          = false;  // not available in baby yet
+      apply_pu_sf_fromFile = true;
+      apply_L1prefire_sf   = true;
+      apply_HEMveto_el_sf  = true;   // scale down 2018 event with HEM electron
+      apply_HEMveto_jet_sf = true;   // scale down 2018 event with HEM jet
+      apply_sample_sf      = false;  // no multiple sample available yet
+      apply_lepFS_sf       = true;
+      if (isfastsim) {
+        apply_lepFS_sf     = true;   // updated on and after v31
+        apply_bTagFS_sf    = true;
+      }
+      break;
+
+    case WH_Run2:
+      apply_cr2lTrigger_sf = false;
+      apply_bTag_sf        = true;
+      apply_lep_sf         = true;
+      apply_vetoLep_sf     = true;
+      apply_tau_sf         = true;
+      apply_topPt_sf       = false;  // false=uncertainty, but not to be used
+      apply_metRes_sf      = false;  
+      apply_metTTbar_sf    = false;   // Ryan: questionable
+      apply_ttbarSysPt_sf  = false;  // false=uncertainty, need to be updated
+      apply_ttag_sf        = false;   // Ryan: questionable
+      apply_softbtag_sf    = false;   // Ryan: questionable
+      apply_WbXsec_sf      = true;
+      apply_ttZxsec_sf     = true;
+      apply_ISR_sf         = false;   // 2017 & 2018 to be updated. Ryan: questionable
       apply_pu_sf          = false;  // not available in baby yet
       apply_pu_sf_fromFile = false;
       apply_L1prefire_sf   = true;
@@ -3048,21 +3079,21 @@ void evtWgtInfo::setDefaultSystematics( int syst_set, bool isfastsim ) {
       }
       break;
 
-    case stop_Run2_nobtag:
-      apply_cr2lTrigger_sf = true;
+    case WH_Run2_nobtag:
+      apply_cr2lTrigger_sf = false;
       apply_bTag_sf        = false;
       apply_lep_sf         = true;
       apply_vetoLep_sf     = true;
       apply_tau_sf         = true;
       apply_topPt_sf       = false;  // false=uncertainty, but not to be used
-      apply_metRes_sf      = false;  // not controlled here anymore
-      apply_metTTbar_sf    = true;
+      apply_metRes_sf      = false;  
+      apply_metTTbar_sf    = false;
       apply_ttbarSysPt_sf  = false;  // false=uncertainty, need to be updated
-      apply_ttag_sf        = true;
-      apply_softbtag_sf    = true;
+      apply_ttag_sf        = false;
+      apply_softbtag_sf    = false;
       apply_WbXsec_sf      = true;
       apply_ttZxsec_sf     = true;
-      apply_ISR_sf         = true;   // 2017 & 2018 to be updated
+      apply_ISR_sf         = false;   // 2017 & 2018 to be updated
       apply_pu_sf          = false;  // not available in baby yet
       apply_pu_sf_fromFile = false;
       apply_L1prefire_sf   = true;
@@ -3073,6 +3104,35 @@ void evtWgtInfo::setDefaultSystematics( int syst_set, bool isfastsim ) {
       if (isfastsim) {
         apply_lepFS_sf     = true;   // updated on and after v31
         apply_bTagFS_sf    = true;
+      }
+      break;
+
+    case puOnly:
+      puSF_only = true;
+      apply_cr2lTrigger_sf = false;
+      apply_bTag_sf        = false;
+      apply_lep_sf         = false;
+      apply_vetoLep_sf     = false;
+      apply_tau_sf         = false;
+      apply_topPt_sf       = false;  // false=uncertainty, but not to be used
+      apply_metRes_sf      = false;  
+      apply_metTTbar_sf    = false;
+      apply_ttbarSysPt_sf  = false;  // false=uncertainty, need to be updated
+      apply_ttag_sf        = false;
+      apply_softbtag_sf    = false;
+      apply_WbXsec_sf      = false;
+      apply_ttZxsec_sf     = false;
+      apply_ISR_sf         = false;   // 2017 & 2018 to be updated
+      apply_pu_sf          = false;  // not available in baby yet
+      apply_pu_sf_fromFile = true;
+      apply_L1prefire_sf   = false;
+      apply_HEMveto_el_sf  = false;   // scale down 2018 event with HEM electron
+      apply_HEMveto_jet_sf = false;   // scale down 2018 event with HEM jet
+      apply_sample_sf      = false;  // no multiple sample available yet
+      apply_lepFS_sf       = false;
+      if (isfastsim) {
+        apply_lepFS_sf     = false;   // updated on and after v31
+        apply_bTagFS_sf    = false;
       }
       break;
 
@@ -3198,11 +3258,25 @@ double evtWgtInfo::getExtSampleWeightFall17v2( TString fname, bool apply ) {
 double evtWgtInfo::getWNJetsNuPt200SampleWeight( TString fname, bool apply ) {
 
   double sf = 1.0;
+  if(year==2016){
+    if (fname.Contains("W4Jets") && (fname.Contains("NuPt-200") || fname.Contains("NuPt200"))) sf = 0.79109;
+    else if (fname.Contains("W3Jets") && (fname.Contains("NuPt-200") || fname.Contains("NuPt200"))) sf = 0.77786;
+    else if (fname.Contains("W2Jets") && (fname.Contains("NuPt-200") || fname.Contains("NuPt200"))) sf = 0.78218;
+    else if (fname.Contains("W1Jets") && (fname.Contains("NuPt-200") || fname.Contains("NuPt200"))) sf = 0.78198;
+  }
 
-  if (fname.Contains("W4Jets") && (fname.Contains("NuPt-200") || fname.Contains("NuPt200"))) sf = 0.79109;
-  else if (fname.Contains("W3Jets") && (fname.Contains("NuPt-200") || fname.Contains("NuPt200"))) sf = 0.77786;
-  else if (fname.Contains("W2Jets") && (fname.Contains("NuPt-200") || fname.Contains("NuPt200"))) sf = 0.78218;
-  else if (fname.Contains("W1Jets") && (fname.Contains("NuPt-200") || fname.Contains("NuPt200"))) sf = 0.78198;
+  if(year==2017){
+    if (fname.Contains("W4Jets") && (fname.Contains("NuPt-200") || fname.Contains("NuPt200"))) sf = 1.005;
+    else if (fname.Contains("W3Jets") && (fname.Contains("NuPt-200") || fname.Contains("NuPt200"))) sf = 1.084;
+    else if (fname.Contains("W2Jets") && (fname.Contains("NuPt-200") || fname.Contains("NuPt200"))) sf = 1.030;
+    else if (fname.Contains("W1Jets") && (fname.Contains("NuPt-200") || fname.Contains("NuPt200"))) sf = 1.421;
+  }
+  if(year==2018){
+    if (fname.Contains("W4Jets") && (fname.Contains("NuPt-200") || fname.Contains("NuPt200"))) sf = 1.014;
+    else if (fname.Contains("W3Jets") && (fname.Contains("NuPt-200") || fname.Contains("NuPt200"))) sf = 1.119;
+    else if (fname.Contains("W2Jets") && (fname.Contains("NuPt-200") || fname.Contains("NuPt200"))) sf = 1.056;
+    else if (fname.Contains("W1Jets") && (fname.Contains("NuPt-200") || fname.Contains("NuPt200"))) sf = 1.326;
+  }
 
   if (verbose) cout << "[eventWeight] >> The sample weight to be scaled by is: " << sf << endl;
   if (apply) sf_extra_file *= sf;
