@@ -327,6 +327,11 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
     is_bkg_ = (!is_data() && !is_fastsim_);
     // if (dsname.Contains("Fast")) is_fastsim_ = true;
 
+    if (int i = dsname.Index("mStop-"); i >= 0) mstop_ = TString(dsname(i+6, dsname.Index("_",i))).Atof();
+    if (int i = dsname.Index("mLSP-"); i >= 0) mlsp_ = TString(dsname(i+5, dsname.Index("_",i))).Atof();
+    if (!is_fastsim_ && mlsp_ > 0 && mstop_ > 0)
+      cout << "[StopLooper] >> Detect fullsim signal!! With mstop = " << mstop_ << ", mlsp = " << mlsp_ << endl;
+
     // Get event weight histogram from baby
     TH2D* h_sig_counter_nEvents = nullptr;
     if (is_fastsim_) h_sig_counter_nEvents = (TH2D*) file.Get("histNEvts");
@@ -504,6 +509,10 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
         int nEventsPoint = h_sig_counter_nEvents->GetBinContent(h_sig_counter_nEvents->FindBin(mstop_, mlsp_));
         evtweight_ = kLumi * xsec() * 1000 / nEventsPoint;
         plot2d("h2d_sigpts_xsecwgtd", mstop_, mlsp_, evtweight_, SRVec.at(0).histMap, ";M_{stop} [GeV]; M_{lsp} [GeV]", 320, 100, 2100, 120, 0, 1500);
+      }
+      else if (mlsp_ > 0 && mstop_ > 0) {
+        plot2d("h2d_sigpts_ylds", mstop_, mlsp_, 1, SRVec.at(0).histMap, ";M_{stop} [GeV]; M_{lsp} [GeV]", mStopBins.size()-1, mStopBins.data(), mLSPBins.size()-1, mLSPBins.data());
+        plot2d("h2d_sigpts_xsecwgtd", mstop_, mlsp_, scale1fb(), SRVec.at(0).histMap, ";M_{stop} [GeV]; M_{lsp} [GeV]", 320, 100, 2100, 120, 0, 1500);
       }
 
       ++nPassedTotal;
@@ -1042,15 +1051,15 @@ void StopLooper::fillYieldHistos(SR& sr, float met, string suf, bool is_cr2l) {
     return;
   }
 
-  auto fillhists = [&](string s, bool fill3D = true) {
-    if (is_fastsim_ && fill3D)
+  auto fillhists = [&](string s, int filldim = 1) {
+    if (filldim == 3)
       plot3d("hSMS_metbins"+s+suf, met, mstop_, mlsp_, evtweight_, sr.histMap, ";E^{miss}_{T} [GeV];M_{stop};M_{LSP}",
              sr.GetNMETBins(), sr.GetMETBinsPtr(), mStopBins.size()-1, mStopBins.data(), mLSPBins.size()-1, mLSPBins.data());
     else
       plot1d("h_metbins"+s+suf, met, evtweight_, sr.histMap, (sr.GetName()+":"+sr.GetDetailName()+";E^{miss}_{T} [GeV]").c_str(),
              sr.GetNMETBins(), sr.GetMETBinsPtr());
 
-    if (doSystVariations && (is_bkg_ || (is_fastsim_ && fill3D)) && suf == "") {
+    if (doSystVariations && (is_bkg_ || (is_fastsim_ && filldim == 3)) && suf == "") {
       // Only run once when filling for nominal. JES or METRes variation dealt with above. No need for signals?
       for (int isyst = 3; isyst < evtWgtInfo::k_nSyst; ++isyst) {
         auto syst = (evtWgtInfo::systID) isyst;
@@ -1060,7 +1069,7 @@ void StopLooper::fillYieldHistos(SR& sr, float met, string suf, bool is_cr2l) {
             cout << "[StopLooper::fillYieldHistos]: WARNING: the event weight is 0 for syst = " << evtWgt.getLabel(syst) << " at evt = " << evt() << "!!" << ", SR=" << srname << endl;
           if (isnan(systwgt))
             cout << "[StopLooper::fillYieldHistos]: WARNING: the event weight is NAN for syst = " << evtWgt.getLabel(syst) << " at evt = " << evt() << "!!" << ", SR=" << srname << endl;
-          if (is_fastsim_)
+          if (filldim == 3)
             plot3d("hSMS_metbins"+s+"_"+evtWgt.getLabel(syst), met, mstop_, mlsp_, systwgt, sr.histMap, ";E^{miss}_{T} [GeV];M_{stop};M_{LSP}",
                    sr.GetNMETBins(), sr.GetMETBinsPtr(), mStopBins.size()-1, mStopBins.data(), mLSPBins.size()-1, mLSPBins.data());
           else
@@ -1074,11 +1083,14 @@ void StopLooper::fillYieldHistos(SR& sr, float met, string suf, bool is_cr2l) {
       }
     }
   };
-  fillhists("");
-  if (is_fastsim_ && suf == "" && checkMassPt(450, 325)) fillhists("_500_325", false);
-  if (is_fastsim_ && suf == "" && checkMassPt(425, 325)) fillhists("_425_325", false);
-  if (is_fastsim_ && suf == "" && checkMassPt(1200, 50)) fillhists("_1200_50", false);
-  if (is_fastsim_ && suf == "" && checkMassPt(800, 400)) fillhists("_800_400", false);
+  fillhists("", (is_fastsim_)? 3 : 1);
+  if (!is_fastsim_ && mlsp_ > 0 && mstop_ > 0) fillhists("", 3);  // for fullsim signal
+
+  if (is_fastsim_ && suf == "" && checkMassPt(450, 325)) fillhists("_500_325", 1);
+  if (is_fastsim_ && suf == "" && checkMassPt(425, 325)) fillhists("_425_325", 1);
+  if (is_fastsim_ && suf == "" && checkMassPt(1200, 50)) fillhists("_1200_50", 1);
+  if (is_fastsim_ && suf == "" && checkMassPt(800, 400)) fillhists("_800_400", 1);
+
   if (doGenClassification && is_bkg_) {
     // Only fill gen classification for background events, used for background estimation
     if (isZtoNuNu()) fillhists("_Znunu");

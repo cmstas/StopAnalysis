@@ -11,31 +11,31 @@ fi
 
 LOGDIR=logs
 
-skimtype=skimmed
-# skimtype=merged
+# skimtype=skimmed
+skimtype=merged
 
 OUTDIR18=$OUTDIR
 
-vsuf=v31_s15
+vsuf=v31_s21
 
 OUTDIR18=output/samp18_$vsuf
 OUTDIR17=output/samp17_$vsuf
 OUTDIR16=output/samp16_$vsuf
 OUTDIRRUN2=output/combRun2_$vsuf
 
-run18dat=1
-run18bkg=1
-run18sig=1
+run18dat=0
+run18bkg=0
+run18sig=0
 
-run17dat=1
-run17bkg=1
-run17sig=1
+run17dat=0
+run17bkg=0
+run17sig=0
 
-run16dat=1
-run16bkg=1
-run16sig=1
+run16dat=0
+run16bkg=0
+run16sig=0
 
-# OUTDIRRUN2=""
+OUTDIRRUN2=""
 
 function runLooperJobs {
     # [[ -d ${OUTDIR} ]] && rm -r ${OUTDIR}
@@ -72,6 +72,7 @@ declare -a Samples=(data_2018A data_2018B data_2018C data_2018D)
 
 # INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/a18v1_v30_10
 INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/a18v1_v31_2
+# INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/ttbar_v31_8_ge1j
 # OUTDIR=output/samp18_v30
 # LOGDIR=$OUTDIR/logs
 
@@ -99,26 +100,45 @@ Samples+=( WZTo1L3Nu WZTo3LNu WZTo2L2Q WWToLNuQQ WWTo2L2Nu ZZ )   # diboson
 
 # INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/f17v2_v30_8
 # INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/f17v2_v31_2
-INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/signal_v31_4
+INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/signal_v31_8
+# INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/fastsim_v31_6
 # declare -a Samples=(T2tt_mStop850_mLSP100 T2tt_mStop650_mLSP350 T2tt_mStop1200_mLSP100)
 declare -a Samples=()
-Samples+=( SMS_T2tt_mStop1200to2000_f17v2_ext1_0 SMS_T2tt_mStop1200to2000_f17v2_ext1_1 SMS_T2tt_mStop1200to2000_f17v2_ext1_2 )
-Samples+=( SMS_T2tt_mStop1200to2000_f17v2_ext1_3 SMS_T2tt_mStop1200to2000_f17v2_ext1_4 )
-Samples+=( SMS_T2tt_mStop400to1200_f17v2_ext1_0 SMS_T2tt_mStop400to1200_f17v2_ext1_1 SMS_T2tt_mStop400to1200_f17v2_ext1_2 )
-Samples+=( SMS_T2tt_mStop400to1200_f17v2_ext1_3 SMS_T2tt_mStop400to1200_f17v2_ext1_4 SMS_T2tt_mStop400to1200_f17v2_ext1_5 )
-Samples+=( SMS_T2tt_mStop400to1200_f17v2_ext1_6 SMS_T2tt_mStop400to1200_f17v2_ext1_7 SMS_T2tt_mStop400to1200_f17v2_ext1_8 )
-Samples+=( SMS_T2tt_mStop400to1200_f17v2_ext1_9 )
-Samples+=( SMS_T2tt_mStop350to400_f17v2_ext1_0 SMS_T2tt_mStop350to400_f17v2_ext1_1 SMS_T2tt_mStop350to400_f17v2_ext1_2 )
-Samples+=( SMS_T2tt_mStop350to400_f17v2_ext1_3 SMS_T2tt_mStop350to400_f17v2_ext1_4 SMS_T2tt_mStop350to400_f17v2_ext1_5 )
-Samples+=( SMS_T2tt_mStop350to400_f17v2_ext1_6 )
-Samples+=( SMS_T2tt_mStop250to350_f17v2_ext1_0 SMS_T2tt_mStop250to350_f17v2_ext1_1 SMS_T2tt_mStop250to350_f17v2_ext1_2 )
-Samples+=( SMS_T2tt_mStop250to350_f17v2_ext1_3 SMS_T2tt_mStop250to350_f17v2_ext1_4 SMS_T2tt_mStop250to350_f17v2_ext1_5 )
-Samples+=( SMS_T2tt_mStop150to250_f17v2_ext1_0 SMS_T2tt_mStop150to250_f17v2_ext1_1 SMS_T2tt_mStop150to250_f17v2_ext1_2 )
+
+Samples+=( SMS_T2tt_mStop1200to2000_a18v1_0 SMS_T2tt_mStop1200to2000_a18v1_1 SMS_T2tt_mStop1200to2000_a18v1_2 )
+Samples+=( SMS_T2tt_mStop1200to2000_a18v1_3 SMS_T2tt_mStop1200to2000_a18v1_4 )
+Samples+=( SMS_T2tt_mStop400to1200_a18v1_0 SMS_T2tt_mStop400to1200_a18v1_1 SMS_T2tt_mStop400to1200_a18v1_2 SMS_T2tt_mStop400to1200_a18v1_3  )
+Samples+=( SMS_T2tt_mStop400to1200_a18v1_4 SMS_T2tt_mStop400to1200_a18v1_5 SMS_T2tt_mStop400to1200_a18v1_6 SMS_T2tt_mStop400to1200_a18v1_7 )
+Samples+=( SMS_T2tt_mStop400to1200_a18v1_8 SMS_T2tt_mStop400to1200_a18v1_9 )
+Samples+=( SMS_T2tt_mStop350to400_a18v1_0 SMS_T2tt_mStop350to400_a18v1_1 SMS_T2tt_mStop350to400_a18v1_2 SMS_T2tt_mStop350to400_a18v1_3 )
+Samples+=( SMS_T2tt_mStop350to400_a18v1_4 SMS_T2tt_mStop350to400_a18v1_5 SMS_T2tt_mStop350to400_a18v1_6 SMS_T2tt_mStop350to400_a18v1_7 )
+Samples+=( SMS_T2tt_mStop250to350_a18v1_0 SMS_T2tt_mStop250to350_a18v1_1 SMS_T2tt_mStop250to350_a18v1_2 SMS_T2tt_mStop250to350_a18v1_3  )
+Samples+=( SMS_T2tt_mStop250to350_a18v1_4 SMS_T2tt_mStop250to350_a18v1_5 )
+Samples+=( SMS_T2tt_mStop150to250_a18v1_0 SMS_T2tt_mStop150to250_a18v1_1 SMS_T2tt_mStop150to250_a18v1_2 SMS_T2tt_mStop150to250_a18v1_3 )
 
 Samples+=( SMS_T2bW_a18v1_0 SMS_T2bW_a18v1_1 SMS_T2bW_a18v1_2 SMS_T2bW_a18v1_3 SMS_T2bW_a18v1_4 )
 Samples+=( SMS_T2bW_a18v1_5 SMS_T2bW_a18v1_6 SMS_T2bW_a18v1_7 SMS_T2bW_a18v1_8 SMS_T2bW_a18v1_9 )
 Samples+=( SMS_T2bt_a18v1_0 SMS_T2bt_a18v1_1 SMS_T2bt_a18v1_2 SMS_T2bt_a18v1_3 SMS_T2bt_a18v1_4 )
-Samples+=( SMS_T2bt_a18v1_5 SMS_T2bt_a18v1_6 )
+Samples+=( SMS_T2bt_a18v1_5 SMS_T2bt_a18v1_6 SMS_T2bt_a18v1_7 )
+
+# Samples+=( SMS_T8bbstausnu_XStau0p25_a18v1_0 SMS_T8bbstausnu_XStau0p25_a18v1_1 SMS_T8bbstausnu_XStau0p25_a18v1_2 )
+# Samples+=( SMS_T8bbstausnu_XStau0p25_a18v1_3 SMS_T8bbstausnu_XStau0p25_a18v1_4 SMS_T8bbstausnu_XStau0p25_a18v1_5 )
+# Samples+=( SMS_T8bbstausnu_XStau0p25_a18v1_6 SMS_T8bbstausnu_XStau0p25_a18v1_7 SMS_T8bbstausnu_XStau0p25_a18v1_8 )
+# Samples+=( SMS_T8bbstausnu_XStau0p25_a18v1_9 SMS_T8bbstausnu_XStau0p25_a18v1_A SMS_T8bbstausnu_XStau0p25_a18v1_B )
+# Samples+=( SMS_T8bbstausnu_XStau0p25_a18v1_C SMS_T8bbstausnu_XStau0p25_a18v1_D SMS_T8bbstausnu_XStau0p25_a18v1_E )
+# Samples+=( SMS_T8bbstausnu_XStau0p25_a18v1_F )
+# Samples+=( SMS_T8bbstausnu_XStau0p5_a18v1_0 SMS_T8bbstausnu_XStau0p5_a18v1_1 SMS_T8bbstausnu_XStau0p5_a18v1_2 )
+# Samples+=( SMS_T8bbstausnu_XStau0p5_a18v1_3 SMS_T8bbstausnu_XStau0p5_a18v1_4 SMS_T8bbstausnu_XStau0p5_a18v1_5 )
+# Samples+=( SMS_T8bbstausnu_XStau0p5_a18v1_6 SMS_T8bbstausnu_XStau0p5_a18v1_7 SMS_T8bbstausnu_XStau0p5_a18v1_8 )
+# Samples+=( SMS_T8bbstausnu_XStau0p5_a18v1_9 SMS_T8bbstausnu_XStau0p5_a18v1_A SMS_T8bbstausnu_XStau0p5_a18v1_B )
+# Samples+=( SMS_T8bbstausnu_XStau0p5_a18v1_C SMS_T8bbstausnu_XStau0p5_a18v1_D SMS_T8bbstausnu_XStau0p5_a18v1_E )
+# Samples+=( SMS_T8bbstausnu_XStau0p5_a18v1_F SMS_T8bbstausnu_XStau0p5_a18v1_G )
+# Samples+=( SMS_T8bbstausnu_XStau0p75_a18v1_0 SMS_T8bbstausnu_XStau0p75_a18v1_1 SMS_T8bbstausnu_XStau0p75_a18v1_2 )
+# Samples+=( SMS_T8bbstausnu_XStau0p75_a18v1_3 SMS_T8bbstausnu_XStau0p75_a18v1_4 SMS_T8bbstausnu_XStau0p75_a18v1_5 )
+# Samples+=( SMS_T8bbstausnu_XStau0p75_a18v1_6 SMS_T8bbstausnu_XStau0p75_a18v1_7 SMS_T8bbstausnu_XStau0p75_a18v1_8 )
+# Samples+=( SMS_T8bbstausnu_XStau0p75_a18v1_9 SMS_T8bbstausnu_XStau0p75_a18v1_A SMS_T8bbstausnu_XStau0p75_a18v1_B )
+# Samples+=( SMS_T8bbstausnu_XStau0p75_a18v1_C SMS_T8bbstausnu_XStau0p75_a18v1_D SMS_T8bbstausnu_XStau0p75_a18v1_E )
+# Samples+=( SMS_T8bbstausnu_XStau0p75_a18v1_F )
 
 [[ $run18sig == 1 ]] && runLooperJobs
 
@@ -129,7 +149,6 @@ Samples+=( SMS_T2bt_a18v1_5 SMS_T2bt_a18v1_6 )
 # INDIR=/nfs-7/userdata/haweber/tupler_babies/merged/Stop_1l/v2017/output/
 # INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/data_v30_7
 # INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/data_v30_3
-# INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/data_v31_2
 INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/data_v31_2
 OUTDIR=$OUTDIR17
 # OUTDIR=output/data17_v30_leptrig
@@ -177,9 +196,11 @@ Samples+=( WZTo1L3Nu WZTo3LNu WZTo2L2Q WZTo1L1Nu2Q WWToLNuQQ WWTo2L2Nu TTWZ ZZ )
 # 2017 Signal
 
 # INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/f17v2_v31_2
-INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/signal_v31_4
+INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/signal_v31_8
+# INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/fastsim_v31_6
 # declare -a Samples=(T2tt_mStop850_mLSP100 T2tt_mStop650_mLSP350 T2tt_mStop1200_mLSP100)
 declare -a Samples=()
+
 Samples+=( SMS_T2tt_mStop1200to2000_f17v2_ext0_0 SMS_T2tt_mStop1200to2000_f17v2_ext0_1 SMS_T2tt_mStop1200to2000_f17v2_ext0_2 )
 Samples+=( SMS_T2tt_mStop400to1200_f17v2_ext0_0 SMS_T2tt_mStop400to1200_f17v2_ext0_1 SMS_T2tt_mStop400to1200_f17v2_ext0_2 )
 Samples+=( SMS_T2tt_mStop400to1200_f17v2_ext0_3 SMS_T2tt_mStop400to1200_f17v2_ext0_4 )
@@ -191,8 +212,21 @@ Samples+=( SMS_T2tt_mStop250to350_f17v2_ext0_2 SMS_T2tt_mStop250to350_f17v2_ext0
 Samples+=( SMS_T2tt_mStop150to250_f17v2_ext0_0 SMS_T2tt_mStop150to250_f17v2_ext0_1 )
 
 Samples+=( SMS_T2bW_f17v2_0 SMS_T2bW_f17v2_1 SMS_T2bW_f17v2_2 SMS_T2bW_f17v2_3 )
-Samples+=( SMS_T2bW_f17v2_4 SMS_T2bW_f17v2_5 SMS_T2bW_f17v2_6 )
+Samples+=( SMS_T2bW_f17v2_4 SMS_T2bW_f17v2_5 SMS_T2bW_f17v2_6 SMS_T2bW_f17v2_7 )
 Samples+=( SMS_T2bt_f17v2_0 SMS_T2bt_f17v2_1 SMS_T2bt_f17v2_2 SMS_T2bt_f17v2_3 SMS_T2bt_f17v2_4 )
+
+# Samples+=( SMS_T8bbstausnu_XStau0p25_f17v2_0 SMS_T8bbstausnu_XStau0p25_f17v2_1 SMS_T8bbstausnu_XStau0p25_f17v2_2 )
+# Samples+=( SMS_T8bbstausnu_XStau0p25_f17v2_3 SMS_T8bbstausnu_XStau0p25_f17v2_4 SMS_T8bbstausnu_XStau0p25_f17v2_5 )
+# Samples+=( SMS_T8bbstausnu_XStau0p25_f17v2_6 SMS_T8bbstausnu_XStau0p25_f17v2_7 SMS_T8bbstausnu_XStau0p25_f17v2_8 )
+# Samples+=( SMS_T8bbstausnu_XStau0p25_f17v2_9 )
+# Samples+=( SMS_T8bbstausnu_XStau0p5_f17v2_0 SMS_T8bbstausnu_XStau0p5_f17v2_1 SMS_T8bbstausnu_XStau0p5_f17v2_2 )
+# Samples+=( SMS_T8bbstausnu_XStau0p5_f17v2_3 SMS_T8bbstausnu_XStau0p5_f17v2_4 SMS_T8bbstausnu_XStau0p5_f17v2_5 )
+# Samples+=( SMS_T8bbstausnu_XStau0p5_f17v2_6 SMS_T8bbstausnu_XStau0p5_f17v2_7 SMS_T8bbstausnu_XStau0p5_f17v2_8 )
+# Samples+=( SMS_T8bbstausnu_XStau0p5_f17v2_9 SMS_T8bbstausnu_XStau0p5_f17v2_A )
+# Samples+=( SMS_T8bbstausnu_XStau0p75_f17v2_0 SMS_T8bbstausnu_XStau0p75_f17v2_1 SMS_T8bbstausnu_XStau0p75_f17v2_2 )
+# Samples+=( SMS_T8bbstausnu_XStau0p75_f17v2_3 SMS_T8bbstausnu_XStau0p75_f17v2_4 SMS_T8bbstausnu_XStau0p75_f17v2_5 )
+# Samples+=( SMS_T8bbstausnu_XStau0p75_f17v2_6 SMS_T8bbstausnu_XStau0p75_f17v2_7 SMS_T8bbstausnu_XStau0p75_f17v2_8 )
+# Samples+=( SMS_T8bbstausnu_XStau0p75_f17v2_9 SMS_T8bbstausnu_XStau0p75_f17v2_A )
 
 [[ $run17sig == 1 ]] && runLooperJobs
 
@@ -202,7 +236,7 @@ Samples+=( SMS_T2bt_f17v2_0 SMS_T2bt_f17v2_1 SMS_T2bt_f17v2_2 SMS_T2bt_f17v2_3 S
 # INDIR=/nfs-7/userdata/stopRun2/analysis2016_SUS-16-051_35p9fbinv/v24/output
 # INDIR=/nfs-7/userdata/sicheng/stopbabies/merged_v25_10
 # INDIR=/nfs-7/userdata/sicheng/stopbabies/skimmed_v29_14
-INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/data_v31_1
+INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/data_v31_8
 OUTDIR=$OUTDIR16
 # OUTDIR=output/samp16_v30_s3
 # OUTDIR=output/data16_jetht
@@ -253,6 +287,8 @@ Samples+=( WZTo1L3Nu WZTo1L1Nu2Q WZTo3LNu_amcnlo WZTo2L2Q WWTo2L2Nu WWToLNuQQ ZZ
 # Samples+=( W4Jets_NuPt200_s16v3_0 W4Jets_NuPt200_s16v3_1 W4Jets_NuPt200_s16v3_2 )
 # Samples+=( W4Jets_NuPt200_s16v3_3 W4Jets_NuPt200_s16v3_4 W4Jets_NuPt200_s16v3_5 )
 # Samples+=( W1Jets W2Jets W3Jets W4JetsToLNu DYJets )       # Vjets : Wjets + DY
+# Samples+=( W1Jets_NuPt200 W2Jets_NuPt200 W3Jets_NuPt200 )       # Vjets : Wjets + DY
+# Samples+=( W1JetsToLNu W2JetsToLNu W3JetsToLNu W4JetsToLNu DYJets )       # Vjets : Wjets + DY
 
 [[ $run16bkg == 1 ]] && runLooperJobs
 
@@ -261,32 +297,99 @@ Samples+=( WZTo1L3Nu WZTo1L1Nu2Q WZTo3LNu_amcnlo WZTo2L2Q WWTo2L2Nu WWToLNuQQ ZZ
 
 # INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/s16v3_v30_9
 # INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/s16v3_v31_2
-INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/signal_v31_4
+INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/signal_v31_8
+# INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/fastsim_v31_6
 # INDIR=/nfs-7/userdata/stopRun2/analysis2016_SUS-16-051_35p9fbinv/v22/skim
 # INDIR=/nfs-7/userdata/stopRun2/analysis2016_SUS-16-051_35p9fbinv/v22_usegenMET/skim
 # OUTDIR=output/temp12
 # LOGDIR=$OUTDIR/logs
 
 declare -a Samples=()
-Samples+=( SMS_T2tt_mStop1200to2000_s16v3_0 SMS_T2tt_mStop1200to2000_s16v3_1 SMS_T2tt_mStop1200to2000_s16v3_2 )
-Samples+=( SMS_T2tt_mStop400to1200_s16v3_0 SMS_T2tt_mStop400to1200_s16v3_1 SMS_T2tt_mStop400to1200_s16v3_2 )
-Samples+=( SMS_T2tt_mStop400to1200_s16v3_3 SMS_T2tt_mStop400to1200_s16v3_4 )
-Samples+=( SMS_T2tt_mStop400to1200_s16v3_5 SMS_T2tt_mStop400to1200_s16v3_6 )
-Samples+=( SMS_T2tt_mStop350to400_s16v3_0 SMS_T2tt_mStop350to400_s16v3_1 SMS_T2tt_mStop350to400_s16v3_2 )
-Samples+=( SMS_T2tt_mStop350to400_s16v3_3 SMS_T2tt_mStop350to400_s16v3_4)
-Samples+=( SMS_T2tt_mStop250to350_s16v3_0 SMS_T2tt_mStop250to350_s16v3_1 )
-Samples+=( SMS_T2tt_mStop250to350_s16v3_2 SMS_T2tt_mStop250to350_s16v3_3 )
-Samples+=( SMS_T2tt_mStop150to250_s16v3_0 SMS_T2tt_mStop150to250_s16v3_1)
 
-Samples+=( SMS_T2bW_s16v3_0 SMS_T2bW_s16v3_1 SMS_T2bW_s16v3_2 SMS_T2bW_s16v3_3 )
-Samples+=( SMS_T2bW_s16v3_4 SMS_T2bW_s16v3_5 SMS_T2bW_s16v3_6 )
+# Samples+=( SMS_T2tt_mStop1200to2000_s16v3_0 SMS_T2tt_mStop1200to2000_s16v3_1 SMS_T2tt_mStop1200to2000_s16v3_2 )
+# Samples+=( SMS_T2tt_mStop400to1200_s16v3_0 SMS_T2tt_mStop400to1200_s16v3_1 SMS_T2tt_mStop400to1200_s16v3_2 )
+# Samples+=( SMS_T2tt_mStop400to1200_s16v3_3 SMS_T2tt_mStop400to1200_s16v3_4 )
+# Samples+=( SMS_T2tt_mStop400to1200_s16v3_5 SMS_T2tt_mStop400to1200_s16v3_6 )
+# Samples+=( SMS_T2tt_mStop350to400_s16v3_0 SMS_T2tt_mStop350to400_s16v3_1 SMS_T2tt_mStop350to400_s16v3_2 )
+# Samples+=( SMS_T2tt_mStop350to400_s16v3_3 SMS_T2tt_mStop350to400_s16v3_4)
+# Samples+=( SMS_T2tt_mStop250to350_s16v3_0 SMS_T2tt_mStop250to350_s16v3_1 )
+# Samples+=( SMS_T2tt_mStop250to350_s16v3_2 SMS_T2tt_mStop250to350_s16v3_3 )
+# Samples+=( SMS_T2tt_mStop150to250_s16v3_0 SMS_T2tt_mStop150to250_s16v3_1)
+
+# Samples+=( SMS_T2bW_s16v3_0 SMS_T2bW_s16v3_1 SMS_T2bW_s16v3_2 SMS_T2bW_s16v3_3 )
+# Samples+=( SMS_T2bW_s16v3_4 SMS_T2bW_s16v3_5 SMS_T2bW_s16v3_6 )
 Samples+=( SMS_T2bt_s16v3_0 SMS_T2bt_s16v3_1 SMS_T2bt_s16v3_2 SMS_T2bt_s16v3_3 SMS_T2bt_s16v3_4 )
+
+# Samples+=( SMS_T8bbstausnu_XStau0p25_s16v3_0 SMS_T8bbstausnu_XStau0p25_s16v3_1 SMS_T8bbstausnu_XStau0p25_s16v3_2 )
+# Samples+=( SMS_T8bbstausnu_XStau0p25_s16v3_3 SMS_T8bbstausnu_XStau0p25_s16v3_4 SMS_T8bbstausnu_XStau0p25_s16v3_5 )
+# Samples+=( SMS_T8bbstausnu_XStau0p25_s16v3_6 SMS_T8bbstausnu_XStau0p25_s16v3_7 SMS_T8bbstausnu_XStau0p25_s16v3_8 )
+# Samples+=( SMS_T8bbstausnu_XStau0p25_s16v3_9 )
+# Samples+=( SMS_T8bbstausnu_XStau0p5_s16v3_0 SMS_T8bbstausnu_XStau0p5_s16v3_1 SMS_T8bbstausnu_XStau0p5_s16v3_2 )
+# Samples+=( SMS_T8bbstausnu_XStau0p5_s16v3_3 SMS_T8bbstausnu_XStau0p5_s16v3_4 SMS_T8bbstausnu_XStau0p5_s16v3_5 )
+# Samples+=( SMS_T8bbstausnu_XStau0p5_s16v3_6 SMS_T8bbstausnu_XStau0p5_s16v3_7 SMS_T8bbstausnu_XStau0p5_s16v3_8 )
+# Samples+=( SMS_T8bbstausnu_XStau0p5_s16v3_9 )
+# Samples+=( SMS_T8bbstausnu_XStau0p75_s16v3_0 SMS_T8bbstausnu_XStau0p75_s16v3_1 SMS_T8bbstausnu_XStau0p75_s16v3_2 )
+# Samples+=( SMS_T8bbstausnu_XStau0p75_s16v3_3 SMS_T8bbstausnu_XStau0p75_s16v3_4 SMS_T8bbstausnu_XStau0p75_s16v3_5 )
+# Samples+=( SMS_T8bbstausnu_XStau0p75_s16v3_6 SMS_T8bbstausnu_XStau0p75_s16v3_7 SMS_T8bbstausnu_XStau0p75_s16v3_8 )
+# Samples+=( SMS_T8bbstausnu_XStau0p75_s16v3_9 )
 
 # Samples+=( SMS_T2tt_400to1200_80X_0 SMS_T2tt_400to1200_80X_1 SMS_T2tt_400to1200_80X_2 )
 # Samples+=( SMS_T2tt_400to1200_80X_3 SMS_T2tt_400to1200_80X_4 )
 # Samples+=( SMS_T2bt_80X_0 SMS_T2bt_80X_1 SMS_T2bt_80X_2 SMS_T2bt_80X_3 )
 
 [[ $run16sig == 1 ]] && runLooperJobs
+
+# # Extra
+# INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/ttbar_v31_8_ge1j
+# OUTDIR=output/samp1x_v31_ttagtest4
+# LOGDIR=${OUTDIR}/logs
+# declare -a Samples=()
+# Samples+=( TTJets_2lep_a18v1fs TTJets_1lep_top_a18v1fs TTJets_1lep_tbar_a18v1fs )
+# Samples+=( TTJets_2lep_f17v2fs TTJets_1lep_top_f17v2fs TTJets_1lep_tbar_f17v2fs )
+# Samples+=( TTJets_2lep_s16v3fs TTJets_1lep_top_s16v3fs TTJets_1lep_tbar_s16v3fs )
+# Samples+=( TTJets_2lep_a18v1_emu1J_0 TTJets_2lep_a18v1_emu1J_1 TTJets_2lep_a18v1_emu1J_2 )
+# Samples+=( TTJets_2lep_f17v2_emu1J_0 TTJets_2lep_f17v2_emu1J_1 TTJets_2lep_f17v2_emu1J_2 )
+# Samples+=( TTJets_2lep_s16v3_ext1_emu1J_0 TTJets_2lep_s16v3_ext1_emu1J_2 )
+# runLooperJobs
+
+# INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/ttbar_v31_9
+# OUTDIR=output/samp1x_v31_ttagtest9
+# LOGDIR=${OUTDIR}/logs
+# declare -a Samples=()
+# Samples+=( TTJets_1lep_top_a18v1fs TTJets_1lep_tbar_a18v1fs )
+# Samples+=( TTJets_1lep_top_f17v2fs TTJets_1lep_tbar_f17v2fs )
+# Samples+=( TTJets_1lep_top_s16v3fs TTJets_1lep_tbar_s16v3fs )
+# Samples+=( TTJets_1lep_top_a18v1_1 TTJets_1lep_tbar_a18v1_1 )
+# Samples+=( TTJets_1lep_top_f17v2_1 TTJets_1lep_tbar_f17v2_1 )
+# Samples+=( TTJets_1lep_top_s16v3_ext0_1 TTJets_1lep_tbar_s16v3_ext0_1 )
+# Samples+=( TTJets_1lep_top_a18v1_2 TTJets_1lep_tbar_a18v1_2 )
+# Samples+=( TTJets_1lep_top_f17v2_2 TTJets_1lep_tbar_f17v2_2 )
+# Samples+=( TTJets_1lep_top_a18v1_0 TTJets_1lep_tbar_a18v1_0 )
+# Samples+=( TTJets_1lep_top_f17v2_0 TTJets_1lep_tbar_f17v2_0 )
+# runLooperJobs
+
+# INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/signal_v31_9
+# OUTDIR=output/samp1x_v31_ttagtest9
+# LOGDIR=${OUTDIR}/logs
+# declare -a Samples=()
+# Samples+=( T2tt_mStop1200_mLSP100_f17v2 T2tt_mStop650_mLSP350_a18v1 T2tt_mStop650_mLSP350_f17v2 ) 
+# Samples+=( T2tt_mStop650_mLSP350_s16v3 T2tt_mStop850_mLSP100_f17v2 T2tt_mStop850_mLSP100_s16v3 )
+# Samples+=( T2tt_mStop1200_mLSP100_a18v1 )
+# runLooperJobs
+
+INDIR=/nfs-7/userdata/sicheng/stopbabies/merged/corsig_v32_0
+OUTDIR=output/samp1x_v32_sigcor
+LOGDIR=${OUTDIR}/logs
+declare -a Samples=()
+Samples+=( T2tt_3J_xqcut20_mStop175_mLSP1_s16v3 T2tt_3J_xqcut20_mStop250_mLSP50_s16v3 T2tt_3J_xqcut20_mStop250_mLSP75_s16v3 )
+Samples+=( T2tt_3J_xqcut20_mStop175_mLSP1_f17v2 T2tt_3J_xqcut20_mStop250_mLSP50_f17v2 T2tt_3J_xqcut20_mStop250_mLSP75_f17v2 )
+Samples+=( T2tt_3J_xqcut20_mStop250_mLSP100_f17v2 )
+Samples+=( T2tt_3J_xqcut20_mStop175_mLSP1_a18v1 T2tt_3J_xqcut20_mStop250_mLSP50_a18v1 T2tt_3J_xqcut20_mStop250_mLSP75_a18v1 )
+Samples+=( T2tt_3J_xqcut20_mStop250_mLSP100_a18v1 )
+# ( T2tt_3J_xqcut20_mStop150_mLSP50_s16v3 T2tt_3J_xqcut20_mStop225_mLSP50_s16v3 T2tt_3J_xqcut20_mStop200_mLSP50_s16v3 )
+# ( T2tt_3J_xqcut20_mStop250_mLSP150_s16v3 T2tt_3J_xqcut20_mStop300_mLSP150_s16v3 T2tt_3J_xqcut20_mStop325_mLSP150_s16v3 )
+# ( T2tt_3J_xqcut20_mStop350_mLSP150_s16v3 )
+runLooperJobs
 
 ########################
 # Merge output samples with hadd
@@ -300,18 +403,6 @@ while : ; do
 done
 
 echo -e 'All looper jobs done!\a'
-
-# pushd output/temp2018data1/
-# hadd -f data_2018_all.root  data_2018?.root > /dev/null
-# popd > /dev/null
-# pushd output/temp2017data1/
-# hadd -f data_2017_all.root  data_2017?.root > /dev/null
-# popd > /dev/null
-# pushd output/temp2016data9/
-# # hadd -f data_2016_all.root  data_2016?.root > /dev/null
-# cp data_single_lepton_met.root data_2016_all.root
-# popd > /dev/null
-
 # Local merge for the v29_11+ babies
 pushd ${OUTDIR18}
 [[ $run18bkg == 1 ]] && hadd -f tt2l_18.root     TTJets_2lep*.root > /dev/null
@@ -327,6 +418,9 @@ pushd ${OUTDIR18}
 [[ $run18sig == 1 ]] && hadd -f SMS_T2tt_18.root SMS_T2tt_*to*.root > /dev/null && rm SMS_T2tt_*to*.root
 [[ $run18sig == 1 ]] && hadd -f SMS_T2bW_18.root SMS_T2bW_*_?.root > /dev/null && rm SMS_T2bW_*_?.root
 [[ $run18sig == 1 ]] && hadd -f SMS_T2bt_18.root SMS_T2bt_*_?.root > /dev/null && rm SMS_T2bt_*_?.root
+# [[ $run18sig == 1 ]] && hadd -f SMS_T8bbstausnu_XStau0p75_18.root SMS_T8bbstausnu_XStau0p75_*_?.root > /dev/null && rm SMS_T8bbstausnu_XStau0p75_*_?.root
+# [[ $run18sig == 1 ]] && hadd -f SMS_T8bbstausnu_XStau0p5_18.root SMS_T8bbstausnu_XStau0p5_*_?.root > /dev/null && rm SMS_T8bbstausnu_XStau0p5_*_?.root
+# [[ $run18sig == 1 ]] && hadd -f SMS_T8bbstausnu_XStau0p25_18.root SMS_T8bbstausnu_XStau0p25_*_?.root > /dev/null && rm SMS_T8bbstausnu_XStau0p25_*_?.root
 popd > /dev/null
 
 # Local merge for the v29_11+ babies
@@ -345,6 +439,9 @@ pushd ${OUTDIR17}
 [[ $run17sig == 1 ]] && hadd -f SMS_T2tt_17.root SMS_T2tt_*to*.root > /dev/null && rm SMS_T2tt_*to*.root
 [[ $run17sig == 1 ]] && hadd -f SMS_T2bW_17.root SMS_T2bW_*_?.root > /dev/null && rm SMS_T2bW_*_?.root
 [[ $run17sig == 1 ]] && hadd -f SMS_T2bt_17.root SMS_T2bt_*_?.root > /dev/null && rm SMS_T2bt_*_?.root
+# [[ $run17sig == 1 ]] && hadd -f SMS_T8bbstausnu_XStau0p75_17.root SMS_T8bbstausnu_XStau0p75_*_?.root > /dev/null && rm SMS_T8bbstausnu_XStau0p75_*_?.root
+# [[ $run17sig == 1 ]] && hadd -f SMS_T8bbstausnu_XStau0p5_17.root SMS_T8bbstausnu_XStau0p5_*_?.root > /dev/null && rm SMS_T8bbstausnu_XStau0p5_*_?.root
+# [[ $run17sig == 1 ]] && hadd -f SMS_T8bbstausnu_XStau0p25_17.root SMS_T8bbstausnu_XStau0p25_*_?.root > /dev/null && rm SMS_T8bbstausnu_XStau0p25_*_?.root
 popd > /dev/null
 
 pushd ${OUTDIR16}
@@ -356,10 +453,29 @@ pushd ${OUTDIR16}
 [[ $run16bkg == 1 ]] && hadd -f rare_16.root     TTZ*.root TTW*.root WZ*.root WW*.root ZZ*.root > /dev/null
 [[ $run16bkg == 1 ]] && hadd -f allBkg_16.root   ttbar_16.root singleT_16.root Vjets_16.root rare_16.root > /dev/null
 [[ $run16dat == 1 ]] && hadd -f allData_16.root  data_2016*.root > /dev/null
-[[ $run16sig == 1 ]] && hadd -f SMS_T2tt_16.root SMS_T2tt_*to*.root > /dev/null && rm SMS_T2tt_*to*.root
-[[ $run16sig == 1 ]] && hadd -f SMS_T2bW_16.root SMS_T2bW_*_?.root > /dev/null && rm SMS_T2bW_*_?.root
+# [[ $run16sig == 1 ]] && hadd -f SMS_T2tt_16.root SMS_T2tt_*to*.root > /dev/null && rm SMS_T2tt_*to*.root
+# [[ $run16sig == 1 ]] && hadd -f SMS_T2bW_16.root SMS_T2bW_*_?.root > /dev/null && rm SMS_T2bW_*_?.root
 [[ $run16sig == 1 ]] && hadd -f SMS_T2bt_16.root SMS_T2bt_*_?.root > /dev/null && rm SMS_T2bt_*_?.root
+# [[ $run16sig == 1 ]] && hadd -f SMS_T8bbstausnu_XStau0p75_16.root SMS_T8bbstausnu_XStau0p75_*_?.root > /dev/null && rm SMS_T8bbstausnu_XStau0p75_*_?.root
+# [[ $run16sig == 1 ]] && hadd -f SMS_T8bbstausnu_XStau0p5_16.root SMS_T8bbstausnu_XStau0p5_*_?.root > /dev/null && rm SMS_T8bbstausnu_XStau0p5_*_?.root
+# [[ $run16sig == 1 ]] && hadd -f SMS_T8bbstausnu_XStau0p25_16.root SMS_T8bbstausnu_XStau0p25_*_?.root > /dev/null && rm SMS_T8bbstausnu_XStau0p25_*_?.root
 popd > /dev/null
+
+# cd output/samp1x_v31_ttagtest4
+# hadd -f ttbar_fastsim_16.root TTJ*s16v3fs.root > /dev/null && hadd -f ttbar_16.root TTJ*_s16v3_ext1_emu1J*.root > /dev/null
+# hadd -f ttbar_fastsim_17.root TTJ*f17v2fs.root > /dev/null && hadd -f ttbar_17.root TTJ*_f17v2_emu1J_?.root > /dev/null
+# hadd -f ttbar_fastsim_18.root TTJ*a18v1fs.root > /dev/null && hadd -f ttbar_18.root TTJ*_a18v1_emu1J_?.root > /dev/null
+# cd -
+
+# cd output/samp1x_v31_ttagtest9
+# hadd -f ttbar_fastsim_16.root TTJ*s16v3fs.root > /dev/null && hadd -f ttbar_16.root TTJ*_s16v3_ext0_?.root > /dev/null
+# hadd -f ttbar_fastsim_17.root TTJ*f17v2fs.root > /dev/null && hadd -f ttbar_17.root TTJ*_f17v2_?.root > /dev/null
+# hadd -f ttbar_fastsim_18.root TTJ*a18v1fs.root > /dev/null && hadd -f ttbar_18.root TTJ*_a18v1_?.root > /dev/null
+# cd -
+
+# cd output/samp16_v31_ttagtest && hadd -f ttbar_fastsim_16.root TTJ*fs.root > /dev/null && hadd -f ttbar_16.root TTJ*v?_ext0_?.root > /dev/null && cd -
+# cd output/samp17_v31_ttagtest && hadd -f ttbar_fastsim_17.root TTJ*fs.root > /dev/null && hadd -f ttbar_17.root TTJ*v?_?.root > /dev/null && cd -
+# cd output/samp18_v31_ttagtest && hadd -f ttbar_fastsim_18.root TTJ*fs.root > /dev/null && hadd -f ttbar_18.root TTJ*v?_?.root > /dev/null && cd -
 
 # Make combined results
 if [ ! ${OUTDIRRUN2} == "" ]; then
