@@ -926,7 +926,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
 
         fillHistosForCR2l(suffix);
 
-        // testCutFlowHistos(testVec[2]);
+        testCutFlowHistos(testVec[2]);
         // fillTopTaggingHistos(suffix);
 
         // Also do yield using genmet for fastsim samples <-- under development
@@ -2976,4 +2976,46 @@ void StopLooper::testTopTaggingEffficiency(SR& sr) {
     if (lead_disc > 0.5)
       plot1d("hnum_fakep5_pt", lead_disc, evtweight_, sr.histMap, ";fakecand pt", 110, 0, 1100);
   }
+}
+
+// Generate the yields for cut-flow table
+void StopLooper::testCutFlowHistos(SR& sr) {
+
+  // Defining cuts
+  const vector<string> cutnames = {"base", "mt", "btag", "lepveto", "tauveto", "dphijmet", "met"};
+  const vector<pair<string,bool(*)()>> cuts = {
+    {"base", [](){ return (ngoodleps() >= 1 && ngoodjets() >= 2 && pfmet() > 150); }},
+    {"mt", [](){ return (mt_met_lep() > 150); }},
+    {"btag", [](){ return (ngoodbtags() >= 1); }},
+    {"lepveto", [](){ return (nvetoleps() == 1); }},
+    {"tauveto", [](){ return (PassTrackVeto() && PassTauVeto()); }},
+    {"dphijmet", [](){ return (mindphi_met_j1_j2() > 0.8); }},
+    {"met", [](){ return (pfmet() > 250); }},
+  };
+  const int ncuts = cuts.size();
+
+  string suf;
+  if (isZtoNuNu()) suf = "_Znunu";
+  else if (is2lep()) suf = "_2lep";
+  else if (is1lepFromW()) suf = "_1lepW";
+  else if (is1lepFromTop()) suf = "_1lepTop";
+  else suf = "_unclass";  // either unclassified 1lep or 0lep, or something else unknown, shouldn't have (m)any
+  if (is_fastsim_) {
+    if (!(checkMassPt(1200, 100) || checkMassPt(850, 100) || checkMassPt(650, 350) ||
+          checkMassPt(1250, 150) || checkMassPt(900, 150) || checkMassPt(700, 400) ||
+          checkMassPt(1150, 50)  || checkMassPt(800,  50) || checkMassPt(600, 300) ||
+          checkMassPt(625, 325)  || checkMassPt(675, 375) )) return;
+    suf = "_"+to_string(mstop_)+"_"+to_string(mlsp_);
+  }
+
+  for (int icut = 0; icut < ncuts; ++icut) {
+    if (!cuts[icut].second()) return;
+    plot1d("h_cutflow", icut, evtweight_, sr.histMap, ";Cuts", ncuts, 0, ncuts);
+    plot1d("h_cutflow"+suf, icut, evtweight_, sr.histMap, ";Cuts", ncuts, 0, ncuts);
+  }
+
+  // const vector<string> catnames = {"tmod0", "tmod10", "mlbL", "mlbH", "rtag", "mtag", "sbtag"};
+  // const int ncats = catnames.size();
+
+
 }
