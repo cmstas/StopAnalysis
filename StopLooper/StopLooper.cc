@@ -70,7 +70,7 @@ const bool runMETResCorrection = false;
 // only produce yield histos
 const bool runYieldsOnly = true;
 // only running selected signal points to speed up
-const bool runFullSignalScan = true;
+const bool runFullSignalScan = false;
 // debug symbol, for printing exact event kinematics that passes
 const bool printPassedEvents = false;
 // switch to use the separate fine scan points in the corridor or combine them
@@ -150,6 +150,11 @@ void StopLooper::SetSignalRegions() {
       }
       if (sr.GetNMETBins() > 0) {
         plot1d("h_metbins", -1, 0, sr.histMap, (sr.GetName()+":"+sr.GetDetailName()+";E^{miss}_{T} [GeV]").c_str(), sr.GetNMETBins(), sr.GetMETBinsPtr());
+      }
+      if (false) {
+        // temporary for the tests of fullsim corridor
+        plot3d("hSMS_metbins", -1, 0, 0, 0, sr.histMap, (sr.GetName()+":"+sr.GetDetailName()+";E^{miss}_{T} [GeV];M_{stop};M_{LSP}").c_str(),
+               sr.GetNMETBins(), sr.GetMETBinsPtr(), mStopBins.size()-1, mStopBins.data(), mLSPBins.size()-1, mLSPBins.data());
       }
     }
   };
@@ -321,7 +326,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
     else if (dsname.Contains("RunIISpring16MiniAODv2")) samplever += ":Spring16v2";
 
     cout << "[StopLooper] >> Running on sample: " << dsname << endl;
-    cout << "[StopLooper] >> Sample detected with year = " << year_ << " and version = " << samplever << endl;
+    cout << "[StopLooper] >> Sample detected with year = " << year_ << " and version = " << samplever << " (" << babyver << ")" << endl;
 
     is_fastsim_ = fname.Contains("SMS") || fname.Contains("Signal");
     is_bkg_ = (!is_data() && !is_fastsim_);
@@ -443,15 +448,18 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
 
       // For testing on only subset of mass points
       if (!runFullSignalScan && is_fastsim_) {
-        // if (!(checkMassPt(1050, 100) || checkMassPt(900, 500) || checkMassPt(950, 100) || checkMassPt(425, 325) ||
-        //       checkMassPt(1000, 100) || checkMassPt(800, 450) || checkMassPt(750, 400) || checkMassPt(800, 400) ||
-        //       checkMassPt(1200, 100) || checkMassPt(850, 100) || checkMassPt(650, 350))) continue;
         // if (!(checkMassPt(1200, 100) || checkMassPt(850, 100) || checkMassPt(650, 350))) continue;
-        if (!(checkMassPt(1200, 100) || checkMassPt(850, 100) || checkMassPt(650, 350) ||
-              checkMassPt(1250, 150) || checkMassPt(900, 150) || checkMassPt(700, 400) ||
-              checkMassPt(1150, 50)  || checkMassPt(800,  50) || checkMassPt(600, 300) ||
-              checkMassPt(625, 325)  || checkMassPt(675, 375) )) continue;
-        // if (!(checkMassPt(425, 325) || checkMassPt(450, 325))) continue;
+        // if (!(checkMassPt(1200, 100) || checkMassPt(850, 100) || checkMassPt(650, 350) ||
+        //       checkMassPt(1250, 150) || checkMassPt(900, 150) || checkMassPt(700, 400) ||
+        //       checkMassPt(1150, 50)  || checkMassPt(800,  50) || checkMassPt(600, 300) ||
+        //       checkMassPt(625, 325)  || checkMassPt(675, 375) )) continue;
+        if (!(checkMassPt(1200, 100) || checkMassPt(850, 100) || checkMassPt(650, 350) || // T2tt fullsim available
+              checkMassPt(1050,  50) || checkMassPt(800, 400) || checkMassPt(600, 400) || // New points
+              checkMassPt(1000, 50)  || checkMassPt(800, 400) || checkMassPt(500, 325) || // T2tt points in SUS-16-051
+              checkMassPt(900, 50)   || checkMassPt(800, 350) || checkMassPt(500, 300) || // T2bW points in SUS-16-051
+              checkMassPt(850, 50)   || checkMassPt(750, 300) || checkMassPt(450, 250) || // T2tb points in SUS-16-051
+              checkMassPt(175,  1)   || checkMassPt(250,  50) || checkMassPt(250,  75) || // Corridor fullsim points
+              checkMassPt(250, 100) )) continue;
         // if (!checkMassPt(800,400)  && !checkMassPt(1200,50)  && !checkMassPt(400,100) &&
         //     !checkMassPt(1100,300) && !checkMassPt(1100,500) && !checkMassPt(900,600) &&
         //     !checkMassPt(1200,200) && !checkMassPt(1200,400) && !checkMassPt(1200,600)) continue;
@@ -926,7 +934,8 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
 
         fillHistosForCR2l(suffix);
 
-        testCutFlowHistos(testVec[2]);
+        if (systype == 0)
+          testCutFlowHistos(testVec[2]);
         // fillTopTaggingHistos(suffix);
 
         // Also do yield using genmet for fastsim samples <-- under development
@@ -1738,14 +1747,14 @@ void StopLooper::fillHistosForCRemu(string suf, int trigType) {
 
       };
       fillhists(suf);
-      if ( (cr.GetName() == "cremuA1" || cr.GetName().find("cremuB") == 0) && babyver >= 31.6)  // available on and after v31_6
-        testGenMatching(cr);
-      if (is_bkg_) {
-        evtweight_ = evtWgt.getWeight(evtWgtInfo::systID::k_softbSFUp, false, 5) * 0.85;
-        fillhists(suf+"_softbSFUp");
-        evtweight_ = evtWgt.getWeight(evtWgtInfo::systID::k_softbSFDown, false, 5) * 0.85;
-        fillhists(suf+"_softbSFDn");
-      }
+      // if ( (cr.GetName() == "cremuA1" || cr.GetName().find("cremuB") == 0) && babyver >= 31.6)  // available on and after v31_6
+      //   testGenMatching(cr);
+      // if (is_bkg_) {
+      //   evtweight_ = evtWgt.getWeight(evtWgtInfo::systID::k_softbSFUp, false, 5) * 0.85;
+      //   fillhists(suf+"_softbSFUp");
+      //   evtweight_ = evtWgt.getWeight(evtWgtInfo::systID::k_softbSFDown, false, 5) * 0.85;
+      //   fillhists(suf+"_softbSFDn");
+      // }
       // if (abs(lep1_pdgid()) == 13)
       //   fillhists(suf+"_mu");
       // else if (abs(lep1_pdgid()) == 11)
@@ -2980,6 +2989,7 @@ void StopLooper::testTopTaggingEffficiency(SR& sr) {
 
 // Generate the yields for cut-flow table
 void StopLooper::testCutFlowHistos(SR& sr) {
+  if (is_data()) return;
 
   // Defining cuts
   const vector<string> cutnames = {"base", "mt", "btag", "lepveto", "tauveto", "dphijmet", "met"};
@@ -2994,17 +3004,50 @@ void StopLooper::testCutFlowHistos(SR& sr) {
   };
   const int ncuts = cuts.size();
 
+  const vector<pair<string,bool(*)()>> cats = {
+    {"tmod_gt0", [](){ return (topnessMod() > 0); }},
+    {"tmod_gt10", [](){ return (topnessMod() > 10); }},
+    {"Mlb_gt175", [](){ return (Mlb_closestb() > 175); }},
+    {"Mlb_lt175", [](){ return (Mlb_closestb() > 0 && Mlb_closestb() < 175); }},
+    {"mtag_ge1", [](){
+      for (size_t iak8 = 0; iak8 < ak8pfjets_deepdisc_top().size(); ++iak8) {
+        if (ak8pfjets_deepdisc_top()[iak8] > 0.4) return true;
+      }
+      return false;
+    }},
+    {"rtag_ge1", [](){
+      for (float disc : tftops_disc()) {
+        if (disc > 0.95) return true;
+      }
+      return false;
+    }},
+    {"softb_ge1", [](){
+      int nsoftb = nsoftbtags();
+      for (auto sb : softtags_p4()) {
+        if (nvetoleps() > 0 && isCloseObject(sb, lep1_p4(), 0.4)) nsoftb--;
+        if (nvetoleps() > 1 && isCloseObject(sb, lep2_p4(), 0.4)) nsoftb--;
+      }
+      return nsoftb > 0;
+    }},
+  };
+  const int ncats = cats.size();
+
   string suf;
   if (isZtoNuNu()) suf = "_Znunu";
   else if (is2lep()) suf = "_2lep";
   else if (is1lepFromW()) suf = "_1lepW";
   else if (is1lepFromTop()) suf = "_1lepTop";
   else suf = "_unclass";  // either unclassified 1lep or 0lep, or something else unknown, shouldn't have (m)any
+
   if (is_fastsim_) {
-    if (!(checkMassPt(1200, 100) || checkMassPt(850, 100) || checkMassPt(650, 350) ||
-          checkMassPt(1250, 150) || checkMassPt(900, 150) || checkMassPt(700, 400) ||
-          checkMassPt(1150, 50)  || checkMassPt(800,  50) || checkMassPt(600, 300) ||
-          checkMassPt(625, 325)  || checkMassPt(675, 375) )) return;
+    if (!(checkMassPt(1200, 100) || checkMassPt(850, 100) || checkMassPt(650, 350) || // T2tt fullsim available
+          checkMassPt(1050,  50) || checkMassPt(800, 400) || checkMassPt(600, 400) || // New points
+          checkMassPt(1000,  50) || checkMassPt(800, 400) || checkMassPt(500, 325) || // T2tt points in SUS-16-051
+          checkMassPt(900,  50)  || checkMassPt(800, 350) || checkMassPt(500, 300) || // T2bW points in SUS-16-051
+          checkMassPt(850,  50)  || checkMassPt(750, 300) || checkMassPt(450, 250) || // T2tb points in SUS-16-051
+          checkMassPt(175,  1)   || checkMassPt(250,  50) || checkMassPt(250,  75) || // Corridor fullsim points
+          checkMassPt(250, 100)  || checkMassPt(625, 325) || checkMassPt(675, 375)
+          )) return;
     suf = "_"+to_string(mstop_)+"_"+to_string(mlsp_);
   }
 
@@ -3012,6 +3055,12 @@ void StopLooper::testCutFlowHistos(SR& sr) {
     if (!cuts[icut].second()) return;
     plot1d("h_cutflow", icut, evtweight_, sr.histMap, ";Cuts", ncuts, 0, ncuts);
     plot1d("h_cutflow"+suf, icut, evtweight_, sr.histMap, ";Cuts", ncuts, 0, ncuts);
+  }
+
+  for (int icat = 0; icat < ncats; ++icat) {
+    if (!cats[icat].second()) continue;
+    plot1d("h_selcat", icat, evtweight_, sr.histMap, ";Selection Cats", ncats, 0, ncats);
+    plot1d("h_selcat"+suf, icat, evtweight_, sr.histMap, ";Selection Cats", ncats, 0, ncats);
   }
 
   // const vector<string> catnames = {"tmod0", "tmod10", "mlbL", "mlbH", "rtag", "mtag", "sbtag"};
