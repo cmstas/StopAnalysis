@@ -45,7 +45,7 @@ void zip(TString slimFilename, TString whFilename){
 			else this_type=2;
 		}
 		//if it is not vector, assume is float, unless name begins with "n" (e.g. njets)
-		else if (this_branch_name.BeginsWith("n")) this_type=0;
+		else if (this_branch_name.BeginsWith("n") || this_branch_name.EqualTo("year")) this_type=0;
 		//Goddamnit- hack for now..
 		else if(this_branch_name.EqualTo("stitch") || this_branch_name.EqualTo("pass") || this_branch_name.EqualTo("duplicate") || this_branch_name.EqualTo("goodrun")) this_type=4;
 		else this_type = 1;

@@ -1,6 +1,7 @@
 drop *
 
 #### event info ####
+keep year
 keep run
 keep ls
 keep evt
@@ -16,6 +17,7 @@ keep HLT*
 drop HLT_Photon*
 ### met ###
 keep pfmet
+keep pfmet_phi
 keep genmet
 keep genmet_phi
 

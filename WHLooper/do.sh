@@ -1,26 +1,228 @@
 #!/bin/bash
 
-datetag=2019_08_13
-babytag=signal
+
+########################
+#Jet HT data
+
+datetag=2019_10_05
+babytag=v30_3
 
 OUTDIR=/home/users/rheller/wh_babies/babies_${babytag}_${datetag}/
 LOGDIR=/home/users/rheller/wh_babies/babies_${babytag}_${datetag}/log/
 
+INDIR=/hadoop/cms/store/user/sicheng/stopbabies/merged/data_v30_3/jetht/
+#/nfs-7/userdata/sicheng/stopbabies/merged/data_v30_3/
+#/nfs-7/userdata/sicheng/stopbabies/merged_v29_14/
+
+declare -a Samples=(data_2017B data_2017C data_2017D data_2017E data_2017F )
+Samples+=( data_2018A data_2018B data_2018C data_2018D )
+Samples+=( data_2016B data_2016C data_2016D data_2016E data_2016F data_2016G data_2016H )
+
+
+mkdir -p ${OUTDIR}; mkdir -p ${LOGDIR}
+for SAMPLE in ${Samples[@]}; do
+    echo ./processWH.py ${INDIR} ${SAMPLE} ${OUTDIR}  '>&' ${LOGDIR}/log_${SAMPLE}.txt
+    eval "nohup nice -n -10 ./processWH.py ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
+done
+
+
+########################
+# 2016 Data
+
+datetag=2019_10_05
+babytag=v31_1
+
+OUTDIR=/home/users/rheller/wh_babies/babies_${babytag}_${datetag}/
+LOGDIR=/home/users/rheller/wh_babies/babies_${babytag}_${datetag}/log/
+
+INDIR=/nfs-7/userdata/sicheng/stopbabies/merged/data_v31_1/
+#/nfs-7/userdata/sicheng/stopbabies/merged/data_v30_3/
+#/nfs-7/userdata/sicheng/stopbabies/merged_v29_14/
+
+declare -a Samples=(data_2016B data_2016C data_2016D data_2016E data_2016F data_2016G data_2016H)
+# declare -a Samples=(data_2016)
+
+mkdir -p ${OUTDIR}; mkdir -p ${LOGDIR}
+for SAMPLE in ${Samples[@]}; do
+    echo ./processWH.py ${INDIR} ${SAMPLE} ${OUTDIR}  '>&' ${LOGDIR}/log_${SAMPLE}.txt
+    eval "nohup nice -n -10 ./processWH.py ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
+done
+
+
+########################
+# 2017/18 Data
+
+datetag=2019_10_05
+babytag=v31_2
+
+OUTDIR=/home/users/rheller/wh_babies/babies_${babytag}_${datetag}/
+LOGDIR=/home/users/rheller/wh_babies/babies_${babytag}_${datetag}/log/
+
+INDIR=/nfs-7/userdata/sicheng/stopbabies/merged/data_v31_2/
+#/nfs-7/userdata/sicheng/stopbabies/merged/data_v30_3/
+#/nfs-7/userdata/sicheng/stopbabies/merged_v29_14/
+
+declare -a Samples=(data_2017B data_2017C data_2017D data_2017E data_2017F )
+Samples+=( data_2018A data_2018B data_2018C data_2018D )
+
+
+mkdir -p ${OUTDIR}; mkdir -p ${LOGDIR}
+for SAMPLE in ${Samples[@]}; do
+    echo ./processWH.py ${INDIR} ${SAMPLE} ${OUTDIR}  '>&' ${LOGDIR}/log_${SAMPLE}.txt
+    eval "nohup nice -n -10 ./processWH.py ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
+done
+
+
+### met binned 2016 ttbar
+datetag=2019_10_05
+babytag=v30_9
+
+
+OUTDIR=/home/users/rheller/wh_babies/babies_${babytag}_${datetag}/s16v3/
+LOGDIR=/home/users/rheller/wh_babies/babies_${babytag}_${datetag}/s16v3/log/
+INDIR=/nfs-7/userdata/stopRun2/run2babies/merged/s16v3_v30_9/
+
+
+declare -a Samples=(TTJets_2lep_met150_s16v3 TTJets_1lep_top_met150_s16v3 TTJets_1lep_tbar_met150_s16v3)
+
+mkdir -p ${OUTDIR}; mkdir -p ${LOGDIR}
+for SAMPLE in ${Samples[@]}; do
+    echo ./processWH.py ${INDIR} ${SAMPLE} ${OUTDIR}  '>&' ${LOGDIR}/log_${SAMPLE}.txt
+    eval "nohup nice -n -10 ./processWH.py ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
+done
+
+
+### met binned 2017 ttbar
+datetag=2019_10_05
+babytag=v30_9
+
+OUTDIR=/home/users/rheller/wh_babies/babies_${babytag}_${datetag}/f17v2/
+LOGDIR=/home/users/rheller/wh_babies/babies_${babytag}_${datetag}/f17v2/log/
+INDIR=/nfs-7/userdata/stopRun2/run2babies/merged/f17v2_v30_9/
+
+
+declare -a Samples=(TTJets_2lep_met150 TTJets_1lep_top_met150 TTJets_1lep_tbar_met150)
+
+mkdir -p ${OUTDIR}; mkdir -p ${LOGDIR}
+for SAMPLE in ${Samples[@]}; do
+    echo ./processWH.py ${INDIR} ${SAMPLE} ${OUTDIR}  '>&' ${LOGDIR}/log_${SAMPLE}.txt
+    eval "nohup nice -n -10 ./processWH.py ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
+done
+
+
+
+#### special DY samples
+datetag=2019_10_05
+babytag=v32_0z
+INDIR=/home/users/rheller/z_merged/
+OUTDIR=/home/users/rheller/wh_babies/babies_${babytag}_${datetag}/
+LOGDIR=/home/users/rheller/wh_babies/babies_${babytag}_${datetag}/log/
+
+declare -a Samples=(DYJetsToLL)
+#declare -a Samples=(DYJetsToLL_M50_s16v3 DYJetsToLL_Zpt150_s16v3)
+# declare -a Samples=(data_2016)
+
+mkdir -p ${OUTDIR}; mkdir -p ${LOGDIR}
+for SAMPLE in ${Samples[@]}; do
+    echo ./processWH.py ${INDIR} ${SAMPLE} ${OUTDIR}  '>&' ${LOGDIR}/log_${SAMPLE}.txt
+    eval "nohup nice -n -10 ./processWH.py ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
+
+done
+
+## WJet NLO 2018
+datetag=2019_10_05
+babytag=v30_9
+
+OUTDIR=/home/users/rheller/wh_babies/babies_${babytag}_${datetag}/a18v1/
+LOGDIR=/home/users/rheller/wh_babies/babies_${babytag}_${datetag}/a18v1/log/
+INDIR=/nfs-7/userdata/stopRun2/run2babies/merged_WHextra/a18v1_v30_9/
+
+
+declare -a Samples=(WJets_0J_amcnlo WJets_1J_amcnlo WJets_2J_amcnlo)
+
+mkdir -p ${OUTDIR}; mkdir -p ${LOGDIR}
+for SAMPLE in ${Samples[@]}; do
+    echo ./processWH.py ${INDIR} ${SAMPLE} ${OUTDIR}  '>&' ${LOGDIR}/log_${SAMPLE}.txt
+    eval "nohup nice -n -10 ./processWH.py ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
+done
+
+
+## WJet NLO 2017
+datetag=2019_10_05
+babytag=v30_9
+
+OUTDIR=/home/users/rheller/wh_babies/babies_${babytag}_${datetag}/f17v2/
+LOGDIR=/home/users/rheller/wh_babies/babies_${babytag}_${datetag}/f17v2/log/
+INDIR=/nfs-7/userdata/stopRun2/run2babies/merged_WHextra/f17v2_v30_9/
+
+
+declare -a Samples=(WJets_0J_amcnlo WJets_1J_amcnlo WJets_2J_amcnlo)
+
+mkdir -p ${OUTDIR}; mkdir -p ${LOGDIR}
+for SAMPLE in ${Samples[@]}; do
+    echo ./processWH.py ${INDIR} ${SAMPLE} ${OUTDIR}  '>&' ${LOGDIR}/log_${SAMPLE}.txt
+    eval "nohup nice -n -10 ./processWH.py ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
+done
+
+
+
 
 ###2016 signal
-# INDIR="/home/users/rheller/babies/merged_noskim/"
-# declare -a Samples=()
-# Samples+=( SMS-TChiWH )
+datetag=2019_10_05
+babytag=signal_s16v3_v32
 
-# mkdir -p ${OUTDIR}; mkdir -p ${LOGDIR}
-# for SAMPLE in ${Samples[@]}; do
-#     # ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
-#     #echo ./processWH.py ${INDIR} ${SAMPLE} ${OUTDIR} '>&' ${LOGDIR}/log_${SAMPLE}.txt
-#     #eval "./processWH.py ${INDIR} ${SAMPLE} ${OUTDIR}"
-#     #'>&' ${LOGDIR}/log_${SAMPLE}.txt
-#     #eval "nohup nice -n -10 ./processWH.py ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
-# done
+OUTDIR=/home/users/rheller/wh_babies/babies_${babytag}_${datetag}/
+LOGDIR=/home/users/rheller/wh_babies/babies_${babytag}_${datetag}/log/
 
+INDIR="/nfs-7/userdata/stopRun2/run2babies/merged_WHextra/s16v3_v32_0/"
+#INDIR="/home/users/rheller/babies/merged_noskim/"
+declare -a Samples=()
+Samples+=( SMS_TChiWH )
+
+mkdir -p ${OUTDIR}; mkdir -p ${LOGDIR}
+for SAMPLE in ${Samples[@]}; do
+    echo ./processWH.py ${INDIR} ${SAMPLE} ${OUTDIR}  '>&' ${LOGDIR}/log_${SAMPLE}.txt
+    eval "nohup nice -n -10 ./processWH.py ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
+done
+
+
+##2017 Signal
+datetag=2019_10_05
+babytag=signal_f17v2_v32_0
+
+OUTDIR=/home/users/rheller/wh_babies/babies_${babytag}_${datetag}/
+LOGDIR=/home/users/rheller/wh_babies/babies_${babytag}_${datetag}/log/
+
+INDIR=/nfs-7/userdata/stopRun2/run2babies/merged_WHextra/f17v2_v32_0/
+#INDIR="/home/users/rheller/babies/merged_noskim/"
+declare -a Samples=()
+Samples+=( SMS_TChiWH )
+
+mkdir -p ${OUTDIR}; mkdir -p ${LOGDIR}
+for SAMPLE in ${Samples[@]}; do
+    echo ./processWH.py ${INDIR} ${SAMPLE} ${OUTDIR}  '>&' ${LOGDIR}/log_${SAMPLE}.txt
+    eval "nohup nice -n -10 ./processWH.py ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
+done
+
+##2018 Signal
+datetag=2019_10_05
+babytag=signal_a18v1_v32_0
+
+OUTDIR=/home/users/rheller/wh_babies/babies_${babytag}_${datetag}/
+LOGDIR=/home/users/rheller/wh_babies/babies_${babytag}_${datetag}/log/
+
+INDIR=/nfs-7/userdata/stopRun2/run2babies/merged_WHextra/a18v1_v32_0/
+#INDIR="/home/users/rheller/babies/merged_noskim/"
+declare -a Samples=()
+Samples+=( SMS_TChiWH )
+
+mkdir -p ${OUTDIR}; mkdir -p ${LOGDIR}
+for SAMPLE in ${Samples[@]}; do
+    echo ./processWH.py ${INDIR} ${SAMPLE} ${OUTDIR}  '>&' ${LOGDIR}/log_${SAMPLE}.txt
+    eval "nohup nice -n -10 ./processWH.py ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
+done
+
+exit 1
 ########################
 # 2016 MC
 
@@ -31,7 +233,7 @@ LOGDIR=/home/users/rheller/wh_babies/babies_${babytag}_${datetag}/log/
 #8_13 v5: Turn off MET res, ISR, top tag, soft btag, top tag, but turn back on PU.
 #8_13 v6: Turn off MET res, ISR, top tag, soft btag, top tag, pu, add separate PU weight branch.
 
-datetag=2019_08_13
+datetag=2019_10_05
 babytag=v31_2
 
 OUTDIR=/home/users/rheller/wh_babies/babies_${babytag}_${datetag}/s16v3/
@@ -57,16 +259,16 @@ Samples+=( TTZ TTW WZ WW DYJets)  # rare  : ttV + diboson
 
 mkdir -p ${OUTDIR}; mkdir -p ${LOGDIR}
 for SAMPLE in ${Samples[@]}; do
-
-  	echo ./processWH.py ${INDIR} ${SAMPLE} ${OUTDIR}  '>&' ${LOGDIR}/log_${SAMPLE}.txt
-   	eval "nohup nice -n -10 ./processWH.py ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
+  echo "skip"
+  	 echo ./processWH.py ${INDIR} ${SAMPLE} ${OUTDIR}  '>&' ${LOGDIR}/log_${SAMPLE}.txt
+     eval "nohup nice -n -10 ./processWH.py ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
 done
 
 
 ########################
 # 2017 MC
 
-datetag=2019_08_13
+datetag=2019_10_05
 babytag=v31_2
 
 OUTDIR=/home/users/rheller/wh_babies/babies_${babytag}_${datetag}/f17v2/
@@ -81,7 +283,7 @@ Samples+=( TTJets_2lep)
 Samples+=( ST_schan ST_tW_top ST_tW_tbar ST_tchan )    # singleT
 Samples+=( W1Jets W2Jets W3Jets W4Jets)       # Vjets : Wjets + DY
 Samples+=( TTZ TTW WZ WW DYJets)  # rare  : ttV + diboson
-#Samples+=( WWTo2L2Nu WZTo1L1Nu2Q WZTo2L2Q WZTo3LNu_amcnlo TTWJetsToQQ TTZToQQ)      # rare : smaller contributions
+# Samples+=( WWTo2L2Nu WZTo1L1Nu2Q WZTo2L2Q WZTo3LNu_amcnlo TTWJetsToQQ TTZToQQ)      # rare : smaller contributions
 
 
 mkdir -p ${OUTDIR}; mkdir -p ${LOGDIR}
@@ -94,7 +296,7 @@ done
 ########################
 # 2018 MC
 
-datetag=2019_08_13
+datetag=2019_10_05
 babytag=v31_2
 
 OUTDIR=/home/users/rheller/wh_babies/babies_${babytag}_${datetag}/a18v1/
@@ -118,116 +320,5 @@ for SAMPLE in ${Samples[@]}; do
     echo ./processWH.py ${INDIR} ${SAMPLE} ${OUTDIR}  '>&' ${LOGDIR}/log_${SAMPLE}.txt
     eval "nohup nice -n -10 ./processWH.py ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
 done
-
-
-
-########################
-# 2016 Data
-
-datetag=2019_08_13
-babytag=v31_1
-
-OUTDIR=/home/users/rheller/wh_babies/babies_${babytag}_${datetag}/
-LOGDIR=/home/users/rheller/wh_babies/babies_${babytag}_${datetag}/log/
-
-INDIR=/nfs-7/userdata/sicheng/stopbabies/merged/data_v31_1/
-#/nfs-7/userdata/sicheng/stopbabies/merged/data_v30_3/
-#/nfs-7/userdata/sicheng/stopbabies/merged_v29_14/
-
-declare -a Samples=(data_2016B data_2016C data_2016D data_2016E data_2016F data_2016G data_2016H)
-# declare -a Samples=(data_2016)
-
-mkdir -p ${OUTDIR}; mkdir -p ${LOGDIR}
-for SAMPLE in ${Samples[@]}; do
-    echo ./processWH.py ${INDIR} ${SAMPLE} ${OUTDIR}  '>&' ${LOGDIR}/log_${SAMPLE}.txt
-    eval "nohup nice -n -10 ./processWH.py ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
-done
-
-
-########################
-# 2017/18 Data
-
-datetag=2019_08_13
-babytag=v31_2
-
-OUTDIR=/home/users/rheller/wh_babies/babies_${babytag}_${datetag}/
-LOGDIR=/home/users/rheller/wh_babies/babies_${babytag}_${datetag}/log/
-
-INDIR=/nfs-7/userdata/sicheng/stopbabies/merged/data_v31_2/
-#/nfs-7/userdata/sicheng/stopbabies/merged/data_v30_3/
-#/nfs-7/userdata/sicheng/stopbabies/merged_v29_14/
-
-declare -a Samples=(data_2017B data_2017C data_2017D data_2017E data_2017F )
-Samples+=( data_2018A data_2018B data_2018C data_2018D )
-
-
-mkdir -p ${OUTDIR}; mkdir -p ${LOGDIR}
-for SAMPLE in ${Samples[@]}; do
-    echo ./processWH.py ${INDIR} ${SAMPLE} ${OUTDIR}  '>&' ${LOGDIR}/log_${SAMPLE}.txt
-    eval "nohup nice -n -10 ./processWH.py ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
-done
-
-
-### met binned 2016 ttbar
-datetag=2019_08_13
-babytag=v30_9
-
-
-OUTDIR=/home/users/rheller/wh_babies/babies_${babytag}_${datetag}/s16v3/
-LOGDIR=/home/users/rheller/wh_babies/babies_${babytag}_${datetag}/s16v3/log/
-INDIR=/nfs-7/userdata/stopRun2/run2babies/merged/s16v3_v30_9/
-
-
-declare -a Samples=(TTJets_2lep_met150_s16v3 TTJets_1lep_top_met150_s16v3 TTJets_1lep_tbar_met150_s16v3)
-
- mkdir -p ${OUTDIR}; mkdir -p ${LOGDIR}
- for SAMPLE in ${Samples[@]}; do
-     echo ./processWH.py ${INDIR} ${SAMPLE} ${OUTDIR}  '>&' ${LOGDIR}/log_${SAMPLE}.txt
-     eval "nohup nice -n -10 ./processWH.py ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
- done
-
-
-### met binned 2017 ttbar
-datetag=2019_08_13
-babytag=v30_9
-
-OUTDIR=/home/users/rheller/wh_babies/babies_${babytag}_${datetag}/f17v2/
-LOGDIR=/home/users/rheller/wh_babies/babies_${babytag}_${datetag}/f17v2/log/
-INDIR=/nfs-7/userdata/stopRun2/run2babies/merged/f17v2_v30_9/
-
-
-declare -a Samples=(TTJets_2lep_met150 TTJets_1lep_top_met150 TTJets_1lep_tbar_met150)
-
- mkdir -p ${OUTDIR}; mkdir -p ${LOGDIR}
- for SAMPLE in ${Samples[@]}; do
-     echo ./processWH.py ${INDIR} ${SAMPLE} ${OUTDIR}  '>&' ${LOGDIR}/log_${SAMPLE}.txt
-     eval "nohup nice -n -10 ./processWH.py ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
- done
-
-
-
-#### special DY samples
-datetag=2019_08_13
-babytag=v32_0z
-INDIR=/home/users/rheller/z_merged/
-OUTDIR=/home/users/rheller/wh_babies/babies_${babytag}_${datetag}/
-LOGDIR=/home/users/rheller/wh_babies/babies_${babytag}_${datetag}/log/
-
-declare -a Samples=(DYJetsToLL)
-#declare -a Samples=(DYJetsToLL_M50_s16v3 DYJetsToLL_Zpt150_s16v3)
-# declare -a Samples=(data_2016)
-
-mkdir -p ${OUTDIR}; mkdir -p ${LOGDIR}
-for SAMPLE in ${Samples[@]}; do
-    echo ./processWH.py ${INDIR} ${SAMPLE} ${OUTDIR}  '>&' ${LOGDIR}/log_${SAMPLE}.txt
-    eval "nohup nice -n -10 ./processWH.py ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
-
-done
-
-
-
-
-
-
 
 

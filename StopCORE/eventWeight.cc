@@ -386,6 +386,7 @@ void evtWgtInfo::Setup(string samplestr, int inyear, bool applyUnc, bool useBTag
        else{
          f_sig_xsec  = new TFile("../StopCORE/inputs/signal_xsec/xsec_tchi_13TeV.root","read");
          h_sig_xsec = (TH1D*) f_sig_xsec->Get("h_xsec_c1n2");
+         cout<<"Got TChi signal xsec hist"<<endl;
        }
   }
 
@@ -1034,6 +1035,12 @@ void evtWgtInfo::getXSecWeight( double &xsec_val, double &weight_xsec_up, double
   if ( is_fastsim_ && susy_xsec_fromfile ) {
     xsec_val = h_sig_xsec->GetBinContent(h_sig_xsec->FindBin(mStop));
     xsec_err = h_sig_xsec->GetBinError(h_sig_xsec->FindBin(mStop));
+    //Adjust for branching ratio built in to TChi W->lnu and H->bb samples
+    if(isTChi){
+      xsec_val *= (0.324 * 0.584); //(pdg)
+      xsec_err *= (0.324 * 0.584); //(pdg)
+    }
+    //cout<<"EVTWGT: Using xsec from file"<<endl;
   } else {
     xsec_val = babyAnalyzer.xsec();
     xsec_err = babyAnalyzer.xsec_uncert();
@@ -2923,7 +2930,7 @@ evtWgtInfo::SampleType evtWgtInfo::findSampleType( string samplestr ) {
   else cout << "[eventWeight] >> Cannot assigned sampletype for " << samplestr << endl;
 
   if (sample.BeginsWith("TTJets") && sample.EndsWith("fs")) is_fsttbar = true;
-  if(sample.BeginsWith("SMS-TChi")) {
+  if(sample.BeginsWith("SMS-TChi") || sample.BeginsWith("SMS_TChi")) {
       isTChi=true;
       cout<<"This is a TChi WH sample"<<endl;
     }

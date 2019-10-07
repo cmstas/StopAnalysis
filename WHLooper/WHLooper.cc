@@ -300,18 +300,21 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
     extraTree->SetBranchAddress("ak8pfjets_m",&v_ak8mass,&b_ak8mass);
 
     //Lepton info
+    int nWHLeptons=0;
     int nleps_tm=0;
     vector<float> * leps_pt = new vector<float>(); 
     vector<float> * leps_eta = new vector<float>();
     vector<float> * leps_phi = new vector<float>();
     vector<int> * leps_fromW = new vector<int>();
     vector<int> * leps_pdgid = new vector<int>();
+    TBranch * b_nWHLeptons = extraTree->Branch("nWHLeptons",&nWHLeptons,"nWHLeptons/I");
     TBranch * b_nleps_tm = extraTree->Branch("nleps_tm",&nleps_tm,"nleps_tm/I");
     TBranch * b_leps_pt = extraTree->Branch("leps_pt",&leps_pt);
     TBranch * b_leps_eta = extraTree->Branch("leps_eta",&leps_eta);
     TBranch * b_leps_phi = extraTree->Branch("leps_phi",&leps_phi);
     TBranch * b_leps_fromW = extraTree->Branch("leps_fromW",&leps_fromW);
     TBranch * b_leps_pdgid = extraTree->Branch("leps_pdgid",&leps_pdgid);
+    extraTree->SetBranchAddress("nWHLeptons",&nWHLeptons,&b_nWHLeptons);
     extraTree->SetBranchAddress("nleps_tm",&nleps_tm,&b_nleps_tm);
     extraTree->SetBranchAddress("leps_pt",&leps_pt,&b_leps_pt);
     extraTree->SetBranchAddress("leps_eta",&leps_eta,&b_leps_eta);
@@ -452,6 +455,7 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
 
     // Setup the event weight calculator
     evtWgt.verbose = true;
+    evtWgt.susy_xsec_fromfile = true;
     evtWgt.setDefaultSystematics(evtWgtInfo::stop_Run2, is_fastsim_);
 
     // evtWgt.apply_L1prefire_sf = false;
@@ -545,7 +549,7 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
       evtWgt.setbTagSF_medloose();
       w_BtagSF_medloose = evtWgt.getWeight(evtWgtInfo::systID(0), false);
 
-      w_lumi = kLumi * xsec() * 1000 / nEvts;
+      w_lumi = kLumi * xsec() * 1000 / nEvts; //This uses Stop1l Baby xsec, not actual xsec for TChiWH
       w_lumi_scale1fb = evtweight_ = kLumi * scale1fb();
       if(event==0){
         cout<<"h_counter and scale1b weights: "<<w_lumi<<", "<<w_lumi_scale1fb<<endl;
@@ -587,6 +591,7 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
         v_ak8mass->push_back(ak8pfjets_p4().at(ijet).mass());
       }
       nfatjets=v_ak8pt->size();
+      nWHLeptons=0;
       nleps_tm=0;
       leps_pt->clear();
       leps_eta->clear();
@@ -631,6 +636,9 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
           leps_fromW->push_back(0);
 
         if(abs(lep1_pdgid())==11){
+          //this is a subset of goodleps (so POG ID is already applied)
+          if(lep1_p4().pt()>30&&lep1_relIso()*lep1_p4().pt()<5&&abs(lep1_p4().eta())<1.4442) nWHLeptons++;
+
           els_pt->push_back(lep1_p4().pt());
           els_phi->push_back(lep1_p4().phi());
           els_eta->push_back(lep1_p4().eta());
@@ -644,6 +652,7 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
         }
 
         else if(abs(lep1_pdgid())==13){
+          if(lep1_p4().pt()>25&&lep1_relIso()*lep1_p4().pt()<5&&abs(lep1_p4().eta())<2.1) nWHLeptons++;
           mus_pt->push_back(lep1_p4().pt());
           mus_phi->push_back(lep1_p4().phi());
           mus_eta->push_back(lep1_p4().eta());
@@ -670,6 +679,7 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
           leps_fromW->push_back(0);
 
         if(abs(lep2_pdgid())==11){
+          if(lep2_p4().pt()>30&&lep2_relIso()*lep2_p4().pt()<5&&abs(lep2_p4().eta())<1.4442) nWHLeptons++;
           els_pt->push_back(lep2_p4().pt());
           els_phi->push_back(lep2_p4().phi());
           els_eta->push_back(lep2_p4().eta());
@@ -683,6 +693,7 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
         }
 
         else if(abs(lep2_pdgid())==13){
+          if(lep2_p4().pt()>25&&lep2_relIso()*lep2_p4().pt()<5&&abs(lep2_p4().eta())<2.1) nWHLeptons++;
           mus_pt->push_back(lep2_p4().pt());
           mus_phi->push_back(lep2_p4().phi());
           mus_eta->push_back(lep2_p4().eta());
