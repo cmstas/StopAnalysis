@@ -824,7 +824,7 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
       stitch =true;
       //cout<<dsname<<" "<<genmet()<<" "<<dsname.Contains("TTJets")<<" "<<!dsname.Contains("genMET")<<endl;
 
-      if(dsname.Contains("TTJets") && !dsname.Contains("genMET") && genmet()>150.) stitch = false;
+      if(dsname.Contains("TTJets") && !dsname.Contains("genMET") && ((year()<2018 && genmet()>150.) || (year()==2018 && genmet()>80.))) stitch = false;
       //cout<<stitch<<endl;
       
       if((dsname.Contains("W1Jets") || dsname.Contains("W2Jets") || dsname.Contains("W3Jets") || dsname.Contains("W4Jets"))  && !dsname.Contains("NuPt-200") && maxnupt>200.) stitch = false;
