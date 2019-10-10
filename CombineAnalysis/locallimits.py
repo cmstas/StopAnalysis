@@ -11,13 +11,16 @@ have_tqdm = False
 verbose = True
 dosignif = True
 dolimits = True
+noupdate = False
 
 os.nice(10)
 
 def combine_cards(sig):
+    cardname = combineddir+'/datacard_'+sig+'.txt'
+    if noupdate and os.path.isfile(cardname):
+        return cardname
     os.system('./CombineCards.sh {} {}/'.format(sig, carddir))
-    return combineddir+'/datacard_'+sig+'.txt'
-
+    return cardname
 
 def run_asymptotic(card):
     # stagger the processes so that they don't all do createCards
@@ -73,6 +76,7 @@ if __name__ == "__main__":
     parser.add_argument('sigscan', nargs='?', default='std_T2tt')
     parser.add_argument('--runsignif', action='store_true', default=False)
     parser.add_argument('--nolimits', action='store_true', default=False)
+    parser.add_argument('--noupdate', action='store_true', default=False)
 
     args = parser.parse_args()
 
@@ -84,6 +88,7 @@ if __name__ == "__main__":
     sigscan = args.sigscan
     dosignif = args.runsignif
     dolimits = not args.nolimits
+    noupdate = args.noupdate
     # print 'sigscan =', sigscan, ', dosignif =', dosignif, ', dolimits =', dolimits
 
     print "Doing limits from cards in ", carddir

@@ -74,7 +74,7 @@ void Make2DSignifHistos(TString signaltype="std_T2tt", TString indir="significan
   int mLSPLow   = 0;
   int mLSPHigh  = 1150;
   int mLSPStep  = 25;
-  int binsize = 5;
+  double binsize = 12.5;
   int nbinsx = (mStopHigh - mStopLow) / binsize + 1;
   int nbinsy = (mLSPHigh - mLSPLow) / binsize + 1;
   double xlow  = mStopLow  - binsize / 2.0;
@@ -85,7 +85,7 @@ void Make2DSignifHistos(TString signaltype="std_T2tt", TString indir="significan
   if (!indir.EndsWith("/")) indir += "/";
   cout << "inputs from " << indir << endl;
   TString outputdir = indir;
-  outputdir += "histo/";
+  outputdir += (binsize == 25)? "histo_bin25/" : (binsize == 12.5)? "histo_bin12p5/" : "histo/";
   cout << "make directory " << outputdir << endl;
   MakeOutputDir(outputdir);
 
@@ -114,7 +114,7 @@ void Make2DSignifHistos(TString signaltype="std_T2tt", TString indir="significan
       if (lsp == 0) lsp = 1;
       if (signaltype.Contains("T2tt")) {
         if (stop-lsp == 75) lsp -= 12;
-        if (stop-lsp == 175) {
+        if (stop-lsp == 175 && binsize < 8) {
           if (tcorpt == 1) stop -= 8;
           if (tcorpt == 2) stop += 8;
           tcorpt++;

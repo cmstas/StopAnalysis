@@ -35,7 +35,7 @@
 
 using namespace std;
 
-void GetCorrelationMatrix(TString inputfilename="mlfit.root"){
+void GetCorrelationMatrix(TString inputfilename="fitDiagnostics.root"){
 
   TFile *fin = TFile::Open(inputfilename);
   TH2D *hcov = (TH2D*)fin->Get("shapes_prefit/overall_total_covar");
