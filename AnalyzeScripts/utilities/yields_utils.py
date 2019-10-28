@@ -75,6 +75,28 @@ def getYieldEInTopoBins(f, srNames, hname='metbins', backup_hname=None):
 
     return yields
 
+def getYieldEInTopoBins3D(f, srNames, mstop, mlsp, hname='metbins', backup_hname=None):
+    yields = []
+    for sr in srNames:
+        hist = f.Get(sr+'/hSMS_'+hname)
+        if not hist and backup_hname:
+            hist = f.Get(sr+'/hSMS_'+backup_hname)
+        if not hist:
+            print "Can't find", sr+'/hSMS_'+hname, "from", f.GetName(), "!! Returning 0s";
+            hist = f.Get(sr+'/h_metbins')
+            if not hist: print "This should not happen!"
+            yields.append([E(0,0)]*hist.GetNbinsX())
+            continue
+        topoylds = []
+        for ibin in range(1, hist.GetNbinsX()+1):
+            ibiny = hist.GetYaxis().FindBin(mstop)
+            ibinz = hist.GetZaxis().FindBin(mlsp)
+            topoylds.append(E(hist.GetBinContent(ibin,ibiny,ibinz), hist.GetBinError(ibin,ibiny,ibinz)))
+        yields.append(topoylds)
+
+    return yields
+
+
 def getYieldEInFlatBins(f, srNames, hname='metbins', backup_hname=None):
     return  sum(getYieldEInTopoBins(f, srNames, hname, backup_hname),[])
 
@@ -139,15 +161,26 @@ def rond(y, errup=None, errdn=None, digit=2):
     if y > 1000: digit = 0
     if y > 100: digit = 1
     if y > 10: digit = 1
-    if type(y) == float:
-        y = round(y,digit)
 
+    if errup != None and y > 0:
+        aerr = errup if errdn==None else min(errup,errdn)
+        if aerr > 3.55: digit = 0
+        elif aerr > 0.355: digit = 1
+        elif aerr > 0.095: digit = 2
+        else: digit = 2
+
+    if type(y) == float:
+        y = int(round(y,digit)) if digit == 0 else round(y,digit)
     if errup == None:
         return y
     elif errdn == None:
-        return y, round(errup,digit)
+        err = int(round(errup,digit)) if digit == 0 else round(errup,digit)
+        return y, err
     else:
-        return y, round(errup,digit), round(errdn,digit)
+        errup = int(round(errup,digit)) if digit == 0 else round(errup,digit)
+        errdn = int(round(errdn,digit)) if digit == 0 else round(errdn,digit)
+        if errdn > y: errdn = y
+        return y, errup, errdn
 
 
 def getPredStrDataDriven(f, srNames, systs=None, showUpDn=True):
@@ -190,10 +223,11 @@ def getPredStrDataDriven(f, srNames, systs=None, showUpDn=True):
     # y_CR = [ '${0}^{{+{1}}}_{{-{2}}}$'.format(int(y.val), round(e[0],2), round(e[1],2)) for y, e in zip(yld_CR, pderr)])
     # R_CR = [(d/m).round(2) for d, m in zip(yld_CR, yMC_CR)]
     if showUpDn:
-        pstr = [ '${0}^{{+{1}+{3}}}_{{-{2}-{4}}}$'.format(y, round(sup*y,2), round(sdn*y,2), round(pde[0]*a,2), round(pde[1]*a,2)) for y,pde,a,sup,sdn in zip(preds, pderr, alpha, systup, systdn)]
-    else:
+        # pstr = [ '${0}^{{+{1}+{3}}}_{{-{2}-{4}}}$'.format(y, round(sup*y,2), round(sdn*y,2), round(pde[0]*a,2), round(pde[1]*a,2)) for y,pde,a,sup,sdn in zip(preds, pderr, alpha, systup, systdn)]
         # pstr = [ '${0}^{{+{1}}}_{{-{2}}}\pm{3}$'.format(y, round(pde[0]*a,2), round(pde[1]*a,2), max(round(sup*y,2), round(sdn*y,2))) for y,pde,a,sup,sdn in zip(preds, pderr, alpha, systup, systdn)]
         pstr = [ '${0}^{{+{1}}}_{{-{2}}}$'.format(*rond(y, sqrt((pde[0]*a)**2+(sup*y)**2), sqrt((pde[1]*a)**2+(sdn*y)**2), 2)) for y,pde,a,sup,sdn in zip(preds, pderr, alpha, systup, systdn)]
+    else:
+        pstr = [ '${0} \pm {1}$'.format(*rond(y, (sqrt((pde[0]*a)**2+(sup*y)**2)+sqrt((pde[1]*a)**2+(sdn*y)**2))*0.5, 2)) for y,pde,a,sup,sdn in zip(preds, pderr, alpha, systup, systdn)]
     peup = [ round(sqrt((pde[0]*a)**2 +(sup*y)**2),2) for y,pde,a,sup in zip(preds, pderr, alpha, systup)]
     pedn = [ round(sqrt((pde[1]*a)**2 +(sdn*y)**2),2) for y,pde,a,sdn in zip(preds, pderr, alpha, systdn)]
 
