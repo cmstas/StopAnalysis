@@ -89,7 +89,7 @@ def printDataDrivenTable(f, srNames, crname='', systs=None, doAsymErr=True):
         tfstr   = [ '${0}^{{+{1}}}_{{-{2}}}$'.format(*rond(a, a*(1+sup), a*(1-sdn))) for a, sup, sdn in zip(alpha, systup, systdn)]
         yCRstr  = [ '${0}^{{+{1}}}_{{-{2}}}$'.format(*rond(int(y.val), e[0], e[1])) for y, e in zip(yld_CR, pderr)]
         Ratstr  = [ (d/m).round(2) for d, m in zip(yld_CR, yMC_CR)]
-        predstr = [ '${0}^{{+{1}+{3}}}_{{-{2}-{4}}}$'.format(rond(y), rond(y, pde[0]*a)[1],rond(y,pde[1]*a)[1], rond(y, sup*y)[1], rond(y, sdn*y)[1]) for y,pde,a,sup,sdn in zip(preds, pderr, alpha, systup, systdn)]
+        predstr = [ '${0}^{{+{1}+{3}}}_{{-{2}-{4}}}$'.format(rond(y,pde[1]*a)[0], rond(y, pde[0]*a)[1],rond(y,pde[1]*a)[1], rond(y, sup*y)[1], rond(y, sdn*y)[1]) for y,pde,a,sup,sdn in zip(preds, pderr, alpha, systup, systdn)]
         for i in range(len(preds)-1):
             if yld_CR[i] == yld_CR[i+1]:
                 # tfstr[i] = '\\multirow{{2}}{{*}}{{${0}^{{+{1}}}_{{-{2}}}}}$'.format(*rond(a, a*(1+sup), a*(1-sdn)))
@@ -112,7 +112,7 @@ def printDataDrivenTable(f, srNames, crname='', systs=None, doAsymErr=True):
         tab.add_column(crname+'Data CR', [ '${0}^{{+{1}}}_{{-{2}}}$'.format(*rond(int(y.val), e[0], e[1])) for y, e in zip(yld_CR, pderr)])
         # tab.add_column(crname+'R$_{CR}$(data/MC)', [ '({})%'.format((d/m*100).round(1)) for d, m in zip(yld_CR, yMC_CR)])
         tab.add_column(crname+'R$_{CR}$(data/MC)', [(d/m).round(2) for d, m in zip(yld_CR, yMC_CR)])
-        tab.add_column(crname+'Prediction', [ '${0}^{{+{1}+{3}}}_{{-{2}-{4}}}$'.format(rond(y), rond(y, pde[0]*a)[1],rond(y,pde[1]*a)[1], rond(y, sup*y)[1], rond(y, sdn*y)[1]) for y,pde,a,sup,sdn in zip(preds, pderr, alpha, systup, systdn)])
+        tab.add_column(crname+'Prediction', [ '${0}^{{+{1}+{3}}}_{{-{2}-{4}}}$'.format(rond(y, pde[1]*a)[0], rond(y, pde[0]*a)[1],rond(y,pde[1]*a)[1], rond(y, sup*y)[1],rond(y, sdn*y)[1]) for y,pde,a,sup,sdn in zip(preds, pderr, alpha, systup, systdn)])
     else:
         tab.add_column(crname+'TF$_{CR}^{SR}$', [ E(a.val, a.val*max(sup,sdn)).round(2) for a, sup, sdn in zip(alpha, systup, systdn)])
         tab.add_column(crname+'data CR', [y.round(2) for y in yld_CR])
@@ -428,6 +428,70 @@ def makeBkgCompositionTable(f1, srNames, savename='run2', fdata=None, nofraction
     tab2.print_pdf('bkgCompositionYields_'+savename+'.pdf')
 
 
+def printCutFlowTable(f1, sufs=['',], hname='cutflow', savename='T2tt', tab=None):
+
+    if tab == None: tab = Table()
+    for suf in sufs:
+        cfhist = getYieldEInTopoBins(f1, ['testCutflow',], '{}{}'.format(hname, suf))
+        tab.add_column(suf, ['${} \\pm {}$'.format(*rond(y.val, y.err)) for y in sum(cfhist,[])])
+    tab.print_table()
+    tab.set_theme_latex()
+    tab.print_pdf('cutflow_'+savename+'.pdf')
+    return tab
+
+def makeSigYieldTable(f1, srNames, sigpoints=[], savename='run2', tab=None):
+
+    metrange = getBinningFromTopoSRs(f1, srNames)
+
+    if tab == None: tab = Table()
+    tab.add_column('SR name', sum([[sr]*n for sr, n in zip(srNames, map(len, metrange))], []))
+    tab.add_column('MET [GeV]', [m[0]+' -- '+m[1] for m in sum(metrange, [])])
+    for mstop, mlsp in sigpoints:
+        preds_sig = getYieldEInTopoBins3D(f1, srNames, mstop, mlsp, 'metbins')
+        tab.add_column('({},{})'.format(mstop,mlsp), ['${} \\pm {}$'.format(*rond(y.val, y.err)) for y in sum(preds_sig,[])])
+    tab.print_table()
+    tab.set_theme_latex()
+    tab.print_pdf('sigYields_'+savename+'.pdf')
+    return tab
+
+def makeSignalYieldTables(indir, ysuf='run2'):
+
+
+    srNames   = ['srA0', 'srA1', 'srA2', 'srB', 'srC','srD', 'srE0', 'srE1', 'srE2', 'srE3', 'srF', 'srG0', 'srG1', 'srG2', 'srG3', 'srH', 'srI', 'srJ']
+    
+    f_t2tt = r.TFile(indir+'/SMS_T2tt_'+ysuf+'.root','read')
+    # pts_t2tt = [(1200,100), (1050,50), (850,100), (650,350), (525, 350), (437, 350)]
+    pts_t2tt = [(1200,100), (1050,50), (850,100), (650,350)]
+    pts_corr = [(500, 325), (425, 350), (400, 300)]
+
+    f_t2bW = r.TFile(indir+'/SMS_T2bW_'+ysuf+'.root','read')
+    pts_t2bW = [(950,100), (800,350), (600,400)]
+
+    f_t2bt = r.TFile(indir+'/SMS_T2bt_'+ysuf+'.root','read')
+    pts_t2bt = [(900,50), (750,400), (500,300)]
+
+    makeSigYieldTable(f_t2tt, srNames, pts_t2tt, 'test_T2tt')
+    makeSigYieldTable(f_t2bW, srNames, pts_t2bW, 'test_T2bW')
+    makeSigYieldTable(f_t2bt, srNames, pts_t2bt, 'test_T2bt')
+
+    t2tt_sufs = ['_{}_{}'.format(mstop,mlsp) for mstop, mlsp in pts_t2tt]
+    t2bW_sufs = ['_{}_{}'.format(mstop,mlsp) for mstop, mlsp in pts_t2bW]
+    t2bt_sufs = ['_{}_{}'.format(mstop,mlsp) for mstop, mlsp in pts_t2bt]
+    corr_sufs = ['_{}_{}'.format(mstop,mlsp) for mstop, mlsp in pts_corr]
+
+    print '------------- T2tt --------------'
+    printCutFlowTable(f_t2tt, t2tt_sufs, 'cutflow', 'cutflow_T2tt')
+    printCutFlowTable(f_t2tt, t2tt_sufs, 'selcat',  'selcat_T2tt')
+    printCutFlowTable(f_t2tt, corr_sufs, 'corcutflow', 'corcutflow_T2tt')
+    printCutFlowTable(f_t2tt, corr_sufs, 'corselcat',  'corselcat_T2tt')
+    print '------------- T2bW --------------'
+    printCutFlowTable(f_t2bW, t2bW_sufs, 'cutflow', 'cutflow_T2bW')
+    printCutFlowTable(f_t2bW, t2bW_sufs, 'selcat',  'selcat_T2bW')
+    print '------------- T2bt --------------'
+    printCutFlowTable(f_t2bt, t2bt_sufs, 'cutflow', 'cutflow_T2bt')
+    printCutFlowTable(f_t2bt, t2bt_sufs, 'selcat',  'selcat_T2bt')
+
+
 def makeBkgEstimationTableWJets():
     f1 = r.TFile('../StopLooper/output/combRun2_v30_s3/allBkg_run2.root')
 
@@ -480,7 +544,7 @@ def makeSystUncertaintyMaxTable(indir, srNames, bkgType='lostlep'):
 
 def printAllTables():
 
-    bvsuf = 'v31_s12'
+    bvsuf = 'v31_s21'
 
     f1 = r.TFile('../StopLooper/output/combRun2_'+bvsuf+'/allBkg_run2.root')
     f2 = r.TFile('../StopLooper/output/combRun2_'+bvsuf+'/allData_run2.root')
@@ -506,8 +570,8 @@ def printAllTables():
 
     indir = '../StopLooper/output/combRun2_'+bvsuf
 
-    makeBkgEstimateTablesLostLepton(indir)
-    makeBkgEstimateTables1LepFromW(indir)
+    # makeBkgEstimateTablesLostLepton(indir)
+    # makeBkgEstimateTables1LepFromW(indir)
 
     # # # # # # # # # # # # # # #
     # Year separated results
@@ -516,23 +580,26 @@ def printAllTables():
     cr2lNames = [ sr.replace('sr', 'cr2l') for sr in srNames ]
     cr0bNames = [ sr.replace('sr', 'cr0b') for sr in srNames ]
 
-    # f16 = r.TFile('../StopLooper/output/samp16_'+bvsuf+'/allBkg_16.root')
-    # d16 = r.TFile('../StopLooper/output/samp16_'+bvsuf+'/allData_16.root')
-    # makeBkgCompositionTable(f16, srNames,   '2016_SR_all')
-    # makeBkgCompositionTable(f16, cr2lNames, '2016_CR2l_all', fdata=d16)
-    # makeBkgCompositionTable(f16, cr0bNames, '2016_CR0b_all', fdata=d16)
+    f16 = r.TFile('../StopLooper/output/combRun2_'+bvsuf+'/allBkg_16.root')
+    d16 = r.TFile('../StopLooper/output/combRun2_'+bvsuf+'/allData_16.root')
+    makeBkgCompositionTable(f16, srNames,   '2016_SR_all')
+    makeBkgCompositionTable(f16, srNames,   '2016_SRwd_all', fdata=d16)
+    makeBkgCompositionTable(f16, cr2lNames, '2016_CR2l_all', fdata=d16)
+    makeBkgCompositionTable(f16, cr0bNames, '2016_CR0b_all', fdata=d16)
 
-    # f17 = r.TFile('../StopLooper/output/samp17_'+bvsuf+'/allBkg_17.root')
-    # d17 = r.TFile('../StopLooper/output/samp17_'+bvsuf+'/allData_17.root')
-    # makeBkgCompositionTable(f17, srNames,   '2017_SR_all')
-    # makeBkgCompositionTable(f17, cr2lNames, '2017_CR2l_all', fdata=d17)
-    # makeBkgCompositionTable(f17, cr0bNames, '2017_CR0b_all', fdata=d17)
+    f17 = r.TFile('../StopLooper/output/combRun2_'+bvsuf+'/allBkg_17.root')
+    d17 = r.TFile('../StopLooper/output/combRun2_'+bvsuf+'/allData_17.root')
+    makeBkgCompositionTable(f17, srNames,   '2017_SR_all')
+    makeBkgCompositionTable(f17, srNames,   '2017_SRwd_all', fdata=d17)
+    makeBkgCompositionTable(f17, cr2lNames, '2017_CR2l_all', fdata=d17)
+    makeBkgCompositionTable(f17, cr0bNames, '2017_CR0b_all', fdata=d17)
 
-    # f18 = r.TFile('../StopLooper/output/samp18_'+bvsuf+'/allBkg_18.root')
-    # d18 = r.TFile('../StopLooper/output/samp18_'+bvsuf+'/allData_18.root')
-    # makeBkgCompositionTable(f18, srNames,   '2018_SR_all')
-    # makeBkgCompositionTable(f18, cr2lNames, '2018_CR2l_all', fdata=d18)
-    # makeBkgCompositionTable(f18, cr0bNames, '2018_CR0b_all', fdata=d18)
+    f18 = r.TFile('../StopLooper/output/combRun2_'+bvsuf+'/allBkg_18.root')
+    d18 = r.TFile('../StopLooper/output/combRun2_'+bvsuf+'/allData_18.root')
+    makeBkgCompositionTable(f18, srNames,   '2018_SR_all')
+    makeBkgCompositionTable(f18, srNames,   '2018_SRwd_all', fdata=d18)
+    makeBkgCompositionTable(f18, cr2lNames, '2018_CR2l_all', fdata=d18)
+    makeBkgCompositionTable(f18, cr0bNames, '2018_CR0b_all', fdata=d18)
 
 
 def makePredictionTable(indir, srNames, ysuf='run2', showdata=False):
@@ -600,7 +667,10 @@ def makeBetterPredictionTable(indir, ysuf='run2', showdata=False, showUpDn=True)
     ytot = [ p2+pw+p1+pz for p2, pw, p1, pz in zip(pred2l, pred1l, pred1lt, predZnu)]
     yeup = [ sqrt(p2**2+pw**2+p1**2+pz**2) for p2, pw, p1, pz in zip(e2lup, e1lup, e1ltup, Znuup)]
     yedn = [ sqrt(p2**2+pw**2+p1**2+pz**2) for p2, pw, p1, pz in zip(e2ldn, e1ldn, e1ltdn, Znudn)]
-    strtot = [ '${0}^{{+{1}}}_{{-{2}}}$'.format(*rond(y, eup, edn)) for y, eup, edn in zip(ytot, yeup, yedn) ]
+    if showUpDn:
+        strtot = [ '${0}^{{+{1}}}_{{-{2}}}$'.format(*rond(y, eup, edn)) for y, eup, edn in zip(ytot, yeup, yedn) ]
+    else:
+        strtot = [ '${0} \pm {1}$'.format(*rond(y, (eup+edn)*0.5)) for y, eup, edn in zip(ytot, yeup, yedn) ]
 
     if showdata:
         # strdat = [ '${0}^{{+{1}}}_{{-{2}}}$'.format(int(y.val), round(getPoissonErrors(y.val)[0],2), round(getPoissonErrors(y.val)[1],2)) for y in getYieldEInFlatBins(f_data, srNames)]
@@ -625,7 +695,10 @@ def makeBetterPredictionTable(indir, ysuf='run2', showdata=False, showUpDn=True)
 
     tab.print_table()
     tab.set_theme_latex()
-    tab.print_pdf('ResultTable_'+ysuf+'.pdf')
+    if showUpDn:
+        tab.print_pdf('ResultTable_'+ysuf+'.pdf')
+    else:
+        tab.print_pdf('ResultTable_'+ysuf+'_sym.pdf')
 
 
 if __name__ == '__main__':
@@ -642,15 +715,17 @@ if __name__ == '__main__':
     indir16 = '../StopLooper/output/samp16_'+bvsuf
     # makePredictionTable(indir16, srNames, '16', True)
 
-    bvsuf = 'v31_s18'
+    bvsuf = 'v31_s21' # final result!!
     indir = '../StopLooper/output/combRun2_'+bvsuf
     # makeBkgEstimateTablesLostLepton(indir)
     # makeBkgEstimateTables1LepFromW(indir)
 
     # makePredictionTable(indir, srNames, 'run2', True)
-    makeBetterPredictionTable(indir, 'run2', True, False)
+    # makeBetterPredictionTable(indir, 'run2', True, False) # result plot!!
 
     # makeMETExtrInfoTable()
     # makeSystUncertaintyMaxTable(indir, srNames)
     # makeBkgEstimationTableWJets()
     # makeTFComparisonTable()
+
+    makeSignalYieldTables('../StopLooper/output/combRun2_v31_s21_cf4')

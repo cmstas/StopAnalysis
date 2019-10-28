@@ -8,7 +8,7 @@ from utilities.errors import *
 r.gROOT.SetBatch(1)
 r.gStyle.SetOptStat('')
 
-def moveOverFlowToLastBin1D(hist, newXmax = 800):
+def moveOverFlowToLastBin1D(hist, newXmax=-1.0):
     nbin = hist.GetNbinsX();
     if hist.GetBinContent(nbin+1) > 0:
         err = r.Double();
@@ -17,12 +17,13 @@ def moveOverFlowToLastBin1D(hist, newXmax = 800):
         hist.SetBinContent(nbin+1, 0);
         hist.SetBinError(nbin+1, 0);
 
-    hist.GetXaxis().SetRangeUser(hist.GetXaxis().GetXmin(), newXmax)
+    if newXmax > 0:
+        hist.GetXaxis().SetRangeUser(hist.GetXaxis().GetXmin(), newXmax)
 
     return hist
 
 
-def DrawHeaderText(canvas, lumi=137.2):
+def DrawHeaderText(canvas, lumi=137.2, state="Preliminary"):
     tCMS = r.TLatex()
     tCMS.SetNDC(1)
     tCMS.SetTextFont(61)
@@ -37,16 +38,17 @@ def DrawHeaderText(canvas, lumi=137.2):
     tplm.SetTextAlign(11)
     tplm.SetTextSize(0.048)
     canvas.cd()
-    tplm.DrawLatex(canvas.GetLeftMargin()+0.105, 1.0-canvas.GetTopMargin()+0.012, "Preliminary")
+    tplm.DrawLatex(canvas.GetLeftMargin()+0.110, 1.0-canvas.GetTopMargin()+0.012, state)
 
-    ttext = r.TLatex()
-    ttext.SetNDC(1)
-    ttext.SetTextFont(42)
-    ttext.SetTextAlign(31)
-    ttext.SetTextSize(0.048)
-    canvas.cd()
-    text = "{0} {1}^{{-1}} ({2} TeV)".format(lumi,"fb",13)
-    ttext.DrawLatex(1.0-canvas.GetRightMargin()-0.01, 1.0-canvas.GetTopMargin()+0.012, text)
+    if lumi:
+        ttext = r.TLatex()
+        ttext.SetNDC(1)
+        ttext.SetTextFont(42)
+        ttext.SetTextAlign(31)
+        ttext.SetTextSize(0.048)
+        canvas.cd()
+        text = "{0} {1}^{{-1}} ({2} TeV)".format(lumi,"fb",13)
+        ttext.DrawLatex(1.0-canvas.GetRightMargin()-0.01, 1.0-canvas.GetTopMargin()+0.012, text)
 
 def plotHT5overHT():
     f1 = r.TFile('../StopLooper/output/samp17_v31_m12_noht5/data_2017BtoE.root')
@@ -93,7 +95,13 @@ def plotDataMETinEMuCR(src=0, plot='metbins', hdir='cremuA1', bsuf='v31_m16_noME
     r.gStyle.SetPadTickY(1)
     r.gStyle.SetFrameBorderMode(0)
 
-    srcstr = 'allData' if src == 0 else 'allBkg'
+    srcstr = 'allData' if src == 0 else 'allBkg' if src == 1 else 'ttbar_fastsim' if src == 2 else 'allBkg'
+    if src == 0: srcstr = 'allData'
+    elif src == 1: srcstr = 'allBkg'
+    elif src == 2: srcstr = 'ttbar_fastsim'
+    elif src == 3: srcstr = 'SMS_T2tt_425_325'
+    elif src == 4: srcstr = 'TTTo2L2Nu'
+
     f16 = r.TFile('../StopLooper/output/samp16_'+bsuf+'/'+srcstr+'_16.root')
     f17 = r.TFile('../StopLooper/output/samp17_'+bsuf+'/'+srcstr+'_17.root')
     f18 = r.TFile('../StopLooper/output/samp18_'+bsuf+'/'+srcstr+'_18.root')
@@ -164,13 +172,16 @@ def plotDataMETinEMuCR(src=0, plot='metbins', hdir='cremuA1', bsuf='v31_m16_noME
     h17.Scale(35.9/42.0)
     h18.Scale(35.9/59.9)
 
+    # # Temporary
+    # h17.Scale(1.*h18.Integral()/h17.Integral())
+
     h16.Draw()
     h17.Draw("same")
     h18.Draw("same")
 
     leg = r.TLegend(0.68, 0.68, 0.92, 0.89)
 
-    srcstr = 'data' if src == 0 else 'MC'
+    srcstr = 'data' if src == 0 else 'MC' if src == 1 else 'ttFS' if src == 2 else 'T2tt' if src == 3 else 'MC'
     leg.AddEntry(h16, srcstr+' 2016')
     leg.AddEntry(h17, srcstr+' 2017')
     leg.AddEntry(h18, srcstr+' 2018')
@@ -179,7 +190,7 @@ def plotDataMETinEMuCR(src=0, plot='metbins', hdir='cremuA1', bsuf='v31_m16_noME
     DrawHeaderText(mainPad, 35.9)
 
     ratioPad.cd()
-    
+
     h_axis_ratio = r.TH1D('ratio_axis','', h16.GetNbinsX(), h16.GetXaxis().GetXmin(), xmax)
     h_axis_ratio.GetYaxis().SetNdivisions(4)
     h_axis_ratio.GetYaxis().SetLabelSize(0.15)
@@ -297,7 +308,7 @@ def plotDoubleRatio(hdir='cremuA1', bsuf='v31_cremu4', suf='ge1sb'):
     # DrawHeaderText(mainPad, 35.9)
 
     ratioPad.cd()
-    
+
     h_axis_ratio = r.TH1D('ratio_axis','', rbkg.GetNbinsX(), rbkg.GetXaxis().GetXmin(), rbkg.GetXaxis().GetXmax())
     h_axis_ratio.GetYaxis().SetNdivisions(4)
     h_axis_ratio.GetYaxis().SetLabelSize(0.15)
@@ -325,7 +336,6 @@ def plotDoubleRatio(hdir='cremuA1', bsuf='v31_cremu4', suf='ge1sb'):
     dubr.Draw("same")
 
     c0.SaveAs('doubleRatio_nvtx_'+suf+'.pdf')
-
 
 def plotTopTaggerMatchingEfficiency(mstop = 1200, mlsp = 100, base = 'genbase'):
 
@@ -361,66 +371,106 @@ def plotTopTaggerMatchingEfficiency(mstop = 1200, mlsp = 100, base = 'genbase'):
     hsf.Write()
     # esf.Write()
 
-def plotTopTaggerSF3pt(tag = 'rtag', base = 'genbase'):
+def plotTopTaggerSF3pt(tag = 'rtag', base = 'genbase', samp = '2017', suf = ''):
 
-    ffull1 = r.TFile('../StopLooper/output/samp17_v31_ttagtest/T2tt_mStop{}_mLSP{}_f17v2_1.root'.format(1200,100))
-    ffull2 = r.TFile('../StopLooper/output/samp17_v31_ttagtest/T2tt_mStop{}_mLSP{}_f17v2_1.root'.format(850,100))
-    ffull3 = r.TFile('../StopLooper/output/samp17_v31_ttagtest/T2tt_mStop{}_mLSP{}_f17v2_1.root'.format(650,350))
-    ffast = r.TFile('../StopLooper/output/samp17_v31_ttagtest/SMS_T2tt_17.root')
+    # ffull1 = r.TFile('../StopLooper/output/samp17_v31_ttagtest/T2tt_mStop{}_mLSP{}_f17v2_1.root'.format(1200,100))
+    # ffull2 = r.TFile('../StopLooper/output/samp17_v31_ttagtest/T2tt_mStop{}_mLSP{}_f17v2_1.root'.format(850,100))
+    # ffull3 = r.TFile('../StopLooper/output/samp17_v31_ttagtest/T2tt_mStop{}_mLSP{}_f17v2_1.root'.format(650,350))
+    # ffast = r.TFile('../StopLooper/output/samp17_v31_ttagtest/SMS_T2tt_17.root')
 
-    ext = 'tftop_' if tag == 'rtag' else 'ak8top_' if tag == 'mtag' else ''
+    ssuf = 'a18v1' if samp == '2018' else 'f17v2' if samp == '2017' else 's16v3' if samp == '2016' else ''
 
-    nfull1 = ffull1.Get('testGeneral/hnum_{}_{}_{}pt'.format(tag,base,ext))
-    nfull2 = ffull2.Get('testGeneral/hnum_{}_{}_{}pt'.format(tag,base,ext))
-    nfull3 = ffull3.Get('testGeneral/hnum_{}_{}_{}pt'.format(tag,base,ext))
-    dfull1 = ffull1.Get('testGeneral/hden_{}_{}_{}pt'.format(tag,base,ext))
-    dfull2 = ffull2.Get('testGeneral/hden_{}_{}_{}pt'.format(tag,base,ext))
-    dfull3 = ffull3.Get('testGeneral/hden_{}_{}_{}pt'.format(tag,base,ext))
+    ffull1 = r.TFile('../StopLooper/output/samp1x_v31_ttagtest9/T2tt_mStop{}_mLSP{}_{}.root'.format(650, 350, ssuf))
+    ffast = r.TFile('../StopLooper/output/samp1x_v31_ttagtest9/SMS_T2tt_{}.root'.format(samp[2:]))
 
-    nfull = nfull1.Clone('hn_fullsim_3pt')
-    nfull.Add(nfull2)
-    nfull.Add(nfull3)
-    dfull = dfull1.Clone('hd_fullsim_3pt')
-    dfull.Add(dfull2)
-    dfull.Add(dfull3)
+    ext = 'tftop_pt' if tag == 'rtag' else 'ak8top_pt' if tag == 'mtag' else ''
 
-    dfast1 = ffast.Get('testGeneral/hden_{}_{}_{}pt_{}_{}'.format(tag,base,ext,1200,100))
-    dfast2 = ffast.Get('testGeneral/hden_{}_{}_{}pt_{}_{}'.format(tag,base,ext,850,100))
-    dfast3 = ffast.Get('testGeneral/hden_{}_{}_{}pt_{}_{}'.format(tag,base,ext,650,350))
-    nfast1 = ffast.Get('testGeneral/hnum_{}_{}_{}pt_{}_{}'.format(tag,base,ext,1200,100))
-    nfast2 = ffast.Get('testGeneral/hnum_{}_{}_{}pt_{}_{}'.format(tag,base,ext,850,100))
-    nfast3 = ffast.Get('testGeneral/hnum_{}_{}_{}pt_{}_{}'.format(tag,base,ext,650,350))
+    if 'bin' in suf:
+        ext += 'bin'
+
+    nfull1 = ffull1.Get('testGeneral/hnum_{}_{}_{}'.format(tag,base,ext))
+    dfull1 = ffull1.Get('testGeneral/hden_{}_{}_{}'.format(tag,base,ext))
+
+    nfull = nfull1.Clone('hn_{}_{}_fullsim_3pt'.format(tag,base))
+    dfull = dfull1.Clone('hd_{}_{}_fullsim_3pt'.format(tag,base))
+
+    # dfast1 = ffast.Get('testGeneral/hden_{}_{}_{}_{}_{}'.format(tag,base,ext,650,350))
+    # nfast1 = ffast.Get('testGeneral/hnum_{}_{}_{}_{}_{}'.format(tag,base,ext,650,350))
+
+    dfast1 = ffast.Get('testGeneral/hden_{}_{}_{}_{}_{}'.format(tag,base,ext,850,100))
+    nfast1 = ffast.Get('testGeneral/hnum_{}_{}_{}_{}_{}'.format(tag,base,ext,850,100))
 
     nfast = nfast1.Clone('hn_fastsim_3pt')
-    nfast.Add(nfast2)
-    nfast.Add(nfast3)
     dfast = dfast1.Clone('hd_fastsim_3pt')
-    dfast.Add(dfast2)
-    dfast.Add(dfast3)
 
-    nfull.Rebin(4)
-    dfull.Rebin(4)
-    nfast.Rebin(4)
-    dfast.Rebin(4)
+    # for mstop, mlsp in [(625,325), (675,375), (600,300), (700,400), (800,50), (900,150), (1250, 150), (1150, 50)]:
+    # for mstop, mlsp in [(625,325), (675,375), (600,300), (700,400)]:
+    for mstop, mlsp in [(800,50), (900,150)]:
+        dfastX = ffast.Get('testGeneral/hden_{}_{}_{}_{}_{}'.format(tag,base,ext,mstop,mlsp))
+        nfastX = ffast.Get('testGeneral/hnum_{}_{}_{}_{}_{}'.format(tag,base,ext,mstop,mlsp))
+        nfast.Add(nfastX)
+        dfast.Add(dfastX)
 
-    hfull = nfull.Clone('heff_{}_fullsim'.format(base))
+    # if samp != '2018':
+    #     ffull2 = r.TFile('../StopLooper/output/samp1x_v31_ttagtest9/T2tt_mStop{}_mLSP{}_{}.root'.format(850, 100, ssuf))
+
+    #     nfull2 = ffull2.Get('testGeneral/hnum_{}_{}_{}'.format(tag,base,ext))
+    #     dfull2 = ffull2.Get('testGeneral/hden_{}_{}_{}'.format(tag,base,ext))
+    #     nfull.Add(nfull2)
+    #     dfull.Add(dfull2)
+
+    #     nfast2 = ffast.Get('testGeneral/hnum_{}_{}_{}_{}_{}'.format(tag,base,ext,850,100))
+    #     dfast2 = ffast.Get('testGeneral/hden_{}_{}_{}_{}_{}'.format(tag,base,ext,850,100))
+    #     nfast.Add(nfast2)
+    #     dfast.Add(dfast2)
+
+    # if samp != '2016':
+    #     ffull3 = r.TFile('../StopLooper/output/samp1x_v31_ttagtest9/T2tt_mStop{}_mLSP{}_{}.root'.format(1200, 100, ssuf))
+
+    #     nfull3 = ffull3.Get('testGeneral/hnum_{}_{}_{}'.format(tag,base,ext))
+    #     dfull3 = ffull3.Get('testGeneral/hden_{}_{}_{}'.format(tag,base,ext))
+    #     nfull.Add(nfull3)
+    #     dfull.Add(dfull3)
+
+    #     dfast3 = ffast.Get('testGeneral/hden_{}_{}_{}_{}_{}'.format(tag,base,ext,1200,100))
+    #     nfast3 = ffast.Get('testGeneral/hnum_{}_{}_{}_{}_{}'.format(tag,base,ext,1200,100))
+    #     nfast.Add(nfast3)
+    #     dfast.Add(dfast3)
+
+    moveOverFlowToLastBin1D(dfull)
+    moveOverFlowToLastBin1D(nfull)
+    moveOverFlowToLastBin1D(dfast)
+    moveOverFlowToLastBin1D(nfast)
+
+    if 'bin' not in suf:
+        nfull.Rebin(2)
+        dfull.Rebin(2)
+        nfast.Rebin(2)
+        dfast.Rebin(2)
+
+    hfull = nfull.Clone('heff_{}_{}_fullsim'.format(tag,base))
     hfull.Divide(nfull, dfull, 1, 1, 'B')
 
-    hfast = nfast.Clone('heff_{}_fastsim'.format(base))
+    hfast = nfast.Clone('heff_{}_{}_fastsim'.format(tag,base))
     hfast.Divide(nfast, dfast, 1, 1, 'B')
 
     efull = r.TEfficiency(nfull, dfull)
-    efull.SetName('eff_{}_fullsim'.format(base))
+    efull.SetName('eff_{}_{}_fullsim'.format(tag,base))
 
     efast = r.TEfficiency(nfast, dfast)
-    efast.SetName('eff_{}_fastsim'.format(base))
+    efast.SetName('eff_{}_{}_fastsim'.format(tag,base))
 
-    hsf = hfull.Clone('SF_{}'.format(base))
+    hsf = hfull.Clone('SF_{}_{}'.format(tag, base))
     hsf.Divide(hfast)
 
-    outfile = r.TFile(tag+'SF_rb4.root', 'update')
+    outfile = r.TFile('{}SF_{}.root'.format(tag, suf), 'update')
+    outdir = outfile.Get(samp)
+    if not outdir: outdir = outfile.mkdir(samp)
+    outdir.cd()
     efull.Write()
     efast.Write()
+    nfull.Write()
+    dfull.Write()
     hfast.Write()
     hfull.Write()
     hsf.Write()
@@ -428,29 +478,50 @@ def plotTopTaggerSF3pt(tag = 'rtag', base = 'genbase'):
 
 def getTotalEff(hnum, hden):
     err = r.Double(0)
-    itn = hnum.IntegralAndError(0,-1,err)
+    nbin = hnum.GetNbinsX()
+    itn = hnum.IntegralAndError(1,nbin+1,err)
     ein = E(itn, err)
-    itd = hden.IntegralAndError(0,-1,err)
+    itd = hden.IntegralAndError(1,nbin+1,err)
     eid = E(itd, err)
     return get_efficiency(ein, eid)
 
-def plotFSSFfromTTbar(tag='softb',base='genbase',samp='f17v2',nlep='2lep'):
+def plotFSSFfromTTbar(tag='softb',base='genbase',samp='2017',nlep='2lep'):
 
-    ffull = r.TFile('../StopLooper/output/samp{}_v31_ttagtest/TTJets_{}_{}_1.root'.format(samp[1:3],nlep,samp))
-    ffast = r.TFile('../StopLooper/output/samp{}_v31_ttagtest/TTJets_{}_{}fs_1.root'.format(samp[1:3],nlep,samp))
+    # ffull = r.TFile('../StopLooper/output/samp{}_v31_ttagtest/TTJets_{}_{}_1.root'.format(samp[1:3],nlep,samp))
+    # ffast = r.TFile('../StopLooper/output/samp{}_v31_ttagtest/TTJets_{}_{}fs_1.root'.format(samp[1:3],nlep,samp))
+
+    # ffull = r.TFile('../StopLooper/output/samp{}_v31_ttagtest/ttbar_{}.root'.format(samp[1:3],samp[1:3]))
+    # ffast = r.TFile('../StopLooper/output/samp{}_v31_ttagtest/ttbar_fastsim_nosbFSSF_{}.root'.format(samp[1:3],samp[1:3]))
+
+    ffull = r.TFile('../StopLooper/output/samp1x_v31_ttagtest9/ttbar_{}.root'.format(samp[2:]))
+    ffast = r.TFile('../StopLooper/output/samp1x_v31_ttagtest9/ttbar_fastsim_{}.root'.format(samp[2:]))
 
     ext = 'tftop_' if tag == 'rtag' else 'ak8top_' if tag == 'mtag' else ''
+    # ext = 'tftop_' if tag == 'rtag' else 'gentop_' if tag == 'mtag' else ''
+    # ext = 'gen' if 'soft' in tag and 'genbase' in base else ''
 
-    dfull = ffull.Get('testGeneral/hden_{}_{}_{}pt'.format(tag,base,ext))
-    nfull = ffull.Get('testGeneral/hnum_{}_{}_{}pt'.format(tag,base,ext))
+    # psuf = '_{}_{}'.format(m1, m2) if m1 > 0 else ''
+    psuf = ''
 
-    dfast = ffast.Get('testGeneral/hden_{}_{}_{}pt'.format(tag,base,ext))
-    nfast = ffast.Get('testGeneral/hnum_{}_{}_{}pt'.format(tag,base,ext))
+    dfull = ffull.Get('testGeneral/hden_{}_{}_{}ptbin'.format(tag,base,ext))
+    nfull = ffull.Get('testGeneral/hnum_{}_{}_{}ptbin'.format(tag,base,ext))
+    dfast = ffast.Get('testGeneral/hden_{}_{}_{}ptbin{}'.format(tag,base,ext,psuf))
+    nfast = ffast.Get('testGeneral/hnum_{}_{}_{}ptbin{}'.format(tag,base,ext,psuf))
 
-    # nfull.Rebin(2)
-    # dfull.Rebin(2)
-    # nfast.Rebin(2)
-    # dfast.Rebin(2)
+    # dfull = ffull.Get('cremuB2/hden_{}_{}_{}pt'.format(tag,base,ext))
+    # nfull = ffull.Get('cremuB2/hnum_{}_{}_{}pt'.format(tag,base,ext))
+    # dfast = ffast.Get('cremuB2/hden_{}_{}_{}pt'.format(tag,base,ext))
+    # nfast = ffast.Get('cremuB2/hnum_{}_{}_{}pt'.format(tag,base,ext))
+
+    moveOverFlowToLastBin1D(dfull)
+    moveOverFlowToLastBin1D(nfull)
+    moveOverFlowToLastBin1D(dfast)
+    moveOverFlowToLastBin1D(nfast)
+
+    nfull.Rebin(2)
+    dfull.Rebin(2)
+    nfast.Rebin(2)
+    dfast.Rebin(2)
 
     hfull = nfull.Clone('h_fullsim_{}_{}'.format(tag,base))
     hfull.Divide(dfull)
@@ -470,51 +541,279 @@ def plotFSSFfromTTbar(tag='softb',base='genbase',samp='f17v2',nlep='2lep'):
     hsf = hfull.Clone('SF_{}_{}'.format(tag, base))
     hsf.Divide(hfast)
 
-    eefull = getTotalEff(nfull, dfull)
-    eefast = getTotalEff(nfast, dfast)
-    esf = eefull/eefast
-    hsf.SetBinContent(1, esf.val)     # fill first bin with the average
-    hsf.SetBinError(1, esf.err)
+    # eefull = getTotalEff(nfull, dfull)
+    # eefast = getTotalEff(nfast, dfast)
+    # esf = eefull/eefast
+    # hsf.SetBinContent(1, esf.val)     # fill first bin with the average
+    # hsf.SetBinError(1, esf.err)
 
     # outfile = r.TFile('{}SF_{}_{}v2.root'.format(tag,samp,nlep), 'update')
-    outfile = r.TFile('{}SF_{}v2.root'.format(tag,nlep), 'update')
-    outdir = outfile.mkdir(samp)
+    outfile = r.TFile('{}SF_{}.root'.format(tag,nlep), 'update')
+    outdir = outfile.Get(samp+psuf)
+    if not outdir: outdir = outfile.mkdir(samp+psuf)
     outdir.cd()
     efull.Write()
     efast.Write()
     hfast.Write()
     hfull.Write()
+    nfull.Write()
+    dfull.Write()
+    # nfast.Write()
     hsf.Write()
     # esf.Write()
 
 
-def makeSoftbFSSFplots(samp='f17v2'):
+def plotFSFSfromTTbar(hdir, hname='met',samp='2017', rebin=1, y2=None):
 
-    f1 = r.TFile('./softbSF_2lepv2.root','read')
+    ffull = r.TFile('../StopLooper/output/samp1x_v31_test11/ttbar_{}.root'.format(samp[2:]))
+    ffast = r.TFile('../StopLooper/output/samp1x_v31_test11/ttbar_fastsim_{}.root'.format(samp[2:]))
+    if y2: fy2 = r.TFile('../StopLooper/output/samp1x_v31_test11/ttbar_{}.root'.format(y2[2:]))
+    samptype = 'madgraph'
 
-    h1 = f1.Get(samp+'/SF_softb_genbase')
-    h1.GetXaxis().SetTitle('p_{T}(soft-b)')
-    h1.GetYaxis().SetRangeUser(0.8,1.1)
+    ffull = r.TFile('../StopLooper/output/samp1x_v31_test11/tt2l_17.root'.format(samp[2:]))
+    ffast = r.TFile('../StopLooper/output/samp1x_v31_test11/tt2l_18.root'.format(samp[2:]))
+    if y2: fy2 = r.TFile('../StopLooper/output/samp1x_v31_test11/tt2l_{}.root'.format(y2[2:]))
+    samptype = 'powheg'
+
+    hfull = ffull.Get('{}/h_{}'.format(hdir,hname))
+    hfast = ffast.Get('{}/h_{}'.format(hdir,hname))
+    if y2: hy2 = fy2.Get('{}/h_{}'.format(hdir,hname))
+
+    # ffull = r.TFile('/home/users/sicheng/working/quicktests/genjetChecks/hists_ttbar_CP5_17.root'.format(samp[2:]))
+    # ffast = r.TFile('/home/users/sicheng/working/quicktests/genjetChecks/hists_ttbar_CP2_17.root'.format(samp[2:]))
+    # # ffast = r.TFile('/home/users/sicheng/working/quicktests/genjetChecks/hists_ttbar_M2_16.root'.format(samp[2:]))
+    # if y2: fy2 = r.TFile('/home/users/sicheng/working/quicktests/genjetChecks/hists_ttbar_{}.root'.format(y2[2:]))
+    # samptype = 'madgraph'
+
+    # y2 = None
+    # ffull = r.TFile('/home/users/sicheng/working/quicktests/genjetChecks/hists_tt2l_17.root'.format(samp[2:]))
+    # ffast = r.TFile('/home/users/sicheng/working/quicktests/genjetChecks/hists_tt2l_16.root'.format(samp[2:]))
+    # samptype = 'powheg'
+
+    # hfull = ffull.Get('h_{}'.format(hname))
+    # hfast = ffast.Get('h_{}'.format(hname))
+    # if y2: hy2 = fy2.Get('h_{}'.format(hname))
+
+    moveOverFlowToLastBin1D(hfull)
+    moveOverFlowToLastBin1D(hfast)
+    if y2: moveOverFlowToLastBin1D(hy2)
+
+    c0 = r.TCanvas('c0', 'c0', 800, 800)
+
+    mainPad = r.TPad('1', '1', 0.0, 0.20, 1.0, 0.99)
+    ratioPad = r.TPad('2', '2', 0.0, 0.02, 1.0, 0.24)
+
+    r.SetOwnership(c0, False)
+    r.SetOwnership(mainPad, False)
+    r.SetOwnership(ratioPad, False)
+
+    mainPad.SetTopMargin(0.08)
+    mainPad.SetLeftMargin(0.12)
+    mainPad.SetRightMargin(0.05)
+    mainPad.SetBottomMargin(0.15)
+    mainPad.SetLogy()
+    mainPad.Draw()
+    ratioPad.SetTopMargin(0.05)
+    ratioPad.SetLeftMargin(0.12)
+    ratioPad.SetRightMargin(0.05)
+    ratioPad.SetBottomMargin(0.10)
+    ratioPad.Draw()
+
+    mainPad.cd()
+
+    hfull.SetTitle('')
+    hfull.GetYaxis().SetTitle('Events')
+    hfull.GetYaxis().SetTitleOffset(0.75)
+    hfull.GetYaxis().SetTitleSize(0.058)
+    hfull.GetYaxis().SetTickSize(0.015)
+    hfull.GetXaxis().SetTitleSize(0.04)
+
+    hfull.SetLineWidth(2)
+    hfast.SetLineWidth(2)
+    if y2: hy2.SetLineWidth(2)
+
+    hfull.SetMarkerSize(1.3)
+    hfast.SetMarkerSize(1.3)
+    if y2: hy2.SetMarkerSize(1.3)
+
+    hfull.SetMarkerStyle(25)
+    hfast.SetMarkerStyle(26)
+    if y2: hy2.SetMarkerStyle(26)
+
+    hfull.SetLineColor(r.kBlack)
+    # hfast.SetLineColor(r.kRed)
+    if y2: hy2.SetLineColor(r.kRed)
+    else: hfast.SetLineColor(r.kRed)
+
+    hfast.Scale(hfull.Integral()/hfast.Integral())
+    if y2: hy2.Scale(hfull.Integral()/hy2.Integral())
+
+    if rebin != 1:
+        hfull.Rebin(rebin)
+        hfast.Rebin(rebin)
+        if y2: hy2.Rebin(rebin)
+
+    hfull.Draw()
+    hfast.Draw("same")
+    if y2: hy2.Draw("same")
+
+    leg = r.TLegend(0.54, 0.68, 0.92, 0.89)
+
+    if 'mother' in hname:
+        leg = r.TLegend(0.24, 0.68, 0.62, 0.89)
+    elif 'Efrac' in hname:
+        leg = r.TLegend(0.34, 0.18, 0.7, 0.39)
+    elif 'n' == hname[0]:
+        leg = r.TLegend(0.14, 0.18, 0.5, 0.39)
+
+    if samptype == 'madgraph':
+        leg.AddEntry(hfull, 'ttbar '+samp[2:]+' full (TuneCP5)')
+        leg.AddEntry(hfast, 'ttbar '+samp[2:]+' fast (TuneCP2)')
+        # leg.AddEntry(hfast, 'ttbar 16'+' (TuneCUETP8M2)')
+        if y2: leg.AddEntry(hy2, 'ttbar '+y2[2:]+' (TuneCUETP8M1)')
+    if samptype == 'powheg':
+        if y2:
+            leg.AddEntry(hfull, 'ttbar '+' 17 (TuneCP5)')
+            leg.AddEntry(hfast, 'ttbar '+' 18 (TuneCP5)')
+            leg.AddEntry(hy2, 'ttbar '+y2[2:]+' (TuneCUETP8M2)')
+        else:
+            leg.AddEntry(hfull, 'ttbar 17'+' (TuneCP5)')
+            leg.AddEntry(hfast, 'ttbar 16'+' (TuneCUETP8M2)')
+    leg.Draw()
+
+    # DrawHeaderText(mainPad, 35.9 if '16' in samp else 41.5 if '17' in samp else 59.7 if '18' in samp else 137)
+    DrawHeaderText(mainPad, None, 'Simulation')
+
+    ratioPad.cd()
+
+    h_axis_ratio = r.TH1D('ratio_axis','', hfull.GetNbinsX(), hfull.GetXaxis().GetXmin(), hfull.GetXaxis().GetXmax())
+    h_axis_ratio.GetYaxis().SetNdivisions(4)
+    h_axis_ratio.GetYaxis().SetLabelSize(0.15)
+    h_axis_ratio.GetYaxis().SetRangeUser(0, 2)
+    # h_axis_ratio.GetYaxis().SetTitle('fast / full')
+    h_axis_ratio.GetYaxis().SetTitle('Ratios')
+    h_axis_ratio.GetYaxis().SetTitleOffset(0.25)
+    h_axis_ratio.GetYaxis().SetTitleSize(0.18)
+    h_axis_ratio.GetYaxis().SetTickLength(0.01)
+    h_axis_ratio.GetXaxis().SetTickLength(0.07)
+    h_axis_ratio.GetXaxis().SetTitleSize(0.0)
+    h_axis_ratio.GetXaxis().SetLabelSize(0.0)
+    h_axis_ratio.Draw('axis')
+
+    line = r.TF1('line1', '1', hfull.GetXaxis().GetXmin(), hfull.GetXaxis().GetXmax())
+    line.SetLineStyle(2)
+    line.SetLineColor(r.kGray+2)
+    line.Draw('same')
+
+    rat = hfast.Clone('ratio_17vs16')
+    rat.Divide(hfull)
+    rat.Draw("same")
+
+    if y2:
+        rat2 = hy2.Clone('ratio_y2vs16')
+        rat2.Divide(hfull)
+        rat2.Draw("same")
+
+    os.system('mkdir -p plots/genbcomp_madgraph')
+    os.system('mkdir -p plots/genbcomp_powheg')
+
+    if samptype == 'madgraph':
+        c0.SaveAs('plots/ttbar_madgraph_comp/{}_{}_{}.pdf'.format(hdir, hname, samp))
+        # c0.SaveAs('plots/genbcomp_madgraph/{}_{}_{}.pdf'.format(hdir, hname, samp))
+    if samptype == 'powheg':
+        c0.SaveAs('plots/ttbar_powheg_comp/{}_{}_{}.pdf'.format(hdir, hname, samp))
+        # c0.SaveAs('plots/genbcomp_powheg/{}_{}_{}.pdf'.format(hdir, hname, samp))
+
+
+
+def makeFSSFplots(samp='2017', fn='mtagSF_tGv1', hn='mtag_genbase'):
+
+    f1 = r.TFile('./'+fn+'.root','read')
+
+    h1 = f1.Get(samp+'/SF_'+hn)
+    # h1.GetXaxis().SetTitle('p_{T}(AK8-jet) [GeV]')
+    h1.GetXaxis().SetTitle('p_{T}(top candidate) [GeV]')
+    h1.GetYaxis().SetRangeUser(0.6,1.4)
     h1.SetLineWidth(2)
+    h1.SetMarkerStyle(24)
+    h1.GetYaxis().SetTitle('SF (Full/Fast)')
 
-    avg = float(h1.GetBinContent(1))
-    line1 = r.TF1("l1", "{}".format(avg), 0, 20)
-    line1.SetLineStyle(2)
-    line1.SetLineWidth(2)
-    line1.SetLineColor(r.kGray+2)
+    # avg = float(h1.GetBinContent(1))
+    # line1 = r.TF1("l1", "{}".format(avg), 0, 50)
+    # line1.SetLineStyle(2)
+    # line1.SetLineWidth(2)
+    # line1.SetLineColor(r.kGray+2)
 
-    h1.SetBinContent(1,0)
-    h1.SetBinError(1,0)
+    # h1.SetBinContent(1,0)
+    # h1.SetBinError(1,0)
 
     c0 = r.TCanvas('c0', 'c0', 800, 600)
 
+    # Do fit
+    print samp
+    # h1.SetBinContent(1,0)
+    # h1.SetBinError(1,0)
+    h1.Fit('pol0')
+    print ''
+    # h1.GetXaxis().SetRangeUser(0,45)
+
     h1.Draw()
-    line1.Draw('same')
+    # line1.Draw('same')
 
     # txt = r.TText(0.7,0.7, '{:.3f}'.format(avg))
     # txt.Draw()
+    DrawHeaderText(c0,False)
 
-    c0.Print('softbFSSF_'+samp+'.pdf')
+    c0.Print('hSF_{}_{}_{}.pdf'.format(hn.split('_')[0], fn.split('_')[1], samp))
+    c0.Clear()
+
+    h1 = f1.Get(samp+'/heff_'+hn+'_fastsim')
+    h1.GetXaxis().SetTitle('p_{T}(AK8-jet) [GeV]')
+    # h1.GetYaxis().SetRangeUser(0.0,0.6)
+    # h1.GetXaxis().SetRangeUser(0.0,45)
+    h1.SetLineWidth(2)
+    h1.SetMarkerStyle(24)
+    h1.GetYaxis().SetTitle('Efficiency')
+
+    h2 = f1.Get(samp+'/heff_'+hn+'_fullsim')
+    h2.SetLineWidth(2)
+    h2.SetLineColor(r.kRed)
+    h2.SetMarkerStyle(25)
+
+    h1.Draw()
+    h2.Draw('same')
+
+    leg = r.TLegend(0.65,0.7,0.88,0.86)
+    leg.AddEntry(h1, 'Fastsim {} '.format(samp[2:]))
+    leg.AddEntry(h2, 'Fullsim {} '.format(samp[2:]))
+
+    leg.Draw()
+
+    DrawHeaderText(c0,False)
+
+    c0.Print('heff_{}_{}_{}.pdf'.format(hn.split('_')[0], fn.split('_')[1], samp))
+
+
+def printRatiosFast(hdir='cremuB1', bsuf='v31_ttagtest', ysuf='17', hn='genb_genpt_unwgtd'):
+
+    # fnum = r.TFile('../StopLooper/output/samp{}_{}/ttbar_{}.root'.format(ysuf, bsuf, ysuf))
+    # fden = r.TFile('../StopLooper/output/samp{}_{}/ttbar_fastsim_{}.root'.format(ysuf, bsuf, ysuf))
+    fnum = r.TFile('../StopLooper/output/samp1x_{}/ttbar_{}.root'.format(bsuf, ysuf))
+    fden = r.TFile('../StopLooper/output/samp1x_{}/ttbar_fastsim_{}.root'.format(bsuf, ysuf))
+
+    hnum = fnum.Get(hdir+'/h_'+hn)
+    hden = fden.Get(hdir+'/h_'+hn)
+
+    hrat = hnum.Clone('hrat_'+hn)
+    hrat.Scale(hden.Integral(0,-1)/hnum.Integral(0,-1))
+    hrat.Divide(hrat,hden,1,1,'B')
+
+    for ibin in range(1, hrat.GetNbinsX()+1):
+        print ibin, '{:.3f}'.format(hrat.GetBinContent(ibin))
+
+    # fout = r.TFile('./scaler.root','recreate')
+
+
 
 
 if __name__ == '__main__':
@@ -530,7 +829,68 @@ if __name__ == '__main__':
     # plotDataMETinEMuCR(0, 'lep2pt')
     # plotDataMETinEMuCR(1, 'lep2pt')
 
-    # plotTopTaggerSF3pt('rtag', 'genbase')
+    # plotDataMETinEMuCR(2, 'nisrmatch', bsuf='v31_cremu4')
+    # plotDataMETinEMuCR(1, 'nisrmatch', bsuf='v31_cremu4')
+    # plotDataMETinEMuCR(0, 'njets', bsuf='v31_cremu4')
+    # plotDataMETinEMuCR(3, 'nisrmatch', bsuf='v31_cremu4')
+
+    # plotDataMETinEMuCR(0, 'ptbb', bsuf='v31_cremu4')
+    # plotDataMETinEMuCR(0, 'ptll', bsuf='v31_cremu4')
+    # plotDataMETinEMuCR(0, 'nbjets', bsuf='v31_cremu4')
+    # plotDataMETinEMuCR(1, 'nbjets', bsuf='v31_cremu4')
+    # plotDataMETinEMuCR(0, 'nsbtags', bsuf='v31_cremu4')
+    # plotDataMETinEMuCR(1, 'nsbtags', bsuf='v31_cremu4')
+
+    # plotDataMETinEMuCR(4, 'met_uncorr', bsuf='v31_s21_cremu5_noISR', hdir='cremuA0')
+    # plotDataMETinEMuCR(4, 'met_uncorr_b1', bsuf='v31_s21_cremu5_noISR', hdir='cremuA0')
+    # plotDataMETinEMuCR(4, 'genb_mother_nott', bsuf='v31_s21_cremu5_noISR', hdir='cremuA0')
+    # plotDataMETinEMuCR(4, 'genbpt_fromg', bsuf='v31_s21_cremu5_noISR', hdir='cremuA0')
+    # plotDataMETinEMuCR(4, 'genbpt_fromt_fc', bsuf='v31_s21_cremu5_noISR', hdir='cremuA0')
+    # plotDataMETinEMuCR(4, 'genbpt_fromt_lc', bsuf='v31_s21_cremu5_noISR', hdir='cremuA0')
+    # plotDataMETinEMuCR(4, 'lead_genbpt', bsuf='v31_s21_cremu5_noISR', hdir='cremuA0')
+    # plotDataMETinEMuCR(4, 'lead_genbpt_b1', bsuf='v31_s21_cremu5_noISR', hdir='cremuA0')
+
+    # plotFSFSfromTTbar('cremuA0', 'genb_mother_nott',samp='2018')
+    # plotFSFSfromTTbar('cremuA0', 'genbpt_fromg',samp='2018')
+    # plotFSFSfromTTbar('cremuA0', 'genbpt_fromt_lc',samp='2018')
+
+    # plotFSFSfromTTbar('testGeneral', 'genb_fromtop_genpt',samp='2016', rebin=2)
+    # plotFSFSfromTTbar('testGeneral', 'genb_notfromtop_genpt',samp='2016', rebin=2)
+    # plotFSFSfromTTbar('testGeneral', 'genb_fromg_genpt',samp='2016', rebin=2)
+    # plotFSFSfromTTbar('testGeneral', 'genb_frompp_genpt',samp='2016', rebin=2)
+
+    plotFSFSfromTTbar('testGeneral', 'genb_fromtop_genpt',samp='2017', rebin=2, y2='2016')
+    plotFSFSfromTTbar('testGeneral', 'genb_FC_fromtop_genpt',samp='2017', rebin=2, y2='2016')
+    plotFSFSfromTTbar('testGeneral', 'genb_notfromtop_genpt',samp='2017', rebin=2, y2='2016')
+    plotFSFSfromTTbar('testGeneral', 'genb_fromg_genpt',samp='2017', rebin=2, y2='2016')
+    plotFSFSfromTTbar('testGeneral', 'genb_frompp_genpt',samp='2017', rebin=2, y2='2016')
+    plotFSFSfromTTbar('testGeneral', 'genb_notfromtop_mother',samp='2017', y2='2016')
+    plotFSFSfromTTbar('testGeneral', 'matched_bgenjetpt',samp='2017', rebin=2, y2='2016')
+    plotFSFSfromTTbar('testGeneral', 'matched_genbgenjet_DR',samp='2017', rebin=2, y2='2016')
+    plotFSFSfromTTbar('testGeneral', 'matched_genbgenjet_Efrac',samp='2017', rebin=2, y2='2016')
+    plotFSFSfromTTbar('testGeneral', 'bgenjet_fromtop_genpt',samp='2017', rebin=2, y2='2016')
+    plotFSFSfromTTbar('testGeneral', 'bgenjet_fromg_genpt',samp='2017', rebin=2, y2='2016')
+    plotFSFSfromTTbar('testGeneral', 'bgenjet_frompp_genpt',samp='2017', rebin=2, y2='2016')
+    plotFSFSfromTTbar('testGeneral', 'matched_bjetpt',samp='2017', rebin=2, y2='2016')
+    plotFSFSfromTTbar('testGeneral', 'matched_bjetgenb_DR',samp='2017', rebin=2, y2='2016')
+    plotFSFSfromTTbar('testGeneral', 'matched_bjetgenb_Efrac',samp='2017', rebin=2, y2='2016')
+    plotFSFSfromTTbar('testGeneral', 'matched_bjet_deepCSV',samp='2017', rebin=2, y2='2016')
+    plotFSFSfromTTbar('testGeneral', 'bjet_fromg_deepCSV',samp='2017', rebin=2, y2='2016')
+    plotFSFSfromTTbar('testGeneral', 'bjet_frompp_deepCSV',samp='2017', rebin=2, y2='2016')
+    plotFSFSfromTTbar('testGeneral', 'bjet_fromtop_deepCSV',samp='2017', rebin=2, y2='2016')
+    plotFSFSfromTTbar('testGeneral', 'bjet_fromtop_pt',samp='2017', rebin=2, y2='2016')
+    plotFSFSfromTTbar('testGeneral', 'bjet_frompp_pt',samp='2017', rebin=2, y2='2016')
+    plotFSFSfromTTbar('testGeneral', 'bjet_fromg_pt',samp='2017', rebin=2, y2='2016')
+    plotFSFSfromTTbar('testGeneral', 'njet_bmatch',samp='2017', y2='2016')
+    plotFSFSfromTTbar('testGeneral', 'nbjet_match',samp='2017', y2='2016')
+    plotFSFSfromTTbar('testGeneral', 'nbgenjet',samp='2017', y2='2016')
+
+    # PlotFSFSfromTTbar('testGeneral', 'genb_fromtop_genpt',samp='2018', rebin=2)
+    # plotFSFSfromTTbar('testGeneral', 'genb_notfromtop_genpt',samp='2018', rebin=2)
+    # plotFSFSfromTTbar('testGeneral', 'genb_fromg_genpt',samp='2018', rebin=2)
+    # plotFSFSfromTTbar('testGeneral', 'genb_frompp_genpt',samp='2018', rebin=2)
+
+   # plotTopTaggerSF3pt('rtag', 'genbase')
     # plotTopTaggerSF3pt('rtag', 'tagbase')
     # plotTopTaggerSF3pt('mtag', 'genbase')
     # plotTopTaggerSF3pt('mtag', 'tagbase')
@@ -539,18 +899,75 @@ if __name__ == '__main__':
 
     # plotFSSFfromTTbar('softb', 'tagbase')
     # plotFSSFfromTTbar('softb', 'genbase')
-    # plotFSSFfromTTbar('softb', 'tagbase', 'a18v1')
-    # plotFSSFfromTTbar('softb', 'genbase', 'a18v1')
-    # plotFSSFfromTTbar('softb', 'tagbase', 's16v3')
-    # plotFSSFfromTTbar('softb', 'genbase', 's16v3')
+    # plotFSSFfromTTbar('softb', 'tagbase', '2018')
+    # plotFSSFfromTTbar('softb', 'genbase', '2018')
+    # plotFSSFfromTTbar('softb', 'tagbase', '2016')
+    # plotFSSFfromTTbar('softb', 'genbase', '2016')
 
-    # makeSoftbFSSFplots('s16v3')
-    # makeSoftbFSSFplots('f17v2')
-    # makeSoftbFSSFplots('a18v1')
+    # plotFSSFfromTTbar('softb', 'genbase',  '2016', 'fromtv2')
+    # plotFSSFfromTTbar('softb', 'genbase',  '2017', 'fromtv2')
+    # plotFSSFfromTTbar('softb', 'genbase',  '2018', 'fromtv2')
+    # plotFSSFfromTTbar('softb', 'genbase2', '2016', 'fromtv2')
+    # plotFSSFfromTTbar('softb', 'genbase2', '2017', 'fromtv2')
+    # plotFSSFfromTTbar('softb', 'genbase2', '2018', 'fromtv2')
+    # plotFSSFfromTTbar('softb', 'genbase3', '2016', 'fromtv2')
+    # plotFSSFfromTTbar('softb', 'genbase3', '2017', 'fromtv2')
+    # plotFSSFfromTTbar('softb', 'genbase3', '2018', 'fromtv2')
+    # plotFSSFfromTTbar('softb', 'objbase',  '2016', 'fromtv2')
+    # plotFSSFfromTTbar('softb', 'objbase',  '2017', 'fromtv2')
+    # plotFSSFfromTTbar('softb', 'objbase',  '2018', 'fromtv2')
 
-    plotDoubleRatio()
-    plotDoubleRatio(suf='lsbptgt10')
-    plotDoubleRatio(suf='lsbptlt10')
+    # plotFSSFfromTTbar('softb', 'genbase3', '2016', 'B2fromtv1')
+    # plotFSSFfromTTbar('softb', 'genbase3', '2017', 'B2fromtv1')
+    # plotFSSFfromTTbar('softb', 'genbase3', '2018', 'B2fromtv1')
+
+    # plotFSSFfromTTbar('softb', 'qmatch', '2016', 'B2fromtv3')
+    # plotFSSFfromTTbar('softb', 'qmatch', '2017', 'B2fromtv3')
+    # plotFSSFfromTTbar('softb', 'qmatch', '2018', 'B2fromtv3')
+    # plotFSSFfromTTbar('softb', 'cmatch', '2016', 'B2fromtv3')
+    # plotFSSFfromTTbar('softb', 'cmatch', '2017', 'B2fromtv3')
+    # plotFSSFfromTTbar('softb', 'cmatch', '2018', 'B2fromtv3')
+
+    # plotTopTaggerSF3pt('mtag', 'genbase', '2016', 'tG3ptbinv2')
+    # plotTopTaggerSF3pt('mtag', 'genbase', '2017', 'tG3ptbinv2')
+    # plotTopTaggerSF3pt('mtag', 'genbase', '2018', 'tG3ptbinv2')
+
+    # plotFSSFfromTTbar('rtag', 'genbase', '2016', 'tGtptbinv1')
+    # plotFSSFfromTTbar('rtag', 'genbase', '2017', 'tGtptbinv1')
+    # plotFSSFfromTTbar('rtag', 'genbase', '2018', 'tGtptbinv1')
+
+    # plotFSSFfromTTbar('mtag', 'genbase', '2016', 'tGv6fb', m1=850,  m2=100)
+    # plotFSSFfromTTbar('mtag', 'genbase', '2017', 'tGv6fb', m1=850,  m2=100)
+    # plotFSSFfromTTbar('mtag', 'genbase', '2017', 'tGv6fb', m1=1200, m2=100)
+    # plotFSSFfromTTbar('mtag', 'genbase', '2016', 'tGv6fb', m1=650,  m2=350)
+    # plotFSSFfromTTbar('mtag', 'genbase', '2017', 'tGv6fb', m1=650,  m2=350)
+    # plotFSSFfromTTbar('mtag', 'genbase', '2018', 'tGv6fb', m1=650,  m2=350)
+
+    # printRatiosFast()
+
+    # makeFSSFplots('2016')
+    # makeFSSFplots('2017')
+    # makeFSSFplots('2018')
+    # makeFSSFplots('2016', 'mtagSF_tGv4bin')
+    # makeFSSFplots('2017', 'mtagSF_tGv4bin')
+    # makeFSSFplots('2018', 'mtagSF_tGv4bin')
+    # makeFSSFplots('2018', 'mtagSF_tGv4_ak8Mrwgtd')
+
+    # makeFSSFplots('2016', 'mtagSF_tG3ptbinv2')
+    # makeFSSFplots('2017', 'mtagSF_tG3ptbinv2')
+    # makeFSSFplots('2018', 'mtagSF_tG3ptbinv2')
+
+    # plotTopTaggerSF3pt('rtag', 'genbase', '2016', 'tG3ptbinv5')
+    # plotTopTaggerSF3pt('rtag', 'genbase', '2017', 'tG3ptbinv5')
+    # plotTopTaggerSF3pt('rtag', 'genbase', '2018', 'tG3ptbinv5')
+
+    # makeFSSFplots('2016', 'rtagSF_tG3ptbinv4', 'rtag_genbase')
+    # makeFSSFplots('2017', 'rtagSF_tG3ptbinv4', 'rtag_genbase')
+    # makeFSSFplots('2018', 'rtagSF_tG3ptbinv4', 'rtag_genbase')
+
+    # plotDoubleRatio()
+    # plotDoubleRatio(suf='lsbptgt10')
+    # plotDoubleRatio(suf='lsbptlt10')
 
     # plotTopTaggerMatchingEfficiency(1200, 100)
     # plotTopTaggerMatchingEfficiency(850,  100)
@@ -559,4 +976,4 @@ if __name__ == '__main__':
     # plotTopTaggerMatchingEfficiency(1200, 100, 'tagbase')
     # plotTopTaggerMatchingEfficiency(850,  100, 'tagbase')
     # plotTopTaggerMatchingEfficiency(650,  350, 'tagbase')
-
+                             
