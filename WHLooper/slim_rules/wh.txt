@@ -18,6 +18,10 @@ drop HLT_Photon*
 ### met ###
 keep pfmet
 keep pfmet_phi
+keep pfmet_uncorr
+keep pfmet_uncorr_phi
+keep pfmet_original
+keep pfmet_original_phi
 keep genmet
 keep genmet_phi
 

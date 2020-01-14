@@ -228,6 +228,7 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
     float w_BtagSF_medloose=0;
     float w_80X=0;
     float w_pu=0;
+    float w_L1=0;
 
     TBranch * b_pass = extraTree->Branch("pass",&pass,"pass/O");
     TBranch * b_stitch = extraTree->Branch("stitch",&stitch,"stitch/O");
@@ -242,6 +243,7 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
     TBranch * b_w_BtagSF_medloose = extraTree->Branch("w_BtagSF_medloose",&w_BtagSF_medloose,"w_BtagSF_medloose/F");
     TBranch * b_w_80X = extraTree->Branch("w_80X",&w_80X,"w_80X/F");
     TBranch * b_w_pu = extraTree->Branch("w_pu",&w_pu,"w_pu/F");
+    TBranch * b_w_L1 = extraTree->Branch("w_L1",&w_L1,"w_L1/F");
 
     extraTree->SetBranchAddress("pass",&pass,&b_pass);
     extraTree->SetBranchAddress("stitch",&stitch,&b_stitch);
@@ -256,6 +258,7 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
     extraTree->SetBranchAddress("w_BtagSF_medloose",&w_BtagSF_medloose,&b_w_BtagSF_medloose);
     extraTree->SetBranchAddress("w_80X",&w_80X,&b_w_80X);
     extraTree->SetBranchAddress("w_pu",&w_pu,&b_w_pu);
+    extraTree->SetBranchAddress("w_L1",&w_L1,&b_w_L1);
     
     //Jet info (flatten LorentzVectors) 
 
@@ -307,6 +310,10 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
     vector<float> * leps_phi = new vector<float>();
     vector<int> * leps_fromW = new vector<int>();
     vector<int> * leps_pdgid = new vector<int>();
+    vector<float> * vetoleps_pt = new vector<float>(); 
+    vector<float> * vetoleps_eta = new vector<float>();
+    vector<float> * vetoleps_phi = new vector<float>();
+    vector<int> * vetoleps_pdgid = new vector<int>();
     TBranch * b_nWHLeptons = extraTree->Branch("nWHLeptons",&nWHLeptons,"nWHLeptons/I");
     TBranch * b_nleps_tm = extraTree->Branch("nleps_tm",&nleps_tm,"nleps_tm/I");
     TBranch * b_leps_pt = extraTree->Branch("leps_pt",&leps_pt);
@@ -314,6 +321,10 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
     TBranch * b_leps_phi = extraTree->Branch("leps_phi",&leps_phi);
     TBranch * b_leps_fromW = extraTree->Branch("leps_fromW",&leps_fromW);
     TBranch * b_leps_pdgid = extraTree->Branch("leps_pdgid",&leps_pdgid);
+    TBranch * b_vetoleps_pt  = extraTree->Branch("vetoleps_pt",&leps_pt);
+    TBranch * b_vetoleps_eta = extraTree->Branch("vetoleps_eta",&leps_eta);
+    TBranch * b_vetoleps_phi = extraTree->Branch("vetoleps_phi",&leps_phi);
+    TBranch * b_vetoleps_pdgid = extraTree->Branch("vetoleps_pdgid",&vetoleps_pdgid);
     extraTree->SetBranchAddress("nWHLeptons",&nWHLeptons,&b_nWHLeptons);
     extraTree->SetBranchAddress("nleps_tm",&nleps_tm,&b_nleps_tm);
     extraTree->SetBranchAddress("leps_pt",&leps_pt,&b_leps_pt);
@@ -321,6 +332,10 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
     extraTree->SetBranchAddress("leps_phi",&leps_phi,&b_leps_phi);
     extraTree->SetBranchAddress("leps_fromW",&leps_fromW,&b_leps_fromW);
     extraTree->SetBranchAddress("leps_pdgid",&leps_pdgid,&b_leps_pdgid);
+    extraTree->SetBranchAddress("vetoleps_pt", &vetoleps_pt, &b_vetoleps_pt);
+    extraTree->SetBranchAddress("vetoleps_eta",&vetoleps_eta,&b_vetoleps_eta);
+    extraTree->SetBranchAddress("vetoleps_phi",&vetoleps_phi,&b_vetoleps_phi);
+    extraTree->SetBranchAddress("vetoleps_pdgid",&vetoleps_pdgid,&b_vetoleps_pdgid);
 
     int nels_tm=0;
     vector<float> * els_pt = new vector<float>(); 
@@ -539,6 +554,9 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
       evtWgt.setDefaultSystematics(evtWgtInfo::puOnly, is_fastsim_);
       w_pu = evtWgt.getWeight(evtWgtInfo::systID(0), false);
       
+      evtWgt.resetEvent();
+      evtWgt.setDefaultSystematics(evtWgtInfo::L1Only, is_fastsim_);
+      w_L1 = evtWgt.getWeight(evtWgtInfo::systID(0), false);
 
       evtWgt.resetEvent();
       evtWgt.setDefaultSystematics(evtWgtInfo::WH_Run2, is_fastsim_);
@@ -598,6 +616,10 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
       leps_phi->clear();
       leps_pdgid->clear();
       leps_fromW->clear();
+      vetoleps_pt->clear();
+      vetoleps_eta->clear();
+      vetoleps_phi->clear();
+      vetoleps_pdgid->clear();
       nels_tm=0;
       els_pt->clear();
       els_eta->clear();
@@ -666,6 +688,19 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
         }
 
       }
+      
+      if(nvetoleps()>0){
+        vetoleps_pt->push_back(lep1_p4().pt());
+        vetoleps_phi->push_back(lep1_p4().phi());
+        vetoleps_eta->push_back(lep1_p4().eta());
+        vetoleps_pdgid->push_back(lep1_pdgid());
+      }
+      if(nvetoleps()>1){
+        vetoleps_pt->push_back(lep2_p4().pt());
+        vetoleps_phi->push_back(lep2_p4().phi());
+        vetoleps_eta->push_back(lep2_p4().eta());
+        vetoleps_pdgid->push_back(lep2_pdgid());
+      }
       if(ngoodleps()>1){
         leps_pt->push_back(lep2_p4().pt());
         leps_phi->push_back(lep2_p4().phi());
@@ -711,8 +746,8 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
       // Use CSV sorted for mbb
       vector <pair<int, float>> jet_csv_pairs;
       //Only 30 GeV jets passing ID, inside eta 2.4 should survive to babies.
-      for(uint ijet=0;ijet<ak4pfjets_deepCSVb().size();ijet++){
-        float btagvalue = ak4pfjets_deepCSVb().at(ijet) + ak4pfjets_deepCSVbb().at(ijet);
+      for(uint ijet=0;ijet<ak4pfjets_deepCSV().size();ijet++){
+        float btagvalue = ak4pfjets_deepCSV().at(ijet);
         jet_csv_pairs.push_back(make_pair(ijet,btagvalue));
       }
       sort( jet_csv_pairs.begin(), jet_csv_pairs.end(), sortIndexbyCSV);
