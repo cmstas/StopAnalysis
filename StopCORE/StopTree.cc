@@ -108,6 +108,12 @@ void StopTree::Init(TTree *tree) {
   if (tau_p4_branch) tau_p4_branch->SetAddress(&tau_p4_);
   isoTracks_p4_branch = tree->GetBranch("isoTracks_p4");
   if (isoTracks_p4_branch) isoTracks_p4_branch->SetAddress(&isoTracks_p4_);
+  Zll_p4l1_branch = tree->GetBranch("Zll_p4l1");
+  if (Zll_p4l1_branch) Zll_p4l1_branch->SetAddress(&Zll_p4l1_);
+  Zll_p4l2_branch = tree->GetBranch("Zll_p4l2");
+  if (Zll_p4l2_branch) Zll_p4l2_branch->SetAddress(&Zll_p4l2_);
+  Zll_p4_branch = tree->GetBranch("Zll_p4");
+  if (Zll_p4_branch) Zll_p4_branch->SetAddress(&Zll_p4_);
 
   tree->SetMakeClass(1);
 
@@ -1163,6 +1169,48 @@ void StopTree::Init(TTree *tree) {
   if (mindphi_genmet_j1_j2_rl_branch) mindphi_genmet_j1_j2_rl_branch->SetAddress(&mindphi_genmet_j1_j2_rl_);
   MT2_ll_genmet_branch = tree->GetBranch("MT2_ll_genmet");
   if (MT2_ll_genmet_branch) MT2_ll_genmet_branch->SetAddress(&MT2_ll_genmet_);
+  Zll_idl1_branch = tree->GetBranch("Zll_idl1");
+  if (Zll_idl1_branch) Zll_idl1_branch->SetAddress(&Zll_idl1_);
+  Zll_idl2_branch = tree->GetBranch("Zll_idl2");
+  if (Zll_idl2_branch) Zll_idl2_branch->SetAddress(&Zll_idl2_);
+  Zll_OS_branch = tree->GetBranch("Zll_OS");
+  if (Zll_OS_branch) Zll_OS_branch->SetAddress(&Zll_OS_);
+  Zll_SF_branch = tree->GetBranch("Zll_SF");
+  if (Zll_SF_branch) Zll_SF_branch->SetAddress(&Zll_SF_);
+  Zll_isZmass_branch = tree->GetBranch("Zll_isZmass");
+  if (Zll_isZmass_branch) Zll_isZmass_branch->SetAddress(&Zll_isZmass_);
+  Zll_M_branch = tree->GetBranch("Zll_M");
+  if (Zll_M_branch) Zll_M_branch->SetAddress(&Zll_M_);
+  Zll_selLep_branch = tree->GetBranch("Zll_selLep");
+  if (Zll_selLep_branch) Zll_selLep_branch->SetAddress(&Zll_selLep_);
+  Zll_met_branch = tree->GetBranch("Zll_met");
+  if (Zll_met_branch) Zll_met_branch->SetAddress(&Zll_met_);
+  Zll_met_phi_branch = tree->GetBranch("Zll_met_phi");
+  if (Zll_met_phi_branch) Zll_met_phi_branch->SetAddress(&Zll_met_phi_);
+  Zll_mindphi_met_j1_j2_branch = tree->GetBranch("Zll_mindphi_met_j1_j2");
+  if (Zll_mindphi_met_j1_j2_branch) Zll_mindphi_met_j1_j2_branch->SetAddress(&Zll_mindphi_met_j1_j2_);
+  Zll_mt_met_lep_branch = tree->GetBranch("Zll_mt_met_lep");
+  if (Zll_mt_met_lep_branch) Zll_mt_met_lep_branch->SetAddress(&Zll_mt_met_lep_);
+  Zll_dphi_Wlep_branch = tree->GetBranch("Zll_dphi_Wlep");
+  if (Zll_dphi_Wlep_branch) Zll_dphi_Wlep_branch->SetAddress(&Zll_dphi_Wlep_);
+  Zll_MT2W_branch = tree->GetBranch("Zll_MT2W");
+  if (Zll_MT2W_branch) Zll_MT2W_branch->SetAddress(&Zll_MT2W_);
+  Zll_topness_branch = tree->GetBranch("Zll_topness");
+  if (Zll_topness_branch) Zll_topness_branch->SetAddress(&Zll_topness_);
+  Zll_topnessMod_branch = tree->GetBranch("Zll_topnessMod");
+  if (Zll_topnessMod_branch) Zll_topnessMod_branch->SetAddress(&Zll_topnessMod_);
+  Zll_MT2_ll_branch = tree->GetBranch("Zll_MT2_ll");
+  if (Zll_MT2_ll_branch) Zll_MT2_ll_branch->SetAddress(&Zll_MT2_ll_);
+  Zll_MT2_lb_b_mass_branch = tree->GetBranch("Zll_MT2_lb_b_mass");
+  if (Zll_MT2_lb_b_mass_branch) Zll_MT2_lb_b_mass_branch->SetAddress(&Zll_MT2_lb_b_mass_);
+  Zll_MT2_lb_b_branch = tree->GetBranch("Zll_MT2_lb_b");
+  if (Zll_MT2_lb_b_branch) Zll_MT2_lb_b_branch->SetAddress(&Zll_MT2_lb_b_);
+  Zll_MT2_lb_bqq_mass_branch = tree->GetBranch("Zll_MT2_lb_bqq_mass");
+  if (Zll_MT2_lb_bqq_mass_branch) Zll_MT2_lb_bqq_mass_branch->SetAddress(&Zll_MT2_lb_bqq_mass_);
+  Zll_MT2_lb_bqq_branch = tree->GetBranch("Zll_MT2_lb_bqq");
+  if (Zll_MT2_lb_bqq_branch) Zll_MT2_lb_bqq_branch->SetAddress(&Zll_MT2_lb_bqq_);
+  genlepsfromtop_branch = tree->GetBranch("genlepsfromtop");
+  if (genlepsfromtop_branch) genlepsfromtop_branch->SetAddress(&genlepsfromtop_);
   ph_selectedidx_branch = tree->GetBranch("ph_selectedidx");
   if (ph_selectedidx_branch) ph_selectedidx_branch->SetAddress(&ph_selectedidx_);
   ph_met_branch = tree->GetBranch("ph_met");
@@ -1883,6 +1931,30 @@ void StopTree::GetEntry(unsigned int idx) {
   mindphi_genmet_j1_j2_isLoaded = false;
   mindphi_genmet_j1_j2_rl_isLoaded = false;
   MT2_ll_genmet_isLoaded = false;
+  Zll_idl1_isLoaded = false;
+  Zll_idl2_isLoaded = false;
+  Zll_p4l1_isLoaded = false;
+  Zll_p4l2_isLoaded = false;
+  Zll_OS_isLoaded = false;
+  Zll_SF_isLoaded = false;
+  Zll_isZmass_isLoaded = false;
+  Zll_M_isLoaded = false;
+  Zll_p4_isLoaded = false;
+  Zll_selLep_isLoaded = false;
+  Zll_met_isLoaded = false;
+  Zll_met_phi_isLoaded = false;
+  Zll_mindphi_met_j1_j2_isLoaded = false;
+  Zll_mt_met_lep_isLoaded = false;
+  Zll_dphi_Wlep_isLoaded = false;
+  Zll_MT2W_isLoaded = false;
+  Zll_topness_isLoaded = false;
+  Zll_topnessMod_isLoaded = false;
+  Zll_MT2_ll_isLoaded = false;
+  Zll_MT2_lb_b_mass_isLoaded = false;
+  Zll_MT2_lb_b_isLoaded = false;
+  Zll_MT2_lb_bqq_mass_isLoaded = false;
+  Zll_MT2_lb_bqq_isLoaded = false;
+  genlepsfromtop_isLoaded = false;
   ph_selectedidx_isLoaded = false;
   ph_met_isLoaded = false;
   ph_met_phi_isLoaded = false;
@@ -2533,6 +2605,30 @@ void StopTree::LoadAllBranches() {
   if (mindphi_genmet_j1_j2_branch != 0) mindphi_genmet_j1_j2();
   if (mindphi_genmet_j1_j2_rl_branch != 0) mindphi_genmet_j1_j2_rl();
   if (MT2_ll_genmet_branch != 0) MT2_ll_genmet();
+  if (Zll_idl1_branch != 0) Zll_idl1();
+  if (Zll_idl2_branch != 0) Zll_idl2();
+  if (Zll_p4l1_branch != 0) Zll_p4l1();
+  if (Zll_p4l2_branch != 0) Zll_p4l2();
+  if (Zll_OS_branch != 0) Zll_OS();
+  if (Zll_SF_branch != 0) Zll_SF();
+  if (Zll_isZmass_branch != 0) Zll_isZmass();
+  if (Zll_M_branch != 0) Zll_M();
+  if (Zll_p4_branch != 0) Zll_p4();
+  if (Zll_selLep_branch != 0) Zll_selLep();
+  if (Zll_met_branch != 0) Zll_met();
+  if (Zll_met_phi_branch != 0) Zll_met_phi();
+  if (Zll_mindphi_met_j1_j2_branch != 0) Zll_mindphi_met_j1_j2();
+  if (Zll_mt_met_lep_branch != 0) Zll_mt_met_lep();
+  if (Zll_dphi_Wlep_branch != 0) Zll_dphi_Wlep();
+  if (Zll_MT2W_branch != 0) Zll_MT2W();
+  if (Zll_topness_branch != 0) Zll_topness();
+  if (Zll_topnessMod_branch != 0) Zll_topnessMod();
+  if (Zll_MT2_ll_branch != 0) Zll_MT2_ll();
+  if (Zll_MT2_lb_b_mass_branch != 0) Zll_MT2_lb_b_mass();
+  if (Zll_MT2_lb_b_branch != 0) Zll_MT2_lb_b();
+  if (Zll_MT2_lb_bqq_mass_branch != 0) Zll_MT2_lb_bqq_mass();
+  if (Zll_MT2_lb_bqq_branch != 0) Zll_MT2_lb_bqq();
+  if (genlepsfromtop_branch != 0) genlepsfromtop();
   if (ph_selectedidx_branch != 0) ph_selectedidx();
   if (ph_met_branch != 0) ph_met();
   if (ph_met_phi_branch != 0) ph_met_phi();
@@ -10129,6 +10225,318 @@ const float &StopTree::MT2_ll_genmet() {
   return MT2_ll_genmet_;
 }
 
+const int &StopTree::Zll_idl1() {
+  if (not Zll_idl1_isLoaded) {
+    if (Zll_idl1_branch != 0) {
+      Zll_idl1_branch->GetEntry(index);
+    } else {
+      printf("branch Zll_idl1_branch does not exist!\n");
+      exit(1);
+    }
+    Zll_idl1_isLoaded = true;
+  }
+  return Zll_idl1_;
+}
+
+const int &StopTree::Zll_idl2() {
+  if (not Zll_idl2_isLoaded) {
+    if (Zll_idl2_branch != 0) {
+      Zll_idl2_branch->GetEntry(index);
+    } else {
+      printf("branch Zll_idl2_branch does not exist!\n");
+      exit(1);
+    }
+    Zll_idl2_isLoaded = true;
+  }
+  return Zll_idl2_;
+}
+
+const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &StopTree::Zll_p4l1() {
+  if (not Zll_p4l1_isLoaded) {
+    if (Zll_p4l1_branch != 0) {
+      Zll_p4l1_branch->GetEntry(index);
+    } else {
+      printf("branch Zll_p4l1_branch does not exist!\n");
+      exit(1);
+    }
+    Zll_p4l1_isLoaded = true;
+  }
+  return *Zll_p4l1_;
+}
+
+const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &StopTree::Zll_p4l2() {
+  if (not Zll_p4l2_isLoaded) {
+    if (Zll_p4l2_branch != 0) {
+      Zll_p4l2_branch->GetEntry(index);
+    } else {
+      printf("branch Zll_p4l2_branch does not exist!\n");
+      exit(1);
+    }
+    Zll_p4l2_isLoaded = true;
+  }
+  return *Zll_p4l2_;
+}
+
+const bool &StopTree::Zll_OS() {
+  if (not Zll_OS_isLoaded) {
+    if (Zll_OS_branch != 0) {
+      Zll_OS_branch->GetEntry(index);
+    } else {
+      printf("branch Zll_OS_branch does not exist!\n");
+      exit(1);
+    }
+    Zll_OS_isLoaded = true;
+  }
+  return Zll_OS_;
+}
+
+const bool &StopTree::Zll_SF() {
+  if (not Zll_SF_isLoaded) {
+    if (Zll_SF_branch != 0) {
+      Zll_SF_branch->GetEntry(index);
+    } else {
+      printf("branch Zll_SF_branch does not exist!\n");
+      exit(1);
+    }
+    Zll_SF_isLoaded = true;
+  }
+  return Zll_SF_;
+}
+
+const bool &StopTree::Zll_isZmass() {
+  if (not Zll_isZmass_isLoaded) {
+    if (Zll_isZmass_branch != 0) {
+      Zll_isZmass_branch->GetEntry(index);
+    } else {
+      printf("branch Zll_isZmass_branch does not exist!\n");
+      exit(1);
+    }
+    Zll_isZmass_isLoaded = true;
+  }
+  return Zll_isZmass_;
+}
+
+const float &StopTree::Zll_M() {
+  if (not Zll_M_isLoaded) {
+    if (Zll_M_branch != 0) {
+      Zll_M_branch->GetEntry(index);
+    } else {
+      printf("branch Zll_M_branch does not exist!\n");
+      exit(1);
+    }
+    Zll_M_isLoaded = true;
+  }
+  return Zll_M_;
+}
+
+const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &StopTree::Zll_p4() {
+  if (not Zll_p4_isLoaded) {
+    if (Zll_p4_branch != 0) {
+      Zll_p4_branch->GetEntry(index);
+    } else {
+      printf("branch Zll_p4_branch does not exist!\n");
+      exit(1);
+    }
+    Zll_p4_isLoaded = true;
+  }
+  return *Zll_p4_;
+}
+
+const int &StopTree::Zll_selLep() {
+  if (not Zll_selLep_isLoaded) {
+    if (Zll_selLep_branch != 0) {
+      Zll_selLep_branch->GetEntry(index);
+    } else {
+      printf("branch Zll_selLep_branch does not exist!\n");
+      exit(1);
+    }
+    Zll_selLep_isLoaded = true;
+  }
+  return Zll_selLep_;
+}
+
+const float &StopTree::Zll_met() {
+  if (not Zll_met_isLoaded) {
+    if (Zll_met_branch != 0) {
+      Zll_met_branch->GetEntry(index);
+    } else {
+      printf("branch Zll_met_branch does not exist!\n");
+      exit(1);
+    }
+    Zll_met_isLoaded = true;
+  }
+  return Zll_met_;
+}
+
+const float &StopTree::Zll_met_phi() {
+  if (not Zll_met_phi_isLoaded) {
+    if (Zll_met_phi_branch != 0) {
+      Zll_met_phi_branch->GetEntry(index);
+    } else {
+      printf("branch Zll_met_phi_branch does not exist!\n");
+      exit(1);
+    }
+    Zll_met_phi_isLoaded = true;
+  }
+  return Zll_met_phi_;
+}
+
+const float &StopTree::Zll_mindphi_met_j1_j2() {
+  if (not Zll_mindphi_met_j1_j2_isLoaded) {
+    if (Zll_mindphi_met_j1_j2_branch != 0) {
+      Zll_mindphi_met_j1_j2_branch->GetEntry(index);
+    } else {
+      printf("branch Zll_mindphi_met_j1_j2_branch does not exist!\n");
+      exit(1);
+    }
+    Zll_mindphi_met_j1_j2_isLoaded = true;
+  }
+  return Zll_mindphi_met_j1_j2_;
+}
+
+const float &StopTree::Zll_mt_met_lep() {
+  if (not Zll_mt_met_lep_isLoaded) {
+    if (Zll_mt_met_lep_branch != 0) {
+      Zll_mt_met_lep_branch->GetEntry(index);
+    } else {
+      printf("branch Zll_mt_met_lep_branch does not exist!\n");
+      exit(1);
+    }
+    Zll_mt_met_lep_isLoaded = true;
+  }
+  return Zll_mt_met_lep_;
+}
+
+const float &StopTree::Zll_dphi_Wlep() {
+  if (not Zll_dphi_Wlep_isLoaded) {
+    if (Zll_dphi_Wlep_branch != 0) {
+      Zll_dphi_Wlep_branch->GetEntry(index);
+    } else {
+      printf("branch Zll_dphi_Wlep_branch does not exist!\n");
+      exit(1);
+    }
+    Zll_dphi_Wlep_isLoaded = true;
+  }
+  return Zll_dphi_Wlep_;
+}
+
+const float &StopTree::Zll_MT2W() {
+  if (not Zll_MT2W_isLoaded) {
+    if (Zll_MT2W_branch != 0) {
+      Zll_MT2W_branch->GetEntry(index);
+    } else {
+      printf("branch Zll_MT2W_branch does not exist!\n");
+      exit(1);
+    }
+    Zll_MT2W_isLoaded = true;
+  }
+  return Zll_MT2W_;
+}
+
+const float &StopTree::Zll_topness() {
+  if (not Zll_topness_isLoaded) {
+    if (Zll_topness_branch != 0) {
+      Zll_topness_branch->GetEntry(index);
+    } else {
+      printf("branch Zll_topness_branch does not exist!\n");
+      exit(1);
+    }
+    Zll_topness_isLoaded = true;
+  }
+  return Zll_topness_;
+}
+
+const float &StopTree::Zll_topnessMod() {
+  if (not Zll_topnessMod_isLoaded) {
+    if (Zll_topnessMod_branch != 0) {
+      Zll_topnessMod_branch->GetEntry(index);
+    } else {
+      printf("branch Zll_topnessMod_branch does not exist!\n");
+      exit(1);
+    }
+    Zll_topnessMod_isLoaded = true;
+  }
+  return Zll_topnessMod_;
+}
+
+const float &StopTree::Zll_MT2_ll() {
+  if (not Zll_MT2_ll_isLoaded) {
+    if (Zll_MT2_ll_branch != 0) {
+      Zll_MT2_ll_branch->GetEntry(index);
+    } else {
+      printf("branch Zll_MT2_ll_branch does not exist!\n");
+      exit(1);
+    }
+    Zll_MT2_ll_isLoaded = true;
+  }
+  return Zll_MT2_ll_;
+}
+
+const float &StopTree::Zll_MT2_lb_b_mass() {
+  if (not Zll_MT2_lb_b_mass_isLoaded) {
+    if (Zll_MT2_lb_b_mass_branch != 0) {
+      Zll_MT2_lb_b_mass_branch->GetEntry(index);
+    } else {
+      printf("branch Zll_MT2_lb_b_mass_branch does not exist!\n");
+      exit(1);
+    }
+    Zll_MT2_lb_b_mass_isLoaded = true;
+  }
+  return Zll_MT2_lb_b_mass_;
+}
+
+const float &StopTree::Zll_MT2_lb_b() {
+  if (not Zll_MT2_lb_b_isLoaded) {
+    if (Zll_MT2_lb_b_branch != 0) {
+      Zll_MT2_lb_b_branch->GetEntry(index);
+    } else {
+      printf("branch Zll_MT2_lb_b_branch does not exist!\n");
+      exit(1);
+    }
+    Zll_MT2_lb_b_isLoaded = true;
+  }
+  return Zll_MT2_lb_b_;
+}
+
+const float &StopTree::Zll_MT2_lb_bqq_mass() {
+  if (not Zll_MT2_lb_bqq_mass_isLoaded) {
+    if (Zll_MT2_lb_bqq_mass_branch != 0) {
+      Zll_MT2_lb_bqq_mass_branch->GetEntry(index);
+    } else {
+      printf("branch Zll_MT2_lb_bqq_mass_branch does not exist!\n");
+      exit(1);
+    }
+    Zll_MT2_lb_bqq_mass_isLoaded = true;
+  }
+  return Zll_MT2_lb_bqq_mass_;
+}
+
+const float &StopTree::Zll_MT2_lb_bqq() {
+  if (not Zll_MT2_lb_bqq_isLoaded) {
+    if (Zll_MT2_lb_bqq_branch != 0) {
+      Zll_MT2_lb_bqq_branch->GetEntry(index);
+    } else {
+      printf("branch Zll_MT2_lb_bqq_branch does not exist!\n");
+      exit(1);
+    }
+    Zll_MT2_lb_bqq_isLoaded = true;
+  }
+  return Zll_MT2_lb_bqq_;
+}
+
+const int &StopTree::genlepsfromtop() {
+  if (not genlepsfromtop_isLoaded) {
+    if (genlepsfromtop_branch != 0) {
+      genlepsfromtop_branch->GetEntry(index);
+    } else {
+      printf("branch genlepsfromtop_branch does not exist!\n");
+      exit(1);
+    }
+    genlepsfromtop_isLoaded = true;
+  }
+  return genlepsfromtop_;
+}
+
 const int &StopTree::ph_selectedidx() {
   if (not ph_selectedidx_isLoaded) {
     if (ph_selectedidx_branch != 0) {
@@ -11602,6 +12010,30 @@ const float &mt_genmet_lep_rl() { return babyAnalyzer.mt_genmet_lep_rl(); }
 const float &mindphi_genmet_j1_j2() { return babyAnalyzer.mindphi_genmet_j1_j2(); }
 const float &mindphi_genmet_j1_j2_rl() { return babyAnalyzer.mindphi_genmet_j1_j2_rl(); }
 const float &MT2_ll_genmet() { return babyAnalyzer.MT2_ll_genmet(); }
+const int &Zll_idl1() { return babyAnalyzer.Zll_idl1(); }
+const int &Zll_idl2() { return babyAnalyzer.Zll_idl2(); }
+const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &Zll_p4l1() { return babyAnalyzer.Zll_p4l1(); }
+const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &Zll_p4l2() { return babyAnalyzer.Zll_p4l2(); }
+const bool &Zll_OS() { return babyAnalyzer.Zll_OS(); }
+const bool &Zll_SF() { return babyAnalyzer.Zll_SF(); }
+const bool &Zll_isZmass() { return babyAnalyzer.Zll_isZmass(); }
+const float &Zll_M() { return babyAnalyzer.Zll_M(); }
+const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &Zll_p4() { return babyAnalyzer.Zll_p4(); }
+const int &Zll_selLep() { return babyAnalyzer.Zll_selLep(); }
+const float &Zll_met() { return babyAnalyzer.Zll_met(); }
+const float &Zll_met_phi() { return babyAnalyzer.Zll_met_phi(); }
+const float &Zll_mindphi_met_j1_j2() { return babyAnalyzer.Zll_mindphi_met_j1_j2(); }
+const float &Zll_mt_met_lep() { return babyAnalyzer.Zll_mt_met_lep(); }
+const float &Zll_dphi_Wlep() { return babyAnalyzer.Zll_dphi_Wlep(); }
+const float &Zll_MT2W() { return babyAnalyzer.Zll_MT2W(); }
+const float &Zll_topness() { return babyAnalyzer.Zll_topness(); }
+const float &Zll_topnessMod() { return babyAnalyzer.Zll_topnessMod(); }
+const float &Zll_MT2_ll() { return babyAnalyzer.Zll_MT2_ll(); }
+const float &Zll_MT2_lb_b_mass() { return babyAnalyzer.Zll_MT2_lb_b_mass(); }
+const float &Zll_MT2_lb_b() { return babyAnalyzer.Zll_MT2_lb_b(); }
+const float &Zll_MT2_lb_bqq_mass() { return babyAnalyzer.Zll_MT2_lb_bqq_mass(); }
+const float &Zll_MT2_lb_bqq() { return babyAnalyzer.Zll_MT2_lb_bqq(); }
+const int &genlepsfromtop() { return babyAnalyzer.genlepsfromtop(); }
 const int &ph_selectedidx() { return babyAnalyzer.ph_selectedidx(); }
 const float &ph_met() { return babyAnalyzer.ph_met(); }
 const float &ph_met_phi() { return babyAnalyzer.ph_met_phi(); }
