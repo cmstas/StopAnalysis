@@ -13,6 +13,7 @@ enum Vars {       met,        mt,         nlep,       nvlep,   passvetos,       
                metphi,    lep1pt,       lep2pt,     lep1eta,     lep2eta,     jet1pt,     jet2pt,    jet1eta,    jet2eta,
              nvtx, ht, nak8jets, chi2, binttag, leadbpt, mllbbmet, mtttbar, ptttbar, ptll, ptbb, passlep1pt,
                   mht, mhtphi, met_rs, metphi_rs, mt_rs, dphijmet_rs, dphilmet_rs, metphi_rl, nsblep,
+                  met_rZ, mt_rZ, nlep_rZ,
                   // rmet, rmetphi, cmet, cmetphi, mt_cmet, dphilcmet,
                 nvars };
 // vector<std::string> varnames_ = { "met",};
@@ -64,6 +65,7 @@ std::vector<SR> getStopControlRegionsDileptonBooleanTopTags();
 
 std::vector<SR> getStopCrosscheckRegionsEMu();
 std::vector<SR> getStopCrosscheckRegionsEMuRun2();
+std::vector<SR> getStopCrosscheckRegionsTrileptonRun2();
 std::vector<SR> getStopInclusiveRegionsTopological();
 std::vector<SR> getStopInclusiveControlRegionsNoBTags();
 std::vector<SR> getStopInclusiveControlRegionsDilepton();

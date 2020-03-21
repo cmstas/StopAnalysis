@@ -25,6 +25,7 @@ class StopLooper {
   std::vector<SR> CR2lVec;
   std::vector<SR> CR0bVec;
   std::vector<SR> CRemuVec;
+  std::vector<SR> CR3lVec;
 
   std::vector<SR> testVec;
 
@@ -34,6 +35,7 @@ class StopLooper {
   void fillHistosForCR2l(std::string suffix = "");
   void fillHistosForCR0b(std::string suffix = "");
   void fillHistosForCRemu(std::string suffix = "", int trigType = 0);
+  void fillHistosForCR3l(std::string suffix = "");
 
   // Helper functions
   bool PassingHLTriggers(const int type = 1);

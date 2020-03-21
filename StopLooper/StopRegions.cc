@@ -293,7 +293,7 @@ std::vector<SR> getStopCrosscheckRegionsEMuRun2() {
 
   SR crbase;
 
-  crbase.SetName("cremu_base");
+  crbase.SetName("cremubase");
   crbase.SetVar(nvlep, 1, 3);
   crbase.SetVar(met, 50, fInf);
   crbase.SetVar(njet, 2, fInf);
@@ -501,6 +501,63 @@ std::vector<SR> getStopCrosscheckRegionsEMuRun2() {
 
   return CRvec;
 }
+
+std::vector<SR> getStopCrosscheckRegionsTrileptonRun2() {
+
+  std::vector<SR> CRvec;
+
+  SR crbase;
+
+  crbase.SetName("cr3lbase");
+  crbase.SetVar(nvlep, 3, fInf);
+  crbase.SetVar(met_rZ, 50, fInf);
+  crbase.SetVar(njet, 2, fInf);
+  crbase.SetMETBins({50, 100, 150, 200, 250, 350, 450, 600, 800, 1500});
+  crbase.SetAllowDummyVars(1);
+
+  // The strict lepton selections are in the looper
+
+  SR cr = crbase;
+
+  cr.SetName("cr3lA0");
+  cr.SetDetailName("3l_ge2j_ge0b_met50toInf");
+  cr.SetVar(nbjet, 0, fInf);
+  CRvec.emplace_back(cr);
+
+  cr.SetName("cr3lA1");
+  cr.SetDetailName("3l_ge2j_ge1b_met50toInf");
+  cr.SetVar(nbjet, 0, fInf);
+  CRvec.emplace_back(cr);
+
+  cr.SetName("cr3lA2");
+  cr.SetDetailName("3l_ge2j_ge2b_met50toInf");
+  cr.SetVar(nbjet, 0, fInf);
+  CRvec.emplace_back(cr);
+
+
+  cr.SetName("cr3lB0");
+  cr.SetDetailName("3l_ge2j_ge1b_mt150toInf_met50toInf");
+  cr.SetVar(nbjet, 1, fInf);
+  cr.SetVar(mt_rZ, 150, fInf);
+  CRvec.emplace_back(cr);
+
+  cr.SetName("cr3lB1");
+  cr.SetDetailName("3l_ge2j_ge1b_met0toInf");
+  cr.SetVar(met_rZ, 250, fInf);
+  cr.SetVar(mt_rZ, 0, fInf);
+  CRvec.emplace_back(cr);
+
+  cr.SetName("cr3lC0");
+  cr.SetDetailName("3l_ge2j_ge1b_mt150toInf_met250toInf");
+  cr.SetVar(nbjet, 1, fInf);
+  cr.SetVar(mt_rZ, 150, fInf);
+  cr.SetVar(met_rZ, 250, fInf);
+  CRvec.emplace_back(cr);
+
+
+  return CRvec;
+}
+
 
 std::vector<SR> getStopInclusiveRegionsTopological() {
   std::vector<SR> SRvec;
