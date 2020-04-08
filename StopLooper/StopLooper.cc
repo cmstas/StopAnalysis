@@ -52,9 +52,9 @@ const bool applyGoodRunList = true;
 // apply the MET resolution correction to the MET variables, required running
 const bool applyMETResCorrection = true;
 // turn on to enable plots of metbins with systematic variations applied. will only do variations for applied weights
-const bool doSystVariations = false;
+const bool doSystVariations = true;
 // turn on to enable plots of metbins with different gen classifications
-const bool doGenClassification = true;
+const bool doGenClassification = false;
 // turn on to apply Nvtx reweighting to MC / data2016
 const bool doNvtxReweight = false;
 // turn on top tagging studies, off for baby ver < 25
@@ -137,7 +137,7 @@ void StopLooper::SetSignalRegions() {
   // CRemuVec = getStopCrosscheckRegionsEMuRun2();
   // CRemuVec = getStopCrosscheckRegionsEMu();
 
-  CR3lVec = getStopCrosscheckRegionsTrileptonRun2();
+  // CR3lVec = getStopCrosscheckRegionsTrileptonRun2();
   // Temporary
   // SRVec.clear();
   // CR0bVec.clear();
@@ -385,9 +385,9 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
 
     evtWgt.getZSampleWeightFromCR3l(fname);
 
-    if (year_ == 2016) kLumi = 35.867;
-    else if (year_ == 2017) kLumi = 41.96;
-    else if (year_ == 2018) kLumi = 70;
+    if (year_ == 2016) kLumi = 35.922;
+    else if (year_ == 2017) kLumi = 41.529;
+    else if (year_ == 2018) kLumi = 59.740;
 
     if (!is_data() && runMETResCorrection) // setup MET resolution stuff
       metCorrector.setup(year_, to_string(year_), "../StopCORE/METCorr/METSFs");
@@ -524,7 +524,7 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
       evtWgt.resetEvent(); // full event weights only get calculated if the event get selected for a SR
 
       // Simple weight with scale1fb only
-      if (is_bkg_) evtweight_ = kLumi * scale1fb();
+      if (is_bkg_) evtweight_ = kLumi * scale1fb();  // NOTE: this is NOT the final event weight! just to have something for shape studies
 
       // Plot nvtxs on the base selection of stopbaby for reweighting purpose
       plot1d("h_nvtxs", nvtxs(), 1, testVec[0].histMap, ";Number of vertices", 100, 1, 101);
@@ -923,12 +923,12 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
 
         fillHistosForCR2l(suffix);
 
-        if (systype == 0 && babyver >= 32.1) {
-          values_[met_rZ] = Zll_met();
-          values_[mt_rZ] = Zll_mt_met_lep();
+        // if (systype == 0 && babyver >= 32.1) {
+        //   values_[met_rZ] = Zll_met();
+        //   values_[mt_rZ] = Zll_mt_met_lep();
 
-          fillHistosForCR3l(suffix);
-        }
+        //   fillHistosForCR3l(suffix);
+        // }
 
         if (systype == 0)
           testCutFlowHistos(testVec[2]);

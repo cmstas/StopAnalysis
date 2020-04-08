@@ -33,7 +33,7 @@ const bool correlated = true;
 // do subtract signal contamination from CR? default: true
 const bool dosigcont = true;
 // do average with yields using genmet for signal? default: true
-const bool dogenmet = true;
+const bool dogenmet = false;
 // test without real data?
 const bool fakedata = false;
 // test without background systematics?
@@ -65,7 +65,9 @@ TFile *fsig_genmet;
 // vector<string> systNames_sig = {"jes", "ISR", "lepFSSF", "bTagFSEff"}; //  "q2" <-- fix this
 // vector<string> systNames_corr = {"bTagEffHF", "bTagEffLF", "lepSF", "pdf", "q2", "jes", "ISR", "pileup", "alphas", "metRes", "L1prefire"};
 // vector<string> systNames_corr = {"bTagEffHF", "bTagEffLF", "lepSF", "pdf", "q2", "jes", "ISR", "alphas", "L1prefire"};
-vector<string> systNames_sig = {"jes16", "jes17", "jes18", "ISR", "lepFSSF", "bTagFSEff"}; //  "q2" <-- fix this
+// vector<string> systNames_sig = {"jes16", "jes17", "jes18", "ISR", "lepFSSF", "bTagFSEff"}; //  "q2" <-- fix this
+// vector<string> systNames_sig = {"jes16", "jes17", "jes18", "ISR16"}; //  Fullsim signals
+vector<string> systNames_sig; //  Fullsim signals
 vector<string> systNames_corr = {"bTagEffHF16", "bTagEffHF17", "bTagEffHF18", "bTagEffLF16", "bTagEffLF17", "bTagEffLF18", "lepSF",
                                  "pdf", "q2", "jes16", "jes17", "jes18", "ISR16", "pileup16", "pileup17", "pileup18",
                                  "alphas", "metRes16", "metRes17", "metRes18", "L1prefire", "ttagSF", "softbSF16", "softbSF17", "softbSF18"};
@@ -353,6 +355,8 @@ int makeCardForOneBin(TString dir, int mstop, int mlsp, int metbin, int bin, TSt
   TString hname_Z  = hname + "_"; // + "_Znunu_";
   // TString hname_sig = hname + signame(4, 12);  // signame format: "T2tt_1200_900"
   TString hname_sig = dir + "/hSMS_metbins";
+  bool fullsimsig = (mstop == -1 && mlsp == -1);
+  if (fullsimsig) hname_sig = hname;
 
   // constants uncertainties
   // TODO: numbers to be updated for new analysis
@@ -435,7 +439,8 @@ int makeCardForOneBin(TString dir, int mstop, int mlsp, int metbin, int bin, TSt
   *fLogStream << "------------" << endl;
 
   // next ALL control region statistical uncertainties
-  if (dosigcont) {
+  if (dogenmet && dosigcont) {
+    if (sig == 0.) cout << "WARNING: signal = 0 in bin " << bin << "!!" << endl;
     double genmetunc = 1. + fabs(sig1-sig) / (2.*sig); // <-- careful for sig == 0.
     if (fsig_genmet && (fabs(fabs(sig1-sig)-fabs(sig2-sig)) > 0.001)) cout << "This should not happen " << fabs(sig1-sig) << " " << fabs(sig2-sig) << endl;
     if (genmetunc != 1) {
@@ -583,11 +588,9 @@ int makeCardForOneBin(TString dir, int mstop, int mlsp, int metbin, int bin, TSt
 void makeCardsForPoint(TString signal, int mstop, int mlsp, TString outdir) {
 
   system(Form("mkdir -p %s", outdir.Data()));
-  vector<TString> dirlist;
-  if (signal == "T2tt")
+  vector<TString> dirlist = vector<TString> {"srA0", "srA1", "srA2", "srB", "srC", "srD", "srE0", "srE1", "srE2", "srE3", "srF", "srG0", "srG1", "srG2", "srG3", "srH"};
+  if (signal.Contains("T2tt"))
     dirlist = vector<TString> {"srA0", "srA1", "srA2", "srB", "srC", "srD", "srE0", "srE1", "srE2", "srE3", "srF", "srG0", "srG1", "srG2", "srG3", "srH", "srI", "srJ"};
-  else
-    dirlist = vector<TString> {"srA0", "srA1", "srA2", "srB", "srC", "srD", "srE0", "srE1", "srE2", "srE3", "srF", "srG0", "srG1", "srG2", "srG3", "srH",};
 
   if (outdir.Contains("fullsplit") || outdir.Contains("oldsplit"))
       dirlist = vector<TString> {"srA1", "srA2", "srB", "srC", "srD", "srE1", "srE2", "srE3", "srF", "srG1", "srG2", "srG3", "srH", "srI", "srJ"};
@@ -604,11 +607,6 @@ void makeCardsForPoint(TString signal, int mstop, int mlsp, TString outdir) {
   TList* listOfDirs = fsig->GetListOfKeys();
   string keep = "sr";
   string skip = "srbase";
-  // for (auto k : *listOfDirs) {
-  //   TString dir = k->GetName();
-  //   if (dir[2] < 'A' || dir[2] > 'J') continue;
-  //   if (strncmp (dir, keep.c_str(), keep.length()) != 0) continue; // it is a signal region
-  // for (TString dir : {"srA0", "srA1", "srA2", "srB", "srC", "srD", "srE0", "srE1", "srE2", "srE3", "srF", "srG0", "srG1", "srG2", "srG3", "srH", }) {
   for (TString dir : dirlist) {
     // Fixed SRs for Run2 legacy analysis
     TString hname = dir + "/h_metbins"; // for met binning information, empty hist for signal output
@@ -629,8 +627,37 @@ void makeCardsForPoint(TString signal, int mstop, int mlsp, TString outdir) {
 }
 
 // -------------------------------------------------------------------------------------------------------------------
+// Make cards for a from fullsim signal (single mass point)
+void newCardMaker(int dummy, string signal = "ttHtoInv", string signal_dir="../StopLooper/output/sampttH_v32_s2", string input_dir="../StopLooper/output/combRun2_v31_s21", string output_dir="datacards/ttHtoInv_s2", string ysuf="run2") {
+  cout << "Making cards for single mass point: " << signal << endl;
+  system(Form("mkdir -p %s", output_dir.c_str()));
+
+  // set input files (global pointers)
+  fsig = new TFile(Form("%s/sig_%s_%s.root",signal_dir.c_str(), signal.c_str(), ysuf.c_str()));
+  fsig16 = new TFile(Form("%s/%s_s16v3.root",signal_dir.c_str(), signal.c_str()));
+  fsig17 = new TFile(Form("%s/%s_f17v2.root",signal_dir.c_str(), signal.c_str()));
+  fsig18 = new TFile(Form("%s/%s_a18v1.root",signal_dir.c_str(), signal.c_str()));
+  // fsig = new TFile(Form("%s/Signal_%s.root",input_dir.c_str(), signal.substr(0,4).c_str()));
+  f2l = new TFile(Form("%s/lostlepton_%s.root",input_dir.c_str(), ysuf.c_str()));
+  f1l = new TFile(Form("%s/1lepFromW_%s.root",input_dir.c_str(), ysuf.c_str()));
+  f1ltop = new TFile(Form("%s/1lepFromTop_%s.root",input_dir.c_str(), ysuf.c_str()));
+  fznunu = new TFile(Form("%s/ZToNuNu_%s.root",input_dir.c_str(), ysuf.c_str()));
+  fsig_genmet = nullptr; // don't use switched genmet signal for now
+
+  if (!fakedata) fdata = new TFile(Form("%s/allData_%s.root", input_dir.c_str(), ysuf.c_str()));
+  else fdata = new TFile(Form("%s/allBkg_%s.root", input_dir.c_str(), ysuf.c_str()));
+
+  if ( f2l->IsZombie() || f1l->IsZombie() ||  f1ltop->IsZombie() || fznunu->IsZombie() || fsig->IsZombie() || fdata->IsZombie() ) {
+    std::cout << "Input file does not exist" << std::endl;
+    return;
+  }
+
+  makeCardsForPoint(signal.c_str(), -1, -1, output_dir.c_str());
+}
+
+// -------------------------------------------------------------------------------------------------------------------
 // Make cards for a single mass point
-void newCardMaker(string signal = "T2tt", int mStop = 500, int mLSP = 400, string input_dir="../StopLooper/output/combRun2_v31_s17", string output_dir="datacards/temp", string ysuf="run2") {
+void newCardMaker(string signal = "T2tt", int mStop = 500, int mLSP = 400, string input_dir="../StopLooper/output/combRun2_v31_s21", string output_dir="datacards/temp", string ysuf="run2") {
   cout << "Making cards for single mass point: " << signal << endl;
   system(Form("mkdir -p %s", output_dir.c_str()));
 
@@ -721,6 +748,7 @@ int newCardMaker(string signal, string input_dir="../StopLooper/output/temp", st
         mstop += 8;
       }
       cout << "Making cards for point: " << Form("%s_%d_%d", signal.c_str(), mstop, mlsp) << endl;
+      if (not((mstop == 175 && mlsp == 1) || (mstop == 250 && mlsp == 50) || (mstop == 250 && mlsp == 75))) continue;
       makeCardsForPoint(signal.c_str(), mstop, mlsp, output_dir.c_str());
       signal_points.insert( make_pair(mstop, mlsp) );
     } // scanM2 loop

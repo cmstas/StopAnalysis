@@ -367,3 +367,26 @@ int makeBkgEstimates(string input_dir="../StopLooper/output/temp14", string outp
 
   return 0;
 }
+
+int postProcessOnly(string sample="ttHtoInv", string input_dir="../StopLooper/output/sampttH_v32_s2", string output_dir="../StopLooper/output/sampttH_v32_s2", string suffix="run2") {
+
+  // Set input files (global pointers)
+  TFile* fbkg = new TFile(Form("%s/%s_%s.root", input_dir.c_str(), sample.c_str(), suffix.c_str()));
+
+  yearSeparateSyst = (suffix == "run2");
+  if (yearSeparateSyst) {
+    fbkgs[0] = fbkg;
+    fbkgs[1] = new TFile(Form("%s/%s_s16v3.root",input_dir.c_str(), sample.c_str()));
+    fbkgs[2] = new TFile(Form("%s/%s_f17v2.root",input_dir.c_str(), sample.c_str()));
+    fbkgs[3] = new TFile(Form("%s/%s_a18v1.root",input_dir.c_str(), sample.c_str()));
+  }
+
+  // Create output files
+  TFile* fout = new TFile(Form("%s/sig_%s_%s.root",output_dir.c_str(), sample.c_str(), suffix.c_str()), "RECREATE");
+
+  takeDirectlyFromMC(fbkg, fout, "");
+
+  fbkg->Close();
+  fout->Close();
+  return 0;
+}

@@ -343,7 +343,7 @@ void evtWgtInfo::Setup(string samplestr, int inyear, bool applyUnc, bool useBTag
     lumi = 41.529;         // 2017 lumi
     lumi_err = lumi*0.023;
   } else if (year == 2018) {
-    lumi = 59.740;          // projected 2018 lumi
+    lumi = 59.740;          // 2018 lumi
     lumi_err = lumi*0.025;  // preliminary value
   }
 

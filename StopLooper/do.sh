@@ -14,7 +14,8 @@ LOGDIR=logs
 # skimtype=skimmed
 skimtype=merged
 
-vsuf=v31_s21_cf4
+# vsuf=v31_s21
+vsuf=v32_s2_fake16
 
 OUTDIR18=output/samp18_$vsuf
 OUTDIR17=output/samp17_$vsuf
@@ -33,7 +34,11 @@ run16dat=0
 run16bkg=0
 run16sig=0
 
+runextra=1
+
 # OUTDIRRUN2=""
+
+nomerge=1
 
 function runLooperJobs {
     # [[ -d ${OUTDIR} ]] && rm -r ${OUTDIR}
@@ -47,6 +52,15 @@ function runLooperJobs {
 }
 
 ########################
+# Extra signal ttH
+INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/tth_v32_1
+OUTDIR=output/sampttH_$vsuf
+LOGDIR=$OUTDIR/logs
+# declare -a Samples=(ttHtoInv_a18v1 ttHtoInv_f17v2)
+declare -a Samples=(ttHtoInv_a18v1 ttHtoInv_f17v2)
+[[ $runextra == 1 ]] && runLooperJobs
+
+########################
 # 2018 Data
 
 # INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/data_v30_10
@@ -56,6 +70,7 @@ OUTDIR=$OUTDIR18
 # INDIR=/nfs-7/userdata/sicheng/stopbabies/merged/data_v30_3/jetht
 # OUTDIR=output/jetht_v30
 LOGDIR=$OUTDIR/logs
+
 
 declare -a Samples=(data_2018A data_2018B data_2018C data_2018D)
 # declare -a Samples=(data_2018)
@@ -91,6 +106,9 @@ Samples+=( WZTo1L3Nu WZTo3LNu WZTo2L2Q WWToLNuQQ WWTo2L2Nu ZZ )   # diboson
 # Samples+=( W4Jets_NuPt200_a18v1_0 W4Jets_NuPt200_a18v1_1 W4Jets_NuPt200_a18v1_2 W4Jets_NuPt200_a18v1_3 )
 # Samples+=( W4Jets_NuPt200_a18v1_4 W4Jets_NuPt200_a18v1_5 W4Jets_NuPt200_a18v1_6 )
 # Samples+=( TTTo2L2Nu )
+
+# INDIR=/hadoop/cms/store/user/sicheng/ProjectMetis/stopbaby_TTZToLLNuNu_a18v1_v32_1_Zll/merged/
+# declare -a Samples=( TTZToLLNuNu )
 
 [[ $run18bkg == 1 ]] && runLooperJobs
 
@@ -407,6 +425,9 @@ while : ; do
 done
 
 echo -e 'All looper jobs done!\a'
+
+[[ $nomerge == 1 ]] && return 0;
+
 # Local merge for the v29_11+ babies
 pushd ${OUTDIR18}
 [[ $run18bkg == 1 ]] && hadd -f tt2l_18.root     TTJets_2lep*.root > /dev/null
