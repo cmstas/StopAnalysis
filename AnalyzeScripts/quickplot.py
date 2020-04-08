@@ -36,9 +36,9 @@ def DrawHeaderText(canvas, lumi=137.2, state="Preliminary"):
     tplm.SetNDC(1)
     tplm.SetTextFont(52)
     tplm.SetTextAlign(11)
-    tplm.SetTextSize(0.048)
+    tplm.SetTextSize(0.054)
     canvas.cd()
-    tplm.DrawLatex(canvas.GetLeftMargin()+0.110, 1.0-canvas.GetTopMargin()+0.012, state)
+    tplm.DrawLatex(canvas.GetLeftMargin()+0.1, 1.0-canvas.GetTopMargin()+0.012, state)
 
     if lumi:
         ttext = r.TLatex()
@@ -813,10 +813,66 @@ def printRatiosFast(hdir='cremuB1', bsuf='v31_ttagtest', ysuf='17', hn='genb_gen
 
     # fout = r.TFile('./scaler.root','recreate')
 
+def makeSinglePlot():
+    r.gStyle.SetOptStat('')
+    r.gStyle.SetPadGridX(0)
+    r.gStyle.SetPadGridY(0)
+    r.gStyle.SetPadTickX(1)
+    r.gStyle.SetPadTickY(1)
+    r.gStyle.SetFrameBorderMode(0)
+
+    f = r.TFile('../StopLooper/output/samp18_v32_s1_refans/TTJets_2lep_a18v1.root')
+    h = f.Get('testGeneral/h_genlep2_eta')
+
+    c0 = r.TCanvas('c0', 'c0', 800, 600)
+
+    mainPad = r.TPad('1', '1', 0.0, 0.00, 1.0, 0.99)
+
+    r.SetOwnership(c0, False)
+    r.SetOwnership(mainPad, False)
+
+    mainPad.SetTopMargin(0.08)
+    mainPad.SetLeftMargin(0.12)
+    mainPad.SetRightMargin(0.05)
+    mainPad.SetBottomMargin(0.15)
+    mainPad.SetLogy()
+    mainPad.Draw()
+
+    mainPad.cd()
+
+    h.SetTitle('')
+    h.GetYaxis().SetTitle('Events')
+    h.GetYaxis().SetTitleOffset(0.92)
+    h.GetYaxis().SetTitleSize(0.052)
+    h.GetYaxis().SetLabelSize(0.048)
+    # h.GetYaxis().SetTickSize(0.015)
+    # h.GetXaxis().SetTitleOffset(0.75)
+    h.GetXaxis().SetTitleSize(0.052)
+    h.GetXaxis().SetLabelSize(0.048)
+    h.GetXaxis().SetTitle('#eta (sub-leading gen-lepton)')
+
+    print h.GetXaxis().GetLabelSize(), h.GetXaxis().GetTitleOffset()
 
 
+    h.SetLineWidth(2)
+    # h.SetMarkerSize(1.2)
+    h.SetMarkerStyle(24)
+    h.SetLineColor(r.kBlack)
+
+    h.Draw()
+
+    leg = r.TLegend(0.72, 0.8, 0.91, 0.86 )
+    leg.AddEntry(h, 't#bar{t}#rightarrow 2#font[12]{l}2#nu')
+    leg.SetBorderSize(0)
+    leg.Draw()
+
+    DrawHeaderText(mainPad, None, 'Simulation')
+
+    c0.Print('h_genlep2_eta.pdf')
 
 if __name__ == '__main__':
+
+    makeSinglePlot()
 
     # plotDataMETinEMuCR(0, 'metbins')
     # plotDataMETinEMuCR(1, 'metbins')
@@ -828,6 +884,8 @@ if __name__ == '__main__':
     # plotDataMETinEMuCR(1, 'njets')
     # plotDataMETinEMuCR(0, 'lep2pt')
     # plotDataMETinEMuCR(1, 'lep2pt')
+    # plotDataMETinEMuCR(0, 'jet1pt')
+    # plotDataMETinEMuCR(0, 'jet2pt')
 
     # plotDataMETinEMuCR(2, 'nisrmatch', bsuf='v31_cremu4')
     # plotDataMETinEMuCR(1, 'nisrmatch', bsuf='v31_cremu4')
@@ -859,38 +917,38 @@ if __name__ == '__main__':
     # plotFSFSfromTTbar('testGeneral', 'genb_fromg_genpt',samp='2016', rebin=2)
     # plotFSFSfromTTbar('testGeneral', 'genb_frompp_genpt',samp='2016', rebin=2)
 
-    plotFSFSfromTTbar('testGeneral', 'genb_fromtop_genpt',samp='2017', rebin=2, y2='2016')
-    plotFSFSfromTTbar('testGeneral', 'genb_FC_fromtop_genpt',samp='2017', rebin=2, y2='2016')
-    plotFSFSfromTTbar('testGeneral', 'genb_notfromtop_genpt',samp='2017', rebin=2, y2='2016')
-    plotFSFSfromTTbar('testGeneral', 'genb_fromg_genpt',samp='2017', rebin=2, y2='2016')
-    plotFSFSfromTTbar('testGeneral', 'genb_frompp_genpt',samp='2017', rebin=2, y2='2016')
-    plotFSFSfromTTbar('testGeneral', 'genb_notfromtop_mother',samp='2017', y2='2016')
-    plotFSFSfromTTbar('testGeneral', 'matched_bgenjetpt',samp='2017', rebin=2, y2='2016')
-    plotFSFSfromTTbar('testGeneral', 'matched_genbgenjet_DR',samp='2017', rebin=2, y2='2016')
-    plotFSFSfromTTbar('testGeneral', 'matched_genbgenjet_Efrac',samp='2017', rebin=2, y2='2016')
-    plotFSFSfromTTbar('testGeneral', 'bgenjet_fromtop_genpt',samp='2017', rebin=2, y2='2016')
-    plotFSFSfromTTbar('testGeneral', 'bgenjet_fromg_genpt',samp='2017', rebin=2, y2='2016')
-    plotFSFSfromTTbar('testGeneral', 'bgenjet_frompp_genpt',samp='2017', rebin=2, y2='2016')
-    plotFSFSfromTTbar('testGeneral', 'matched_bjetpt',samp='2017', rebin=2, y2='2016')
-    plotFSFSfromTTbar('testGeneral', 'matched_bjetgenb_DR',samp='2017', rebin=2, y2='2016')
-    plotFSFSfromTTbar('testGeneral', 'matched_bjetgenb_Efrac',samp='2017', rebin=2, y2='2016')
-    plotFSFSfromTTbar('testGeneral', 'matched_bjet_deepCSV',samp='2017', rebin=2, y2='2016')
-    plotFSFSfromTTbar('testGeneral', 'bjet_fromg_deepCSV',samp='2017', rebin=2, y2='2016')
-    plotFSFSfromTTbar('testGeneral', 'bjet_frompp_deepCSV',samp='2017', rebin=2, y2='2016')
-    plotFSFSfromTTbar('testGeneral', 'bjet_fromtop_deepCSV',samp='2017', rebin=2, y2='2016')
-    plotFSFSfromTTbar('testGeneral', 'bjet_fromtop_pt',samp='2017', rebin=2, y2='2016')
-    plotFSFSfromTTbar('testGeneral', 'bjet_frompp_pt',samp='2017', rebin=2, y2='2016')
-    plotFSFSfromTTbar('testGeneral', 'bjet_fromg_pt',samp='2017', rebin=2, y2='2016')
-    plotFSFSfromTTbar('testGeneral', 'njet_bmatch',samp='2017', y2='2016')
-    plotFSFSfromTTbar('testGeneral', 'nbjet_match',samp='2017', y2='2016')
-    plotFSFSfromTTbar('testGeneral', 'nbgenjet',samp='2017', y2='2016')
+    # plotFSFSfromTTbar('testGeneral', 'genb_fromtop_genpt',samp='2017', rebin=2, y2='2016')
+    # plotFSFSfromTTbar('testGeneral', 'genb_FC_fromtop_genpt',samp='2017', rebin=2, y2='2016')
+    # plotFSFSfromTTbar('testGeneral', 'genb_notfromtop_genpt',samp='2017', rebin=2, y2='2016')
+    # plotFSFSfromTTbar('testGeneral', 'genb_fromg_genpt',samp='2017', rebin=2, y2='2016')
+    # plotFSFSfromTTbar('testGeneral', 'genb_frompp_genpt',samp='2017', rebin=2, y2='2016')
+    # plotFSFSfromTTbar('testGeneral', 'genb_notfromtop_mother',samp='2017', y2='2016')
+    # plotFSFSfromTTbar('testGeneral', 'matched_bgenjetpt',samp='2017', rebin=2, y2='2016')
+    # plotFSFSfromTTbar('testGeneral', 'matched_genbgenjet_DR',samp='2017', rebin=2, y2='2016')
+    # plotFSFSfromTTbar('testGeneral', 'matched_genbgenjet_Efrac',samp='2017', rebin=2, y2='2016')
+    # plotFSFSfromTTbar('testGeneral', 'bgenjet_fromtop_genpt',samp='2017', rebin=2, y2='2016')
+    # plotFSFSfromTTbar('testGeneral', 'bgenjet_fromg_genpt',samp='2017', rebin=2, y2='2016')
+    # plotFSFSfromTTbar('testGeneral', 'bgenjet_frompp_genpt',samp='2017', rebin=2, y2='2016')
+    # plotFSFSfromTTbar('testGeneral', 'matched_bjetpt',samp='2017', rebin=2, y2='2016')
+    # plotFSFSfromTTbar('testGeneral', 'matched_bjetgenb_DR',samp='2017', rebin=2, y2='2016')
+    # plotFSFSfromTTbar('testGeneral', 'matched_bjetgenb_Efrac',samp='2017', rebin=2, y2='2016')
+    # plotFSFSfromTTbar('testGeneral', 'matched_bjet_deepCSV',samp='2017', rebin=2, y2='2016')
+    # plotFSFSfromTTbar('testGeneral', 'bjet_fromg_deepCSV',samp='2017', rebin=2, y2='2016')
+    # plotFSFSfromTTbar('testGeneral', 'bjet_frompp_deepCSV',samp='2017', rebin=2, y2='2016')
+    # plotFSFSfromTTbar('testGeneral', 'bjet_fromtop_deepCSV',samp='2017', rebin=2, y2='2016')
+    # plotFSFSfromTTbar('testGeneral', 'bjet_fromtop_pt',samp='2017', rebin=2, y2='2016')
+    # plotFSFSfromTTbar('testGeneral', 'bjet_frompp_pt',samp='2017', rebin=2, y2='2016')
+    # plotFSFSfromTTbar('testGeneral', 'bjet_fromg_pt',samp='2017', rebin=2, y2='2016')
+    # plotFSFSfromTTbar('testGeneral', 'njet_bmatch',samp='2017', y2='2016')
+    # plotFSFSfromTTbar('testGeneral', 'nbjet_match',samp='2017', y2='2016')
+    # plotFSFSfromTTbar('testGeneral', 'nbgenjet',samp='2017', y2='2016')
 
     # PlotFSFSfromTTbar('testGeneral', 'genb_fromtop_genpt',samp='2018', rebin=2)
     # plotFSFSfromTTbar('testGeneral', 'genb_notfromtop_genpt',samp='2018', rebin=2)
     # plotFSFSfromTTbar('testGeneral', 'genb_fromg_genpt',samp='2018', rebin=2)
     # plotFSFSfromTTbar('testGeneral', 'genb_frompp_genpt',samp='2018', rebin=2)
 
-   # plotTopTaggerSF3pt('rtag', 'genbase')
+    # plotTopTaggerSF3pt('rtag', 'genbase')
     # plotTopTaggerSF3pt('rtag', 'tagbase')
     # plotTopTaggerSF3pt('mtag', 'genbase')
     # plotTopTaggerSF3pt('mtag', 'tagbase')
@@ -976,4 +1034,3 @@ if __name__ == '__main__':
     # plotTopTaggerMatchingEfficiency(1200, 100, 'tagbase')
     # plotTopTaggerMatchingEfficiency(850,  100, 'tagbase')
     # plotTopTaggerMatchingEfficiency(650,  350, 'tagbase')
-                             

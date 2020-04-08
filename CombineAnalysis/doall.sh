@@ -28,9 +28,9 @@ sigscan=std_T2tt
 # echo -e "Limits for $sigscan in $outdir is done!\\a"
 
 function runLimits {
-    root -b -q newCardMaker.C"(\"$sigscan\",\"$indir\",\"datacards/$outdir\",\"$ysuf\")" || return $?
-    python locallimits.py "datacards/$outdir" std_${sigscan} # --runsignif # --nolimits
-    root -b -q Make2DLimitHistos.C"(\"std_${sigscan}\", \"limits/$outdir\")"
+    # root -b -q newCardMaker.C"(\"$sigscan\",\"$indir\",\"datacards/$outdir\",\"$ysuf\")" || return $?
+    # python locallimits.py "datacards/$outdir" std_${sigscan} # --runsignif # --nolimits
+    # root -b -q Make2DLimitHistos.C"(\"std_${sigscan}\", \"limits/$outdir\")"
     root -b -q Make2DSignifHistos.C"(\"std_${sigscan}\", \"significances/$outdir\")"
     root -b -q MakeSignificancePlot.C"(\"significances/$outdir\", \"std_${sigscan}\", 0)"
     root -b -q MakeSignificancePlot.C"(\"significances/$outdir\", \"std_${sigscan}\", 1)"
@@ -51,7 +51,8 @@ outdir=scan_samp${ysuf}_$bvsuf
 
 # bvsuf=v31_cor_w3
 # bvsuf=v31_s13_noMETttbarSF
-bvsuf=v31_s21
+# bvsuf=v31_s21_fullsim_corr
+bvsuf=v31_s20
 # bvsuf=v31_m17sync
 
 ysuf=run2
@@ -59,32 +60,33 @@ indir=../StopLooper/output/combRun2_$bvsuf
 outdir=scan_comb${ysuf}_${bvsuf}
 
 # root -b -q fakeBkgEstimates.C"(\"$indir\",\"$indir\",\"$ysuf\")" || return $?
-root -b -q ../AnalyzeScripts/makeBkgEstimates.C"(\"$indir\",\"$indir\",\"$ysuf\")" || return $?
+# root -b -q ../AnalyzeScripts/makeBkgEstimates.C"(\"$indir\",\"$indir\",\"$ysuf\")" || return $?
 # root -b -q ../AnalyzeScripts/makeBkgEstimates.C"(\"$indir\",\"$indir\",\"$ysuf\",\"extrShapeFromCR=false\")" || return $?
 # root -b -q ../AnalyzeScripts/makeBkgEstimates.C"(\"$indir\",\"./\",\"$ysuf\",\"useMetExtrapolation=false\")" || return $?
 
 sigscan=T2tt
 # root -b -q newCardMaker.C"(\"$sigscan\",\"$indir\",\"datacards/$outdir\",\"$ysuf\")" || return $?
-# python locallimits.py "datacards/$outdir" std_${sigscan} # --runsignif # --nolimits
-# python locallimits.py "datacards/$outdir" tcor_${sigscan} # --runsignif # --nolimits
-# python locallimits.py "datacards/$outdir" Wcor_${sigscan} # --runsignif # --nolimits
+# root -b -q newCardMaker.C"(\"$sigscan\",\"$indir\",\"datacards/$outdir\",\"$ysuf\")"
+# python locallimits.py "datacards/$outdir" std_${sigscan}   --runsignif  --nolimits --noupdate
+# python locallimits.py "datacards/$outdir" tcor_${sigscan}  --runsignif  --nolimits --noupdate
+# python locallimits.py "datacards/$outdir" Wcor_${sigscan}  --runsignif  --nolimits --noupdate
 # # eva40
 # root -b -q Make2DLimitHistos.C"(\"comb_${sigscan}\", \"limits/$outdir\")"
 # root -b -q Make2DLimitHistos.C"(\"std_${sigscan}\", \"limits/$outdir\")"
 # root -b -q Make2DLimitHistos.C"(\"tcor_${sigscan}\", \"limits/$outdir\")"
 # root -b -q Make2DLimitHistos.C"(\"Wcor_${sigscan}\", \"limits/$outdir\")"
-# root -b -q Make2DSignifHistos.C"(\"comb_${sigscan}\", \"significances/$outdir\")"
-# root -b -q MakeSignificancePlot.C"(\"significances/$outdir\", \"comb_${sigscan}\", 0)"
-# root -b -q MakeSignificancePlot.C"(\"significances/$outdir\", \"comb_${sigscan}\", 1)"
-# echo -e "Limits for $sigscan in $outdir is done!\\a"
+root -b -q Make2DSignifHistos.C"(\"comb_${sigscan}\", \"significances/$outdir\")"
+root -b -q MakeSignificancePlot.C"(\"significances/$outdir\", \"comb_${sigscan}\", 0)"
+root -b -q MakeSignificancePlot.C"(\"significances/$outdir\", \"comb_${sigscan}\", 1)"
+echo -e "Limits for $sigscan in $outdir is done!\\a"
 # # mkcp limits/$outdir/histo/* limits/$outdir/histo_scan
 # runLimits
 
 sigscan=T2bW
-# runLimits
+runLimits
 
 sigscan=T2bt
-# runLimits
+runLimits
 
 # root -b -q systTableMaker.C"(\"T2bt\",\"../StopLooper/output/combRun2_v31_s13\",\"datacards/sigcont\",\"run2\")"
 

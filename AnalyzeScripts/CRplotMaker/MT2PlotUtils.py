@@ -10,6 +10,7 @@ def GetColor(sample):
 
     if 'tt2l'    in sample: return 866  # kAzure+6
     if 'tt1l'    in sample: return 861  # kAzure+1
+    if 'WJets'   in sample: return 798  # kOrange-2
 
     if 'data'    in sample: return 14   # Gray
     if 'lostlep' in sample: return 866  # kAzure+6
@@ -21,6 +22,10 @@ def GetColor(sample):
     if "1lepW"   in sample: return 796  # kOrange-4
     if "1lepTop" in sample: return 625  # kRed-7
     if "Znunu"   in sample: return 872  # kViolet-8
+
+    if "bevt" in sample: return 842  # kTeak+2
+    if "cevt" in sample: return 798  # kOrange-2
+    if "lfevt" in sample: return 425  # kCyan-7
 
     return 870 # for everything else
 
@@ -58,10 +63,14 @@ def GetSampleName(sample):
         # "allBkg " : "allBkg" ,
         "_mrs0" : " no METRes corr." ,
         "_mrs2" : " w/ METRes corr." ,
-        "2lep" : "t#bar{t}/tW#rightarrow2 #font[12]{l}",
-        "1lepW" : "1#font[12]{l} from W",
-        "1lepTop" : "1#font[12]{l} from top",
-        "Znunu" : "Z#rightarrow #nu#nu",
+        # "2lep" : "t#bar{t}/tW#rightarrow2 #font[12]{l}",
+        "2lep" : "Lost lepton",
+        "1lepW" : "1#font[12]{l} (not from t)",
+        "1lepTop" : "1#font[12]{l} (from t)",
+        "Znunu" : "Z#rightarrow #nu#bar{#nu}",
+        "bevt"  : "Events with b-quarks",
+        "cevt"  : "Events with c-quarks",
+        "lfevt" : "Events with LF",
     }
 
     # use the above name if defined, otherwise use sample itself
@@ -137,7 +146,8 @@ def GetSubtitles(dirname):
         elif "A2" in dirname: subtitle[2] = "#geq 2j, #geq 2b"
         elif "A3" in dirname: subtitle[2] = "#geq 2j, = 2b"
         elif "B0" in dirname: subtitle[2] = "#geq 2j, 0b"
-        elif "B1" in dirname: subtitle[2] = "#geq 2j, 1b"
+        elif "B1" in dirname: subtitle[2] = "#geq 1j, 1b"
+        elif "B2" in dirname: subtitle[2] = "1j, 1b"
 
         if "emuM" in dirname: subtitle[2] = "#geq 2j, 1b"
         if   "M1" in dirname: subtitle[1] = "50 GeV < "+met+"< 100 GeV "
@@ -162,6 +172,9 @@ def GetSubtitles(dirname):
         subtitle[2] = "#geq 4j, #geq 1b"
     if "sbmet+srbase" in dirname:
         subtitle[0] = met+" > 150 GeV"
+
+    if "testG" in dirname:
+        subtitle = [met+" > 125 GeV", "#geq 1lep, "+mt+" > 0", "#geq 2j, #geq 0b"]
 
     return subtitle
 

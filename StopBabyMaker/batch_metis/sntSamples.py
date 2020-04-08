@@ -130,10 +130,14 @@ if __name__ == "__main__":
         # "TTGamma_SingleLept_a18v1" : "/TTGamma_SingleLeptFromT_TuneCP5_13TeV_madgraph_pythia8/RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15_ext1-v2/MINIAODSIM",
         # "TTGamma_Dilept_Tune_a18v1" : "/TTGamma_Dilept_TuneCP5_13TeV_madgraph_pythia8/RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15_ext1-v2/MINIAODSIM",
 
+        # Fullsim single points
+        "ttHtoInv_a18v1" : "/ttH_HToInvisible_M125_TuneCP5_PSweights_13TeV_powheg_pythia8/RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1/MINIAODSIM",
+
         # Extra
         # "TTTo2L2Nu_a18v1" : "/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1/MINIAODSIM",
         # "TTJets_amcnlo_a18v1" : "/TTJets_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15_ext1-v2/MINIAODSIM",
-        # "ttZJets_a18v1" : "/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8/RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15_ext1-v2/MINIAODSIM"
+        # "ttZJets_a18v1" : "/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8/RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15_ext1-v2/MINIAODSIM",
+        # "TTZToLL_M1to10_a18v1" : "/TTZToLL_M-1to10_TuneCP5_13TeV-amcatnlo-pythia8/RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1/MINIAODSIM",
         # "TTZZ_a18v1" : "/TTZZ_TuneCP5_13TeV-madgraph-pythia8/RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15_ext1-v2/MINIAODSIM",
         # "TTZH_a18v1" : "/TTZH_TuneCP5_13TeV-madgraph-pythia8/RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15_ext1-v2/MINIAODSIM",
         # "TTWW_a18v1" : "/TTWW_TuneCP5_13TeV-madgraph-pythia8/RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15_ext1-v2/MINIAODSIM",
@@ -263,10 +267,11 @@ if __name__ == "__main__":
         # "DYJetsToLL_M50_f17v2" : "/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIFall17MiniAODv2-PU2017RECOSIMstep_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM",
         # "DYJetsToLL_M50_f17v2_ext1" : "/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIFall17MiniAODv2-PU2017RECOSIMstep_12Apr2018_94X_mc2017_realistic_v14_ext1-v1/MINIAODSIM",
 
-        # # Full sim single points
-        # "T2tt_mStop1200_mLSP100_v17v2" : "/SMS-T2tt_mStop-1200_mLSP-100_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM",
-        # "T2tt_mStop650_mLSP350_v17v2" : "/SMS-T2tt_mStop-650_mLSP-350_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM",
-        # "T2tt_mStop850_mLSP100_v17v2" : "/SMS-T2tt_mStop-850_mLSP-100_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM",
+        # Fullsim single points
+        # "T2tt_mStop1200_mLSP100_f17v2" : "/SMS-T2tt_mStop-1200_mLSP-100_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM",
+        # "T2tt_mStop650_mLSP350_f17v2" : "/SMS-T2tt_mStop-650_mLSP-350_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM",
+        # "T2tt_mStop850_mLSP100_f17v2" : "/SMS-T2tt_mStop-850_mLSP-100_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM",
+        "ttHtoInv_f17v2" : "/ttH_HToInvisible_M125_13TeV_TuneCP5_powheg_pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM",
 
         # # Fastsim ttbar
         # "TTJets_2lep_f17v2fs" : "/TTJets_DiLept_TuneCP2_13TeV-madgraphMLM-pythia8/RunIIFall17MiniAODv2-PUFall17Fast_lhe_94X_mc2017_realistic_v15-v1/MINIAODSIM",
@@ -549,7 +554,7 @@ if __name__ == "__main__":
     for babyname, dsname in snt_samples.items():
         cmsswver = "CMSSW_10_1_0"
         scramarch = "slc6_amd64_gcc700"
-        tag = "v32_0"
+        tag = "v32_1"
         # if "a18v1" in babyname: tag = "v31_8"
         tarfile = "tarfiles/input_"+tag+".tar.gz"
         cms3tag = "CMS4_V08-00-06" if "80X" in dsname else None
@@ -576,10 +581,13 @@ if __name__ == "__main__":
         if "TTTo2L2Nu" in dsname:
             extrarg = " skim_nGoodLep=2,skim_met=250" # only for emu region
         # extrarg = " topcandTree=topcands" if "TTJets" in dsname else ""
+        # tag += "_Zll" # extra suf to the tag, to reflect extrarg
+        if "Zll" in tag:
+            extrarg = " skim_nGoodLep=2,fillZll=true,skim_met_ZllEvt=50"
         # renew = True if 'TTJets' in babyname else False
         renew = True
         minfrac = 0.97 if 'SMS' in babyname else 0.98 if '1J' in babyname else 1
-        # minfrac = 1 if 'SMS' in babyname else 0.93 if '1J' in babyname else 0.75
+        minfrac = 0.98 if 'ttZ' in babyname else minfrac
         maker_task = CondorTask(
             sample = SNTSample(dataset=dsname, tag=cms3tag, exclude_tag_pattern=excltag),
             files_per_output = getNfilesPerJob(babyname),

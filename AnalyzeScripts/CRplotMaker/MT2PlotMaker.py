@@ -207,7 +207,8 @@ def MT2PlotMaker(rootdir, samples, data, dirname, plots, output_dir=".", exts=["
         if len(plots[i]) >= 6:
             doOverflow = plots[i][5]
         markerSize=0.8
-        title = utils.GetCRName(dirname)
+        # title = utils.GetCRName(dirname)
+        title = "p_{T}^{miss} sideband"
         xAxisTitle = h_bkg_vecs[i][0].GetXaxis().GetTitle()
         unit = None
         if xAxisTitle == "":
@@ -238,5 +239,5 @@ def MT2PlotMaker(rootdir, samples, data, dirname, plots, output_dir=".", exts=["
                            scaleMCtoData=scaleMC, xAxisUnit=unit, userMin=userMin, userMax=userMax, doSort=False, customColors=colors,
                            markerSize=markerSize, titleSize=0.035, subtitleSize=0.033, legCoords=(0.60,0.70,0.87,0.895),
                            subLegText=subLegText, subLegTextSize=0.036, doBkgError=True, doOverflow=doOverflow, cmsTextSize=0.04,
-                           convertToPoisson=False, drawZeros=False, drawSystematicBand=drawSystematicBand, systematics=systs[i],
+                           convertToPoisson=True, drawZeros=False, drawSystematicBand=drawSystematicBand, systematics=systs[i],
                            h_sig_vec=h_sig_vec[i], sig_names=sig_names[i], ratioType=ratioType)
