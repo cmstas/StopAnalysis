@@ -742,6 +742,29 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
         }
       }
 
+      //%%%%%%%%%%%%%%%%%%%%%%%%%
+      vector <pair<int, float>> jup_cvs_pairs;
+      for(uint ijet = 0; ijet < jup_ak4_pfjets_deepCSV().size(); ijet++) {
+	float btagvalue = jup_ak4pfjets_deepCSV().at(ijet);
+	jup_csv_pairs.push_back(make_pairs(ijet,btagvalue));
+      }
+      sort(jup_pairs.begin(), jup_pairs.end(), sortIndexbyCSV);
+
+      float jup_mbb=-999;
+      float jup_mct=-999;
+      float jup_ptbb=-999;
+      if(jup_ngoodjets() > 1) {
+	jup_mbb = (jup_ak4pfjets_p4().at(jup_csv_pairs.at(0).first) + jup_ak4pfjets_p4().at(jup_csv_pairs.at(1).first)).mass();
+	jup_ptbb = (jup_ak4pfjets_p4().at(jup_csv_pairs.at(0).first) + jup_ak4pfjets_p4().at(jup_csv_pairs.at(1).first)).pt();
+
+	float ptb1, ptb2, dPhibb;
+	ptb1 = jup_ak4pfjets_p4().at(jup_csv_pairs.at(0).first).pt();
+	ptb2 = jup_ak4pfjets_p4().at(jup_csv_pairs.at(1).first).pt();
+	dPhibb = getdphi(jup_ak4pfjets_p4().at(jup_csv_pairs.at(0).first).phi(),jup_ak4pfjets_p4().at(jup_csv_pairs.at(1).first).phi());
+	jup_mct = sqrt(2*ptb1*ptb2*(1+cos(dPhibb)));
+      }
+      //%%%%%%%%%%%%%%%%%%%%%%%%%
+
       ///Kinematic variables
       // Use CSV sorted for mbb
       vector <pair<int, float>> jet_csv_pairs;
