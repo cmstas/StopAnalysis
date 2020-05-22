@@ -774,10 +774,7 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
       mbb=-999;
       mct=-999;
       ptbb=-999;
-      int ngj = -22222;
-//      float dpbb = -22222;
-      if((ngj = ngoodjets())>1){
-	//      if(ngoodjets()>1){
+      if(ngoodjets()>1){
         mbb = (ak4pfjets_p4().at(jet_csv_pairs.at(0).first) + ak4pfjets_p4().at(jet_csv_pairs.at(1).first)).mass()  ; 
         ptbb = (ak4pfjets_p4().at(jet_csv_pairs.at(0).first) + ak4pfjets_p4().at(jet_csv_pairs.at(1).first)).pt()  ; 
         
@@ -785,30 +782,12 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
         ptb1 = ak4pfjets_p4().at(jet_csv_pairs.at(0).first).pt();
         ptb2 = ak4pfjets_p4().at(jet_csv_pairs.at(1).first).pt();
         dPhibb = getdphi(ak4pfjets_p4().at(jet_csv_pairs.at(0).first).phi(),ak4pfjets_p4().at(jet_csv_pairs.at(1).first).phi());
-	//        dpbb = dPhibb;
 	mct = sqrt(2*ptb1*ptb2*(1+cos(dPhibb)));  
        
       }
       printf("mbb:  %f\n", mbb );
       printf("ptbb: %f\n", ptbb);
       printf("mct:  %f\n", mct );
-      if(mbb == -999) {
-	if(ngj < 2) {
-	  printf("everything good mbb\n");
-	} else {
-	  printf("something's wrong\n");
-	}
-      }
-      if(mct == -999) {
-	if(ngj < 2) {
-	  printf("everything good mct\n");
-	} else {
-	  printf("something's wrong\n");
-	}
-      }
-//      if(mct < 0.001) {
-//      	printf("number of jets: %d %f %f\n", ngj, dpbb, mbb);
-//      }
       // up
       vector <pair<int, float>> jup_csv_pairs;
       for(uint ijet = 0; ijet < jup_ak4pfjets_deepCSV().size(); ijet++) {
@@ -820,9 +799,7 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
       jup_mbb  = -999;
       jup_mct  = -999;
       jup_ptbb = -999;
-      int jungj = -22222;
-      if((jungj = jup_ngoodjets()) > 1) {
-	//      if(jup_ngoodjets()>1) {
+      if(jup_ngoodjets()>1) {
 	jup_mbb = (jup_ak4pfjets_p4().at(jup_csv_pairs.at(0).first) + jup_ak4pfjets_p4().at(jup_csv_pairs.at(1).first)).mass();
 	jup_ptbb = (jup_ak4pfjets_p4().at(jup_csv_pairs.at(0).first) + jup_ak4pfjets_p4().at(jup_csv_pairs.at(1).first)).pt();
 
@@ -832,22 +809,10 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
 	dPhibb = getdphi(jup_ak4pfjets_p4().at(jup_csv_pairs.at(0).first).phi(),jup_ak4pfjets_p4().at(jup_csv_pairs.at(1).first).phi());
 	jup_mct = sqrt(2*ptb1*ptb2*(1+cos(dPhibb)));
       }
-      printf("jup_mbb:  %f\n", jup_mbb );
-      printf("jup_ptbb: %f\n", jup_ptbb);
-      printf("jup_mct:  %f\n", jup_mct );
-      if(jup_mbb == -999) {
-	if(jungj < 2) {
-	  printf("everything good jup_mbb\n");
-	} else {
-	  printf("something's wrong\n");
-	}
-      }
-      if(jup_mct == -999) {
-	if(jungj < 2) {
-	  printf("everything good jup_mct\n");
-	} else {
-	  printf("something's wrong\n");
-	}
+      if(-1 == datayear) { // We have MC, not data
+	printf("jup_mbb:  %f\n", jup_mbb );
+	printf("jup_ptbb: %f\n", jup_ptbb);
+	printf("jup_mct:  %f\n", jup_mct );
       }
       // down
       vector <pair<int, float>> jdown_csv_pairs;
@@ -860,9 +825,7 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
       jdown_mbb  = -999;
       jdown_mct  = -999;
       jdown_ptbb = -999;
-      int jdngj = -22222;
-      if((jdngj = jdown_ngoodjets()) > 1) {
-	//      if(jdown_ngoodjets()>1) {
+      if(jdown_ngoodjets()>1) {
 	jdown_mbb = (jdown_ak4pfjets_p4().at(jdown_csv_pairs.at(0).first) + jdown_ak4pfjets_p4().at(jdown_csv_pairs.at(1).first)).mass();
 	jdown_ptbb = (jdown_ak4pfjets_p4().at(jdown_csv_pairs.at(0).first) + jdown_ak4pfjets_p4().at(jdown_csv_pairs.at(1).first)).pt();
 
@@ -872,49 +835,11 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
 	dPhibb = getdphi(jdown_ak4pfjets_p4().at(jdown_csv_pairs.at(0).first).phi(),jdown_ak4pfjets_p4().at(jdown_csv_pairs.at(1).first).phi());
 	jdown_mct = sqrt(2*ptb1*ptb2*(1+cos(dPhibb)));
       }
-      printf("jdown_mbb:  %f\n", jdown_mbb );
-      printf("jdown_ptbb: %f\n", jdown_ptbb);
-      printf("jdown_mct:  %f\n", jdown_mct );
-      if(jdown_mbb == -999) {
-	if(jdngj < 2) {
-	  printf("everything good jdown_mbb\n");
-	} else {
-	  printf("something's wrong\n");
-	}
+      if(-1 == datayear) { // We have MC, not data
+	printf("jdown_mbb:  %f\n", jdown_mbb );
+	printf("jdown_ptbb: %f\n", jdown_ptbb);
+	printf("jdown_mct:  %f\n", jdown_mct );
       }
-      if(jdown_mct == -999) {
-	if(jungj < 2) {
-	  printf("everything good jdown_mct\n");
-	} else {
-	  printf("something's wrong\n");
-	}
-      }
-
-//      if((ngj == jungj) && (ngj == jdngj)) {
-//	printf("good");
-//	if(ngj == 2) {
-//	  printf(" 2\n");
-//	}
-//      }
-//
-//      if(10.0 < abs((jup_mbb-mbb)/mbb)) {
-//	printf("1 more than 10: %d %d  %.10f %.10f %.10f\n", jungj, ngj, (jup_mbb-mbb)/mbb, jup_mbb, mbb);
-//      }
-//      if(10.0 < abs((jup_ptbb-ptbb)/ptbb)) {
-//	printf("2 more than 10: %d %d  %.10f %.10f %.10f\n", jungj, ngj, (jup_ptbb-ptbb)/ptbb, jup_ptbb, ptbb);
-//      }
-//      if(10.0 < abs((jup_mct-mct)/mct)) {
-//	printf("3 more than 10: %d %d  %.10f %.10f %.10f\n", jungj, ngj, (jup_mct-mct)/mct, jup_mct, mct);
-//      }
-//      if(10.0 < abs((jdown_mbb-mbb)/mbb)) {
-//	printf("4 more than 10: %d %d  %.10f %.10f %.10f\n", jdngj, ngj, (jdown_mbb-mbb)/mbb, jdown_mbb, mbb);
-//      }
-//      if(10.0 < abs((jdown_ptbb-ptbb)/ptbb)) {
-//	printf("5 more than 10: %d %d  %.10f %.10f %.10f\n", jdngj, ngj, (jdown_ptbb-ptbb)/ptbb, jdown_ptbb, ptbb);
-//      }
-//      if(10.0 < abs((jdown_mct-mct)/mct)) {
-//	printf("6 more than 10: %d %d  %.10f %.10f %.10f\n", jdngj, ngj, (jdown_mct-mct)/mct, jdown_mct, mct);
-//      }
 
       ///Gen information: susy particles, quarks, bosons, leptons
 
