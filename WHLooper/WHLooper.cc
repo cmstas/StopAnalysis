@@ -774,9 +774,10 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
       mbb=-999;
       mct=-999;
       ptbb=-999;
-      int ngj = -22222;
-      float dpbb = -22222;
-      if((ngj = ngoodjets())>1){
+//      int ngj = -22222;
+//      float dpbb = -22222;
+//      if((ngj = ngoodjets())>1){
+      if(ngoodjets()>1){
         mbb = (ak4pfjets_p4().at(jet_csv_pairs.at(0).first) + ak4pfjets_p4().at(jet_csv_pairs.at(1).first)).mass()  ; 
         ptbb = (ak4pfjets_p4().at(jet_csv_pairs.at(0).first) + ak4pfjets_p4().at(jet_csv_pairs.at(1).first)).pt()  ; 
         
@@ -784,7 +785,7 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
         ptb1 = ak4pfjets_p4().at(jet_csv_pairs.at(0).first).pt();
         ptb2 = ak4pfjets_p4().at(jet_csv_pairs.at(1).first).pt();
         dPhibb = getdphi(ak4pfjets_p4().at(jet_csv_pairs.at(0).first).phi(),ak4pfjets_p4().at(jet_csv_pairs.at(1).first).phi());
-        dpbb = dPhibb;
+	//        dpbb = dPhibb;
 	mct = sqrt(2*ptb1*ptb2*(1+cos(dPhibb)));  
        
       }
@@ -805,8 +806,9 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
       jup_mbb  = -999;
       jup_mct  = -999;
       jup_ptbb = -999;
-      int jungj = -22222;
-      if((jungj = jup_ngoodjets()) > 1) {
+//      int jungj = -22222;
+//      if((jungj = jup_ngoodjets()) > 1) {
+      if(jup_ngoodjets()>1) {
 	jup_mbb = (jup_ak4pfjets_p4().at(jup_csv_pairs.at(0).first) + jup_ak4pfjets_p4().at(jup_csv_pairs.at(1).first)).mass();
 	jup_ptbb = (jup_ak4pfjets_p4().at(jup_csv_pairs.at(0).first) + jup_ak4pfjets_p4().at(jup_csv_pairs.at(1).first)).pt();
 
@@ -830,8 +832,9 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
       jdown_mbb  = -999;
       jdown_mct  = -999;
       jdown_ptbb = -999;
-      int jdngj = -22222;
-      if((jdngj = jdown_ngoodjets()) > 1) {
+//      int jdngj = -22222;
+//      if((jdngj = jdown_ngoodjets()) > 1) {
+      if(jdown_ngoodjets()>1) {
 	jdown_mbb = (jdown_ak4pfjets_p4().at(jdown_csv_pairs.at(0).first) + jdown_ak4pfjets_p4().at(jdown_csv_pairs.at(1).first)).mass();
 	jdown_ptbb = (jdown_ak4pfjets_p4().at(jdown_csv_pairs.at(0).first) + jdown_ak4pfjets_p4().at(jdown_csv_pairs.at(1).first)).pt();
 
