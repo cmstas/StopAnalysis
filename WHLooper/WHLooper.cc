@@ -774,10 +774,10 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
       mbb=-999;
       mct=-999;
       ptbb=-999;
-//      int ngj = -22222;
+      int ngj = -22222;
 //      float dpbb = -22222;
-//      if((ngj = ngoodjets())>1){
-      if(ngoodjets()>1){
+      if((ngj = ngoodjets())>1){
+	//      if(ngoodjets()>1){
         mbb = (ak4pfjets_p4().at(jet_csv_pairs.at(0).first) + ak4pfjets_p4().at(jet_csv_pairs.at(1).first)).mass()  ; 
         ptbb = (ak4pfjets_p4().at(jet_csv_pairs.at(0).first) + ak4pfjets_p4().at(jet_csv_pairs.at(1).first)).pt()  ; 
         
@@ -792,6 +792,20 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
       printf("mbb:  %f\n", mbb );
       printf("ptbb: %f\n", ptbb);
       printf("mct:  %f\n", mct );
+      if(mbb == -999) {
+	if(ngj < 2) {
+	  printf("everything good mbb\n");
+	} else {
+	  printf("something's wrong\n");
+	}
+      }
+      if(mct == -999) {
+	if(ngj < 2) {
+	  printf("everything good mct\n");
+	} else {
+	  printf("something's wrong\n");
+	}
+      }
 //      if(mct < 0.001) {
 //      	printf("number of jets: %d %f %f\n", ngj, dpbb, mbb);
 //      }
@@ -806,9 +820,9 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
       jup_mbb  = -999;
       jup_mct  = -999;
       jup_ptbb = -999;
-//      int jungj = -22222;
-//      if((jungj = jup_ngoodjets()) > 1) {
-      if(jup_ngoodjets()>1) {
+      int jungj = -22222;
+      if((jungj = jup_ngoodjets()) > 1) {
+	//      if(jup_ngoodjets()>1) {
 	jup_mbb = (jup_ak4pfjets_p4().at(jup_csv_pairs.at(0).first) + jup_ak4pfjets_p4().at(jup_csv_pairs.at(1).first)).mass();
 	jup_ptbb = (jup_ak4pfjets_p4().at(jup_csv_pairs.at(0).first) + jup_ak4pfjets_p4().at(jup_csv_pairs.at(1).first)).pt();
 
@@ -821,6 +835,20 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
       printf("jup_mbb:  %f\n", jup_mbb );
       printf("jup_ptbb: %f\n", jup_ptbb);
       printf("jup_mct:  %f\n", jup_mct );
+      if(jup_mbb == -999) {
+	if(jungj < 2) {
+	  printf("everything good jup_mbb\n");
+	} else {
+	  printf("something's wrong\n");
+	}
+      }
+      if(jup_mct == -999) {
+	if(jungj < 2) {
+	  printf("everything good jup_mct\n");
+	} else {
+	  printf("something's wrong\n");
+	}
+      }
       // down
       vector <pair<int, float>> jdown_csv_pairs;
       for(uint ijet = 0; ijet < jdown_ak4pfjets_deepCSV().size(); ijet++) {
@@ -832,9 +860,9 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
       jdown_mbb  = -999;
       jdown_mct  = -999;
       jdown_ptbb = -999;
-//      int jdngj = -22222;
-//      if((jdngj = jdown_ngoodjets()) > 1) {
-      if(jdown_ngoodjets()>1) {
+      int jdngj = -22222;
+      if((jdngj = jdown_ngoodjets()) > 1) {
+	//      if(jdown_ngoodjets()>1) {
 	jdown_mbb = (jdown_ak4pfjets_p4().at(jdown_csv_pairs.at(0).first) + jdown_ak4pfjets_p4().at(jdown_csv_pairs.at(1).first)).mass();
 	jdown_ptbb = (jdown_ak4pfjets_p4().at(jdown_csv_pairs.at(0).first) + jdown_ak4pfjets_p4().at(jdown_csv_pairs.at(1).first)).pt();
 
@@ -847,6 +875,20 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
       printf("jdown_mbb:  %f\n", jdown_mbb );
       printf("jdown_ptbb: %f\n", jdown_ptbb);
       printf("jdown_mct:  %f\n", jdown_mct );
+      if(jdown_mbb == -999) {
+	if(jdngj < 2) {
+	  printf("everything good jdown_mbb\n");
+	} else {
+	  printf("something's wrong\n");
+	}
+      }
+      if(jdown_mct == -999) {
+	if(jungj < 2) {
+	  printf("everything good jdown_mct\n");
+	} else {
+	  printf("something's wrong\n");
+	}
+      }
 
 //      if((ngj == jungj) && (ngj == jdngj)) {
 //	printf("good");
