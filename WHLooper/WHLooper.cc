@@ -374,8 +374,8 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
     extraTree->SetBranchAddress("mus_phi",&mus_phi,&b_mus_phi);
     extraTree->SetBranchAddress("mus_fromW",&mus_fromW,&b_mus_fromW);
     extraTree->SetBranchAddress("mus_pdgid",&mus_pdgid,&b_mus_pdgid);
-
-    /// other kinematic variables ///
+    
+    /// other kinematic variables /// central, up, down
     float mbb=0; //sorted by CSV
     float ptbb=0;
     float mct=0;
@@ -385,7 +385,25 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
     extraTree->SetBranchAddress("mbb",&mbb,&b_mbb);
     extraTree->SetBranchAddress("ptbb",&ptbb,&b_ptbb);
     extraTree->SetBranchAddress("mct",&mct,&b_mct);
-
+    float jup_mbb  = 0;
+    float jup_ptbb = 0;
+    float jup_mct  = 0;
+    TBranch * jup_b_mbb  = extraTree->Branch("jup_mbb" , &jup_mbb ,"jup_mbb/F" );
+    TBranch * jup_b_ptbb = extraTree->Branch("jup_ptbb", &jup_ptbb,"jup_ptbb/F");   
+    TBranch * jup_b_mct  = extraTree->Branch("jup_mct" , &jup_mct ,"jup_mct/F" );
+    extraTree->SetBranchAddress("jup_mbb" , &jup_mbb , &jup_b_mbb );
+    extraTree->SetBranchAddress("jup_ptbb", &jup_ptbb, &jup_b_ptbb);
+    extraTree->SetBranchAddress("jup_mct" , &jup_mct , &jup_b_mct );
+    float jdown_mbb  = 0;
+    float jdown_ptbb = 0;
+    float jdown_mct  = 0;
+    TBranch * jdown_b_mbb  = extraTree->Branch("jdown_mbb" , &jdown_mbb ,"jdown_mbb/F" );
+    TBranch * jdown_b_ptbb = extraTree->Branch("jdown_ptbb", &jdown_ptbb,"jdown_ptbb/F");   
+    TBranch * jdown_b_mct  = extraTree->Branch("jdown_mct" , &jdown_mct ,"jdown_mct/F" );
+    extraTree->SetBranchAddress("jdown_mbb" , &jdown_mbb , &jdown_b_mbb );
+    extraTree->SetBranchAddress("jdown_ptbb", &jdown_ptbb, &jdown_b_ptbb);
+    extraTree->SetBranchAddress("jdown_mct" , &jdown_mct , &jdown_b_mct );
+        
 
     //Generator information
     vector<float> * gen_pt = new vector<float>(); 
@@ -742,31 +760,9 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
         }
       }
 
-      //%%%%%%%%%%%%%%%%%%%%%%%%%
-      vector <pair<int, float>> jup_cvs_pairs;
-      for(uint ijet = 0; ijet < jup_ak4_pfjets_deepCSV().size(); ijet++) {
-	float btagvalue = jup_ak4pfjets_deepCSV().at(ijet);
-	jup_csv_pairs.push_back(make_pairs(ijet,btagvalue));
-      }
-      sort(jup_pairs.begin(), jup_pairs.end(), sortIndexbyCSV);
-
-      float jup_mbb=-999;
-      float jup_mct=-999;
-      float jup_ptbb=-999;
-      if(jup_ngoodjets() > 1) {
-	jup_mbb = (jup_ak4pfjets_p4().at(jup_csv_pairs.at(0).first) + jup_ak4pfjets_p4().at(jup_csv_pairs.at(1).first)).mass();
-	jup_ptbb = (jup_ak4pfjets_p4().at(jup_csv_pairs.at(0).first) + jup_ak4pfjets_p4().at(jup_csv_pairs.at(1).first)).pt();
-
-	float ptb1, ptb2, dPhibb;
-	ptb1 = jup_ak4pfjets_p4().at(jup_csv_pairs.at(0).first).pt();
-	ptb2 = jup_ak4pfjets_p4().at(jup_csv_pairs.at(1).first).pt();
-	dPhibb = getdphi(jup_ak4pfjets_p4().at(jup_csv_pairs.at(0).first).phi(),jup_ak4pfjets_p4().at(jup_csv_pairs.at(1).first).phi());
-	jup_mct = sqrt(2*ptb1*ptb2*(1+cos(dPhibb)));
-      }
-      //%%%%%%%%%%%%%%%%%%%%%%%%%
-
       ///Kinematic variables
       // Use CSV sorted for mbb
+      // central
       vector <pair<int, float>> jet_csv_pairs;
       //Only 30 GeV jets passing ID, inside eta 2.4 should survive to babies.
       for(uint ijet=0;ijet<ak4pfjets_deepCSV().size();ijet++){
@@ -778,7 +774,9 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
       mbb=-999;
       mct=-999;
       ptbb=-999;
-      if(ngoodjets()>1){
+      int ngj = -22222;
+      float dpbb = -22222;
+      if((ngj = ngoodjets())>1){
         mbb = (ak4pfjets_p4().at(jet_csv_pairs.at(0).first) + ak4pfjets_p4().at(jet_csv_pairs.at(1).first)).mass()  ; 
         ptbb = (ak4pfjets_p4().at(jet_csv_pairs.at(0).first) + ak4pfjets_p4().at(jet_csv_pairs.at(1).first)).pt()  ; 
         
@@ -786,9 +784,92 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
         ptb1 = ak4pfjets_p4().at(jet_csv_pairs.at(0).first).pt();
         ptb2 = ak4pfjets_p4().at(jet_csv_pairs.at(1).first).pt();
         dPhibb = getdphi(ak4pfjets_p4().at(jet_csv_pairs.at(0).first).phi(),ak4pfjets_p4().at(jet_csv_pairs.at(1).first).phi());
-        mct = sqrt(2*ptb1*ptb2*(1+cos(dPhibb)));  
+        dpbb = dPhibb;
+	mct = sqrt(2*ptb1*ptb2*(1+cos(dPhibb)));  
        
       }
+      printf("mbb:  %f\n", mbb );
+      printf("ptbb: %f\n", ptbb);
+      printf("mct:  %f\n", mct );
+//      if(mct < 0.001) {
+//      	printf("number of jets: %d %f %f\n", ngj, dpbb, mbb);
+//      }
+      // up
+      vector <pair<int, float>> jup_csv_pairs;
+      for(uint ijet = 0; ijet < jup_ak4pfjets_deepCSV().size(); ijet++) {
+	float btagvalue = jup_ak4pfjets_deepCSV().at(ijet);
+	jup_csv_pairs.push_back(make_pair(ijet,btagvalue));
+      }
+      sort(jup_csv_pairs.begin(), jup_csv_pairs.end(), sortIndexbyCSV);
+
+      jup_mbb  = -999;
+      jup_mct  = -999;
+      jup_ptbb = -999;
+      int jungj = -22222;
+      if((jungj = jup_ngoodjets()) > 1) {
+	jup_mbb = (jup_ak4pfjets_p4().at(jup_csv_pairs.at(0).first) + jup_ak4pfjets_p4().at(jup_csv_pairs.at(1).first)).mass();
+	jup_ptbb = (jup_ak4pfjets_p4().at(jup_csv_pairs.at(0).first) + jup_ak4pfjets_p4().at(jup_csv_pairs.at(1).first)).pt();
+
+	float ptb1, ptb2, dPhibb;
+	ptb1 = jup_ak4pfjets_p4().at(jup_csv_pairs.at(0).first).pt();
+	ptb2 = jup_ak4pfjets_p4().at(jup_csv_pairs.at(1).first).pt();
+	dPhibb = getdphi(jup_ak4pfjets_p4().at(jup_csv_pairs.at(0).first).phi(),jup_ak4pfjets_p4().at(jup_csv_pairs.at(1).first).phi());
+	jup_mct = sqrt(2*ptb1*ptb2*(1+cos(dPhibb)));
+      }
+      printf("jup_mbb:  %f\n", jup_mbb );
+      printf("jup_ptbb: %f\n", jup_ptbb);
+      printf("jup_mct:  %f\n", jup_mct );
+      // down
+      vector <pair<int, float>> jdown_csv_pairs;
+      for(uint ijet = 0; ijet < jdown_ak4pfjets_deepCSV().size(); ijet++) {
+	float btagvalue = jdown_ak4pfjets_deepCSV().at(ijet);
+	jdown_csv_pairs.push_back(make_pair(ijet,btagvalue));
+      }
+      sort(jdown_csv_pairs.begin(), jdown_csv_pairs.end(), sortIndexbyCSV);
+
+      jdown_mbb  = -999;
+      jdown_mct  = -999;
+      jdown_ptbb = -999;
+      int jdngj = -22222;
+      if((jdngj = jdown_ngoodjets()) > 1) {
+	jdown_mbb = (jdown_ak4pfjets_p4().at(jdown_csv_pairs.at(0).first) + jdown_ak4pfjets_p4().at(jdown_csv_pairs.at(1).first)).mass();
+	jdown_ptbb = (jdown_ak4pfjets_p4().at(jdown_csv_pairs.at(0).first) + jdown_ak4pfjets_p4().at(jdown_csv_pairs.at(1).first)).pt();
+
+	float ptb1, ptb2, dPhibb;
+	ptb1 = jdown_ak4pfjets_p4().at(jdown_csv_pairs.at(0).first).pt();
+	ptb2 = jdown_ak4pfjets_p4().at(jdown_csv_pairs.at(1).first).pt();
+	dPhibb = getdphi(jdown_ak4pfjets_p4().at(jdown_csv_pairs.at(0).first).phi(),jdown_ak4pfjets_p4().at(jdown_csv_pairs.at(1).first).phi());
+	jdown_mct = sqrt(2*ptb1*ptb2*(1+cos(dPhibb)));
+      }
+      printf("jdown_mbb:  %f\n", jdown_mbb );
+      printf("jdown_ptbb: %f\n", jdown_ptbb);
+      printf("jdown_mct:  %f\n", jdown_mct );
+
+//      if((ngj == jungj) && (ngj == jdngj)) {
+//	printf("good");
+//	if(ngj == 2) {
+//	  printf(" 2\n");
+//	}
+//      }
+//
+//      if(10.0 < abs((jup_mbb-mbb)/mbb)) {
+//	printf("1 more than 10: %d %d  %.10f %.10f %.10f\n", jungj, ngj, (jup_mbb-mbb)/mbb, jup_mbb, mbb);
+//      }
+//      if(10.0 < abs((jup_ptbb-ptbb)/ptbb)) {
+//	printf("2 more than 10: %d %d  %.10f %.10f %.10f\n", jungj, ngj, (jup_ptbb-ptbb)/ptbb, jup_ptbb, ptbb);
+//      }
+//      if(10.0 < abs((jup_mct-mct)/mct)) {
+//	printf("3 more than 10: %d %d  %.10f %.10f %.10f\n", jungj, ngj, (jup_mct-mct)/mct, jup_mct, mct);
+//      }
+//      if(10.0 < abs((jdown_mbb-mbb)/mbb)) {
+//	printf("4 more than 10: %d %d  %.10f %.10f %.10f\n", jdngj, ngj, (jdown_mbb-mbb)/mbb, jdown_mbb, mbb);
+//      }
+//      if(10.0 < abs((jdown_ptbb-ptbb)/ptbb)) {
+//	printf("5 more than 10: %d %d  %.10f %.10f %.10f\n", jdngj, ngj, (jdown_ptbb-ptbb)/ptbb, jdown_ptbb, ptbb);
+//      }
+//      if(10.0 < abs((jdown_mct-mct)/mct)) {
+//	printf("6 more than 10: %d %d  %.10f %.10f %.10f\n", jdngj, ngj, (jdown_mct-mct)/mct, jdown_mct, mct);
+//      }
 
       ///Gen information: susy particles, quarks, bosons, leptons
 
