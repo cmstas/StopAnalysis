@@ -44,7 +44,7 @@ const bool applyBtagSFfromFiles = true; // default false
 // turn on to apply lepton sf to central value - reread from files
 const bool applyLeptonSFfromFiles = false; // default false
 // turn on to enable plots of metbins with systematic variations applied. will only do variations for applied weights
-const bool doSystVariations = false;
+const bool doSystVariations = true;
 // turn on to enable plots of metbins with different gen classifications
 const bool doGenClassification = true;
 // turn on to apply Nvtx reweighting to MC / data2016
@@ -230,6 +230,38 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
     float w_pu=0;
     float w_L1=0;
 
+    //Systematic weight variations
+    float w_btagHFUp=0;
+    float w_btagHFDown=0;
+    float w_btagLFUp=0;
+    float w_btagLFDown=0;
+    float w_btagFSUp=0;
+    float w_btagFSDown=0;
+    float w_lepSFUp=0;
+    float w_lepSFDown=0;
+    float w_lepFSSFUp=0;
+    float w_lepFSSFDown=0;
+    float w_topPtSFUp=0;
+    float w_topPtSFDown=0;
+    // float w_ttbarSysPtUp=0; //this is stop 1l ad hoc weight
+    // float w_ttbarSysPtDown=0;
+    float w_pdfUp=0;
+    float w_pdfDown=0;
+    float w_alphasUp=0;
+    float w_alphasDown=0;
+    float w_q2Up=0;
+    float w_q2Down=0;
+    float w_ISRUp=0; //this is SUSY prescription for 2016 fullsim ttbar, and njets reweighting for strong susy production. for EWK signal, probably easier to use namedFunc.
+    float w_ISRDown=0;
+    float w_xsecUp=0;
+    float w_xsecDown=0;
+    float w_puUp=0;
+    float w_puDown=0;
+    float w_tauSFUp=0;
+    float w_tauSFDown=0;
+    float w_L1prefireUp=0;
+    float w_L1prefireDown=0;
+
     TBranch * b_pass = extraTree->Branch("pass",&pass,"pass/O");
     TBranch * b_stitch = extraTree->Branch("stitch",&stitch,"stitch/O");
     TBranch * b_isgoodrun = extraTree->Branch("goodrun",&isgoodrun,"isgoodrun/O");
@@ -245,6 +277,36 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
     TBranch * b_w_pu = extraTree->Branch("w_pu",&w_pu,"w_pu/F");
     TBranch * b_w_L1 = extraTree->Branch("w_L1",&w_L1,"w_L1/F");
 
+    //Systematic weight variations
+    TBranch * b_w_btagHFUp = extraTree->Branch("w_btagHFUp",&w_btagHFUp,"w_btagHFUp/F");
+    TBranch * b_w_btagHFDown = extraTree->Branch("w_btagHFDown",&w_btagHFDown,"w_btagHFDown/F");
+    TBranch * b_w_btagLFUp = extraTree->Branch("w_btagLFUp",&w_btagLFUp,"w_btagLFUp/F");
+    TBranch * b_w_btagLFDown = extraTree->Branch("w_btagLFDown",&w_btagLFDown,"w_btagLFDown/F");
+    TBranch * b_w_btagFSUp = extraTree->Branch("w_btagFSUp",&w_btagFSUp,"w_btagFSUp/F");
+    TBranch * b_w_btagFSDown = extraTree->Branch("w_btagFSDown",&w_btagFSDown,"w_btagFSDown/F");
+    TBranch * b_w_lepSFUp = extraTree->Branch("w_lepSFUp",&w_lepSFUp,"w_lepSFUp/F");
+    TBranch * b_w_lepSFDown = extraTree->Branch("w_lepSFDown",&w_lepSFDown,"w_lepSFDown/F");
+    TBranch * b_w_lepFSSFUp = extraTree->Branch("w_lepFSSFUp",&w_lepFSSFUp,"w_lepFSSFUp/F");
+    TBranch * b_w_lepFSSFDown = extraTree->Branch("w_lepFSSFDown",&w_lepFSSFDown,"w_lepFSSFDown/F");
+    TBranch * b_w_topPtSFUp = extraTree->Branch("w_topPtSFUp",&w_topPtSFUp,"w_topPtSFUp/F");
+    TBranch * b_w_topPtSFDown = extraTree->Branch("w_topPtSFDown",&w_topPtSFDown,"w_topPtSFDown/F");
+    TBranch * b_w_pdfUp = extraTree->Branch("w_pdfUp",&w_pdfUp,"w_pdfUp/F");
+    TBranch * b_w_pdfDown = extraTree->Branch("w_pdfDown",&w_pdfDown,"w_pdfDown/F");
+    TBranch * b_w_alphasUp = extraTree->Branch("w_alphasUp",&w_alphasUp,"w_alphasUp/F");
+    TBranch * b_w_alphasDown = extraTree->Branch("w_alphasDown",&w_alphasDown,"w_alphasDown/F");
+    TBranch * b_w_q2Up = extraTree->Branch("w_q2Up",&w_q2Up,"w_q2Up/F");
+    TBranch * b_w_q2Down = extraTree->Branch("w_q2Down",&w_q2Down,"w_q2Down/F");
+    TBranch * b_w_ISRUp = extraTree->Branch("w_ISRUp",&w_ISRUp,"w_ISRUp/F");
+    TBranch * b_w_ISRDown = extraTree->Branch("w_ISRDown",&w_ISRDown,"w_ISRDown/F");
+    TBranch * b_w_xsecUp = extraTree->Branch("w_xsecUp",&w_xsecUp,"w_xsecUp/F");
+    TBranch * b_w_xsecDown = extraTree->Branch("w_xsecDown",&w_xsecDown,"w_xsecDown/F");
+    TBranch * b_w_puUp = extraTree->Branch("w_puUp",&w_puUp,"w_puUp/F");
+    TBranch * b_w_puDown = extraTree->Branch("w_puDown",&w_puDown,"w_puDown/F");
+    TBranch * b_w_tauSFUp = extraTree->Branch("w_tauSFUp",&w_tauSFUp,"w_tauSFUp/F");
+    TBranch * b_w_tauSFDown = extraTree->Branch("w_tauSFDown",&w_tauSFDown,"w_tauSFDown/F");
+    TBranch * b_w_L1prefireUp = extraTree->Branch("w_L1prefireUp",&w_L1prefireUp,"w_L1prefireUp/F");
+    TBranch * b_w_L1prefireDown = extraTree->Branch("w_L1prefireDown",&w_L1prefireDown,"w_L1prefireDown/F");
+
     extraTree->SetBranchAddress("pass",&pass,&b_pass);
     extraTree->SetBranchAddress("stitch",&stitch,&b_stitch);
     extraTree->SetBranchAddress("goodrun",&isgoodrun,&b_isgoodrun);
@@ -259,6 +321,37 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
     extraTree->SetBranchAddress("w_80X",&w_80X,&b_w_80X);
     extraTree->SetBranchAddress("w_pu",&w_pu,&b_w_pu);
     extraTree->SetBranchAddress("w_L1",&w_L1,&b_w_L1);
+
+    //Systematic weight variations
+    extraTree->SetBranchAddress("w_btagHFUp",&w_btagHFUp,&b_w_btagHFUp);
+    extraTree->SetBranchAddress("w_btagHFDown",&w_btagHFDown,&b_w_btagHFDown);
+    extraTree->SetBranchAddress("w_btagLFUp",&w_btagLFUp,&b_w_btagLFUp);
+    extraTree->SetBranchAddress("w_btagLFDown",&w_btagLFDown,&b_w_btagLFDown);
+    extraTree->SetBranchAddress("w_btagFSUp",&w_btagFSUp,&b_w_btagFSUp);
+    extraTree->SetBranchAddress("w_btagFSDown",&w_btagFSDown,&b_w_btagFSDown);
+    extraTree->SetBranchAddress("w_lepSFUp",&w_lepSFUp,&b_w_lepSFUp);
+    extraTree->SetBranchAddress("w_lepSFDown",&w_lepSFDown,&b_w_lepSFDown);
+    extraTree->SetBranchAddress("w_lepFSSFUp",&w_lepFSSFUp,&b_w_lepFSSFUp);
+    extraTree->SetBranchAddress("w_lepFSSFDown",&w_lepFSSFDown,&b_w_lepFSSFDown);
+    extraTree->SetBranchAddress("w_topPtSFUp",&w_topPtSFUp,&b_w_topPtSFUp);
+    extraTree->SetBranchAddress("w_topPtSFDown",&w_topPtSFDown,&b_w_topPtSFDown);
+    extraTree->SetBranchAddress("w_pdfUp",&w_pdfUp,&b_w_pdfUp);
+    extraTree->SetBranchAddress("w_pdfDown",&w_pdfDown,&b_w_pdfDown);
+    extraTree->SetBranchAddress("w_alphasUp",&w_alphasUp,&b_w_alphasUp);
+    extraTree->SetBranchAddress("w_alphasDown",&w_alphasDown,&b_w_alphasDown);
+    extraTree->SetBranchAddress("w_q2Up",&w_q2Up,&b_w_q2Up);
+    extraTree->SetBranchAddress("w_q2Down",&w_q2Down,&b_w_q2Down);
+    extraTree->SetBranchAddress("w_ISRUp",&w_ISRUp,&b_w_ISRUp);
+    extraTree->SetBranchAddress("w_ISRDown",&w_ISRDown,&b_w_ISRDown);
+    extraTree->SetBranchAddress("w_xsecUp",&w_xsecUp,&b_w_xsecUp);
+    extraTree->SetBranchAddress("w_xsecDown",&w_xsecDown,&b_w_xsecDown);
+    extraTree->SetBranchAddress("w_puUp",&w_puUp,&b_w_puUp);
+    extraTree->SetBranchAddress("w_puDown",&w_puDown,&b_w_puDown);
+    extraTree->SetBranchAddress("w_tauSFUp",&w_tauSFUp,&b_w_tauSFUp);
+    extraTree->SetBranchAddress("w_tauSFDown",&w_tauSFDown,&b_w_tauSFDown);
+    extraTree->SetBranchAddress("w_L1prefireUp",&w_L1prefireUp,&b_w_L1prefireUp);
+    extraTree->SetBranchAddress("w_L1prefireDown",&w_L1prefireDown,&b_w_L1prefireDown);
+
     
     //Jet info (flatten LorentzVectors) 
 
@@ -506,7 +599,7 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
     if (nEventsTotal >= nEventsChain) continue;
     unsigned int nEventsTree = tree->GetEntriesFast();
 
-    //nEventsTree = 10;
+    // nEventsTree = 10;
     //cout<<"apply good run list "<<applyGoodRunList<<endl;
     for (unsigned int event = 0; event < nEventsTree; ++event) {
       // Read Tree
@@ -553,7 +646,9 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
       evtWgt.resetEvent();
       evtWgt.setDefaultSystematics(evtWgtInfo::puOnly, is_fastsim_);
       w_pu = evtWgt.getWeight(evtWgtInfo::systID(0), false);
-      
+      w_puUp = evtWgt.getWeight(evtWgtInfo::systID::k_puUp,false);
+      w_puDown = evtWgt.getWeight(evtWgtInfo::systID::k_puDown,false);
+
       evtWgt.resetEvent();
       evtWgt.setDefaultSystematics(evtWgtInfo::L1Only, is_fastsim_);
       w_L1 = evtWgt.getWeight(evtWgtInfo::systID(0), false);
@@ -573,6 +668,37 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
         cout<<"h_counter and scale1b weights: "<<w_lumi<<", "<<w_lumi_scale1fb<<endl;
         if( abs(w_lumi - w_lumi_scale1fb)/w_lumi_scale1fb > 0.15 ) cout<<"WARNING: incompatible lumi weights."<<endl;
       }
+
+
+      //systematic weight variations:
+      evtWgt.resetEvent();
+      evtWgt.setDefaultSystematics(evtWgtInfo::WH_Run2, is_fastsim_);
+      w_btagHFUp = evtWgt.getWeight(evtWgtInfo::systID::k_bTagEffHFUp,false);
+      w_btagHFDown = evtWgt.getWeight(evtWgtInfo::systID::k_bTagEffHFDown,false);
+      w_btagLFUp = evtWgt.getWeight(evtWgtInfo::systID::k_bTagEffLFUp,false);
+      w_btagLFDown = evtWgt.getWeight(evtWgtInfo::systID::k_bTagEffLFDown,false);
+      w_btagFSUp = evtWgt.getWeight(evtWgtInfo::systID::k_bTagFSEffUp,false);
+      w_btagFSDown = evtWgt.getWeight(evtWgtInfo::systID::k_bTagFSEffDown,false);
+      w_lepSFUp = evtWgt.getWeight(evtWgtInfo::systID::k_lepSFUp,false);
+      w_lepSFDown = evtWgt.getWeight(evtWgtInfo::systID::k_lepSFDown,false);
+      w_lepFSSFUp = evtWgt.getWeight(evtWgtInfo::systID::k_lepFSSFUp,false);
+      w_lepFSSFDown = evtWgt.getWeight(evtWgtInfo::systID::k_lepFSSFDown,false);
+      w_topPtSFUp = evtWgt.getWeight(evtWgtInfo::systID::k_topPtSFUp,false);
+      w_topPtSFDown = evtWgt.getWeight(evtWgtInfo::systID::k_topPtSFDown,false);
+      w_pdfUp = evtWgt.getWeight(evtWgtInfo::systID::k_pdfUp,false);
+      w_pdfDown = evtWgt.getWeight(evtWgtInfo::systID::k_pdfDown,false);
+      w_alphasUp = evtWgt.getWeight(evtWgtInfo::systID::k_alphasUp,false);
+      w_alphasDown = evtWgt.getWeight(evtWgtInfo::systID::k_alphasDown,false);
+      w_q2Up = evtWgt.getWeight(evtWgtInfo::systID::k_q2Up,false);
+      w_q2Down = evtWgt.getWeight(evtWgtInfo::systID::k_q2Down,false);
+      w_ISRUp = evtWgt.getWeight(evtWgtInfo::systID::k_ISRUp,false); 
+      w_ISRDown = evtWgt.getWeight(evtWgtInfo::systID::k_ISRDown,false);
+      w_xsecUp = evtWgt.getWeight(evtWgtInfo::systID::k_xsecUp,false);
+      w_xsecDown = evtWgt.getWeight(evtWgtInfo::systID::k_xsecDown,false);
+      w_tauSFUp = evtWgt.getWeight(evtWgtInfo::systID::k_tauSFUp,false);
+      w_tauSFDown = evtWgt.getWeight(evtWgtInfo::systID::k_tauSFDown,false);
+      w_L1prefireUp = evtWgt.getWeight(evtWgtInfo::systID::k_L1prefireUp,false);
+      w_L1prefireDown = evtWgt.getWeight(evtWgtInfo::systID::k_L1prefireDown,false);
       //Get and fill jet info
       v_ak4pt->clear();
       v_ak4eta->clear();

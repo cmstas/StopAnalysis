@@ -685,7 +685,6 @@ void evtWgtInfo::calculateWeightsForEvent() {
 
   // Get xSec
   getXSecWeight( xsec, sf_xsec_up, sf_xsec_dn );
-
   // Get Scale1fb*Lumi Wgt
   getScaleToLumiWeight( sf_nominal );
 
@@ -743,12 +742,19 @@ void evtWgtInfo::calculateWeightsForEvent() {
   if (apply_ISR_sf && (samptype == ttbar || is_fastsim_)) {
     if (year == 2016 || is_fastsim_)
       getISRnJetsWeight( sf_ISR, sf_ISR_up, sf_ISR_dn );
-    else
+    else{
       getISRnJetsWeight_local( sf_ISR, sf_ISR_up, sf_ISR_dn );
+      if(isWH){ // per ashraf's slide conclusions.
+        sf_ISR=1.0;
+        sf_ISR_up=1.0;
+        sf_ISR_dn=1.0;}
+    }
+
   }
 
+
   // Pileup Reweighting
-  if (apply_pu_sf_fromFile) {
+  if (apply_pu_sf_fromFile || isWH) {
     getPileupWeight_fromFile( sf_pu, sf_pu_up, sf_pu_dn );
   } else if (apply_pu_sf) {
     getPileupWeight( sf_pu, sf_pu_up, sf_pu_dn );
@@ -853,6 +859,7 @@ void evtWgtInfo::calculateWeightsForEvent() {
   for (int iSys = 0; iSys < k_nSyst; iSys++) {
     if (iSys > 2 && !doingSystematic( systID(iSys) )) continue;
     double sys_wgt = evt_wgt;
+    if(isWH && iSys>0) sys_wgt = 1.0; //store multiplicative factor for systematics, not final weight
 
     switch (iSys) {
       case k_nominal:
@@ -879,7 +886,7 @@ void evtWgtInfo::calculateWeightsForEvent() {
         sys_wgt *= (use_tight_bTag)? (sf_bTag_tight_FS_up/sf_bTag_tight) : (sf_bTag_FS_up/sf_bTag); break;
       case k_bTagFSEffDown:
         sys_wgt *= (use_tight_bTag)? (sf_bTag_tight_FS_dn/sf_bTag_tight) : (sf_bTag_FS_dn/sf_bTag); break;
-      case k_lepSFUp:
+      case k_lepSFUp: 
         sys_wgt *= (sf_lep_up*sf_vetoLep_up)/(sf_lep*sf_vetoLep); break;
       case k_lepSFDown:
         sys_wgt *= (sf_lep_dn*sf_vetoLep_dn)/(sf_lep*sf_vetoLep); break;
@@ -952,7 +959,7 @@ void evtWgtInfo::calculateWeightsForEvent() {
       case k_ISRDown:
         sys_wgt *= (sf_ISR_dn/sf_ISR); break;
       case k_xsecUp:
-        sys_wgt *= (sf_xsec_up/xsec); break;
+        sys_wgt *= (sf_xsec_up/xsec); break; 
       case k_xsecDown:
         sys_wgt *= (sf_xsec_dn/xsec); break;
       case k_puUp:  // Pileup Up
@@ -970,7 +977,7 @@ void evtWgtInfo::calculateWeightsForEvent() {
 
     // Corridor regions use alternate MET resolution weights
     double wgt_corridor = sys_wgt;
-    if (apply_metRes_corridor_sf && apply_metRes_sf && !bTagSF_only) {
+    if (!isWH && apply_metRes_corridor_sf && apply_metRes_sf && !bTagSF_only) {
       if ( iSys==k_metResUp ) wgt_corridor *= sf_metRes_corridor_up / sf_metRes_up;
       else if ( iSys==k_metResDown ) wgt_corridor *= sf_metRes_corridor_dn / sf_metRes_dn;
       else wgt_corridor *= sf_metRes_corridor / sf_metRes;
@@ -1042,7 +1049,7 @@ void evtWgtInfo::getXSecWeight( double &xsec_val, double &weight_xsec_up, double
       xsec_val *= (0.324 * 0.584); //(pdg)
       xsec_err *= (0.324 * 0.584); //(pdg)
     }
-    //cout<<"EVTWGT: Using xsec from file"<<endl;
+//    cout<<"EVTWGT: Using xsec from file"<<endl;
   } else {
     xsec_val = babyAnalyzer.xsec();
     xsec_err = babyAnalyzer.xsec_uncert();
@@ -2542,7 +2549,7 @@ void evtWgtInfo::getttZxsecUnc( double &weight_ttZxsec_up, double &weight_ttZxse
 
 void evtWgtInfo::getPDFWeight( double &weight_pdf_up, double &weight_pdf_dn ) {
 
-  if ( babyAnalyzer.genweights().size() < 110 ) return;
+  if ( babyAnalyzer.genweights().size() < 110 ){ cout<<"Exiting PDF weight early, only "<<babyAnalyzer.genweights().size()<<" genweights."<<endl; return;}
 
   weight_pdf_up = babyAnalyzer.pdf_up_weight();
   weight_pdf_dn = babyAnalyzer.pdf_down_weight();
@@ -2898,7 +2905,7 @@ bool evtWgtInfo::doingSystematic( systID isyst ) {
       return apply_ISR_sf;
     case k_xsecUp:
     case k_xsecDown:
-      return false;  // <-- todo: look this up
+      return true;  // <-- todo: look this up
     case k_puUp:
     case k_puDown:
       return apply_pu_sf || apply_pu_sf_fromFile;

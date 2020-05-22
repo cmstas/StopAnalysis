@@ -30,8 +30,8 @@ void eventWeight_bTagSF::setup(bool isFastsim, int year, std::string fn_btagSF, 
     BTAG_TGT = 0.8953;
     BTAG_MED = 0.6321;
     BTAG_LSE = 0.2217;
-    if (fn_btagSF == "") fn_btagSF = "DeepCSV_2016LegacySF_V1.csv";
-    if (fn_btagSF_FS == "") fn_btagSF_FS = "deepcsv_13TEV_16SL_18_3_2019.csv";
+  if (fn_btagSF == "") fn_btagSF = "DeepCSV_Moriond17_B_H.csv";//"DeepCSV_2016LegacySF_V1.csv";    
+  if (fn_btagSF_FS == "") fn_btagSF_FS = "deepcsv_13TEV_16SL_18_3_2019.csv";
   } else if (year == 2017) {
     BTAG_TGT = 0.8001;
     BTAG_MED = 0.4941;
