@@ -785,9 +785,6 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
 	mct = sqrt(2*ptb1*ptb2*(1+cos(dPhibb)));  
        
       }
-      printf("mbb:  %f\n", mbb );
-      printf("ptbb: %f\n", ptbb);
-      printf("mct:  %f\n", mct );
       // up
       vector <pair<int, float>> jup_csv_pairs;
       for(uint ijet = 0; ijet < jup_ak4pfjets_deepCSV().size(); ijet++) {
@@ -809,11 +806,6 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
 	dPhibb = getdphi(jup_ak4pfjets_p4().at(jup_csv_pairs.at(0).first).phi(),jup_ak4pfjets_p4().at(jup_csv_pairs.at(1).first).phi());
 	jup_mct = sqrt(2*ptb1*ptb2*(1+cos(dPhibb)));
       }
-      if(-1 == datayear) { // We have MC, not data
-	printf("jup_mbb:  %f\n", jup_mbb );
-	printf("jup_ptbb: %f\n", jup_ptbb);
-	printf("jup_mct:  %f\n", jup_mct );
-      }
       // down
       vector <pair<int, float>> jdown_csv_pairs;
       for(uint ijet = 0; ijet < jdown_ak4pfjets_deepCSV().size(); ijet++) {
@@ -834,11 +826,6 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
 	ptb2 = jdown_ak4pfjets_p4().at(jdown_csv_pairs.at(1).first).pt();
 	dPhibb = getdphi(jdown_ak4pfjets_p4().at(jdown_csv_pairs.at(0).first).phi(),jdown_ak4pfjets_p4().at(jdown_csv_pairs.at(1).first).phi());
 	jdown_mct = sqrt(2*ptb1*ptb2*(1+cos(dPhibb)));
-      }
-      if(-1 == datayear) { // We have MC, not data
-	printf("jdown_mbb:  %f\n", jdown_mbb );
-	printf("jdown_ptbb: %f\n", jdown_ptbb);
-	printf("jdown_mct:  %f\n", jdown_mct );
       }
 
       ///Gen information: susy particles, quarks, bosons, leptons
