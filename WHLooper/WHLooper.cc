@@ -467,8 +467,8 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
     extraTree->SetBranchAddress("mus_phi",&mus_phi,&b_mus_phi);
     extraTree->SetBranchAddress("mus_fromW",&mus_fromW,&b_mus_fromW);
     extraTree->SetBranchAddress("mus_pdgid",&mus_pdgid,&b_mus_pdgid);
-
-    /// other kinematic variables ///
+    
+    /// other kinematic variables /// central, up, down
     float mbb=0; //sorted by CSV
     float ptbb=0;
     float mct=0;
@@ -478,7 +478,25 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
     extraTree->SetBranchAddress("mbb",&mbb,&b_mbb);
     extraTree->SetBranchAddress("ptbb",&ptbb,&b_ptbb);
     extraTree->SetBranchAddress("mct",&mct,&b_mct);
-
+    float jup_mbb  = 0;
+    float jup_ptbb = 0;
+    float jup_mct  = 0;
+    TBranch * jup_b_mbb  = extraTree->Branch("jup_mbb" , &jup_mbb ,"jup_mbb/F" );
+    TBranch * jup_b_ptbb = extraTree->Branch("jup_ptbb", &jup_ptbb,"jup_ptbb/F");   
+    TBranch * jup_b_mct  = extraTree->Branch("jup_mct" , &jup_mct ,"jup_mct/F" );
+    extraTree->SetBranchAddress("jup_mbb" , &jup_mbb , &jup_b_mbb );
+    extraTree->SetBranchAddress("jup_ptbb", &jup_ptbb, &jup_b_ptbb);
+    extraTree->SetBranchAddress("jup_mct" , &jup_mct , &jup_b_mct );
+    float jdown_mbb  = 0;
+    float jdown_ptbb = 0;
+    float jdown_mct  = 0;
+    TBranch * jdown_b_mbb  = extraTree->Branch("jdown_mbb" , &jdown_mbb ,"jdown_mbb/F" );
+    TBranch * jdown_b_ptbb = extraTree->Branch("jdown_ptbb", &jdown_ptbb,"jdown_ptbb/F");   
+    TBranch * jdown_b_mct  = extraTree->Branch("jdown_mct" , &jdown_mct ,"jdown_mct/F" );
+    extraTree->SetBranchAddress("jdown_mbb" , &jdown_mbb , &jdown_b_mbb );
+    extraTree->SetBranchAddress("jdown_ptbb", &jdown_ptbb, &jdown_b_ptbb);
+    extraTree->SetBranchAddress("jdown_mct" , &jdown_mct , &jdown_b_mct );
+        
 
     //Generator information
     vector<float> * gen_pt = new vector<float>(); 
@@ -870,6 +888,7 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
 
       ///Kinematic variables
       // Use CSV sorted for mbb
+      // central
       vector <pair<int, float>> jet_csv_pairs;
       //Only 30 GeV jets passing ID, inside eta 2.4 should survive to babies.
       for(uint ijet=0;ijet<ak4pfjets_deepCSV().size();ijet++){
@@ -889,8 +908,50 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
         ptb1 = ak4pfjets_p4().at(jet_csv_pairs.at(0).first).pt();
         ptb2 = ak4pfjets_p4().at(jet_csv_pairs.at(1).first).pt();
         dPhibb = getdphi(ak4pfjets_p4().at(jet_csv_pairs.at(0).first).phi(),ak4pfjets_p4().at(jet_csv_pairs.at(1).first).phi());
-        mct = sqrt(2*ptb1*ptb2*(1+cos(dPhibb)));  
+	mct = sqrt(2*ptb1*ptb2*(1+cos(dPhibb)));  
        
+      }
+      // up
+      vector <pair<int, float>> jup_csv_pairs;
+      for(uint ijet = 0; ijet < jup_ak4pfjets_deepCSV().size(); ijet++) {
+	float btagvalue = jup_ak4pfjets_deepCSV().at(ijet);
+	jup_csv_pairs.push_back(make_pair(ijet,btagvalue));
+      }
+      sort(jup_csv_pairs.begin(), jup_csv_pairs.end(), sortIndexbyCSV);
+
+      jup_mbb  = -999;
+      jup_mct  = -999;
+      jup_ptbb = -999;
+      if(jup_ngoodjets()>1) {
+	jup_mbb = (jup_ak4pfjets_p4().at(jup_csv_pairs.at(0).first) + jup_ak4pfjets_p4().at(jup_csv_pairs.at(1).first)).mass();
+	jup_ptbb = (jup_ak4pfjets_p4().at(jup_csv_pairs.at(0).first) + jup_ak4pfjets_p4().at(jup_csv_pairs.at(1).first)).pt();
+
+	float ptb1, ptb2, dPhibb;
+	ptb1 = jup_ak4pfjets_p4().at(jup_csv_pairs.at(0).first).pt();
+	ptb2 = jup_ak4pfjets_p4().at(jup_csv_pairs.at(1).first).pt();
+	dPhibb = getdphi(jup_ak4pfjets_p4().at(jup_csv_pairs.at(0).first).phi(),jup_ak4pfjets_p4().at(jup_csv_pairs.at(1).first).phi());
+	jup_mct = sqrt(2*ptb1*ptb2*(1+cos(dPhibb)));
+      }
+      // down
+      vector <pair<int, float>> jdown_csv_pairs;
+      for(uint ijet = 0; ijet < jdown_ak4pfjets_deepCSV().size(); ijet++) {
+	float btagvalue = jdown_ak4pfjets_deepCSV().at(ijet);
+	jdown_csv_pairs.push_back(make_pair(ijet,btagvalue));
+      }
+      sort(jdown_csv_pairs.begin(), jdown_csv_pairs.end(), sortIndexbyCSV);
+
+      jdown_mbb  = -999;
+      jdown_mct  = -999;
+      jdown_ptbb = -999;
+      if(jdown_ngoodjets()>1) {
+	jdown_mbb = (jdown_ak4pfjets_p4().at(jdown_csv_pairs.at(0).first) + jdown_ak4pfjets_p4().at(jdown_csv_pairs.at(1).first)).mass();
+	jdown_ptbb = (jdown_ak4pfjets_p4().at(jdown_csv_pairs.at(0).first) + jdown_ak4pfjets_p4().at(jdown_csv_pairs.at(1).first)).pt();
+
+	float ptb1, ptb2, dPhibb;
+	ptb1 = jdown_ak4pfjets_p4().at(jdown_csv_pairs.at(0).first).pt();
+	ptb2 = jdown_ak4pfjets_p4().at(jdown_csv_pairs.at(1).first).pt();
+	dPhibb = getdphi(jdown_ak4pfjets_p4().at(jdown_csv_pairs.at(0).first).phi(),jdown_ak4pfjets_p4().at(jdown_csv_pairs.at(1).first).phi());
+	jdown_mct = sqrt(2*ptb1*ptb2*(1+cos(dPhibb)));
       }
 
       ///Gen information: susy particles, quarks, bosons, leptons
