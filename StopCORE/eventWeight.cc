@@ -284,6 +284,7 @@ evtWgtInfo::evtWgtInfo() {
   // Initialize Switches for additional SFs
   apply_diLepTrigger_sf = false;
   apply_cr2lTrigger_sf  = false;
+  apply_WH_trig_eff     = false;
   apply_bTag_sf         = false;
   apply_bTagFS_sf       = false;
   apply_lep_sf          = false;
@@ -484,6 +485,14 @@ void evtWgtInfo::Setup(string samplestr, int inyear, bool applyUnc, bool useBTag
     }
   }
 
+  //Get WH trig efficiency
+  if(!is_data_ && isWH){
+    f_WH_trig_eff = new TFile(Form("../WHLooper/trig_eff/jetHT_%d_HLT_PFHT_prescaled_OR_all_trig.root",year), "read");
+    h_WH_trig_eff  = (TH2D*) f_WH_trig_eff->Get("h");
+
+
+  }
+
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -496,6 +505,7 @@ void evtWgtInfo::Cleanup() {
 
     if (useBTagSFs_fromFiles) delete bTagSFUtil;
     if (useLepSFs_fromFiles) delete lepSFUtil;
+    if (apply_WH_trig_eff) f_WH_trig_eff->Close();
   }
   if ( is_fastsim_ ) {
     f_sig_xsec->Close();
@@ -2806,6 +2816,15 @@ void evtWgtInfo::getPileupWeight_fromFile( double &weight_pu, double &weight_pu_
   weight_pu_dn = h_pu_wgt_dn->GetBinContent(ibin);
 }
 
+void evtWgtInfo::getWH_trig_eff_fromFile( float &trig_eff, float &trig_eff_up, float &trig_eff_dn ) {
+
+  int ibin = h_WH_trig_eff->FindBin(lep1_p4().pt(),pfmet());
+  trig_eff    = h_WH_trig_eff->GetBinContent(ibin);
+  trig_eff_up = h_WH_trig_eff->GetBinContent(ibin); // What to do for sys variation?
+  trig_eff_dn = h_WH_trig_eff->GetBinContent(ibin);
+}
+
+
 inline void evtWgtInfo::getL1PrefireWeight( double &weight_L1Prefire, double &weight_L1Prefire_up, double &weight_L1Prefire_dn ) {
   weight_L1Prefire    = babyAnalyzer.weight_L1prefire();
   weight_L1Prefire_up = babyAnalyzer.weight_L1prefire_UP();
@@ -3090,6 +3109,7 @@ void evtWgtInfo::setDefaultSystematics( int syst_set, bool isfastsim ) {
       apply_HEMveto_jet_sf = true;   // scale down 2018 event with HEM jet
       apply_sample_sf      = false;  // no multiple sample available yet
       apply_lepFS_sf       = true;
+      apply_WH_trig_eff = true;
       if (isfastsim) {
         apply_lepFS_sf     = true;   // updated on and after v31
         apply_bTagFS_sf    = true;

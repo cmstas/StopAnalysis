@@ -143,6 +143,10 @@ class evtWgtInfo {
   TH1D *h_tfttagSF_bkg;
   TH1D *h_tfttagSF_FS;
 
+  //WH trif eff hists
+  TFile * f_WH_trig_eff;
+  TH2D * h_WH_trig_eff;
+
   // Event weights for each systematic
   double sys_wgts[k_nSyst];
   double sys_wgts_corridor[k_nSyst];
@@ -174,6 +178,8 @@ class evtWgtInfo {
   double sf_diLepTrigger;
   double sf_diLepTrigger_up;
   double sf_diLepTrigger_dn;
+
+  bool apply_WH_trig_eff;
 
   bool   apply_cr2lTrigger_sf;
   double sf_cr2lTrigger;
@@ -368,6 +374,7 @@ class evtWgtInfo {
   void getL1PrefireWeight( double &weight_L1prefire, double &weight_L1prefire_up, double &weight_L1prefire_dn );
   void getHEMElectronVetoWeight( double &weight_HEMveto );
   void getHEMJetVetoWeight( double &weight_HEMveto );
+  void getWH_trig_eff_fromFile( float &trig_eff, float &trig_eff_up, float &trig_eff_dn );
 
   double getZSampleWeightFromCR3l( TString fname, bool apply=true );
   double getExtSampleWeightSummer16v2( TString sample, bool apply=true );

@@ -89,6 +89,11 @@ float getdphi( float phi1 , float phi2 ){
   return dphi;
 }
 
+float getdR(float phi1, float phi2, float eta1, float eta2){
+  float dR = sqrt( pow(getdphi(phi1,phi2),2) + pow((eta1-eta2),2));
+  return dR;
+}
+
 bool WHLooper::PassingHLTriggers(const int type) {
   if (type == 1) {
     switch (year_) {
@@ -196,7 +201,7 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
 
   cout << "[WHLooper::looper] running on " << nEventsChain << " events" << endl;
   unsigned int nEventsTotal = 0;
-  unsigned int nPassedTotal = 0;
+
 
   TObjArray *listOfFiles = chain->GetListOfFiles();
   TIter fileIter(listOfFiles);
@@ -216,11 +221,13 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
 
     //Weight info
     bool pass=true;
+    bool pass_old=true;
     bool stitch=true;
     bool isgoodrun=true;
     bool duplicate=false;
 
     float weight=0;
+    float full_weight=0;
     float w_lumi=0;
     float w_lumi_scale1fb=0;
     float w_noBtagSF=0;
@@ -229,6 +236,9 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
     float w_80X=0;
     float w_pu=0;
     float w_L1=0;
+
+    //Trig eff
+    float trig_eff =1.0;
 
     //Systematic weight variations
     float w_btagHFUp=0;
@@ -263,11 +273,13 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
     float w_L1prefireDown=0;
 
     TBranch * b_pass = extraTree->Branch("pass",&pass,"pass/O");
+    TBranch * b_pass_old = extraTree->Branch("pass_old",&pass_old,"pass_old/O");
     TBranch * b_stitch = extraTree->Branch("stitch",&stitch,"stitch/O");
     TBranch * b_isgoodrun = extraTree->Branch("goodrun",&isgoodrun,"isgoodrun/O");
     TBranch * b_duplicate = extraTree->Branch("duplicate",&duplicate,"duplicate/O");
 
     TBranch * b_weight = extraTree->Branch("weight",&weight,"weight/F");
+    TBranch * b_full_weight = extraTree->Branch("full_weight",&full_weight,"full_weight/F");
     TBranch * b_w_lumi = extraTree->Branch("w_lumi",&w_lumi,"w_lumi/F");
     TBranch * b_w_lumi_scale1fb = extraTree->Branch("w_lumi_scale1fb",&w_lumi_scale1fb,"w_lumi_scale1fb/F");
     TBranch * b_w_noBtagSF = extraTree->Branch("w_noBtagSF",&w_noBtagSF,"w_noBtagSF/F");
@@ -276,6 +288,9 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
     TBranch * b_w_80X = extraTree->Branch("w_80X",&w_80X,"w_80X/F");
     TBranch * b_w_pu = extraTree->Branch("w_pu",&w_pu,"w_pu/F");
     TBranch * b_w_L1 = extraTree->Branch("w_L1",&w_L1,"w_L1/F");
+
+    TBranch * b_trig_eff = extraTree->Branch("trig_eff",&trig_eff,"trig_eff/F");
+
 
     //Systematic weight variations
     TBranch * b_w_btagHFUp = extraTree->Branch("w_btagHFUp",&w_btagHFUp,"w_btagHFUp/F");
@@ -308,11 +323,13 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
     TBranch * b_w_L1prefireDown = extraTree->Branch("w_L1prefireDown",&w_L1prefireDown,"w_L1prefireDown/F");
 
     extraTree->SetBranchAddress("pass",&pass,&b_pass);
+    extraTree->SetBranchAddress("pass_old",&pass_old,&b_pass_old);
     extraTree->SetBranchAddress("stitch",&stitch,&b_stitch);
     extraTree->SetBranchAddress("goodrun",&isgoodrun,&b_isgoodrun);
     extraTree->SetBranchAddress("duplicate",&duplicate,&b_duplicate);
 
     extraTree->SetBranchAddress("weight",&weight,&b_weight);
+    extraTree->SetBranchAddress("full_weight",&full_weight,&b_full_weight);
     extraTree->SetBranchAddress("w_lumi",&w_lumi,&b_w_lumi);
     extraTree->SetBranchAddress("w_lumi_scale1fb",&w_lumi_scale1fb,&b_w_lumi_scale1fb);
     extraTree->SetBranchAddress("w_noBtagSF",&w_noBtagSF,&b_w_noBtagSF);
@@ -321,6 +338,8 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
     extraTree->SetBranchAddress("w_80X",&w_80X,&b_w_80X);
     extraTree->SetBranchAddress("w_pu",&w_pu,&b_w_pu);
     extraTree->SetBranchAddress("w_L1",&w_L1,&b_w_L1);
+
+    extraTree->SetBranchAddress("trig_eff",&trig_eff,&b_trig_eff);
 
     //Systematic weight variations
     extraTree->SetBranchAddress("w_btagHFUp",&w_btagHFUp,&b_w_btagHFUp);
@@ -362,6 +381,7 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
     vector<float> * v_ak4eta = new vector<float>();
     vector<float> * v_ak4phi = new vector<float>();
     vector<float> * v_ak4mass = new vector<float>();
+    vector<float> * v_ak4genpt = new vector<float>();
   
     TBranch * b_njets = extraTree->Branch("njets",&njets,"njets/I");
     TBranch * b_nbtagCSV = extraTree->Branch("nbtagCSV",&nbtagCSV,"nbtagCSV/I");
@@ -369,6 +389,7 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
     TBranch * b_ak4eta = extraTree->Branch("ak4pfjets_eta",&v_ak4eta);
     TBranch * b_ak4phi = extraTree->Branch("ak4pfjets_phi",&v_ak4phi);
     TBranch * b_ak4mass = extraTree->Branch("ak4pfjets_m",&v_ak4mass);
+    TBranch * b_ak4genpt = extraTree->Branch("ak4pfjets_genpt",&v_ak4mass);
     
     extraTree->SetBranchAddress("njets",&njets,&b_njets);
     extraTree->SetBranchAddress("nbtagCSV",&nbtagCSV,&b_nbtagCSV);
@@ -376,24 +397,28 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
     extraTree->SetBranchAddress("ak4pfjets_eta",&v_ak4eta,&b_ak4eta);
     extraTree->SetBranchAddress("ak4pfjets_phi",&v_ak4phi,&b_ak4phi);
     extraTree->SetBranchAddress("ak4pfjets_m",&v_ak4mass,&b_ak4mass);
+    extraTree->SetBranchAddress("ak4pfjets_genpt",&v_ak4genpt,&b_ak4genpt);
 
     int nfatjets=0;
     vector<float> * v_ak8pt = new vector<float>();
     vector<float> * v_ak8eta = new vector<float>();
     vector<float> * v_ak8phi = new vector<float>();
     vector<float> * v_ak8mass = new vector<float>();
+    // vector<float> * v_ak8genpt = new vector<float>();
     
     TBranch * b_nfatjets = extraTree->Branch("nfatjets",&njets,"nfatjets/I");
     TBranch * b_ak8pt = extraTree->Branch("ak8pfjets_pt",&v_ak8pt);
     TBranch * b_ak8eta = extraTree->Branch("ak8pfjets_eta",&v_ak8eta);
     TBranch * b_ak8phi = extraTree->Branch("ak8pfjets_phi",&v_ak8phi);
     TBranch * b_ak8mass = extraTree->Branch("ak8pfjets_m",&v_ak8mass);
+    // TBranch * b_ak8genpt = extraTree->Branch("ak8pfjets_genpt",&v_ak8genpt);
     
     extraTree->SetBranchAddress("nfatjets",&nfatjets,&b_nfatjets);
     extraTree->SetBranchAddress("ak8pfjets_pt",&v_ak8pt,&b_ak8pt);
     extraTree->SetBranchAddress("ak8pfjets_eta",&v_ak8eta,&b_ak8eta);
     extraTree->SetBranchAddress("ak8pfjets_phi",&v_ak8phi,&b_ak8phi);
     extraTree->SetBranchAddress("ak8pfjets_m",&v_ak8mass,&b_ak8mass);
+    // extraTree->SetBranchAddress("ak8pfjets_genpt",&v_ak8genpt,&b_ak8genpt);
 
     //Lepton info
     int nWHLeptons=0;
@@ -614,10 +639,11 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
 
     //dummy.cd();
     // Loop over Events in current file
+
     if (nEventsTotal >= nEventsChain) continue;
     unsigned int nEventsTree = tree->GetEntriesFast();
 
-    // nEventsTree = 10;
+    // nEventsTree = 25;
     //cout<<"apply good run list "<<applyGoodRunList<<endl;
     for (unsigned int event = 0; event < nEventsTree; ++event) {
       // Read Tree
@@ -688,9 +714,25 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
       }
 
 
+      //year weight for 3-year plotting simultaneously
+      float year_weight=1.;
+      float totalLumi = 35.9+41.6+59.7;
+      if(!is_data()){
+        if(year() == 2016 ) year_weight = 35.9 / totalLumi;
+        else if(year() == 2017)  year_weight = 41.6 / totalLumi;
+        else if(year() == 2018)  year_weight = 59.7 / totalLumi;
+      }
+
+      //Full weight
+      full_weight = weight;
+      if(!is_data()) full_weight = weight * w_pu * year_weight;
+
+
       //systematic weight variations:
       evtWgt.resetEvent();
       evtWgt.setDefaultSystematics(evtWgtInfo::WH_Run2, is_fastsim_);
+      float trig_eff_up,trig_eff_dn;
+      evtWgt.getWH_trig_eff_fromFile(trig_eff,trig_eff_up,trig_eff_dn);
       w_btagHFUp = evtWgt.getWeight(evtWgtInfo::systID::k_bTagEffHFUp,false);
       w_btagHFDown = evtWgt.getWeight(evtWgtInfo::systID::k_bTagEffHFDown,false);
       w_btagLFUp = evtWgt.getWeight(evtWgtInfo::systID::k_bTagEffLFUp,false);
@@ -722,12 +764,25 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
       v_ak4eta->clear();
       v_ak4phi->clear();
       v_ak4mass->clear();
+      v_ak4genpt->clear();
       for(uint ijet=0;ijet<ak4pfjets_p4().size();ijet++){
         v_ak4pt->push_back(ak4pfjets_p4().at(ijet).pt());
        // cout<<"jet pt"<<ak4pfjets_p4().at(ijet).pt()<<endl;
         v_ak4eta->push_back(ak4pfjets_p4().at(ijet).eta());
         v_ak4phi->push_back(ak4pfjets_p4().at(ijet).phi());
         v_ak4mass->push_back(ak4pfjets_p4().at(ijet).mass());
+        float genpT =0;
+        if(!is_data()){
+          float dR = 999;
+          int imatch = -1;
+          for(uint igjet=0;igjet<ak4genjets_p4().size();igjet++){
+            float this_dR = getdR(ak4pfjets_p4().at(ijet).phi(),ak4genjets_p4().at(igjet).phi(),ak4pfjets_p4().at(ijet).eta(),ak4genjets_p4().at(igjet).eta());
+            if (this_dR < dR) {imatch = igjet; dR = this_dR;}
+          }
+          if(imatch>=0 && dR < 0.3) genpT = ak4genjets_p4().at(imatch).pt();
+        }
+        v_ak4genpt->push_back(genpT);
+
       }
       njets=v_ak4pt->size();
 
@@ -746,12 +801,27 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
       v_ak8eta->clear();
       v_ak8phi->clear();
       v_ak8mass->clear();
+      // v_ak8genpt->clear();
       for(uint ijet=0;ijet<ak8pfjets_p4().size();ijet++){
         v_ak8pt->push_back(ak8pfjets_p4().at(ijet).pt());
         v_ak8eta->push_back(ak8pfjets_p4().at(ijet).eta());
         v_ak8phi->push_back(ak8pfjets_p4().at(ijet).phi());
         v_ak8mass->push_back(ak8pfjets_p4().at(ijet).mass());
+        //Stop baby has no ak8 genjets.
+        // float genpT =0;
+        // if(!is_data()){
+        //   float dR = 999;
+        //   int imatch = -1;
+        //   for(uint igjet=0;igjet<ak8pfjets_p4().size();igjet++){
+        //     float this_dR = getdR(ak8pfjets_p4().at(ijet).phi(),ak8genjets_p4().at(igjet).phi(),ak8pfjets_p4().at(ijet).eta(),ak8genjets_p4().at(igjet).eta());
+        //     if (this_dR < dR) {imatch = igjet; dR = this_dR;}
+        //   }
+        //   if(imatch>=0 && dR < 0.3) genpT = ak8genjets_p4().at(imatch).pt();
+        // }
+        // v_ak8genpt->push_back(genpT);
+
       }
+
       nfatjets=v_ak8pt->size();
       nWHLeptons=0;
       nleps_tm=0;
@@ -1046,7 +1116,11 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
       stitch =true;
       //cout<<dsname<<" "<<genmet()<<" "<<dsname.Contains("TTJets")<<" "<<!dsname.Contains("genMET")<<endl;
 
-      if(dsname.Contains("TTJets") && !dsname.Contains("genMET") && ((year()<2018 && genmet()>150.) || (year()==2018 && genmet()>80.))) stitch = false;
+      if(dsname.Contains("TTJets") && !dsname.Contains("genMET") && ((year()<2018 && genmet()>150.) || (year()==2018 && genmet()>120.))) stitch = false;
+      
+      //for 2018, inclusive and met binned don't match between 80 and 120 GeV. Use inclusive for this region instead of METBinned.
+      if(dsname.Contains("TTJets") && dsname.Contains("genMET") &&  year()==2018 && genmet()<=120.) stitch = false;
+
       //cout<<stitch<<endl;
       
       if((dsname.Contains("W1Jets") || dsname.Contains("W2Jets") || dsname.Contains("W3Jets") || dsname.Contains("W4Jets"))  && !dsname.Contains("NuPt-200") && maxnupt>200.) stitch = false;
@@ -1085,7 +1159,22 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
         // if ( !filt_nobadmuons() ) pass=false;
       }
 
+      pass_old = pass; //preserve value for comparison to old babies
 
+            // HEM issue for 2018, that excess of electron happens at -4.7 < eta < -1.4, -1.6 < phi < -0.8
+      if (doHEMElectronVeto && year_ == 2018 && is_data() && run() >= 319077) {
+        if (abs(lep2_pdgid()) == 11 && lep2_p4().eta() < -1.4 && lep2_p4().phi() > -1.6 && lep2_p4().phi() < -0.8)
+          pass=false; // veto the events
+      }
+
+      if (doHEMJetVeto && year_ == 2018 && is_data() && run() >= 319077) {
+        bool hasHEMjet = false;
+        for (auto jet : ak4pfjets_p4()) {  // the jets are cleaned with leptons already
+          if (jet.eta() < -1.4 && jet.phi() > -1.6 && jet.phi() < -0.8)
+            hasHEMjet = true;
+        }
+        if (hasHEMjet) pass=false;
+      }
 
 
       // Apply met filters
@@ -1146,8 +1235,7 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
   outfile_->Close();
   bmark->Stop("benchmark");
   cout << endl;
-  cout << nEventsTotal << " Events Processed, where " << nDuplicates << " duplicates were skipped, and ";
-  cout << nPassedTotal << " Events passed all selections." << endl;
+  cout << nEventsTotal << " Events Processed, where " << nDuplicates << " duplicates were skipped.";
   cout << "------------------------------" << endl;
   cout << "CPU  Time:   " << Form( "%.01f s", bmark->GetCpuTime("benchmark")  ) << endl;
   cout << "Real Time:   " << Form( "%.01f s", bmark->GetRealTime("benchmark") ) << endl;
