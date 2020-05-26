@@ -233,6 +233,7 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
     float w_noBtagSF=0;
     float w_BtagSF_medmed=0;
     float w_BtagSF_medloose=0;
+    float w_BtagSF_tightloose=0;
     float w_80X=0;
     float w_pu=0;
     float w_L1=0;
@@ -285,6 +286,7 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
     TBranch * b_w_noBtagSF = extraTree->Branch("w_noBtagSF",&w_noBtagSF,"w_noBtagSF/F");
     TBranch * b_w_BtagSF_medmed = extraTree->Branch("w_BtagSF_medmed",&w_BtagSF_medmed,"w_BtagSF_medmed/F");
     TBranch * b_w_BtagSF_medloose = extraTree->Branch("w_BtagSF_medloose",&w_BtagSF_medloose,"w_BtagSF_medloose/F");
+    TBranch * b_w_BtagSF_tightloose = extraTree->Branch("w_BtagSF_tightloose",&w_BtagSF_tightloose,"w_BtagSF_tightloose/F");
     TBranch * b_w_80X = extraTree->Branch("w_80X",&w_80X,"w_80X/F");
     TBranch * b_w_pu = extraTree->Branch("w_pu",&w_pu,"w_pu/F");
     TBranch * b_w_L1 = extraTree->Branch("w_L1",&w_L1,"w_L1/F");
@@ -335,6 +337,7 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
     extraTree->SetBranchAddress("w_noBtagSF",&w_noBtagSF,&b_w_noBtagSF);
     extraTree->SetBranchAddress("w_BtagSF_medmed",&w_BtagSF_medmed,&b_w_BtagSF_medmed);
     extraTree->SetBranchAddress("w_BtagSF_medloose",&w_BtagSF_medloose,&b_w_BtagSF_medloose);
+    extraTree->SetBranchAddress("w_BtagSF_tightloose",&w_BtagSF_tightloose,&b_w_BtagSF_tightloose);
     extraTree->SetBranchAddress("w_80X",&w_80X,&b_w_80X);
     extraTree->SetBranchAddress("w_pu",&w_pu,&b_w_pu);
     extraTree->SetBranchAddress("w_L1",&w_L1,&b_w_L1);
@@ -378,6 +381,8 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
     int njets=0;
     int nbtagCSV=0;
     vector<float> * v_ak4pt = new vector<float>();
+    vector<float> * v_ak4pt_jup = new vector<float>();
+    vector<float> * v_ak4pt_jdown = new vector<float>();
     vector<float> * v_ak4eta = new vector<float>();
     vector<float> * v_ak4phi = new vector<float>();
     vector<float> * v_ak4mass = new vector<float>();
@@ -386,6 +391,8 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
     TBranch * b_njets = extraTree->Branch("njets",&njets,"njets/I");
     TBranch * b_nbtagCSV = extraTree->Branch("nbtagCSV",&nbtagCSV,"nbtagCSV/I");
     TBranch * b_ak4pt = extraTree->Branch("ak4pfjets_pt",&v_ak4pt);
+    TBranch * b_ak4pt_jup = extraTree->Branch("ak4pfjets_pt_jup",&v_ak4pt_jup);
+    TBranch * b_ak4pt_jdown = extraTree->Branch("ak4pfjets_pt_jdown",&v_ak4pt_jdown);
     TBranch * b_ak4eta = extraTree->Branch("ak4pfjets_eta",&v_ak4eta);
     TBranch * b_ak4phi = extraTree->Branch("ak4pfjets_phi",&v_ak4phi);
     TBranch * b_ak4mass = extraTree->Branch("ak4pfjets_m",&v_ak4mass);
@@ -394,6 +401,8 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
     extraTree->SetBranchAddress("njets",&njets,&b_njets);
     extraTree->SetBranchAddress("nbtagCSV",&nbtagCSV,&b_nbtagCSV);
     extraTree->SetBranchAddress("ak4pfjets_pt",&v_ak4pt,&b_ak4pt);
+    extraTree->SetBranchAddress("ak4pfjets_pt_jup",&v_ak4pt_jup,&b_ak4pt_jup);
+    extraTree->SetBranchAddress("ak4pfjets_pt_jdown",&v_ak4pt_jdown,&b_ak4pt_jdown);
     extraTree->SetBranchAddress("ak4pfjets_eta",&v_ak4eta,&b_ak4eta);
     extraTree->SetBranchAddress("ak4pfjets_phi",&v_ak4phi,&b_ak4phi);
     extraTree->SetBranchAddress("ak4pfjets_m",&v_ak4mass,&b_ak4mass);
@@ -401,6 +410,8 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
 
     int nfatjets=0;
     vector<float> * v_ak8pt = new vector<float>();
+    vector<float> * v_ak8pt_jup = new vector<float>();
+    vector<float> * v_ak8pt_jdown = new vector<float>();
     vector<float> * v_ak8eta = new vector<float>();
     vector<float> * v_ak8phi = new vector<float>();
     vector<float> * v_ak8mass = new vector<float>();
@@ -408,6 +419,8 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
     
     TBranch * b_nfatjets = extraTree->Branch("nfatjets",&njets,"nfatjets/I");
     TBranch * b_ak8pt = extraTree->Branch("ak8pfjets_pt",&v_ak8pt);
+    TBranch * b_ak8pt_jup = extraTree->Branch("ak8pfjets_pt_jup",&v_ak8pt_jup);
+    TBranch * b_ak8pt_jdown = extraTree->Branch("ak8pfjets_pt_jdown",&v_ak8pt_jdown);
     TBranch * b_ak8eta = extraTree->Branch("ak8pfjets_eta",&v_ak8eta);
     TBranch * b_ak8phi = extraTree->Branch("ak8pfjets_phi",&v_ak8phi);
     TBranch * b_ak8mass = extraTree->Branch("ak8pfjets_m",&v_ak8mass);
@@ -415,6 +428,8 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
     
     extraTree->SetBranchAddress("nfatjets",&nfatjets,&b_nfatjets);
     extraTree->SetBranchAddress("ak8pfjets_pt",&v_ak8pt,&b_ak8pt);
+    extraTree->SetBranchAddress("ak8pfjets_pt_jup",&v_ak8pt_jup,&b_ak8pt_jup);
+    extraTree->SetBranchAddress("ak8pfjets_pt_jdown",&v_ak8pt_jdown,&b_ak8pt_jdown);
     extraTree->SetBranchAddress("ak8pfjets_eta",&v_ak8eta,&b_ak8eta);
     extraTree->SetBranchAddress("ak8pfjets_phi",&v_ak8phi,&b_ak8phi);
     extraTree->SetBranchAddress("ak8pfjets_m",&v_ak8mass,&b_ak8mass);
@@ -643,7 +658,7 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
     if (nEventsTotal >= nEventsChain) continue;
     unsigned int nEventsTree = tree->GetEntriesFast();
 
-    // nEventsTree = 25;
+    nEventsTree = 2000;
     //cout<<"apply good run list "<<applyGoodRunList<<endl;
     for (unsigned int event = 0; event < nEventsTree; ++event) {
       // Read Tree
@@ -696,7 +711,7 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
       evtWgt.resetEvent();
       evtWgt.setDefaultSystematics(evtWgtInfo::L1Only, is_fastsim_);
       w_L1 = evtWgt.getWeight(evtWgtInfo::systID(0), false);
-
+      
       evtWgt.resetEvent();
       evtWgt.setDefaultSystematics(evtWgtInfo::WH_Run2, is_fastsim_);
       evtWgt.setbTagSF_only();
@@ -705,6 +720,10 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
       evtWgt.resetEvent();
       evtWgt.setbTagSF_medloose();
       w_BtagSF_medloose = evtWgt.getWeight(evtWgtInfo::systID(0), false);
+
+      evtWgt.resetEvent();
+      evtWgt.setbTagSF_tightloose();
+      w_BtagSF_tightloose = evtWgt.getWeight(evtWgtInfo::systID(0), false);
 
       w_lumi = kLumi * xsec() * 1000 / nEvts; //This uses Stop1l Baby xsec, not actual xsec for TChiWH
       w_lumi_scale1fb = evtweight_ = kLumi * scale1fb();
@@ -732,7 +751,8 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
       evtWgt.resetEvent();
       evtWgt.setDefaultSystematics(evtWgtInfo::WH_Run2, is_fastsim_);
       float trig_eff_up,trig_eff_dn;
-      evtWgt.getWH_trig_eff_fromFile(trig_eff,trig_eff_up,trig_eff_dn);
+      if(!is_data()) evtWgt.getWH_trig_eff_fromFile(trig_eff,trig_eff_up,trig_eff_dn);
+      else {trig_eff=1.;trig_eff_up=1.;trig_eff_dn=1.;}
       w_btagHFUp = evtWgt.getWeight(evtWgtInfo::systID::k_bTagEffHFUp,false);
       w_btagHFDown = evtWgt.getWeight(evtWgtInfo::systID::k_bTagEffHFDown,false);
       w_btagLFUp = evtWgt.getWeight(evtWgtInfo::systID::k_bTagEffLFUp,false);
@@ -761,12 +781,16 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
       w_L1prefireDown = evtWgt.getWeight(evtWgtInfo::systID::k_L1prefireDown,false);
       //Get and fill jet info
       v_ak4pt->clear();
+      v_ak4pt_jdown->clear();
+      v_ak4pt_jup->clear();
       v_ak4eta->clear();
       v_ak4phi->clear();
       v_ak4mass->clear();
       v_ak4genpt->clear();
       for(uint ijet=0;ijet<ak4pfjets_p4().size();ijet++){
         v_ak4pt->push_back(ak4pfjets_p4().at(ijet).pt());
+        v_ak4pt_jup->push_back(jup_ak4pfjets_p4().at(ijet).pt());
+        if(ijet < jdown_ak4pfjets_p4().size()) v_ak4pt_jdown->push_back(jdown_ak4pfjets_p4().at(ijet).pt());
        // cout<<"jet pt"<<ak4pfjets_p4().at(ijet).pt()<<endl;
         v_ak4eta->push_back(ak4pfjets_p4().at(ijet).eta());
         v_ak4phi->push_back(ak4pfjets_p4().at(ijet).phi());
@@ -798,12 +822,16 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
       }
 
       v_ak8pt->clear();
+      v_ak8pt_jup->clear();
+      v_ak8pt_jdown->clear();
       v_ak8eta->clear();
       v_ak8phi->clear();
       v_ak8mass->clear();
       // v_ak8genpt->clear();
       for(uint ijet=0;ijet<ak8pfjets_p4().size();ijet++){
         v_ak8pt->push_back(ak8pfjets_p4().at(ijet).pt());
+        v_ak8pt_jup->push_back(jup_ak8pfjets_p4().at(ijet).pt());
+        if(ijet < jdown_ak8pfjets_p4().size()) v_ak8pt_jdown->push_back(jdown_ak8pfjets_p4().at(ijet).pt());
         v_ak8eta->push_back(ak8pfjets_p4().at(ijet).eta());
         v_ak8phi->push_back(ak8pfjets_p4().at(ijet).phi());
         v_ak8mass->push_back(ak8pfjets_p4().at(ijet).mass());

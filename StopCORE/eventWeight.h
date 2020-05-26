@@ -189,6 +189,7 @@ class evtWgtInfo {
   bool   apply_bTag_sf;
   bool   bTagSF_only;
   bool   bTagSF_medloose;
+  bool   bTagSF_tightloose;
   bool   use_tight_bTag;
   bool   puSF_only;
   bool   L1SF_only;
@@ -208,6 +209,11 @@ class evtWgtInfo {
   double sf_bTagEffHF_medloose_dn;
   double sf_bTagEffLF_medloose_up;
   double sf_bTagEffLF_medloose_dn;
+  double sf_bTag_tightloose;
+  double sf_bTagEffHF_tightloose_up;
+  double sf_bTagEffHF_tightloose_dn;
+  double sf_bTagEffLF_tightloose_up;
+  double sf_bTagEffLF_tightloose_dn;
 
   bool   apply_bTagFS_sf;
   double sf_bTag_FS_up;
@@ -216,6 +222,9 @@ class evtWgtInfo {
   double sf_bTag_tight_FS_dn;
   double sf_bTag_medloose_FS_up;
   double sf_bTag_medloose_FS_dn;
+  double sf_bTag_tightloose_FS_up;
+  double sf_bTag_tightloose_FS_dn;
+
 
   bool   apply_lep_sf;
   double sf_lep;
@@ -391,6 +400,7 @@ class evtWgtInfo {
 
   void setbTagSF_only();
   void setbTagSF_medloose();
+  void setbTagSF_tightloose();
 
  private:
   bool is_bkg_;
