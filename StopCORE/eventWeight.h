@@ -99,7 +99,7 @@ class evtWgtInfo {
   int srtype;
 
   enum SampleType {data, ttbar, Wjets, singletop, ttW, ttZ, WZ, diboson, fastsim, fs17ext1, unknown=-1 } samptype;
-  enum SystSet {stop_Moriond17, stop_Run2,stop_Moriond17_nobtag, WH_Run2,  WH_Run2_nobtag, puOnly, test_alloff, L1Only};
+  enum SystSet {stop_Moriond17, stop_Run2,stop_Moriond17_nobtag, WH_Run2,  WH_Run2_nobtag, puOnly, ISROnly, test_alloff, L1Only};
 
   bool isTChi;
   bool isWH;
@@ -193,6 +193,7 @@ class evtWgtInfo {
   bool   use_tight_bTag;
   bool   puSF_only;
   bool   L1SF_only;
+  bool   ISRSF_only;
 
   double sf_bTag;
   double sf_bTagEffHF_up;

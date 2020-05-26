@@ -281,6 +281,7 @@ evtWgtInfo::evtWgtInfo() {
   bTagSF_tightloose = false;
   puSF_only = false;
   L1SF_only = false;
+  ISRSF_only = false;
   use_hcounter_instead_of_scale1b = false;
   // Initialize Switches for additional SFs
   apply_diLepTrigger_sf = false;
@@ -756,14 +757,15 @@ void evtWgtInfo::calculateWeightsForEvent() {
 
   // ISR Correction
   if (apply_ISR_sf && (samptype == ttbar || is_fastsim_)) {
-    if (year == 2016 || is_fastsim_)
+    if (year == 2016 || (is_fastsim_ && !isWH))
       getISRnJetsWeight( sf_ISR, sf_ISR_up, sf_ISR_dn );
     else{
-      getISRnJetsWeight_local( sf_ISR, sf_ISR_up, sf_ISR_dn );
       if(isWH){ // per ashraf's slide conclusions.
         sf_ISR=1.0;
         sf_ISR_up=1.0;
-        sf_ISR_dn=1.0;}
+        sf_ISR_dn=1.0;
+      }
+      else getISRnJetsWeight_local( sf_ISR, sf_ISR_up, sf_ISR_dn );
     }
 
   }
@@ -869,6 +871,7 @@ void evtWgtInfo::calculateWeightsForEvent() {
   }
   if(puSF_only) evt_wgt = sf_pu;
   if(L1SF_only) evt_wgt = sf_L1prefire;
+  if(ISRSF_only) evt_wgt = sf_ISR;
   //
   // Systematic Weights
   //
@@ -3016,6 +3019,7 @@ void evtWgtInfo::setDefaultSystematics( int syst_set, bool isfastsim ) {
   bTagSF_tightloose=false;
   puSF_only=false;
   L1SF_only=false;
+  ISRSF_only=false;
 
   switch (syst_set) {
     // Set of systematics used in the Moriond17 analysis
@@ -3173,6 +3177,35 @@ void evtWgtInfo::setDefaultSystematics( int syst_set, bool isfastsim ) {
       apply_ISR_sf         = false;   // 2017 & 2018 to be updated
       apply_pu_sf          = false;  // not available in baby yet
       apply_pu_sf_fromFile = true;
+      apply_L1prefire_sf   = false;
+      apply_HEMveto_el_sf  = false;   // scale down 2018 event with HEM electron
+      apply_HEMveto_jet_sf = false;   // scale down 2018 event with HEM jet
+      apply_sample_sf      = false;  // no multiple sample available yet
+      apply_lepFS_sf       = false;
+      if (isfastsim) {
+        apply_lepFS_sf     = false;   // updated on and after v31
+        apply_bTagFS_sf    = false;
+      }
+      break;
+
+    case ISROnly:
+      ISRSF_only = true;
+      apply_cr2lTrigger_sf = false;
+      apply_bTag_sf        = false;
+      apply_lep_sf         = false;
+      apply_vetoLep_sf     = false;
+      apply_tau_sf         = false;
+      apply_topPt_sf       = false;  // false=uncertainty, but not to be used
+      apply_metRes_sf      = false;  
+      apply_metTTbar_sf    = false;
+      apply_ttbarSysPt_sf  = false;  // false=uncertainty, need to be updated
+      apply_ttag_sf        = false;
+      apply_softbtag_sf    = false;
+      apply_WbXsec_sf      = false;
+      apply_ttZxsec_sf     = false;
+      apply_ISR_sf         = true;   // 2017 & 2018 to be updated
+      apply_pu_sf          = false;  // not available in baby yet
+      apply_pu_sf_fromFile = false;
       apply_L1prefire_sf   = false;
       apply_HEMveto_el_sf  = false;   // scale down 2018 event with HEM electron
       apply_HEMveto_jet_sf = false;   // scale down 2018 event with HEM jet

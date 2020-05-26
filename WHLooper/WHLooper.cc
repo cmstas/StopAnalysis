@@ -240,6 +240,7 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
     float w_80X=0;
     float w_pu=0;
     float w_L1=0;
+    float w_ISRnjets=0;
 
     //Trig eff
     float trig_eff =1.0;
@@ -293,6 +294,7 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
     TBranch * b_w_80X = extraTree->Branch("w_80X",&w_80X,"w_80X/F");
     TBranch * b_w_pu = extraTree->Branch("w_pu",&w_pu,"w_pu/F");
     TBranch * b_w_L1 = extraTree->Branch("w_L1",&w_L1,"w_L1/F");
+    TBranch * b_w_ISRnjets = extraTree->Branch("w_ISRnjets",&w_ISRnjets,"w_ISRnjets/F");
 
     TBranch * b_trig_eff = extraTree->Branch("trig_eff",&trig_eff,"trig_eff/F");
 
@@ -344,6 +346,7 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
     extraTree->SetBranchAddress("w_80X",&w_80X,&b_w_80X);
     extraTree->SetBranchAddress("w_pu",&w_pu,&b_w_pu);
     extraTree->SetBranchAddress("w_L1",&w_L1,&b_w_L1);
+    extraTree->SetBranchAddress("w_ISRnjets",&w_ISRnjets,&b_w_ISRnjets);
 
     extraTree->SetBranchAddress("trig_eff",&trig_eff,&b_trig_eff);
 
@@ -719,11 +722,11 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
     if (nEventsTotal >= nEventsChain) continue;
     unsigned int nEventsTree = tree->GetEntriesFast();
 
-    // nEventsTree = 2000;
+     // nEventsTree = 2000;
     //cout<<"apply good run list "<<applyGoodRunList<<endl;
     for (unsigned int event = 0; event < nEventsTree; ++event) {
       // Read Tree
-      //cout<<"Event "<<event<<endl;
+      if(event%100000==0) cout<<"Event "<<event<<endl;
       if (nEventsTotal >= nEventsChain) continue;
       tree->LoadTree(event);
       babyAnalyzer.GetEntry(event);
@@ -774,6 +777,12 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
       w_L1 = evtWgt.getWeight(evtWgtInfo::systID(0), false);
       
       evtWgt.resetEvent();
+      evtWgt.setDefaultSystematics(evtWgtInfo::ISROnly, is_fastsim_);
+      w_ISRnjets = evtWgt.getWeight(evtWgtInfo::systID(0), false);
+      w_ISRUp = evtWgt.getWeight(evtWgtInfo::systID::k_ISRUp,false); 
+      w_ISRDown = evtWgt.getWeight(evtWgtInfo::systID::k_ISRDown,false);
+
+      evtWgt.resetEvent();
       evtWgt.setDefaultSystematics(evtWgtInfo::WH_Run2, is_fastsim_);
       evtWgt.setbTagSF_only();
       w_BtagSF_medmed = evtWgt.getWeight(evtWgtInfo::systID(0), false);
@@ -807,7 +816,6 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
       full_weight = weight;
       if(!is_data()) full_weight = weight * w_pu * year_weight;
 
-
       //systematic weight variations:
       evtWgt.resetEvent();
       evtWgt.setDefaultSystematics(evtWgtInfo::WH_Run2, is_fastsim_);
@@ -832,14 +840,14 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
       w_alphasDown = evtWgt.getWeight(evtWgtInfo::systID::k_alphasDown,false);
       w_q2Up = evtWgt.getWeight(evtWgtInfo::systID::k_q2Up,false);
       w_q2Down = evtWgt.getWeight(evtWgtInfo::systID::k_q2Down,false);
-      w_ISRUp = evtWgt.getWeight(evtWgtInfo::systID::k_ISRUp,false); 
-      w_ISRDown = evtWgt.getWeight(evtWgtInfo::systID::k_ISRDown,false);
+     
       w_xsecUp = evtWgt.getWeight(evtWgtInfo::systID::k_xsecUp,false);
       w_xsecDown = evtWgt.getWeight(evtWgtInfo::systID::k_xsecDown,false);
       w_tauSFUp = evtWgt.getWeight(evtWgtInfo::systID::k_tauSFUp,false);
       w_tauSFDown = evtWgt.getWeight(evtWgtInfo::systID::k_tauSFDown,false);
       w_L1prefireUp = evtWgt.getWeight(evtWgtInfo::systID::k_L1prefireUp,false);
       w_L1prefireDown = evtWgt.getWeight(evtWgtInfo::systID::k_L1prefireDown,false);
+
       //Get and fill jet info
       v_ak4pt->clear();
       v_ak4pt_jdown->clear();
@@ -848,9 +856,11 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
       v_ak4phi->clear();
       v_ak4mass->clear();
       v_ak4genpt->clear();
+
       for(uint ijet=0;ijet<ak4pfjets_p4().size();ijet++){
+     
         v_ak4pt->push_back(ak4pfjets_p4().at(ijet).pt());
-        v_ak4pt_jup->push_back(jup_ak4pfjets_p4().at(ijet).pt());
+        if(ijet < jup_ak4pfjets_p4().size()) v_ak4pt_jup->push_back(jup_ak4pfjets_p4().at(ijet).pt());
         if(ijet < jdown_ak4pfjets_p4().size()) v_ak4pt_jdown->push_back(jdown_ak4pfjets_p4().at(ijet).pt());
        // cout<<"jet pt"<<ak4pfjets_p4().at(ijet).pt()<<endl;
         v_ak4eta->push_back(ak4pfjets_p4().at(ijet).eta());
@@ -871,7 +881,6 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
       }
       njets=v_ak4pt->size();
 
-
       // nbtag for CSV valued btags -- for comparison with previous version
       int nbtagCSV = 0;
       for (float csv : ak4pfjets_CSV()) {
@@ -889,9 +898,10 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
       v_ak8phi->clear();
       v_ak8mass->clear();
       // v_ak8genpt->clear();
+
       for(uint ijet=0;ijet<ak8pfjets_p4().size();ijet++){
         v_ak8pt->push_back(ak8pfjets_p4().at(ijet).pt());
-        v_ak8pt_jup->push_back(jup_ak8pfjets_p4().at(ijet).pt());
+        if(ijet < jup_ak8pfjets_p4().size()) v_ak8pt_jup->push_back(jup_ak8pfjets_p4().at(ijet).pt());
         if(ijet < jdown_ak8pfjets_p4().size()) v_ak8pt_jdown->push_back(jdown_ak8pfjets_p4().at(ijet).pt());
         v_ak8eta->push_back(ak8pfjets_p4().at(ijet).eta());
         v_ak8phi->push_back(ak8pfjets_p4().at(ijet).phi());
@@ -912,6 +922,7 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
       }
 
       nfatjets=v_ak8pt->size();
+
       nWHLeptons=0;
       nleps_tm=0;
       leps_pt->clear();
@@ -1044,7 +1055,6 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
             mus_fromW->push_back(0);
         }
       }
-
       // JER. use ak4pfjets_rho
       vector <float> jet_JER_factor, jet_JER_factor_up, jet_JER_factor_down;
       vector<Double_t> GenJetPt;
@@ -1414,6 +1424,7 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
     file.Close();
     outfile_->Write();
     outfile_->Close();
+    delete extraTree;
   } // end of file loop
 
   cout << "[WHLooper::looper] processed  " << nEventsTotal << " events" << endl;
