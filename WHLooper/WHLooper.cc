@@ -518,22 +518,32 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
     float jerup_mbb  = 0;
     float jerup_ptbb = 0;
     float jerup_mct  = 0;
-    TBranch * jer_b_mbb_up  = extraTree->Branch("jerup_mbb" , &jerup_mbb ,"jerup_mbb/F" );
-    TBranch * jer_b_ptbb_up = extraTree->Branch("jerup_ptbb", &jerup_ptbb,"jerup_ptbb/F");   
-    TBranch * jer_b_mct_up  = extraTree->Branch("jerup_mct" , &jerup_mct ,"jerup_mct/F" );
-    extraTree->SetBranchAddress("jerup_mbb" , &jerup_mbb , &jer_b_mbb_up );
-    extraTree->SetBranchAddress("jerup_ptbb", &jerup_ptbb, &jer_b_ptbb_up);
-    extraTree->SetBranchAddress("jerup_mct" , &jerup_mct , &jer_b_mct_up );
+    TBranch * jerup_b_mbb  = extraTree->Branch("jerup_mbb" , &jerup_mbb ,"jerup_mbb/F" );
+    TBranch * jerup_b_ptbb = extraTree->Branch("jerup_ptbb", &jerup_ptbb,"jerup_ptbb/F");   
+    TBranch * jerup_b_mct  = extraTree->Branch("jerup_mct" , &jerup_mct ,"jerup_mct/F" );
+    extraTree->SetBranchAddress("jerup_mbb" , &jerup_mbb , &jerup_b_mbb );
+    extraTree->SetBranchAddress("jerup_ptbb", &jerup_ptbb, &jerup_b_ptbb);
+    extraTree->SetBranchAddress("jerup_mct" , &jerup_mct , &jerup_b_mct );
+
     float jerdown_mbb  = 0;
     float jerdown_ptbb = 0;
     float jerdown_mct  = 0;
-    TBranch * jer_b_mbb_down  = extraTree->Branch("jerdown_mbb" , &jerdown_mbb ,"jerdown_mbb/F" );
-    TBranch * jer_b_ptbb_down = extraTree->Branch("jerdown_ptbb", &jerdown_ptbb,"jerdown_ptbb/F");   
-    TBranch * jer_b_mct_down  = extraTree->Branch("jerdown_mct" , &jerdown_mct ,"jerdown_mct/F" );
-    extraTree->SetBranchAddress("jerdown_mbb" , &jerdown_mbb , &jer_b_mbb_down );
-    extraTree->SetBranchAddress("jerdown_ptbb", &jerdown_ptbb, &jer_b_ptbb_down);
-    extraTree->SetBranchAddress("jerdown_mct" , &jerdown_mct , &jer_b_mct_down );
+    TBranch * jerdown_b_mbb  = extraTree->Branch("jerdown_mbb" , &jerdown_mbb ,"jerdown_mbb/F" );
+    TBranch * jerdown_b_ptbb = extraTree->Branch("jerdown_ptbb", &jerdown_ptbb,"jerdown_ptbb/F");   
+    TBranch * jerdown_b_mct  = extraTree->Branch("jerdown_mct" , &jerdown_mct ,"jerdown_mct/F" );
+    extraTree->SetBranchAddress("jerdown_mbb" , &jerdown_mbb , &jerdown_b_mbb );
+    extraTree->SetBranchAddress("jerdown_ptbb", &jerdown_ptbb, &jerdown_b_ptbb );
+    extraTree->SetBranchAddress("jerdown_mct" , &jerdown_mct , &jerdown_b_mct );
 
+    float jercdown_mbb  = 0;
+    float jercdown_ptbb = 0;
+    float jercdown_mct  = 0;
+    TBranch * jercdown_b_mbb  = extraTree->Branch("jercdown_mbb" , &jercdown_mbb ,"jercdown_mbb/F" );
+    TBranch * jercdown_b_ptbb = extraTree->Branch("jercdown_ptbb", &jercdown_ptbb,"jercdown_ptbb/F");   
+    TBranch * jercdown_b_mct  = extraTree->Branch("jercdown_mct" , &jercdown_mct ,"jercdown_mct/F" );
+    extraTree->SetBranchAddress("jercdown_mbb" , &jercdown_mbb , &jercdown_b_mbb );
+    extraTree->SetBranchAddress("jercdown_ptbb", &jercdown_ptbb, &jercdown_b_ptbb);
+    extraTree->SetBranchAddress("jercdown_mct" , &jercdown_mct , &jercdown_b_mct );
 
     float jup_mbb  = 0;
     float jup_ptbb = 0;
@@ -1006,13 +1016,13 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
             mus_fromW->push_back(0);
         }
       }
+
       // JER. use ak4pfjets_rho
       vector <float> jet_JER_factor, jet_JER_factor_up, jet_JER_factor_down;
       vector<Double_t> GenJetPt;
       for (auto& genjet : ak4genjets_p4()) {
         GenJetPt.push_back(genjet.pt());
       }
-      //float dR = 999;
       for(uint ijet=0;ijet<ak4pfjets_deepCSV().size();ijet++){
         res.loadVariable("JetEta", ak4pfjets_p4().at(ijet).eta());
         res.loadVariable("Rho", ak4pfjets_rho());
@@ -1034,17 +1044,6 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
         jet_JER_factor.push_back(smearing[0]/ak4pfjets_p4().at(ijet).pt());
         jet_JER_factor_up.push_back(smearing_up[0]/ak4pfjets_p4().at(ijet).pt());
         jet_JER_factor_down.push_back(smearing_down[0]/ak4pfjets_p4().at(ijet).pt());
-        
-        //dR = 999;
-        //for(uint igenjet=0;igenjet<ak4genjets_p4().size();igenjet++){
-        //    std::cout << "GenJet pt " << ak4genjets_p4().at(igenjet).pt() << std::endl;
-        //    //dR = DeltaR(ak4pfjets_p4().at(ijet), ak4genjets_p4().at(igenjet));
-        //    dR = ROOT::Math::VectorUtil::DeltaR(ak4pfjets_p4().at(ijet), ak4genjets_p4().at(igenjet));
-        //    //dR = DeltaR(ak4pfjets_p4().at(ijet).eta(), ak4genjets_p4().at(igenjet).eta(), ak4pfjets_p4().at(ijet).phi(), ak4genjets_p4().at(igenjet).phi());
-        //    if (dR<0.2){
-        //        std::cout << "Found a match" << std::endl;
-        //    }
-        //}
       }
       
 
@@ -1078,12 +1077,15 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
       jer_mbb  = -999;
       jerup_mbb  = -999;
       jerdown_mbb  = -999;
+      jercdown_mbb  = -999;
       jer_mct  = -999;
       jerup_mct  = -999;
       jerdown_mct  = -999;
+      jercdown_mct  = -999;
       jer_ptbb = -999;
       jerup_ptbb = -999;
       jerdown_ptbb = -999;
+      jercdown_ptbb = -999;
       //int jer_ngoodjets = 0;
       if(ngoodjets()>1){
         float jet0_pt, jet1_pt;
@@ -1124,6 +1126,17 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
         ptb1 = ak4pfjets_p4().at(jet_csv_pairs.at(0).first).pt()*jet_JER_factor_down.at(jet_csv_pairs.at(0).first);
         ptb2 = ak4pfjets_p4().at(jet_csv_pairs.at(1).first).pt()*jet_JER_factor_down.at(jet_csv_pairs.at(1).first);
         jerdown_mct = sqrt(2*ptb1*ptb2*(1+cos(dPhibb)));  //dphi bb doesn't change
+
+        // custom down variation
+        jet0_pt = ak4pfjets_p4().at(jet_csv_pairs.at(0).first).pt()*jet_JER_factor_down.at(jet_csv_pairs.at(0).first)/jet_JER_factor.at(jet_csv_pairs.at(0).first);
+        jet1_pt = ak4pfjets_p4().at(jet_csv_pairs.at(1).first).pt()*jet_JER_factor_down.at(jet_csv_pairs.at(1).first)/jet_JER_factor.at(jet_csv_pairs.at(1).first);
+        jet0.SetPtEtaPhiM(jet0_pt, ak4pfjets_p4().at(jet_csv_pairs.at(0).first).eta(), ak4pfjets_p4().at(jet_csv_pairs.at(0).first).phi(), 0);
+        jet1.SetPtEtaPhiM(jet1_pt, ak4pfjets_p4().at(jet_csv_pairs.at(1).first).eta(), ak4pfjets_p4().at(jet_csv_pairs.at(1).first).phi(), 0);
+        jercdown_mbb = (jet0 + jet1).M()  ; 
+        jercdown_ptbb = (jet0 + jet1).Pt()  ; 
+        ptb1 = ak4pfjets_p4().at(jet_csv_pairs.at(0).first).pt()*jet_JER_factor_down.at(jet_csv_pairs.at(0).first)/jet_JER_factor.at(jet_csv_pairs.at(0).first);
+        ptb2 = ak4pfjets_p4().at(jet_csv_pairs.at(1).first).pt()*jet_JER_factor_down.at(jet_csv_pairs.at(1).first)/jet_JER_factor.at(jet_csv_pairs.at(1).first);
+        jercdown_mct = sqrt(2*ptb1*ptb2*(1+cos(dPhibb)));  //dphi bb doesn't change
         
       }
 
