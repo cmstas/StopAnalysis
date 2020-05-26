@@ -15,8 +15,13 @@ keep filt*
 keep xsec*
 keep HLT*
 drop HLT_Photon*
+
 ### met ###
 keep pfmet
+keep pfmet_resup
+keep pfmet_resdown
+keep pfmet_jup
+keep pfmet_jdown
 keep pfmet_phi
 keep pfmet_uncorr
 keep pfmet_uncorr_phi
@@ -29,6 +34,10 @@ keep genmet_phi
 keep ngoodleps
 keep nvetoleps
 keep mt_met_lep
+keep mt_met_lep_resup
+keep mt_met_lep_resdown
+keep mt_met_lep_jup
+keep mt_met_lep_jdown
 keep mt_genmet_lep
 keep lep1*
 keep lep2*
@@ -37,6 +46,8 @@ drop lep2_p4
 
 ### jets ###
 keep ngoodjets
+keep jup_ngoodjets
+keep jdown_ngoodjets
 keep ak4_HT
 keep ak4pfjets*
 drop ak4pfjets_p4
@@ -45,8 +56,14 @@ keep dphi_ak4pfjet_met
 
 ### btags ###
 keep ngoodbtags
+keep jup_ngoodbtags
+keep jdown_ngoodbtags
 keep nloosebtags
+keep jup_nloosebtags
+keep jdown_nloosebtags
 keep ntightbtags
+keep jup_ntightbtags
+keep jdown_ntightbtags
 keep ak8pfjets*
 drop ak4pfjets_leadbtag_p4
 drop ak4pfjets_leadMEDbjet_p4
