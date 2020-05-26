@@ -278,6 +278,7 @@ evtWgtInfo::evtWgtInfo() {
   isWH        = false;
   bTagSF_only = false;
   bTagSF_medloose = false;
+  bTagSF_tightloose = false;
   puSF_only = false;
   L1SF_only = false;
   use_hcounter_instead_of_scale1b = false;
@@ -340,7 +341,6 @@ void evtWgtInfo::Setup(string samplestr, int inyear, bool applyUnc, bool useBTag
   isWH = WH;
 
   samptype = findSampleType(samplestr);
-
   year = inyear;
 
   if (year == 2016) {
@@ -361,9 +361,9 @@ void evtWgtInfo::Setup(string samplestr, int inyear, bool applyUnc, bool useBTag
 
   // Get sample info from enum
   if ( samptype == data ) {
-    is_data_ = true;
+     is_data_ = true;
   } else if ( samptype == fastsim || samptype == fs17ext1 ) {
-    is_fastsim_ = true;
+      is_fastsim_ = true;
   }
   is_bkg_ = !is_data_ && !is_fastsim_;
 
@@ -502,7 +502,6 @@ void evtWgtInfo::Cleanup() {
   if ( is_data_ ) {
     f_cr2lTrigger_sf->Close();
     delete f_cr2lTrigger_sf;
-
     if (useBTagSFs_fromFiles) delete bTagSFUtil;
     if (useLepSFs_fromFiles) delete lepSFUtil;
     if (apply_WH_trig_eff) f_WH_trig_eff->Close();
@@ -585,6 +584,13 @@ void evtWgtInfo::initializeWeights() {
   sf_bTag_medloose_FS_up = 1.0;
   sf_bTag_medloose_FS_dn = 1.0;
 
+  sf_bTag_tightloose = 1.0;
+  sf_bTagEffHF_tightloose_up = 1.0;
+  sf_bTagEffHF_tightloose_dn = 1.0;
+  sf_bTagEffLF_tightloose_up = 1.0;
+  sf_bTagEffLF_tightloose_dn = 1.0;
+  sf_bTag_tightloose_FS_up = 1.0;
+  sf_bTag_tightloose_FS_dn = 1.0;
 
   sf_lep = 1.0;
   sf_lep_up = 1.0;
@@ -681,12 +687,10 @@ void evtWgtInfo::initializeWeights() {
 //////////////////////////////////////////////////////////////////////
 
 void evtWgtInfo::calculateWeightsForEvent() {
-
   initializeWeights();
 
   // If sample is data
   if ( is_data_ ) return;
-
   // Get SUSY masses if sample is signal scan
   if ( is_fastsim_ ) getSusyMasses( mStop, mLSP );
 
@@ -708,9 +712,11 @@ void evtWgtInfo::calculateWeightsForEvent() {
 
   // btag SF, medium=1 and tight=2
   if (apply_bTag_sf) {
+
     getBTagWeight( 1, sf_bTag, sf_bTagEffHF_up, sf_bTagEffHF_dn, sf_bTagEffLF_up, sf_bTagEffLF_dn, sf_bTag_FS_up, sf_bTag_FS_dn );
     getBTagWeight( 2, sf_bTag_tight, sf_bTagEffHF_tight_up, sf_bTagEffHF_tight_dn, sf_bTagEffLF_tight_up, sf_bTagEffLF_tight_dn, sf_bTag_tight_FS_up, sf_bTag_tight_FS_dn );
     getBTagWeight( 4, sf_bTag_medloose, sf_bTagEffHF_medloose_up, sf_bTagEffHF_medloose_dn, sf_bTagEffLF_medloose_up, sf_bTagEffLF_medloose_dn, sf_bTag_medloose_FS_up, sf_bTag_medloose_FS_dn );
+    getBTagWeight( 5, sf_bTag_tightloose, sf_bTagEffHF_tightloose_up, sf_bTagEffHF_tightloose_dn, sf_bTagEffLF_tightloose_up, sf_bTagEffLF_tightloose_dn, sf_bTag_tightloose_FS_up, sf_bTag_tightloose_FS_dn );
 
   }
 
@@ -856,9 +862,9 @@ void evtWgtInfo::calculateWeightsForEvent() {
   // Apply any extra weight for the event
   evt_wgt *= sf_extra_event;
 
-
   if(bTagSF_only){
     if(bTagSF_medloose) evt_wgt = sf_bTag_medloose;
+    else if(bTagSF_tightloose) evt_wgt = sf_bTag_tightloose;
     else evt_wgt = sf_bTag;
   }
   if(puSF_only) evt_wgt = sf_pu;
@@ -1185,7 +1191,7 @@ void evtWgtInfo::getBTagWeight( int WP, double &wgt_btagsf, double &wgt_btagsf_h
   wgt_btagsf_fs_dn = 1.0;
 
   if ( !apply_bTag_sf ) return;
-  if ( WP < 0 || WP > 4 ) return;
+  if ( WP < 0 || WP > 5 ) return;
 
   // IF deriving SFs on the Looper level
   if ( useBTagSFs_fromFiles ) {
@@ -2987,7 +2993,6 @@ double evtWgtInfo::getWeight( systID isyst, bool is_cr2l, int cortype ) {
   }
   if (!event_ready)
     calculateWeightsForEvent();
-
   return sys_wgts[isyst];
 }
 
@@ -2997,12 +3002,18 @@ void evtWgtInfo::setbTagSF_only(){
 
 void evtWgtInfo::setbTagSF_medloose(){
   bTagSF_medloose = true;
+  bTagSF_tightloose = false;
+}
+void evtWgtInfo::setbTagSF_tightloose(){
+  bTagSF_tightloose = true;
+  bTagSF_medloose = false;
 }
 
 
 void evtWgtInfo::setDefaultSystematics( int syst_set, bool isfastsim ) {
   bTagSF_only=false;
   bTagSF_medloose=false;
+  bTagSF_tightloose=false;
   puSF_only=false;
   L1SF_only=false;
 
@@ -3298,7 +3309,6 @@ double evtWgtInfo::getExtSampleWeightSummer16v3( TString fname, bool apply ) {
 }
 
 double evtWgtInfo::getExtSampleWeightFall17v2( TString fname, bool apply ) {
-
   double sf = 1.0;
   if (fname.Contains("_v29_") && fname.Contains("JetsToLNu") && !fname.Contains("NuPt-200")) {
     // Temporary fix for missing k-factor in the WNJets xsec

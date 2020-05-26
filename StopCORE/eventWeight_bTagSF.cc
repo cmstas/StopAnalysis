@@ -123,8 +123,8 @@ void eventWeight_bTagSF::getBTagWeight( int WP, std::vector< double > jet_pt, st
   weight_btagsf_FS_DN = 1.0;
 
   // Input sanitation
-  if( WP<0 || WP>4 ){
-    std::cout << "btag sf WP needs an argument of 0, 1, 2, 3, or 4 for loose, medium, tight, or med+loose ID or medium+inclusive loose" << std::endl;
+  if( WP<0 || WP>5 ){
+    std::cout << "btag sf WP needs an argument of 0, 1, 2, 3, or 4 for loose, medium, tight, or med+loose ID or medium+inclusive loose, or tight+inclusive loose" << std::endl;
   }
 
   if( jet_pt.size()!=jet_eta.size() ){
@@ -163,7 +163,7 @@ void eventWeight_bTagSF::getBTagWeight( int WP, std::vector< double > jet_pt, st
 
   //For WH case, find index of highest CSV jet to use medium WP SF. For others, use loose.
   int idx_max_csv=0;
-  if(WP==4) idx_max_csv = distance(jet_CSV.begin(),std::max_element(jet_CSV.begin(),jet_CSV.end()));
+  if(WP==4 || WP==5) idx_max_csv = distance(jet_CSV.begin(),std::max_element(jet_CSV.begin(),jet_CSV.end()));
   
   // Loop over jet vectors
   for(int iJet=0; iJet<(int)jet_pt.size(); iJet++){
@@ -189,27 +189,27 @@ void eventWeight_bTagSF::getBTagWeight( int WP, std::vector< double > jet_pt, st
       flavor = BTagEntry::FLAV_B;
       pt_eff = std::max(20.0,std::min(599.0, jet_pt[iJet])); // max pt of 600.0 GeV for b
 
-      if( WP==BTagEntry::OP_LOOSE  || (WP==4 && iJet!=idx_max_csv)) h_eff = h_loose_btag_eff_b;
+      if( WP==BTagEntry::OP_LOOSE  || ( (WP==4 || WP==5) && iJet!=idx_max_csv)) h_eff = h_loose_btag_eff_b;
       if( WP==BTagEntry::OP_MEDIUM || WP==3 || (WP==4 && iJet==idx_max_csv)) h_eff = h_btag_eff_b;
-      if( WP==BTagEntry::OP_TIGHT  ) h_eff = h_tight_btag_eff_b;
+      if( WP==BTagEntry::OP_TIGHT  || (WP==5 && iJet==idx_max_csv)) h_eff = h_tight_btag_eff_b;
       h_eff_loose = h_loose_btag_eff_b;
     }
     // Charm
     else if( abs(jet_flavour[iJet])==4 ){
       flavor = BTagEntry::FLAV_C;
 
-      if( WP==BTagEntry::OP_LOOSE || (WP==4 && iJet!=idx_max_csv) ) h_eff = h_loose_btag_eff_c;
+      if( WP==BTagEntry::OP_LOOSE || ((WP==4 || WP==5) && iJet!=idx_max_csv))  h_eff = h_loose_btag_eff_c;
       if( WP==BTagEntry::OP_MEDIUM || WP==3 || (WP==4 && iJet==idx_max_csv)) h_eff = h_btag_eff_c;
-      if( WP==BTagEntry::OP_TIGHT  ) h_eff = h_tight_btag_eff_c;
+      if( WP==BTagEntry::OP_TIGHT  || (WP==5 && iJet==idx_max_csv)) h_eff = h_tight_btag_eff_c;
       h_eff_loose = h_loose_btag_eff_c;
     }
     // UDSG
     else{
       flavor = BTagEntry::FLAV_UDSG;
 
-      if( WP==BTagEntry::OP_LOOSE || (WP==4 && iJet!=idx_max_csv) ) h_eff = h_loose_btag_eff_udsg;
+      if( WP==BTagEntry::OP_LOOSE || ((WP==4 || WP==5) && iJet!=idx_max_csv)) h_eff = h_loose_btag_eff_udsg;
       if( WP==BTagEntry::OP_MEDIUM || WP==3 || (WP==4 && iJet==idx_max_csv)) h_eff = h_btag_eff_udsg;
-      if( WP==BTagEntry::OP_TIGHT  ) h_eff = h_tight_btag_eff_udsg;
+      if( WP==BTagEntry::OP_TIGHT  || (WP==5 && iJet==idx_max_csv)) h_eff = h_tight_btag_eff_udsg;
       h_eff_loose = h_loose_btag_eff_udsg;
     }
 
@@ -220,7 +220,7 @@ void eventWeight_bTagSF::getBTagWeight( int WP, std::vector< double > jet_pt, st
     biny_loose = h_eff_loose->GetYaxis()->FindBin(eta_eff);
     btagprob_eff_loose = h_eff_loose->GetBinContent(binx_loose,biny_loose);
 
-    if( WP==BTagEntry::OP_LOOSE || (WP==4 && iJet!=idx_max_csv)){
+    if( WP==BTagEntry::OP_LOOSE || ((WP==4 || WP==5) && iJet!=idx_max_csv)){
       weight_cent = reader_loose->eval_auto_bounds("central", flavor, jet_eta[iJet], jet_pt[iJet]);
       weight_UP   = reader_loose->eval_auto_bounds("up",      flavor, jet_eta[iJet], jet_pt[iJet]);
       weight_DN   = reader_loose->eval_auto_bounds("down",    flavor, jet_eta[iJet], jet_pt[iJet]);
@@ -230,7 +230,7 @@ void eventWeight_bTagSF::getBTagWeight( int WP, std::vector< double > jet_pt, st
       weight_UP   = reader_medium->eval_auto_bounds("up",      flavor, jet_eta[iJet], jet_pt[iJet]);
       weight_DN   = reader_medium->eval_auto_bounds("down",    flavor, jet_eta[iJet], jet_pt[iJet]);
     }
-    else if( WP==BTagEntry::OP_TIGHT ){
+    else if( WP==BTagEntry::OP_TIGHT || (WP==5 && iJet==idx_max_csv)){
       weight_cent = reader_tight->eval_auto_bounds("central", flavor, jet_eta[iJet], jet_pt[iJet]);
       weight_UP   = reader_tight->eval_auto_bounds("up",      flavor, jet_eta[iJet], jet_pt[iJet]);
       weight_DN   = reader_tight->eval_auto_bounds("down",    flavor, jet_eta[iJet], jet_pt[iJet]);
@@ -271,9 +271,9 @@ void eventWeight_bTagSF::getBTagWeight( int WP, std::vector< double > jet_pt, st
 
     // Check if CSV passes WP
     bool passWP = false;
-    if( (WP==0 || (WP==4 && iJet!=idx_max_csv)) && jet_CSV[iJet]>BTAG_LSE ) passWP = true;
+    if( (WP==0 || (WP==4 && iJet!=idx_max_csv) || (WP==5 && iJet!=idx_max_csv)) && jet_CSV[iJet]>BTAG_LSE ) passWP = true;
     if( (WP==1 || WP==3 || (WP==4 && iJet==idx_max_csv)) && jet_CSV[iJet]>BTAG_MED ) passWP = true;
-    if( WP==2 && jet_CSV[iJet]>BTAG_TGT ) passWP = true;
+    if( (WP==2 || (WP==5 && iJet==idx_max_csv)) && jet_CSV[iJet]>BTAG_TGT ) passWP = true;
 
     bool passLooseNotMed= (jet_CSV[iJet]<=BTAG_MED && jet_CSV[iJet]>BTAG_LSE);
 
