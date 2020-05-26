@@ -45,7 +45,11 @@ TOOLSSOURCES = ../CORE/Tools/goodrun.cc ../CORE/Tools/dorky/dorky.cc
 TOOLSOBJECTS = $(TOOLSSOURCES:.cc=.o)
 TOOLSLIB = libCORETools.so
 
-LIBS = $(LIB) $(CORELIB) $(TOOLSLIB)
+JERSOURCES = ../CORE/Tools/JetResolution/JetResolution.cxx
+JEROBJECTS = $(JERSOURCES:.cxx=.o)
+JERLIB = ../CORE/Tools/JetResolution/libJetResolution.so
+
+LIBS = $(LIB) $(CORELIB) $(TOOLSLIB) $(JERLIB)
 
 EXE = runWHLooper
 
@@ -67,6 +71,11 @@ $(LIB):	$(DICT) $(OBJECTS)
 	$(QUIET) echo "Linking $@"; \
 	echo "$(LINKER) -shared -o $@ $(OBJECTS) $(DICT) $(LINKERFLAGS)"; \
 	$(LINKER) -shared -o $@ $(OBJECTS) $(DICT) $(LINKERFLAGS)
+
+$(JERLIB): $(DICT) $(JEROBJECTS)
+	$(QUIET) echo "Linking $@"; \
+	echo "Using Makefile from JER using $(MAKE) -j12"; \
+	$(LINKER) -shared -o $@ $(JEROBJECTS) $(DICT) $(LINKERFLAGS)
 
 # the option "-Wl,-rpath,./" adds ./ to the runtime search path for libraries
 $(EXE):  $(LIBS)

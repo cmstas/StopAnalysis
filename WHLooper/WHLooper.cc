@@ -24,6 +24,9 @@
 #include "../CORE/Tools/dorky/dorky.h"
 #include "../CORE/Tools/badEventFilter.h"
 
+// JER
+#include "../CORE/Tools/JetResolution/JetResolution.h"
+
 // Stop baby class
 #include "../StopCORE/StopTree.h"
 // #include "../StopCORE/stop_variables/metratio.cc"
@@ -503,6 +506,35 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
     extraTree->SetBranchAddress("mbb",&mbb,&b_mbb);
     extraTree->SetBranchAddress("ptbb",&ptbb,&b_ptbb);
     extraTree->SetBranchAddress("mct",&mct,&b_mct);
+    float jer_mbb  = 0;
+    float jer_ptbb = 0;
+    float jer_mct  = 0;
+    TBranch * jer_b_mbb  = extraTree->Branch("jer_mbb" , &jer_mbb ,"jer_mbb/F" );
+    TBranch * jer_b_ptbb = extraTree->Branch("jer_ptbb", &jer_ptbb,"jer_ptbb/F");   
+    TBranch * jer_b_mct  = extraTree->Branch("jer_mct" , &jer_mct ,"jer_mct/F" );
+    extraTree->SetBranchAddress("jer_mbb" , &jer_mbb , &jer_b_mbb );
+    extraTree->SetBranchAddress("jer_ptbb", &jer_ptbb, &jer_b_ptbb);
+    extraTree->SetBranchAddress("jer_mct" , &jer_mct , &jer_b_mct );
+    float jerup_mbb  = 0;
+    float jerup_ptbb = 0;
+    float jerup_mct  = 0;
+    TBranch * jer_b_mbb_up  = extraTree->Branch("jerup_mbb" , &jerup_mbb ,"jerup_mbb/F" );
+    TBranch * jer_b_ptbb_up = extraTree->Branch("jerup_ptbb", &jerup_ptbb,"jerup_ptbb/F");   
+    TBranch * jer_b_mct_up  = extraTree->Branch("jerup_mct" , &jerup_mct ,"jerup_mct/F" );
+    extraTree->SetBranchAddress("jerup_mbb" , &jerup_mbb , &jer_b_mbb_up );
+    extraTree->SetBranchAddress("jerup_ptbb", &jerup_ptbb, &jer_b_ptbb_up);
+    extraTree->SetBranchAddress("jerup_mct" , &jerup_mct , &jer_b_mct_up );
+    float jerdown_mbb  = 0;
+    float jerdown_ptbb = 0;
+    float jerdown_mct  = 0;
+    TBranch * jer_b_mbb_down  = extraTree->Branch("jerdown_mbb" , &jerdown_mbb ,"jerdown_mbb/F" );
+    TBranch * jer_b_ptbb_down = extraTree->Branch("jerdown_ptbb", &jerdown_ptbb,"jerdown_ptbb/F");   
+    TBranch * jer_b_mct_down  = extraTree->Branch("jerdown_mct" , &jerdown_mct ,"jerdown_mct/F" );
+    extraTree->SetBranchAddress("jerdown_mbb" , &jerdown_mbb , &jer_b_mbb_down );
+    extraTree->SetBranchAddress("jerdown_ptbb", &jerdown_ptbb, &jer_b_ptbb_down);
+    extraTree->SetBranchAddress("jerdown_mct" , &jerdown_mct , &jer_b_mct_down );
+
+
     float jup_mbb  = 0;
     float jup_ptbb = 0;
     float jup_mct  = 0;
@@ -632,6 +664,25 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
     // if (year_ == 2016) kLumi = 35.867;
     // else if (year_ == 2017) kLumi = 41.96;
     // else if (year_ == 2018) kLumi = 70;
+
+    // JER
+    JetResolution res;
+    if (year_ == 2016){
+        std::cout << "Loading 2016 JER files" << std::endl;
+        res.loadResolutionFile("../CORE/Tools/JetResolution/data/Summer16_25nsV1_MC_PtResolution_AK4PFchs.txt");
+        res.loadScaleFactorFile("../CORE/Tools/JetResolution/data/Summer16_25nsV1_MC_SF_AK4PFchs.txt");
+    }
+    else if (year_ == 2017){
+        std::cout << "Loading 2017 JER files" << std::endl;
+        res.loadResolutionFile("../CORE/Tools/JetResolution/data/Fall17_V3_MC_PtResolution_AK4PFchs.txt");
+        res.loadScaleFactorFile("../CORE/Tools/JetResolution/data/Fall17_V3_MC_SF_AK4PFchs.txt");
+    }
+    else if (year_ == 2018){
+        std::cout << "Loading 2018 JER files" << std::endl;
+        res.loadResolutionFile("../CORE/Tools/JetResolution/data/Autumn18_V6_MC_PtResolution_AK4PFchs.txt");
+        res.loadScaleFactorFile("../CORE/Tools/JetResolution/data/Autumn18_V6_MC_SF_AK4PFchs.txt");
+    }
+        
 
 
     //WH framework: normalize weights always to 1 fb-1
@@ -955,6 +1006,47 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
             mus_fromW->push_back(0);
         }
       }
+      // JER. use ak4pfjets_rho
+      vector <float> jet_JER_factor, jet_JER_factor_up, jet_JER_factor_down;
+      vector<Double_t> GenJetPt;
+      for (auto& genjet : ak4genjets_p4()) {
+        GenJetPt.push_back(genjet.pt());
+      }
+      //float dR = 999;
+      for(uint ijet=0;ijet<ak4pfjets_deepCSV().size();ijet++){
+        res.loadVariable("JetEta", ak4pfjets_p4().at(ijet).eta());
+        res.loadVariable("Rho", ak4pfjets_rho());
+        res.loadVariable("JetPt", ak4pfjets_p4().at(ijet).pt());
+
+        auto smearing = res.smear(ak4pfjets_p4().at(ijet), ak4genjets_p4(), GenJetPt, 0);
+        auto smearing_up = res.smear(ak4pfjets_p4().at(ijet), ak4genjets_p4(), GenJetPt, 1);
+        auto smearing_down = res.smear(ak4pfjets_p4().at(ijet), ak4genjets_p4(), GenJetPt, -1);
+        //auto matching = res.match();
+        //cout << "   MC resolution:        " << res.getResolution() << endl;
+        //cout << "   data/MC scale factor: " << res.getScaleFactor(0) << endl;
+        //cout << "   jet eta:              " << ak4pfjets_p4().at(ijet).eta() << endl;
+        //cout << "   jet phi:              " << ak4pfjets_p4().at(ijet).phi() << endl;
+        //cout << "   is matched:           " << matching[0] << endl;
+        //cout << "   original jet pT:      " << ak4pfjets_p4().at(ijet).pt() << endl;
+        //cout << "   smeared jet pT:       " << smearing[0] << endl;
+        //cout << endl;
+        
+        jet_JER_factor.push_back(smearing[0]/ak4pfjets_p4().at(ijet).pt());
+        jet_JER_factor_up.push_back(smearing_up[0]/ak4pfjets_p4().at(ijet).pt());
+        jet_JER_factor_down.push_back(smearing_down[0]/ak4pfjets_p4().at(ijet).pt());
+        
+        //dR = 999;
+        //for(uint igenjet=0;igenjet<ak4genjets_p4().size();igenjet++){
+        //    std::cout << "GenJet pt " << ak4genjets_p4().at(igenjet).pt() << std::endl;
+        //    //dR = DeltaR(ak4pfjets_p4().at(ijet), ak4genjets_p4().at(igenjet));
+        //    dR = ROOT::Math::VectorUtil::DeltaR(ak4pfjets_p4().at(ijet), ak4genjets_p4().at(igenjet));
+        //    //dR = DeltaR(ak4pfjets_p4().at(ijet).eta(), ak4genjets_p4().at(igenjet).eta(), ak4pfjets_p4().at(ijet).phi(), ak4genjets_p4().at(igenjet).phi());
+        //    if (dR<0.2){
+        //        std::cout << "Found a match" << std::endl;
+        //    }
+        //}
+      }
+      
 
       ///Kinematic variables
       // Use CSV sorted for mbb
@@ -978,35 +1070,91 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
         ptb1 = ak4pfjets_p4().at(jet_csv_pairs.at(0).first).pt();
         ptb2 = ak4pfjets_p4().at(jet_csv_pairs.at(1).first).pt();
         dPhibb = getdphi(ak4pfjets_p4().at(jet_csv_pairs.at(0).first).phi(),ak4pfjets_p4().at(jet_csv_pairs.at(1).first).phi());
-	mct = sqrt(2*ptb1*ptb2*(1+cos(dPhibb)));  
+        mct = sqrt(2*ptb1*ptb2*(1+cos(dPhibb)));  
        
       }
-      // up
+
+      // JER + variations
+      jer_mbb  = -999;
+      jerup_mbb  = -999;
+      jerdown_mbb  = -999;
+      jer_mct  = -999;
+      jerup_mct  = -999;
+      jerdown_mct  = -999;
+      jer_ptbb = -999;
+      jerup_ptbb = -999;
+      jerdown_ptbb = -999;
+      //int jer_ngoodjets = 0;
+      if(ngoodjets()>1){
+        float jet0_pt, jet1_pt;
+        TLorentzVector jet0, jet1;
+        float ptb1,ptb2,dPhibb;
+
+        // central
+        jet0_pt = ak4pfjets_p4().at(jet_csv_pairs.at(0).first).pt()*jet_JER_factor.at(jet_csv_pairs.at(0).first);
+        jet1_pt = ak4pfjets_p4().at(jet_csv_pairs.at(1).first).pt()*jet_JER_factor.at(jet_csv_pairs.at(1).first);
+        jet0.SetPtEtaPhiM(jet0_pt, ak4pfjets_p4().at(jet_csv_pairs.at(0).first).eta(), ak4pfjets_p4().at(jet_csv_pairs.at(0).first).phi(), 0);
+        jet1.SetPtEtaPhiM(jet1_pt, ak4pfjets_p4().at(jet_csv_pairs.at(1).first).eta(), ak4pfjets_p4().at(jet_csv_pairs.at(1).first).phi(), 0);
+        jer_mbb = (jet0 + jet1).M()  ; 
+        jer_ptbb = (jet0 + jet1).Pt()  ; 
+        
+        ptb1 = ak4pfjets_p4().at(jet_csv_pairs.at(0).first).pt()*jet_JER_factor.at(jet_csv_pairs.at(0).first);
+        ptb2 = ak4pfjets_p4().at(jet_csv_pairs.at(1).first).pt()*jet_JER_factor.at(jet_csv_pairs.at(1).first);
+        dPhibb = getdphi(jet0.Phi(), jet1.Phi());
+        jer_mct = sqrt(2*ptb1*ptb2*(1+cos(dPhibb)));  
+
+        // up
+        jet0_pt = ak4pfjets_p4().at(jet_csv_pairs.at(0).first).pt()*jet_JER_factor_up.at(jet_csv_pairs.at(0).first);
+        jet1_pt = ak4pfjets_p4().at(jet_csv_pairs.at(1).first).pt()*jet_JER_factor_up.at(jet_csv_pairs.at(1).first);
+        jet0.SetPtEtaPhiM(jet0_pt, ak4pfjets_p4().at(jet_csv_pairs.at(0).first).eta(), ak4pfjets_p4().at(jet_csv_pairs.at(0).first).phi(), 0);
+        jet1.SetPtEtaPhiM(jet1_pt, ak4pfjets_p4().at(jet_csv_pairs.at(1).first).eta(), ak4pfjets_p4().at(jet_csv_pairs.at(1).first).phi(), 0);
+        jerup_mbb = (jet0 + jet1).M()  ; 
+        jerup_ptbb = (jet0 + jet1).Pt()  ; 
+        ptb1 = ak4pfjets_p4().at(jet_csv_pairs.at(0).first).pt()*jet_JER_factor_up.at(jet_csv_pairs.at(0).first);
+        ptb2 = ak4pfjets_p4().at(jet_csv_pairs.at(1).first).pt()*jet_JER_factor_up.at(jet_csv_pairs.at(1).first);
+        jerup_mct = sqrt(2*ptb1*ptb2*(1+cos(dPhibb))); //dphi bb doesn't change
+
+        // down
+        jet0_pt = ak4pfjets_p4().at(jet_csv_pairs.at(0).first).pt()*jet_JER_factor_down.at(jet_csv_pairs.at(0).first);
+        jet1_pt = ak4pfjets_p4().at(jet_csv_pairs.at(1).first).pt()*jet_JER_factor_down.at(jet_csv_pairs.at(1).first);
+        jet0.SetPtEtaPhiM(jet0_pt, ak4pfjets_p4().at(jet_csv_pairs.at(0).first).eta(), ak4pfjets_p4().at(jet_csv_pairs.at(0).first).phi(), 0);
+        jet1.SetPtEtaPhiM(jet1_pt, ak4pfjets_p4().at(jet_csv_pairs.at(1).first).eta(), ak4pfjets_p4().at(jet_csv_pairs.at(1).first).phi(), 0);
+        jerdown_mbb = (jet0 + jet1).M()  ; 
+        jerdown_ptbb = (jet0 + jet1).Pt()  ; 
+        ptb1 = ak4pfjets_p4().at(jet_csv_pairs.at(0).first).pt()*jet_JER_factor_down.at(jet_csv_pairs.at(0).first);
+        ptb2 = ak4pfjets_p4().at(jet_csv_pairs.at(1).first).pt()*jet_JER_factor_down.at(jet_csv_pairs.at(1).first);
+        jerdown_mct = sqrt(2*ptb1*ptb2*(1+cos(dPhibb)));  //dphi bb doesn't change
+        
+      }
+
+
+      // JES up
       vector <pair<int, float>> jup_csv_pairs;
       for(uint ijet = 0; ijet < jup_ak4pfjets_deepCSV().size(); ijet++) {
-	float btagvalue = jup_ak4pfjets_deepCSV().at(ijet);
-	jup_csv_pairs.push_back(make_pair(ijet,btagvalue));
+        float btagvalue = jup_ak4pfjets_deepCSV().at(ijet);
+        jup_csv_pairs.push_back(make_pair(ijet,btagvalue));
       }
       sort(jup_csv_pairs.begin(), jup_csv_pairs.end(), sortIndexbyCSV);
+
 
       jup_mbb  = -999;
       jup_mct  = -999;
       jup_ptbb = -999;
       if(jup_ngoodjets()>1) {
-	jup_mbb = (jup_ak4pfjets_p4().at(jup_csv_pairs.at(0).first) + jup_ak4pfjets_p4().at(jup_csv_pairs.at(1).first)).mass();
-	jup_ptbb = (jup_ak4pfjets_p4().at(jup_csv_pairs.at(0).first) + jup_ak4pfjets_p4().at(jup_csv_pairs.at(1).first)).pt();
+        jup_mbb = (jup_ak4pfjets_p4().at(jup_csv_pairs.at(0).first) + jup_ak4pfjets_p4().at(jup_csv_pairs.at(1).first)).mass();
+        jup_ptbb = (jup_ak4pfjets_p4().at(jup_csv_pairs.at(0).first) + jup_ak4pfjets_p4().at(jup_csv_pairs.at(1).first)).pt();
 
-	float ptb1, ptb2, dPhibb;
-	ptb1 = jup_ak4pfjets_p4().at(jup_csv_pairs.at(0).first).pt();
-	ptb2 = jup_ak4pfjets_p4().at(jup_csv_pairs.at(1).first).pt();
-	dPhibb = getdphi(jup_ak4pfjets_p4().at(jup_csv_pairs.at(0).first).phi(),jup_ak4pfjets_p4().at(jup_csv_pairs.at(1).first).phi());
-	jup_mct = sqrt(2*ptb1*ptb2*(1+cos(dPhibb)));
+        float ptb1, ptb2, dPhibb;
+        ptb1 = jup_ak4pfjets_p4().at(jup_csv_pairs.at(0).first).pt();
+        ptb2 = jup_ak4pfjets_p4().at(jup_csv_pairs.at(1).first).pt();
+        dPhibb = getdphi(jup_ak4pfjets_p4().at(jup_csv_pairs.at(0).first).phi(),jup_ak4pfjets_p4().at(jup_csv_pairs.at(1).first).phi());
+        jup_mct = sqrt(2*ptb1*ptb2*(1+cos(dPhibb)));
       }
       // down
       vector <pair<int, float>> jdown_csv_pairs;
       for(uint ijet = 0; ijet < jdown_ak4pfjets_deepCSV().size(); ijet++) {
-	float btagvalue = jdown_ak4pfjets_deepCSV().at(ijet);
-	jdown_csv_pairs.push_back(make_pair(ijet,btagvalue));
+        float btagvalue = jdown_ak4pfjets_deepCSV().at(ijet);
+        jdown_csv_pairs.push_back(make_pair(ijet,btagvalue));
       }
       sort(jdown_csv_pairs.begin(), jdown_csv_pairs.end(), sortIndexbyCSV);
 
@@ -1014,14 +1162,14 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
       jdown_mct  = -999;
       jdown_ptbb = -999;
       if(jdown_ngoodjets()>1) {
-	jdown_mbb = (jdown_ak4pfjets_p4().at(jdown_csv_pairs.at(0).first) + jdown_ak4pfjets_p4().at(jdown_csv_pairs.at(1).first)).mass();
-	jdown_ptbb = (jdown_ak4pfjets_p4().at(jdown_csv_pairs.at(0).first) + jdown_ak4pfjets_p4().at(jdown_csv_pairs.at(1).first)).pt();
+        jdown_mbb = (jdown_ak4pfjets_p4().at(jdown_csv_pairs.at(0).first) + jdown_ak4pfjets_p4().at(jdown_csv_pairs.at(1).first)).mass();
+        jdown_ptbb = (jdown_ak4pfjets_p4().at(jdown_csv_pairs.at(0).first) + jdown_ak4pfjets_p4().at(jdown_csv_pairs.at(1).first)).pt();
 
-	float ptb1, ptb2, dPhibb;
-	ptb1 = jdown_ak4pfjets_p4().at(jdown_csv_pairs.at(0).first).pt();
-	ptb2 = jdown_ak4pfjets_p4().at(jdown_csv_pairs.at(1).first).pt();
-	dPhibb = getdphi(jdown_ak4pfjets_p4().at(jdown_csv_pairs.at(0).first).phi(),jdown_ak4pfjets_p4().at(jdown_csv_pairs.at(1).first).phi());
-	jdown_mct = sqrt(2*ptb1*ptb2*(1+cos(dPhibb)));
+        float ptb1, ptb2, dPhibb;
+        ptb1 = jdown_ak4pfjets_p4().at(jdown_csv_pairs.at(0).first).pt();
+        ptb2 = jdown_ak4pfjets_p4().at(jdown_csv_pairs.at(1).first).pt();
+        dPhibb = getdphi(jdown_ak4pfjets_p4().at(jdown_csv_pairs.at(0).first).phi(),jdown_ak4pfjets_p4().at(jdown_csv_pairs.at(1).first).phi());
+        jdown_mct = sqrt(2*ptb1*ptb2*(1+cos(dPhibb)));
       }
 
       ///Gen information: susy particles, quarks, bosons, leptons
