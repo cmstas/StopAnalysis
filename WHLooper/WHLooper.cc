@@ -719,7 +719,7 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
     if (nEventsTotal >= nEventsChain) continue;
     unsigned int nEventsTree = tree->GetEntriesFast();
 
-    nEventsTree = 2000;
+    // nEventsTree = 2000;
     //cout<<"apply good run list "<<applyGoodRunList<<endl;
     for (unsigned int event = 0; event < nEventsTree; ++event) {
       // Read Tree
