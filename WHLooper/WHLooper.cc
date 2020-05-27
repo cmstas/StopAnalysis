@@ -710,8 +710,7 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
         res.loadResolutionFile("../CORE/Tools/JetResolution/data/Autumn18_V6_MC_PtResolution_AK4PFchs.txt");
         res.loadScaleFactorFile("../CORE/Tools/JetResolution/data/Autumn18_V6_MC_SF_AK4PFchs.txt");
     }
-        
-
+    
 
     //WH framework: normalize weights always to 1 fb-1
     kLumi=1.0;
@@ -1424,7 +1423,7 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
     file.Close();
     outfile_->Write();
     outfile_->Close();
-    delete extraTree;
+    // delete extraTree;
   } // end of file loop
 
   cout << "[WHLooper::looper] processed  " << nEventsTotal << " events" << endl;
