@@ -1,10 +1,11 @@
 #!/bin/bash
 
 
+datetag=2020_05_26
+
 ########################
 #Jet HT data
 
-datetag=2019_10_05
 babytag=v30_3
 
 OUTDIR=/home/users/rheller/wh_babies/babies_${babytag}_${datetag}/
@@ -29,7 +30,6 @@ done
 ########################
 # 2016 Data
 
-datetag=2019_10_05
 babytag=v31_1
 
 OUTDIR=/home/users/rheller/wh_babies/babies_${babytag}_${datetag}/
@@ -52,7 +52,6 @@ done
 ########################
 # 2017/18 Data
 
-datetag=2019_10_05
 babytag=v31_2
 
 OUTDIR=/home/users/rheller/wh_babies/babies_${babytag}_${datetag}/
@@ -74,7 +73,6 @@ done
 
 
 ### met binned 2016 ttbar
-datetag=2019_10_05
 babytag=v30_9
 
 
@@ -93,7 +91,6 @@ done
 
 
 ### met binned 2017 ttbar
-datetag=2019_10_05
 babytag=v30_9
 
 OUTDIR=/home/users/rheller/wh_babies/babies_${babytag}_${datetag}/f17v2/
@@ -112,7 +109,6 @@ done
 
 
 #### special DY samples
-datetag=2019_10_05
 babytag=v32_0z
 INDIR=/home/users/rheller/z_merged/
 OUTDIR=/home/users/rheller/wh_babies/babies_${babytag}_${datetag}/
@@ -130,7 +126,6 @@ for SAMPLE in ${Samples[@]}; do
 done
 
 ## WJet NLO 2018
-datetag=2019_10_05
 babytag=v30_9
 
 OUTDIR=/home/users/rheller/wh_babies/babies_${babytag}_${datetag}/a18v1/
@@ -148,7 +143,6 @@ done
 
 
 ## WJet NLO 2017
-datetag=2019_10_05
 babytag=v30_9
 
 OUTDIR=/home/users/rheller/wh_babies/babies_${babytag}_${datetag}/f17v2/
@@ -168,7 +162,6 @@ done
 
 
 ###2016 signal
-datetag=2019_10_05
 babytag=signal_s16v3_v32
 
 OUTDIR=/home/users/rheller/wh_babies/babies_${babytag}_${datetag}/
@@ -187,7 +180,6 @@ done
 
 
 ##2017 Signal
-datetag=2019_10_05
 babytag=signal_f17v2_v32_0
 
 OUTDIR=/home/users/rheller/wh_babies/babies_${babytag}_${datetag}/
@@ -205,7 +197,6 @@ for SAMPLE in ${Samples[@]}; do
 done
 
 ##2018 Signal
-datetag=2019_10_05
 babytag=signal_a18v1_v32_0
 
 OUTDIR=/home/users/rheller/wh_babies/babies_${babytag}_${datetag}/
@@ -222,7 +213,7 @@ for SAMPLE in ${Samples[@]}; do
     eval "nohup nice -n -10 ./processWH.py ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
 done
 
-exit 1
+
 ########################
 # 2016 MC
 
@@ -233,7 +224,6 @@ exit 1
 #8_13 v5: Turn off MET res, ISR, top tag, soft btag, top tag, but turn back on PU.
 #8_13 v6: Turn off MET res, ISR, top tag, soft btag, top tag, pu, add separate PU weight branch.
 
-datetag=2019_10_05
 babytag=v31_2
 
 OUTDIR=/home/users/rheller/wh_babies/babies_${babytag}_${datetag}/s16v3/
@@ -268,7 +258,6 @@ done
 ########################
 # 2017 MC
 
-datetag=2019_10_05
 babytag=v31_2
 
 OUTDIR=/home/users/rheller/wh_babies/babies_${babytag}_${datetag}/f17v2/
@@ -296,7 +285,6 @@ done
 ########################
 # 2018 MC
 
-datetag=2019_10_05
 babytag=v31_2
 
 OUTDIR=/home/users/rheller/wh_babies/babies_${babytag}_${datetag}/a18v1/

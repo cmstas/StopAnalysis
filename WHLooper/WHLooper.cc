@@ -813,7 +813,7 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
 
       //Full weight
       full_weight = weight;
-      if(!is_data()) full_weight = weight * w_pu * year_weight;
+      if(!is_data()) full_weight = weight * w_pu * w_ISRnjets * year_weight; //ISR weight only != 1 for 2016 ttbar.
 
       //systematic weight variations:
       evtWgt.resetEvent();
