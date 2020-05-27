@@ -4,7 +4,8 @@ The analysis try to look for / exclude the hypothetical top squark (stop) predic
 
 ## Setup
 ``` bash
-git clone --recurse-submodules git@github.com:cmstas/StopAnalysis.git && cd StopAnalysis
+git clone -b devwh2 --recurse-submodules git@github.com:cmstas/StopAnalysis.git && cd StopAnalysis
+
 ```
 
 ## Analysis work flow in steps
