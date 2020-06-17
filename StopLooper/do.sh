@@ -11,11 +11,11 @@ fi
 
 LOGDIR=logs
 
-# skimtype=skimmed
-skimtype=merged
+skimtype=skimmed
+# skimtype=merged
 
 # vsuf=v31_s21
-vsuf=v32_s2_fake16
+vsuf=v32_s3
 
 OUTDIR18=output/samp18_$vsuf
 OUTDIR17=output/samp17_$vsuf
@@ -46,8 +46,8 @@ function runLooperJobs {
     cp do.sh StopLooper.cc StopRegions.cc ${LOGDIR}
     for SAMPLE in ${Samples[@]}; do
         # ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR}
-        echo ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} '>&' ${LOGDIR}/log_${SAMPLE}.txt
-        eval "nohup nice -n 10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} >& ${LOGDIR}/log_${SAMPLE}.txt &"
+        echo ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} '&>' ${LOGDIR}/log_${SAMPLE}.txt
+        eval "nohup nice -n 10 ./runStopLooper ${INDIR} ${SAMPLE} ${OUTDIR} &> ${LOGDIR}/log_${SAMPLE}.txt &"
     done
 }
 
@@ -58,6 +58,17 @@ OUTDIR=output/sampttH_$vsuf
 LOGDIR=$OUTDIR/logs
 # declare -a Samples=(ttHtoInv_a18v1 ttHtoInv_f17v2)
 declare -a Samples=(ttHtoInv_a18v1 ttHtoInv_f17v2)
+# [[ $runextra == 1 ]] && runLooperJobs
+
+# Extra signal ttDM
+INDIR=/nfs-7/userdata/sicheng/stopbabies/$skimtype/ttdm_v32_1
+OUTDIR=output/sampttDM_$vsuf
+LOGDIR=$OUTDIR/logs
+declare -a Samples=()
+# Samples+=(TTbarDMJets_scalar_a18v1 TTbarDMJets_scalar_f17v2 TTbarDMJets_scalar_s16v3)
+# Samples+=(TTbarDMJets_pseudo_a18v1 TTbarDMJets_pseudo_f17v2 TTbarDMJets_pseudo_s16v3)
+Samples+=(TTbarDMJets_scalar_s16v3)
+
 [[ $runextra == 1 ]] && runLooperJobs
 
 ########################
@@ -105,7 +116,7 @@ Samples+=( WZTo1L3Nu WZTo3LNu WZTo2L2Q WWToLNuQQ WWTo2L2Nu ZZ )   # diboson
 # Samples+=( W1Jets W2Jets W3Jets W4JetsToLNu DYJets )
 # Samples+=( W4Jets_NuPt200_a18v1_0 W4Jets_NuPt200_a18v1_1 W4Jets_NuPt200_a18v1_2 W4Jets_NuPt200_a18v1_3 )
 # Samples+=( W4Jets_NuPt200_a18v1_4 W4Jets_NuPt200_a18v1_5 W4Jets_NuPt200_a18v1_6 )
-# Samples+=( TTTo2L2Nu )
+# Samples+=( TTTo2L2Nu TTZToLLNuNu WWTo2L2Nu ZZ)
 
 # INDIR=/hadoop/cms/store/user/sicheng/ProjectMetis/stopbaby_TTZToLLNuNu_a18v1_v32_1_Zll/merged/
 # declare -a Samples=( TTZToLLNuNu )
@@ -205,7 +216,7 @@ Samples+=( WZTo1L3Nu WZTo3LNu WZTo2L2Q WZTo1L1Nu2Q WWToLNuQQ WWTo2L2Nu TTWZ ZZ )
 # Samples+=( W1Jets W2Jets W3Jets W4JetsToLNu DYJets )       # Vjets : Wjets + DY
 # Samples+=( W4Jets_NuPt200_f17v2_0 W4Jets_NuPt200_f17v2_1 W4Jets_NuPt200_f17v2_2 )
 # Samples+=( W4Jets_NuPt200_f17v2_3 W4Jets_NuPt200_f17v2_4 W4Jets_NuPt200_f17v2_5 )
-# Samples+=( TTTo2L2Nu )
+# Samples+=( TTTo2L2Nu TTZToLLNuNu WWTo2L2Nu ZZ)
 
 [[ $run17bkg == 1 ]] && runLooperJobs
 
@@ -306,7 +317,7 @@ Samples+=( WZTo1L3Nu WZTo1L1Nu2Q WZTo3LNu_amcnlo WZTo2L2Q WWTo2L2Nu WWToLNuQQ ZZ
 # Samples+=( W1Jets W2Jets W3Jets W4JetsToLNu DYJets )       # Vjets : Wjets + DY
 # Samples+=( W1Jets_NuPt200 W2Jets_NuPt200 W3Jets_NuPt200 )       # Vjets : Wjets + DY
 # Samples+=( W1JetsToLNu W2JetsToLNu W3JetsToLNu W4JetsToLNu DYJets )       # Vjets : Wjets + DY
-# Samples+=( TTTo2L2Nu )
+# Samples+=( TTTo2L2Nu TTZToLLNuNu WWTo2L2Nu ZZ)
 
 [[ $run16bkg == 1 ]] && runLooperJobs
 

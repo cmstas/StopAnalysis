@@ -37,6 +37,9 @@
 #include "StopLooper.h"
 #include "Utilities.h"
 
+// Special extension
+#include "ttbarDMutils.h"
+
 using namespace std;
 using namespace stop1l;
 
@@ -88,6 +91,9 @@ string samplever;
 string sigtype;
 double babyver;
 
+// Special switch for ttbar+DM signal (fullsim, read xsec, read mass point)
+int ttbarDMtype = 0;
+
 const float fInf = std::numeric_limits<float>::max();
 
 const float kSMSMassStep = 25;
@@ -136,8 +142,8 @@ void StopLooper::SetSignalRegions() {
 
   // CRemuVec = getStopCrosscheckRegionsEMuRun2();
   // CRemuVec = getStopCrosscheckRegionsEMu();
-
   // CR3lVec = getStopCrosscheckRegionsTrileptonRun2();
+
   // Temporary
   // SRVec.clear();
   // CR0bVec.clear();
@@ -340,6 +346,8 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
     else if (dsname.Contains("RunIISummer16MiniAODv3")) samplever += ":Summer16v3";
     else if (dsname.Contains("RunIISpring16MiniAODv2")) samplever += ":Spring16v2";
 
+    if (dsname.BeginsWith("/TTbarDMJets")) ttbarDMtype = (dsname.Contains("pseudo"))? -1 : 1;
+
     cout << "[StopLooper] >> Running on sample: " << dsname << endl;
     cout << "[StopLooper] >> Sample detected with year = " << year_ << " and version = " << samplever << " (" << babyver << ")" << endl;
 
@@ -384,6 +392,8 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
       evtWgt.getExtSampleWeightFall17v2(fname);
 
     evtWgt.getZSampleWeightFromCR3l(fname);
+
+    if (ttbarDMtype) evtWgt.apply_genweights_unc = false;  // FIXME: to be fixed
 
     if (year_ == 2016) kLumi = 35.922;
     else if (year_ == 2017) kLumi = 41.529;
@@ -455,6 +465,25 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
 
       // Fill tirgger efficiency histos after the MET filters are applied
       // fillEfficiencyHistos(testVec[0], "triggers");
+
+      if (ttbarDMtype) {
+        sigtype = "_ttDM";
+        unsigned int nevt(1);
+        static unsigned int skipLumi = 0;
+        if (ls() == skipLumi) continue;
+        std::tie(mlsp_, mstop_, nevt) = ttdm::getDMMassesByLumi(ttbarDMtype, year_, ls());
+        if (mstop_ <= 0 || nevt <= 0) {
+          cout << "[StopLooper] >> Invalid nEvents " << nevt << " for mphi = " << mstop_ << ", mchi = " << mlsp_ << ", nevt= " << nevt << ", dataset()= " << dataset() << endl;
+          skipLumi = ls();
+          continue;
+        }
+        const float xsec = ttdm::getXsecTTbarDM(ttbarDMtype, mlsp_, mstop_);
+        float wgt1fb = 1000 * xsec / nevt;
+        evtWgt.sf_extra_event *= wgt1fb;
+
+        plot2d("h2d_ttDMpts_ylds", mstop_, mlsp_, 1, SRVec.at(0).histMap, ";M_{#phi} [GeV]; M_{#chi} [GeV]", 160, 0, 800, 80, 0, 80);
+        plot2d("h2d_ttDMpts_xsecwgtd", mstop_, mlsp_, wgt1fb, SRVec.at(0).histMap, ";M_{#phi} [GeV]; M_{#chi} [GeV]", 160, 0, 800, 80, 0, 80);
+      }
 
       // For testing on only subset of mass points
       if (!runFullSignalScan && is_fastsim_) {
@@ -1075,6 +1104,8 @@ void StopLooper::fillYieldHistos(SR& sr, float met, string suf, bool is_cr2l) {
             cout << "[StopLooper::fillYieldHistos]: WARNING: the event weight is 0 for syst = " << evtWgt.getLabel(syst) << " at evt = " << evt() << "!!" << ", SR=" << srname << endl;
           if (isnan(systwgt))
             cout << "[StopLooper::fillYieldHistos]: WARNING: the event weight is NAN for syst = " << evtWgt.getLabel(syst) << " at evt = " << evt() << "!!" << ", SR=" << srname << endl;
+          if (isnan(systwgt))
+            cout << __LINE__ << ": evtWgt.apply_genweights_unc= " << evtWgt.apply_genweights_unc << endl;
           if (filldim == 3)
             plot3d("hSMS_metbins"+s+"_"+evtWgt.getLabel(syst), met, mstop_, mlsp_, systwgt, sr.histMap, ";E^{miss}_{T} [GeV];M_{stop};M_{LSP}",
                    sr.GetNMETBins(), sr.GetMETBinsPtr(), mStopBins.size()-1, mStopBins.data(), mLSPBins.size()-1, mLSPBins.data());
@@ -1898,13 +1929,6 @@ void StopLooper::fillHistosForCRemu(string suf, int trigType) {
         evtWgt.getISRnJetsWeight_local(ISRwgt, ISRup, ISRdn);
         plot1d("h_ptttbar_b1_ISRUp", values_[ptttbar], evtweight_*ISRup/ISRwgt, cr.histMap, ";p_{T}(t#bar{t}) [GeV]", ptbin1.size()-1, ptbin1.data());
         plot1d("h_ptttbar_b1_ISRDn", values_[ptttbar], evtweight_*ISRdn/ISRwgt, cr.histMap, ";p_{T}(t#bar{t}) [GeV]", ptbin1.size()-1, ptbin1.data());
-        // evtweight_ *= ISRwgt;
-        // fillhists("_ISRUncUp");
-        // fillhists("_ISRUncDn");
-        // evtweight_ *= ISRup/ISRwgt;
-        // fillhists("_ISRUp");
-        // evtweight_ *= ISRdn/ISRup;
-        // fillhists("_ISRDn");
       }
 
       if (trigType == 1) {

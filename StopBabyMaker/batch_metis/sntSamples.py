@@ -130,8 +130,10 @@ if __name__ == "__main__":
         # "TTGamma_SingleLept_a18v1" : "/TTGamma_SingleLeptFromT_TuneCP5_13TeV_madgraph_pythia8/RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15_ext1-v2/MINIAODSIM",
         # "TTGamma_Dilept_Tune_a18v1" : "/TTGamma_Dilept_TuneCP5_13TeV_madgraph_pythia8/RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15_ext1-v2/MINIAODSIM",
 
-        # Fullsim single points
-        "ttHtoInv_a18v1" : "/ttH_HToInvisible_M125_TuneCP5_PSweights_13TeV_powheg_pythia8/RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1/MINIAODSIM",
+        # Fullsim signal points
+        # "ttHtoInv_a18v1" : "/ttH_HToInvisible_M125_TuneCP5_PSweights_13TeV_powheg_pythia8/RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1/MINIAODSIM",
+        "TTbarDMJets_scalar_a18v1" : "/TTbarDMJets_Inclusive_scalar_LO_TuneCP5_13TeV-madgraph-mcatnlo-pythia8/RunIIAutumn18MiniAOD-rp_102X_upgrade2018_realistic_v15-v1/MINIAODSIM",
+        "TTbarDMJets_pseudo_a18v1" : "/TTbarDMJets_Inclusive_pseudoscalar_LO_TuneCP5_13TeV-madgraph-mcatnlo-pythia8/RunIIAutumn18MiniAOD-rp_102X_upgrade2018_realistic_v15-v1/MINIAODSIM",
 
         # Extra
         # "TTTo2L2Nu_a18v1" : "/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1/MINIAODSIM",
@@ -267,11 +269,13 @@ if __name__ == "__main__":
         # "DYJetsToLL_M50_f17v2" : "/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIFall17MiniAODv2-PU2017RECOSIMstep_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM",
         # "DYJetsToLL_M50_f17v2_ext1" : "/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIFall17MiniAODv2-PU2017RECOSIMstep_12Apr2018_94X_mc2017_realistic_v14_ext1-v1/MINIAODSIM",
 
-        # Fullsim single points
+        # Fullsim signal points
         # "T2tt_mStop1200_mLSP100_f17v2" : "/SMS-T2tt_mStop-1200_mLSP-100_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM",
         # "T2tt_mStop650_mLSP350_f17v2" : "/SMS-T2tt_mStop-650_mLSP-350_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM",
         # "T2tt_mStop850_mLSP100_f17v2" : "/SMS-T2tt_mStop-850_mLSP-100_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM",
-        "ttHtoInv_f17v2" : "/ttH_HToInvisible_M125_13TeV_TuneCP5_powheg_pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM",
+        # "ttHtoInv_f17v2" : "/ttH_HToInvisible_M125_13TeV_TuneCP5_powheg_pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM",
+        "TTbarDMJets_scalar_f17v2" : "/TTbarDMJets_Inclusive_scalar_LO_TuneCP5_13TeV-madgraph-mcatnlo-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_rp_94X_mc2017_realistic_v14-v1/MINIAODSIM",
+        "TTbarDMJets_pseudo_f17v2" : "/TTbarDMJets_Inclusive_pseudoscalar_LO_TuneCP5_13TeV-madgraph-mcatnlo-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_rp_94X_mc2017_realistic_v14-v1/MINIAODSIM",
 
         # # Fastsim ttbar
         # "TTJets_2lep_f17v2fs" : "/TTJets_DiLept_TuneCP2_13TeV-madgraphMLM-pythia8/RunIIFall17MiniAODv2-PUFall17Fast_lhe_94X_mc2017_realistic_v15-v1/MINIAODSIM",
@@ -515,6 +519,10 @@ if __name__ == "__main__":
         # "GJets_HT400to600" : "/GJets_HT-400To600_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v2/MINIAODSIM",
         # "GJets_HT600toInf" : "/GJets_HT-600ToInf_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM",
 
+        # Fullsim signal points
+        "TTbarDMJets_scalar_s16v3" : "/TTbarDMJets_Inclusive_scalar_LO_TuneCP5_13TeV-madgraph-mcatnlo-pythia8/RunIISummer16MiniAODv3-PUMoriond17_rp_94X_mcRun2_asymptotic_v3-v1/MINIAODSIM",
+        "TTbarDMJets_pseudo_s16v3" : "/TTbarDMJets_Inclusive_pseudoscalar_LO_TuneCP5_13TeV-madgraph-mcatnlo-pythia8/RunIISummer16MiniAODv3-PUMoriond17_rp_94X_mcRun2_asymptotic_v3-v1/MINIAODSIM",
+
         # # Extra samples for WH
         # "SMS_TChiWH_s16v3" : "/SMS-TChiWH_WToLNu_HToBB_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16MiniAODv3-PUSummer16v3Fast_94X_mcRun2_asymptotic_v3-v1/MINIAODSIM",
         # "SMS_TChiWH_f17v2" : "/SMS-TChiWH_WToLNu_HToBB_TuneCP2_13TeV-madgraphMLM-pythia8/RunIIFall17MiniAODv2-PUFall17Fast_94X_mc2017_realistic_v15-v1/MINIAODSIM",
@@ -599,13 +607,13 @@ if __name__ == "__main__":
             scram_arch = scramarch,
             arguments = samptyp + extrarg,
             tarfile = tarfile,
-            # condor_submit_params = {"sites": "T2_US_UCSD"},
+            condor_submit_params = {"sites": "T2_US_UCSD"},
             min_completion_fraction = minfrac,
             # condor_submit_params = {"sites": "UAF"},
-            condor_submit_params = {"use_xrootd": True},
+            # condor_submit_params = {"use_xrootd": True},
             # max_jobs = 1,      # temporary for submission test
             # no_load_from_backup = renew,
-            # recopy_inputs = True,
+            recopy_inputs = True,
         )
         merge_task = CondorTask(
             sample = DirectorySample(
