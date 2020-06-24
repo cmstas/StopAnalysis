@@ -32,8 +32,6 @@ const int maxnprocess = 5;
 const bool correlated = true;
 // do subtract signal contamination from CR? default: true
 const bool dosigcont = true;
-// do average with yields using genmet for signal? default: true
-const bool dogenmet = false;
 // test without real data?
 const bool fakedata = false;
 // test without background systematics?
@@ -43,7 +41,11 @@ const bool nosigsyst = false;
 // use Poisson for data stats
 const bool usegmN = true;
 // use Poisson for data stats
-const bool yearseparated = true;
+const bool yearseparated = false;
+// do average with yields using genmet for signal? default: true
+bool dogenmet = true;
+// the signal is fullsim
+bool fullsimsig = false;
 
 bool verbose = true;  // automatic turned off if is signal scan
 
@@ -67,17 +69,35 @@ TFile *fsig_genmet;
 // vector<string> systNames_corr = {"bTagEffHF", "bTagEffLF", "lepSF", "pdf", "q2", "jes", "ISR", "alphas", "L1prefire"};
 // vector<string> systNames_sig = {"jes16", "jes17", "jes18", "ISR", "lepFSSF", "bTagFSEff"}; //  "q2" <-- fix this
 // vector<string> systNames_sig = {"jes16", "jes17", "jes18", "ISR16"}; //  Fullsim signals
-vector<string> systNames_sig; //  Fullsim signals
-vector<string> systNames_corr = {"bTagEffHF16", "bTagEffHF17", "bTagEffHF18", "bTagEffLF16", "bTagEffLF17", "bTagEffLF18", "lepSF",
-                                 "pdf", "q2", "jes16", "jes17", "jes18", "ISR16", "pileup16", "pileup17", "pileup18",
-                                 "alphas", "metRes16", "metRes17", "metRes18", "L1prefire", "ttagSF", "softbSF16", "softbSF17", "softbSF18"};
+// vector<string> systNames_sig; //  Fullsim signals
+// vector<string> systNames_corr = {"bTagEffHF16", "bTagEffHF17", "bTagEffHF18", "bTagEffLF16", "bTagEffLF17", "bTagEffLF18", "lepSF",
+//                                  "pdf", "q2", "jes16", "jes17", "jes18", "ISR16", "pileup16", "pileup17", "pileup18",
+//                                  "alphas", "metRes16", "metRes17", "metRes18", "L1prefire", "ttagSF", "softbSF16", "softbSF17", "softbSF18"};
+
+// Set of systematics of maximum correlation <-- least number of nuances
+vector<string> systNames_sig = {"ISR", "lepFSSF", "bTagFSEff"};  // "jes"
+vector<string> systNames_corr = {"bTagEffHF", "bTagEffLF", "lepSF", "pdf", "q2", "jes", "ISR", "pileup", "alphas", "metRes", "L1prefire", "ttagSF", "softbSF"};
+
+// auto systNames_sig = []() -> vector<string> {
+//   if (!yearseparated) cout << "!!!" << endl;
+//   if (!yearseparated) return vector<string>{"jes", "ISR", "lepFSSF", "bTagFSEff"};
+//   return vector<string>{"jes16", "jes17", "jes18", "ISR", "lepFSSF", "bTagFSEff"};
+// }; //  "q2" <-- fix this
+
+// auto systNames_corr = []() -> vector<string> {
+//   if (!yearseparated)
+//     return vector<string>{"bTagEffHF", "bTagEffLF", "lepSF", "pdf", "q2", "jes", "ISR", "pileup", "alphas", "metRes", "L1prefire", "ttagSF", "softbSF"};
+//   return vector<string>{"bTagEffHF16", "bTagEffHF17", "bTagEffHF18", "bTagEffLF16", "bTagEffLF17", "bTagEffLF18", "lepSF",
+//                         "pdf", "q2", "jes16", "jes17", "jes18", "ISR16", "pileup16", "pileup17", "pileup18", "alphas",
+//                         "metRes16", "metRes17", "metRes18", "L1prefire", "ttagSF", "softbSF16", "softbSF17", "softbSF18"};
+// };
 
 // individual systematic uncertainties for different backgrounds
 // vector<string> systNames_bg2l = {"metRes", "ttbarSysPt", "tauSF"};
 // vector<string> systNames_bg2l = {"tauSF", "metTTbar", "cr2lTriggerSF16", "cr2lTriggerSF17", "cr2lTriggerSF18"};
 vector<string> systNames_bg2l = {"tauSF", "metTTbar", "cr2lTriggerSF"};
 vector<string> systNames_bg1l = {"CRpurity", "WbXsec"};
-vector<string> systNames_bgZnunu;
+vector<string> systNames_bgZnunu = {"ttZxsec"};
 
 ///////////////////////
 // Helper functions
@@ -147,17 +167,17 @@ int getUncertainties(double& errup, double& errdn, double origyield, TFile* file
       histUp = (TH1*) file->Get(hname2+"Up");
       histDn = (TH1*) file->Get(hname2+"Dn");
     }
-    int biny = histUp->GetYaxis()->FindBin(m1);
-    int binz = histUp->GetZaxis()->FindBin(m2);
-    double yldup = histUp->GetBinContent(metbin, biny, binz);
-    double ylddn = histDn->GetBinContent(metbin, biny, binz);
-
     if (!histUp || !histDn) {
       if (verbose) cout << "[getUncertainties] Cannot find the up or down syst for: " << hname << " in file: " << file->GetName() << " !! skipping!\n";
       return 0;
     }
 
-    if (hname.EndsWith("16")) {
+    int biny = histUp->GetYaxis()->FindBin(m1);
+    int binz = histUp->GetZaxis()->FindBin(m2);
+    double yldup = histUp->GetBinContent(metbin, biny, binz);
+    double ylddn = histDn->GetBinContent(metbin, biny, binz);
+
+    if (yearseparated && hname.EndsWith("16")) {
       TString hname3 = hname(0,hname.Index("metbins")+7);
       TH1* histCen = (TH1*) file->Get(hname3.Data());
       TH1* histCen16 = (TH1*) fsig16->Get(hname3.Data());
@@ -167,7 +187,7 @@ int getUncertainties(double& errup, double& errdn, double origyield, TFile* file
       yldup = histUp16->GetBinContent(metbin, biny, binz) + yld16;
       ylddn = histDn16->GetBinContent(metbin, biny, binz) + yld16;
     } 
-    else if (hname.EndsWith("17")) {
+    else if (yearseparated && hname.EndsWith("17")) {
       TString hname3 = hname(0,hname.Index("metbins")+7);
       TH1* histCen = (TH1*) file->Get(hname3.Data());
       TH1* histCen17 = (TH1*) fsig17->Get(hname3.Data());
@@ -177,7 +197,7 @@ int getUncertainties(double& errup, double& errdn, double origyield, TFile* file
       yldup = histUp17->GetBinContent(metbin, biny, binz) + yld17;
       ylddn = histDn17->GetBinContent(metbin, biny, binz) + yld17;
     } 
-    else if (hname.EndsWith("18")) {
+    else if (yearseparated && hname.EndsWith("18")) {
       TString hname3 = hname(0,hname.Index("metbins")+7);
       TH1* histCen = (TH1*) file->Get(hname3.Data());
       TH1* histCen18 = (TH1*) fsig18->Get(hname3.Data());
@@ -293,7 +313,7 @@ int addCorrelatedUnc(std::ostringstream *fLogStream, string name, double *d, dou
     }
     // else if(fabs(d[i]-1.)<10e-10&&fabs(u[i]-1.)<10e-10) *fLogStream << "- ";
     else if(d[i]>=0&&u[i]>=0) {
-      *fLogStream << TMath::Max(TMath::Min(1.999,u[i]),0.001) << "/" << TMath::Max(TMath::Min(1.999,d[i]),0.001) << " ";
+      *fLogStream << TMath::Max(TMath::Min(1.999,d[i]),0.001) << "/" << TMath::Max(TMath::Min(1.999,u[i]),0.001) << " ";
     }
     else if (u[i] >= 0 && d[i] < 0) {
       *fLogStream << u[i] << " ";
@@ -340,7 +360,8 @@ int addOneUnc(std::ostringstream *fLogStream, string name, double d, double u, i
     else        *fLogStream << 1./d << " ";//only one uncertainty
   }
   else {
-    *fLogStream << TMath::Max(TMath::Min(1.999,u),0.001) << "/" << TMath::Max(TMath::Min(1.999,d),0.001) << " ";
+    // *fLogStream << TMath::Max(TMath::Min(1.999,u),0.001) << "/" << TMath::Max(TMath::Min(1.999,d),0.001) << " ";
+    *fLogStream << TMath::Max(TMath::Min(1.999,d),0.001) << "/" << TMath::Max(TMath::Min(1.999,u),0.001) << " ";
   }
   for(int i = process + 1; i<maxnprocess; ++i) *fLogStream << "- ";
   *fLogStream << endl;
@@ -355,8 +376,7 @@ int makeCardForOneBin(TString dir, int mstop, int mlsp, int metbin, int bin, TSt
   TString hname_Z  = hname + "_"; // + "_Znunu_";
   // TString hname_sig = hname + signame(4, 12);  // signame format: "T2tt_1200_900"
   TString hname_sig = dir + "/hSMS_metbins";
-  bool fullsimsig = (mstop == -1 && mlsp == -1);
-  if (fullsimsig) hname_sig = hname;
+  if (mstop == -1 && mlsp == -1) hname_sig = hname;
 
   // constants uncertainties
   // TODO: numbers to be updated for new analysis
@@ -364,7 +384,7 @@ int makeCardForOneBin(TString dir, int mstop, int mlsp, int metbin, int bin, TSt
   // if (bin == 1 || bin == 4 || bin == 8 || bin == 11)  // TODO: To use better scheme for these
   //   triggerrDn = 0.95;
   double triggerrUp  = 1.01;
-  double lumierr     = 1.025;
+  double lumierr     = 1.014;  // 1.025 for envelope
   double lepvetoerr  = 1.03;
 
   // these are the yields and statistical uncertainties
@@ -457,7 +477,8 @@ int makeCardForOneBin(TString dir, int mstop, int mlsp, int metbin, int bin, TSt
       getUncertainties(systUp, systDn, osig, fsig, hname_sig+"_"+syst.c_str(), metbin, mstop, mlsp);
       numnuis += addOneUnc(fLogStream, syst+"SystSig", systDn, systUp, 0,  -1, "lnN");
     }
-    numnuis += addOneUnc(fLogStream, "lepVetoSyst", lepvetoerr, -1, 0, bin, "lnN");
+    // numnuis += addOneUnc(fLogStream, "lepVetoSyst", lepvetoerr, -1, 0, bin, "lnN"); // <-- uncorrelated version
+    numnuis += addOneUnc(fLogStream, "lepVetoSyst", lepvetoerr, -1, 0, -1, "lnN"); // <-- correlated version
   }
 
   auto addStatUncsDataDriven = [&](TFile* fbkg, string bgname, int proc) {
@@ -524,7 +545,7 @@ int makeCardForOneBin(TString dir, int mstop, int mlsp, int metbin, int bin, TSt
         if (syst.find("softbSF") == 0 && !dir.EndsWith("J")) continue;
 
         string suf = "SystBG";
-        if (std::find(systNames_sig.begin(), systNames_sig.end(), syst) == systNames_sig.end() && syst != "pdf" && syst != "alphas" && syst != "ISR16") {
+        if (std::find(systNames_sig.begin(), systNames_sig.end(), syst) == systNames_sig.end() && (fullsimsig || (syst != "pdf" && syst != "alphas" && syst != "ISR16"))) {
           getUncertainties(uperr[0], dnerr[0], osig, fsig, hname_sig+"_"+syst.c_str(), metbin, mstop, mlsp);
           suf = "Syst";
         }
@@ -562,7 +583,11 @@ int makeCardForOneBin(TString dir, int mstop, int mlsp, int metbin, int bin, TSt
     // bgZnunu
     for (string syst : systNames_bgZnunu) {
       double systUp, systDn;  // <-- use both up and down error here until otherwise instructed
-      getUncertainties(systUp, systDn, bgznunu, fznunu, hname_Z+syst.c_str(), metbin);
+      if (syst == "ttZxsec") {
+        systUp = 1.0821; systDn = 0.9179;
+      } else {
+        getUncertainties(systUp, systDn, bgznunu, fznunu, hname_Z+syst.c_str(), metbin);
+      }
       numnuis += addOneUnc(fLogStream, syst+"SystZ", systDn, systUp, 4,  -1, "lnN");
     }
   }
@@ -600,6 +625,11 @@ void makeCardsForPoint(TString signal, int mstop, int mlsp, TString outdir) {
 
   if (outdir.Contains("m17fullsplit"))
     dirlist = vector<TString> {"srA1", "srA2", "srB", "srC1", "srC2", "srC3", "srD", "srE1", "srE2", "srE3", "srF", "srG1", "srG2", "srG3", "srH"};
+
+  if (fullsimsig) {
+    systNames_sig.clear();
+    dogenmet = false;
+  }
 
   int nbintot = 1;
   // Loop through list of every directory in the signal file.
@@ -723,16 +753,26 @@ int newCardMaker(string signal, string input_dir="../StopLooper/output/temp", st
   set<pair<int, int> > signal_points;
 
   // TH2D* hpoints = (TH2D*) fsig->Get("srbase/h2d_signal_masspts");
-  TH2D* hpoints = (TH2D*) fsig->Get("srbase/h2d_sigpts_ylds");
+  string hname_sigpts = "srbase/h2d_sigpts_ylds";
+  int ibgn_m1(150), iend_m1(1550), istp_m1(25);
+  int ibgn_m2(0)  , iend_m2(1150), istp_m2(25);
+
+  if (signal.find("ttbarDM") != string::npos) {
+    hname_sigpts = "srbase/h2d_ttDMpts_ylds";
+    ibgn_m1 = 50; iend_m1 = 550; istp_m1 = 50;
+    ibgn_m2 =  0; iend_m2 =  55; istp_m2 =  1;
+    fullsimsig = true;
+    dogenmet = false;
+  }
+
+  TH2D* hpoints = (TH2D*) fsig->Get(hname_sigpts.c_str());
   if (!hpoints) {
     cout << "Cannot find signal mass points hist in " << fsig->GetName() << endl;
     return -1;
   }
 
-  for (int im1 = 150; im1 <= 1550; im1 += 25) {
-    for (int im2 = 0; im2 <= 1150; im2 += 25) {
-      // if (im1 < 900 && im2 < 400) continue;
-      // if (im1 - im2 > 150) continue;
+  for (int im1 = ibgn_m1; im1 <= iend_m1; im1 += istp_m1) {
+    for (int im2 = ibgn_m2; im2 <= iend_m2; im2 += istp_m2) {
       if (hpoints->GetBinContent(hpoints->FindBin(im1, im2)) == 0) continue;
       int mstop = im1;
       int mlsp = im2;
@@ -747,8 +787,8 @@ int newCardMaker(string signal, string input_dir="../StopLooper/output/temp", st
         mlsp = mstop - 175;
         mstop += 8;
       }
+      // if (not(mstop == 250 && mlsp == 1) ) continue;  // Temporary for testing only
       cout << "Making cards for point: " << Form("%s_%d_%d", signal.c_str(), mstop, mlsp) << endl;
-      if (not((mstop == 175 && mlsp == 1) || (mstop == 250 && mlsp == 50) || (mstop == 250 && mlsp == 75))) continue;
       makeCardsForPoint(signal.c_str(), mstop, mlsp, output_dir.c_str());
       signal_points.insert( make_pair(mstop, mlsp) );
     } // scanM2 loop
