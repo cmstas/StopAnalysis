@@ -36,6 +36,7 @@
 
 // StopCORE
 #include "../StopCORE/eventWeight_lepSF.h"
+#include "../StopCORE/ttbarDMutils.h" // special extension
 
 // CORE/Tools
 #include "goodrun.h"
@@ -296,6 +297,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
   bool isDataFromFileName;
   bool isSignalFromFileName;
   bool isTChiFromFileName = false;
+  bool isDMFromFileName = false;
   string outfilestr(output_name);
   string filestr(chain->GetFile()->GetName());
   cout << "[looper] >> The output name will be " << output_name << ".root";
@@ -312,6 +314,13 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
       isSignalFromFileName = false;
     if (filestr.find("TChi") != std::string::npos)
       isTChiFromFileName = true;
+  }
+  else if (filestr.find("TTbarDMJets") != std::string::npos) {
+    isDataFromFileName = false;
+    isSignalFromFileName = true;
+    isDMFromFileName = true;
+    StopEvt.kGenweightSize = 150;
+    cout << ", running on TTbarDM signals, based on input file name." << endl;
   }
   else {
     isDataFromFileName = false;
@@ -713,7 +722,25 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
       float mStop = -1;
       float mLSP = -1;
       //This must come before any continue affecting signal scans
-      if(isSignalFromFileName && !isFastsim){
+      if (isDMFromFileName) {
+        unsigned int nevt(1);
+        int ttbarDMtype = (filestr.find("pseudo") != std::string::npos)? -1 : 1;
+        std::tie(mLSP, mStop, nevt) = ttdm::getDMMassesByLumi(ttbarDMtype, gconf.year, StopEvt.ls);
+        if (mStop <= 0 || nevt <= 0) {
+          cout << "[looper] >> Invalid nEvents " << nevt << " for mphi = " << mStop << ", mchi = " << mLSP << ", nevt= " << nevt << ", dataset= " << StopEvt.dataset << endl;
+        } else {
+          float sgnMCweight = (genweights()[0] > 0)? 1 : -1;
+          StopEvt.xsec     = sgnMCweight * ttdm::getXsecTTbarDM(ttbarDMtype, mLSP, mStop);
+          StopEvt.scale1fb = 1000 * StopEvt.xsec / nevt;
+        }
+        StopEvt.mass_stop = mStop;
+        StopEvt.mass_lsp = mLSP;
+        if (genweights()[0] > 0)      histNEvts->Fill(mStop,mLSP,1);
+        else if (genweights()[0] < 0) histNEvts->Fill(mStop,mLSP,-1);
+        if (genweights()[0] > 0)      counterhistSig->Fill(mStop,mLSP,36,1);
+        else if (genweights()[0] < 0) counterhistSig->Fill(mStop,mLSP,36,-1);
+      }
+      else if (isSignalFromFileName && !isFastsim) {
         int posi = filestr.find("mStop-") + 6;
         mStop = atof(filestr.substr(posi, filestr.find("_", posi) - posi).c_str());
         posi = filestr.find("mLSP-", posi) + 5;
@@ -721,7 +748,8 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
         StopEvt.mass_stop = mStop;
         StopEvt.mass_lsp = mLSP;
       }
-      if(isSignalFromFileName && isFastsim){
+
+      if (isSignalFromFileName && isFastsim) {
         //get stop and lsp mass from sparms
         if (gconf.cmssw_ver >= 94) {  // the sparm_names no longer exists after this
           if (sparm_values().size() < 2) cout << "[looper] ERROR: Sample is determined fastsim but not having 2 sparm values!!\n";
@@ -846,7 +874,41 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
         }
       }// is signal
       else if(!evt_isRealData()){
-        if (StopEvt.cms3tag.find("CMS4_V1") == 0) {
+        if (isDMFromFileName) {
+          if (genweights().size() > 148) {
+            double genw0inv = (genweights()[0] == 0)? 1 : 1.0 / genweights()[0];  // inverse of the central gen weight [0]
+            double sum_pdfweight_sq = 0;
+            for (int i = 0; i < 100; ++i) {
+              double iwgt = genweights()[47+i] * genw0inv - 1;
+              sum_pdfweight_sq += iwgt*iwgt;
+            }
+            double err_pdfweight = sqrt(sum_pdfweight_sq);  // Hessian
+            StopEvt.pdf_up_weight      = 1 + err_pdfweight;
+            StopEvt.pdf_down_weight    = 1 - err_pdfweight;
+            StopEvt.weight_Q2_up       = genweights()[21] * genw0inv;
+            StopEvt.weight_Q2_down     = genweights()[41] * genw0inv;
+            StopEvt.weight_muF_up      = genweights()[16] * genw0inv;
+            StopEvt.weight_muF_down    = genweights()[31] * genw0inv;
+            StopEvt.weight_muR_up      = genweights()[6] * genw0inv;
+            StopEvt.weight_muR_down    = genweights()[11] * genw0inv;
+            StopEvt.weight_alphas_up   = genweights()[147] * genw0inv;
+            StopEvt.weight_alphas_down = genweights()[148] * genw0inv;
+            counterhistSig->Fill(mStop, mLSP, 1,  genweights()[0]            );
+            counterhistSig->Fill(mStop, mLSP, 2,  StopEvt.weight_muF_up      );
+            counterhistSig->Fill(mStop, mLSP, 3,  StopEvt.weight_muF_down    );
+            counterhistSig->Fill(mStop, mLSP, 4,  StopEvt.weight_muR_up      );
+            counterhistSig->Fill(mStop, mLSP, 5,  StopEvt.weight_Q2_up       );
+            counterhistSig->Fill(mStop, mLSP, 6,  genweights()[36]           );
+            counterhistSig->Fill(mStop, mLSP, 7,  StopEvt.weight_muR_down    );
+            counterhistSig->Fill(mStop, mLSP, 8,  genweights()[26]           );
+            counterhistSig->Fill(mStop, mLSP, 9,  StopEvt.weight_Q2_down     );
+            counterhistSig->Fill(mStop, mLSP, 10, StopEvt.pdf_up_weight      );
+            counterhistSig->Fill(mStop, mLSP, 11, StopEvt.pdf_down_weight    );
+            counterhistSig->Fill(mStop, mLSP, 12, StopEvt.weight_alphas_up   );
+            counterhistSig->Fill(mStop, mLSP, 13, StopEvt.weight_alphas_down );
+          }
+        }
+        else if (StopEvt.cms3tag.find("CMS4_V1") == 0) {
           // The correctly yearly normalized gen_LHEweight branches are available since CMS4_V10-02-04
           // note that the gen_LHEweight branches are already ratios wrt nominal
           StopEvt.pdf_up_weight      = gen_LHEweight_PDFVariation_Up();

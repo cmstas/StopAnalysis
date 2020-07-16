@@ -40,6 +40,8 @@ private:
     std::string prefix_;
     eventFilter metFilterTxt;
 public:
+    unsigned long kGenweightSize;  // default to 112
+
     // branch objects
     unsigned int run;
     unsigned int ls;

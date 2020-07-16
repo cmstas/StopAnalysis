@@ -520,6 +520,7 @@ if __name__ == "__main__":
         # "GJets_HT600toInf" : "/GJets_HT-600ToInf_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM",
 
         # Fullsim signal points
+        "ttHtoInv_s16v3" : "/ttH_HToInvisible_M125_TuneCUETP8M1_13TeV_powheg_pythia8/RunIISummer16MiniAODv3-PUMoriond17_94X_mcRun2_asymptotic_v3-v1/MINIAODSIM",
         "TTbarDMJets_scalar_s16v3" : "/TTbarDMJets_Inclusive_scalar_LO_TuneCP5_13TeV-madgraph-mcatnlo-pythia8/RunIISummer16MiniAODv3-PUMoriond17_rp_94X_mcRun2_asymptotic_v3-v1/MINIAODSIM",
         "TTbarDMJets_pseudo_s16v3" : "/TTbarDMJets_Inclusive_pseudoscalar_LO_TuneCP5_13TeV-madgraph-mcatnlo-pythia8/RunIISummer16MiniAODv3-PUMoriond17_rp_94X_mcRun2_asymptotic_v3-v1/MINIAODSIM",
 
@@ -562,7 +563,7 @@ if __name__ == "__main__":
     for babyname, dsname in snt_samples.items():
         cmsswver = "CMSSW_10_1_0"
         scramarch = "slc6_amd64_gcc700"
-        tag = "v32_1"
+        tag = "v32_2"
         # if "a18v1" in babyname: tag = "v31_8"
         tarfile = "tarfiles/input_"+tag+".tar.gz"
         cms3tag = "CMS4_V08-00-06" if "80X" in dsname else None

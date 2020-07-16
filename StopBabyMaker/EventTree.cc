@@ -12,7 +12,7 @@ EventTree::EventTree ()
 }
  
 EventTree::EventTree (const std::string &prefix)
-    : prefix_(prefix)
+    : prefix_(prefix), kGenweightSize(112)
 {
 }
 
@@ -117,10 +117,10 @@ void EventTree::FillCommon (const std::string &root_file_name)
       kfactor  = evt_kfactor();
 //      pu_nvtxs = puInfo_nPUvertices().at(6);
       if(puInfo_trueNumInteractions().size()>0) pu_ntrue = puInfo_trueNumInteractions().at(0);
-      // Only store the first 150 genweights <-- new after 94X to have > 1000 genweights taking up unnecessary spaces.
-      ngenweights = std::min(cms3.genweights().size(), 150UL);
+      // Only store the first 112 genweights, unless specified otherwise <-- new after 94X to have > 1000 genweights taking up unnecessary spaces.
+      ngenweights = std::min(cms3.genweights().size(), kGenweightSize);
       genweights = vector<float>(cms3.genweights().begin(), cms3.genweights().begin()+ngenweights);
-      genweightsID = vector<string>(cms3.genweightsID().begin(), cms3.genweightsID().begin()+std::min(cms3.genweightsID().size(), 112UL));
+      genweightsID = vector<string>(cms3.genweightsID().begin(), cms3.genweightsID().begin()+std::min(cms3.genweightsID().size(), (unsigned long)ngenweights));
 
       if(fastsim){
 	sparms_values = sparm_values();
