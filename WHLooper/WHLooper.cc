@@ -650,10 +650,10 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
     cout << "[looper] >> Sample detected with year = " << year_ << " and version = " << samplever << endl;
 
     is_fastsim_ = dsname.Contains("SMS") || fname.Contains("SMS") || fname.Contains("Signal");
-    //if(dsname.Contains("TChi")) is_fastsim_=false;
+    if(dsname.Contains("mChargino")) is_fastsim_=false; //This is a fullsim point
     babyver = TString(samplever).ReplaceAll("v","").ReplaceAll("_",".").Atof();
 
-
+    cout<<"WHLooper: is_fastsim_: "<<is_fastsim_<<endl;
     // Get event weight histogram from baby
     TH3D* h_sig_counter = nullptr;
     TH2D* h_sig_counter_nEvents = nullptr;
@@ -673,7 +673,7 @@ void WHLooper::looper(TChain* chain, string samplestr, string output_dir, int je
     evtWgt.apply_HEMveto_el_sf = doHEMElectronVeto;
     evtWgt.apply_HEMveto_jet_sf = doHEMJetVeto;
 
-    evtWgt.Setup(samplestr, year_, doSystVariations, applyBtagSFfromFiles, applyLeptonSFfromFiles, true);
+    evtWgt.Setup(samplestr, year_, doSystVariations, applyBtagSFfromFiles, applyLeptonSFfromFiles, true, dsname);
 
     evtWgt.getCounterHistogramFromBaby(&file);
 

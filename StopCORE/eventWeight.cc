@@ -338,9 +338,10 @@ evtWgtInfo::evtWgtInfo() {
 
 //////////////////////////////////////////////////////////////////////
 
-void evtWgtInfo::Setup(string samplestr, int inyear, bool applyUnc, bool useBTagUtils, bool useLepSFUtils, bool WH) {
+void evtWgtInfo::Setup(string samplestr, int inyear, bool applyUnc, bool useBTagUtils, bool useLepSFUtils, bool WH, TString ds_name) {
   isWH = WH;
 
+  dsname = ds_name;
   samptype = findSampleType(samplestr);
   year = inyear;
 
@@ -366,7 +367,7 @@ void evtWgtInfo::Setup(string samplestr, int inyear, bool applyUnc, bool useBTag
   } else if ( samptype == fastsim || samptype == fs17ext1 ) {
       is_fastsim_ = true;
   }
-  is_bkg_ = !is_data_ && !is_fastsim_;
+  is_bkg_ = !is_data_ && !is_fastsim_ && !isTChi;
 
   // The event counter hists setup is postponed to the file loop
   apply_genweights_unc = applyUnc;
@@ -381,7 +382,7 @@ void evtWgtInfo::Setup(string samplestr, int inyear, bool applyUnc, bool useBTag
   }
 
   // Get Signal XSection File
-  if ( is_fastsim_ && susy_xsec_fromfile ) {
+  if ( (is_fastsim_ || isTChi ) && susy_xsec_fromfile ) {
     if(!isTChi){
          f_sig_xsec = new TFile("../CORE/Tools/susyxsecs/xsec_susy_13tev_run2.root","read");
          h_sig_xsec = (TH1D*) f_sig_xsec->Get("h_xsec_stop");
@@ -507,7 +508,7 @@ void evtWgtInfo::Cleanup() {
     if (useLepSFs_fromFiles) delete lepSFUtil;
     if (apply_WH_trig_eff) f_WH_trig_eff->Close();
   }
-  if ( is_fastsim_ ) {
+  if ( is_fastsim_ || isTChi) {
     f_sig_xsec->Close();
     delete f_sig_xsec;
   }
@@ -693,8 +694,14 @@ void evtWgtInfo::calculateWeightsForEvent() {
   // If sample is data
   if ( is_data_ ) return;
   // Get SUSY masses if sample is signal scan
-  if ( is_fastsim_ ) getSusyMasses( mStop, mLSP );
+  if ( is_fastsim_ ) getSusyMasses( mStop, mLSP ); 
+  else if (!is_fastsim_ && isTChi){
+    if(dsname.Contains("mChargino350")) {mStop = 350; mLSP = 100;}
+    else if(dsname.Contains("mChargino750")) {mStop = 750; mLSP = 1;}
+  }
+ 
 
+  // cout<<"Got SUSY masses: "<<mStop<<" "<<mLSP<<endl;
   // Get nEvents
   getNEvents( nEvents );
 
@@ -1023,7 +1030,7 @@ void evtWgtInfo::calculateWeightsForEvent() {
 //////////////////////////////////////////////////////////////////////
 
 void evtWgtInfo::getSusyMasses( int &mStop, int &mLSP ) {
-  if ( is_fastsim_ ) {
+  if ( is_fastsim_ || isTChi) {
     mStop     = babyAnalyzer.mass_stop();
     mLSP      = babyAnalyzer.mass_lsp();
     // Protection against the 25 Gev bin size for the extra fine scans in the corridors <-- moving scheme need to sync with the babymaker!
@@ -1060,7 +1067,7 @@ void evtWgtInfo::getXSecWeight( double &xsec_val, double &weight_xsec_up, double
   double xsec_err = 0.0;
 
   //Need to double check this for WH
-  if ( is_fastsim_ && susy_xsec_fromfile ) {
+  if ( (is_fastsim_ || isTChi) && susy_xsec_fromfile ) {
     xsec_val = h_sig_xsec->GetBinContent(h_sig_xsec->FindBin(mStop));
     xsec_err = h_sig_xsec->GetBinError(h_sig_xsec->FindBin(mStop));
     //Adjust for branching ratio built in to TChi W->lnu and H->bb samples
@@ -2963,7 +2970,8 @@ evtWgtInfo::SampleType evtWgtInfo::findSampleType( string samplestr ) {
   else if (sample.BeginsWith("W") && sample.Contains("Jets")) samptype = Wjets;
   else if (sample.BeginsWith("WZ")) samptype = WZ;
   else if (sample.BeginsWith("SMS") && sample.Contains("f17v2_ext1")) samptype = fs17ext1;
-  else if (sample.BeginsWith("SMS") || sample.BeginsWith("Signal") ) samptype = fastsim;
+  else if ((sample.BeginsWith("SMS") || sample.BeginsWith("Signal")) && !sample.Contains("SMS_TChiWH_mCh")) samptype = fastsim;
+  else if ((sample.BeginsWith("SMS") || sample.BeginsWith("Signal")) && sample.Contains("SMS_TChiWH_mCh")) samptype = fullsim_signal;
   else cout << "[eventWeight] >> Cannot assigned sampletype for " << samplestr << endl;
 
   if (sample.BeginsWith("TTJets") && sample.EndsWith("fs")) is_fsttbar = true;

@@ -98,8 +98,10 @@ class evtWgtInfo {
   bool add2ndLepToMet;
   int srtype;
 
-  enum SampleType {data, ttbar, Wjets, singletop, ttW, ttZ, WZ, diboson, fastsim, fs17ext1, unknown=-1 } samptype;
+  enum SampleType {data, ttbar, Wjets, singletop, ttW, ttZ, WZ, diboson, fastsim, fs17ext1, fullsim_signal, unknown=-1 } samptype;
   enum SystSet {stop_Moriond17, stop_Run2,stop_Moriond17_nobtag, WH_Run2,  WH_Run2_nobtag, puOnly, ISROnly, test_alloff, L1Only};
+
+  TString dsname;
 
   bool isTChi;
   bool isWH;
@@ -341,7 +343,7 @@ class evtWgtInfo {
   double sf_extra_event; // special weight that has to be associate with spcific event
 
   evtWgtInfo();
-  void Setup(std::string sample, int year = 0, bool applyUnc=true, bool useBTagUtils=false, bool useLepSFUtils=false, bool isWH = false);
+  void Setup(std::string sample, int year = 0, bool applyUnc=true, bool useBTagUtils=false, bool useLepSFUtils=false, bool isWH = false, TString ds_name="");
   void Cleanup();
   void resetEvent();
   void getCounterHistogramFromBaby( TFile *sourceFile );
