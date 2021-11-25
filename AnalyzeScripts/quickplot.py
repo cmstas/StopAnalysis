@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+from __future__ import print_function, division
+
 import os
 import sys
 from math import sqrt
@@ -49,6 +52,347 @@ def DrawHeaderText(canvas, lumi=137.2, state="Preliminary"):
         canvas.cd()
         text = "{0} {1}^{{-1}} ({2} TeV)".format(lumi,"fb",13)
         ttext.DrawLatex(1.0-canvas.GetRightMargin()-0.01, 1.0-canvas.GetTopMargin()+0.012, text)
+
+
+def makeplot(hdir, hname='met', samp='', rebin=1, y2=None, newrange=None, norm=True, *arg, **kwargs):
+
+    sampsuf = '' if samp == '' else '_'+samp
+    doscale = (norm != False)
+
+    # keyword arguments
+    h2 = kwargs.get('h2', True)
+    h3 = kwargs.get('h3', False)
+    fname = kwargs.get('fname', '')
+    sdir  = kwargs.get('sdir', 'temp')
+    # hname = kwargs.get('hname', '')
+    fh1 = r.TFile( kwargs.get('fname1', fname) )
+    fh2 = r.TFile( kwargs.get('fname2', fname) ) if h2 else None
+    fh3 = r.TFile( kwargs.get('fname3', fname) ) if h3 else None
+    hn1 = '{0}{3}/h_{1}{2}{3}'.format( kwargs.get('hdir1', hdir), kwargs.get('hname1', hname), kwargs.get('hsuf1', ''), kwargs.get('ssuf1', sampsuf))
+    hn2 = '{0}{3}/h_{1}{2}{3}'.format( kwargs.get('hdir2', hdir), kwargs.get('hname2', hname), kwargs.get('hsuf2', ''), kwargs.get('ssuf2', sampsuf)) if h2 else None
+    hn3 = '{0}{3}/h_{1}{2}{3}'.format( kwargs.get('hdir3', hdir), kwargs.get('hname3', hname), kwargs.get('hsuf3', ''), kwargs.get('ssuf3', sampsuf)) if h3 else None
+    hh1 =  kwargs.get('hist1', fh1.Get(hn1))
+    hh2 =  kwargs.get('hist2', fh2.Get(hn2) if h2 else None)
+    hh3 =  kwargs.get('hist3', fh3.Get(hn3) if h3 else None)
+    nh1 = '{} {}'.format( kwargs.get('legn', ''), kwargs.get('ysuf1', '') )
+    nh2 = '{} {}'.format( kwargs.get('legn', ''), kwargs.get('ysuf2', '') )
+    nh3 = '{} {}'.format( kwargs.get('legn', ''), kwargs.get('ysuf3', '') )
+    rtype = kwargs.get('rtype', 'Ratio')
+
+    if not hh1: print( 'Cannot find {} in {}'.format( hn1, kwargs.get('fname1', fname)) )
+    if h2 and not hh2: print( 'Cannot find hist {} in {}'.format(hn2, kwargs.get('fname2', fname)) )
+    if h3 and not hh3: print( 'Cannot find hist {} in {}'.format(hn3, kwargs.get('fname3', fname)) )
+
+    setrange = True if type(newrange) == list and len(newrange) > 1 else False
+    newmax = newrange[1] if setrange else -1
+    if kwargs.get('moveOFbin', True):
+        moveOverFlowToLastBin1D(hh1,newmax)
+        if h2: moveOverFlowToLastBin1D(hh2,newmax)
+        if h3: moveOverFlowToLastBin1D(hh3,newmax)
+
+    if rebin != 1:
+        hh1.Rebin(rebin)
+        if h2: hh2.Rebin(rebin)
+        if h3: hh3.Rebin(rebin)
+
+    if setrange:
+        hh1.GetXaxis().SetRangeUser(newrange[0], newrange[1])
+        if h2: hh2.GetXaxis().SetRangeUser(newrange[0], newrange[1])
+        if h3: hh3.GetXaxis().SetRangeUser(newrange[0], newrange[1])
+
+    c0 = r.TCanvas('c0', 'c0', 800, 800)
+
+    if h2 and rtype:
+        ratpad_height = kwargs.get("ratpad_size", 0.20)
+        mainPad = r.TPad('1', '1', 0.0, ratpad_height, 1.0, 0.99)
+        ratioPad = r.TPad('2', '2', 0.0, 0.02, 1.0, ratpad_height+0.04)
+    else:
+        c0 = r.TCanvas('c0', 'c0', 800, 640)
+        mainPad = r.TPad('1', '1', 0.0, 0.00, 1.0, 0.99)
+
+    r.SetOwnership(c0, False)
+    r.SetOwnership(mainPad, False)
+    if h2 and rtype: r.SetOwnership(ratioPad, False)
+
+    mainPad.SetTopMargin(0.08)
+    mainPad.SetLeftMargin(0.12)
+    mainPad.SetRightMargin(0.05)
+    mainPad.SetBottomMargin(0.14)
+    if kwargs.get('logy', True):
+        mainPad.SetLogy()
+    else:
+        mainPad.SetLogy(0)
+    mainPad.Draw()
+    if h2 and rtype:
+        ratioPad.SetTopMargin(0.05)
+        ratioPad.SetLeftMargin(0.12)
+        ratioPad.SetRightMargin(0.05)
+        ratioPad.SetBottomMargin(0.10)
+        ratioPad.Draw()
+
+    mainPad.cd()
+
+    hh1.SetTitle('')
+    if kwargs.get('xtitle', None):
+        hh1.GetXaxis().SetTitle(kwargs.get('xtitle'))
+    hh1.GetYaxis().SetTitle(kwargs.get('ytitle', 'Events'))
+    hh1.GetYaxis().SetTitleOffset(0.75)
+    hh1.GetYaxis().SetTitleSize(0.058)
+    hh1.GetYaxis().SetTickSize(0.015)
+    if h2: hh1.GetXaxis().SetTitleSize(0.046)
+    else: hh1.GetXaxis().SetTitleSize(0.054)
+
+    hh1.SetLineWidth(2)
+    if h2: hh2.SetLineWidth(2)
+    if h3: hh3.SetLineWidth(2)
+
+    hh1.SetMarkerSize(1.3)
+    if h2: hh2.SetMarkerSize(1.3)
+    if h3: hh3.SetMarkerSize(1.3)
+
+    hh1.SetMarkerStyle(25)
+    if h2: hh2.SetMarkerStyle(kwargs.get('marker2', 26))
+    if h3: hh3.SetMarkerStyle(kwargs.get('marker3', 24))
+
+    hh1.SetLineColor(r.kGreen+3)
+    # if h2: hh2.SetLineColor(r.kOrange+3)
+    if h2: hh2.SetLineColor(kwargs.get('color2', r.kRed))
+    if h3: hh3.SetLineColor(kwargs.get('color3', r.kBlue))
+
+    if not h3 and 'data' in nh2:
+        hh2.SetMarkerStyle(20)
+        hh2.SetLineColor(r.kBlack)
+
+    if kwargs.get('ymax', None):
+        hh1.SetMaximum(kwargs.get('ymax'))
+    if kwargs.get('ymin', None):
+        hh1.SetMinimum(kwargs.get('ymin'))
+
+    if 'TFvals' in fname:
+        # c0 = r.TCanvas('c0', 'c0', 800, 500)
+        mainPad.SetLogy(0)
+        if 'eq0j' in sampsuf:
+            hh1.SetMaximum(0.5)
+        else:
+            hh1.SetMaximum(0.25)
+        hh1.SetMinimum(0.0)
+        hh1.GetYaxis().SetTitle('Weights')
+
+    if kwargs.get('prt_scale', False) and h2:
+        err1 = r.Double()
+        int1 = hh1.IntegralAndError(0,-1,err1)
+        ehi1 = E(int1, err1)
+        int2 = hh2.IntegralAndError(0,-1,err1)
+        ehi2 = E(int2, err1)
+        escale = ehi1/ehi2
+        print('scale = {} for {}'.format(escale.round(4), hname))
+
+    scale = hh1.Integral()/hh2.Integral() if h2 else 1
+    if norm == 'lumi':
+        if h2: hh2.Scale(35.92/41.53)
+        if h3: hh3.Scale(35.9/59.74)
+    elif type(norm) == list:
+        if h2: hh2.Scale(norm[0])
+        if h3: hh3.Scale(norm[1])
+    elif doscale:
+        if h2: hh2.Scale(hh1.Integral()/hh2.Integral())
+        if h3: hh3.Scale(hh1.Integral()/hh3.Integral())
+
+    hh1.Draw()
+    if h2: hh2.Draw("same")
+    if h3: hh3.Draw("same")
+
+    legpos = 'tr'
+    txtpos = (0.58, 0.64)
+    selpos = (0.86, 0.56)
+
+    if 'dphi' in hname or 'n' == hname[0] or 'Djj' in hname  :
+        legpos = 'bl'
+    elif 'Efrac' in hname or 'eta' in hname:
+        legpos = 'bm'
+    elif 'TFvals' in fname:
+        legpos = 'br'
+
+    legpos = kwargs.get('legpos', legpos)
+
+    if legpos.lower() == 'tl':
+        legpos = [0.14, 0.68, 0.5, 0.89]
+        txtpos = (0.14, 0.64)
+    elif legpos.lower() == 'bl':
+        legpos = [0.14, 0.18, 0.5, 0.39]
+        txtpos = (0.14, 0.4)
+        selpos = (0.16, 0.84)
+    elif legpos.lower() == 'tm':
+        legpos = [0.34, 0.68, 0.7, 0.89]
+        txtpos = (0.34, 0.64)
+    elif legpos.lower() == 'bm':
+        legpos = [0.34, 0.18, 0.7, 0.39]
+        txtpos = (0.34, 0.4)
+    elif legpos.lower() == 'bl':
+        legpos = [0.14, 0.18, 0.5, 0.39]
+        txtpos = (0.14, 0.40)
+    elif legpos.lower() == 'br':
+        legpos = [0.58, 0.18, 0.92, 0.39]
+        txtpos = (0.58, 0.40)
+    else:
+        legpos = [0.58, 0.68, 0.92, 0.89]
+        txtpos = (0.58, 0.64)
+
+    if type(legpos) != list:
+        print(legpos)
+
+    if h2: 
+        leg = r.TLegend(*legpos)
+        leg.AddEntry(hh1, nh1)
+        leg.AddEntry(hh2, nh2)
+        if h3: leg.AddEntry(hh3, nh3)
+        leg.Draw()
+
+    selstr = kwargs.get('selstr', '')
+
+    atxt = r.TLatex();
+    atxt.SetNDC();
+    atxt.SetTextSize(0.04);
+    # atxt.SetTextAlign(22);
+    if h2 and doscale and norm != 'arb.' and norm != 'lumi':
+        atxt.DrawLatex(txtpos[0], txtpos[1], "{0} scaled by {1:.3f}".format(nh2,scale));
+
+    # atxt.DrawLatex(txtpos[0], txtpos[1], "Int. (#gamma-trig) = {0}".format(hh2.Integral()));
+    # atxt.DrawLatex(txtpos[0], txtpos[1]-0.035, "Int. (#font[12]{{ll}}-trig) = {0}".format(hh1.Integral()));
+
+    atxt.SetTextSize(0.08);
+    if not h3:
+        atxt.DrawLatex(selpos[0], selpos[1], selstr);
+
+    lumi = 35.9 if '16' in samp else 41.5 if '17' in samp else 59.7 if '18' in samp else kwargs.get('lumi', None)
+    DrawHeaderText(mainPad, lumi)
+    # DrawHeaderText(mainPad, None, 'Simulation')
+    # DrawHeaderText(mainPad, None, 'Preliminary')
+
+    if h2 and rtype:
+        ratioPad.cd()
+
+        h_axis_ratio = r.TH1D('ratio_axis','', hh1.GetNbinsX(), hh1.GetXaxis().GetXmin(), hh1.GetXaxis().GetXmax())
+        h_axis_ratio.GetYaxis().SetNdivisions(4)
+        h_axis_ratio.GetYaxis().SetLabelSize(0.15)
+        h_axis_ratio.GetYaxis().SetRangeUser(kwargs.get('ratioMin', 0), kwargs.get('ratioMax', 2))
+        if 'TFvals' in fname and 'eq0j' in sampsuf:
+            h_axis_ratio.GetYaxis().SetRangeUser(0, 4)
+        h_axis_ratio.GetYaxis().SetTitle(rtype)
+        h_axis_ratio.GetYaxis().SetTitleOffset(0.25)
+        h_axis_ratio.GetYaxis().SetTitleSize(0.18)
+        h_axis_ratio.GetYaxis().SetTickLength(0.01)
+        h_axis_ratio.GetXaxis().SetTickLength(0.07)
+        h_axis_ratio.GetXaxis().SetTitleSize(0.0)
+        h_axis_ratio.GetXaxis().SetLabelSize(0.0)
+        if setrange: h_axis_ratio.GetXaxis().SetRangeUser(newrange[0], newrange[1])
+        h_axis_ratio.Draw('axis')
+
+        line = r.TF1('line1', '1', hh1.GetXaxis().GetXmin(), hh1.GetXaxis().GetXmax())
+        line.SetLineStyle(2)
+        line.SetLineColor(r.kGray+2)
+        line.Draw('same')
+
+        rat = hh2.Clone('ratio_gjetsvsdy')
+        if kwargs.get('is_eff', False):
+            rat = r.TEfficiency(rat, hh1)
+            rat.SetName("heff_h2vsh1")
+            rat.SetMarkerSize(1.3)
+            rat.SetMarkerStyle(kwargs.get('marker2', 26))
+            rat.SetLineColor(kwargs.get('color2', r.kRed))
+        elif kwargs.get('use_binrat', False):
+            rat.Divide(rat, hh1, 1, 1, 'B')
+        else:
+            rat.Divide(hh1)
+        rat.Draw("same")
+        ret_hrat = kwargs.get('ret_hrat', None)
+        if type(ret_hrat) == str:
+            ret_hrat = rat.GetName()
+    if h3 and rtype:
+        rat2 = hh3.Clone('ratio_h3vsdy')
+        if kwargs.get('is_eff', False):
+            rat2 = r.TEfficiency(rat2, hh1)
+            rat2.SetName("heff_h2vsh1")
+            rat2.SetMarkerSize(1.3)
+            rat2.SetMarkerStyle(kwargs.get('marker3', 24))
+            rat2.SetLineColor(kwargs.get('color3', r.kBlue))
+        elif kwargs.get('use_binrat', False):
+            rat2.Divide(rat2, hh1, 1, 1, 'B')
+        else:
+            rat2.Divide(hh1)
+        rat2.Draw("same")
+        ret_hrat2 = kwargs.get('ret_hrat2', None)
+        if ret_hrat2: rat2.Copy(kwargs['ret_hrat2'])
+
+    if kwargs.get('prt_rat', False):
+        for i in range(1, rat.GetNbinsX()+1):
+            rav = rat.GetBinContent(i)
+            rae = rat.GetBinError(i)
+            ra = E(rav, rae)
+            print( "{},".format(ra.round(3) if ra.val > 0 else 0.0), end='')
+        print( "" )
+
+    savename = 'plots/{}/{}_{}_{}{}.pdf'.format(sdir, kwargs.get('snprf', 'plot'), hdir, hname, sampsuf)
+    os.system('mkdir -p plots/{}'.format(sdir))
+    c0.SaveAs(savename)
+    print( 'Plot generated as ', savename)
+    if kwargs.get('png', False):
+        c0.SaveAs(savename.replace('.pdf','.png'))
+    if kwargs.get('show', False): os.system('ic '+savename)
+
+
+def makeSyncCheckPlot():
+    
+    indir = '../StopLooper/output/sampttDM_v32_m10_temp'
+    args = {
+        'h3'     : True,
+        'fname1' : '../StopLooper/output/combRun2_v32_m10_temp/SMS_T2tt_mStop400to1200_run2.root',
+        'fname2' : indir+'/TTbarDMJets_scalar_run2.root',
+        'fname3' : indir+'/TTbarDMJets_pseudo_run2.root',
+        'sdir'   : 'SyncCheck0l/',
+        'ysuf2'  : 'scalar 1 400',
+        'ysuf3'  : 'pseudo 1 400',
+        'ysuf1'  : 'T2tt 750 1',
+        'hsuf2'  : '_400_1',
+        'hsuf3'  : '_400_1',
+        'hsuf1'  : '_750_1',
+        'rtype'  : 'Ratio',
+        'norm'   : False,
+        'lumi'   : 137,
+        'show'   : True,
+        'logy'   : False,
+        # 'legpos' : 'bl',
+        'snprf'  : 'T2tt_run2_lin',
+        'savepng': True,
+    }
+
+    makeplot('testGeneral', 'check_met', '', rebin=2, **args)
+    makeplot('testGeneral', 'check_met_uncorr', '', rebin=2, **args)
+    makeplot('testGeneral', 'check_genmet', '', rebin=2, **args)
+    makeplot('testGeneral', 'check_njets', '', rebin=1, **args)
+    makeplot('testGeneral', 'check_nbjets', '', rebin=1, **args)
+
+def plotMETfiltEff():
+    args = {
+        'h3'     : False,
+        'fname1' : '../StopLooper/output/samp18_v32_s12_nometfilt/allData_18.root',
+        # 'fname2' : '../StopLooper/output/samp18_v32_s11/allData_18.root',
+        'fname2' : '../StopLooper/output/samp18_v32_s11_tighthalo/allData_18.root',
+        # 'fname2' : indir+'/TTbarDMJets_scalar_run2.root',
+        'sdir'   : 'MetFilt/',
+        'ysuf1'  : 'w/o MET filt',
+        'ysuf2'  : 'w/  MET filt',
+        'rtype'  : 'Ratio',
+        'is_eff' : True,
+        'norm'   : False,
+        'lumi'   : 137,
+        'show'   : True,
+    }
+
+    makeplot('srsbfmet4', 'met_h', '', **args)
+    # makeplot('cr2lsbfmet4', 'met', '', **args)
+    # makeplot('cr2lsbfmet4', 'rlmet_h', '', **args)
+
 
 def plotHT5overHT():
     f1 = r.TFile('../StopLooper/output/samp17_v31_m12_noht5/data_2017BtoE.root')
@@ -141,7 +485,7 @@ def plotDataMETinEMuCR(src=0, plot='metbins', hdir='cremuA1', bsuf='v31_m16_noME
     # h16.GetYaxis().SetRangeUser(0, 10000)
     # h16.GetXaxis().SetLabelSize(0)
     h16.GetXaxis().SetTitleSize(0.04)
-    # print h16.GetXaxis().GetTitleOffset()
+    # print( h16.GetXaxis().GetTitleOffset() )
 
     xmax = 800 if h16.GetXaxis().GetXmax() > 800 else h16.GetXaxis().GetXmax()
     moveOverFlowToLastBin1D(h16, xmax)
@@ -291,10 +635,10 @@ def plotDoubleRatio(hdir='cremuA1', bsuf='v31_cremu4', suf='ge1sb'):
     rbkg.GetYaxis().SetRangeUser(0, 0.3)
     rbkg.GetXaxis().SetTitleSize(0.05)
     rbkg.GetXaxis().SetTitleOffset(0.9)
-    print rbkg.GetXaxis().GetTitleOffset()
+    print( rbkg.GetXaxis().GetTitleOffset() )
 
-    # print rdat.GetBinContent(20)
-    # print rbkg.GetBinContent(20)
+    # print( rdat.GetBinContent(20) )
+    # print( rbkg.GetBinContent(20) )
 
     rbkg.Draw()
     rdat.Draw("same")
@@ -750,11 +1094,11 @@ def makeFSSFplots(samp='2017', fn='mtagSF_tGv1', hn='mtag_genbase'):
     c0 = r.TCanvas('c0', 'c0', 800, 600)
 
     # Do fit
-    print samp
+    print( samp )
     # h1.SetBinContent(1,0)
     # h1.SetBinError(1,0)
     h1.Fit('pol0')
-    print ''
+    print( '' )
     # h1.GetXaxis().SetRangeUser(0,45)
 
     h1.Draw()
@@ -809,7 +1153,7 @@ def printRatiosFast(hdir='cremuB1', bsuf='v31_ttagtest', ysuf='17', hn='genb_gen
     hrat.Divide(hrat,hden,1,1,'B')
 
     for ibin in range(1, hrat.GetNbinsX()+1):
-        print ibin, '{:.3f}'.format(hrat.GetBinContent(ibin))
+        print( ibin, '{:.3f}'.format(hrat.GetBinContent(ibin)) )
 
     # fout = r.TFile('./scaler.root','recreate')
 
@@ -851,7 +1195,7 @@ def makeSinglePlot():
     h.GetXaxis().SetLabelSize(0.048)
     h.GetXaxis().SetTitle('#eta (sub-leading gen-lepton)')
 
-    print h.GetXaxis().GetLabelSize(), h.GetXaxis().GetTitleOffset()
+    print( h.GetXaxis().GetLabelSize(), h.GetXaxis().GetTitleOffset() )
 
 
     h.SetLineWidth(2)
@@ -872,7 +1216,9 @@ def makeSinglePlot():
 
 if __name__ == '__main__':
 
-    makeSinglePlot()
+    # makeSinglePlot()
+    # makeSyncCheckPlot()
+    plotMETfiltEff()
 
     # plotDataMETinEMuCR(0, 'metbins')
     # plotDataMETinEMuCR(1, 'metbins')

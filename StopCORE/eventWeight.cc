@@ -272,6 +272,7 @@ evtWgtInfo::Util::Util( systID systematic ) {
 evtWgtInfo::evtWgtInfo() {
   is_bkg_     = false;
   is_data_    = false;
+  is_scan_    = false;
   is_fastsim_ = false;
   sync16      = false;
   verbose     = false;
@@ -354,6 +355,9 @@ void evtWgtInfo::Setup(string samplestr, int inyear, bool applyUnc, bool useBTag
     is_data_ = true;
   } else if ( samptype == fastsim || samptype == fs17ext1 ) {
     is_fastsim_ = true;
+    is_scan_    = true;
+  } else if ( samptype == ttDM ) {
+    is_scan_    = true;
   }
   is_bkg_ = !is_data_ && !is_fastsim_;
 
@@ -500,7 +504,7 @@ void evtWgtInfo::resetEvent() {
 void evtWgtInfo::getCounterHistogramFromBaby( TFile *sourceFile ) {
 
   // Get counter histogram from source file
-  if ( is_fastsim_ ) {
+  if ( is_scan_ ) {
     h_sig_counter = (TH3D*) sourceFile->Get("h_counterSMS");
     h_sig_counter_nEvents = (TH2D*) sourceFile->Get("histNEvts");
   }
@@ -653,7 +657,7 @@ void evtWgtInfo::calculateWeightsForEvent() {
   if ( is_data_ ) return;
 
   // Get SUSY masses if sample is signal scan
-  if ( is_fastsim_ ) getSusyMasses( mStop, mLSP );
+  if ( is_scan_ ) getSusyMasses( mStop, mLSP );
 
   // Get nEvents
   getNEvents( nEvents );
@@ -960,11 +964,11 @@ void evtWgtInfo::calculateWeightsForEvent() {
 //////////////////////////////////////////////////////////////////////
 
 void evtWgtInfo::getSusyMasses( int &mStop, int &mLSP ) {
-  if ( is_fastsim_ ) {
+  if ( is_scan_ ) {
     mStop     = babyAnalyzer.mass_stop();
     mLSP      = babyAnalyzer.mass_lsp();
     // Protection against the 25 Gev bin size for the extra fine scans in the corridors <-- moving scheme need to sync with the babymaker!
-    if (!combineCorridorScans) {
+    if (is_fastsim_ && !combineCorridorScans) {
       if (fmod(mLSP, 25.0) <= 1 && fabs(fabs(mStop - mLSP - 175) - 7.5) < 2) {
         mLSP = mStop + 63;
         // cout << "Moving (mstop,mlsp) = (" << mass_stop() << "," << mass_lsp() << ") to (" << mStop << "," << mLSP << ") \n";
@@ -982,7 +986,7 @@ void evtWgtInfo::getSusyMasses( int &mStop, int &mLSP ) {
 }
 
 void evtWgtInfo::getNEvents( int &nEvts ) {
-  if ( is_fastsim_ ) {
+  if ( is_scan_ ) {
     nEvts = (int) h_sig_counter_nEvents->GetBinContent(h_sig_counter_nEvents->FindBin(mStop,mLSP));
     if (nEvts < 1) throw std::logic_error(Form("[evtWgtInfo::getNEvents]: Cannot find NEvents for point (%d,%d)!!",mStop,mLSP));
   } else {
@@ -2507,7 +2511,22 @@ void evtWgtInfo::getPDFWeight( double &weight_pdf_up, double &weight_pdf_dn ) {
 
   // Normalization
   float norm = 1;
-  if ( is_fastsim_ ) {
+  if ( samptype == ttDM ) {
+    double genw46inv = (genweights()[46] == 0)? 1 : 1.0 / genweights()[46];  // inverse of the central gen weight [0]
+    double sum_pdfweight_sq = 0;
+    for (int i = 0; i < 100; ++i) {
+      double iwgt = babyAnalyzer.genweights().at(47+i) * genw46inv - 1;
+      sum_pdfweight_sq += iwgt*iwgt;
+    }
+    double err_pdfweight = sqrt(sum_pdfweight_sq);  // Hessian
+    weight_pdf_up = 1 + err_pdfweight;
+    weight_pdf_dn = 1 - err_pdfweight;
+    // check for spurious weight
+    if (fabs(weight_pdf_up-1) > 1 || fabs(weight_pdf_dn-1) > 1) {
+      // cout << "[evtWgtInfo::getPDFWeight]: WARNING: weight_pdf_up = " << weight_pdf_up << ", weight_pdf_dn = " << weight_pdf_dn << " for mStop= " << mStop << ", mLSP= " << mLSP << endl;
+      weight_pdf_up = weight_pdf_dn = 1;
+    }
+  } else if ( is_scan_ ) {
     norm = (nEvents/h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,10)));
     if (isnan(norm) || isinf(norm)) cout << "[evtWgtInfo::getPDFWeight]: norm for weight_pdf_up = " << norm << ", mStop= " << mStop << ", mLSP= " << mLSP << endl;
     else  weight_pdf_up *= norm;
@@ -2556,7 +2575,16 @@ void evtWgtInfo::getAlphasWeight( double &weight_alphas_up, double &weight_alpha
   if (samptype == WZ) return;
 
   float norm = 1;
-  if ( is_fastsim_ ) {
+  if ( samptype == ttDM ) {
+    weight_alphas_up = babyAnalyzer.genweights().at(147)/babyAnalyzer.genweights().at(46);
+    weight_alphas_dn = babyAnalyzer.genweights().at(148)/babyAnalyzer.genweights().at(46);
+    // check for spurious weight
+    if (fabs(weight_alphas_up-1) > 1 || fabs(weight_alphas_dn-1) > 1) {
+      // cout << "[evtWgtInfo::getPDFWeight]: WARNING: weight_alphas_up = " << weight_alphas_up << ", weight_alphas_dn = " << weight_alphas_dn << " for mStop= " << mStop << ", mLSP= " << mLSP << endl;
+      // cout << "[evtWgtInfo::getPDFWeight]: WARNING: " << "  genweights().size()= " << babyAnalyzer.genweights().size() << ", genweights()[0]= " << babyAnalyzer.genweights()[0]<< ", genweights()[1]= " << babyAnalyzer.genweights()[1] << ", genweights().at(46)= " << babyAnalyzer.genweights().at(46) << endl;
+      weight_alphas_up = weight_alphas_dn = 1;
+    }
+  } else if ( is_scan_ ) {
     norm = ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,12)) );
     if (isnan(norm)) cout << "[evtWgtInfo::getAlphasWegight]: WARNING: norm for weight_alphas_up = " << norm << ", mStop = " << mStop << ", mLSP = " << mLSP << endl;
     else weight_alphas_up *= norm;
@@ -2607,7 +2635,16 @@ void evtWgtInfo::getQ2Weight( double &weight_q2_up, double &weight_q2_dn ) {
   if (samptype == WZ) return;
 
   float norm = 1;
-  if ( is_fastsim_ ) {
+  if ( samptype == ttDM ) {
+    weight_q2_up = babyAnalyzer.genweights().at(21)/babyAnalyzer.genweights().at(1);
+    weight_q2_dn = babyAnalyzer.genweights().at(41)/babyAnalyzer.genweights().at(1);
+    // check for spurious weight
+    if (fabs(weight_q2_up-1) > 1 || fabs(weight_q2_dn-1) > 1) {
+      // cout << "[evtWgtInfo::getPDFWeight]: WARNING: weight_q2_up = " << weight_q2_up << ", weight_q2_dn = " << weight_q2_dn << " for mStop= " << mStop << ", mLSP= " << mLSP << endl;
+      // cout << "[evtWgtInfo::getPDFWeight]: WARNING: " << "  genweights().size()= " << babyAnalyzer.genweights().size() << ", genweights()[0]= " << babyAnalyzer.genweights()[0]<< ", genweights()[1]= " << babyAnalyzer.genweights()[1] << ", genweights()[21]= " << babyAnalyzer.genweights()[21] << ", genweights()[41]= " << babyAnalyzer.genweights()[41] << ", weight_muF_up()= " << babyAnalyzer.weight_muF_up() << ", weight_muR_up()= " << babyAnalyzer.weight_muR_up() << endl;
+      weight_q2_up = weight_q2_dn = 1;
+    }
+  } else if ( is_scan_ ) {
     norm = ( nEvents / h_sig_counter->GetBinContent(h_sig_counter->FindBin(mStop,mLSP,5)) );
     if (isnan(norm)) cout << "[evtWgtInfo::getQ2Wegight]: WARNING: norm for weight_q2_up = " << norm << ", mStop = " << mStop << ", mLSP = " << mLSP << endl;
     else weight_q2_up *= norm;
@@ -2786,6 +2823,7 @@ bool evtWgtInfo::doingSystematic( systID isyst ) {
   if (isyst > k_JESDown && jes_type != 0) return false;
   switch (isyst) {
     case k_nominal:
+      return true;
     case k_JESUp:
       return jes_type == k_JESUp;
     case k_JESDown:
@@ -2885,6 +2923,7 @@ evtWgtInfo::SampleType evtWgtInfo::findSampleType( string samplestr ) {
   else if (sample.BeginsWith("WZ")) samptype = WZ;
   else if (sample.BeginsWith("SMS") && sample.Contains("f17v2_ext1")) samptype = fs17ext1;
   else if (sample.BeginsWith("SMS") || sample.BeginsWith("Signal") ) samptype = fastsim;
+  else if (sample.BeginsWith("TTbarDM")) samptype = ttDM;
   else cout << "[eventWeight] >> Cannot assigned sampletype for " << samplestr << endl;
 
   if (sample.BeginsWith("TTJets") && sample.EndsWith("fs")) is_fsttbar = true;

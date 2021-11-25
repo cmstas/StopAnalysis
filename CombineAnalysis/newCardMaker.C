@@ -42,6 +42,8 @@ const bool nosigsyst = false;
 const bool usegmN = true;
 // use Poisson for data stats
 const bool yearseparated = false;
+// scale ttZ scale the ttZ xsec to the value used by 0l
+const float ttZscale = (0.253*1.214)/(0.25*1.17);  // = 1.05
 // do average with yields using genmet for signal? default: true
 bool dogenmet = true;
 // the signal is fullsim
@@ -63,19 +65,15 @@ TFile *fsig_genmet;
 
 // Set of systematics
 // vector<string> systNamesCard = {"PUSyst", "BLFSyst", "BHFSyst", "JESSyst", "ISRSyst", "LEffSyst", "LEffFSSyst", "BFSSyst", "MuRFSyst"};
-// vector<string> systNames_sig = {"bTagEffLF", "bTagEffHF", "jes", "lepSF", }; //  temporary as most ones aren't available
-// vector<string> systNames_sig = {"jes", "ISR", "lepFSSF", "bTagFSEff"}; //  "q2" <-- fix this
-// vector<string> systNames_corr = {"bTagEffHF", "bTagEffLF", "lepSF", "pdf", "q2", "jes", "ISR", "pileup", "alphas", "metRes", "L1prefire"};
-// vector<string> systNames_corr = {"bTagEffHF", "bTagEffLF", "lepSF", "pdf", "q2", "jes", "ISR", "alphas", "L1prefire"};
-// vector<string> systNames_sig = {"jes16", "jes17", "jes18", "ISR", "lepFSSF", "bTagFSEff"}; //  "q2" <-- fix this
-// vector<string> systNames_sig = {"jes16", "jes17", "jes18", "ISR16"}; //  Fullsim signals
-// vector<string> systNames_sig; //  Fullsim signals
+
+// vector<string> systNames_sig; //  Fullsim signals <-- all correlating with bkg (ttH signals)
+// vector<string> systNames_sig = {"jes16", "jes17", "jes18", "ISR", "lepFSSF", "bTagFSEff"}; // Fastsim sigs, pay attention to "q2"
 // vector<string> systNames_corr = {"bTagEffHF16", "bTagEffHF17", "bTagEffHF18", "bTagEffLF16", "bTagEffLF17", "bTagEffLF18", "lepSF",
 //                                  "pdf", "q2", "jes16", "jes17", "jes18", "ISR16", "pileup16", "pileup17", "pileup18",
 //                                  "alphas", "metRes16", "metRes17", "metRes18", "L1prefire", "ttagSF", "softbSF16", "softbSF17", "softbSF18"};
 
-// Set of systematics of maximum correlation <-- least number of nuances
-vector<string> systNames_sig = {"ISR", "lepFSSF", "bTagFSEff"};  // "jes"
+// Set of systematics of maximum correlation <-- least number of nuances (stop combination)
+vector<string> systNames_sig = {"ISR", "lepFSSF", "bTagFSEff", "jes", "q2"};
 vector<string> systNames_corr = {"bTagEffHF", "bTagEffLF", "lepSF", "pdf", "q2", "jes", "ISR", "pileup", "alphas", "metRes", "L1prefire", "ttagSF", "softbSF"};
 
 // auto systNames_sig = []() -> vector<string> {
@@ -98,6 +96,10 @@ vector<string> systNames_corr = {"bTagEffHF", "bTagEffLF", "lepSF", "pdf", "q2",
 vector<string> systNames_bg2l = {"tauSF", "metTTbar", "cr2lTriggerSF"};
 vector<string> systNames_bg1l = {"CRpurity", "WbXsec"};
 vector<string> systNames_bgZnunu = {"ttZxsec"};
+
+// The names of the year uncorrelate syst that need to be combined property (add in squres)
+vector<string> systNames_yrcomb = {"bTagEffHF", "bTagEffLF", "jes", "pileup", "metRes", "softbSF"};
+// vector<string> systNames_yrcomb = {"bTagEffHF", "jes"};  // for separate systs
 
 ///////////////////////
 // Helper functions
@@ -252,6 +254,30 @@ int getUncertainties(double& errup, double& errdn, double origyield, TFile* file
 
   return 1;
 }
+
+void getCombinedUncertainties(double& systup, double& systdn, double orgyld, TFile* file, TString hname, string syst, int metbin, int m1 = 0, int m2 = 0) {
+  if (std::find(systNames_yrcomb.begin(), systNames_yrcomb.end(), syst) != systNames_yrcomb.end()) {
+    for (string yrsuf : {"16", "17", "18"}) {
+      double systup_i, systdn_i;
+      getUncertainties(systup_i, systdn_i, orgyld, file, hname+syst.c_str()+yrsuf, metbin, m1, m2);
+      if (systup <= 0)
+        systup = systup_i;
+      else if (systup_i > 1)
+        systup = 1 + sqrt(pow(systup - 1, 2) + pow(systup_i - 1, 2));
+      else
+        systup = 1 - sqrt(pow(systup - 1, 2) + pow(systup_i - 1, 2));
+      if (systdn <= 0)
+        systdn = systdn_i;
+      else if (systdn_i > 1)
+        systdn = 1 + sqrt(pow(systdn - 1, 2) + pow(systdn_i - 1, 2));
+      else
+        systdn = 1 - sqrt(pow(systdn - 1, 2) + pow(systdn_i - 1, 2));
+    }
+  } else {
+    getUncertainties(systup, systdn, orgyld, file, hname+syst.c_str(), metbin, m1, m2);
+  }
+}
+
 
 //helper function for addCorrelatedUnc:check if there is at least one good uncertainty
 bool checkIfPos(double *d){
@@ -455,7 +481,7 @@ int makeCardForOneBin(TString dir, int mstop, int mlsp, int metbin, int bin, TSt
   *fLogStream << "bin          b" << bin << "       b" << bin << "       b" << bin << "       b" << bin << "       b" << bin << "       " << endl;
   *fLogStream << "process     sig       2l      1lW       1ltop       znunu" << endl;
   *fLogStream << "process      0        1        2          3           4  " << endl;
-  *fLogStream << "rate        " << sig << "  " << bg2l << "  " << bg1l << "  " << bg1ltop << "  " << bgznunu << endl;
+  *fLogStream << "rate        " << sig << "  " << bg2l << "  " << bg1l << "  " << bg1ltop << "  " << bgznunu*ttZscale << endl;
   *fLogStream << "------------" << endl;
 
   // next ALL control region statistical uncertainties
@@ -474,7 +500,7 @@ int makeCardForOneBin(TString dir, int mstop, int mlsp, int metbin, int bin, TSt
   if (!nosigsyst && sig > 0) {
     for (string syst : systNames_sig) {
       double systUp, systDn;
-      getUncertainties(systUp, systDn, osig, fsig, hname_sig+"_"+syst.c_str(), metbin, mstop, mlsp);
+      getCombinedUncertainties(systUp, systDn, osig, fsig, hname_sig+"_", syst, metbin, mstop, mlsp);
       numnuis += addOneUnc(fLogStream, syst+"SystSig", systDn, systUp, 0,  -1, "lnN");
     }
     // numnuis += addOneUnc(fLogStream, "lepVetoSyst", lepvetoerr, -1, 0, bin, "lnN"); // <-- uncorrelated version
@@ -543,18 +569,16 @@ int makeCardForOneBin(TString dir, int mstop, int mlsp, int metbin, int bin, TSt
       for (auto syst : systNames_corr) {
         if (syst.find("ttagSF") == 0 && !dir.EndsWith("2") && !dir.EndsWith("3")) continue;
         if (syst.find("softbSF") == 0 && !dir.EndsWith("J")) continue;
-
-        string suf = "SystBG";
-        if (std::find(systNames_sig.begin(), systNames_sig.end(), syst) == systNames_sig.end() && (fullsimsig || (syst != "pdf" && syst != "alphas" && syst != "ISR16"))) {
-          getUncertainties(uperr[0], dnerr[0], osig, fsig, hname_sig+"_"+syst.c_str(), metbin, mstop, mlsp);
-          suf = "Syst";
-        }
-        if (true)              // bg2l
-          getUncertainties(uperr[1], dnerr[1], bg2l, f2l, hname_2l + syst.c_str(), metbin); // doing pdf?
+        bool correlatesig = (std::find(systNames_sig.begin(), systNames_sig.end(), syst) == systNames_sig.end() && (fullsimsig || (syst != "pdf" && syst != "alphas" && syst != "ISR16")));
+        string suf = (correlatesig)? "Syst" : "SystBG";
+        if (correlatesig)
+          getCombinedUncertainties(uperr[0], dnerr[0], osig, fsig, hname_sig+"_", syst, metbin, mstop, mlsp);
+        if (true)             // bg2l
+          getCombinedUncertainties(uperr[1], dnerr[1], bg2l, f2l, hname_2l, syst, metbin); // doing pdf?
         if (syst != "lepSF")  // bg1l
-          getUncertainties(uperr[2], dnerr[2], bg1l, f1l, hname_1l + syst.c_str(), metbin);
-        // bgZnunu <-- uses both up and dn err for Znunu bkg until otherwise instructed
-        getUncertainties(uperr[4], dnerr[4], bgznunu, fznunu, hname_Z + syst.c_str(), metbin);
+          getCombinedUncertainties(uperr[2], dnerr[2], bg1l, f1l, hname_1l, syst, metbin);
+        if (true)
+          getCombinedUncertainties(uperr[4], dnerr[4], bgznunu, fznunu, hname_Z, syst, metbin);
 
         if (syst.find("ttagSF") == 0 && dir.EndsWith("2")) syst = "mer"+syst;
         if (syst.find("ttagSF") == 0 && dir.EndsWith("3")) syst = "res"+syst;
@@ -570,14 +594,14 @@ int makeCardForOneBin(TString dir, int mstop, int mlsp, int metbin, int bin, TSt
     // bg2l
     for (string syst : systNames_bg2l) {
       double systUp, systDn;
-      getUncertainties(systUp, systDn, bg2l, f2l, hname_2l+syst.c_str(), metbin);
+      getCombinedUncertainties(systUp, systDn, bg2l, f2l, hname_2l, syst, metbin);
       numnuis += addOneUnc(fLogStream, syst+"Syst2l", systDn, systUp, 1,  -1, "lnN");
     }
     // bg1l
     for (string syst : systNames_bg1l) {
       if (take1lfromMC && syst == "CRpurity") continue;
       double systUp, systDn;
-      getUncertainties(systUp, systDn, bg1l, f1l, hname_1l+syst.c_str(), metbin);
+      getCombinedUncertainties(systUp, systDn, bg1l, f1l, hname_1l, syst, metbin);
       numnuis += addOneUnc(fLogStream, syst+"Syst1l", systDn, systUp, 2,  -1, "lnN");
     }
     // bgZnunu
@@ -586,7 +610,7 @@ int makeCardForOneBin(TString dir, int mstop, int mlsp, int metbin, int bin, TSt
       if (syst == "ttZxsec") {
         systUp = 1.0821; systDn = 0.9179;
       } else {
-        getUncertainties(systUp, systDn, bgznunu, fznunu, hname_Z+syst.c_str(), metbin);
+        getCombinedUncertainties(systUp, systDn, bgznunu, fznunu, hname_Z, syst, metbin);
       }
       numnuis += addOneUnc(fLogStream, syst+"SystZ", systDn, systUp, 4,  -1, "lnN");
     }
@@ -658,7 +682,7 @@ void makeCardsForPoint(TString signal, int mstop, int mlsp, TString outdir) {
 
 // -------------------------------------------------------------------------------------------------------------------
 // Make cards for a from fullsim signal (single mass point)
-void newCardMaker(int dummy, string signal = "ttHtoInv", string signal_dir="../StopLooper/output/sampttH_v32_s2", string input_dir="../StopLooper/output/combRun2_v31_s21", string output_dir="datacards/ttHtoInv_s2", string ysuf="run2") {
+void newCardMaker(int dummy, string signal = "ttHtoInv", string signal_dir="../StopLooper/output/sampttH_v32_s7", string input_dir="../StopLooper/output/combRun2_v31_s21", string output_dir="datacards/ttHtoInv_s7_v2", string ysuf="run2") {
   cout << "Making cards for single mass point: " << signal << endl;
   system(Form("mkdir -p %s", output_dir.c_str()));
 
@@ -673,6 +697,7 @@ void newCardMaker(int dummy, string signal = "ttHtoInv", string signal_dir="../S
   f1ltop = new TFile(Form("%s/1lepFromTop_%s.root",input_dir.c_str(), ysuf.c_str()));
   fznunu = new TFile(Form("%s/ZToNuNu_%s.root",input_dir.c_str(), ysuf.c_str()));
   fsig_genmet = nullptr; // don't use switched genmet signal for now
+  fullsimsig = true;
 
   if (!fakedata) fdata = new TFile(Form("%s/allData_%s.root", input_dir.c_str(), ysuf.c_str()));
   else fdata = new TFile(Form("%s/allBkg_%s.root", input_dir.c_str(), ysuf.c_str()));
@@ -726,6 +751,11 @@ int newCardMaker(string signal, string input_dir="../StopLooper/output/temp", st
   TBenchmark *bmark = new TBenchmark();
   bmark->Start("benchmark");
 
+  if ((signal.find("ttHtoInv") != string::npos) || (signal.find("ttbarDM") != string::npos)) {
+    fullsimsig = true;
+    dogenmet = false;
+  }
+
   // set input files (global pointers)
   fsig = new TFile(Form("%s/SMS_%s_%s.root",input_dir.c_str(), signal.c_str(), ysuf.c_str()));
   if (yearseparated) {
@@ -761,8 +791,6 @@ int newCardMaker(string signal, string input_dir="../StopLooper/output/temp", st
     hname_sigpts = "srbase/h2d_ttDMpts_ylds";
     ibgn_m1 = 50; iend_m1 = 550; istp_m1 = 50;
     ibgn_m2 =  0; iend_m2 =  55; istp_m2 =  1;
-    fullsimsig = true;
-    dogenmet = false;
   }
 
   TH2D* hpoints = (TH2D*) fsig->Get(hname_sigpts.c_str());

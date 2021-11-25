@@ -27,6 +27,11 @@ def GetColor(sample):
     if "cevt" in sample: return 798  # kOrange-2
     if "lfevt" in sample: return 425  # kCyan-7
 
+    # if 'lostlep' in sample.lower(): return 866  # kAzure+6
+    if 'ww'  in sample.lower(): return 796  # kOrange-4
+    if 'zz'  in sample.lower(): return 625  # kRed-7
+    if 'ttz' in sample.lower(): return 613  # kMagenta-3
+
     return 870 # for everything else
 
 def GetCRName(cr):

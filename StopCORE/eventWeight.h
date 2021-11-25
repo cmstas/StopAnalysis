@@ -98,7 +98,7 @@ class evtWgtInfo {
   bool add2ndLepToMet;
   int srtype;
 
-  enum SampleType {data, ttbar, Wjets, singletop, ttW, ttZ, WZ, diboson, fastsim, fs17ext1, unknown=-1 } samptype;
+  enum SampleType {data, ttbar, Wjets, singletop, ttW, ttZ, WZ, diboson, fastsim, fs17ext1, ttDM, unknown=-1 } samptype;
   enum SystSet {stop_Moriond17, stop_Run2, test_alloff};
 
   // Counter histograms stored in babies
@@ -367,6 +367,7 @@ class evtWgtInfo {
   bool is_bkg_;
   bool is_data_;
   bool is_fastsim_;
+  bool is_scan_;
   bool event_ready;
 
 }; // end class def

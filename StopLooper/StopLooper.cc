@@ -38,7 +38,7 @@
 #include "Utilities.h"
 
 // Special extension
-#include "ttbarDMutils.h"
+// #include "../StopCORE/ttbarDMutils.h"
 
 using namespace std;
 using namespace stop1l;
@@ -55,7 +55,7 @@ const bool applyGoodRunList = true;
 // apply the MET resolution correction to the MET variables, required running
 const bool applyMETResCorrection = true;
 // turn on to enable plots of metbins with systematic variations applied. will only do variations for applied weights
-const bool doSystVariations = true;
+const bool doSystVariations = false;
 // turn on to enable plots of metbins with different gen classifications
 const bool doGenClassification = false;
 // turn on to apply Nvtx reweighting to MC / data2016
@@ -97,8 +97,8 @@ int ttbarDMtype = 0;
 const float fInf = std::numeric_limits<float>::max();
 
 const float kSMSMassStep = 25;
-const vector<float> mStopBins = []() { vector<float> bins; for (float m = 137.5; m < 2137.5; m += kSMSMassStep) bins.push_back(m); return bins; } ();
-const vector<float> mLSPBins  = []() { vector<float> bins; for (float m = -12.5; m < 1437.5; m += kSMSMassStep) bins.push_back(m); return bins; } ();
+vector<float> mStopBins = []() { vector<float> bins; for (float m = 137.5; m < 2137.5; m += kSMSMassStep) bins.push_back(m); return bins; } ();
+vector<float> mLSPBins  = []() { vector<float> bins; for (float m = -12.5; m < 1437.5; m += kSMSMassStep) bins.push_back(m); return bins; } ();
 
 // Helper function to pick out signal events
 auto checkMassPt = [&](double mstop, double mlsp) { return (mass_stop() == mstop) && (mass_lsp() == mlsp); };
@@ -393,7 +393,12 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
 
     evtWgt.getZSampleWeightFromCR3l(fname);
 
-    if (ttbarDMtype) evtWgt.apply_genweights_unc = false;  // FIXME: to be fixed
+    if (ttbarDMtype) {
+      // evtWgt.apply_genweights_unc = false;
+      evtWgt.apply_ISR_sf = false;  // Since is all TuneCP5
+      mStopBins = []() { vector<float> bins; for (float m = 12.5; m < 612.5; m += 25) bins.push_back(m); return bins; } (); // mPhi bins
+      mLSPBins  = []() { vector<float> bins; for (float m = -0.5; m <  60.5; m +=  1) bins.push_back(m); return bins; } (); // mChi bins
+    }
 
     if (year_ == 2016) kLumi = 35.922;
     else if (year_ == 2017) kLumi = 41.529;
@@ -468,21 +473,32 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
 
       if (ttbarDMtype) {
         sigtype = "_ttDM";
-        unsigned int nevt(1);
-        static unsigned int skipLumi = 0;
-        if (ls() == skipLumi) continue;
-        std::tie(mlsp_, mstop_, nevt) = ttdm::getDMMassesByLumi(ttbarDMtype, year_, ls());
-        if (mstop_ <= 0 || nevt <= 0) {
-          cout << "[StopLooper] >> Invalid nEvents " << nevt << " for mphi = " << mstop_ << ", mchi = " << mlsp_ << ", nevt= " << nevt << ", dataset()= " << dataset() << endl;
-          skipLumi = ls();
-          continue;
-        }
-        const float xsec = ttdm::getXsecTTbarDM(ttbarDMtype, mlsp_, mstop_);
-        float wgt1fb = 1000 * xsec / nevt;
-        evtWgt.sf_extra_event *= wgt1fb;
-
+        // New: scale1fb from baby already account for the correct ttDM xsec
+        mstop_ = mass_stop();
+        mlsp_ = mass_lsp();
         plot2d("h2d_ttDMpts_ylds", mstop_, mlsp_, 1, SRVec.at(0).histMap, ";M_{#phi} [GeV]; M_{#chi} [GeV]", 160, 0, 800, 80, 0, 80);
-        plot2d("h2d_ttDMpts_xsecwgtd", mstop_, mlsp_, wgt1fb, SRVec.at(0).histMap, ";M_{#phi} [GeV]; M_{#chi} [GeV]", 160, 0, 800, 80, 0, 80);
+        plot2d("h2d_ttDMpts_xsecwgtd", mstop_, mlsp_, scale1fb(), SRVec.at(0).histMap, ";M_{#phi} [GeV]; M_{#chi} [GeV]", 160, 0, 800, 80, 0, 80);
+
+        // // Old method without support from baby
+        // unsigned int nevt(1);
+        // static unsigned int skipLumi = 0;
+        // if (ls() == skipLumi) continue;
+        // std::tie(mlsp_, mstop_, nevt) = ttdm::getDMMassesByLumi(ttbarDMtype, year_, ls(), "../StopCORE/inputs/configs");
+        // if (mstop_ <= 0 || nevt <= 0) {
+        //   cout << "[StopLooper] >> Invalid nEvents " << nevt << " for mphi = " << mstop_ << ", mchi = " << mlsp_ << ", nevt= " << nevt << ", dataset()= " << dataset() << endl;
+        //   skipLumi = ls();
+        //   continue;
+        // }
+        // const float xsec = ttdm::getXsecTTbarDM(ttbarDMtype, mlsp_, mstop_);
+        // float wgt1fb = 1000 * xsec / nevt;
+        // if (genweights()[0] < 0) wgt1fb *= -1;
+        // evtWgt.sf_extra_file = wgt1fb;  // mis-use this extra sf for event
+        // plot2d("h2d_ttDMpts_ylds", mstop_, mlsp_, 1, SRVec.at(0).histMap, ";M_{#phi} [GeV]; M_{#chi} [GeV]", 160, 0, 800, 80, 0, 80);
+        // plot2d("h2d_ttDMpts_xsecwgtd", mstop_, mlsp_, wgt1fb, SRVec.at(0).histMap, ";M_{#phi} [GeV]; M_{#chi} [GeV]", 160, 0, 800, 80, 0, 80);
+        // if (genweights().size() > 148) nEvt_genwgt_long++;
+        // else nEvt_genwgt_short++;
+        if (!runFullSignalScan && !(checkMassPt(300, 1) || checkMassPt(200, 1) || checkMassPt(100, 1))) continue;
+        // if (!runFullSignalScan && !(checkMassPt(100, 1))) continue;
       }
 
       // For testing on only subset of mass points
@@ -554,6 +570,19 @@ void StopLooper::looper(TChain* chain, string samplestr, string output_dir, int 
 
       // Simple weight with scale1fb only
       if (is_bkg_) evtweight_ = kLumi * scale1fb();  // NOTE: this is NOT the final event weight! just to have something for shape studies
+
+      // Temporary: for 0l checks
+      const bool doSyncCheck0lep = false;
+      if (doSyncCheck0lep && (checkMassPt(400,1) || checkMassPt(750, 1))) {
+        evtweight_ = evtWgt.getWeight(evtWgtInfo::systID(0), false, 0);
+        string s = "_"+to_string(mstop_)+"_"+to_string(mlsp_);
+        plot1d("h_check_met"+s, pfmet(), evtweight_, testVec[0].histMap, ";p_{T}^{miss} [GeV]", 85, 0, 850);
+        plot1d("h_check_met_uncorr"+s, pfmet_uncorr(), evtweight_, testVec[0].histMap, ";p_{T}^{miss} [GeV]", 85, 0, 850);
+        plot1d("h_check_genmet"+s, genmet(), evtweight_, testVec[0].histMap, ";p_{T}^{miss} [GeV]", 85, 0, 850);
+        plot1d("h_check_njets"+s,  ngoodjets() , evtweight_, testVec[0].histMap, ";Number of jets" ,  8,    2,  10);
+        plot1d("h_check_nbjets"+s, ngoodbtags()  , evtweight_, testVec[0].histMap, ";Number of b-tagged jets" ,  5, 0,  5);
+      }
+      if (doSyncCheck0lep) continue;  // speed up
 
       // Plot nvtxs on the base selection of stopbaby for reweighting purpose
       plot1d("h_nvtxs", nvtxs(), 1, testVec[0].histMap, ";Number of vertices", 100, 1, 101);
@@ -1139,12 +1168,15 @@ void StopLooper::fillYieldHistos(SR& sr, float met, string suf, bool is_cr2l) {
 
   // Block for debugging, active when setting printPassedEvents = true
   // if (printPassedEvents && sr.GetName() == "srbase" && suf == "") {
-  if (printPassedEvents && met > 750 && suf == "" && sr.GetName().find("sr") == 0) {
+  // if (printPassedEvents && sr.GetName().find("sr") == 0 && sr.GetName()[2] < 73 && suf == "") {
+  if (printPassedEvents && sr.GetName().find("cr0b") == 0 && sr.GetName()[4] < 75 && suf == "") {
+  // if (printPassedEvents && met > 750 && suf == "" && sr.GetName().find("sr") == 0) {
+  // if (printPassedEvents && sr.GetName().find("cr2l") == 0 && sr.GetName() != "cr2lbase" && suf == "") {
     // static bool printOnce1 = false;
     // if (!printOnce1) { for (auto& v : values_) ofile << ' ' << v.first; ofile << endl; printOnce1 = true; }
     ofile << run() << ' ' << ls() << ' ' << evt() << ' ' << sr.GetName();
     // if (run() == 277168) for (auto& v : values_) ofile << ' ' << v.second;
-    ofile << ": values_[met]= " << values_[Vars::met] << ", values_[mt]= " << values_[mt] << ", values_[njet]= " << values_[njet] << ", values_[nbjet] = " << values_[nbjet]  << ", values_[tmod]= " << values_[tmod] << ", values_[mlb]= " << values_[mlb];
+    // ofile << ": values_[met]= " << values_[Vars::met] << ", values_[mt]= " << values_[mt] << ", values_[njet]= " << values_[njet] << ", values_[nbjet] = " << values_[nbjet]  << ", values_[tmod]= " << values_[tmod] << ", values_[mlb]= " << values_[mlb];
     // ofile << ": pfmet()= " << pfmet() << ", ngoodjets()= " << ngoodjets() << ", ak4pfjets_p4()[1].pt()= " << ak4pfjets_p4()[1].pt() << endl;
     // ofile << ' ' << evtweight_ << ' ' << evtWgt.getWeight(evtWgtInfo::systID::k_bTagEffHFUp) << ' ' << evtWgt.getLabel(evtWgtInfo::systID::k_bTagEffHFUp);
     // ofile << ' ' << evtweight_ << ' ' << pfmet() << ' ' << mt_met_lep() << ' ' << Mlb_closestb() << ' ' << topnessMod() << ' ' << ngoodjets() << ' ' << ngoodbtags() << ' ' << mindphi_met_j1_j2() << ' ' << pfmet_rl();
@@ -1223,6 +1255,10 @@ void StopLooper::fillHistosForSR(string suf) {
                                      checkMassPt(1000, 100) || checkMassPt(800, 450) || checkMassPt(750, 400) ||
                                      checkMassPt(1200, 100) || checkMassPt(850, 100) || checkMassPt(650, 350)))
       fillKineHists(Form("%s_%d_%d%s", sigtype.c_str(), mstop_, mlsp_, suf.c_str()));
+
+    if (ttbarDMtype && (checkMassPt(100, 1) || checkMassPt(200, 1) || checkMassPt(300, 1))) {
+      fillKineHists(Form("%s_%d_%d%s", ((ttbarDMtype > 0)? "_scalar" : "_pseudo"), mstop_, mlsp_, suf.c_str()));
+    }
 
     // Separate contribution by gen classification for background events
     if (doGenClassification && is_bkg_ && suf == "") {
@@ -3198,17 +3234,20 @@ void StopLooper::testCutFlowHistos(SR& sr) {
 
   // Defining cuts
   const vector<pair<string,bool(*)()>> cuts = {
-    {"base", [](){ return (ngoodleps() >= 1 && ngoodjets() >= 2 && pfmet() > 150); }},
-    {"mt", [](){ return (mt_met_lep() > 150); }},
-    {"btag", [](){ return (ngoodbtags() >= 1); }},
+    {"base", [](){ return (ngoodleps() >= 1 && lep1_p4().pt() > 30 && ngoodjets() >= 2 && pfmet() > 160); }},
     {"lepveto", [](){ return (nvetoleps() == 1); }},
     {"tauveto", [](){ return (PassTrackVeto() && PassTauVeto()); }},
+    {"btag", [](){ return (ngoodbtags() >= 1); }},
+    {"mt", [](){ return (mt_met_lep() > 160); }},
     {"dphijmet", [](){ return (mindphi_met_j1_j2() > 0.8); }},
-    {"met", [](){ return (pfmet() > 250); }},
+    // {"met", [](){ return (pfmet() > 250); }},
   };
   const int ncuts = cuts.size();
 
   const vector<pair<string,bool(*)()>> cats = {
+    {"met", [](){ return (pfmet() > 250); }},
+    {"mt2w", [](){ return (MT2W() > 200); }},
+    {"dphijmet1p2", [](){ return (mindphi_met_j1_j2() > 1.2); }},
     {"tmod_gt0", [](){ return (topnessMod() > 0); }},
     {"tmod_gt10", [](){ return (topnessMod() > 10); }},
     {"Mlb_gt175", [](){ return (Mlb_closestb() > 175); }},
@@ -3272,6 +3311,10 @@ void StopLooper::testCutFlowHistos(SR& sr) {
           checkMassPt(500, 325)  || checkMassPt(425, 338) || checkMassPt(400, 300) || // Corridor region points
           checkMassPt(508, 325)  || checkMassPt(492, 325) || checkMassPt(250, 100)
           )) return;
+    suf = "_"+to_string(mstop_)+"_"+to_string(mlsp_);
+  }
+  if (sigtype == "_ttDM") {
+    if (!(checkMassPt(100, 1) || checkMassPt(200, 1) || checkMassPt(400, 1))) return;
     suf = "_"+to_string(mstop_)+"_"+to_string(mlsp_);
   }
 

@@ -368,7 +368,7 @@ int makeBkgEstimates(string input_dir="../StopLooper/output/temp14", string outp
   return 0;
 }
 
-int postProcessOnly(string sample="ttHtoInv", string input_dir="../StopLooper/output/sampttH_v32_s2", string output_dir="../StopLooper/output/sampttH_v32_s2", string suffix="run2") {
+int postProcessOnly(string sample="ttHtoInv", string input_dir="../StopLooper/output/sampttH_v32_s7", string output_dir="../StopLooper/output/sampttH_v32_s7", string suffix="run2") {
 
   // Set input files (global pointers)
   TFile* fbkg = new TFile(Form("%s/%s_%s.root", input_dir.c_str(), sample.c_str(), suffix.c_str()));

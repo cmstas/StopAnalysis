@@ -7,7 +7,7 @@ ROOT.gROOT.SetBatch(1)
 
 from MT2PlotMaker import *
 
-exts = ['pdf','C']
+exts = ['pdf','png']
 bkgnames = ['ttbar', 'Vjets', 'singleT', 'rare']
 # bkgnames = ['tt2l', 'Vjets', 'singleT', 'tt1l', 'rare']
 gencats   = ['2lep', '1lepTop', '1lepW', 'Znunu',]
@@ -56,8 +56,8 @@ rl_plots = [
     ("rldphijmet",True,None,None),
     ("rldphilmet",True,None,None),
 
-    ("lep2pt",True,None,None),
-    ("lep2eta",True,None,None),
+    # ("lep2pt",True,None,None),
+    # ("lep2eta",True,None,None),
 ]
 
 cor_plots = [
@@ -147,9 +147,10 @@ def addsuff(plotset, suf):
 
 def makePlotsByGenCatRun2():
 
-    srNames = ['cr2lbase', 'cr0bbase']
+    # srNames = ['cr2lbase', 'cr0bbase']
     # srNames = ['srsbfdphi']
     # srNames = ['cr2lJ3', 'cr0bJ3']
+    srNames = ['srbase']
     # srNames = [ 'srsbfmt', 'cr0bsbfmt' ]
     # srNames = [  'srsbmet+srbase+srsbmt2' ]
     # srNames = ['cr2lincl1', 'cr2lincl4J']
@@ -158,7 +159,9 @@ def makePlotsByGenCatRun2():
 
     # bvsuf = 'v39_s6'
     # bvsuf = 'v31_m14'
-    bvsuf = 'v32_s1_refans_no2ltrigeff_metgt250'
+    # bvsuf = 'v32_s1_refans_no2ltrigeff_metgt250'
+    bvsuf = 'v32_m8'            # sampttH dir
+    bvsuf = 'v32_m11'           # sampttDM dir
     # bvsuf = 'v31_cor_w2'
 
     gencats = [ '1lepTop', '2lep', '1lepW', 'Znunu',]
@@ -169,7 +172,6 @@ def makePlotsByGenCatRun2():
     # srNames = ['cr2lsbmet2']
 
     # for ysuf in ['16', '17', '18']:
-    # for ysuf in ['18']:
     for ysuf in ['run2']:
         bkg_set = ['allBkg_'+ysuf]
         dataname = 'allData_'+ysuf
@@ -177,16 +179,21 @@ def makePlotsByGenCatRun2():
         # output_dir = 'plots_'+ysuf+'_MCunscaled_'+bvsuf
         # dataname = None
         # output_dir = 'plots_'+ysuf+'_'+bvsuf+'_nodata'
-        output_dir = 'plots_'+ysuf+'_'+bvsuf+'_Feb27'
+        output_dir = 'plots_'+ysuf+'_'+bvsuf+'_ttDM'
         if ysuf == 'run2':
             input_dir = '../../StopLooper/output/combRun2_'+bvsuf
+        # input_dir = '../../StopLooper/output/sampttH_'+bvsuf # Temp for ttH plots
+        input_dir = '../../StopLooper/output/sampttDM_'+bvsuf # Temp for ttbar DM signals
 
         for sr in srNames:
             plot_set = base_plots+rl_plots+obj_plots if ('cr2l' in sr) else base_plots+obj_plots
             # plot_set = [("rlmt_h",True,(0,450), (10,1e5)),]
             cats = gencats0b if 'cr0b' in sr else gencats
-            MT2PlotMaker(input_dir, bkg_set, dataname, sr, plot_set, output_dir, exts, gencats=cats, datatitle='Observed')
+            # MT2PlotMaker(input_dir, bkg_set, dataname, sr, plot_set, output_dir, exts, gencats=cats, datatitle='Observed') # run2 results
             # MT2PlotMaker(input_dir, bkg_set, dataname, sr, plot_set, output_dir, exts, scaleMC=False, gencats=cats)
+            # MT2PlotMaker(input_dir, bkg_set, None, sr, plot_set, output_dir, exts, gencats=cats, lumi=137, signame='ttHtoInv_run2', sig_points=['',]) # ttH plots
+            MT2PlotMaker(input_dir, bkg_set, None, sr, plot_set, output_dir, exts, gencats=cats, lumi=137, signame='TTbarDMJets_run2', sig_points=['_scalar_200_1','_pseudo_300_1']) # ttDM points
+
 
 def makeTestCatStackHist():
 
@@ -319,25 +326,25 @@ def makeCRemuPlots():
 
     # bkgnames = ['ttbar', 'singleT', 'Vjets', 'rare']
     # bkgnames = ['Vjets', 'ttbar', 'singleT', 'rare']
-    bkgnames = ['ttbar',]
+    bkgnames = ['TTTo2L2Nu', 'TTZToLLNuNu', 'WWTo2L2Nu', 'ZZ',]
 
     # bvsuf = 'v31_cremu4'
     # bvsuf = 'v31_m20'
-    bvsuf = 'v31_ttagtest4'
+    bvsuf = 'nrb_v32_s2'
     # srNames = ['cremuA0', 'cremuA1']
-    srNames = ['cremuB1']
+    srNames = ['cremuC0', 'cremuC1']
     # srNames = ['cr0bsbjfsb']
     # plot_set = [("ptttbar",True,None,None), ("ptttbar_b1",True,None,None), 
     #             ("ptisr_b1",True,None,None), ("htisr_b1",True,None,None),
     #             ("genttbar_pt",True,None,None), 
     #             ("genttbar_pt",True,None,None),
     # ]
-    plot_set = [ ("nsbtags",True,None,None), ("softbs_pt",True,None,None), ("lead_softb_pt",True,None,None),
+    plot_set = [ # ("nsbtags",True,None,None), ("softbs_pt",True,None,None), ("lead_softb_pt",True,None,None),
                  # ("njets_h",False,None,None), ("nisrmatch",False,None,None), 
                  # ("nmatchedsoftb",True,None,None), ("nsoftbmatched",True,None,None), ("nmatchedsoftvtx",False,None,None),
-                 # # ("nsbfromtop",True,None,None),
+                 # ("nsbfromtop",True,None,None),
                  # ("genb_cat",False,None,None), ("cat3genb_pt",True,None,None),
-                 ("genb_genpt",True,None,None), ("genb_fromtop_genpt",True,None,None), ("genb_notfromtop_genpt",True,None,None), 
+                 # ("genb_genpt",True,None,None), ("genb_fromtop_genpt",True,None,None), ("genb_notfromtop_genpt",True,None,None), 
                  # ("genb_genpt",True,None,None), ("genb_fromtop_genpt",True,None,None), ("gentop_genpt",True,None,None), 
                  # ("softb_genid",False,None,None), 
                  # ("genttbar_pt",True,None,None), 
@@ -345,63 +352,64 @@ def makeCRemuPlots():
                  # # ("nbjets",True,None,None), 
                  # ("met_h",True,None,None), ("genmet",True,None,None), ("nupt",True,None,None), 
                  # ("nvtxs_ge2sb",False,None,None),
+        ("met_h",True,None,None), 
+        ("mt_h",True,None,None), 
+        ("mll",True,None,None), 
+        ("ptll",True,None,None), 
+        ("njets",True,None,None), 
+        ("nbjets",True,None,None), 
+        ("nleps",True,None,None), 
+        ("dphillmet",True,None,None), 
+        ("dphilljmet",True,None,None), 
     ]
     # plot_set = emu_plots
 
-    # srNames = ['cremuA1',]
-    # plot_set = [
-    #     ("rlmetbinA",True,None,None),
-    #     ("rlmetbinB",True,None,None),
-    #     ("rlmetbinC",True,None,None),
-    #     ("rlmetbinE",True,None,None),
-    #     ("rlmetbinG",True,None,None),
-    #     ("rlmetbinH",True,None,None),
-    #     ("rlmetbinI",True,None,None),
-    #     ("rlmetbinJ",True,None,None),
-    # ]
 
-    input_dir = '../../StopLooper/output/samp1x_'+bvsuf
-    # input_dir = '../../StopLooper/output/samp16_'+bvsuf
-    output_dir = 'plots1x_'+bvsuf+'_fsfs4_v2'
-    # output_dir = 'plots16_'+bvsuf
-    bkg_set = [fn+'_16' for fn in bkgnames]
+    # input_dir = '../../StopLooper/output/samp1x_'+bvsuf
+    # output_dir = 'plots1x_'+bvsuf+'_fsfs4_v2'
+    input_dir = '../../StopLooper/output/samp16_'+bvsuf
+    output_dir = 'plots16_'+bvsuf
+    # bkg_set = [fn+'_16' for fn in bkgnames]
+    bkg_set = [fn for fn in bkgnames]
     dataname = 'allData_16'
-    dataname = 'ttbar_fastsim_16'
+    # dataname = 'ttbar_fastsim_16'
 
-    for sr in srNames:
-        MT2PlotMaker(input_dir, bkg_set, dataname, sr, plot_set, output_dir, exts, datatitle=dataname)
-        # MT2PlotMaker(input_dir, bkg_set, dataname, sr, plot_set, output_dir, exts, ratioType=1)
-        # MT2PlotMaker(input_dir, bkg_set, dataname, sr, plot_set, output_dir, exts, systset=['softbSF'])
-        os.system('rm -r {0}/{1}_16; mv {0}/{1} {0}/{1}_16'.format(output_dir, sr))
+    # for sr in srNames:
+    #     MT2PlotMaker(input_dir, bkg_set, dataname, sr, plot_set, output_dir, exts, datatitle=dataname)
+    #     # MT2PlotMaker(input_dir, bkg_set, dataname, sr, plot_set, output_dir, exts, ratioType=1)
+    #     # MT2PlotMaker(input_dir, bkg_set, dataname, sr, plot_set, output_dir, exts, systset=['softbSF'])
+    #     # os.system('rm -r {0}/{1}_16; mv {0}/{1} {0}/{1}_16'.format(output_dir, sr))
 
 
-    # input_dir = '../../StopLooper/output/samp17_'+bvsuf
-    output_dir = 'plots1x_'+bvsuf+'_fsfs4_v2'
-    # output_dir = 'plots17_'+bvsuf
-    bkg_set = [fn+'_17' for fn in bkgnames]
+    # output_dir = 'plots1x_'+bvsuf+'_fsfs4_v2'
+    input_dir = '../../StopLooper/output/samp17_'+bvsuf
+    output_dir = 'plots17_'+bvsuf
+    # bkg_set = [fn+'_17' for fn in bkgnames]
+    bkg_set = [fn for fn in bkgnames]
     # bkg_set = ['TTJets_amcnlo',] + bkg_set[1:]
     dataname = 'allData_17'
-    dataname = 'ttbar_fastsim_17'
+    # dataname = 'ttbar_fastsim_17'
 
-    for sr in srNames:
-        MT2PlotMaker(input_dir, bkg_set, dataname, sr, plot_set, output_dir, exts, datatitle=dataname)
-        # MT2PlotMaker(input_dir, bkg_set, dataname, sr, plot_set, output_dir, exts, ratioType=1)
-        # MT2PlotMaker(input_dir, bkg_set, dataname, sr, plot_set, output_dir, exts, systset=['softbSF'])
-        os.system('rm -r {0}/{1}_17; mv {0}/{1} {0}/{1}_17'.format(output_dir, sr))
+    # for sr in srNames:
+    #     MT2PlotMaker(input_dir, bkg_set, dataname, sr, plot_set, output_dir, exts, datatitle=dataname)
+    #     # MT2PlotMaker(input_dir, bkg_set, dataname, sr, plot_set, output_dir, exts, ratioType=1)
+    #     # MT2PlotMaker(input_dir, bkg_set, dataname, sr, plot_set, output_dir, exts, systset=['softbSF'])
+    #     # os.system('rm -r {0}/{1}_17; mv {0}/{1} {0}/{1}_17'.format(output_dir, sr))
 
     # bvsuf = 'v37_m1'
-    # input_dir = '../../StopLooper/output/samp18_'+bvsuf
-    output_dir = 'plots1x_'+bvsuf+'_fsfs4_v2'
-    # output_dir = 'plots18_'+bvsuf
-    bkg_set = [fn+'_18' for fn in bkgnames]
+    input_dir = '../../StopLooper/output/samp18_'+bvsuf
+    # output_dir = 'plots1x_'+bvsuf+'_fsfs4_v2'
+    output_dir = 'plots18_'+bvsuf
+    # bkg_set = [fn+'_18' for fn in bkgnames]
+    bkg_set = [fn for fn in bkgnames]
     dataname = 'allData_18'
-    dataname = 'ttbar_fastsim_18'
+    # dataname = 'ttbar_fastsim_18'
 
     for sr in srNames:
         MT2PlotMaker(input_dir, bkg_set, dataname, sr, plot_set, output_dir, exts, datatitle=dataname)
         # MT2PlotMaker(input_dir, bkg_set, dataname, sr, plot_set, output_dir, exts, ratioType=1)
         # MT2PlotMaker(input_dir, bkg_set, dataname, sr, plot_set, output_dir, exts, systset=['softbSF'])
-        os.system('rm -r {0}/{1}_18; mv {0}/{1} {0}/{1}_18'.format(output_dir, sr))
+        # os.system('rm -r {0}/{1}_18; mv {0}/{1} {0}/{1}_18'.format(output_dir, sr))
 
     input_dir = '../../StopLooper/output/combRun2_'+bvsuf
     output_dir = 'plots_run2_'+bvsuf

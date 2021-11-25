@@ -15,6 +15,8 @@ sig_label = {
     'T2bW' : '#tilde{t}#rightarrowb#tilde{#chi}^{#pm}_{1}',
     'T2bt' : '#tilde{t}#rightarrowt#tilde{#chi}^{0}_{1}/b#tilde{#chi}^{#pm}_{1}',
     'T2tb' : '#tilde{t}#rightarrowt#tilde{#chi}^{0}_{1}/b#tilde{#chi}^{#pm}_{1}',
+    'ttbarDM_scalar' : 't#bar{t}DM[scalar]',
+    'ttbarDM_pseudo' : 't#bar{t}DM[pseudo]',
 }
 
 def getLabelsTemporary(srNames):
@@ -384,6 +386,7 @@ def drawSRyieldStack(hstk, xlabels, legitems=None, savename='sigYieldHist.pdf', 
     hstk.Draw('histsame')
     htot.Draw('axissame');
 
+    g_bkgerr = None
     if not noBkgError and not gsyst:
         h_err = htot.Clone('h_err')
         h_err.SetFillStyle(3244)
@@ -420,9 +423,10 @@ def drawSRyieldStack(hstk, xlabels, legitems=None, savename='sigYieldHist.pdf', 
 
     if type(hsigs) == list:
         # sig_colors = [  r.kTeal, r.kPink, r.kOrange-7, r.kCyan, ]
-        sig_colors = [  r.kCyan, r.kMagenta, r.kOrange, r.kSpring,  ]
+        sig_colors = [  r.kGreen, r.kCyan, r.kMagenta, r.kOrange, r.kSpring,  ]
+        sig_linesty = [ 2, 7, 9, 1, 2 ]
         for i, (sn, hsig) in enumerate(hsigs):
-            hsig.SetLineStyle(2);
+            hsig.SetLineStyle(sig_linesty[i]);
             hsig.SetLineWidth(2);
             hsig.SetLineColor(sig_colors[i]);
             hsig.Draw('same hist')
@@ -438,7 +442,10 @@ def drawSRyieldStack(hstk, xlabels, legitems=None, savename='sigYieldHist.pdf', 
             leg = r.TLegend(0.47, 0.68, 0.76, 0.89)
             if 'CR0b' in savename: 
                 leg = r.TLegend(0.42, 0.76, 0.71, 0.89)
+            if len(xlabels)==39:
+                leg = r.TLegend(0.56, 0.68, 0.9, 0.89)
             leg.SetNColumns(2)
+
         # for i in range(len(legitems)-1, -1, -1):
         #     leg.AddEntry(hstk.GetHists().At(i), legitems[i], 'lf')
         #     if hdata != None and i == len(legitems)-2:
@@ -455,7 +462,8 @@ def drawSRyieldStack(hstk, xlabels, legitems=None, savename='sigYieldHist.pdf', 
         if type(hsigs) == list:
             # leg.Clear()
             leg2 = r.TLegend(0.13, 0.75, 0.45, 0.89)
-            leg2.SetNColumns(2)
+            if len(hsigs) > 2:
+                leg2.SetNColumns(2)
             leg2.SetBorderSize(0)
             leg2.SetTextSize(0.047)
             for i, (sn, hsig) in enumerate(hsigs):
@@ -483,8 +491,10 @@ def drawSRyieldStack(hstk, xlabels, legitems=None, savename='sigYieldHist.pdf', 
         vlineJ.Draw()
 
 
-    if type(hsigs) == list:
+    if type(hsigs) == list and len(hsigs) > 1:
         DrawHeaderText(mainPad, prelim='Supplementary')
+    if len(xlabels) == 39:
+        DrawHeaderText(mainPad, prelim='  Preliminary')
     else:
         DrawHeaderText(mainPad, prelim=False)
 
@@ -556,7 +566,7 @@ def drawSRyieldStack(hstk, xlabels, legitems=None, savename='sigYieldHist.pdf', 
         DrawTextPad(textPad)
 
     c0.SaveAs(savename)
-    c0.SaveAs(savename[:-4]+".C")
+    # c0.SaveAs(savename[:-4]+".C")
     c0.Clear()
 
 
@@ -591,7 +601,7 @@ def drawBkgEstimateHists(indir, srNames, suf='', bkgType='lostlep'):
     drawSRyieldHist(h_purity, xlabels, 'noleg', bkgType+suf+'_CRpurity.pdf', 'PE', True, [0, 1.2], 1, ytitle='')
 
 
-def drawBkgCompositionStack(indir, srNames=None, savename='bkgCompostion_std.pdf', plotData=False, normalize=False, drawTextPad=False):
+def drawBkgCompositionStack(indir, srNames=None, savename='bkgCompostion_std.pdf', plotData=False, normalize=False, drawTextPad=False, drawSignal=False):
 
     # -------------------------------------------------------
     # Draw test bkg composition / expected yields hists
@@ -620,6 +630,15 @@ def drawBkgCompositionStack(indir, srNames=None, savename='bkgCompostion_std.pdf
     h_1lt  = getSRHistFromYieldE(y_1lt , 'h_SRyields_1lt' , '', fcolor=r.kRed-7)
     h_Zinv = getSRHistFromYieldE(y_Zinv, 'h_SRyields_Zinv', '', fcolor=r.kViolet-8)
 
+    signals=None
+    if type(drawSignal) == str:
+        signame = drawSignal
+        signals = []
+        f_ttH = r.TFile(indir+'/'+signame+'_run2.root','read')
+        y_sig = [ y.round(4) for y in sum(getYieldEInTopoBins(f_ttH, srNames, 'metbins'), []) ]
+        h_sig = getSRHistFromYieldE(y_sig, 'h_SRyields_'+signame , '', lstyle=1 )
+        signals.append((signame, h_sig))
+
     hstk = r.THStack('hs1', '')
     if 'cr0b' in srNames[0]:
         legname = ['1lepTop', 'Zinv', '2lep', '1lepW']
@@ -647,7 +666,7 @@ def drawBkgCompositionStack(indir, srNames=None, savename='bkgCompostion_std.pdf
         y_data  = [ y.round(2) for y in sum(getYieldEInTopoBins(f_data, srNames, 'metbins'), []) ]
         h_data = getSRHistFromYieldE(y_data, 'h_SRyields_data', '', fcolor=r.kBlack)
 
-        drawSRyieldStack(hstk, xlabels, legname, savename, 'hist', hdata=h_data, drawTextPad=drawTextPad)
+        drawSRyieldStack(hstk, xlabels, legname, savename, 'hist', hdata=h_data, hsigs=signals, drawTextPad=drawTextPad)
     elif normalize:
         drawSRyieldStack(hstk, xlabels, legname, savename, 'hist', linear=True, yrange=[0.0,1.3], noBkgError=True, ytitle='Bkg Fraction')
     else:
@@ -657,7 +676,7 @@ def drawBkgCompositionStack(indir, srNames=None, savename='bkgCompostion_std.pdf
 
 
 def drawBkgPredictionStack(indir, srNames=None, savename='bkgPrediction_std.pdf', ysuf='run2', plotData=False, plotRatio=True, scale=1, 
-                           drawTextPad=False, drawSignal=False):
+                           drawTextPad=False, drawSignal=False, grayScale=False):
 
     # -------------------------------------------------------
     # Draw test bkg composition / expected yields hists
@@ -678,27 +697,30 @@ def drawBkgPredictionStack(indir, srNames=None, savename='bkgPrediction_std.pdf'
     y_Zinv = [ (scale*y).round(4) for y in sum(getYieldEInTopoBins(f_Zinv,    srNames, 'metbins'), []) ]
     y_tot  = [ (y1+y2+y3+y4) for y1, y2, y3, y4 in zip(y_2lep, y_1lt, y_1lW, y_Zinv)]
 
-    h_2lep = getSRHistFromYieldE(y_2lep, 'h_SRyields_lostlep' , '', fcolor=r.kAzure+8   if not drawSignal else 16)
-    h_1lW  = getSRHistFromYieldE(y_1lW , 'h_SRyields_1lepTop' , '', fcolor=r.kOrange-2  if not drawSignal else 15)
-    h_1lt  = getSRHistFromYieldE(y_1lt , 'h_SRyields_1lepW'   , '', fcolor=r.kRed-7     if not drawSignal else 13)
-    h_Zinv = getSRHistFromYieldE(y_Zinv, 'h_SRyields_Zinv'    , '', fcolor=r.kMagenta-3 if not drawSignal else 14)
+    h_2lep = getSRHistFromYieldE(y_2lep, 'h_SRyields_lostlep' , '', fcolor=r.kAzure+8   if not grayScale else 16)
+    h_1lW  = getSRHistFromYieldE(y_1lW , 'h_SRyields_1lepTop' , '', fcolor=r.kOrange-2  if not grayScale else 15)
+    h_1lt  = getSRHistFromYieldE(y_1lt , 'h_SRyields_1lepW'   , '', fcolor=r.kRed-7     if not grayScale else 13)
+    h_Zinv = getSRHistFromYieldE(y_Zinv, 'h_SRyields_Zinv'    , '', fcolor=r.kMagenta-3 if not grayScale else 14)
 
     if type(drawSignal) == list:
-        f_T2tt = r.TFile(indir+'/SMS_T2tt_'+ysuf+'.root','read')
-        f_T2bW = r.TFile(indir+'/SMS_T2bW_'+ysuf+'.root','read')
-        f_T2bt = r.TFile(indir+'/SMS_T2bt_'+ysuf+'.root','read')
-        f_bkg = r.TFile(indir+'/allBkg_'+ysuf+'.root','read')
-
+        f_sig = {}
         signals = []
         for signame in drawSignal:
-            sigtype, mstop, mlsp = signame.split('_')
-            mstop = int(mstop)
-            mlsp  = int(mlsp)
-            f_sig = f_T2tt if sigtype == 'T2tt' else f_T2bW if sigtype == 'T2bW' else f_T2bt if sigtype == 'T2bt' else None
-            y_sig = [ (scale*y).round(4) for y in sum(getYieldEInTopoBins3D(f_sig, srNames, mstop, mlsp, 'metbins'), []) ]
+            sigtype = '_'.join(signame.split('_')[:-2])
+            mstop = int(signame.split('_')[-2])
+            mlsp  = int(signame.split('_')[-1])
+            if sigtype not in f_sig: f_sig[sigtype] = r.TFile(indir+'/SMS_{}_{}.root'.format(sigtype, ysuf), 'read')
+            y_sig = [ (scale*y).round(4) for y in sum(getYieldEInTopoBins3D(f_sig[sigtype], srNames, mstop, mlsp, 'metbins'), []) ]
             h_sig = getSRHistFromYieldE(y_sig, 'h_SRyields_'+signame , '', lstyle=1 )
             signals.append(('{}({},{})'.format(sig_label.get(sigtype,'sigtype'),mstop,mlsp), h_sig))
 
+    elif type(drawSignal) == str:
+        signame = drawSignal
+        signals = []
+        f_ttH = r.TFile(indir+'/'+signame+'_'+ysuf+'.root','read')
+        y_sig = [ (scale*y).round(4) for y in sum(getYieldEInTopoBins(f_ttH, srNames, 'metbins'), []) ]
+        h_sig = getSRHistFromYieldE(y_sig, 'h_SRyields_'+signame , '', lstyle=1 )
+        signals.append((signame, h_sig))
 
     # legname = ['t#bar{t}/tW#rightarrow1#font[12]{l}', 'Z#rightarrow#nu#nu', 'W+jets', 'Lost lepton']
     # legname = ['1#font[12]{l} from top', 'Z#rightarrow#nu#nu', '1#font[12]{l} not from top', 'Lost lepton']
@@ -713,6 +735,7 @@ def drawBkgPredictionStack(indir, srNames=None, savename='bkgPrediction_std.pdf'
 
     yrange = [0.1*scale, 5000*scale] if scale != 1.0 else None
 
+    # TODO: to take the size of thie systs from the combine output!!
     systup = [0.0,]*len(y_tot)
     systdn = [0.0,]*len(y_tot)
     for s in ['MC','data']:
@@ -1102,7 +1125,20 @@ if __name__ == '__main__':
     # drawBkgPredictionStack(indir, srNames, 'Results_prefit_test_s21_6.pdf', 'run2', plotData='allData_run2', drawTextPad=True) # results
 
     sig_pts = ['T2tt_1050_100', 'T2bW_950_100', 'T2bt_750_400']
-    drawBkgPredictionStack(indir, srNames, 'Results_prefit_s21_sigs_2.pdf', 'run2', plotData='allData_run2', drawTextPad=True, drawSignal=sig_pts) # signal
+    # drawBkgPredictionStack(indir, srNames, 'Results_prefit_s21_sigs_2.pdf', 'run2', plotData='allData_run2', drawTextPad=True, drawSignal=sig_pts) # signal
+
+    sig_pts = ['T2tt_850_400', 'T2tt_1050_100']
+    # drawBkgPredictionStack(indir, srNames, 'Results_prefit_s21_sigs_3.pdf', 'run2', plotData='allData_run2', drawTextPad=True, drawSignal=sig_pts) # signal
+
+    srNames = ['srA0', 'srA1', 'srA2', 'srB', 'srC', 'srD', 'srE0', 'srE1', 'srE2', 'srE3', 'srF', 'srG0', 'srG1', 'srG2', 'srG3', 'srH',]
+    # drawBkgPredictionStack(indir, srNames, 'Results_prefit_ttH_s7_3.pdf', 'run2', plotData='allData_run2', drawTextPad=True, drawSignal='ttHtoInv') # signal
+    # crNames = [ sr.replace('sr', 'cr2l') for sr in srNames ]
+    # drawBkgCompositionStack(indir, crNames, 'CR2lYields_s7_ttH_1.pdf', plotData=True, drawTextPad=True, drawSignal='ttHtoInv')
+
+    # ttbarDM signals
+    indir = '../StopLooper/output/sampttDM_v32_m10'
+    sig_pts = ['ttbarDM_pseudo_200_1', 'ttbarDM_scalar_100_1']
+    drawBkgPredictionStack(indir, srNames, 'Results_prefit_ttDM_m10_1.pdf', 'run2', plotData='allData_run2', drawTextPad=True, drawSignal=sig_pts) # signal
 
 
     bkgnames = ['2l', '1lW', 'znunu',  '1ltop',]

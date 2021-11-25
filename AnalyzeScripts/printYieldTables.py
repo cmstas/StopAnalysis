@@ -10,7 +10,6 @@ from utilities.errors import *
 from utilities.pytable import Table
 from utilities.yields_utils import *
 
-
 def printTableDataDriven(f, srNames, crname=''):
     if crname != '' and crname[-1] != ' ': crname += ' '
 
@@ -492,6 +491,21 @@ def makeSignalYieldTables(indir, ysuf='run2'):
     printCutFlowTable(f_t2bt, t2bt_sufs, 'selcat',  'selcat_T2bt')
 
 
+def makeSRYieldTable(indir,  ysuf='run2', **kwargs):
+    srNames   = ['srA0', 'srA1', 'srA2', 'srB', 'srC','srD', 'srE0', 'srE1', 'srE2', 'srE3', 'srF', 'srG0', 'srG1', 'srG2', 'srG3', 'srH',]
+    
+    mtype = 'scalar'
+    f_ttdm = r.TFile(indir+'/TTbarDMJets_{}_{}.root'.format(mtype, ysuf),'read')
+    pts_ttdm = [(200,1), (100,1), ]
+
+    makeSigYieldTable(f_ttdm, srNames, pts_ttdm, 'test_ttDM')
+
+    ttdm_sufs = ['_{}_{}'.format(mstop,mlsp) for mstop, mlsp in pts_ttdm]
+    print '------------- T2tt --------------'
+    printCutFlowTable(f_ttdm, ttdm_sufs, 'cutflow', 'cutflow_ttDM_{}_{}'.format(mtype, ysuf))
+    printCutFlowTable(f_ttdm, ttdm_sufs, 'selcat',  'selcat_ttDM_{}_{}'.format(mtype, ysuf))
+
+
 def makeBkgEstimationTableWJets():
     f1 = r.TFile('../StopLooper/output/combRun2_v30_s3/allBkg_run2.root')
 
@@ -728,4 +742,8 @@ if __name__ == '__main__':
     # makeBkgEstimationTableWJets()
     # makeTFComparisonTable()
 
-    makeSignalYieldTables('../StopLooper/output/combRun2_v31_s21_cf4')
+    # makeSignalYieldTables('../StopLooper/output/combRun2_v31_s21_cf4')
+    # makeSRYieldTable('../StopLooper/output/sampttDM_v32_m10_temp')
+    # makeSRYieldTable('../StopLooper/output/sampttDM_v32_m10_tmp2', 's16v3')
+    indir = '../StopLooper/output/samp16_v31_s21_syr'
+    makeBetterPredictionTable(indir, '16', True, False) # result plot!!

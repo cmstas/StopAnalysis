@@ -31,7 +31,7 @@ def MT2PlotMaker(rootdir, samples, data, dirname, plots, output_dir=".", exts=["
         if 'samp18' in rootdir: lumi = 59.7
         if 'Run2'   in rootdir: lumi = 137.2
 
-    if lumi==None:
+    if lumi==None and data!=None:
         if  '16'  in data: lumi = 35.9
         if  '17'  in data: lumi = 41.5
         if  '18'  in data: lumi = 59.7
@@ -177,15 +177,18 @@ def MT2PlotMaker(rootdir, samples, data, dirname, plots, output_dir=".", exts=["
         for i, pl in enumerate(plots):
             if i in skipList: continue
             for spt in sig_points:
-                vn = pl[0]+'_'+spt
+                vn = pl[0]+spt
                 h_sig_vec[i].append( fid.Get(dirnames[0]+"/h_"+vn) )
-                sig_names[i].append( "T2tt_"+spt)
+                sig_names[i].append( signame+spt)
                 if type(h_sig_vec[i][-1])==type(ROOT.TObject()):
                     raise Exception("No {0}/h_{1} histogram for {2}!".format(dirname, vn, signame))
                 h_sig_vec[i][-1].SetDirectory(0)
                 # handle the case with more than one directory
                 for idir in range(1, len(dirnames)):
                     h_sig_vec[i][-1].Add(fid.Get(dirnames[idir]+"/h_"+vn))
+                if len(plots[i]) >= 5:
+                    h_sig_vec[i][-1].Rebin(plots[i][4])
+
         fid.Close()
 
     # make the output directory if it doesn't exist
@@ -207,8 +210,7 @@ def MT2PlotMaker(rootdir, samples, data, dirname, plots, output_dir=".", exts=["
         if len(plots[i]) >= 6:
             doOverflow = plots[i][5]
         markerSize=0.8
-        # title = utils.GetCRName(dirname)
-        title = "p_{T}^{miss} sideband"
+        title = utils.GetCRName(dirname)
         xAxisTitle = h_bkg_vecs[i][0].GetXaxis().GetTitle()
         unit = None
         if xAxisTitle == "":
@@ -232,12 +234,15 @@ def MT2PlotMaker(rootdir, samples, data, dirname, plots, output_dir=".", exts=["
             sns = [utils.GetSampleName(s) for s in samples]
             colors = [utils.GetColor(s) for s in samples]
 
+        # legCoords = (0.60,0.70,0.87,0.895)
+        legCoords = (0.54,0.60,0.87,0.895)
+
         for ext in exts:
             saveAs = os.path.join(output_dir,dirname+tag,"{0}_{1}.{2}".format(dirname,vn,ext))
             ppm.plotDataMC(h_bkg_vecs[i], sns, h_data[i], doPause=False, xAxisTitle=xAxisTitle, lumi=lumi, lumiUnit='fb',
                            title=title, subtitles=subtitles, dataTitle=datatitle, xRangeUser=plots[i][2], isLog=plots[i][1], saveAs=saveAs,
                            scaleMCtoData=scaleMC, xAxisUnit=unit, userMin=userMin, userMax=userMax, doSort=False, customColors=colors,
-                           markerSize=markerSize, titleSize=0.035, subtitleSize=0.033, legCoords=(0.60,0.70,0.87,0.895),
+                           markerSize=markerSize, titleSize=0.035, subtitleSize=0.033, legCoords=legCoords,
                            subLegText=subLegText, subLegTextSize=0.036, doBkgError=True, doOverflow=doOverflow, cmsTextSize=0.04,
                            convertToPoisson=True, drawZeros=False, drawSystematicBand=drawSystematicBand, systematics=systs[i],
                            h_sig_vec=h_sig_vec[i], sig_names=sig_names[i], ratioType=ratioType)
